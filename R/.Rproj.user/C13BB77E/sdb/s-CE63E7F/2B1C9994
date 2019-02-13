@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "sj <- indicator.map %>%\n    filter( !str_detect(indicatorCode,\"Unknown Sex|Unknown Age\"),\n            (\n                period %in% \"2019\"\n                & resultsTargets == \"Targets\"\n                & str_detect(indicatorCode, \n                             paste0(\"TX_CURR(.)+Age/Sex\",\n                                    \"|PMTCT_STAT\\\\|D(.)+Age/Sex\",\n                                    \"|TB_STAT\\\\|D(.)+Age(.)+Sex\",\n                                    \"|VMMC_CIRC(.)+Age(.)+Sex\",\n                                    \"|HTS_SELF(.)+Age/Sex/HIVSelfTest\",\n                                    \"|OVC_SERV(.)+Age/Sex\\\\|\",\n                                    \"|KeyPop\",\n                                    \"|PP_PREV(.)+\\\\|Age/Sex\\\\|\",\n                                    \"|PrEP_NEW(.)+\\\\|Age/Sex\\\\|\",\n                                    \"|GEND_GBV(.)+\\\\|ViolenceServiceType\\\\|\"\n                                    )\n                             )\n            )\n            | (\n                period %in% \"2018\"\n                & resultsTargets == \"Results\"\n                & str_detect(indicatorCode,\n                             paste0(\"PMTCT_STAT\\\\|N(.)+Age/Sex/KnownNewResult\",\n                                    \"|PMTCT_ART\\\\|(.)+NewExistingArt\",\n                                    \"|TB_STAT\\\\|N(.)+Age(.)+Sex(.)+KnownNew\",\n                                    \"|TB_ART\\\\|N(.)+NewExistingArt\",\n                                    \"|TX_TB\\\\|D(.)+TBScreen/NewExistingART\",\n                                    \"|TB_PREV\\\\|D(.)+TherapyType/NewExistingArt\",\n                                    \"|VMMC_CIRC(.)+(Technique|HIVStatus)\",\n                                    \"|VMMC_CIRC\\\\|N\\\\|(DSD|TA)\\\\|Sex\\\\|\",\n                                    \"|HTS_TST(.)+Result\",\n                                    \"|OVC_SERV(.)+(ProgramStatus|Age/Sex\\\\|)\",\n                                    \"|PP_PREV(.)+\\\\|Age/Sex\\\\|\"\n                                    )\n                             )\n            )\n           ) %>%\n    select(period,indicator,numeratorDenom,supportType,disaggregate,resultsTargets,dataelementuid) %>%\n    unique() %>%\n     write.csv(\"/Users/scott/Documents/GitHub/COP-19-Target-Setting/data-raw/DataPackModelElements.csv\",row.names=F)\n\n\n\n\n\n\nAPRmap <- indicator.map %>%\n    select(dataelement,dataelementuid,period,resultsTargets,indicator) %>%\n    unique %>%\n    filter(period %in% c(\"2018\"),\n           indicator %in% c(\"GEND_GBV\",\"KP_MAT\",\"HTS_INDEX\",\"HTS_SELF\",\"HTS_TST\",\"PMTCT_HEI_POS\",\"PMTCT_STAT\",\"PMTCT_STAT\",\"TX_NEW\",\"VMMC_CIRC\",\"TX_CURR\",\"PrEP_NEW\",\"TB_STAT\",\"TB_STAT\",\"OVC_SERV\",\"KP_PREV\",\"PP_PREV\",\"TB_PREV\",\"TX_TB\")) %>%\n    mutate(APR_period = case_when(\n        indicator %in% c(\"HTS_INDEX\",\"HTS_SELF\",\"HTS_TST\",\"PMTCT_HEI_POS\",\"PMTCT_STAT\",\"PMTCT_STAT\",\"TB_STAT\",\"TB_STAT\",\"TX_NEW\",\"VMMC_CIRC\") ~ \"all\",\n        indicator %in% c(\"KP_PREV\",\"PP_PREV\",\"PrEP_NEW\",\"TB_PREV\",\"TX_TB\") ~ \"semi\",\n        indicator %in% c(\"GEND_GBV\",\"KP_MAT\",\"OVC_SERV\",\"TX_CURR\") ~ \"last\",\n        TRUE ~ \"!!\"\n    ),\n    periodicity = case_when(\n        indicator %in% c(\"GEND_GBV\",\"KP_MAT\") ~ \"annual\",\n        indicator %in% c(\"TB_STAT\",\"TB_STAT\",\"OVC_SERV\",\"KP_PREV\",\"PP_PREV\",\"TB_PREV\",\"TX_TB\") ~ \"semi-annual\",\n        indicator %in% c(\"HTS_INDEX\",\"HTS_SELF\",\"HTS_TST\",\"PMTCT_HEI_POS\",\"PMTCT_STAT\",\"PMTCT_STAT\",\"TX_NEW\",\"VMMC_CIRC\",\"TX_CURR\",\"PrEP_NEW\") ~ \"quarterly\",\n        TRUE ~ \"!!\"\n    ),\n    ) %>%\n    write.csv(\"/Users/scott/Documents/GitHub/COP-19-Target-Setting/data-raw/APRperiods.csv\",row.names=F)\n\n\n\n\n",
+    "created" : 1541701566557.000,
+    "dirty" : true,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "1794253774",
+    "id" : "2B1C9994",
+    "lastKnownWriteTime" : 8589934591,
+    "last_content_update" : 1544233735181,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled2"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
