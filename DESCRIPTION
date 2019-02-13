@@ -1,0 +1,21 @@
+Package: datapackr
+Type: Package
+Title: This package packs and unpacks Data Packs
+Version: 0.1.0
+Date: 2019-02-04
+Author: Jason P. Pickering, Scott Jackson, Sam Garman, Sid Dixit
+Maintainer: Scott J. Jackson <sjackson@baosystems.com>
+Description: This package generates and processes PEPFAR Data Packs for use in COP Target Setting.
+License: GPL-2
+Imports:
+    tidyverse,
+    jsonlite,
+    rlist,
+    compare,
+    magrittr,
+    readxl,
+    openxlsx (>= 4.1.0)
+Suggests: testthat,rprojroot, remotes
+LazyData: true
+RoxygenNote: 6.1.1
+Depends: R (>= 3.2.0)
