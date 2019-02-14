@@ -1,6 +1,6 @@
 Package: datapackr
 Type: Package
-Title: A package that packs and unpacks all Data Packs
+Title: A Package that Packs and Unpacks all Data Packs
 Version: 1.1.0
 Date: 2019-02-13
 Authors@R: c(
