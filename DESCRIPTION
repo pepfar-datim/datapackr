@@ -1,19 +1,19 @@
 Package: datapackr
 Type: Package
-Title: A package that packs and unpacks all Data Packs.
+Title: A package that packs and unpacks all Data Packs
 Version: 1.1.0
 Date: 2019-02-13
 Authors@R: c(
     person("Scott", "Jackson", email = "sjackson@baosystems.com",
-        role = c("aut", "cre", "itr")),
+        role = c("aut", "cre")),
     person("Jason", "Pickering", email = "jason.p.pickering@gmail.com",
-        role = c("aut","led")),
+        role = c("aut")),
     person("Sam", "Garman", email = "sgarman@baosystems.com",
-        role = c("aut", "dtm","res", "wdc")),
+        role = c("aut")),
     person("Sid", "Dixit", , "sdixit@baosystems.com",
-        role = c("aut","prg","res","ppt")),
+        role = c("aut")),
     person("William", "Shiflett", , "wshiflett@guidehouse.com",
-        role = c("ctb","chr","lyr"))
+        role = c("ctb"))
   )
 Description: Generates and processes PEPFAR Data Packs and Site Tools.
 URL: https://github.com/pepfar-datim/datapackr
