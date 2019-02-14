@@ -11,6 +11,14 @@
 #' outputs to be saved.
 #' @param secrets A local path directing to a file containing DATIM login
 #' credentials. See Details for more explanation.
+#' @param export_FAST If TRUE, will extract and output to \code{output_path} a
+#' CSV file of data needed for the PEPFAR FAST Tool. 
+#' @param archive_results If TRUE, will output to \code{output_path} a compiled
+#' \code{datapack} list object containing all results and warning messages from
+#' processing the selected Data Pack or Site Tool.
+#' @param export_SUBNAT_IMPATT If TRUE, will extract and output to 
+#' \code{output_path} a DATIM import file containing all SUBNAT and IMPATT data
+#' from the selected Data Pack.
 #'
 #' @details
 #' Executes the following operations in relation to a submitted Data Pack:
@@ -54,7 +62,12 @@
 #' }
 #'
 #' To log into other instances of DATIM, alter the \code{baseurl}.
-unPackData <- function(support_files_path, output_path, secrets) {
+unPackData <- function(support_files_path,
+                       output_path,
+                       secrets,
+                       export_FAST = TRUE,
+                       archive_results = TRUE,
+                       export_SUBNAT_IMPATT = TRUE) {
 
   # Create data train for use across remainder of program
     d <- list(
@@ -95,40 +108,54 @@ unPackData <- function(support_files_path, output_path, secrets) {
 
   # Package FAST export
     d <- FASTforward(d)
-    #TODO add parameter above for whether to export FAST data
-    d$keychain$FAST_file_name <- paste0(
-      d$keychain$output_path,
-      if (is.na(stringr::str_extract(d$keychain$output_path,"/$"))) {"/"} else {},
-      d$info$datapack_name,"_",
-      "FASTExport_",
-      format(Sys.time(), "%Y%m%d%H%M%S"),
-      ".csv"
-    )
-    readr::write_csv(d$data$FAST, d$keychain$FAST_file_name)
-    print(paste0("Successfully saved FAST export to ", d$keychain$FAST_file_name))
+    if (export_FAST == TRUE) {
+        d$keychain$FAST_file_name <- paste0(
+          d$keychain$output_path,
+          if (is.na(stringr::str_extract(d$keychain$output_path,"/$"))) {"/"} else {},
+          d$info$datapack_name,"_",
+          "FASTExport_",
+          format(Sys.time(), "%Y%m%d%H%M%S"),
+          ".csv"
+        )
+        readr::write_csv(d$data$FAST, d$keychain$FAST_file_name)
+        print(paste0("Successfully saved FAST export to ", d$keychain$FAST_file_name))
+    }
 
   # Package SUBNAT/IMPATT export
     d <- packSUBNAT_IMPATT(d)
 
-  #TODO add parameter above for whether to export SUBNAT/IMPATT data
-    d$keychain$SUBNAT_IMPATT_filename <- paste0(
-      d$keychain$output_path,
-      if (is.na(stringr::str_extract(d$keychain$output_path,"/$"))) {"/"} else {},
-      d$info$datapack_name,"_",
-      "SUBNAT_IMPATT_Export_",
-      format(Sys.time(), "%Y%m%d%H%M%S"),
-      ".csv"
-    )
-    readr::write_csv(d$datim$SUBNAT_IMPATT, d$keychain$SUBNAT_IMPATT_filename)
-    print(paste0("SUBNAT/IMPATT data is ready for DATIM import and available here: ", d$keychain$SUBNAT_IMPATT_filename))
+    if (export_SUBNAT_IMPATT == TRUE) {
+        d$keychain$SUBNAT_IMPATT_filename <- paste0(
+          d$keychain$output_path,
+          if (is.na(stringr::str_extract(d$keychain$output_path,"/$"))) {"/"} else {},
+          d$info$datapack_name,"_",
+          "SUBNAT_IMPATT_Export_",
+          format(Sys.time(), "%Y%m%d%H%M%S"),
+          ".csv"
+        )
+        readr::write_csv(d$datim$SUBNAT_IMPATT, d$keychain$SUBNAT_IMPATT_filename)
+        print(paste0("SUBNAT/IMPATT data is ready for DATIM import and available here: ", d$keychain$SUBNAT_IMPATT_filename))
+    }
 
   # If warnings, show all grouped by sheet and issue
-    if(!is.null(d$info$warningMsg)) {
+    if (!is.null(d$info$warningMsg)) {
       options(warning.length = 8170)
       warning(paste0("
                      ",d$info$warningMsg))
     }
 
-  #TODO Archive entire d object as rds for records
+    if (archive_results == TRUE) {
+      archive <- paste0(
+        d$keychain$output_path,
+        if (is.na(stringr::str_extract(d$keychain$output_path,"/$"))) {"/"} else {},
+        d$info$datapack_name,"_",
+        "Results_Archive",
+        format(Sys.time(), "%Y%m%d%H%M%S"),
+        ".rds"
+      )
+      saveRDS(d, file = archive)
+    }
+    
+    return(d)
 
 }

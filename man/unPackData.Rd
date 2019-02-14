@@ -4,7 +4,8 @@
 \alias{unPackData}
 \title{Unpack a submitted Data Pack}
 \usage{
-unPackData(support_files_path, output_path, secrets)
+unPackData(support_files_path, output_path, secrets, export_FAST = TRUE,
+  archive_results = TRUE, export_SUBNAT_IMPATT = TRUE)
 }
 \arguments{
 \item{support_files_path}{A local path directing to a folder containing
@@ -15,6 +16,17 @@ outputs to be saved.}
 
 \item{secrets}{A local path directing to a file containing DATIM login
 credentials. See Details for more explanation.}
+
+\item{export_FAST}{If TRUE, will extract and output to \code{output_path} a
+CSV file of data needed for the PEPFAR FAST Tool.}
+
+\item{archive_results}{If TRUE, will output to \code{output_path} a compiled
+\code{datapack} list object containing all results and warning messages from
+processing the selected Data Pack or Site Tool.}
+
+\item{export_SUBNAT_IMPATT}{If TRUE, will extract and output to 
+\code{output_path} a DATIM import file containing all SUBNAT and IMPATT data
+from the selected Data Pack.}
 }
 \description{
 Processes a submitted Data Pack (in .xlsx format) by identifying integrity
