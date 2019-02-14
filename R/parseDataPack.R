@@ -465,14 +465,14 @@ unPackSheets <- function(d) {
 unPackSNUxIM <- function(d) {
     msg <- NULL
 
-    nms <- names(readxl::read_excel(path = d$keychain$submission_path,
+    col_num <- length(readxl::read_excel(path = d$keychain$submission_path,
                                     sheet = "SNU x IM",
                                     range = readxl::cell_rows(5)))
-    ct <- c(rep("text",8),rep("numeric",length(nms)-8))
+    ct <- c(rep("text",8),rep("numeric",col_num-8))
 
     d$data$SNUxIM <- readxl::read_excel(path = d$keychain$submission_path,
                                         sheet = "SNU x IM",
-                                        range = readxl::cell_limits(c(5,1), c(NA, NA)),
+                                        range = readxl::cell_limits(c(5,1), c(NA, col_num)),
                                         col_types = ct) %>%
         dplyr::select(dplyr::one_of(c("PSNU","sheet_name","indicatorCode","CoarseAge","Sex","KeyPop","DataPackTarget","Dedupe")),
                       dplyr::matches("(\\d){2,}")) %>%
@@ -502,7 +502,8 @@ unPackSNUxIM <- function(d) {
             dplyr::group_by(PSNU, sheet_name, indicatorCode, CoarseAge, Sex, KeyPop) %>%
             dplyr::mutate(distribution = value / sum(value)) %>%
             dplyr::ungroup() %>%
-            dplyr::mutate(psnuid = stringr::str_extract(PSNU,"(?<=\\()([A-Za-z][A-Za-z0-9]{10})(?=\\)$)")) %>%
+            dplyr::mutate(psnuid = stringr::str_extract(PSNU,"(?<=\\()([A-Za-z][A-Za-z0-9]{10})(?=\\)$)"),
+                          mechanismCode = stringr::str_extract(mechanismCode, "(\\d{1,6})|Dedupe")) %>%
             dplyr::select(PSNU, psnuid, sheet_name, indicatorCode, CoarseAge, Sex, KeyPop, mechanismCode, distribution)
 
     # Bundle warnings by Sheet name
