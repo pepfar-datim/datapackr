@@ -191,8 +191,8 @@ mapIndicators <- function() {
         save(template_schema, file = "./data/template_schema.rda")
 
     ## Valid Data Pack Disaggs
-        validDPDisaggs <- validDPDisaggs()
-        save(validDPDisaggs, file = "./data/validDPDisaggs.rda")
+        valid_dp_disaggs <- validDPDisaggs()
+        saveRDS(valid_dp_disaggs, file = "./data/valid_dp_disaggs.rds")
 
     ## Prioritization Dictionary
         prioritizations <- prioritizationDict()
