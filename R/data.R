@@ -59,7 +59,7 @@
 #'   \item{isMil}{Logical (1/0) field documenting whether the unit listed in 
 #'   \code{countryName} is a Military node.}
 #' }
-"configFile.rda"
+"configFile"
 
 #' @docType data
 #' @title Map of Data Pack dataelements and categoryoptioncombos.
@@ -91,7 +91,7 @@
 #'   combination of all disaggregates (Age, Sex, KP, etc.) for each
 #'   \code{indicatorCode}}
 #' }
-"indicatorMap.rda"
+"indicatorMap"
 
 #' @docType data
 #' @title Mapping of DATIM Prioritization numerals to strings.
@@ -104,12 +104,14 @@
 #'   \item{value}{Numeral associated with DATIM Prioritization.}
 #'   \item{Prioritization}{Name associated with DATIM Prioritization}
 #' }
-"prioritizations.rda"
+"prioritizations"
 
 #' @docType data
-#' @title 
+#' @title Schema describing correct structure of Data Pack template. 
 #'
-#' @description 
+#' @description This schema describes the correct structure of a Data Pack
+#' file, generated from the template used to produce Data Packs and useful in
+#' validating Data Packs passed through datapackr.
 #'
 #' @format 
 #' \describe{
@@ -118,7 +120,7 @@
 #'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack
 #'   and Site Tool.}
 #'   \item{col}{Value describing the column position of each 
-#'   \code{indicatorCode}.)
+#'   \code{indicatorCode}.}
 #'   \item{indicatorCode}{Code used in the Data Pack and Site Tool to uniquely
 #'   identify each distinct programmatic area of target setting.}
 #'   \item{colType}{Flags whether an \code{indicatorCode} is a FY20 Target
@@ -127,12 +129,11 @@
 #'   \code{colType} field, documents the dataset, either "MER", "IMPATT", or
 #'   "SUBNAT"}
 #' }
-"template_schema.rda"
+"template_schema"
 
 #' @docType data
 #' @title Lists valid disaggs for each Data Pack and Site Tool tab.
 #'
 #' @description For each Site Tool and Data Pack sheet/tab, lists the Ages,
 #' Sexes, and KPs allowed.
-#' }
-"valid_dp_disaggs.rds"
+"valid_dp_disaggs"
