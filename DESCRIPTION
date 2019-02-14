@@ -1,21 +1,46 @@
 Package: datapackr
 Type: Package
-Title: This package packs and unpacks Data Packs
-Version: 0.1.0
-Date: 2019-02-04
-Author: Jason P. Pickering, Scott Jackson, Sam Garman, Sid Dixit
-Maintainer: Scott J. Jackson <sjackson@baosystems.com>
-Description: This package generates and processes PEPFAR Data Packs for use in COP Target Setting.
-License: GPL-2
+Title: A package that packs and unpacks all Data Packs.
+Version: 1.1.0
+Date: 2019-02-13
+Authors@R: c(
+    person("Scott", "Jackson", email = "sjackson@baosystems.com",
+        role = c("aut", "cre", "itr")),
+    person("Jason", "Pickering", email = "jason.p.pickering@gmail.com",
+        role = c("aut","led")),
+    person("Sam", "Garman", email = "sgarman@baosystems.com",
+        role = c("aut", "dtm","res", "wdc")),
+    person("Sid", "Dixit", , "sdixit@baosystems.com",
+        role = c("aut","prg","res","ppt")),
+    person("William", "Shiflett", , "wshiflett@guidehouse.com",
+        role = c("ctb","chr","lyr"))
+  )
+Description: Generates and processes PEPFAR Data Packs and Site Tools.
+URL: https://github.com/pepfar-datim/datapackr
+BugReports: https://github.com/pepfar-datim/datapackr
+Depends: R (>= 3.2.0)
 Imports:
-    tidyverse,
-    jsonlite,
-    rlist,
-    compare,
-    magrittr,
-    readxl,
-    openxlsx (>= 4.1.0)
-Suggests: testthat,rprojroot, remotes
+    dplyr (>= 0.7.8),
+    tidyr (>= 0.8.2),
+    tidyxl (>= 1.0.4),
+    readxl (>= 1.2.0),
+    readr (>= 1.3.1),
+    jsonlite (>= 1.6),
+    datimvalidation,
+    purrr (>= 0.3.0),
+    tibble (>= 2.0.1),
+    stringr (>= 1.4.0),
+    httr (>= 1.4.0),
+    rlist (>= 0.4.6.1),
+    magrittr (>= 1.5),
+    devtools (>= 2.0.1),
+    openxlsx (>= 4.1.1)
+Suggests:
+    testthat,
+    rprojroot,
+    remotes
+Remotes: jason-p-pickering/datimvalidation
+License: GPL-2
+Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
-Depends: R (>= 3.2.0)

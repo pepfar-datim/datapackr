@@ -1,13 +1,12 @@
-selectOU <- function() {
-    ous <- datapackr::configFile %>%
-        select(DataPack_name) %>%
-        unique()
-    promptText<-paste0("Please select the OU this Data Pack is associated with [1-",nrow(ous),"]:")
-    print(promptText)
-    selection <- select.list(ous$DataPack_name,multiple=FALSE)
-    return(selection)
-}
-
+#' @importFrom magrittr %>% %<>%
+#' @title checkOUinfo(d)
+#'
+#' @description Cross-checks and updates PEPFAR Operating Unit name and id as
+#'  read from Data Pack or Site Tool submission file.
+#'  
+#' @param d datapackr list object containing at least d$keychain$submission_path.
+#' @return A datapackr list object, \code{d}, storing a unique UID and Name for
+#'    the PEPFAR Operating Unit related to the submitted Data Pack or Site Tool.
 checkOUinfo <- function(d) {
     # Get OU name and uid
         d$info$datapack_uid <- names(readxl::read_excel(d$keychain$submission_path, sheet = "Home", range = "B25"))
@@ -24,7 +23,7 @@ checkOUinfo <- function(d) {
             dplyr::filter(DataPack_name == d$info$datapack_name) %>%
             dplyr::select(model_uid) %>%
             unique() %>%
-            pull(model_uid)
+            dplyr::pull(model_uid)
 
     # If OU name and UID do not match, force identification via user prompt in Console
         if(d$info$datapack_name != datapack_name | d$info$datapack_uid != datapack_uid) {
@@ -37,12 +36,23 @@ checkOUinfo <- function(d) {
                 dplyr::filter(DataPack_name == d$info$datapack_name) %>%
                 dplyr::select(model_uid) %>%
                 unique() %>%
-                pull(model_uid)
+                dplyr::pull(model_uid)
         }
 
     return(d)
 }
 
+
+#' @importFrom magrittr %>% %<>%
+#' @title checkWorkbookStructure(d)
+#'
+#' @description Checks structural integrity of tabs for submitted Data Pack or
+#'    Site Tool.
+#'  
+#' @param d datapackr list object containing at least d$keychain$submission_path
+#'     & d$info$warningMsg.
+#' @return A datapackr list object, \code{d}, storing a warning message of all
+#'    issues related to Data Pack or Site Tool tab names or order.
 checkWorkbookStructure <- function(d) {
 # Check structural integrity of Workbook tabs
     msg <- NULL
@@ -50,7 +60,9 @@ checkWorkbookStructure <- function(d) {
     submission_sheets <- readxl::excel_sheets(d$keychain$submission_path) %>%
         tibble::as_tibble() %>%
         dplyr::select(sheet_name = value) %>%
-        dplyr::filter(!sheet_name %in% c("Home","Quotes","Summary","Spectrum","Validations")) %>%
+        dplyr::filter(
+          !sheet_name %in% c("Home","Quotes","Summary","Spectrum","Validations")
+          ) %>%
         dplyr::mutate(submission_order = as.integer(1:n()+4))
 
     # Check all tabs present and accounted for
@@ -115,6 +127,17 @@ checkWorkbookStructure <- function(d) {
 
 }
 
+
+#' @importFrom magrittr %>% %<>%
+#' @title checkColStructure(d)
+#'
+#' @description Checks structural integrity of columns on critical sheets for
+#'    submitted Data Pack or Site Tool.
+#'  
+#' @param d datapackr list object containing at least d$data$extract,
+#'     d$data$sheet & d$info$warningMsg.
+#' @return A datapackr list object, \code{d}, storing a warning message of all
+#'    issues related to Data Pack or Site Tool columns names or order.
 checkColStructure <- function(d) {
 # Check column structure
     msg <- NULL
@@ -181,6 +204,18 @@ checkColStructure <- function(d) {
     return(d)
 }
 
+
+#' @importFrom magrittr %>% %<>%
+#' @title defunctDisaggs(d)
+#'
+#' @description Checks data extracted from a sheet in a submitted Data Pack or
+#'    Site Tool to identify cases where invalid Disaggregate combinations have
+#'    been used.
+#'  
+#' @param d datapackr list object containing at least d$data$extract of data
+#'     from a single sheet in submission file.
+#' @return A datapackr list object, \code{d}, storing a dataframe of defunct
+#'    disaggs used in a specific sheet.
 defunctDisaggs <- function(d) {
 
     defunct <- d$data$extract %>%
@@ -196,7 +231,7 @@ defunctDisaggs <- function(d) {
                 | (stringr::str_detect(indicatorCode, "KP_PREV")
                         & !KeyPop %in% c("Female PWID","Male PWID","FSW","MSM not SW","MSM SW","People in prisons and other enclosed settings","TG not SW","TG SW"))
                 | (stringr::str_detect(indicatorCode, "PRIORITY_SNU") & !value %in% (datapackr::prioritizations %>%
-                                                                                      pull(value)))
+                                                                                      dplyr::pull(value)))
                 | (stringr::str_detect(indicatorCode, "OVC_HIVSTAT|OVC_SERV") & !Age %in% c("<01","01-04","05-09","10-14","15-17","18+"))
                 | (stringr::str_detect(indicatorCode, "VMMC") & (Age %in% c("<01","01-04","05-09") | Sex == "Female"))
         ) %>%
@@ -206,6 +241,21 @@ defunctDisaggs <- function(d) {
     return(defunct)
 }
 
+
+#' @importFrom magrittr %>% %<>%
+#' @title unPackSheet(d)
+#'
+#' @description Within a submitted Data Pack or Site Tool (directed to by 
+#'    \code{d$keychain$submission_path}), extract data from a single sheet specified
+#'    in \code{d$data$sheet}.
+#'  
+#' @param d datapackr list object containing at least
+#'     \code{d$keychain$submission_path},
+#'     \code{d$data$sheet}, & \code{d$info$warningMsg}.
+#' @return A datapackr list object, \code{d}, storing a dataframe of extracted
+#'    data (\code{d$data$extract}) and a warning message
+#'    (\code{d$info$warningMsg}) compiled with errors discovered while
+#'    extracting data from sheet specified in \code{d$data$sheet}.
 unPackSheet <- function(d) {
 
     addcols <- function(data, cname) {
@@ -225,9 +275,9 @@ unPackSheet <- function(d) {
 
     # List FY20 Target Columns
         targetCols <- datapackr::template_schema %>%
-            filter(sheet_name == d$data$sheet,
+            dplyr::filter(sheet_name == d$data$sheet,
                    colType == "FY20 Target") %>%
-            pull(indicatorCode)
+            dplyr::pull(indicatorCode)
 
     # Add cols to allow compiling with other sheets
         d$data$extract %<>%
@@ -318,6 +368,21 @@ unPackSheet <- function(d) {
     return(d)
 }
 
+
+#' @importFrom magrittr %>% %<>%
+#' @title separateDataSets(d)
+#'
+#' @description After data has been extracted from all sheets in a Data Pack or
+#'     Site Tool, this function separates datasets by either \code{MER} or
+#'     \code{SUBNAT/IMPATT} and removes elements of \code{d} that are no longer
+#'     necessary (\code{targets}, \code{extract}, and \code{sheet})
+#'  
+#' @param d datapackr list object containing at least \code{d$data$targets}.
+#' @return A datapackr list object, \code{d}, storing at least 2 dataframes of
+#'    data extracted from submitted Data Pack or Site Tool: a \code{d$data$MER}
+#'    dataframe containing all MER data to be distributed to site level, and/or
+#'    \code{d$data$SUBNAT_IMPATT} containing data in the SUBNAT and IMPATT
+#'    datasets from DATIM that can be imported into DATIM at the PSNU level.
 separateDataSets <- function(d) {
 
     d$data$MER <- d$data$targets %>%
@@ -339,6 +404,23 @@ separateDataSets <- function(d) {
     return(d)
 }
 
+
+#' @importFrom magrittr %>% %<>%
+#' @title unPackSheets(d)
+#'
+#' @description Loops through all critical sheets in a submitted Data Pack or
+#'     Site Tool and executes \code{\link{unPackSheet}} to extract data, then 
+#'     compiles data into single flat dataframe. Also executes
+#'     \code{\link{separateDataSets}} to separate single dataframe into at least
+#'     two for \code{MER} and \code{SUBNAT/IMPATT}.
+#'  
+#' @param d datapackr list object containing at least
+#'     \code{d$keychain$submission_path}.
+#' @return A datapackr list object, \code{d}, storing at least 2 dataframes of
+#'    data extracted from submitted Data Pack or Site Tool: a \code{d$data$MER}
+#'    dataframe containing all MER data to be distributed to site level, and/or
+#'    \code{d$data$SUBNAT_IMPATT} containing data in the SUBNAT and IMPATT
+#'    datasets from DATIM that can be imported into DATIM at the PSNU level.
 unPackSheets <- function(d) {
     # Get sheets list
         sheets <- datapackr::template_schema %>%
@@ -363,6 +445,23 @@ unPackSheets <- function(d) {
     return(d)
 }
 
+
+#' @importFrom magrittr %>% %<>%
+#' @title unPackSNUxIM(d)
+#'
+#' @description Looks inside submitted Data Pack to extract SNU x IM data from
+#'     \code{SNU x IM} tab and restructure this to be ready for cross-
+#'     pollination with PSNU-level MER data coming from
+#'     \code{\link{unPackSheets}}. This data is also analyzed to identify
+#'     structural or data anomalies and print any issues into running Warning
+#'     Message queue.
+#'  
+#' @param d datapackr list object containing at least
+#'     \code{d$keychain$submission_path}.
+#' @return A datapackr list object, \code{d}, storing at least 1 dataframe of
+#'    data extracted from the \code{SNU x IM} tab in a submitted Data Pack or
+#'    Site Tool, as well as a running Warning Message queue string,
+#'    \code{d$info$warningMsg}
 unPackSNUxIM <- function(d) {
     msg <- NULL
 
@@ -397,7 +496,7 @@ unPackSNUxIM <- function(d) {
     # Create distribution matrix
         d$data$SNUxIM %<>%
             dplyr::filter(DataPackTarget != 0 & sum != 0) %>%
-            select(-DataPackTarget, -sum) %>%
+            dplyr::select(-DataPackTarget, -sum) %>%
             tidyr::gather(key = "mechanismCode", value = "value", -PSNU, -sheet_name, -indicatorCode, -CoarseAge, -Sex, -KeyPop) %>%
             tidyr::drop_na(value) %>%
             dplyr::group_by(PSNU, sheet_name, indicatorCode, CoarseAge, Sex, KeyPop) %>%
@@ -417,6 +516,18 @@ unPackSNUxIM <- function(d) {
     return(d)
 }
 
+
+#' @importFrom magrittr %>% %<>%
+#' @title rePackSNUxIM(d)
+#'
+#' @description Takes the output of the \code{\link{unPackSNUxIM}} and 
+#'     \code{\link{unPackSheets}} functions and delicatety combines these to create
+#'     a single dataframe at the PSNU x IM level.
+#'  
+#' @param d datapackr list object containing at least \code{d$keychain$MER} and
+#'     \code{d$data$SNUxIM}
+#' @return A datapackr list object, \code{d}, storing at least 1 dataframe of
+#'    data at the SNU x IM level, \code{d$data$distributedMER}.
 rePackPSNUxIM <- function(d) {
     d$data$distributedMER <- d$data$MER %>%
         dplyr::mutate(
@@ -446,6 +557,19 @@ rePackPSNUxIM <- function(d) {
     return(d)
 }
 
+
+#' @importFrom magrittr %>% %<>%
+#' @title FASTforward(d)
+#'
+#' @description Takes the output of the \code{\link{unPackSheets}} function and
+#'     recompiles this to contain only data relevant for and in same structure
+#'     as the PEPFAR FAST Tool.
+#'  
+#' @param d datapackr list object containing at least
+#'     \code{d$data$distributedMER}.
+#' @return A datapackr list object, \code{d}, storing at least 1 dataframe of
+#'    data structured for ingestion into the PEPFAR FAST Tool,
+#'    \code{d$data$FAST}.
 FASTforward <- function(d) {
     d$data$FAST <- d$data$distributedMER %>%
         dplyr::filter(
@@ -488,12 +612,25 @@ FASTforward <- function(d) {
     return(d)
 }
 
+
+#' @importFrom magrittr %>% %<>%
+#' @title packSUBNAT_IMPATT(d)
+#'
+#' @description Takes the outputs of the \code{\link{unPackSheets}} function and
+#'     recompiles the dataframe containing SUBNAT and IMPATT data,
+#'     \code{d$data$SUBNAT_IMPATT} into a standard DATIM import file.
+#'  
+#' @param d datapackr list object containing at least
+#'     \code{d$data$SUBNAT_IMPATT}.
+#' @return A datapackr list object, \code{d}, storing at least 1 dataframe of
+#'    SUBNAT & IMPATT data (\code{d$datim$SUBNAT_IMPATT}) ready for DATIM
+#'    ingestion.
 packSUBNAT_IMPATT <- function(d) {
     d$datim$SUBNAT_IMPATT <- d$data$SUBNAT_IMPATT %>%
         dplyr::left_join(
             (datapackr::indicatorMap %>%
-                 filter(dataset %in% c("SUBNAT","IMPATT")) %>%
-                 select(sheet_name, indicatorCode, Age = validAges, Sex = validSexes, KeyPop = validKPs, dataelementuid, categoryoptioncombouid))
+                 dplyr::filter(dataset %in% c("SUBNAT","IMPATT")) %>%
+                 dplyr::select(sheet_name, indicatorCode, Age = validAges, Sex = validSexes, KeyPop = validKPs, dataelementuid, categoryoptioncombouid))
             ) %>%
         tidyr::drop_na(dataelementuid,categoryoptioncombouid,value) %>%
         dplyr::mutate(value = round_trunc(value),

@@ -675,7 +675,7 @@ DRC_PSNU_Patch <- function(d) {
                 is.na(IMPATT.PRIORITY_SNU.20T) ~ "DROP",
                 TRUE ~ IMPATT.PRIORITY_SNU.20T)) %>%
         dplyr::filter(IMPATT.PRIORITY_SNU.20T != "DROP" | is.na(IMPATT.PRIORITY_SNU.20T)) %>%
-        select(-IMPATT.PRIORITY_SNU.20T)
+        dplyr::select(-IMPATT.PRIORITY_SNU.20T)
 
     return(PSNUs)
 
@@ -721,7 +721,7 @@ getPSNUs <- function(d) {
             jsonlite::fromJSON(., flatten = TRUE)
         PSNUs <- as.data.frame(PSNUs$rows,stringsAsFactors = FALSE) %>%
             setNames(.,PSNUs$headers$name) %>%
-            select(country = operating_unit, uid, name) %>%
+            dplyr::select(country = operating_unit, uid, name) %>%
             unique()
 
     # Add new new countries as PSNUs
