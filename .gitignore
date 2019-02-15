@@ -1,3 +1,8 @@
 .Rproj.user
 .Rhistory
 .RData
+.Ruserdata
+packrat/lib*/
+.R_Cache/
+.DS_Store
+Icon
