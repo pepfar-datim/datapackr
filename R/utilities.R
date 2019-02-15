@@ -25,6 +25,7 @@ round_trunc <- function(x) {
 #' @export
 #' @title Use the console to select OU
 #' @importFrom magrittr %>%
+#' @importFrom utils select.list
 #'
 #' @description
 #' In some cases it may be necessary to manually identify the Operating Unit
