@@ -25,7 +25,7 @@ round_trunc <- function(x) {
 #' @export
 #' @title Use the console to select OU
 #' @importFrom magrittr %>%
-#'
+#' @importFrom utils select.list
 #' @description
 #' In some cases it may be necessary to manually identify the Operating Unit
 #' associated with a submitted Data Pack or Site Tool. This function allows
@@ -42,6 +42,6 @@ selectOU <- function() {
     dplyr::distinct()
   promptText<-paste0("Please select the OU this file is associated with [1-",nrow(ous),"]:")
   print(promptText)
-  selection <- select.list(ous$DataPack_name,multiple=FALSE)
+  selection <- utils::select.list(ous$DataPack_name,multiple=FALSE)
   return(selection)
 }

@@ -1,2 +1,14 @@
+^codecov\.yml$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^.travis\.yml
+NEWS\.md
+gh-pages/
+man-roxygen/
+Makefile
+.git/
+.editorconfig
+.idea
+.idea/.name
+^packrat/
+^\.Rprofile$

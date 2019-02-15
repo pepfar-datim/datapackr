@@ -1,4 +1,8 @@
-#'  datapackr: a grammar of Data Pack manipulation
+#' @docType package
+#' @name datapackr
+#' @title Data Pack on R
+#'
+#' datapackr: a grammar of Data Pack manipulation
 #'
 #'
 #' datapackr is the engine behind PEPFAR Data Packs, a tool used annually to
@@ -14,3 +18,35 @@
 #' }
 #'
 #'
+if (getRversion() >= "2.15.1")
+  utils::globalVariables(
+    c(
+      "indicatorCode",
+      ".",
+      "mechanismCode",
+      "indicator",
+      "disag",
+      "value",
+      "mechanismid",
+      "n",
+      "sheet_name",
+      "indicatorCode",
+      "template_order",
+      "submission_order",
+      "order_check",
+      "model_uid",
+      "sheet_num",
+      "dataset",
+      "dataelementuid",
+      "categoryoptioncombouid",
+      "period",
+      "dataelement",
+      "attributeoptioncombo",
+      "orgunit",
+      "psnuid",
+      "categoryoptioncombo",
+      "distribution",
+      "row_id",
+      "msg"
+    )
+  )
