@@ -46,3 +46,46 @@ selectOU <- function() {
   selection <- utils::select.list(ous$DataPack_name,multiple=FALSE)
   return(selection)
 }
+
+
+
+#' @export
+#' @title Log into DATIM using DATIM credentials
+#'
+#' @description
+#' Using provided DATIM credentials, logs into DATIM to allow other functions to
+#' retrieve data from DATIM as needed. Can also be used to log into
+#' non-production instances of DATIM. See Details for explanation.
+#' 
+#' @param secrets A local path directing to a file containing DATIM login
+#' credentials. See Details for more explanation.
+#' 
+#' @details
+#' To securely connect with DATIM, use a secrets JSON file structured as follows:
+#'
+#' \preformatted{
+#' {
+#'   "dhis": {
+#'       "baseurl": "https://www.datim.org/",
+#'       "username": "example",
+#'       "password": "3x@mpl3!"
+#'    }
+#'  }
+#' }
+#' 
+#' Replace the username and password with yours, and save this file in a secure
+#' location on your computer. For more details about how to setup a hidden
+#' folder or file on your operating system, see:
+#' https://www.howtogeek.com/194671/how-to-hide-files-and-folders-on-every-operating-system/
+#' 
+#' You can also save multiple versions of this login file to allow login to
+#' multiple instances of DATIM. For example, a document saved as devDATIM.json:
+#' \preformatted{
+#' {
+#'   "dhis": {
+#'       "baseurl": "https://dev.datim.org/",
+#'       "username": "example",
+#'       "password": "3x@mpl3!"
+#'    }
+#'  }
+#' }
