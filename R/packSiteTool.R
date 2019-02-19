@@ -7,7 +7,7 @@
 #' Site Tool from scratch and writes data into it, along with all other data
 #' for Site Tool features.
 #' 
-#' @param 
+#' @param d A datapackr list object.
 #' 
 #' @details
 #' Executes the following operations:
@@ -29,6 +29,9 @@
 #' }
 #'
 packSiteTool <- function(d) {
+  
+  # Make sure login creds allow export of data from DATIM for specified OU
+  
   
   # Distribute Data Pack data to Site x IM
   

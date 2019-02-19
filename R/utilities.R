@@ -46,3 +46,60 @@ selectOU <- function() {
   selection <- utils::select.list(ous$DataPack_name,multiple=FALSE)
   return(selection)
 }
+
+
+
+#' @export
+#' @title Pull IMPATT levels from DATIM for all PEPFAR countries
+#' 
+#' @description 
+#' Queries DATIM to retrieve the latest version of
+#' \code{/api/dataStore/dataSetAssignments/ous}
+#' 
+#' @return Dataframe of country metadata, including prioritization, planning,
+#' country, community, and facility levels in DATIM organization hierarchy.
+#'
+getIMPATTLevels <- function(){
+  
+  datapackr::loginToDATIM(secrets)
+  
+  impatt_levels <-
+    paste0(getOption("baseurl"),"api/",datapackr::api_version(),
+           "dataStore/dataSetAssignments/ous") %>%
+    httr::GET() %>%
+    httr::content(., "text") %>%
+    jsonlite::fromJSON(., flatten = TRUE) %>%
+    do.call(rbind.data.frame, .) %>%
+    dplyr::select(operating_unit = name3, country_name = name4, dplyr::everything()) %>%
+    dplyr::mutate_if(is.factor, as.character) %>%
+    dplyr::mutate(country_name =
+                    dplyr::case_when(country_name == "" ~ operating_unit,
+                                     TRUE ~ country_name))
+  
+  return(impatt_levels)
+}
+
+
+#' @export
+#' @title Pull all _Military nodes from DATIM for all PEPFAR countries
+#' 
+#' @description 
+#' Queries DATIM (\code{api/organisationUnits}) to retrieve the latest list of
+#' _Military nodes for each PEPFAR country.
+#' 
+#' @return Dataframe of _Military names and ids, with associated Operating Units
+#' and Countries.
+#' 
+getMilitaryNodes <- function() {
+  militaryNodes <- paste0(getOption("baseurl"),"api/",datapackr::api_version(),
+                          "/organisationUnits.json?paging=false",
+                          "&filter=organisationUnitGroups.id:eq:nwQbMeALRjL",
+                          "&fields=name,id,level,ancestors[id,name]") %>%
+    httr::GET() %>%
+    httr::content(., "text") %>%
+    jsonlite::fromJSON(., flatten = TRUE) %>%
+    do.call(rbind.data.frame, .) %>%
+  # Tag Operating Unit and Country (name & id) - accommodate for eventuality of
+  #    _Military at level 5 in Regional OUs
+    dplyr::mutate()
+}

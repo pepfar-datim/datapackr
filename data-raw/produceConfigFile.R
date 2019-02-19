@@ -1,5 +1,4 @@
 library(tidyverse)
-library(datimvalidation)
 
 
 unPackStructure <- function(filepath) {
@@ -176,14 +175,116 @@ mapIndicators <- function() {
 
 }
 
+
+
+produceConfig <- function() {
+  datapackr::loginToDATIM(secrets)
+  
+  # Load Country List
+    configFile <-
+      paste0(getOption("baseurl"),"api/",api_version(),
+             "/organisationUnits.json?paging=false",
+     ## Filter to just countries
+             "&filter=organisationUnitGroups.id:eq:cNzfcPWEGSH",
+             "&fields=id,name,level,ancestors[id,name]") %>%
+      utils::URLencode() %>%
+      httr::GET() %>%
+      httr::content(., "text") %>%
+      jsonlite::fromJSON(., flatten = TRUE) %>%
+      do.call(rbind.data.frame, .) %>%
+    ## Remove countries no longer supported
+      dplyr::filter(!name %in% 
+        c("Antigua & Barbuda","Bahamas","Belize","China","Dominica","Grenada",
+          "Saint Kitts & Nevis","Saint Lucia","Saint Vincent & the Grenadines",
+          "Turkmenistan","Uzbekistan")) %>%
+      
+    ## Add new countries
+      dplyr::select(country_name = name, country_uid = id, dplyr::everything()) %>%
+      dplyr::bind_rows(
+        tibble::tribble(
+          ~country_name, ~country_uid, ~level, ~ancestors,
+          "Nepal", "TBD00000001", 4, list(name = NA_character_, id = NA_character_),
+          "Brazil", "TBD00000002", 4, list(name = NA_character_, id = NA_character_),
+          "Burkina Faso", "TBD00000003", 4, list(name = NA_character_, id = NA_character_),
+          "Liberia", "TBD00000004", 4, list(name = NA_character_, id = NA_character_),
+          "Mali", "TBD00000005", 4, list(name = NA_character_, id = NA_character_),
+          "Senegal", "TBD00000006", 4, list(name = NA_character_, id = NA_character_),
+          "Sierra Leone", "TBD00000007", 4, list(name = NA_character_, id = NA_character_),
+          "Togo", "TBD00000008", 4, list(name = NA_character_, id = NA_character_)
+        )
+      ) %>%
+  
+  # Add metadata
+      dplyr::mutate(is_region = level == 4,
+                    level3name = purrr::map_chr(ancestors,
+                                     function(x) magrittr::use_series(x, name) %>%
+                                       magrittr::extract(3)),
+                    level3name = dplyr::case_when(level == 3 ~ country_name,
+                                                  TRUE ~ level3name),
+                    uidlevel3 = purrr::map_chr(ancestors,
+                                               function(x) magrittr::use_series(x, id) %>%
+                                                 magrittr::extract(3)),
+                    uidlevel3 = dplyr::case_when(level == 3 ~ country_uid,
+                                                  TRUE ~ uidlevel3),
+                    level4name =
+                      dplyr::case_when(is_region &
+                                       !stringr::str_detect(country_uid, "TBD")
+                                          ~ country_name),
+                    uidlevel4 =
+                      dplyr::case_when(is_region &
+                                       !stringr::str_detect(country_uid, "TBD")
+                                          ~ country_uid),
+                    data_pack_name = dplyr::case_when(
+                      country_name %in% c("Burma","Cambodia","India","Indonesia",
+                                          "Kazakhstan","Kyrgyzstan","Laos",
+                                          "Nepal","Papua New Guinea","Tajikistan",
+                                          "Thailand") ~ "Asia Region",
+                      country_name %in% c("Barbados","Guyana","Jamaica","Suriname",
+                                          "Trinidad & Tobago") ~ "Caribbean Region",
+                      country_name %in% c("Brazil","Costa Rica","El Salvador",
+                                          "Guatemala","Honduras","Nicaragua",
+                                          "Panama") ~ "Central America Region",
+                      country_name %in% c("Burkina Faso","Ghana","Liberia","Mali",
+                                          "Senegal","Sierra Leone","Togo") 
+                                            ~ "West Africa Region",
+                      TRUE ~ country_name),
+                    model_uid = dplyr::case_when(
+                      data_pack_name == "Asia Region" ~ "Asia_Regional_Data_Pack",
+                      data_pack_name == "Caribbean Region" ~ "Caribbean_Data_Pack",
+                      data_pack_name == "Central America Region" ~ "Central_America_Data_Pack",
+                      data_pack_name == "West Africa Region" ~ "Western_Africa_Data_Pack",
+                      TRUE ~ country_uid
+                      ),
+                    Currently_in_DATIM = stringr::str_detect(country_uid,"TBD"))
+    
+  # Add levels & prioritization details
+    impattLevels <- datapackr::getIMPATTLevels()
+    
+    configFile %<>%
+      dplyr::left_join(impattLevels, by = c("country_name")) %>%
+      dplyr::select(data_pack_name, model_uid, country_name, country_uid,
+                    level3name, uidlevel3, level4name, uidlevel4,
+                    Currently_in_DATIM,is_region,
+                    country, prioritization, planning, community, facility)
+    
+  # Add Mil names & UIDs & metadata
+    
+    
+}
+
+
 # Procedural logic to generate the actual schemas
     secrets <- "/Users/scott/.secrets/datim.json"
-    datimvalidation::loadSecrets(secrets)
+    datapackr::loginToDATIM(secrets)
 
     ## Config File
         config_path = "./data-raw/DataPackConfiguration.csv"
         configFile <- readr::read_csv(config_path)
         save(configFile, file = "./data/configFile.rda")
+        
+    ## Data Pack Map (i.e., Updated Config File)
+        dataPackMap <- produceConfig()
+        save(dataPackMap, file = "./data/dataPackMap.rda")
 
     ## Template Schema
         template_path <- "./data-raw/COP19 Data Pack Template v1.3.xlsx"

@@ -15,7 +15,7 @@ required support files.}
 outputs to be saved.}
 
 \item{secrets}{A local path directing to a file containing DATIM login
-credentials. See Details for more explanation.}
+credentials. See \code{\link{loginToDATIM}} for more details.}
 
 \item{export_FAST}{If TRUE, will extract and output to \code{output_path} a
 CSV file of data needed for the PEPFAR FAST Tool.}
@@ -58,20 +58,3 @@ FAST and SUBNAT/IMPATT extracts are saved to \code{output_path} as CSV files.
 The final message in the Console prints all warnings identified in the Data
 Pack being processed.
 }
-\section{secrets file}{
-
-To securely connect with DATIM, use a secrets JSON file structured as follows:
-
-\preformatted{
-{
-  "dhis": {
-      "baseurl": "https://www.datim.org/",
-      "username": "example",
-      "password": "3x@mpl3!"
-   }
- }
-}
-
-To log into other instances of DATIM, alter the \code{baseurl}.
-}
-
