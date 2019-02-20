@@ -15,23 +15,21 @@
 #' credentials. See \code{\link{loginToDATIM}} for more details.
 #'
 getSiteList <- function(country_uids,
-                        include_mil = TRUE,
-                        secrets) {
+                        include_mil = TRUE) {
   
-  loginToDATIM(secrets)
+  loginToDATIM(getOption("secrets"))
   
   # Check user has correct permissions to query against country_uids
     # TODO: Configure to allow non-global users to generate Site Tools
   
   # Loop through country uids
     for (i in 1:country_uids) {
-      country_uid <- country_uids[i]
+      country_id <- country_uids[i]
       
       # Is this country in a regional program?
-        isRegion <- datapackr::configFile %>%
-          dplyr::filter(countryUID == country_uid) %>%
-          dplyr::pull(isRegion) %>%
-          as.logical()
+        isRegion <- datapackr::dataPackMap %>%
+          dplyr::filter(country_uid == country_id) %>%
+          dplyr::pull(is_region)
       
       # Pull Sites
         siteList <- 

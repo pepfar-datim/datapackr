@@ -4,7 +4,7 @@
 \alias{getSiteList}
 \title{Compile Site List for Site Tool}
 \usage{
-getSiteList(country_uids, include_mil = TRUE, secrets)
+getSiteList(country_uids, include_mil = TRUE)
 }
 \arguments{
 \item{country_uids}{Character vector of DATIM country IDs. This can only

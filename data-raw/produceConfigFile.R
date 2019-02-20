@@ -213,7 +213,9 @@ produceConfig <- function() {
       ) %>%
   
   # Add metadata
-      dplyr::mutate(is_region = level == 4,
+      dplyr::mutate(is_region = level == 4 |
+                      country_name %in% c("Burma","Cambodia","India","Indonesia",
+                                         "Papua New Guinea","Ghana"),
                     level3name = purrr::map_chr(ancestors,
                                      function(x) magrittr::use_series(x, name) %>%
                                        magrittr::extract(3)),
