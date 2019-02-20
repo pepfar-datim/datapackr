@@ -19,7 +19,8 @@ library(datapackr)
 
 9. Hit the `Run` button.
 10. If this presents issues, contact the development team either through a [GitHub ticket](https://github.com/pepfar-datim/datapackr/issues/new), or via [DATIM Support](https://datim.zendesk.com) (DATIM users only).
-11. If the package loads without issue, copy, paste, and run the following code in RStudio:
+11. If the package loads without issue, restart your R session.
+12. Copy, paste, and run the following code in RStudio:
 
 ```R
 
@@ -27,8 +28,8 @@ d <- unPackData()
 
 ```
 
-12. When prompted, select the location of the file you would like to check. This must be saved as an XLSX file.
-13. Once automated reviews are completed, you can see any warnings that were generated in the RStudio Console.
+13. When prompted, select the location of the file you would like to check. This must be saved as an XLSX file.
+14. Once automated reviews are completed, you can see any warnings that were generated in the RStudio Console.
 
 
 
