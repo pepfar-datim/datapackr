@@ -4,18 +4,12 @@
 \alias{unPackData}
 \title{Unpack a submitted Data Pack}
 \usage{
-unPackData(support_files_path, output_path, secrets, export_FAST = TRUE,
-  archive_results = TRUE, export_SUBNAT_IMPATT = TRUE)
+unPackData(output_path = NA, export_FAST = FALSE,
+  archive_results = FALSE, export_SUBNAT_IMPATT = FALSE)
 }
 \arguments{
-\item{support_files_path}{A local path directing to a folder containing
-required support files.}
-
 \item{output_path}{A local path directing to the folder where you would like
-outputs to be saved.}
-
-\item{secrets}{A local path directing to a file containing DATIM login
-credentials. See \code{\link{loginToDATIM}} for more details.}
+outputs to be saved. If not supplied, will output to working directory.}
 
 \item{export_FAST}{If TRUE, will extract and output to \code{output_path} a
 CSV file of data needed for the PEPFAR FAST Tool.}

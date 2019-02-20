@@ -12,9 +12,6 @@ include countries. Regional Operating Unit uids will not be accepted}
 
 \item{include_mil}{When TRUE, will append _Military organisation nodes to
 site list.}
-
-\item{secrets}{A local path directing to a file containing DATIM login
-credentials. See \code{\link{loginToDATIM}} for more details.}
 }
 \description{
 Extracts full list of sites from DATIM, including _Military nodes where

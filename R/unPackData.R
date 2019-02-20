@@ -5,12 +5,8 @@
 #' Processes a submitted Data Pack (in .xlsx format) by identifying integrity
 #'     issues, checking data against DATIM validations, and extracting data.
 #'
-#' @param support_files_path A local path directing to a folder containing
-#' required support files.
 #' @param output_path A local path directing to the folder where you would like
-#' outputs to be saved.
-#' @param secrets A local path directing to a file containing DATIM login
-#' credentials. See \code{\link{loginToDATIM}} for more details.
+#' outputs to be saved. If not supplied, will output to working directory.
 #' @param export_FAST If TRUE, will extract and output to \code{output_path} a
 #' CSV file of data needed for the PEPFAR FAST Tool. 
 #' @param archive_results If TRUE, will output to \code{output_path} a compiled
@@ -48,21 +44,21 @@
 #' The final message in the Console prints all warnings identified in the Data
 #' Pack being processed.
 #'
-unPackData <- function(support_files_path,
-                       output_path,
-                       secrets,
-                       export_FAST = TRUE,
-                       archive_results = TRUE,
-                       export_SUBNAT_IMPATT = TRUE) {
+unPackData <- function(output_path = NA,
+                       export_FAST = FALSE,
+                       archive_results = FALSE,
+                       export_SUBNAT_IMPATT = FALSE) {
 
   # Create data train for use across remainder of program
     d <- list(
       keychain = list(
-        support_files_path = support_files_path,
-        output_path = output_path,
-        secrets = secrets
+        output_path = output_path
       )
     )
+    
+    if (is.na(output_path)) {
+      d$keychain$output_path = getwd()
+    }
 
   # Allow User to choose file
     d$keychain$submission_path <- file.choose()
