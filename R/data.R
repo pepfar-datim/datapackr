@@ -137,3 +137,63 @@
 #' @description For each Site Tool and Data Pack sheet/tab, lists the Ages,
 #' Sexes, and KPs allowed.
 "valid_dp_disaggs"
+
+
+#' @docType data
+#' @title Mapping of necessary Data Pack metadata
+#'
+#' @description A data frame containing Data Pack metadata required for executing
+#' datapackr processes.
+#'
+#' @format A data frame with metadata for each Operating Unit's Data Pack:
+#' \describe{
+#'   \item{data_pack_name}{Usually the same as Operating Unit, except in rare
+#'   cases for some PEPFAR Regional Operating Units.}
+#'   \item{model_uid}{Usually the same as Operating Unit, except in rare cases
+#'   for some PEPFAR Regional Operating Units.}
+#'   \item{country_name}{Name of country as stored in DATIM organization
+#'   hierarchy}
+#'   \item{country_uid}{Usually the organisationunituid as described in the DATIM
+#'   organization unit hierarchy, uniquely identifying the Country listed in 
+#'   \code{country_name}. For countries that are new to PEPFAR reporting in FY20
+#'   and that were not logged in DATIM prior to the initial release of Data
+#'   Packs, an arbitrary uid is assigned in this column for later re-mapping to
+#'   DATIM.}
+#'   \item{mil_psnu}{For all PEPFAR countries, this column lists the name of the
+#'   _Military node.}
+#'   \item{mil_psnu_uid}{For all countries with a _Military node, this column
+#'   lists the DATIM organisationunituid. For _Military nodes not yet in DATIM
+#'   (regional OU countries), lists "TBD".}
+#'   \item{level3name}{Lists the \code{name} as used in level 3 of DATIM's
+#'   organization unit hierarchy. For Regional OUs, this is the name of the
+#'   Regional OU instead of the Country Name.}
+#'   \item{uidlevel3}{Lists the \code{uid} as used in level 3 of DATIM's
+#'   organization unit hierarchy. For Regional OUs, this is the uid of the
+#'   Regional OU instead of the Country uid.}
+#'   \item{level4name}{For countries in Regional OUs, lists the \code{name} as
+#'   used in level 4 of DATIM's organization unit hierarchy. For Regional OUs,
+#'   this is the name of the Country instead of the Regional OU.}
+#'   \item{uidlevel4}{For countries in Regional OUs, lists the \code{uid} as
+#'   used in level 4 of DATIM's organization unit hierarchy. For Regional OUs,
+#'   this is the uid of the Country instead of the Regional OU.}
+#'   \item{country_in_datim}{Documents whether the Country listed in 
+#'   \code{country_name} was documented in DATIM's organization hierarchy as of
+#'   Jan 8, 2019.}
+#'   \item{mil_in_datim}{Documents (\code{TRUE}/\code{FALSE}) whether _Military
+#'   node was present in DATIM as of Feb 20, 2019.}
+#'   \item{is_region}{Logical (\code{TRUE}/\code{FALSE}) field documenting
+#'   whether country in \code{country_name} is within a PEPFAR Regional OU.}
+#'   \item{country}{Lists level in DATIM organization hierarchy where Country is
+#'   designated.}
+#'   \item{prioritization}{Lists level in DATIM organization hierarchy where
+#'   prioritization occurs.}
+#'   \item{planning}{Lists level in DATIM organization hierarchy where Country
+#'   planning occurs.}
+#'   \item{community}{Lists level in DATIM organization hierarchy where Community is
+#'   designated.}
+#'   \item{facility}{Lists level in DATIM organization hierarchy where Facility is
+#'   designated.}
+#'   \item{mil_level}{Level in DATIM organization hierarchy where _Military node
+#'   is designated.}
+#' }
+"dataPackMap"

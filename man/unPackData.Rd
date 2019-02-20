@@ -4,18 +4,12 @@
 \alias{unPackData}
 \title{Unpack a submitted Data Pack}
 \usage{
-unPackData(support_files_path, output_path, secrets, export_FAST = TRUE,
-  archive_results = TRUE, export_SUBNAT_IMPATT = TRUE)
+unPackData(output_path = NA, export_FAST = FALSE,
+  archive_results = FALSE, export_SUBNAT_IMPATT = FALSE)
 }
 \arguments{
-\item{support_files_path}{A local path directing to a folder containing
-required support files.}
-
 \item{output_path}{A local path directing to the folder where you would like
-outputs to be saved.}
-
-\item{secrets}{A local path directing to a file containing DATIM login
-credentials. See Details for more explanation.}
+outputs to be saved. If not supplied, will output to working directory.}
 
 \item{export_FAST}{If TRUE, will extract and output to \code{output_path} a
 CSV file of data needed for the PEPFAR FAST Tool.}
@@ -58,20 +52,3 @@ FAST and SUBNAT/IMPATT extracts are saved to \code{output_path} as CSV files.
 The final message in the Console prints all warnings identified in the Data
 Pack being processed.
 }
-\section{secrets file}{
-
-To securely connect with DATIM, use a secrets JSON file structured as follows:
-
-\preformatted{
-{
-  "dhis": {
-      "baseurl": "https://www.datim.org/",
-      "username": "example",
-      "password": "3x@mpl3!"
-   }
- }
-}
-
-To log into other instances of DATIM, alter the \code{baseurl}.
-}
-
