@@ -145,7 +145,7 @@ checkColStructure <- function(d) {
     submission_cols <- names(d$data$extract) %>%
         tibble::as_tibble() %>%
         dplyr::select(indicatorCode = value) %>%
-        dplyr::mutate(submission_order = as.integer(1:n()))
+        dplyr::mutate(submission_order = as.integer(1:(dplyr::n())))
 
     col_check <- datapackr::template_schema %>%
         dplyr::filter(sheet_name == d$data$sheet) %>%
@@ -323,7 +323,7 @@ unPackSheet <- function(d) {
         any_dups<- d$data$extract %>%
             dplyr::select(sheet_name, PSNU, Age, Sex, KeyPop, indicatorCode) %>%
             dplyr::group_by(sheet_name, PSNU, Age, Sex, KeyPop, indicatorCode) %>%
-            dplyr::summarise(n=n()) %>%
+            dplyr::summarise(n=(dplyr::n())) %>%
             dplyr::filter(n>1) %>%
             dplyr::ungroup() %>%
             dplyr::distinct() %>%
