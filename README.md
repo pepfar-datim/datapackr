@@ -12,7 +12,6 @@
 8. Copy and paste the following into that new file:
 
 ```R
-install.packages("devtools")
 library(devtools)
 install_github(repo = "https://github.com/pepfar-datim/datapackr.git", ref = "master")
 library(datapackr)
