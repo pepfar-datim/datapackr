@@ -50,6 +50,7 @@ selectOU <- function() {
 
 
 #' @export
+#' @importFrom magrittr %>% %<>%
 #' @title Pull IMPATT levels from DATIM for all PEPFAR countries
 #' 
 #' @description 
@@ -61,11 +62,11 @@ selectOU <- function() {
 #'
 getIMPATTLevels <- function(){
   
-  datapackr::loginToDATIM(secrets)
+  datapackr::loginToDATIM(getOption("secrets"))
   
   impatt_levels <-
     paste0(getOption("baseurl"),"api/",datapackr::api_version(),
-           "dataStore/dataSetAssignments/ous") %>%
+           "/dataStore/dataSetAssignments/ous") %>%
     httr::GET() %>%
     httr::content(., "text") %>%
     jsonlite::fromJSON(., flatten = TRUE) %>%
@@ -81,6 +82,7 @@ getIMPATTLevels <- function(){
 
 
 #' @export
+#' @importFrom magrittr %>% %<>%
 #' @title Pull all _Military nodes from DATIM for all PEPFAR countries
 #' 
 #' @description 
@@ -91,6 +93,8 @@ getIMPATTLevels <- function(){
 #' and Countries.
 #' 
 getMilitaryNodes <- function() {
+  datapackr::loginToDATIM(getOption("secrets"))
+  
   militaryNodes <- paste0(getOption("baseurl"),"api/",datapackr::api_version(),
                           "/organisationUnits.json?paging=false",
                           "&filter=organisationUnitGroups.id:eq:nwQbMeALRjL",
@@ -101,5 +105,24 @@ getMilitaryNodes <- function() {
     do.call(rbind.data.frame, .) %>%
   # Tag Operating Unit and Country (name & id) - accommodate for eventuality of
   #    _Military at level 5 in Regional OUs
-    dplyr::mutate()
+    dplyr::mutate(
+      country_uid = dplyr::case_when(
+        level == 4 ~ purrr::map_chr(ancestors,
+                              function(x) magrittr::use_series(x, id) %>%
+                                magrittr::extract(3)),
+        level == 5 ~ purrr::map_chr(ancestors,
+                                    function(x) magrittr::use_series(x, id) %>%
+                                      magrittr::extract(4))),
+      country_name = dplyr::case_when(
+        level == 4 ~ purrr::map_chr(ancestors,
+                                    function(x) magrittr::use_series(x, name) %>%
+                                      magrittr::extract(3)),
+        level == 5 ~ purrr::map_chr(ancestors,
+                                    function(x) magrittr::use_series(x, name) %>%
+                                      magrittr::extract(4))
+      )
+    ) %>%
+    dplyr::select(-ancestors)
+  
+  return(militaryNodes)
 }

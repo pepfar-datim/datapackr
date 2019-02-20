@@ -14,7 +14,6 @@
 #' @param secrets A local path directing to a file containing DATIM login
 #' credentials. See \code{\link{loginToDATIM}} for more details.
 #'
-#'
 getSiteList <- function(country_uids,
                         include_mil = TRUE,
                         secrets) {

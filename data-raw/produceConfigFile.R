@@ -175,10 +175,8 @@ mapIndicators <- function() {
 
 }
 
-
-
 produceConfig <- function() {
-  datapackr::loginToDATIM(secrets)
+  datapackr::loginToDATIM(getOption("secrets"))
   
   # Load Country List
     configFile <-
@@ -255,20 +253,39 @@ produceConfig <- function() {
                       data_pack_name == "West Africa Region" ~ "Western_Africa_Data_Pack",
                       TRUE ~ country_uid
                       ),
-                    Currently_in_DATIM = stringr::str_detect(country_uid,"TBD"))
+                    country_in_datim = !stringr::str_detect(country_uid,"TBD"))
     
   # Add levels & prioritization details
     impattLevels <- datapackr::getIMPATTLevels()
     
     configFile %<>%
-      dplyr::left_join(impattLevels, by = c("country_name")) %>%
-      dplyr::select(data_pack_name, model_uid, country_name, country_uid,
-                    level3name, uidlevel3, level4name, uidlevel4,
-                    Currently_in_DATIM,is_region,
-                    country, prioritization, planning, community, facility)
+      dplyr::left_join(impattLevels, by = c("country_name"))
     
   # Add Mil names & UIDs & metadata
+    militaryNodes <- datapackr::getMilitaryNodes() %>%
+      dplyr::mutate(mil_in_datim = TRUE) %>%
+      dplyr::select(-country_name, mil_level = level)
     
+    configFile %<>%
+    ## Building based on future state of all military nodes nested under country
+      dplyr::left_join(militaryNodes, by= c("country_uid")) %>%
+      dplyr::select(data_pack_name, model_uid, country_name, country_uid,
+                    mil_psnu = name, mil_psnu_uid = id,
+                    level3name, uidlevel3, level4name, uidlevel4,
+                    country_in_datim, mil_in_datim, is_region,
+                    country, prioritization, planning, community, facility,
+                    mil_level) %>%
+    ## Add Mil manually where not in DATIM currently
+      dplyr::mutate(
+        mil_psnu = dplyr::case_when(
+          is.na(mil_psnu) ~ paste0("_Military ",country_name),
+          TRUE ~ mil_psnu),
+        mil_psnu_uid = dplyr::case_when(
+          is.na(mil_psnu_uid) ~ "TBD",
+          TRUE ~ mil_psnu_uid)) %>%
+      tidyr::replace_na(list(mil_in_datim = FALSE, mil_level = 5))
+    
+    return(configFile)
     
 }
 
