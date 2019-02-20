@@ -63,7 +63,7 @@ checkWorkbookStructure <- function(d) {
         dplyr::filter(
           !sheet_name %in% c("Home","Quotes","Summary","Spectrum","Validations")
           ) %>%
-        dplyr::mutate(submission_order = as.integer(1:n()+4))
+        dplyr::mutate(submission_order = as.integer(1:(dplyr::n())+4))
 
     # Check all tabs present and accounted for
         sheets_check <- datapackr::template_schema %>%
