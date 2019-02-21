@@ -477,7 +477,7 @@ unPackSNUxIM <- function(d) {
         dplyr::select(dplyr::one_of(c("PSNU","sheet_name","indicatorCode","CoarseAge","Sex","KeyPop","DataPackTarget","Dedupe")),
                       dplyr::matches("(\\d){2,}")) %>%
         dplyr::select_if(~!all(is.na(.))) %>%
-        dplyr::mutate(sum = rowSums(dplyr::select(.,dplyr::matches("\\d+")), na.rm = TRUE)) %>%
+        dplyr::mutate(sum = rowSums(dplyr::select(.,dplyr::matches("\\d+|Dedupe")), na.rm = TRUE)) %>%
         dplyr::mutate(DataPackTarget = round_trunc(DataPackTarget),
                       sum = round_trunc(sum))
 

@@ -2,6 +2,7 @@
 
 export(api_version)
 export(getIMPATTLevels)
+export(getMechList)
 export(getMilitaryNodes)
 export(getSiteList)
 export(loginToDATIM)

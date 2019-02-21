@@ -42,8 +42,8 @@ packSiteTool <- function(d) {
   
   
   # Generate full site list
-  d$data$site_list <- getSiteList(d)
-  
+    siteList <- datapackr::getSiteList(country_uids,
+                                       include_mil = TRUE)
   
   # Generate mech list
   

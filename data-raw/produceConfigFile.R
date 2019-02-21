@@ -261,7 +261,21 @@ produceConfig <- function() {
     impattLevels <- datapackr::getIMPATTLevels()
     
     configFile %<>%
-      dplyr::left_join(impattLevels, by = c("country_name"))
+      dplyr::left_join(impattLevels, by = c("country_name")) %>%
+      dplyr::mutate_if(is.integer,as.double) %>%
+      dplyr::mutate(country = level,
+                    prioritization = dplyr::case_when(
+                      country_in_datim != TRUE ~ level,
+                      TRUE ~ prioritization),
+                    operating_unit =
+                      dplyr::if_else(is.na(operating_unit),
+                                     stringr::str_replace(
+                                       data_pack_name,
+                                       "Central America|Caribbean",
+                                       "Western Hemisphere"),
+                                     operating_unit))
+      
+
     
   # Add Mil names & UIDs & metadata
     militaryNodes <- datapackr::getMilitaryNodes() %>%
