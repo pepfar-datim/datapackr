@@ -15,7 +15,7 @@
 getSiteList <- function(country_uids,
                         include_mil = TRUE) {
   
-  loginToDATIM(getOption("secrets"))
+  datapackr::loginToDATIM(getOption("secrets"))
   
   # Check user has correct permissions to query against country_uids
     # TODO: Configure to allow non-global users to generate Site Tools

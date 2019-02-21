@@ -24,7 +24,6 @@ LoadConfigFile <- function(config_path = NA) {
       stop(paste("Cannot read configuration located at",config_path))
     }
     dhis_config <- jsonlite::fromJSON(config_path)
-    options("config" = config_path)
     return(dhis_config)
   } else {
     stop("You must specify a credentials file!") }
@@ -126,7 +125,7 @@ DHISLogin<-function(dhis_config) {
 #' }
 loginToDATIM <- function(secrets = NA) {
   #Load from a file
-  if (is.na(secrets)) {
+  if (is.null(secrets)) {
     s <- GetCredentialsFromConsole()
   } else {
     s <- LoadConfigFile(secrets)
