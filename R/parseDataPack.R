@@ -300,7 +300,8 @@ unPackSheet <- function(d) {
 
     # Drop zeros and NAs
         tidyr::drop_na(value) %>%
-        dplyr::filter(value != 0)
+        dplyr::filter(value != 0,
+                     & !value %in% c("-"," "))
 
     # TEST for Negative values
         has_negative_numbers <- as.numeric(d$data$extract$value) < 0
