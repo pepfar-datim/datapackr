@@ -4,14 +4,19 @@
 \alias{getMechList}
 \title{Compile Mechanism List for Site Tool}
 \usage{
-getMechList(country_uids, FY = NA)
+getMechList(country_uids = NA, FY = NA)
 }
 \arguments{
 \item{country_uids}{Character vector of DATIM country IDs. This can only
-include countries. Regional Operating Unit uids will not be accepted}
+include countries. Regional Operating Unit uids will not be accepted. If not
+supplied, returns entire mechanism list, trimmed to user's DATIM permissions.}
 
 \item{FY}{Numeric value of Fiscal Year to filter mechanism list by. If a FY
 is not supplied, returns entire mechanism list.}
+}
+\value{
+A dataframe of mechanisms, including start and end dates, mechanism
+code, partner name, funding agency, and related country.
 }
 \description{
 Extracts full list of valid mechanisms from DATIM for Fiscal Year & countries

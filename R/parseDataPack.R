@@ -298,9 +298,11 @@ unPackSheet <- function(d) {
         tidyr::gather(key = "indicatorCode", value = "value",-PSNU,-psnuid,-Age,-Sex,-KeyPop,-sheet_name) %>%
         dplyr::select(PSNU, psnuid, sheet_name, indicatorCode, Age, Sex, KeyPop, value) %>%
 
-    # Drop zeros and NAs
+    # Drop zeros, NAs, dashes, and space-only entries
         tidyr::drop_na(value) %>%
-        dplyr::filter(value != 0)
+        dplyr::filter(value != 0
+                      & !value %in% c("-"," ")) %>%
+        dplyr::mutate(value = as.numeric(value))
 
     # TEST for Negative values
         has_negative_numbers <- as.numeric(d$data$extract$value) < 0

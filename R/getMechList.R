@@ -9,18 +9,18 @@
 #' Site Tool.
 #'
 #' @param country_uids Character vector of DATIM country IDs. This can only
-#' include countries. Regional Operating Unit uids will not be accepted
+#' include countries. Regional Operating Unit uids will not be accepted. If not
+#' supplied, returns entire mechanism list, trimmed to user's DATIM permissions.
 #' @param FY Numeric value of Fiscal Year to filter mechanism list by. If a FY
 #' is not supplied, returns entire mechanism list.
+#' 
+#' @return A dataframe of mechanisms, including start and end dates, mechanism
+#' code, partner name, funding agency, and related country.
 #'
-getMechList <- function(country_uids,
+getMechList <- function(country_uids = NA,
                         FY = NA) {
   
   datapackr::loginToDATIM(getOption("secrets"))
-  
-  country_names <- datapackr::dataPackMap %>%
-    dplyr::filter(country_uid %in% country_uids) %>%
-    dplyr::pull(country_name)
   
   # Check user has correct permissions to query against country_uids ####
     # TODO: Configure to allow non-global users to generate Site Tools
@@ -31,9 +31,12 @@ getMechList <- function(country_uids,
              "/categoryOptionCombos.json",
              "?paging=false",
              "&filter=categoryCombo.name:eq:Funding%20Mechanism",
-             "&filter=categoryOptions.organisationUnits.id:in:[",
-             paste0(country_uids,collapse = ","),"]",
-             "&fields=id,name,categoryOptions[startDate,endDate,categoryOptionGroups[id,name,groupSets[id,name]],organisationUnits[id,name]]"
+             dplyr::if_else(
+               !all(is.na(country_uids)),
+               paste0("&filter=categoryOptions.organisationUnits.id:in:[",
+                      paste0(country_uids,collapse = ","),"]"),
+                      ""),
+             "&fields=id,name,code,categoryOptions[startDate,endDate,categoryOptionGroups[id,name,groupSets[id,name]],organisationUnits[id,name]]"
              ) %>%
       utils::URLencode() %>%
       httr::GET() %>%
@@ -74,17 +77,13 @@ getMechList <- function(country_uids,
       ) %>%
       dplyr::select(-categoryOptions, -categoryOptionGroups)
   
-  # Extract Mechanism Code ####
-  
-  
   # Filter by Fiscal Year ####
     if (!is.na(FY)) {
-      sj <- mechList  
+      mechList %<>%
+        dplyr::filter(start_date < paste0(FY,"-10-01"),
+                      end_date > paste0(FY-1,"-09-30"))
     }
     
-      
-  
-  
-  
+  return(mechList)
   
 }

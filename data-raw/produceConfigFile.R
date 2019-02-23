@@ -305,6 +305,61 @@ produceConfig <- function() {
     
 }
 
+loadStyleGuide <- function() {
+  
+  # Home Tab Styles ####
+  home <- list(
+    
+    ## Home Tab Title
+    title = openxlsx::createStyle(fontColour = "#000000",
+                                  fontSize = 76,
+                                  textDecoration = "bold",
+                                  halign = "left",
+                                  valign = "center"),
+    ## Home Tab OU Name
+    data_pack_name = openxlsx::createStyle(fontColour = "#9CBEBD",
+                                            fontSize = 64,
+                                            textDecoration = "bold",
+                                            halign = "left",
+                                            valign = "center"),
+    ## Home Tab PEPFAR banner
+    pepfar = openxlsx::createStyle(fontColour = "#7F7F7F",
+                                   fontSize = 36,
+                                   halign = "left",
+                                   valign = "center")
+  )
+  
+  # Data Tabs ####
+  data <- list(
+    
+    ## Title Row
+    title = openxlsx::createStyle(fontSize = 18,
+                                  textDecoration = "bold",
+                                  halign = "left",
+                                  valign = "center"),
+    header = openxlsx::createStyle(fontSize = 18,
+                                   textDecoration = "bold",
+                                   halign = "left",
+                                   valign = "center",
+                                   fgFill = "#E4E0A7"),
+    label = openxlsx::createStyle(wrapText = TRUE,
+                                  halign = "center",
+                                  valign = "center",
+                                  fgFill = "#9CBEBD"),
+    uid = openxlsx::createStyle(textDecoration = "bold",
+                                fgFill = "#C2D8D8",
+                                fontColour = "#C2D8D8"),
+    rowHeader = openxlsx::createStyle(textDecoration = "bold",
+                                      fgFill = "#C2D8D8",
+                                      fontColour = "#000000")
+  )
+  
+  styleGuide <- list(home = home,
+                     data = data)
+  
+  return(styleGuide)
+}
+
 
 # Procedural logic to generate the actual schemas
     secrets <- "/Users/scott/.secrets/datim.json"
@@ -335,5 +390,9 @@ produceConfig <- function() {
     ## Data Pack to DATIM Indicator Map
         indicatorMap <- readr::read_csv("./data-raw/DataPack to DATIM indicator map.csv")
         save(indicatorMap, file = "./data/indicatorMap.rda")
+        
+    ## Load Openxlsx Style Guide
+        styleGuide <- loadStyleGuide()
+        save(styleGuide, file = "./data/styleGuide.rda")
 
 

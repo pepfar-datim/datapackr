@@ -33,7 +33,7 @@ packSiteTool <- function(d) {
   # Make sure login creds allow export of data from DATIM for specified OU
   
   
-  # Distribute Data Pack data to Site x IM
+  # Grab Data Pack data distributed at Site x IM x DSD/TA
   
   
   
@@ -46,11 +46,12 @@ packSiteTool <- function(d) {
                                        include_mil = TRUE)
   
   # Generate mech list
-  
+    mechList <- datapackr::getMechList(country_uids,
+                                       FY = 2020)
   
   
   # Build Site Tool frame
-  
+    wb <- datapackr::frameSiteTool(datapack_uid = d$info$datapack_uid)
   
   
   # Populate Site Tool
@@ -62,4 +63,19 @@ packSiteTool <- function(d) {
   
   
   # Export Site Tool
+    output_file_name <- paste0(
+      d$keychain$output_path,
+      if (is.na(stringr::str_extract(d$keychain$output_path,"/$"))) {"/"} else {},
+      "SiteTool_",
+      d$info$datapack_name,"_",
+      format(Sys.time(), "%Y%m%d%H%M%S"),
+      ".xlsx"
+    )
+    
+    openxlsx::saveWorkbook(
+      wb = wb,
+      file = output_file_name,
+      overwrite = TRUE
+    )
+    print(paste0("Successfully saved output to ", output_file_name))
 }

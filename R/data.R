@@ -197,3 +197,19 @@
 #'   is designated.}
 #' }
 "dataPackMap"
+
+
+#' @docType data
+#' @title Library of Openxlsx style objects to apply to both Data Pack and Site
+#' Tool files.
+#' 
+#' @description 
+#' A list object containing styles pertaining to different portions of the Data
+#' Pack and Site Tool.
+#' 
+#' @format 
+#' \describe{
+#'   \item{home}{Styles for title, Data Pack Name, & PEPFAR banner.}
+#'   \item{data}{Styles for title, headers, labels, and Unique ID row.}
+#' }
+"styleGuide"

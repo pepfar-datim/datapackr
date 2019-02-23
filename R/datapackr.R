@@ -69,6 +69,14 @@ if (getRversion() >= "2.15.1")
       "name4",
       "name3",
       "",
-      ""
+      "country_uids",
+      "end_date",
+      "endDate",
+      "start_date",
+      "startDate",
+      "categoryOptionGroups",
+      "groupSets",
+      "organisationUnits",
+      "categoryOptions"
     )
   )
