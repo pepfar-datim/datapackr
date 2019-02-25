@@ -77,6 +77,14 @@ if (getRversion() >= "2.15.1")
       "categoryOptionGroups",
       "groupSets",
       "organisationUnits",
-      "categoryOptions"
+      "categoryOptions",
+      "packageVersion",
+      "IMPATT.PRIORITY_SNU.20T",
+      "sheets",
+      "PSNU",
+      "colType",
+      "col_type",
+      "indicator_code",
+      "site_schema"
     )
   )

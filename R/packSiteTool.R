@@ -30,39 +30,64 @@
 #'
 packSiteTool <- function(d) {
   
-  # Make sure login creds allow export of data from DATIM for specified OU
+  # Make sure login creds allow export of data from DATIM for specified OU ####
   
   
-  # Grab Data Pack data distributed at Site x IM x DSD/TA
-  
-  
-  
-  # Mark what wasn't distributed
+  # Grab Data Pack data distributed at Site x IM x DSD/TA ####
   
   
   
-  # Generate full site list
+  # Mark what wasn't distributed ####
+  
+  
+  # Build Site Tool frame ####
+    wb <- datapackr::packFrame(datapack_uid = d$info$datapack_uid,
+                               type = "Site Tool")
+  
+  # Write full site list ####
+    country_uids <- datapackr::dataPackMap %>%
+      dplyr::filter(data_pack_name == d$info$datapack_name) %>%
+      dplyr::pull(country_uid)
+    
     siteList <- datapackr::getSiteList(country_uids,
                                        include_mil = TRUE)
-  
-  # Generate mech list
+    
+  # Write mech list ####
     mechList <- datapackr::getMechList(country_uids,
                                        FY = 2020)
-  
-  
-  # Build Site Tool frame
-    wb <- datapackr::frameSiteTool(datapack_uid = d$info$datapack_uid)
-  
-  
-  # Populate Site Tool
-  
-  
-  
-  # Add data validations
+    openxlsx::writeDataTable(
+      wb = wb,
+      sheet = "Mechs",
+      x - data.frame()
+    )
+    
+  # Populate Site Tool ####
+    
   
   
   
-  # Export Site Tool
+  # Add data validations ####
+    ## DSD, TA options for validation
+    openxlsx::writeDataTable(
+      wb = wb,
+      sheet = "Validations",
+      x = data.frame(type = c("DSD", "TA")),
+      xy = c(1,1),
+      colNames = T,
+      tableName = "dsdta"
+    )
+    
+    ## Inactive site tagging options
+    openxlsx::writeDataTable(
+      wb,
+      sheet = "Validations",
+      x = data.frame(choices = c("Active","Inactive")),
+      xy = c(2,1),
+      colNames = T,
+      tableName = "inactive_options"
+    )
+  
+  # Export Site Tool ####
     output_file_name <- paste0(
       d$keychain$output_path,
       if (is.na(stringr::str_extract(d$keychain$output_path,"/$"))) {"/"} else {},

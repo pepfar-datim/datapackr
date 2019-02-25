@@ -213,3 +213,57 @@
 #'   \item{data}{Styles for title, headers, labels, and Unique ID row.}
 #' }
 "styleGuide"
+
+
+#' @docType data
+#' @title Schema describing correct structure of Data Pack template. 
+#'
+#' @description This schema describes the correct structure of a Data Pack
+#' file, generated from the template used to produce Data Packs and useful in
+#' validating Data Packs passed through datapackr.
+#'
+#' @format 
+#' \describe{
+#'   \item{sheet_num}{Lists the index value associated with the sheet name
+#'   listed in \code{sheet_name}.}
+#'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack
+#'   and Site Tool.}
+#'   \item{col}{Value describing the column position of each 
+#'   \code{indicator_code}.}
+#'   \item{label}{String label used to describe \code{indicator_code}.}
+#'   \item{indicator_code}{Code used in the Data Pack and Site Tool to uniquely
+#'   identify each distinct programmatic area of target setting.}
+#'   \item{formula}{Excel formula defined for \code{indicator_code}.}
+#'   \item{col_type}{Flags whether an \code{indicator_code} is a FY20 Target
+#'   (\code{"FY20 Target"}), row header (\code{Row Header}) or not (\code{NA}).}
+#'   \item{dataset}{For \code{indicator_codes} listed as "\code{FY20 Targets}"
+#'   in the \code{col_type} field, documents the dataset, either \code{MER},
+#'   \code{IMPATT}, or \code{SUBNAT}.}
+#' }
+"data_pack_schema"
+
+
+#' @docType data
+#' @title Schema describing correct structure of Site Tool template. 
+#'
+#' @description This schema describes the correct structure of a Site Tool
+#' file, generated from the template used to produce Data Packs and useful in
+#' validating Site Tools passed through datapackr.
+#'
+#' @format 
+#' \describe{
+#'   \item{sheet_num}{Lists the index value associated with the sheet name
+#'   listed in \code{sheet_name}.}
+#'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack
+#'   and Site Tool.}
+#'   \item{col}{Value describing the column position of each 
+#'   \code{indicator_code}.}
+#'   \item{col_type}{Flags whether an \code{indicator_code} is a FY20 Target
+#'   (\code{"FY20 Target"}), row header (\code{Row Header}) or not (\code{NA}).}
+#'   \item{tech_area}{Header text used to distinguish groups of
+#'   \code{indicator_codes}.}
+#'   \item{label}{String label used to describe \code{indicator_code}.}
+#'   \item{indicator_code}{Code used in the Data Pack and Site Tool to uniquely
+#'   identify each distinct programmatic area of target setting.}
+#' }
+"site_tool_schema"

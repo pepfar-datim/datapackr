@@ -1,5 +1,6 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
+#' @importFrom utils packageVersion
 #' @title writeHomeTab(wb, data_pack_uid, type = "Data Pack")
 #' 
 #' @description
@@ -44,7 +45,7 @@ writeHomeTab <- function(wb, data_pack_uid, type = "Data Pack") {
   # Package version ####
     openxlsx::writeData(wb,"Home",
                         paste("Package version:",
-                          as.character(packageVersion("datapackr"))),
+                          as.character(utils::packageVersion("datapackr"))),
                         xy = c(2, 29))
     
     return(wb)
@@ -62,10 +63,86 @@ writeHomeTab <- function(wb, data_pack_uid, type = "Data Pack") {
 #' 
 #' @return Openxlsx workbook object with added, styled Home tab.
 #' 
-frameDataSheets <- function(wb, type = "Data Pack") {
-  #  ####
+frameDataSheet <- function(wb, sheet, type = "Data Pack") {
+  # Choose schema ####
+  if (type == "Data Pack") {
+    schema <- datapackr::template_schema
+  } else if (type == "Site Tool") {
+    schema <- datapackr::site_tool_schema
+  }
   
-  return(wb)
+  schema %<>%
+  # Filter to current sheet ####
+    dplyr::filter(sheet_name == sheet) %>%
+    dplyr::select(-sheet_num,-sheet_name)
+  
+  row_header_cols <- NROW(schema[schema$col_type == "Row Header",])
+  
+  # Transpose to look like Site Tool rows 1:3 ####
+  schema %<>% 
+    t() %>%
+    as.data.frame() %>%
+    dplyr::slice(-1,-2)
+  
+  # Write rows 1:3 into Pack sheet ####
+  openxlsx::addWorksheet(wb = wb,
+                         sheetName = sheet)
+  openxlsx::writeData(wb = wb,
+                      sheet = sheet,
+                      x = schema,
+                      xy = c(1,1),
+                      colNames = FALSE)
+  
+  # Write title into Pack sheet ####
+  openxlsx::writeData(wb = wb,
+                      sheet = sheet,
+                      x = sheet,
+                      xy = c(1,1),
+                      colNames = FALSE)
+  
+  # Add styles ####
+    ## Title
+      openxlsx::addStyle(wb = wb,
+                         sheet = sheet,
+                         style = datapackr::styleGuide$data$title,
+                         rows = 1,
+                         cols = 1,
+                         gridExpand = TRUE,
+                         stack = TRUE)
+    ## Header Row
+      openxlsx::addStyle(wb = wb,
+                         sheet = sheet,
+                         style = datapackr::styleGuide$data$header,
+                         rows = 1,
+                         cols = (row_header_cols+1):length(schema),
+                         gridExpand = TRUE,
+                         stack = TRUE)
+    ## Labels
+      openxlsx::addStyle(wb = wb,
+                         sheet = sheet,
+                         style = datapackr::styleGuide$data$label,
+                         rows = 2,
+                         cols = (row_header_cols+1):length(schema),
+                         gridExpand = TRUE,
+                         stack = TRUE)
+    ## UIDs
+      openxlsx::addStyle(wb = wb,
+                         sheet = sheet,
+                         style = datapackr::styleGuide$data$uid,
+                         rows = 3,
+                         cols = (row_header_cols+1):length(schema),
+                         gridExpand = TRUE,
+                         stack = TRUE)
+    ## Row Headers
+      openxlsx::addStyle(wb = wb,
+                         sheet = sheet,
+                         style = datapackr::styleGuide$data$rowHeader,
+                         rows = 3,
+                         cols = 1:row_header_cols,
+                         gridExpand = TRUE,
+                         stack = TRUE)
+
+    return(wb)
 }
 
 
@@ -79,11 +156,11 @@ frameDataSheets <- function(wb, type = "Data Pack") {
 #' 
 #' @param datapack_uid A unique ID specifying the PEPFAR Operating Unit 
 #' the Site Tool belongs to.
-#' @param type Either "Data Pack" or "Site Tool". Defaults to "Data Pack".
+#' @param type Either "Data Pack" or "Site Tool". Defaults to "Site Tool".
 #' 
 #' @return OpenXLSX workbook object for use in data writing functions.
 #' 
-frameSiteTool <- function(datapack_uid, type = "Data Pack") {
+packFrame <- function(datapack_uid, type = "Data Pack") {
   
   # Create Workbook ####
     wb <- openxlsx::createWorkbook(
@@ -98,21 +175,36 @@ frameSiteTool <- function(datapack_uid, type = "Data Pack") {
     options("openxlsx.numFmt" = "#,##0")
     
   # Write Home Page ####
-    wb <- writeHomeTab(wb = wb, data_pack_uid = datapack_uid, type = type)
+    wb <- datapackr::writeHomeTab(wb = wb, data_pack_uid = datapack_uid, type = type)
     
-  # Add Site List tab
-    openxlsx::addWorksheet(wb, sheetName = "Site List")
+  if (type == "Site Tool") {
+    # Add Site List tab
+      openxlsx::addWorksheet(wb, sheetName = "Site List")
     
-  # Add Mech List tab
-    openxlsx::addWorksheet(wb, sheetName = "Mechs")
-    openxlsx::sheetVisibility(wb)[which(sheets == "Mechs")] <- "veryHidden"
+    # Add Mech List tab
+      openxlsx::addWorksheet(wb, sheetName = "Mechs")
+      openxlsx::sheetVisibility(wb)[which(names(wb) == "Mechs")] <- "veryHidden"
+  }
     
   # Add validations tab
     openxlsx::addWorksheet(wb, sheetName = "Validations")
-    openxlsx::sheetVisibility(wb)[which(sheets == "Validations")] <- "veryHidden"
+    openxlsx::sheetVisibility(wb)[which(names(wb) == "Validations")] <- "veryHidden"
     
   # Frame data tabs ####
-    wb <- frameDataSheets(wb = wb, type = type)
+    if (type == "Data Pack") {
+      schema <- datapackr::template_schema
+    } else if (type == "Site Tool") {
+      schema <- datapackr::site_tool_schema
+    }
+    
+    sheet_names <- schema %>%
+      dplyr::pull(sheet_name) %>%
+      unique()
+      
+    for (i in 1:length(sheet_names)) {
+      sheet_name = sheet_names[i]
+      wb <- datapackr::frameDataSheet(wb = wb, sheet_name, type = type)
+    }
     
   return(wb)
 }
