@@ -318,7 +318,6 @@ loadStyleGuide <- function() {
   
   # Home Tab Styles ####
   home <- list(
-    
     ## Home Tab Title
     title = openxlsx::createStyle(fontColour = "#000000",
                                   fontSize = 76,
@@ -336,6 +335,20 @@ loadStyleGuide <- function() {
                                    fontSize = 36,
                                    halign = "left",
                                    valign = "center")
+  )
+  
+  # Site Lists ####
+  siteList <- list(
+    community = openxlsx::createStyle(fontColour = "#000000",
+                                      bgFill = "#EBF1DE"),
+    facility = openxlsx::createStyle(fontColour = "#000000",
+                                     bgFill = "#DCE6F1"),
+    inactive = openxlsx::createStyle(fontColour = "#000000",
+                                     bgFill = "#808080"),
+    national = openxlsx::createStyle(fontColour = "#000000",
+                                     bgFill = "#CCC0DA"),
+    military = openxlsx::createStyle(fontColour = "#000000",
+                                     bgFill = "#C4BD97")
   )
   
   # Data Tabs ####
@@ -361,7 +374,9 @@ loadStyleGuide <- function() {
                                       fontColour = "#000000")
   )
   
+  # Compile ####
   styleGuide <- list(home = home,
+                     siteList = siteList,
                      data = data)
   
   return(styleGuide)

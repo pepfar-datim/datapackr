@@ -71,7 +71,7 @@ getSiteList <- function(country_uids,
       dplyr::mutate(
         site_type =
           dplyr::case_when(
-            stringr::str_detect(id,"TBD") ~ "National",
+            stringr::str_detect(id,"^TBD000000\\d{2}") ~ "National",
             stringr::str_detect(as.character(organisationUnitGroups), "PvuaP6YALSA") ~ "Community",
             stringr::str_detect(as.character(organisationUnitGroups), "POHZmzofoVx") ~ "Facility"))
     

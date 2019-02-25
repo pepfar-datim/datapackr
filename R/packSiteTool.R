@@ -44,28 +44,6 @@ packSiteTool <- function(d) {
     wb <- datapackr::packFrame(datapack_uid = d$info$datapack_uid,
                                type = "Site Tool")
   
-  # Write full site list ####
-    country_uids <- datapackr::dataPackMap %>%
-      dplyr::filter(data_pack_name == d$info$datapack_name) %>%
-      dplyr::pull(country_uid)
-    
-    siteList <- datapackr::getSiteList(country_uids,
-                                       include_mil = TRUE)
-    
-  # Write mech list ####
-    mechList <- datapackr::getMechList(country_uids,
-                                       FY = 2020)
-    openxlsx::writeDataTable(
-      wb = wb,
-      sheet = "Mechs",
-      x - data.frame()
-    )
-    
-  # Populate Site Tool ####
-    
-  
-  
-  
   # Add data validations ####
     ## DSD, TA options for validation
     openxlsx::writeDataTable(
@@ -86,7 +64,87 @@ packSiteTool <- function(d) {
       colNames = T,
       tableName = "inactive_options"
     )
+    
+  # Write full site list ####
+    country_uids <- datapackr::dataPackMap %>%
+      dplyr::filter(data_pack_name == d$info$datapack_name) %>%
+      dplyr::pull(country_uid)
+    
+    siteList <- datapackr::getSiteList(country_uids,
+                                       include_mil = TRUE)
+    
+    openxlsx::writeDataTable(
+      wb = wb,
+      sheet = "Site List",
+      x = data.frame(siteID = siteList$site_tool_label,
+                     status = "Active"),
+      xy = c(1,1),
+      colNames = TRUE,
+      tableName = "site_list_table"
+    )
+    
+    openxlsx::setColWidths(wb = wb,
+                           sheet = "Site List",
+                           cols = 1:2,
+                           widths = c("auto",16))
+    
+    openxlsx::dataValidation(wb = wb,
+                             sheet = "Site List",
+                             cols = 2,
+                             rows = 2:(NROW(siteList)+1),
+                             type = "list",
+                             value = 'INDIRECT("inactive_options[choices]")')
+    
+    openxlsx::conditionalFormatting(wb = wb,sheet = "Site List",
+                                    cols = 1,rows = 2:(NROW(siteList)+1),
+                                    rule = "[#Community]",
+                                    style = datapackr::styleGuide$siteList$community,
+                                    type = "contains")
+    openxlsx::conditionalFormatting(wb = wb, sheet = "Site List",
+                                    cols = 1,rows = 2:(NROW(siteList)+1),
+                                    rule = "[#Facility]",
+                                    style = datapackr::styleGuide$siteList$facility,
+                                    type = "contains")
+    openxlsx::conditionalFormatting(wb = wb,sheet = "Site List",
+                                    cols = 1,rows = 2:(NROW(siteList)+1),
+                                    rule = "[#National]",
+                                    style = datapackr::styleGuide$siteList$national,
+                                    type = "contains")
+    openxlsx::conditionalFormatting(wb = wb,sheet = "Site List",
+                                    cols = 1,rows = 2:(NROW(siteList)+1),
+                                    rule = "[#Military]",
+                                    style = datapackr::styleGuide$siteList$military,
+                                    type = "contains")
+    openxlsx::conditionalFormatting(wb = wb,sheet = "Site List",
+                                    cols = 1,rows = 2:(NROW(siteList)+1),
+                                    rule = '$B2="Inactive"',
+                                    style = datapackr::styleGuide$siteList$inactive)
+    
+  # Write mech list ####
+    mechList <- datapackr::getMechList(country_uids,
+                                       FY = 2019)
+    openxlsx::writeDataTable(
+      wb = wb,
+      sheet = "Mechs",
+      x = data.frame(mechID = mechList$name),
+      xy = c(1,1),
+      colNames = TRUE,
+      tableName = "mech_list"
+    )
+    
   
+  # Populate Site Tool ####
+    #TODO
+      # 1) Write data into each sheet
+      # 2) Conditional formatting on each site column
+      # 3) validation on each DSD/TA column
+      # 4) validation on each site column
+      # 5) validation on each mech column
+      # 6) validation on each age column (can this be conditional based on tab?)
+      # 7) validation on each sex column (can this be conditional based on tab?)
+      # 8) validation on each KP column
+      # 9) 
+        
   # Export Site Tool ####
     output_file_name <- paste0(
       d$keychain$output_path,
