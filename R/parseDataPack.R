@@ -300,7 +300,7 @@ unPackSheet <- function(d) {
 
     # Drop zeros and NAs
         tidyr::drop_na(value) %>%
-        dplyr::filter(value != 0,
+        dplyr::filter(value != 0
                      & !value %in% c("-"," ")) %>%
         dplyr::mutate(value = as.numeric(value))
 
