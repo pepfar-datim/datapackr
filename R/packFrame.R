@@ -78,69 +78,52 @@ frameDataSheet <- function(wb, sheet, type = "Data Pack") {
   
   row_header_cols <- NROW(schema[schema$col_type == "Row Header",])
   
-  # Transpose to look like Site Tool rows 1:3 ####
+  # Transpose to look like Tool rows ####
   schema %<>% 
     t() %>%
-    as.data.frame() %>%
-    dplyr::slice(-1,-2)
+    as.data.frame(stringsAsFactors = FALSE) %>%
+    dplyr::slice(-1,-2) %>%
+  # Add sum rows
+    tibble::add_row(V1 = rep(NA_character_,2), .before = 3)
   
-  # Write rows 1:3 into Pack sheet ####
-  openxlsx::addWorksheet(wb = wb,
-                         sheetName = sheet)
-  openxlsx::writeData(wb = wb,
-                      sheet = sheet,
-                      x = schema,
-                      xy = c(1,1),
-                      colNames = FALSE)
+  schema[3,row_header_cols] <- "Data Pack"
+  schema[4,row_header_cols] <- "Roll-up"
+  
+  
+  # Write rows into Pack sheet ####
+  openxlsx::addWorksheet(wb = wb, sheetName = sheet)
+  openxlsx::writeData(wb = wb, sheet = sheet, x = schema,
+                      xy = c(1,1), colNames = FALSE)
   
   # Write title into Pack sheet ####
-  openxlsx::writeData(wb = wb,
-                      sheet = sheet,
-                      x = sheet,
-                      xy = c(1,1),
-                      colNames = FALSE)
+  openxlsx::writeData(wb = wb, sheet = sheet, x = sheet,
+                      xy = c(1,1), colNames = FALSE)
   
   # Add styles ####
     ## Title
-      openxlsx::addStyle(wb = wb,
-                         sheet = sheet,
+      openxlsx::addStyle(wb = wb, sheet = sheet,
                          style = datapackr::styleGuide$data$title,
-                         rows = 1,
-                         cols = 1,
-                         gridExpand = TRUE,
-                         stack = TRUE)
+                         rows = 1, cols = 1, gridExpand = TRUE, stack = TRUE)
     ## Header Row
-      openxlsx::addStyle(wb = wb,
-                         sheet = sheet,
+      openxlsx::addStyle(wb = wb, sheet = sheet,
                          style = datapackr::styleGuide$data$header,
-                         rows = 1,
-                         cols = (row_header_cols+1):length(schema),
-                         gridExpand = TRUE,
-                         stack = TRUE)
+                         rows = 1, cols = (row_header_cols+1):length(schema),
+                         gridExpand = TRUE, stack = TRUE)
     ## Labels
-      openxlsx::addStyle(wb = wb,
-                         sheet = sheet,
+      openxlsx::addStyle(wb = wb, sheet = sheet,
                          style = datapackr::styleGuide$data$label,
-                         rows = 2,
-                         cols = (row_header_cols+1):length(schema),
-                         gridExpand = TRUE,
-                         stack = TRUE)
+                         rows = 2, cols = (row_header_cols+1):length(schema),
+                         gridExpand = TRUE, stack = TRUE)
     ## UIDs
-      openxlsx::addStyle(wb = wb,
-                         sheet = sheet,
+      openxlsx::addStyle(wb = wb, sheet = sheet,
                          style = datapackr::styleGuide$data$uid,
-                         rows = 3,
-                         cols = (row_header_cols+1):length(schema),
-                         gridExpand = TRUE,
-                         stack = TRUE)
+                         rows = 5, cols = (row_header_cols+1):length(schema),
+                         gridExpand = TRUE, stack = TRUE)
     ## Row Headers
-      openxlsx::addStyle(wb = wb,
-                         sheet = sheet,
+      openxlsx::addStyle(wb = wb, sheet = sheet,
                          style = datapackr::styleGuide$data$rowHeader,
-                         rows = 3,
-                         cols = 1:row_header_cols,
-                         gridExpand = TRUE,
-                         stack = TRUE)
+                         rows = 5, cols = 1:row_header_cols,
+                         gridExpand = TRUE, stack = TRUE)
 
     return(wb)
 }

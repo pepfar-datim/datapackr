@@ -122,9 +122,12 @@ unPackData <- function(output_path = NA,
   # If warnings, show all grouped by sheet and issue
     if (!is.null(d$info$warningMsg)) {
       options(warning.length = 8170)
+      #options(warn = 1)
       warning(paste0("
-                     ",d$info$warningMsg))
+                     ",d$info$warningMsg),
+              immediate. = TRUE)
     }
+    #options(warn = 0)
 
     if (archive_results == TRUE) {
       archive <- paste0(

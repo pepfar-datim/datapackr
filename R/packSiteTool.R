@@ -1,3 +1,102 @@
+#' @title Write Site Tool sheet
+#' 
+#' @description 
+#' Writes an individual Site Tool sheet with OU-level summary row, subtotal
+#' formulas, and site-level distributed dataset.
+#' 
+#' @param wb Openxlsx workbook object.
+#' @param sheet Name of sheet to write.
+#' @param d A datapackr list object.
+#' 
+write_site_level_sheet <- function(wb, sheet, d) {
+  # OU sum row ####
+    # sums <- d$data$site$distributed %>%
+    #   dplyr::filter(sheet_name == sheet) %>%
+    #   dplyr::group_by()
+  
+  # Order Columns ####
+    ## Filter and spread distributed site data
+  data <- d$data$site$distributed %>%
+    dplyr::filter(sheet_name == sheet) %>%
+    tidyr::spread(key = indicatorCode, value = siteValue) %>%
+    dplyr::mutate(Inactive = "") %>%
+    dplyr::select(Inactive,dplyr::everything())
+
+    ## Get column order from schema
+  schema <- datapackr::site_tool_schema %>%
+    dplyr::filter(sheet_name == sheet)
+  
+    ## Remember num of row_header columns
+  row_header_cols <- NROW(schema[schema$col_type == "Row Header",])
+  
+  schema %<>%
+    dplyr::select(indicator_code) %>%
+    dplyr::mutate(fields = NA) %>%
+    ## Transpose to look like Site Tool rows 1:3
+    as.data.frame() %>%
+    `row.names<-`(.[, 1]) %>%
+    dplyr::select(-1) %>%
+    t() %>%
+    tibble::as_tibble() %>%
+    dplyr::slice(rep(1:dplyr::n(), each = NROW(data)))
+    
+    ## Morph the distributed data into shape
+  data <- schema %>%
+    datapackr::swapColumns(., data) %>%
+    as.data.frame(.)
+    
+  # Write data ####
+  openxlsx::writeDataTable(wb = wb, sheet = sheet, x = data,
+                           xy = c(1,5), colNames = TRUE, withFilter = TRUE,
+                           stack = TRUE, tableStyle = "none",
+                           tableName = tolower(sheet))
+  
+  # Subtotal row ####
+    ## Formula
+  data_cols <- names(data)[(row_header_cols + 1):length(data)]
+  
+  subtotal_fxs <- paste0('=SUBTOTAL(109,',tolower(sheet),'[',data_cols,'])') %>%
+    t()
+  
+  # Inactive column ####
+  
+  # Conditional formatting ####
+  #to code Mil, Natl, Comm, Fac, Inactive, Not Distributed
+  
+  
+  # Validation ####
+    ## Site
+  
+    ## Mechanism
+  
+    ## Type
+  
+    ## Age (can this be conditional based on tab?)
+  
+    ## Sex (can this be conditional based on tab?)
+  
+    ## KeyPop
+  
+  
+  # Conform column widths ####
+  
+  
+  # Freeze pane ####
+  openxlsx::freezePane(wb = wb, sheet = sheet,
+                       firstActiveRow = 6,
+                       firstActiveCol = (row_header_cols + 1))
+      
+    
+  
+  #TODO ####
+  # - Write data into each sheet
+  # - conditional formatting on cells where data against invalid disaggs
+  # - What to do with dedupes?...
+  # - Add inactive column to site tool schema (first col)
+  # - Add lines in frame for subtotal and Data Pack sum rows
+  
+  
+}
 
 #' @export
 #' @title Pack a Site Tool
@@ -33,18 +132,11 @@ packSiteTool <- function(d) {
   # Make sure login creds allow export of data from DATIM for specified OU ####
   
   
-  # Grab Data Pack data distributed at Site x IM x DSD/TA ####
-  
-  
-  
-  # Mark what wasn't distributed ####
-  
-  
   # Build Site Tool frame ####
     wb <- datapackr::packFrame(datapack_uid = d$info$datapack_uid,
                                type = "Site Tool")
   
-  # Add data validations ####
+  # Add data validation Options ####
     ## DSD, TA options for validation
     openxlsx::writeDataTable(
       wb = wb,
@@ -133,17 +225,30 @@ packSiteTool <- function(d) {
     )
     
   
+  # Grab Data Pack data distributed at Site x IM x DSD/TA ####
+    d$data$site$distributed %<>%
+    ## Pull in mechanism names
+      dplyr::left_join((mechList %>%
+                          dplyr::select(code,mechanism = name)),
+                       by = c("mechanismCode" = "code")) %>%
+    ## Mark what wasn't distributed
+      dplyr::mutate(
+        site_tool_label = dplyr::case_when(
+          is.na(site_tool_label) ~ paste0(PSNU," > NOT YET DISTRIBUTED"),
+          TRUE ~ site_tool_label
+            ),
+        siteValue = dplyr::case_when(is.na(siteValue) ~ value, TRUE ~ siteValue),
+        siteValue = datapackr::round_trunc(siteValue),
+        mechanism = dplyr::case_when(mechanismCode == "Dedupe" ~ "Dedupe", TRUE ~ mechanism)
+        ) %>%
+      dplyr::select(sheet_name,Site = site_tool_label,Mechanism = mechanism,
+                    Age,Sex,KeyPop,Type = type,indicatorCode,siteValue)
+    
   # Populate Site Tool ####
-    #TODO
-      # 1) Write data into each sheet
-      # 2) Conditional formatting on each site column
-      # 3) validation on each DSD/TA column
-      # 4) validation on each site column
-      # 5) validation on each mech column
-      # 6) validation on each age column (can this be conditional based on tab?)
-      # 7) validation on each sex column (can this be conditional based on tab?)
-      # 8) validation on each KP column
-      # 9) 
+    data_sheets <- names(wb)[which(!stringr::str_detect(names(wb), "Home|Site List|Mechs|Validations"))]
+    
+    write_all_sheets <- function(x) {write_site_level_sheet(wb = wb, sheet = x, d = d)}
+    sapply(data_sheets, write_all_sheets)
         
   # Export Site Tool ####
     output_file_name <- paste0(

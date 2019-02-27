@@ -126,3 +126,27 @@ getMilitaryNodes <- function() {
   
   return(militaryNodes)
 }
+
+#' @export
+#' @title Swap columns between dataframes
+#' 
+#' @description 
+#' Replaces columns in \code{to} with those with identical names in \code{from}.
+#' 
+#' @param to Dataframe to pull columns into
+#' @param from Data frame to pull columns from
+#' 
+#' @return dataframe with swapped columns
+#' 
+swapColumns <- function(to, from) {
+  cols = colnames(from)
+  for (i in 1:length(cols)) {
+    col = cols[i]
+    if (col %in% colnames(to)) {
+      dots <- setNames(list(lazyeval::interp(~ magrittr::use_series(from,x), x = as.name(col))), col)
+      to <- to %>%
+        dplyr::mutate_(.dots = dots)
+    } else {next}
+  }
+  return(to)
+}

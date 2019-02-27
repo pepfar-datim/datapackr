@@ -402,7 +402,10 @@ getSiteToolSchema <- function(data_pack_schema) {
   # Data Pack formulas not relevant for Site Tool
     dplyr::select(-formula) %>%
   # Use indicator_code to construct headers
-    dplyr::mutate(tech_area =
+    dplyr::mutate(indicator_code = stringr::str_replace(indicator_code,
+                                                        "^PSNU$",
+                                                        "Site"),
+                  tech_area =
                     dplyr::case_when(
                       col_type == "FY20 Target" ~ stringr::str_extract(indicator_code,"^(.)+\\.(N|D)(?=\\.)")),
                   tech_area = 
@@ -411,13 +414,26 @@ getSiteToolSchema <- function(data_pack_schema) {
     dplyr::group_by(sheet_name,tech_area) %>%
     dplyr::mutate(header = 1:dplyr::n()) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(tech_area = dplyr::case_when(header == 1 ~ tech_area)) %>%
+    dplyr::mutate(tech_area = dplyr::case_when(header == 1 ~ tech_area),
+                  split = dplyr::case_when(indicator_code == "Site" ~ 4, TRUE ~ 1))
+  
+  # Add Mechanism and type columns to every sheet
+  site_schema <- site_schema[rep(seq_len(dim(site_schema)[1]),site_schema$split),] %>%
+    dplyr::select(-split,-header) %>%
   # Recalibrate column numbers
     dplyr::group_by(sheet_num) %>%
     dplyr::mutate(column = 1:dplyr::n()) %>%
     dplyr::ungroup() %>%
   # Recalibrate sheet number
-    dplyr::mutate(sheet_num = sheet_num - 5) %>%
+    dplyr::mutate(
+      sheet_num = sheet_num - 5,
+  # Rename mechanism and type columns
+      indicator_code = dplyr::case_when(
+        indicator_code == "Site" & column == 1 ~ "Inactive",
+        indicator_code == "Site" & column == 3 ~ "Mechanism",
+        indicator_code == "Site" & column == 4 ~ "Type",
+        TRUE ~ indicator_code)
+      ) %>%
     dplyr::select(sheet_num,sheet_name,col = column,col_type,tech_area,label,indicator_code)
   
   return(site_schema)
