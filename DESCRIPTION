@@ -32,8 +32,9 @@ Imports:
     httr (>= 1.4.0),
     rlist (>= 0.4.6.1),
     magrittr (>= 1.5),
-    devtools (>= 2.0.1),
     getPass
+Suggests:
+    devtools (>= 2.0.1)
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
