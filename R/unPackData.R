@@ -84,6 +84,10 @@ unPackData <- function(import_file = NA,
     if (!file.exists(d$keychain$submission_path)) {
       stop("Submission workbook could not be read!")
     }
+    
+    if ( tools::file_ext(d$keychain$submission_path) != "xlsx" ) {
+      stop("File must be an XLSX file!")
+    }
 
   # Start running log of all warning and information messages
     d$info$warningMsg <- NULL
