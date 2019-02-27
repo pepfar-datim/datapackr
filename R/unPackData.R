@@ -76,16 +76,20 @@ unPackData <- function(import_file = NA,
     }
 
   # Check the file exists
-    print("Checking the file exists...")
+    
+    
+    msg<-"Checking the file exists..."
+    interactive_print(msg)
+
     if (!file.exists(d$keychain$submission_path)) {
       stop("Submission workbook could not be read!")
     }
 
-  # Start running log of all warning messages
+  # Start running log of all warning and information messages
     d$info$warningMsg <- NULL
 
-  # Check OU name and UID match up
-    print("Checking the OU name and UID on HOME tab...")
+    # Check OU name and UID match up
+    interactive_print("Checking the OU name and UID on HOME tab...")
     d <- checkOUinfo(d)
 
   # Check integrity of Workbook tabs
@@ -112,7 +116,7 @@ unPackData <- function(import_file = NA,
           ".csv"
         )
         readr::write_csv(d$data$FAST, d$keychain$FAST_file_name)
-        print(paste0("Successfully saved FAST export to ", d$keychain$FAST_file_name))
+        interactive_print(paste0("Successfully saved FAST export to ", d$keychain$FAST_file_name))
     }
 
   # Package SUBNAT/IMPATT export
@@ -128,7 +132,7 @@ unPackData <- function(import_file = NA,
           ".csv"
         )
         readr::write_csv(d$datim$SUBNAT_IMPATT, d$keychain$SUBNAT_IMPATT_filename)
-        print(paste0("SUBNAT/IMPATT data is ready for DATIM import and available here: ", d$keychain$SUBNAT_IMPATT_filename))
+        interactive_print(paste0("SUBNAT/IMPATT data is ready for DATIM import and available here: ", d$keychain$SUBNAT_IMPATT_filename))
     }
 
   # If warnings, show all grouped by sheet and issue
