@@ -15,7 +15,7 @@ A datapackr list object, \code{d}, storing at least 1 dataframe of
    data at the SNU x IM level, \code{d$data$distributedMER}.
 }
 \description{
-Takes the output of the \code{\link{unPackSNUxIM}} and 
+Takes the output of the \code{\link{unPackSNUxIM}} and
     \code{\link{unPackSheets}} functions and delicatety combines these to create
     a single dataframe at the PSNU x IM level.
 }

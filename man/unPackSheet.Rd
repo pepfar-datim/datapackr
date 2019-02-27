@@ -18,7 +18,7 @@ A datapackr list object, \code{d}, storing a dataframe of extracted
    extracting data from sheet specified in \code{d$data$sheet}.
 }
 \description{
-Within a submitted Data Pack or Site Tool (directed to by 
+Within a submitted Data Pack or Site Tool (directed to by
    \code{d$keychain$submission_path}), extract data from a single sheet specified
    in \code{d$data$sheet}.
 }
