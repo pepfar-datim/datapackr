@@ -5,6 +5,7 @@
 #' Processes a submitted Data Pack (in .xlsx format) by identifying integrity
 #'     issues, checking data against DATIM validations, and extracting data.
 #'
+#' @param import_file Local path to the file to import. 
 #' @param output_path A local path directing to the folder where you would like
 #' outputs to be saved. If not supplied, will output to working directory.
 #' @param export_FAST If TRUE, will extract and output to \code{output_path} a
@@ -44,7 +45,8 @@
 #' The final message in the Console prints all warnings identified in the Data
 #' Pack being processed.
 #'
-unPackData <- function(output_path = NA,
+unPackData <- function(import_file = NA,
+                       output_path = NA,
                        export_FAST = FALSE,
                        archive_results = FALSE,
                        export_SUBNAT_IMPATT = FALSE) {
@@ -60,8 +62,18 @@ unPackData <- function(output_path = NA,
       d$keychain$output_path = getwd()
     }
 
+  can_read_import_file<-function(import_file) {
+    
+    if (is.na(import_file)) { return(FALSE)}
+    
+    file.access(import_file,4) == 0
+  }
+    
+  if ( !can_read_import_file( import_file ) ) {
   # Allow User to choose file
-    d$keychain$submission_path <- file.choose()
+    d$keychain$submission_path <- file.choose() } else {
+      d$keychain$submission_path <- import_file
+    }
 
   # Check the file exists
     print("Checking the file exists...")
