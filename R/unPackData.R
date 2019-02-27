@@ -156,6 +156,7 @@ unPackData <- function(import_file = NA,
         ".rds"
       )
       saveRDS(d, file = archive)
+      d$keychain$archive_file<-archive
     }
     
     return(d)
