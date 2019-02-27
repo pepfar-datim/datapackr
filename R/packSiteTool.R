@@ -52,11 +52,23 @@ write_site_level_sheet <- function(wb, sheet, d) {
                            tableName = tolower(sheet))
   
   # Subtotal row ####
-    ## Formula
+    ##Compile Formula
   data_cols <- names(data)[(row_header_cols + 1):length(data)]
-  
-  subtotal_fxs <- paste0('=SUBTOTAL(109,',tolower(sheet),'[',data_cols,'])') %>%
-    t()
+  subtotal_fxs <- paste0('=SUBTOTAL(109,',tolower(sheet),'[',data_cols,'])')
+    ## Write Formula
+  datapackr::writeFxColumnwise(wb, sheet, subtotal_fxs, xy = c(row_header_cols+1,4))
+    ## Format formula as numeric
+  num <- openxlsx::createStyle(numFmt = "#,##0.00")
+  openxlsx::addStyle(wb, sheet, style = num,
+                     rows = 4, cols = (row_header_cols+1:length(data_cols)))
+    ## Add red conditional formatting for discrepancies
+  subtotal_colStart_letter <- openxlsx::int2col(row_header_cols+1)
+  subtotal_cond_format_fx <- paste0(
+      '!=',subtotal_colStart_letter,'3')
+  openxlsx::conditionalFormatting(
+    wb, sheet,
+    cols = (row_header_cols+1:length(data_cols)), rows = 4,
+    rule = subtotal_cond_format_fx)
   
   # Inactive column ####
   
