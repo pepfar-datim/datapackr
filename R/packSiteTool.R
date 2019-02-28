@@ -131,13 +131,12 @@ write_site_level_sheet <- function(wb, sheet, d) {
   openxlsx::writeFormula(wb, sheet, inactiveFormula, xy = c(1, 6))
   
 # Conditional formatting ####
-  #to code Mil, Natl, Comm, Fac, Inactive, Not Distributed
   datapackr::colorCodeSites(
     wb = wb, sheet = sheet, cols = 2, rows = 6:(NROW(data) + max_row_buffer + 5))
   openxlsx::conditionalFormatting(
     wb = wb, sheet = sheet,
     cols = 2, rows = 6:(NROW(data) + max_row_buffer + 5),
-    rule = '$A6!="Active"')
+    rule = 'OR($A6=="Inactive",$A6=="NOT A SITE")')
   
 # Validation ####
   ## Site
@@ -201,8 +200,19 @@ write_site_level_sheet <- function(wb, sheet, d) {
         value = "kp")
   }
   
-# Conform column widths ####
+# Conform column/row sizes ####
+  openxlsx::setColWidths(wb, sheet,
+    cols = 1:length(data),
+    widths =
+      c("auto", 50, 20, "auto",
+        rep("auto",row_header_cols-4),
+        rep(12,length(data_cols))
+        )
+    )
   
+  openxlsx::setRowHeights(wb, sheet,
+    rows = 2,
+    heights = 120)
   
 # Freeze pane ####
   openxlsx::freezePane(wb = wb, sheet = sheet,
@@ -212,11 +222,10 @@ write_site_level_sheet <- function(wb, sheet, d) {
     
   
 #TODO ####
-  # - Write data into each sheet
   # - conditional formatting on cells where data against invalid disaggs
   # - What to do with dedupes?...
-  # - Add inactive column to site tool schema (first col)
-  # - Add lines in frame for subtotal and Data Pack sum rows
+  # - Add line in frame for Data Pack sum
+  # - Redo column labels to list full string of element name?
   
   
 }
@@ -338,19 +347,8 @@ packSiteTool <- function(d) {
     sapply(data_sheets, write_all_sheets)
         
 # Export Site Tool ####
-    output_file_name <- paste0(
-      d$keychain$output_path,
-      if (is.na(stringr::str_extract(d$keychain$output_path,"/$"))) {"/"} else {},
-      "SiteTool_",
-      d$info$datapack_name,"_",
-      format(Sys.time(), "%Y%m%d%H%M%S"),
-      ".xlsx"
-    )
-    
-    openxlsx::saveWorkbook(
-      wb = wb,
-      file = output_file_name,
-      overwrite = TRUE
-    )
-    print(paste0("Successfully saved output to ", output_file_name))
+    exportPackr(wb,
+                d$keychain$output_path,
+                type = "Site Tool",
+                d$info$datapack_name)
 }

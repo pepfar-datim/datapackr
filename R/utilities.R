@@ -179,3 +179,61 @@ writeFxColumnwise <- function(wb, sheet, x, xy) {
   
   openxlsx::writeData(wb = wb, sheet = sheet, x = fx, xy = xy, colNames = FALSE)
 }
+
+#' @export
+#' @title Export output.
+#' 
+#' @description 
+#' Exports a datapackr output to specified filepath.
+#'
+#' @param data Data object to export. Can be either a dataframe or an Openxlsx
+#' Workbook object.
+#' @param output_path A local path directing to the folder where you would like
+#' outputs to be saved. If not supplied, will output to working directory.
+#' @param type File prefix to be applied in output filename.
+#' @param datapack_name Country name or OU name to be listed in output filename.
+#' 
+exportPackr <- function(data, output_path, type, datapack_name) {
+  packName <- function(output_path, type, datapack_name, extension) {
+    paste0(
+      output_path,
+      if (is.na(stringr::str_extract(output_path,"/$"))) {"/"} else {},
+      type,"_",
+      datapack_name,"_",
+      format(Sys.time(), "%Y%m%d%H%M%S"),
+      extension
+    )
+  }
+
+  if (type %in% c("Site Tool", "Data Pack")) {
+    if (class(data) != "Workbook") {
+      stop("Output type and data do not match!")
+    }
+    
+    output_file_name <- packName(output_path, type, datapack_name, extension = ".xlsx")
+    
+    openxlsx::saveWorkbook(wb, output_file_name, overwrite = TRUE)
+  }
+  
+  if (type %in% c("FAST Export","SUBNAT IMPATT")) {
+    if (class(data) != "data.frame") {
+      stop("Output type and data do not match!")
+    }
+    
+    output_file_name <- packName(output_path, type, datapack_name, extension = ".csv")
+    
+    readr::write_csv(data, output_file_name)
+  }
+  
+  if (type %in% c("Results Archive")) {
+    if (class(data) != "list") {
+      stop("Output type and data do not match!")
+    }
+    
+    output_file_name <- packName(output_path, type, datapack_name, extension = ".rds")
+    
+    saveRDS(data, output_file_name)
+  }
+    
+  print(paste0("Successfully saved ",type," to ", output_file_name))
+}

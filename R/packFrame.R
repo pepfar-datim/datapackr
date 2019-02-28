@@ -100,26 +100,26 @@ frameDataSheet <- function(wb, sheet, type = "Data Pack") {
   
 # Add styles ####
   ## Title
-      openxlsx::addStyle(wb = wb, sheet = sheet,
+      openxlsx::addStyle(wb, sheet,
                          style = datapackr::styleGuide$data$title,
                          rows = 1, cols = 1, gridExpand = TRUE, stack = TRUE)
   ## Header Row
-      openxlsx::addStyle(wb = wb, sheet = sheet,
+      openxlsx::addStyle(wb, sheet,
                          style = datapackr::styleGuide$data$header,
                          rows = 1, cols = (row_header_cols+1):length(schema),
                          gridExpand = TRUE, stack = TRUE)
   ## Labels
-      openxlsx::addStyle(wb = wb, sheet = sheet,
+      openxlsx::addStyle(wb, sheet,
                          style = datapackr::styleGuide$data$label,
                          rows = 2, cols = (row_header_cols+1):length(schema),
                          gridExpand = TRUE, stack = TRUE)
   ## UIDs
-      openxlsx::addStyle(wb = wb, sheet = sheet,
+      openxlsx::addStyle(wb, sheet,
                          style = datapackr::styleGuide$data$uid,
                          rows = 5, cols = (row_header_cols+1):length(schema),
                          gridExpand = TRUE, stack = TRUE)
   ## Row Headers
-      openxlsx::addStyle(wb = wb, sheet = sheet,
+      openxlsx::addStyle(wb, sheet,
                          style = datapackr::styleGuide$data$rowHeader,
                          rows = 5, cols = 1:row_header_cols,
                          gridExpand = TRUE, stack = TRUE)

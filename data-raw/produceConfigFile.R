@@ -357,7 +357,7 @@ loadStyleGuide <- function() {
                                   textDecoration = "bold",
                                   halign = "left",
                                   valign = "center"),
-    header = openxlsx::createStyle(fontSize = 18,
+    header = openxlsx::createStyle(fontSize = 12,
                                    textDecoration = "bold",
                                    halign = "left",
                                    valign = "center",

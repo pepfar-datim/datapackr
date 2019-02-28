@@ -91,32 +91,19 @@ unPackData <- function(output_path = NA,
   # Package FAST export
     d <- FASTforward(d)
     if (export_FAST == TRUE) {
-        d$keychain$FAST_file_name <- paste0(
-          d$keychain$output_path,
-          if (is.na(stringr::str_extract(d$keychain$output_path,"/$"))) {"/"} else {},
-          d$info$datapack_name,"_",
-          "FASTExport_",
-          format(Sys.time(), "%Y%m%d%H%M%S"),
-          ".csv"
-        )
-        readr::write_csv(d$data$FAST, d$keychain$FAST_file_name)
-        print(paste0("Successfully saved FAST export to ", d$keychain$FAST_file_name))
+      exportPackr(d$data$FAST,
+                  d$keychain$output_path,
+                  type = "FAST Export",
+                  d$info$datapack_name)
     }
 
   # Package SUBNAT/IMPATT export
     d <- packSUBNAT_IMPATT(d)
-
     if (export_SUBNAT_IMPATT == TRUE) {
-        d$keychain$SUBNAT_IMPATT_filename <- paste0(
-          d$keychain$output_path,
-          if (is.na(stringr::str_extract(d$keychain$output_path,"/$"))) {"/"} else {},
-          d$info$datapack_name,"_",
-          "SUBNAT_IMPATT_Export_",
-          format(Sys.time(), "%Y%m%d%H%M%S"),
-          ".csv"
-        )
-        readr::write_csv(d$datim$SUBNAT_IMPATT, d$keychain$SUBNAT_IMPATT_filename)
-        print(paste0("SUBNAT/IMPATT data is ready for DATIM import and available here: ", d$keychain$SUBNAT_IMPATT_filename))
+      exportPackr(d$data$SUBNAT_IMPATT,
+                  d$keychain$output_path,
+                  type = "SUBNAT IMPATT",
+                  d$info$datapack_name)
     }
 
   # If warnings, show all grouped by sheet and issue
@@ -130,15 +117,10 @@ unPackData <- function(output_path = NA,
     #options(warn = 0)
 
     if (archive_results == TRUE) {
-      archive <- paste0(
-        d$keychain$output_path,
-        if (is.na(stringr::str_extract(d$keychain$output_path,"/$"))) {"/"} else {},
-        d$info$datapack_name,"_",
-        "Results_Archive",
-        format(Sys.time(), "%Y%m%d%H%M%S"),
-        ".rds"
-      )
-      saveRDS(d, file = archive)
+      exportPackr(d,
+                  d$keychain$output_path,
+                  type = "Results Archive",
+                  d$info$datapack_name)
     }
     
     return(d)

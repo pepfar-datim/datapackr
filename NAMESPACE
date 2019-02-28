@@ -3,6 +3,7 @@
 export(addValidationsSite)
 export(api_version)
 export(colorCodeSites)
+export(exportPackr)
 export(frameDataSheet)
 export(getIMPATTLevels)
 export(getMechList)
