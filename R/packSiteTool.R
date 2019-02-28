@@ -40,6 +40,7 @@ colorCodeSites <- function(wb, sheet, cols, rows) {
                                   type = "contains")  
 }
 
+
 #' @importFrom magrittr %>% %<>%
 #' @title Write Site Tool sheet
 #' 
@@ -140,52 +141,64 @@ write_site_level_sheet <- function(wb, sheet, d) {
   
 # Validation ####
   ## Site
-  openxlsx::dataValidation(
-    wb = wb, sheet = sheet,
+  openxlsx::dataValidation(wb, sheet,
     cols = 2, rows = 6:(NROW(data) + max_row_buffer + 5),
     type = "list",
     value = 'INDIRECT("site_list_table[siteID]")')
   
   ## Mechanism
-  openxlsx::dataValidation(
-    wb = wb, sheet = sheet,
+  openxlsx::dataValidation(wb, sheet,
     cols = 3, rows = 6:(NROW(data) + max_row_buffer + 5),
     type = "list",
     value = 'INDIRECT("mech_list[mechID]")')
   
   ## Type
-  openxlsx::dataValidation(
-    wb = wb, sheet = sheet,
+  openxlsx::dataValidation(wb, sheet,
     cols = 4, rows = 6:(NROW(data) + max_row_buffer + 5),
     type = "list",
-    value = 'INDIRECT("dsdta[type]")')
+    value = 'dsdta')
   
-  ## Age (can this be conditional based on tab?)
+  ## Age
   if ("Age" %in% names(data)) {
-    validAges <- datapackr::valid_dp_disaggs %>%
-      magrittr::extract2(sheet) %>%
-      magrittr::use_series(validAges)
-    
-    openxlsx::dataValidation(
-      wb = wb, sheet = sheet,
+    age_range <-
+      dplyr::case_when(
+        sheet %in% c("TB_STAT_ART","TX") ~ "ages_long",
+        sheet == "TB_TX_PREV" ~ "ages_coarse",
+        sheet == "OVC" ~ "ages_ovc",
+        sheet == "HTS" ~ "ages_no01",
+        sheet == "CXCA" ~ "ages_cxca",
+        sheet %in% c("PMTCT_STAT_ART","VMMC","PP") ~ "ages_noUnder10",
+        sheet == "PrEP" ~ "ages_over15"
+      )
+    openxlsx::dataValidation(wb, sheet,
       cols = which(names(data)=="Age"),
       rows = 6:(NROW(data) + max_row_buffer + 5),
       type = "list",
-      value = "10-14")
+      value = age_range)
   }
   
   ## Sex (can this be conditional based on tab?)
   if ("Sex" %in% names(data)) {
-    validSexes <- datapackr::valid_dp_disaggs %>%
-      magrittr::extract2(sheet) %>%
-      magrittr::use_series(validSexes)
+      sexes <- dplyr::case_when(
+        sheet %in% c("TB_STAT_ART","TX","HTS","TB_TX_PREV","OVC","PP","PrEP") ~ "MF",
+        sheet %in% c("PMTCT_STAT_ART","CXCA") ~ "Female",
+        sheet == "VMMC" ~ "Male"
+      )
+    
+      openxlsx::dataValidation(wb, sheet,
+        cols = which(names(data)=="Sex"),
+        rows = 6:(NROW(data) + max_row_buffer + 5),
+        type = "list",
+        value = sexes)
   }
   
   ## KeyPop
   if ("KeyPop" %in% names(data)) {
-    validKPs <- datapackr::valid_dp_disaggs %>%
-      magrittr::extract2(sheet) %>%
-      magrittr::use_series(validKPs)
+      openxlsx::dataValidation(wb, sheet,
+        cols = which(names(data)=="KeyPop"),
+        rows = 6:(NROW(data) + max_row_buffer + 5),
+        type = "list",
+        value = "kp")
   }
   
 # Conform column widths ####
@@ -246,7 +259,7 @@ packSiteTool <- function(d) {
     wb <- datapackr::packFrame(datapack_uid = d$info$datapack_uid,
                                type = "Site Tool")
   
-# Write site list ####
+# Write site list (TODO: SPEED THIS UP) ####
     country_uids <- datapackr::dataPackMap %>%
       dplyr::filter(data_pack_name == d$info$datapack_name) %>%
       dplyr::pull(country_uid)
