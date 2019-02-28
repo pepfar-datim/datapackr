@@ -35,6 +35,7 @@ Imports:
     devtools (>= 2.0.1),
     getPass,
     openxlsx
+Remotes: jason-p-pickering/openxlsx
 License: GPL-2
 Encoding: UTF-8
 LazyData: true

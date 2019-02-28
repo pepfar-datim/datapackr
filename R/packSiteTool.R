@@ -1,3 +1,46 @@
+#' @export
+#' @title Color code sites by type
+#' 
+#' @description 
+#' Adds conditional formatting layers over site names to color code then by type:
+#' \itemize{
+#'   \item{Green}{Community sites.}
+#'   \item{Blue}{Facility sites.}
+#'   \item{Purple}{National-level.}
+#'   \item{Khaki}{Military node.}
+#' }
+#' 
+#' @param wb An Openxlsx Workbook object.
+#' @param sheet A name or index of a worksheet.
+#' @param cols Columns to apply conditional formatting to.
+#' @param rows Rows to apply conditional formatting to.
+#'
+colorCodeSites <- function(wb, sheet, cols, rows) {
+  sg <- datapackr::styleGuide$siteList
+  
+  openxlsx::conditionalFormatting(wb = wb,sheet = sheet,
+                                  cols = cols,rows = rows,
+                                  rule = "[#Community]",
+                                  style = sg$community,
+                                  type = "contains")
+  openxlsx::conditionalFormatting(wb = wb,sheet = sheet,
+                                  cols = cols,rows = rows,
+                                  rule = "[#Facility]",
+                                  style = sg$facility,
+                                  type = "contains")
+  openxlsx::conditionalFormatting(wb = wb,sheet = sheet,
+                                  cols = cols,rows = rows,
+                                  rule = "[#National]",
+                                  style = sg$national,
+                                  type = "contains")
+  openxlsx::conditionalFormatting(wb = wb,sheet = sheet,
+                                  cols = cols,rows = rows,
+                                  rule = "[#Military]",
+                                  style = sg$military,
+                                  type = "contains")  
+}
+
+#' @importFrom magrittr %>% %<>%
 #' @title Write Site Tool sheet
 #' 
 #' @description 
@@ -9,18 +52,18 @@
 #' @param d A datapackr list object.
 #' 
 write_site_level_sheet <- function(wb, sheet, d) {
-  # OU sum row ####
+# OU sum row ####
     # sums <- d$data$site$distributed %>%
     #   dplyr::filter(sheet_name == sheet) %>%
     #   dplyr::group_by()
   
-  # Order Columns ####
+# Order Columns ####
     ## Filter and spread distributed site data
   data <- d$data$site$distributed %>%
     dplyr::filter(sheet_name == sheet) %>%
     tidyr::spread(key = indicatorCode, value = siteValue) %>%
-    dplyr::mutate(Inactive = "") %>%
-    dplyr::select(Inactive,dplyr::everything())
+    dplyr::mutate(Status = "") %>%
+    dplyr::select(Status,dplyr::everything())
 
     ## Get column order from schema
   schema <- datapackr::site_tool_schema %>%
@@ -45,22 +88,25 @@ write_site_level_sheet <- function(wb, sheet, d) {
     datapackr::swapColumns(., data) %>%
     as.data.frame(.)
     
-  # Write data ####
+# Write data ####
   openxlsx::writeDataTable(wb = wb, sheet = sheet, x = data,
                            xy = c(1,5), colNames = TRUE, withFilter = TRUE,
                            stack = TRUE, tableStyle = "none",
                            tableName = tolower(sheet))
   
-  # Subtotal row ####
+# Subtotal row ####
     ##Compile Formula
   data_cols <- names(data)[(row_header_cols + 1):length(data)]
   subtotal_fxs <- paste0('=SUBTOTAL(109,',tolower(sheet),'[',data_cols,'])')
+    
     ## Write Formula
   datapackr::writeFxColumnwise(wb, sheet, subtotal_fxs, xy = c(row_header_cols+1,4))
+    
     ## Format formula as numeric
   num <- openxlsx::createStyle(numFmt = "#,##0.00")
   openxlsx::addStyle(wb, sheet, style = num,
                      rows = 4, cols = (row_header_cols+1:length(data_cols)))
+    
     ## Add red conditional formatting for discrepancies
   subtotal_colStart_letter <- openxlsx::int2col(row_header_cols+1)
   subtotal_cond_format_fx <- paste0(
@@ -70,37 +116,89 @@ write_site_level_sheet <- function(wb, sheet, d) {
     cols = (row_header_cols+1:length(data_cols)), rows = 4,
     rule = subtotal_cond_format_fx)
   
-  # Inactive column ####
+# Inactive column ####
+  max_row_buffer <- 500
+  formula_cell_numbers <- seq(1, NROW(data) + max_row_buffer) + 5
   
-  # Conditional formatting ####
+  inactiveFormula <- paste0(
+    'IF(B',
+    formula_cell_numbers,
+    '<>"",IFERROR(INDEX(site_list_table[status],MATCH(B',
+    formula_cell_numbers,
+    ',site_list_table[siteID],0)),"NOT A SITE"),"")'
+  )
+  openxlsx::writeFormula(wb, sheet, inactiveFormula, xy = c(1, 6))
+  
+# Conditional formatting ####
   #to code Mil, Natl, Comm, Fac, Inactive, Not Distributed
+  datapackr::colorCodeSites(
+    wb = wb, sheet = sheet, cols = 2, rows = 6:(NROW(data) + max_row_buffer + 5))
+  openxlsx::conditionalFormatting(
+    wb = wb, sheet = sheet,
+    cols = 2, rows = 6:(NROW(data) + max_row_buffer + 5),
+    rule = '$A6!="Active"')
+  
+# Validation ####
+  ## Site
+  openxlsx::dataValidation(
+    wb = wb, sheet = sheet,
+    cols = 2, rows = 6:(NROW(data) + max_row_buffer + 5),
+    type = "list",
+    value = 'INDIRECT("site_list_table[siteID]")')
+  
+  ## Mechanism
+  openxlsx::dataValidation(
+    wb = wb, sheet = sheet,
+    cols = 3, rows = 6:(NROW(data) + max_row_buffer + 5),
+    type = "list",
+    value = 'INDIRECT("mech_list[mechID]")')
+  
+  ## Type
+  openxlsx::dataValidation(
+    wb = wb, sheet = sheet,
+    cols = 4, rows = 6:(NROW(data) + max_row_buffer + 5),
+    type = "list",
+    value = 'INDIRECT("dsdta[type]")')
+  
+  ## Age (can this be conditional based on tab?)
+  if ("Age" %in% names(data)) {
+    validAges <- datapackr::valid_dp_disaggs %>%
+      magrittr::extract2(sheet) %>%
+      magrittr::use_series(validAges)
+    
+    openxlsx::dataValidation(
+      wb = wb, sheet = sheet,
+      cols = which(names(data)=="Age"),
+      rows = 6:(NROW(data) + max_row_buffer + 5),
+      type = "list",
+      value = "10-14")
+  }
+  
+  ## Sex (can this be conditional based on tab?)
+  if ("Sex" %in% names(data)) {
+    validSexes <- datapackr::valid_dp_disaggs %>%
+      magrittr::extract2(sheet) %>%
+      magrittr::use_series(validSexes)
+  }
+  
+  ## KeyPop
+  if ("KeyPop" %in% names(data)) {
+    validKPs <- datapackr::valid_dp_disaggs %>%
+      magrittr::extract2(sheet) %>%
+      magrittr::use_series(validKPs)
+  }
+  
+# Conform column widths ####
   
   
-  # Validation ####
-    ## Site
-  
-    ## Mechanism
-  
-    ## Type
-  
-    ## Age (can this be conditional based on tab?)
-  
-    ## Sex (can this be conditional based on tab?)
-  
-    ## KeyPop
-  
-  
-  # Conform column widths ####
-  
-  
-  # Freeze pane ####
+# Freeze pane ####
   openxlsx::freezePane(wb = wb, sheet = sheet,
                        firstActiveRow = 6,
                        firstActiveCol = (row_header_cols + 1))
       
     
   
-  #TODO ####
+#TODO ####
   # - Write data into each sheet
   # - conditional formatting on cells where data against invalid disaggs
   # - What to do with dedupes?...
@@ -141,90 +239,54 @@ write_site_level_sheet <- function(wb, sheet, d) {
 #'
 packSiteTool <- function(d) {
   
-  # Make sure login creds allow export of data from DATIM for specified OU ####
+# Make sure login creds allow export of data from DATIM for specified OU ####
   
   
-  # Build Site Tool frame ####
+# Build Site Tool frame ####
     wb <- datapackr::packFrame(datapack_uid = d$info$datapack_uid,
                                type = "Site Tool")
   
-  # Add data validation Options ####
-    ## DSD, TA options for validation
-    openxlsx::writeDataTable(
-      wb = wb,
-      sheet = "Validations",
-      x = data.frame(type = c("DSD", "TA")),
-      xy = c(1,1),
-      colNames = T,
-      tableName = "dsdta"
-    )
-    
-    ## Inactive site tagging options
-    openxlsx::writeDataTable(
-      wb,
-      sheet = "Validations",
-      x = data.frame(choices = c("Active","Inactive")),
-      xy = c(2,1),
-      colNames = T,
-      tableName = "inactive_options"
-    )
-    
-  # Write full site list ####
+# Write site list ####
     country_uids <- datapackr::dataPackMap %>%
       dplyr::filter(data_pack_name == d$info$datapack_name) %>%
       dplyr::pull(country_uid)
     
     siteList <- datapackr::getSiteList(country_uids,
-                                       include_mil = TRUE)
+                                       include_mil = TRUE) %>%
+      #dplyr::select(country_name,psnu,siteID = site_tool_label,site_type) %>%
+      dplyr::select(siteID = site_tool_label) %>%
+      dplyr::mutate(status = "Active") %>%
+      dplyr::arrange(siteID)
     
     openxlsx::writeDataTable(
       wb = wb,
       sheet = "Site List",
-      x = data.frame(siteID = siteList$site_tool_label,
-                     status = "Active"),
+      x = siteList,
       xy = c(1,1),
       colNames = TRUE,
-      tableName = "site_list_table"
+      tableName = "site_list_table",
+      tableStyle = "none",
+      withFilter = TRUE
     )
     
-    openxlsx::setColWidths(wb = wb,
-                           sheet = "Site List",
-                           cols = 1:2,
-                           widths = c("auto",16))
+    openxlsx::setColWidths(
+      wb = wb, sheet = "Site List", cols = 1:2,
+      #widths = c(rep("auto",4),16))
+      widths = c("auto",16))
     
-    openxlsx::dataValidation(wb = wb,
-                             sheet = "Site List",
-                             cols = 2,
-                             rows = 2:(NROW(siteList)+1),
-                             type = "list",
-                             value = 'INDIRECT("inactive_options[choices]")')
+    openxlsx::dataValidation(
+      wb = wb, sheet = "Site List", cols = 2, rows = 2:(NROW(siteList)+1),
+      type = "list",
+      value = 'INDIRECT("inactive_options[choices]")')
     
-    openxlsx::conditionalFormatting(wb = wb,sheet = "Site List",
-                                    cols = 1,rows = 2:(NROW(siteList)+1),
-                                    rule = "[#Community]",
-                                    style = datapackr::styleGuide$siteList$community,
-                                    type = "contains")
-    openxlsx::conditionalFormatting(wb = wb, sheet = "Site List",
-                                    cols = 1,rows = 2:(NROW(siteList)+1),
-                                    rule = "[#Facility]",
-                                    style = datapackr::styleGuide$siteList$facility,
-                                    type = "contains")
-    openxlsx::conditionalFormatting(wb = wb,sheet = "Site List",
-                                    cols = 1,rows = 2:(NROW(siteList)+1),
-                                    rule = "[#National]",
-                                    style = datapackr::styleGuide$siteList$national,
-                                    type = "contains")
-    openxlsx::conditionalFormatting(wb = wb,sheet = "Site List",
-                                    cols = 1,rows = 2:(NROW(siteList)+1),
-                                    rule = "[#Military]",
-                                    style = datapackr::styleGuide$siteList$military,
-                                    type = "contains")
-    openxlsx::conditionalFormatting(wb = wb,sheet = "Site List",
-                                    cols = 1,rows = 2:(NROW(siteList)+1),
-                                    rule = '$B2="Inactive"',
-                                    style = datapackr::styleGuide$siteList$inactive)
+    datapackr::colorCodeSites(
+      wb = wb, sheet = "Site List", cols = 1, rows = 2:(NROW(siteList)+1)
+    )
+    openxlsx::conditionalFormatting(
+      wb = wb,sheet = "Site List", cols = 1,rows = 2:(NROW(siteList)+1),
+      rule = '$E2="Inactive"', style = datapackr::styleGuide$siteList$inactive)
     
-  # Write mech list ####
+# Write mech list ####
     mechList <- datapackr::getMechList(country_uids,
                                        FY = 2019)
     openxlsx::writeDataTable(
@@ -233,11 +295,11 @@ packSiteTool <- function(d) {
       x = data.frame(mechID = mechList$name),
       xy = c(1,1),
       colNames = TRUE,
-      tableName = "mech_list"
+      tableName = "mech_list",
+      tableStyle = "none"
     )
-    
   
-  # Grab Data Pack data distributed at Site x IM x DSD/TA ####
+# Prep Site data ####
     d$data$site$distributed %<>%
     ## Pull in mechanism names
       dplyr::left_join((mechList %>%
@@ -256,13 +318,13 @@ packSiteTool <- function(d) {
       dplyr::select(sheet_name,Site = site_tool_label,Mechanism = mechanism,
                     Age,Sex,KeyPop,Type = type,indicatorCode,siteValue)
     
-  # Populate Site Tool ####
+# Populate Site Tool ####
     data_sheets <- names(wb)[which(!stringr::str_detect(names(wb), "Home|Site List|Mechs|Validations"))]
     
     write_all_sheets <- function(x) {write_site_level_sheet(wb = wb, sheet = x, d = d)}
     sapply(data_sheets, write_all_sheets)
         
-  # Export Site Tool ####
+# Export Site Tool ####
     output_file_name <- paste0(
       d$keychain$output_path,
       if (is.na(stringr::str_extract(d$keychain$output_path,"/$"))) {"/"} else {},
