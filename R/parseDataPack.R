@@ -41,7 +41,7 @@ checkOUinfo <- function(d) {
     msg <-
       "The OU UID and OU name used in this submission don't match up!"
     interactive_print(msg)
-    d$info$messages <- append(msg, d$info$messages)
+    d$info$warningMsg <- append(msg, d$info$warningMsg)
     
     if (interactive()) {
       d$info$datapack_name <- selectOU()
@@ -168,8 +168,8 @@ checkColStructure <- function(d) {
     missing_cols <- col_check %>%
       dplyr::filter(is.na(submission_order)) %>%
       dplyr::pull(indicatorCode)
-    msg <- paste0(
-      "MISSING COLUMNS: Note that this may be due to missing/renamed sheets,
+    msg <- paste0("In tab",d$data$sheet, 
+      " MISSING COLUMNS: Note that this may be due to missing/renamed sheets,
        or added or renamed columns.:  ",
       paste(missing_cols, collapse = ", "),"")
     d$info$warningMsg<-append(msg,d$info$warningMsg)
@@ -180,8 +180,9 @@ checkColStructure <- function(d) {
     added_cols <- col_check %>%
       dplyr::filter(is.na(template_order)) %>%
       dplyr::pull(indicatorCode)
-    msg <- paste0( "ADDED/RENAMED COLUMNS: DO NOT rename columns.
-                   Adding columns is ok.: ", 
+    msg <- paste0( "In tab ",d$data$sheet, 
+                 " ADDED/RENAMED COLUMNS: DO NOT rename columns.
+                   Adding columns is ok : ", 
                    paste(added_cols, collapse = ","),"")
     d$info$warningMsg<-append(msg,d$info$warningMsg)
   }
@@ -191,7 +192,7 @@ checkColStructure <- function(d) {
     out_of_order <- col_check %>%
       dplyr::filter(order_check == FALSE) %>%
       dplyr::pull(indicatorCode)
-    msg <- paste0(
+    msg <- paste0("In tab ",d$data$sheet,
       " COLUMNS OUT OF ORDER: Note that this may be due to missing, 
         added, or renamed columns: ", 
         paste(out_of_order, collapse = ","),"")

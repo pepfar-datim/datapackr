@@ -142,8 +142,14 @@ unPackData <- function(import_file = NA,
   # If warnings, show all grouped by sheet and issue
     if (!is.null(d$info$warningMsg) & interactive()) {
       options(warning.length = 8170)
-      messages <- paste(paste(seq_along(d$info$warningMsg), ": " , stringr::str_squish(gsub(
-                 "\n", "", d$info$warningMsg))),sep="",collapse="\r\n")
+      messages <-
+        paste(paste(
+          seq_along(d$info$warningMsg),
+          ": " ,
+          stringr::str_squish(gsub("\n", "", d$info$warningMsg))
+        ),
+        sep = "",
+        collapse = "\r\n")
       cat(crayon::red("WARNING MESSAGES: \r\n"))
       cat(crayon::red(messages))
     }
