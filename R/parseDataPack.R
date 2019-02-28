@@ -98,17 +98,12 @@ checkWorkbookStructure <- function(d) {
       dplyr::pull(sheet_name)
     
     msg <- paste0(
-      msg,
       "MISSING SHEETS: Be advised that while deleting tabs will
       not prohibit data processing,
       it may cause issues in formulas in the SNU x IM tab.
-      [+] ",
-      paste(missing_sheets, collapse = "
-            [+] "),
-      "
-      
-      "
-      )
+      : ",
+      paste0(missing_sheets, collapse = ", "), "")
+    d$info$warningMsg<-append(msg,d$info$warningMsg)
   }
   
   ## Alert to added/renamed sheets
@@ -118,16 +113,10 @@ checkWorkbookStructure <- function(d) {
       dplyr::filter(is.na(template_order)) %>%
       dplyr::pull(sheet_name)
     msg <- paste0(
-      msg,
       "ADDED/RENAMED SHEETS: Be advised that while adding tabs for custom 
        purposes will not prohibit data processing, renaming existing tabs will.
-      [+] ",
-      paste(added_sheets, collapse = "
-            [+] "),
-      "
-      
-      "
-      )
+      : ",paste(added_sheets, collapse = ", "),"")
+    d$info$warningMsg<-append(msg,d$info$warningMsg)
   }
   
   ## Alert to surprises in sheet order
@@ -137,22 +126,11 @@ checkWorkbookStructure <- function(d) {
       dplyr::filter(order_check == FALSE) %>%
       dplyr::pull(sheet_name)
     msg <- paste0(
-      msg,
       "SHEETS OUT OF ORDER: Be advised that reordering tabs may not prohibit
        data processing, and this issue may be related to missing, 
-       added, or renamed sheets.
-      [+] ",
-      paste(out_of_order, collapse = "
-            [+] "),
-      "
-      
-      "
-      )
-  }
-  
-  # Bundle warnings
-  if (!is.null(msg)) {
-    d$info$warningMsg <- paste0(d$info$warningMsg, msg)
+       added, or renamed sheets. : ", paste(out_of_order, collapse = ","),"")
+    
+    d$info$warningMsg<-append(msg,d$info$warningMsg)
   }
   
   return(d)
@@ -191,16 +169,10 @@ checkColStructure <- function(d) {
       dplyr::filter(is.na(submission_order)) %>%
       dplyr::pull(indicatorCode)
     msg <- paste0(
-      msg,
-      "    MISSING COLUMNS: Note that this may be due to missing/renamed sheets,
-           or added or renamed columns.
-      [+] ",
-      paste(missing_cols, collapse = "
-            [+] "),
-      "
-      
-      "
-      )
+      "MISSING COLUMNS: Note that this may be due to missing/renamed sheets,
+       or added or renamed columns.:  ",
+      paste(missing_cols, collapse = ", "),"")
+    d$info$warningMsg<-append(msg,d$info$warningMsg)
   }
   
   ## Alert to added Columns
@@ -208,16 +180,10 @@ checkColStructure <- function(d) {
     added_cols <- col_check %>%
       dplyr::filter(is.na(template_order)) %>%
       dplyr::pull(indicatorCode)
-    msg <- paste0(
-      msg,
-      "    ADDED/RENAMED COLUMNS: DO NOT rename columns. Adding columns is ok.
-      [+] ",
-      paste(added_cols, collapse = "
-            [+] "),
-      "
-      
-      "
-      )
+    msg <- paste0( "ADDED/RENAMED COLUMNS: DO NOT rename columns.
+                   Adding columns is ok.: ", 
+                   paste(added_cols, collapse = ","),"")
+    d$info$warningMsg<-append(msg,d$info$warningMsg)
   }
   
   ## Alert to surprises in column order
@@ -226,20 +192,10 @@ checkColStructure <- function(d) {
       dplyr::filter(order_check == FALSE) %>%
       dplyr::pull(indicatorCode)
     msg <- paste0(
-      msg,
-      "    COLUMNS OUT OF ORDER: Note that this may be due to missing, added, or renamed columns
-      [+] ",
-      paste(out_of_order, collapse = "
-            [+] "),
-      "
-      
-      "
-      )
-  }
-  
-  # Bundle warnings
-  if (!is.null(msg)) {
-    d$data$warningMsg <- paste0(d$data$warningMsg, msg)
+      " COLUMNS OUT OF ORDER: Note that this may be due to missing, 
+        added, or renamed columns: ", 
+        paste(out_of_order, collapse = ","),"")
+    d$info$warningMsg<-append(msg,d$info$warningMsg)
   }
   
   return(d)
@@ -371,7 +327,7 @@ unPackSheet <- function(d) {
     )
   
   # Run structural checks
-  d$data$warningMsg <- NULL
+
   d <- checkColStructure(d)
   
   # List FY20 Target Columns
@@ -440,15 +396,12 @@ unPackSheet <- function(d) {
       dplyr::filter(value < 0) %>%
       dplyr::pull(indicatorCode) %>%
       unique() %>%
-      paste(collapse = "
-            [+] ")
+      paste(collapse = ", ")
     
-    d$data$warningMsg <- paste0(d$data$warningMsg,
-                                "    NEGATIVE VALUES:
-                                [+] ", negCols, "
-                                
-                                ")
-  }
+    msg<-paste0("In tab ", d$data$sheet, ": NEGATIVE VALUES found! -> ", negCols, "")
+    d$info$warningMsg<-append(msg,d$info$warningMsg)
+    
+    }
   
   # TEST for duplicates
   any_dups <- d$data$extract %>%
@@ -463,14 +416,9 @@ unPackSheet <- function(d) {
     dplyr::pull(row_id)
   
   if (NROW(any_dups) > 0) {
-    d$data$warningMsg <- paste0(d$data$warningMsg,
-                                "    DUPLICATE ROWS:
-                                [+] ",
-                                paste(any_dups, collapse = "
-                                      [+] "),
-                                "
-                                
-                                ")
+   msg<- paste0("In tab ", d$data$sheet, ": DUPLICATE ROWS -> ", 
+                paste(any_dups, collapse = ","))
+   d$info$warningMsg<-append(msg,d$info$warningMsg)
   }
   
   # TEST for defunct disaggs
@@ -482,24 +430,12 @@ unPackSheet <- function(d) {
         paste0(indicatorCode, ":"), Age, Sex, KeyPop
       ))) %>%
       dplyr::pull(msg)
-    d$data$warningMsg <- paste0(d$data$warningMsg,
-                                "    DEFUNCT DISAGGS:
-                                [+] ",
-                                paste(defunctMsg, collapse = "
-                                      [+] "),
-                                "
-                                
-                                ")
+    msg <- paste0("In tab ", d$data$sheet, ": DEFUNCT DISAGGS ->",
+                  paste(defunctMsg, collapse = ","))
+    d$info$warningMsg<-append(msg,d$info$warningMsg)
   }
   
   # Bundle warnings by Sheet name
-  if (!is.null(d$data$warningMsg)) {
-    d$info$warningMsg <- paste0(d$info$warningMsg,
-                                d$data$sheet,
-                                " tab:
-                                ",
-                                d$data$warningMsg)
-  }
   
   return(d)
   }
@@ -606,7 +542,6 @@ unPackSheets <- function(d) {
 #'    Site Tool, as well as a running Warning Message queue string,
 #'    \code{d$info$warningMsg}
 unPackSNUxIM <- function(d) {
-  msg <- NULL
   
   col_num <-
     length(
@@ -655,14 +590,10 @@ unPackSNUxIM <- function(d) {
                   mechanisms = sum)
   
   if (NROW(mismatch) > 0) {
-    msg <- paste0(
-      msg,
-      "    ",
-      NROW(mismatch),
-      " cases where Data Pack Targets are not correctly distributed among mechanisms.
-      
-      "
-    )
+    msg <- paste0("IN SNU x IM tab:", NROW(mismatch), " 
+                  cases where Data Pack Targets are not 
+                  correctly distributed among mechanisms.")
+    d$info$warningMsg<-append(msg,d$info$warningMsg)
   }
   
   # Create distribution matrix
@@ -698,14 +629,7 @@ unPackSNUxIM <- function(d) {
       mechanismCode,
       distribution
     )
-  
-  # Bundle warnings by Sheet name
-  if (!is.null(msg)) {
-    d$info$warningMsg <- paste0(d$info$warningMsg,
-                                "SNU x IM tab:
-                                ", msg)
-  }
-  
+
   return(d)
   }
 

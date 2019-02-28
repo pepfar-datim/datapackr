@@ -140,10 +140,12 @@ unPackData <- function(import_file = NA,
     }
 
   # If warnings, show all grouped by sheet and issue
-    if (!is.null(d$info$warningMsg)) {
+    if (!is.null(d$info$warningMsg) & interactive()) {
       options(warning.length = 8170)
-      warning(paste0("
-                     ",d$info$warningMsg))
+      messages <- paste(paste(seq_along(d$info$warningMsg), ": " , stringr::str_squish(gsub(
+                 "\n", "", d$info$warningMsg))),sep="",collapse="\r\n")
+      cat(crayon::red("WARNING MESSAGES: \r\n"))
+      cat(crayon::red(messages))
     }
 
     if (archive_results == TRUE) {
