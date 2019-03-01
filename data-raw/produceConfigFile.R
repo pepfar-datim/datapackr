@@ -371,7 +371,8 @@ loadStyleGuide <- function() {
                                 fontColour = "#C2D8D8"),
     rowHeader = openxlsx::createStyle(textDecoration = "bold",
                                       fgFill = "#C2D8D8",
-                                      fontColour = "#000000")
+                                      fontColour = "#000000"),
+    sumRows = openxlsx::createStyle(textDecoration = "bold")
   )
   
   # Compile ####
@@ -429,7 +430,7 @@ getSiteToolSchema <- function(data_pack_schema) {
       sheet_num = sheet_num - 5,
   # Rename mechanism and type columns
       indicator_code = dplyr::case_when(
-        indicator_code == "Site" & column == 1 ~ "Inactive",
+        indicator_code == "Site" & column == 1 ~ "Status",
         indicator_code == "Site" & column == 3 ~ "Mechanism",
         indicator_code == "Site" & column == 4 ~ "Type",
         TRUE ~ indicator_code)

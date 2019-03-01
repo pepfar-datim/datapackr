@@ -82,15 +82,15 @@ frameDataSheet <- function(wb, sheet, type = "Data Pack") {
     t() %>%
     as.data.frame(stringsAsFactors = FALSE) %>%
     dplyr::slice(-1,-2) %>%
-# Add sum rows
+# Add sum rows ####
     tibble::add_row(V1 = rep(NA_character_,2), .before = 3)
   
-  schema[3,row_header_cols] <- "Data Pack"
-  schema[4,row_header_cols] <- "Roll-up"
+  schema[3,row_header_cols] <- "Data Pack Total"
+  schema[4,row_header_cols] <- "Site Subtotal"
   
   
 # Write rows into Pack sheet ####
-  openxlsx::addWorksheet(wb = wb, sheetName = sheet)
+  openxlsx::addWorksheet(wb = wb, sheetName = sheet, zoom = 90)
   openxlsx::writeData(wb = wb, sheet = sheet, x = schema,
                       xy = c(1,1), colNames = FALSE)
   
@@ -122,6 +122,12 @@ frameDataSheet <- function(wb, sheet, type = "Data Pack") {
       openxlsx::addStyle(wb, sheet,
                          style = datapackr::styleGuide$data$rowHeader,
                          rows = 5, cols = 1:row_header_cols,
+                         gridExpand = TRUE, stack = TRUE)
+    
+  ## Sum row titles
+      openxlsx::addStyle(wb, sheet,
+                         style = datapackr::styleGuide$data$sumRows,
+                         rows = 3:4, cols = row_header_cols,
                          gridExpand = TRUE, stack = TRUE)
 
     return(wb)

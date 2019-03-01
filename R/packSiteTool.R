@@ -41,6 +41,7 @@ colorCodeSites <- function(wb, sheet, cols, rows) {
 }
 
 
+#' @export
 #' @importFrom magrittr %>% %<>%
 #' @title Write Site Tool sheet
 #' 
@@ -53,24 +54,19 @@ colorCodeSites <- function(wb, sheet, cols, rows) {
 #' @param d A datapackr list object.
 #' 
 write_site_level_sheet <- function(wb, sheet, d) {
-# OU sum row ####
-    # sums <- d$data$site$distributed %>%
-    #   dplyr::filter(sheet_name == sheet) %>%
-    #   dplyr::group_by()
-  
 # Order Columns ####
-    ## Filter and spread distributed site data
+  ## Filter and spread distributed site data
   data <- d$data$site$distributed %>%
     dplyr::filter(sheet_name == sheet) %>%
     tidyr::spread(key = indicatorCode, value = siteValue) %>%
     dplyr::mutate(Status = "") %>%
     dplyr::select(Status,dplyr::everything())
 
-    ## Get column order from schema
+  ## Get column order from schema
   schema <- datapackr::site_tool_schema %>%
     dplyr::filter(sheet_name == sheet)
   
-    ## Remember num of row_header columns
+  ## Remember num of row_header columns
   row_header_cols <- NROW(schema[schema$col_type == "Row Header",])
   
   schema %<>%
@@ -96,19 +92,19 @@ write_site_level_sheet <- function(wb, sheet, d) {
                            tableName = tolower(sheet))
   
 # Subtotal row ####
-    ##Compile Formula
+  ##Compile Formula
   data_cols <- names(data)[(row_header_cols + 1):length(data)]
   subtotal_fxs <- paste0('=SUBTOTAL(109,',tolower(sheet),'[',data_cols,'])')
     
-    ## Write Formula
+  ## Write Formula
   datapackr::writeFxColumnwise(wb, sheet, subtotal_fxs, xy = c(row_header_cols+1,4))
     
-    ## Format formula as numeric
+  ## Format formula as numeric
   num <- openxlsx::createStyle(numFmt = "#,##0.00")
   openxlsx::addStyle(wb, sheet, style = num,
                      rows = 4, cols = (row_header_cols+1:length(data_cols)))
     
-    ## Add red conditional formatting for discrepancies
+  ## Add red conditional formatting for discrepancies
   subtotal_colStart_letter <- openxlsx::int2col(row_header_cols+1)
   subtotal_cond_format_fx <- paste0(
       '!=',subtotal_colStart_letter,'3')
@@ -116,7 +112,15 @@ write_site_level_sheet <- function(wb, sheet, d) {
     wb, sheet,
     cols = (row_header_cols+1:length(data_cols)), rows = 4,
     rule = subtotal_cond_format_fx)
+
+# OU sum row ####
+  sums <- data[,which(names(data) %in% data_cols)] %>%
+    dplyr::summarise_all(sum, na.rm = TRUE)
   
+  openxlsx::writeData(wb, sheet, sums,
+                      xy = c(row_header_cols + 1,3),
+                      colNames = FALSE)
+    
 # Inactive column ####
   max_row_buffer <- 500
   formula_cell_numbers <- seq(1, NROW(data) + max_row_buffer) + 5
@@ -135,7 +139,7 @@ write_site_level_sheet <- function(wb, sheet, d) {
     wb = wb, sheet = sheet, cols = 2, rows = 6:(NROW(data) + max_row_buffer + 5))
   openxlsx::conditionalFormatting(
     wb = wb, sheet = sheet,
-    cols = 2, rows = 6:(NROW(data) + max_row_buffer + 5),
+    cols = 1:length(data), rows = 6:(NROW(data) + max_row_buffer + 5),
     rule = 'OR($A6=="Inactive",$A6=="NOT A SITE")')
   
 # Validation ####
@@ -347,7 +351,7 @@ packSiteTool <- function(d) {
     sapply(data_sheets, write_all_sheets)
         
 # Export Site Tool ####
-    exportPackr(wb,
+    datapackr::exportPackr(wb,
                 d$keychain$output_path,
                 type = "Site Tool",
                 d$info$datapack_name)
