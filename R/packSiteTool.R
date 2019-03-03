@@ -54,6 +54,8 @@ colorCodeSites <- function(wb, sheet, cols, rows) {
 #' @param d A datapackr list object.
 #' 
 write_site_level_sheet <- function(wb, sheet, d) {
+print(sheet)
+  
 # Order Columns ####
   ## Filter and spread distributed site data
   data <- d$data$site$distributed %>%
@@ -84,25 +86,30 @@ write_site_level_sheet <- function(wb, sheet, d) {
   data <- schema %>%
     datapackr::swapColumns(., data) %>%
     as.data.frame(.)
+  
+  data_cols <- names(data)[(row_header_cols + 1):length(data)]
     
 # Write data ####
-  openxlsx::writeDataTable(wb = wb, sheet = sheet, x = data,
-                           xy = c(1,5), colNames = TRUE, withFilter = TRUE,
-                           stack = TRUE, tableStyle = "none",
-                           tableName = tolower(sheet))
+  ## Test for blank datasets
+  if (NROW(data) != 0) {
+    openxlsx::writeDataTable(wb = wb, sheet = sheet, x = data,
+                             xy = c(1,5), colNames = TRUE, withFilter = TRUE,
+                             stack = TRUE, tableStyle = "none",
+                             tableName = tolower(sheet))  
+  }
   
 # Subtotal row ####
   ##Compile Formula
-  data_cols <- names(data)[(row_header_cols + 1):length(data)]
   subtotal_fxs <- paste0('=SUBTOTAL(109,',tolower(sheet),'[',data_cols,'])')
     
   ## Write Formula
   datapackr::writeFxColumnwise(wb, sheet, subtotal_fxs, xy = c(row_header_cols+1,4))
     
-  ## Format formula as numeric
+  ## Format both Site and Data Pack subtotal rows as numeric
   num <- openxlsx::createStyle(numFmt = "#,##0.00")
   openxlsx::addStyle(wb, sheet, style = num,
-                     rows = 4, cols = (row_header_cols+1:length(data_cols)))
+                     rows = 3:4, cols = (row_header_cols+1:length(data_cols)),
+                     gridExpand = TRUE)
     
   ## Add red conditional formatting for discrepancies
   subtotal_colStart_letter <- openxlsx::int2col(row_header_cols+1)
@@ -114,7 +121,8 @@ write_site_level_sheet <- function(wb, sheet, d) {
     rule = subtotal_cond_format_fx)
 
 # OU sum row ####
-  sums <- data[,which(names(data) %in% data_cols)] %>%
+  sums <- data %>%
+    dplyr::select(data_cols) %>%
     dplyr::summarise_all(sum, na.rm = TRUE)
   
   openxlsx::writeData(wb, sheet, sums,
@@ -230,8 +238,9 @@ write_site_level_sheet <- function(wb, sheet, d) {
   # - What to do with dedupes?...
   # - Add line in frame for Data Pack sum
   # - Redo column labels to list full string of element name?
+  # - Resolve issues with OVC, HTS_SELF
   
-  
+  return(wb)
 }
 
 #' @export
@@ -269,10 +278,12 @@ packSiteTool <- function(d) {
   
   
 # Build Site Tool frame ####
-    wb <- datapackr::packFrame(datapack_uid = d$info$datapack_uid,
+  print("Building Site Tool frame...")  
+  wb <- datapackr::packFrame(datapack_uid = d$info$datapack_uid,
                                type = "Site Tool")
   
 # Write site list (TODO: SPEED THIS UP) ####
+  print("Writing Site List...")
     country_uids <- datapackr::dataPackMap %>%
       dplyr::filter(data_pack_name == d$info$datapack_name) %>%
       dplyr::pull(country_uid)
@@ -313,6 +324,7 @@ packSiteTool <- function(d) {
       rule = '$E2="Inactive"', style = datapackr::styleGuide$siteList$inactive)
     
 # Write mech list ####
+    print("Writing Mechanism List")
     mechList <- datapackr::getMechList(country_uids,
                                        FY = 2019)
     openxlsx::writeDataTable(
@@ -326,6 +338,7 @@ packSiteTool <- function(d) {
     )
   
 # Prep Site data ####
+    print("Preparing Site-level data...")
     d$data$site$distributed %<>%
     ## Pull in mechanism names
       dplyr::left_join((mechList %>%
@@ -345,12 +358,16 @@ packSiteTool <- function(d) {
                     Age,Sex,KeyPop,Type = type,indicatorCode,siteValue)
     
 # Populate Site Tool ####
+    print("Writing site-level data into sheets...")
     data_sheets <- names(wb)[which(!stringr::str_detect(names(wb), "Home|Site List|Mechs|Validations"))]
     
-    write_all_sheets <- function(x) {write_site_level_sheet(wb = wb, sheet = x, d = d)}
+    write_all_sheets <- function(x) {
+      wb <- datapackr::write_site_level_sheet(wb = wb, sheet = x, d = d)
+    }
     sapply(data_sheets, write_all_sheets)
         
 # Export Site Tool ####
+    print("Exporting...")
     datapackr::exportPackr(wb,
                 d$keychain$output_path,
                 type = "Site Tool",
