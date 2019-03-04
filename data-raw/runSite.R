@@ -34,7 +34,8 @@ distributedSite <- d$data$distributedMER %>%
   dplyr::arrange(psnuid,indicatorCode,mechanismCode,Age,Sex,KeyPop,type,site_tool_label) %>%
   dplyr::select(-value)
 
-d$data$site$distributed <- d$data$distributedMER %>%
+d$data$site$distributed 
+cj <- d$data$distributedMER %>%
   dplyr::select(-CoarseAge) %>%
   dplyr::filter(value != 0) %>%
   dplyr::left_join(distributedSite, by = c("psnuid" = "psnuid",

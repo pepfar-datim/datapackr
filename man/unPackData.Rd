@@ -4,10 +4,14 @@
 \alias{unPackData}
 \title{Unpack a submitted Data Pack}
 \usage{
-unPackData(output_path = NA, export_FAST = FALSE,
-  archive_results = FALSE, export_SUBNAT_IMPATT = FALSE)
+unPackData(submission_path = NA, output_path = NA,
+  export_FAST = FALSE, archive_results = FALSE,
+  export_SUBNAT_IMPATT = FALSE)
 }
 \arguments{
+\item{submission_path}{A local path directing to the file you would like to 
+parse.}
+
 \item{output_path}{A local path directing to the folder where you would like
 outputs to be saved. If not supplied, will output to working directory.}
 

@@ -358,6 +358,23 @@ unPackSheet <- function(d) {
 
 ")
         }
+        
+    # Aggregate OVC_HIVSTAT
+        if (d$data$sheet == "OVC") {
+          d$data$extract %<>%
+            dplyr::mutate(
+              Age = dplyr::case_when(
+                stringr::str_detect(indicatorCode, "OVC_HIVSTAT") ~ NA_character_,
+                TRUE ~ Age),
+              Sex = dplyr::case_when(
+                stringr::str_detect(indicatorCode, "OVC_HIVSTAT") ~ NA_character_,
+                TRUE ~ Sex)) %>%
+            dplyr::group_by(PSNU, psnuid, sheet_name, indicatorCode, Age, Sex, KeyPop) %>%
+            dplyr::summarise(value = sum(value)) %>%
+            dplyr::ungroup()
+        }
+        
+      
 
     # Bundle warnings by Sheet name
         if (!is.null(d$data$warningMsg)) {
@@ -480,8 +497,8 @@ unPackSNUxIM <- function(d) {
                       dplyr::matches("(\\d){2,}")) %>%
         dplyr::select_if(~!all(is.na(.))) %>%
         dplyr::mutate(sum = rowSums(dplyr::select(.,dplyr::matches("\\d+|Dedupe")), na.rm = TRUE)) %>%
-        dplyr::mutate(DataPackTarget = round_trunc(DataPackTarget),
-                      sum = round_trunc(sum))
+        dplyr::mutate(DataPackTarget = datapackr::round_trunc(DataPackTarget),
+                      sum = datapackr::round_trunc(sum))
 
     # TEST where DataPackTarget != sum of mechanism values
         mismatch <- d$data$SNUxIM %>%
@@ -494,6 +511,14 @@ unPackSNUxIM <- function(d) {
 
 ")
         }
+        
+    # Fix issues with HTS_SELF (duplicate and split by Male/Female)
+        d$data$SNUxIM %<>%
+          dplyr::mutate(
+            Sex = dplyr::case_when(
+              stringr::str_detect(indicatorCode, "HTS_SELF(.)+Unassisted") ~ "Male|Female",
+              TRUE ~ Sex)) %>%
+          tidyr::separate_rows(Sex)
 
     # Create distribution matrix
         d$data$SNUxIM %<>%
@@ -548,13 +573,13 @@ rePackPSNUxIM <- function(d) {
             Sex = dplyr::case_when(stringr::str_detect(indicatorCode,"OVC_HIVSTAT") ~ NA_character_,
                                   stringr::str_detect(indicatorCode,"PMTCT_EID") ~ "Unknown Sex",
                                   stringr::str_detect(indicatorCode,"KP_MAT") ~ stringr::str_replace(KeyPop," PWID",""),
-                                  stringr::str_detect(indicatorCode,"HTS_SELF(.)+Unassisted") ~ NA_character_,
                                       TRUE ~ Sex),
             KeyPop = dplyr::case_when(stringr::str_detect(indicatorCode,"KP_MAT") ~ NA_character_,
                                         TRUE ~ KeyPop)
         ) %>%
         dplyr::left_join(dplyr::select(d$data$SNUxIM,-PSNU)) %>%
         dplyr::mutate(newValue = value * distribution) %>%
+        dplyr::filter(value != 0) %>%
         dplyr::select(PSNU, psnuid, sheet_name, indicatorCode, Age, CoarseAge, Sex, KeyPop, mechanismCode, value = newValue)
 
     return(d)

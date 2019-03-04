@@ -236,7 +236,6 @@ print(sheet)
 #TODO ####
   # - conditional formatting on cells where data against invalid disaggs
   # - What to do with dedupes?...
-  # - Add line in frame for Data Pack sum
   # - Redo column labels to list full string of element name?
   # - Resolve issues with OVC, HTS_SELF
   
