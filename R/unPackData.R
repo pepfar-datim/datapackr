@@ -5,7 +5,7 @@
 #' Processes a submitted Data Pack (in .xlsx format) by identifying integrity
 #'     issues, checking data against DATIM validations, and extracting data.
 #'
-#' @param import_file Local path to the file to import. 
+#' @param submission_path Local path to the file to import. 
 #' @param output_path A local path directing to the folder where you would like
 #' outputs to be saved. If not supplied, will output to working directory.
 #' @param export_FAST If TRUE, will extract and output to \code{output_path} a
@@ -46,7 +46,7 @@
 #' Pack being processed.
 #'
 
-unPackData <- function(import_file = NA,
+unPackData <- function(submission_path = NA,
                        output_path = NA,
                        export_FAST = FALSE,
                        archive_results = FALSE,
@@ -59,39 +59,28 @@ unPackData <- function(import_file = NA,
         output_path = output_path
       )
     )
-    
-    if (is.na(submission_path)) {
-    # Allow User to choose file
-      print("Please choose file path for the file you want us to take a look at.")
-      d$keychain$submission_path <- file.choose()
-    }
-    
     if (is.na(output_path)) {
-      print(paste0("All results will be saved here: ", getwd()))
       d$keychain$output_path = getwd()
     }
-
-
-  can_read_import_file<-function(import_file) {
     
-    if (is.na(import_file)) { return(FALSE)}
-    
-    file.access(import_file,4) == 0
-  }
-    
-  if ( !can_read_import_file( import_file ) ) {
-  # Allow User to choose file
-    d$keychain$submission_path <- file.choose() } else {
-      d$keychain$submission_path <- import_file
+    can_read_import_file<-function(submission_path) {
+      
+      if (is.na(submission_path)) { return(FALSE)}
+      
+      file.access(submission_path,4) == 0
     }
-
-  # Check the file exists
     
+    if ( !can_read_import_file( submission_path ) & interactive() ) {
+      interactive_print("Cannot read the specified file. Please choose another.")
+      d$keychain$submission_path <- file.choose() } else
+      {
+        d$keychain$submission_path <- submission_path
+      }
     
     msg<-"Checking the file exists..."
     interactive_print(msg)
-
-    if (!file.exists(d$keychain$submission_path)) {
+    
+    if (!can_read_import_file( submission_path )) {
       stop("Submission workbook could not be read!")
     }
     
