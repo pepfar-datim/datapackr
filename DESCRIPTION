@@ -34,7 +34,11 @@ Imports:
     magrittr (>= 1.5),
     devtools (>= 2.0.1),
     getPass,
+    crayon (>= 1.3.4),
+    getPass (>= 0.2-2),
     openxlsx
+Suggests:
+    devtools (>= 2.0.1)
 Remotes: jason-p-pickering/openxlsx
 License: GPL-2
 Encoding: UTF-8

@@ -42,7 +42,7 @@ selectOU <- function() {
     dplyr::select(DataPack_name) %>%
     dplyr::distinct()
   promptText<-paste0("Please select the OU this file is associated with [1-",nrow(ous),"]:")
-  print(promptText)
+  interactive_print(promptText)
   selection <- utils::select.list(ous$DataPack_name,multiple=FALSE)
   return(selection)
 }
@@ -126,6 +126,7 @@ getMilitaryNodes <- function() {
   
   return(militaryNodes)
 }
+
 
 #' @export
 #' @title Swap columns between dataframes
@@ -244,3 +245,7 @@ exportPackr <- function(data, output_path, type, datapack_name) {
     
   print(paste0("Successfully saved ",type," to ", output_file_name))
 }
+
+
+interactive_print<-function(x) if (interactive()) { print(x) }
+

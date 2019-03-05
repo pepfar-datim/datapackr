@@ -5,8 +5,7 @@
 #' Processes a submitted Data Pack (in .xlsx format) by identifying integrity
 #'     issues, checking data against DATIM validations, and extracting data.
 #'
-#' @param submission_path A local path directing to the file you would like to 
-#' parse.
+#' @param import_file Local path to the file to import. 
 #' @param output_path A local path directing to the folder where you would like
 #' outputs to be saved. If not supplied, will output to working directory.
 #' @param export_FAST If TRUE, will extract and output to \code{output_path} a
@@ -46,7 +45,8 @@
 #' The final message in the Console prints all warnings identified in the Data
 #' Pack being processed.
 #'
-unPackData <- function(submission_path = NA,
+
+unPackData <- function(import_file = NA,
                        output_path = NA,
                        export_FAST = FALSE,
                        archive_results = FALSE,
@@ -71,17 +71,39 @@ unPackData <- function(submission_path = NA,
       d$keychain$output_path = getwd()
     }
 
+
+  can_read_import_file<-function(import_file) {
+    
+    if (is.na(import_file)) { return(FALSE)}
+    
+    file.access(import_file,4) == 0
+  }
+    
+  if ( !can_read_import_file( import_file ) ) {
+  # Allow User to choose file
+    d$keychain$submission_path <- file.choose() } else {
+      d$keychain$submission_path <- import_file
+    }
+
   # Check the file exists
-    print("Checking the file exists...")
+    
+    
+    msg<-"Checking the file exists..."
+    interactive_print(msg)
+
     if (!file.exists(d$keychain$submission_path)) {
       stop("Submission workbook could not be read!")
     }
+    
+    if ( tools::file_ext(d$keychain$submission_path) != "xlsx" ) {
+      stop("File must be an XLSX file!")
+    }
 
-  # Start running log of all warning messages
+  # Start running log of all warning and information messages
     d$info$warningMsg <- NULL
 
-  # Check OU name and UID match up
-    print("Checking the OU name and UID on HOME tab...")
+    # Check OU name and UID match up
+    interactive_print("Checking the OU name and UID on HOME tab...")
     d <- checkOUinfo(d)
 
   # Check integrity of Workbook tabs
@@ -102,12 +124,12 @@ unPackData <- function(submission_path = NA,
       exportPackr(d$data$FAST,
                   d$keychain$output_path,
                   type = "FAST Export",
-                  d$info$datapack_name)
-    }
+                  d$info$datapack_name)  }
 
   # Package SUBNAT/IMPATT export
     d <- packSUBNAT_IMPATT(d)
     if (export_SUBNAT_IMPATT == TRUE) {
+
       exportPackr(d$data$SUBNAT_IMPATT,
                   d$keychain$output_path,
                   type = "SUBNAT IMPATT",
@@ -115,16 +137,25 @@ unPackData <- function(submission_path = NA,
     }
 
   # If warnings, show all grouped by sheet and issue
-    if (!is.null(d$info$warningMsg)) {
+    if (!is.null(d$info$warningMsg) & interactive()) {
       options(warning.length = 8170)
-      #options(warn = 1)
-      warning(paste0("
-                     ",d$info$warningMsg),
-              immediate. = TRUE)
+      
+      messages <-
+        paste(paste(
+          seq_along(d$info$warningMsg),
+          ": " ,
+          stringr::str_squish(gsub("\n", "", d$info$warningMsg))
+        ),
+        sep = "",
+        collapse = "\r\n")
+      cat(crayon::red("WARNING MESSAGES: \r\n"))
+      cat(crayon::red(messages))
+
     }
     #options(warn = 0)
 
     if (archive_results == TRUE) {
+
       exportPackr(d,
                   d$keychain$output_path,
                   type = "Results Archive",
