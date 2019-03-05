@@ -127,4 +127,131 @@ getMilitaryNodes <- function() {
   return(militaryNodes)
 }
 
+
+#' @importFrom lazyeval interp
+#' @export
+#' @title Swap columns between dataframes
+#' 
+#' @description 
+#' Replaces columns in \code{to} with those with identical names in \code{from}.
+#' 
+#' @param to Dataframe to pull columns into
+#' @param from Data frame to pull columns from
+#' 
+#' @return dataframe with swapped columns
+#' 
+swapColumns <- function(to, from) {
+  cols = colnames(from)
+  for (i in 1:length(cols)) {
+    col = cols[i]
+    if (col %in% colnames(to)) {
+      dots <-
+        stats::setNames(list(lazyeval::interp(
+          ~ magrittr::use_series(from, x), x = as.name(col)
+        )), col)
+      to <- to %>%
+        dplyr::mutate_(.dots = dots)
+    } else {
+      next
+    }
+  }
+  return(to)
+}
+
+#' @export
+#' @title Write character vector of Excel formulas into Openxlsx Workbook object
+#' horizontally, rather than vertically.
+#' 
+#' @description
+#' Takes a character vector of Excel formulas (\code{x}) and writes these into
+#' an Openxlsx Workbook object (\code{wb}) horizontally, beginning at the cell
+#' position demarcated by \code{xy}. This function augments the existing
+#' function in the Openxlsx package \code{\link[openxlsx]{writeFormula}} by
+#' overcoming its strict ability to write formulas only rowwise.
+#' 
+#' @param wb A Workbook object containing a worksheet.
+#' @param sheet The worksheet to write to. Can be the worksheet index or name.
+#' @param x A character vector of Excel formulas.
+#' @param xy A vector of the form \code{c(start column, start row)}.
+#' 
+writeFxColumnwise <- function(wb, sheet, x, xy) {
+  fx <- x %>%
+    t() %>%
+    as.data.frame() %>%
+    dplyr::mutate_all(as.character)
+  
+  for (i in 1:length(fx)) {
+    class(fx[[i]]) <- c(class(fx[[i]]), "formula")
+  }
+  
+  openxlsx::writeData(wb = wb, sheet = sheet, x = fx, xy = xy, colNames = FALSE)
+}
+
+#' @export
+#' @title Export output.
+#' 
+#' @description 
+#' Exports a datapackr output to specified filepath.
+#'
+#' @param data Data object to export. Can be either a dataframe or an Openxlsx
+#' Workbook object.
+#' @param output_path A local path directing to the folder where you would like
+#' outputs to be saved. If not supplied, will output to working directory.
+#' @param type File prefix to be applied in output filename, as follows:
+#'   \describe{
+#'     \item{Site Tool}{Openxlsx Workbook object containing Site Tool.}
+#'     \item{Data Pack}{Openxlsx Workbook object containing Data Pack.}
+#'     \item{FAST Export}{Data frame containing FAST export data.}
+#'     \item{SUBNAT IMPATT}{Data frame containing SUBNAT/IMPATT data.}
+#'     \item{Results Archive}{List object containing results archive.}
+#' }
+#' @param datapack_name Country name or OU name to be listed in output filename.
+#' 
+exportPackr <- function(data, output_path, type, datapack_name) {
+  packName <- function(output_path, type, datapack_name, extension) {
+    paste0(
+      output_path,
+      if (is.na(stringr::str_extract(output_path,"/$"))) {"/"} else {},
+      type,"_",
+      datapack_name,"_",
+      format(Sys.time(), "%Y%m%d%H%M%S"),
+      extension
+    )
+  }
+
+  if (type %in% c("Site Tool", "Data Pack")) {
+    if (class(data) != "Workbook") {
+      stop("Output type and data do not match!")
+    }
+    
+    output_file_name <- packName(output_path, type, datapack_name, extension = ".xlsx")
+    
+    openxlsx::saveWorkbook(wb, output_file_name, overwrite = TRUE)
+  }
+  
+  if (type %in% c("FAST Export","SUBNAT IMPATT")) {
+    if (class(data) != "data.frame") {
+      stop("Output type and data do not match!")
+    }
+    
+    output_file_name <- packName(output_path, type, datapack_name, extension = ".csv")
+    
+    readr::write_csv(data, output_file_name)
+  }
+  
+  if (type %in% c("Results Archive")) {
+    if (class(data) != "list") {
+      stop("Output type and data do not match!")
+    }
+    
+    output_file_name <- packName(output_path, type, datapack_name, extension = ".rds")
+    
+    saveRDS(data, output_file_name)
+  }
+    
+  print(paste0("Successfully saved ",type," to ", output_file_name))
+}
+
+
 interactive_print<-function(x) if (interactive()) { print(x) }
+

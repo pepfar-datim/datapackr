@@ -3,35 +3,46 @@ library(tidyverse)
 
 unPackStructure <- function(filepath) {
 
-    sheets <- tidyxl::xlsx_sheet_names(filepath)
-    sheets_to_loop <- sheets[which(!stringr::str_detect(sheets, "Home|Quotes|Summary|Spectrum|Visualizations|Validations"))]
+  sheets <- tidyxl::xlsx_sheet_names(filepath)
+  sheets_to_loop <- sheets[which(!stringr::str_detect(sheets, "Home|Quotes|Summary|Spectrum|Visualizations|Validations"))]
 
-    schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = FALSE) %>%
-        dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
+  schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = FALSE) %>%
+    dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
 
-    data.table::setDT(schema)[,sheet_num:=.GRP, by = c("sheet_name")]
+  data.table::setDT(schema)[,sheet_num:=.GRP, by = c("sheet_name")]
 
-    schema <- schema %>%
-        dplyr::filter(sheet_name %in% sheets_to_loop,
-                      row == 5) %>%
-        tidyr::gather(key,value,-sheet_num,-sheet_name,-col,-row) %>%
-        tidyr::unite(new.col, c(key,row)) %>%
-        tidyr::spread(new.col,value) %>%
-        dplyr::select(sheet_num,sheet_name,col,indicatorCode = character_5) %>%
-        dplyr::mutate(
-            colType = dplyr::case_when(
-                stringr::str_detect(indicatorCode, "20T")
-                & !(sheet_name == "Prioritization" & indicatorCode != "IMPATT.PRIORITY_SNU.20T")
-                & !(sheet_name == "HTS" & (!stringr::str_detect(indicatorCode,"^HTS_") | stringr::str_detect(indicatorCode,"HTS_TST_PMTCT")))
-                & !(sheet_name == "VMMC" & stringr::str_detect(indicatorCode, "POP_EST|coverage"))
-                ~ "FY20 Target"),
-            dataset = dplyr::case_when(
-                colType == "FY20 Target" & stringr::str_detect(indicatorCode,"SUBNAT|VL_SUPPRESSED") ~ "SUBNAT",
-                colType == "FY20 Target" & stringr::str_detect(indicatorCode,"PLHIV|POP_EST|HIV_PREV|PRIORITY|KP_ESTIMATES") ~ "IMPATT",
-                colType == "FY20 Target" ~ "MER")) %>%
-        dplyr::arrange(sheet_num, col)
+  schema %<>%
+    dplyr::filter(sheet_name %in% sheets_to_loop,
+                  row %in% c(3,5,6)) %>%
+    tidyr::gather(key,value,-sheet_num,-sheet_name,-col,-row) %>%
+    tidyr::unite(new.col, c(key,row)) %>%
+    tidyr::spread(new.col,value) %>%
+    dplyr::select(sheet_num,sheet_name,col,
+                  label = character_3,
+                  indicator_code = character_5,
+                  formula = formula_6,
+                  value = numeric_6) %>%
+    dplyr::mutate(
+      formula = dplyr::case_when(is.na(formula) ~ value,
+                                 TRUE ~ formula),
+      col_type = dplyr::case_when(
+        stringr::str_detect(indicator_code, "20T")
+          & !(sheet_name == "Prioritization" & indicator_code != "IMPATT.PRIORITY_SNU.20T")
+          & !(sheet_name == "HTS" & (!stringr::str_detect(indicator_code,"^HTS_") | stringr::str_detect(indicator_code,"HTS_TST_PMTCT")))
+          & !(sheet_name == "VMMC" & stringr::str_detect(indicator_code, "POP_EST|coverage"))
+          ~ "FY20 Target",
+        indicator_code %in% c("PSNU","Age","Sex","ID","AgeCoarse","IDAgeCoarse",
+                             "PSNUCheck","KeyPop","sheet_name","indicatorCode",
+                             "CoarseAge","sheet_num")
+          ~ "Row Header"),
+      dataset = dplyr::case_when(
+        col_type == "FY20 Target" & stringr::str_detect(indicator_code,"SUBNAT|VL_SUPPRESSED") ~ "SUBNAT",
+        col_type == "FY20 Target" & stringr::str_detect(indicator_code,"PLHIV|POP_EST|HIV_PREV|PRIORITY|KP_ESTIMATES") ~ "IMPATT",
+        col_type == "FY20 Target" ~ "MER")) %>%
+    dplyr::select(-value) %>%
+    dplyr::arrange(sheet_num, col)
 
-    return(schema)
+  return(schema)
 }
 
 validDPDisaggs <- function() {
@@ -153,8 +164,6 @@ mapIndicators <- function() {
         dplyr::left_join(dsdTA, by = c("dataset" = "dataset")) %>%
         readr::write_csv(path = "./data-raw/FY20TargetsUIDMap.csv", na = "")
 
-
-
     # Cross PSNUs x valid Disaggs for complete row setup
     rowStructure <- tidyr::crossing(d$data$PSNUs, disaggs) %>%
         select(org_unit_uid = uid, PSNU = DataPackSiteID, Age = validAges, Sex = validSexes, KeyPop = validKPs)
@@ -261,7 +270,21 @@ produceConfig <- function() {
     impattLevels <- datapackr::getIMPATTLevels()
     
     configFile %<>%
-      dplyr::left_join(impattLevels, by = c("country_name"))
+      dplyr::left_join(impattLevels, by = c("country_name")) %>%
+      dplyr::mutate_if(is.integer,as.double) %>%
+      dplyr::mutate(country = level,
+                    prioritization = dplyr::case_when(
+                      country_in_datim != TRUE ~ level,
+                      TRUE ~ prioritization),
+                    operating_unit =
+                      dplyr::if_else(is.na(operating_unit),
+                                     stringr::str_replace(
+                                       data_pack_name,
+                                       "Central America|Caribbean",
+                                       "Western Hemisphere"),
+                                     operating_unit))
+      
+
     
   # Add Mil names & UIDs & metadata
     militaryNodes <- datapackr::getMilitaryNodes() %>%
@@ -291,35 +314,167 @@ produceConfig <- function() {
     
 }
 
+loadStyleGuide <- function() {
+  
+  # Home Tab Styles ####
+  home <- list(
+    ## Home Tab Title
+    title = openxlsx::createStyle(fontColour = "#000000",
+                                  fontSize = 76,
+                                  textDecoration = "bold",
+                                  halign = "left",
+                                  valign = "center"),
+    ## Home Tab OU Name
+    data_pack_name = openxlsx::createStyle(fontColour = "#9CBEBD",
+                                            fontSize = 64,
+                                            textDecoration = "bold",
+                                            halign = "left",
+                                            valign = "center"),
+    ## Home Tab PEPFAR banner
+    pepfar = openxlsx::createStyle(fontColour = "#7F7F7F",
+                                   fontSize = 36,
+                                   halign = "left",
+                                   valign = "center")
+  )
+  
+  # Site Lists ####
+  siteList <- list(
+    community = openxlsx::createStyle(fontColour = "#000000",
+                                      bgFill = "#EBF1DE"),
+    facility = openxlsx::createStyle(fontColour = "#000000",
+                                     bgFill = "#DCE6F1"),
+    inactive = openxlsx::createStyle(fontColour = "#000000",
+                                     bgFill = "#808080"),
+    national = openxlsx::createStyle(fontColour = "#000000",
+                                     bgFill = "#CCC0DA"),
+    military = openxlsx::createStyle(fontColour = "#000000",
+                                     bgFill = "#C4BD97")
+  )
+  
+  # Data Tabs ####
+  data <- list(
+    title = openxlsx::createStyle(fontSize = 18,
+                                  textDecoration = "bold",
+                                  halign = "left",
+                                  valign = "center"),
+    header = openxlsx::createStyle(fontSize = 12,
+                                   textDecoration = "bold",
+                                   halign = "left",
+                                   valign = "center",
+                                   fgFill = "#E4E0A7"),
+    label = openxlsx::createStyle(wrapText = TRUE,
+                                  halign = "center",
+                                  valign = "center",
+                                  fgFill = "#9CBEBD"),
+    uid = openxlsx::createStyle(textDecoration = "bold",
+                                fgFill = "#C2D8D8",
+                                fontColour = "#C2D8D8"),
+    rowHeader = openxlsx::createStyle(textDecoration = "bold",
+                                      fgFill = "#C2D8D8",
+                                      fontColour = "#000000"),
+    sumRows = openxlsx::createStyle(textDecoration = "bold")
+  )
+  
+  # Compile ####
+  styleGuide <- list(home = home,
+                     siteList = siteList,
+                     data = data)
+  
+  return(styleGuide)
+}
+
+getSiteToolSchema <- function(data_pack_schema) {
+  site_sheets <- data_pack_schema %>%
+    dplyr::filter(sheet_name %in% c("PMTCT_STAT_ART","PMTCT_EID","TB_STAT_ART",
+                                    "VMMC","TX","CXCA","HTS","TB_TX_PREV","OVC",
+                                    "KP","PP","PrEP","GEND")) %>%
+    dplyr::pull(sheet_name) %>%
+    unique()
+  
+  site_row_headers <- c("PSNU","Age","Sex","KeyPop")
+    
+  site_schema <- data_pack_schema %>%
+  # Select only FY20 MER target columns
+    dplyr::filter((col_type == "FY20 Target" & dataset == "MER")
+                  | (col_type == "Row Header" 
+                     & sheet_name %in% site_sheets
+                     & indicator_code %in% site_row_headers)) %>%
+    dplyr::arrange(sheet_num) %>%
+  # Data Pack formulas not relevant for Site Tool
+    dplyr::select(-formula) %>%
+  # Use indicator_code to construct headers
+    dplyr::mutate(indicator_code = stringr::str_replace(indicator_code,
+                                                        "^PSNU$",
+                                                        "Site"),
+                  tech_area =
+                    dplyr::case_when(
+                      col_type == "FY20 Target" ~ stringr::str_extract(indicator_code,"^(.)+\\.(N|D)(?=\\.)")),
+                  tech_area = 
+                    dplyr::case_when(
+                      !is.na(tech_area) ~ paste0(stringr::str_replace(tech_area,"\\."," ("),")"))) %>%
+    dplyr::group_by(sheet_name,tech_area) %>%
+    dplyr::mutate(header = 1:dplyr::n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(tech_area = dplyr::case_when(header == 1 ~ tech_area),
+                  split = dplyr::case_when(indicator_code == "Site" ~ 4, TRUE ~ 1))
+  
+  # Add Mechanism and type columns to every sheet
+  site_schema <- site_schema[rep(seq_len(dim(site_schema)[1]),site_schema$split),] %>%
+    dplyr::select(-split,-header) %>%
+  # Recalibrate column numbers
+    dplyr::group_by(sheet_num) %>%
+    dplyr::mutate(column = 1:dplyr::n()) %>%
+    dplyr::ungroup() %>%
+  # Recalibrate sheet number
+    dplyr::mutate(
+      sheet_num = sheet_num - 5,
+  # Rename mechanism and type columns
+      indicator_code = dplyr::case_when(
+        indicator_code == "Site" & column == 1 ~ "Status",
+        indicator_code == "Site" & column == 3 ~ "Mechanism",
+        indicator_code == "Site" & column == 4 ~ "Type",
+        TRUE ~ indicator_code)
+      ) %>%
+    dplyr::select(sheet_num,sheet_name,col = column,col_type,tech_area,label,indicator_code)
+  
+  return(site_schema)
+}
+
 
 # Procedural logic to generate the actual schemas
     secrets <- "/Users/scott/.secrets/datim.json"
     datapackr::loginToDATIM(secrets)
 
-    ## Config File
+    ## Config File ####
         config_path = "./data-raw/DataPackConfiguration.csv"
         configFile <- readr::read_csv(config_path)
         save(configFile, file = "./data/configFile.rda")
         
-    ## Data Pack Map (i.e., Updated Config File)
+    ## Data Pack Map (i.e., Updated Config File) ####
         dataPackMap <- produceConfig()
         save(dataPackMap, file = "./data/dataPackMap.rda")
 
-    ## Template Schema
-        template_path <- "./data-raw/COP19 Data Pack Template v1.3.xlsx"
-        template_schema <- unPackStructure(template_path)
-        save(template_schema, file = "./data/template_schema.rda")
+    ## Data Pack Schema ####
+        template_path <- "./data-raw/COP19_Data_Pack_Template_vFINAL.xlsx"
+        data_pack_schema <- unPackStructure(template_path)
+        save(data_pack_schema, file = "./data/data_pack_schema.rda")
+        
+    ## Site Tool Schema ####
+        site_tool_schema <- getSiteToolSchema(data_pack_schema)
+        save(site_tool_schema, file = "./data/site_tool_schema.rda")
 
-    ## Valid Data Pack Disaggs
+    ## Valid Data Pack Disaggs ####
         valid_dp_disaggs <- validDPDisaggs()
         save(valid_dp_disaggs, file = "./data/valid_dp_disaggs.rda")
 
-    ## Prioritization Dictionary
+    ## Prioritization Dictionary ####
         prioritizations <- prioritizationDict()
         save(prioritizations, file = "./data/prioritizations.rda")
 
-    ## Data Pack to DATIM Indicator Map
+    ## Data Pack to DATIM Indicator Map ####
         indicatorMap <- readr::read_csv("./data-raw/DataPack to DATIM indicator map.csv")
         save(indicatorMap, file = "./data/indicatorMap.rda")
-
-
+        
+    ## Load Openxlsx Style Guide ####
+        styleGuide <- loadStyleGuide()
+        save(styleGuide, file = "./data/styleGuide.rda")

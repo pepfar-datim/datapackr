@@ -5,7 +5,7 @@
 #' Processes a submitted Data Pack (in .xlsx format) by identifying integrity
 #'     issues, checking data against DATIM validations, and extracting data.
 #'
-#' @param import_file Local path to the file to import. 
+#' @param submission_path Local path to the file to import. 
 #' @param output_path A local path directing to the folder where you would like
 #' outputs to be saved. If not supplied, will output to working directory.
 #' @param export_FAST If TRUE, will extract and output to \code{output_path} a
@@ -45,7 +45,8 @@
 #' The final message in the Console prints all warnings identified in the Data
 #' Pack being processed.
 #'
-unPackData <- function(import_file = NA,
+
+unPackData <- function(submission_path = NA,
                        output_path = NA,
                        export_FAST = FALSE,
                        archive_results = FALSE,
@@ -54,34 +55,32 @@ unPackData <- function(import_file = NA,
   # Create data train for use across remainder of program
     d <- list(
       keychain = list(
+        submission_path = submission_path,
         output_path = output_path
       )
     )
-    
     if (is.na(output_path)) {
       d$keychain$output_path = getwd()
     }
-
-  can_read_import_file<-function(import_file) {
     
-    if (is.na(import_file)) { return(FALSE)}
-    
-    file.access(import_file,4) == 0
-  }
-    
-  if ( !can_read_import_file( import_file ) ) {
-  # Allow User to choose file
-    d$keychain$submission_path <- file.choose() } else {
-      d$keychain$submission_path <- import_file
+    can_read_import_file<-function(submission_path) {
+      
+      if (is.na(submission_path)) { return(FALSE)}
+      
+      file.access(submission_path,4) == 0
     }
-
-  # Check the file exists
     
+    if ( !can_read_import_file( submission_path ) & interactive() ) {
+      interactive_print("Cannot read the specified file. Please choose another.")
+      d$keychain$submission_path <- file.choose() } else
+      {
+        d$keychain$submission_path <- submission_path
+      }
     
     msg<-"Checking the file exists..."
     interactive_print(msg)
-
-    if (!file.exists(d$keychain$submission_path)) {
+    
+    if (!can_read_import_file( submission_path )) {
       stop("Submission workbook could not be read!")
     }
     
@@ -111,37 +110,25 @@ unPackData <- function(import_file = NA,
   # Package FAST export
     d <- FASTforward(d)
     if (export_FAST == TRUE) {
-        d$keychain$FAST_file_name <- paste0(
-          d$keychain$output_path,
-          if (is.na(stringr::str_extract(d$keychain$output_path,"/$"))) {"/"} else {},
-          d$info$datapack_name,"_",
-          "FASTExport_",
-          format(Sys.time(), "%Y%m%d%H%M%S"),
-          ".csv"
-        )
-        readr::write_csv(d$data$FAST, d$keychain$FAST_file_name)
-        interactive_print(paste0("Successfully saved FAST export to ", d$keychain$FAST_file_name))
-    }
+      exportPackr(d$data$FAST,
+                  d$keychain$output_path,
+                  type = "FAST Export",
+                  d$info$datapack_name)  }
 
   # Package SUBNAT/IMPATT export
     d <- packSUBNAT_IMPATT(d)
-
     if (export_SUBNAT_IMPATT == TRUE) {
-        d$keychain$SUBNAT_IMPATT_filename <- paste0(
-          d$keychain$output_path,
-          if (is.na(stringr::str_extract(d$keychain$output_path,"/$"))) {"/"} else {},
-          d$info$datapack_name,"_",
-          "SUBNAT_IMPATT_Export_",
-          format(Sys.time(), "%Y%m%d%H%M%S"),
-          ".csv"
-        )
-        readr::write_csv(d$datim$SUBNAT_IMPATT, d$keychain$SUBNAT_IMPATT_filename)
-        interactive_print(paste0("SUBNAT/IMPATT data is ready for DATIM import and available here: ", d$keychain$SUBNAT_IMPATT_filename))
+
+      exportPackr(d$data$SUBNAT_IMPATT,
+                  d$keychain$output_path,
+                  type = "SUBNAT IMPATT",
+                  d$info$datapack_name)
     }
 
   # If warnings, show all grouped by sheet and issue
     if (!is.null(d$info$warningMsg) & interactive()) {
       options(warning.length = 8170)
+      
       messages <-
         paste(paste(
           seq_along(d$info$warningMsg),
@@ -152,19 +139,16 @@ unPackData <- function(import_file = NA,
         collapse = "\r\n")
       cat(crayon::red("WARNING MESSAGES: \r\n"))
       cat(crayon::red(messages))
+
     }
+    #options(warn = 0)
 
     if (archive_results == TRUE) {
-      archive <- paste0(
-        d$keychain$output_path,
-        if (is.na(stringr::str_extract(d$keychain$output_path,"/$"))) {"/"} else {},
-        d$info$datapack_name,"_",
-        "Results_Archive",
-        format(Sys.time(), "%Y%m%d%H%M%S"),
-        ".rds"
-      )
-      saveRDS(d, file = archive)
-      d$keychain$archive_file<-archive
+
+      exportPackr(d,
+                  d$keychain$output_path,
+                  type = "Results Archive",
+                  d$info$datapack_name)
     }
     
     return(d)
