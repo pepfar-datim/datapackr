@@ -7,7 +7,7 @@ datapackr::loginToDATIM(secrets)
 
 
 country_uids <- datapackr::dataPackMap %>%
-  dplyr::filter(data_pack_name == "Nigeria") %>%
+  dplyr::filter(data_pack_name == d$info$datapack_name) %>%
   dplyr::pull(country_uid)
 
 
@@ -34,8 +34,7 @@ distributedSite <- d$data$distributedMER %>%
   dplyr::arrange(psnuid,indicatorCode,mechanismCode,Age,Sex,KeyPop,type,site_tool_label) %>%
   dplyr::select(-value)
 
-d$data$site$distributed 
-cj <- d$data$distributedMER %>%
+d$data$site$distributed <- d$data$distributedMER %>%
   dplyr::select(-CoarseAge) %>%
   dplyr::filter(value != 0) %>%
   dplyr::left_join(distributedSite, by = c("psnuid" = "psnuid",

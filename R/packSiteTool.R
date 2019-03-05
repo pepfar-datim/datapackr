@@ -105,12 +105,6 @@ print(sheet)
   ## Write Formula
   datapackr::writeFxColumnwise(wb, sheet, subtotal_fxs, xy = c(row_header_cols+1,4))
     
-  ## Format both Site and Data Pack subtotal rows as numeric
-  num <- openxlsx::createStyle(numFmt = "#,##0.00")
-  openxlsx::addStyle(wb, sheet, style = num,
-                     rows = 3:4, cols = (row_header_cols+1:length(data_cols)),
-                     gridExpand = TRUE)
-    
   ## Add red conditional formatting for discrepancies
   subtotal_colStart_letter <- openxlsx::int2col(row_header_cols+1)
   subtotal_cond_format_fx <- paste0(
@@ -128,6 +122,12 @@ print(sheet)
   openxlsx::writeData(wb, sheet, sums,
                       xy = c(row_header_cols + 1,3),
                       colNames = FALSE)
+  
+  ## Format both Site and Data Pack subtotal rows as numeric
+  num <- openxlsx::createStyle(numFmt = "#,##0.00")
+  openxlsx::addStyle(wb, sheet, style = num,
+                     rows = 3:4, cols = (row_header_cols+1:length(data_cols)),
+                     gridExpand = TRUE)
     
 # Inactive column ####
   max_row_buffer <- 500
@@ -243,6 +243,7 @@ print(sheet)
 }
 
 #' @export
+#' @importFrom magrittr %>% %<>%
 #' @title Pack a Site Tool
 #' 
 #' @description
@@ -363,7 +364,7 @@ packSiteTool <- function(d) {
     write_all_sheets <- function(x) {
       wb <- datapackr::write_site_level_sheet(wb = wb, sheet = x, d = d)
     }
-    sapply(data_sheets, write_all_sheets)
+    wb <- sapply(data_sheets, write_all_sheets)
         
 # Export Site Tool ####
     print("Exporting...")

@@ -190,7 +190,14 @@ writeFxColumnwise <- function(wb, sheet, x, xy) {
 #' Workbook object.
 #' @param output_path A local path directing to the folder where you would like
 #' outputs to be saved. If not supplied, will output to working directory.
-#' @param type File prefix to be applied in output filename.
+#' @param type File prefix to be applied in output filename, as follows:
+#'   \describe{
+#'     \item{Site Tool}{Openxlsx Workbook object containing Site Tool.}
+#'     \item{Data Pack}{Openxlsx Workbook object containing Data Pack.}
+#'     \item{FAST Export}{Data frame containing FAST export data.}
+#'     \item{SUBNAT IMPATT}{Data frame containing SUBNAT/IMPATT data.}
+#'     \item{Results Archive}{List object containing results archive.}
+#' }
 #' @param datapack_name Country name or OU name to be listed in output filename.
 #' 
 exportPackr <- function(data, output_path, type, datapack_name) {

@@ -374,7 +374,17 @@ unPackSheet <- function(d) {
             dplyr::ungroup()
         }
         
-      
+    # Add ages to PMTCT_EID
+        if (d$data$sheet == "PMTCT_EID") {
+          d$data$extract %<>%
+            dplyr::mutate(
+              Age = dplyr::case_when(
+                stringr::str_detect(indicatorCode, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
+                stringr::str_detect(indicatorCode, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
+                TRUE ~ Age
+              )
+            )
+        }
 
     # Bundle warnings by Sheet name
         if (!is.null(d$data$warningMsg)) {
@@ -482,56 +492,70 @@ unPackSheets <- function(d) {
 #'    Site Tool, as well as a running Warning Message queue string,
 #'    \code{d$info$warningMsg}
 unPackSNUxIM <- function(d) {
-    msg <- NULL
+  msg <- NULL
+  
+  col_num <- length(readxl::read_excel(path = d$keychain$submission_path,
+                                  sheet = "SNU x IM",
+                                  range = readxl::cell_rows(5)))
+  ct <- c(rep("text",8),rep("numeric",col_num-8))
 
-    col_num <- length(readxl::read_excel(path = d$keychain$submission_path,
-                                    sheet = "SNU x IM",
-                                    range = readxl::cell_rows(5)))
-    ct <- c(rep("text",8),rep("numeric",col_num-8))
+  d$data$SNUxIM <- readxl::read_excel(path = d$keychain$submission_path,
+                                      sheet = "SNU x IM",
+                                      range = readxl::cell_limits(c(5,1), c(NA, col_num)),
+                                      col_types = ct) %>%
+    dplyr::select(
+      dplyr::one_of(
+        c("PSNU","sheet_name","indicatorCode","CoarseAge","Sex","KeyPop","DataPackTarget","Dedupe")),
+      dplyr::matches("(\\d){2,}")) %>%
+    dplyr::select_if(~!all(is.na(.))) %>%
+    dplyr::mutate(
+      sum = rowSums(dplyr::select(.,dplyr::matches("\\d+|Dedupe")), na.rm = TRUE)) %>%
+    dplyr::mutate(DataPackTarget = datapackr::round_trunc(DataPackTarget),
+                  sum = datapackr::round_trunc(sum))
 
-    d$data$SNUxIM <- readxl::read_excel(path = d$keychain$submission_path,
-                                        sheet = "SNU x IM",
-                                        range = readxl::cell_limits(c(5,1), c(NA, col_num)),
-                                        col_types = ct) %>%
-        dplyr::select(dplyr::one_of(c("PSNU","sheet_name","indicatorCode","CoarseAge","Sex","KeyPop","DataPackTarget","Dedupe")),
-                      dplyr::matches("(\\d){2,}")) %>%
-        dplyr::select_if(~!all(is.na(.))) %>%
-        dplyr::mutate(sum = rowSums(dplyr::select(.,dplyr::matches("\\d+|Dedupe")), na.rm = TRUE)) %>%
-        dplyr::mutate(DataPackTarget = datapackr::round_trunc(DataPackTarget),
-                      sum = datapackr::round_trunc(sum))
+# TEST where DataPackTarget != sum of mechanism values
+  mismatch <- d$data$SNUxIM %>%
+    dplyr::filter(DataPackTarget != sum) %>%
+    dplyr::select(PSNU, indicatorCode, CoarseAge, Sex, KeyPop, DataPackTarget, mechanisms = sum)
 
-    # TEST where DataPackTarget != sum of mechanism values
-        mismatch <- d$data$SNUxIM %>%
-            dplyr::filter(DataPackTarget != sum) %>%
-            dplyr::select(PSNU, indicatorCode, CoarseAge, Sex, KeyPop, DataPackTarget, mechanisms = sum)
-
-        if(NROW(mismatch) > 0) {
-            msg <- paste0(msg,
+    if(NROW(mismatch) > 0) {
+        msg <- paste0(msg,
 "    ",NROW(mismatch)," cases where Data Pack Targets are not correctly distributed among mechanisms.
 
 ")
         }
         
-    # Fix issues with HTS_SELF (duplicate and split by Male/Female)
-        d$data$SNUxIM %<>%
-          dplyr::mutate(
-            Sex = dplyr::case_when(
-              stringr::str_detect(indicatorCode, "HTS_SELF(.)+Unassisted") ~ "Male|Female",
-              TRUE ~ Sex)) %>%
-          tidyr::separate_rows(Sex)
-
-    # Create distribution matrix
-        d$data$SNUxIM %<>%
-            dplyr::filter(DataPackTarget != 0 & sum != 0) %>%
-            dplyr::select(-DataPackTarget, -sum) %>%
-            tidyr::gather(key = "mechanismCode", value = "value", -PSNU, -sheet_name, -indicatorCode, -CoarseAge, -Sex, -KeyPop) %>%
-            tidyr::drop_na(value) %>%
-            dplyr::group_by(PSNU, sheet_name, indicatorCode, CoarseAge, Sex, KeyPop) %>%
-            dplyr::mutate(distribution = value / sum(value)) %>%
-            dplyr::ungroup() %>%
-            dplyr::mutate(psnuid = stringr::str_extract(PSNU,"(?<=\\()([A-Za-z][A-Za-z0-9]{10})(?=\\)$)"),
-                          mechanismCode = stringr::str_extract(mechanismCode, "(\\d{1,6})|Dedupe")) %>%
-            dplyr::select(PSNU, psnuid, sheet_name, indicatorCode, CoarseAge, Sex, KeyPop, mechanismCode, distribution)
+  d$data$SNUxIM %<>%
+    dplyr::mutate(
+# Align PMTCT_EID Age bands with rest of Data Pack
+      CoarseAge = dplyr::case_when(
+        stringr::str_detect(indicatorCode, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
+        stringr::str_detect(indicatorCode, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
+        TRUE ~ CoarseAge),
+      Sex = dplyr::case_when(
+# Drop Unknown Sex from PMTCT_EID
+        stringr::str_detect(indicatorCode, "PMTCT_EID") ~ NA_character_,
+# Fix issues with HTS_SELF (duplicate and split by Male/Female)
+        stringr::str_detect(indicatorCode, "HTS_SELF(.)+Unassisted") ~ "Male|Female",
+        TRUE ~ Sex)) %>%
+    tidyr::separate_rows(Sex, sep = "\\|") %>%
+# Create distribution matrix 
+    dplyr::filter(DataPackTarget != 0 & sum != 0) %>%
+    dplyr::select(-DataPackTarget, -sum) %>%
+    tidyr::gather(
+      key = "mechanismCode",
+      value = "value",
+      -PSNU, -sheet_name, -indicatorCode, -CoarseAge, -Sex, -KeyPop) %>%
+  ## Drop all NA values
+    tidyr::drop_na(value) %>%
+    dplyr::group_by(PSNU, sheet_name, indicatorCode, CoarseAge, Sex, KeyPop) %>%
+    dplyr::mutate(distribution = value / sum(value)) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(
+      psnuid = stringr::str_extract(PSNU,"(?<=\\()([A-Za-z][A-Za-z0-9]{10})(?=\\)$)"),
+      mechanismCode = stringr::str_extract(mechanismCode, "(\\d{1,6})|Dedupe")) %>%
+    dplyr::select(PSNU, psnuid, sheet_name, indicatorCode, CoarseAge, Sex,
+                  KeyPop, mechanismCode, distribution)
 
     # Bundle warnings by Sheet name
         if (!is.null(msg)) {
@@ -558,29 +582,30 @@ unPackSNUxIM <- function(d) {
 #'    data at the SNU x IM level, \code{d$data$distributedMER}.
 rePackPSNUxIM <- function(d) {
     d$data$distributedMER <- d$data$MER %>%
-        dplyr::mutate(
-            CoarseAge = dplyr::case_when(
-                            stringr::str_detect(indicatorCode,"OVC_SERV")
-                                & Age %in% c("<01","01-04","05-09","10-14","15-17") ~ "<18",
-                            stringr::str_detect(indicatorCode,"OVC_HIVSTAT") ~ NA_character_,
-                            stringr::str_detect(indicatorCode,"PMTCT_EID(.)+\\.2mo$") ~ "<=02 Months",
-                            stringr::str_detect(indicatorCode,"PMTCT_EID(.)+12mo$") ~ "02 - 12 Months",
-                            stringr::str_detect(indicatorCode,"Malnutrition|Pediatric") ~ "01-04",
-                            stringr::str_detect(indicatorCode,"HTS_SELF(.)+Unassisted") ~ NA_character_,
-                            Age %in% c("<01","01-04","05-09","10-14") ~ "<15",
-                            Age %in% c("15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+") ~ "15+",
-                            TRUE ~ Age),
-            Sex = dplyr::case_when(stringr::str_detect(indicatorCode,"OVC_HIVSTAT") ~ NA_character_,
-                                  stringr::str_detect(indicatorCode,"PMTCT_EID") ~ "Unknown Sex",
-                                  stringr::str_detect(indicatorCode,"KP_MAT") ~ stringr::str_replace(KeyPop," PWID",""),
-                                      TRUE ~ Sex),
-            KeyPop = dplyr::case_when(stringr::str_detect(indicatorCode,"KP_MAT") ~ NA_character_,
-                                        TRUE ~ KeyPop)
-        ) %>%
-        dplyr::left_join(dplyr::select(d$data$SNUxIM,-PSNU)) %>%
-        dplyr::mutate(newValue = value * distribution) %>%
-        dplyr::filter(value != 0) %>%
-        dplyr::select(PSNU, psnuid, sheet_name, indicatorCode, Age, CoarseAge, Sex, KeyPop, mechanismCode, value = newValue)
+      dplyr::mutate(
+        CoarseAge = dplyr::case_when(
+          stringr::str_detect(indicatorCode,"OVC_SERV")
+              & Age %in% c("<01","01-04","05-09","10-14","15-17") ~ "<18",
+          stringr::str_detect(indicatorCode,"OVC_HIVSTAT") ~ NA_character_,
+          stringr::str_detect(indicatorCode,"Malnutrition|Pediatric") ~ "01-04",
+          stringr::str_detect(indicatorCode,"HTS_SELF(.)+Unassisted") ~ NA_character_,
+          Age %in% c("<01","01-04","05-09","10-14") ~ "<15",
+          Age %in% c("15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+") ~ "15+",
+          TRUE ~ Age),
+        Sex = dplyr::case_when(
+          stringr::str_detect(indicatorCode,"OVC_HIVSTAT") ~ NA_character_,
+          stringr::str_detect(indicatorCode,"KP_MAT") ~ stringr::str_replace(KeyPop," PWID",""),
+          TRUE ~ Sex),
+        KeyPop = dplyr::case_when(
+          stringr::str_detect(indicatorCode,"KP_MAT") ~ NA_character_,
+          TRUE ~ KeyPop)
+      ) %>%
+      dplyr::left_join(dplyr::select(d$data$SNUxIM,-PSNU)) %>%
+      dplyr::mutate(newValue = value * distribution) %>%
+      dplyr::select(PSNU, psnuid, sheet_name, indicatorCode, Age, CoarseAge,
+                    Sex, KeyPop, mechanismCode, value = newValue) %>%
+      dplyr::filter(value != 0) %>%
+      tidyr::drop_na(value)
 
     return(d)
 }
