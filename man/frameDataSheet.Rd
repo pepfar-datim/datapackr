@@ -9,6 +9,8 @@ frameDataSheet(wb, sheet, type = "Data Pack")
 \arguments{
 \item{wb}{Openxlsx workbook object.}
 
+\item{sheet}{Name of the sheet}
+
 \item{type}{Either "Data Pack" or "Site Tool". Defaults to "Data Pack".}
 }
 \value{

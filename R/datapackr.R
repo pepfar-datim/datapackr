@@ -31,6 +31,7 @@ if (getRversion() >= "2.15.1")
       "categoryOptionGroups",
       "categoryOptions",
       "CoarseAge",
+      "code",
       "col_type",
       "colType",
       "community",
@@ -41,6 +42,7 @@ if (getRversion() >= "2.15.1")
       "dataelement",
       "dataelementuid",
       "DataPack_name",
+      "data_pack_name",
       "DataPackTarget",
       "dataset",
       "disag",
@@ -57,6 +59,7 @@ if (getRversion() >= "2.15.1")
       "is_region",
       "KeyPop",
       "level",
+      "mechanism",
       "mechanismCode",
       "mechanismid",
       "mil_level",
@@ -86,15 +89,21 @@ if (getRversion() >= "2.15.1")
       "sheet_num",
       "sheets",
       "site_schema",
+      "siteID",
+      "siteValue",
+      "site_tool_label",
       "site_type",
       "start_date",
       "startDate",
+      "Status",
       "submission_order",
       "template_order",
+      "type",
       "validAges",
       "validKPs",
       "validSexes",
-      "value"
+      "value",
+      "wb"
     )
     
   )

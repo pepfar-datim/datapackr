@@ -4,11 +4,12 @@
 \alias{unPackData}
 \title{Unpack a submitted Data Pack}
 \usage{
-unPackData(import_file = NA, output_path = NA, export_FAST = FALSE,
-  archive_results = FALSE, export_SUBNAT_IMPATT = FALSE)
+unPackData(submission_path = NA, output_path = NA,
+  export_FAST = FALSE, archive_results = FALSE,
+  export_SUBNAT_IMPATT = FALSE)
 }
 \arguments{
-\item{import_file}{Local path to the file to import.}
+\item{submission_path}{Local path to the file to import.}
 
 \item{output_path}{A local path directing to the folder where you would like
 outputs to be saved. If not supplied, will output to working directory.}

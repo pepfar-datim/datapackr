@@ -58,6 +58,7 @@ return(wb)
 #' Function to write Data sheet structures 
 #' 
 #' @param wb Openxlsx workbook object.
+#' @param sheet Name of the sheet
 #' @param type Either "Data Pack" or "Site Tool". Defaults to "Data Pack".
 #' 
 #' @return Openxlsx workbook object with added, styled Home tab.
