@@ -188,12 +188,25 @@ produceConfig <- function() {
   datapackr::loginToDATIM(getOption("secrets"))
   
   # Load Country List
+    newCountryUIDs <- c("joGQFpKiHl9", #Brazil
+                        "YlSE5fOVJMa", #Nepal
+                        "ODOymOOWyl0", #Sierra Leone
+                        "N3xTKNKu5KM", #Mali
+                        "ZeB2eGmDfGw", #Burkina Faso
+                        "EIUtrKbw8PQ", #Togo
+                        "kH29I939rDQ", #Liberia
+                        "N5GhQWVpVFs") %>% #Senegal
+      paste(collapse = ",")
+  
     configFile <-
-      paste0(getOption("baseurl"),"api/",api_version(),
-             "/organisationUnits.json?paging=false",
+      paste0(
+        getOption("baseurl"),"api/",datapackr::api_version(),
+        "/organisationUnits.json?paging=false",
      ## Filter to just countries
-             "&filter=organisationUnitGroups.id:eq:cNzfcPWEGSH",
-             "&fields=id,name,level,ancestors[id,name]") %>%
+        "&filter=organisationUnitGroups.id:eq:cNzfcPWEGSH",
+        "&filter=id:in:[",newCountryUIDs,"]",
+        "&rootJunction=OR",
+        "&fields=id,name,level,ancestors[id,name]") %>%
       utils::URLencode() %>%
       httr::GET() %>%
       httr::content(., "text") %>%
@@ -207,19 +220,19 @@ produceConfig <- function() {
       
     ## Add new countries
       dplyr::select(country_name = name, country_uid = id, dplyr::everything()) %>%
-      dplyr::bind_rows(
-        tibble::tribble(
-          ~country_name, ~country_uid, ~level, ~ancestors,
-          "Nepal", "TBD00000001", 4, list(name = NA_character_, id = NA_character_),
-          "Brazil", "TBD00000002", 4, list(name = NA_character_, id = NA_character_),
-          "Burkina Faso", "TBD00000003", 4, list(name = NA_character_, id = NA_character_),
-          "Liberia", "TBD00000004", 4, list(name = NA_character_, id = NA_character_),
-          "Mali", "TBD00000005", 4, list(name = NA_character_, id = NA_character_),
-          "Senegal", "TBD00000006", 4, list(name = NA_character_, id = NA_character_),
-          "Sierra Leone", "TBD00000007", 4, list(name = NA_character_, id = NA_character_),
-          "Togo", "TBD00000008", 4, list(name = NA_character_, id = NA_character_)
-        )
-      ) %>%
+      # dplyr::bind_rows(
+      #   tibble::tribble(
+      #     ~country_name, ~country_uid, ~level, ~ancestors,
+      #     "Nepal", "TBD00000001", 4, list(name = NA_character_, id = NA_character_),
+      #     "Brazil", "TBD00000002", 4, list(name = NA_character_, id = NA_character_),
+      #     "Burkina Faso", "TBD00000003", 4, list(name = NA_character_, id = NA_character_),
+      #     "Liberia", "TBD00000004", 4, list(name = NA_character_, id = NA_character_),
+      #     "Mali", "TBD00000005", 4, list(name = NA_character_, id = NA_character_),
+      #     "Senegal", "TBD00000006", 4, list(name = NA_character_, id = NA_character_),
+      #     "Sierra Leone", "TBD00000007", 4, list(name = NA_character_, id = NA_character_),
+      #     "Togo", "TBD00000008", 4, list(name = NA_character_, id = NA_character_)
+      #   )
+      # ) %>%
   
   # Add metadata
       dplyr::mutate(is_region = level == 4 |
@@ -272,20 +285,18 @@ produceConfig <- function() {
     configFile %<>%
       dplyr::left_join(impattLevels, by = c("country_name")) %>%
       dplyr::mutate_if(is.integer,as.double) %>%
-      dplyr::mutate(country = level,
-                    prioritization = dplyr::case_when(
-                      country_in_datim != TRUE ~ level,
-                      TRUE ~ prioritization),
-                    operating_unit =
-                      dplyr::if_else(is.na(operating_unit),
-                                     stringr::str_replace(
-                                       data_pack_name,
-                                       "Central America|Caribbean",
-                                       "Western Hemisphere"),
-                                     operating_unit))
+      dplyr::mutate(
+        country = level,
+        prioritization = dplyr::if_else(is.na(operating_unit), level, prioritization),
+        planning = dplyr::if_else(is.na(operating_unit), level, planning),
+        community = dplyr::if_else(is.na(operating_unit), level, community),
+        facility = dplyr::if_else(is.na(operating_unit), level, facility),
+        operating_unit =
+          dplyr::if_else(
+            is.na(operating_unit),
+              level3name,
+              operating_unit))
       
-
-    
   # Add Mil names & UIDs & metadata
     militaryNodes <- datapackr::getMilitaryNodes() %>%
       dplyr::mutate(mil_in_datim = TRUE) %>%
@@ -302,12 +313,28 @@ produceConfig <- function() {
                     mil_level) %>%
     ## Add Mil manually where not in DATIM currently
       dplyr::mutate(
-        mil_psnu = dplyr::case_when(
-          is.na(mil_psnu) ~ paste0("_Military ",country_name),
-          TRUE ~ mil_psnu),
-        mil_psnu_uid = dplyr::case_when(
-          is.na(mil_psnu_uid) ~ "TBD",
-          TRUE ~ mil_psnu_uid)) %>%
+        mil_psnu = dplyr::if_else(
+          is.na(mil_psnu),
+          paste0("_Military ",country_name),
+          mil_psnu),
+        mil_psnu_uid =
+          dplyr::if_else(
+            is.na(mil_psnu_uid), 
+            paste0(
+              "MIL",
+              stringr::str_sub(
+                stringr::str_replace_all(country_name," ",""),
+                1,8
+              )
+            ),
+            mil_psnu_uid
+            ),
+        mil_psnu_uid = stringr::str_pad(
+          mil_psnu_uid,
+          width = 11,
+          side = "right",
+          pad = 0)
+        ) %>%
       tidyr::replace_na(list(mil_in_datim = FALSE, mil_level = 5))
     
     return(configFile)

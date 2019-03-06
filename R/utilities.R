@@ -95,10 +95,12 @@ getIMPATTLevels <- function(){
 getMilitaryNodes <- function() {
   datapackr::loginToDATIM(getOption("secrets"))
   
-  militaryNodes <- paste0(getOption("baseurl"),"api/",datapackr::api_version(),
-                          "/organisationUnits.json?paging=false",
-                          "&filter=organisationUnitGroups.id:eq:nwQbMeALRjL",
-                          "&fields=name,id,level,ancestors[id,name]") %>%
+  militaryNodes <- paste0(
+    getOption("baseurl"),"api/",datapackr::api_version(),
+      "/organisationUnits.json?paging=false",
+      "&filter=name:$ilike:_Military",
+      #"&filter=organisationUnitGroups.id:eq:nwQbMeALRjL", (New _Mil nodes not here...)
+      "&fields=name,id,level,ancestors[id,name]") %>%
     httr::GET() %>%
     httr::content(., "text") %>%
     jsonlite::fromJSON(., flatten = TRUE) %>%
@@ -219,14 +221,14 @@ exportPackr <- function(data, output_path, type, datapack_name) {
     )
   }
 
-  if (type %in% c("Site Tool", "Data Pack")) {
+  if (type %in% c("Site Tool", "Data Pack", "Mechanism Map")) {
     if (class(data) != "Workbook") {
       stop("Output type and data do not match!")
     }
     
     output_file_name <- packName(output_path, type, datapack_name, extension = ".xlsx")
     
-    openxlsx::saveWorkbook(wb, output_file_name, overwrite = TRUE)
+    openxlsx::saveWorkbook(data, output_file_name, overwrite = TRUE)
   }
   
   if (type %in% c("FAST Export","SUBNAT IMPATT")) {
@@ -243,7 +245,7 @@ exportPackr <- function(data, output_path, type, datapack_name) {
     if (class(data) != "list") {
       stop("Output type and data do not match!")
     }
-    
+
     output_file_name <- packName(output_path, type, datapack_name, extension = ".rds")
     
     saveRDS(data, output_file_name)
@@ -255,3 +257,135 @@ exportPackr <- function(data, output_path, type, datapack_name) {
 
 interactive_print<-function(x) if (interactive()) { print(x) }
 
+
+#' @export
+#' @title Pull list of PSNUs from DATIM and format based on datapackr structure.
+#' 
+#' @description
+#' Queries DATIM to extract list of PSNUs for specified Data Pack UID and adds
+#' additional PSNUs not currently in DATIM as needed.
+#' 
+#' @param datapack_uid A unique ID specifying the PEPFAR Operating Unit 
+#' the Site Tool belongs to.
+#' 
+#' @return Data frame of PSNUs
+#' 
+getPSNUs <- function(datapack_uid) {
+  # Pull PSNUs from DATIM SQL view
+    DATIMcountryNameString <- datapackr::configFile %>%
+      dplyr::filter(model_uid == datapack_uid,
+             Currently_in_DATIM == "Y") %>%
+      dplyr::select(countryName) %>%
+      dplyr::mutate(
+        countryName = stringr::str_replace(countryName,
+                                           "d'Ivoire",
+                                           "d Ivoire")) %>%
+      unique() %>%
+      dplyr::pull(countryName) %>%
+      paste(collapse = ",") %>%
+      stringr::str_replace_all("&","%26") %>%
+      stringr::str_replace_all(" ","%20")
+
+    PSNUs <- paste0(getOption("baseurl"),
+                    "api/",
+                    datapackr::api_version(),
+                    "/sqlViews/PjjAyeXUbBd/data.json?",
+                    "fields=operating_unit,uid,name",
+                    "&filter=name:!like:_Military",
+                    "&filter=operating_unit:in:[",
+                    DATIMcountryNameString,"]") %>%
+      URLencode() %>%
+      httr::GET() %>%
+      httr::content(., "text") %>%
+      jsonlite::fromJSON(., flatten = TRUE)
+    PSNUs <- as.data.frame(PSNUs$rows,stringsAsFactors = FALSE) %>%
+      setNames(.,PSNUs$headers$name) %>%
+      dplyr::select(country = operating_unit, uid, name) %>%
+      unique()
+  
+  # Add new new countries as PSNUs
+    newCountries <- datapackr::configFile %>%
+      dplyr::filter(
+        model_uid == datapack_uid,
+        Currently_in_DATIM == "N",
+        isMil == "0") %>%
+      dplyr::select(countryName, countryUID)
+    
+  if (NROW(newCountries) != 0) {
+    PSNUs <- PSNUs %>%
+      dplyr::bind_rows(newCountries %>%
+                         dplyr::mutate(name = countryName) %>%
+                         dplyr::select(country = countryName,
+                                      uid = countryUID,
+                                      name))
+  }
+  
+  # No Mil PSNUs at this point. Add them from Config file
+    milPSNUs <- datapackr::configFile %>%
+      dplyr::filter(model_uid == datapack_uid,
+             !is.na(milPSNU)) %>%
+      dplyr::select(DataPack_name, milPSNU, milPSNUuid, milPSNU_in_DATIM) %>%
+      unique()
+    
+    PSNUs <- PSNUs %>%
+      dplyr::bind_rows(milPSNUs %>%
+                       dplyr::select(country = DataPack_name,
+                              uid = milPSNUuid,
+                              name = milPSNU))
+  
+  # Patch for Suriname and Jamaica
+  if(datapack_uid == "Caribbean_Data_Pack") {
+    patchList <- c("Suriname","Jamaica")
+    
+    JamaicaSuriname = NULL
+    
+    for (i in 1:length(patchList)) {
+      URL <- paste0(getOption("baseurl"),
+                    "api/sqlViews/kEtZ2bSQCu2/data.json?fields=level4name,organisationunituid,name&filter=level4name:eq:",
+                    patchList[i],
+                    dplyr::case_when(patchList[i] == "Jamaica" ~ "&filter=level:eq:6",
+                                     patchList[i] == "Suriname" ~ "&filter=level:eq:5"))
+      Export <- URL %>%
+        URLencode() %>%
+        httr::GET() %>%
+        httr::content(., "text") %>%
+        jsonlite::fromJSON(., flatten = TRUE)
+      JamaicaSuriname <- as.data.frame(Export$rows,stringsAsFactors = FALSE) %>%
+        setNames(.,Export$headers$name) %>%
+        dplyr::select(country = level4name, uid = organisationunituid, name) %>%
+        unique() %>%
+        dplyr::bind_rows(JamaicaSuriname,.)
+    }
+    
+    PSNUs <- PSNUs %>%
+      dplyr::filter(!country %in% c("Jamaica", "Suriname")) %>%
+      dplyr::bind_rows(JamaicaSuriname)
+  }
+  
+  # Create Data Pack Site ID & tag with country name breadcrumb where country != PSNU
+  isRegion = datapackr::configFile %>%
+    dplyr::filter(model_uid == datapack_uid) %>%
+    dplyr::select(isRegion) %>%
+    unique() %>%
+    dplyr::pull(isRegion)
+  needsCountryTag = datapackr::configFile %>%
+    dplyr::filter(model_uid == datapack_uid &
+                  Prioritizing_at_Natl_or_SNU == "SNU" &
+                  isRegion == 1) %>%
+    dplyr::select(countryName) %>%
+    unique() %>%
+    dplyr::pull(countryName)
+    
+    PSNUs <- PSNUs %>%
+      dplyr::mutate(DataPackSiteID = paste0(
+        ## Country Name only where country != PSNU
+        dplyr::case_when(isRegion == 1
+                         & country %in% needsCountryTag
+                         ~ paste0(country," > "),
+                         TRUE ~ ""),
+        ## name & uid
+        name, " (", uid,")")
+    )
+  
+  return(PSNUs)
+}

@@ -25,7 +25,7 @@ getMechList <- function(country_uids = NA,
   # Check user has correct permissions to query against country_uids ####
     # TODO: Configure to allow non-global users to generate Site Tools
   
-  # Pull Sites ####
+  # Pull Mechs ####
     mechList <- 
       paste0(getOption("baseurl"), "api/",datapackr::api_version(),
              "/categoryOptionCombos.json",
