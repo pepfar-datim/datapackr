@@ -255,7 +255,7 @@ exportPackr <- function(data, output_path, type, datapack_name) {
 }
 
 
-interactive_print<-function(x) if (interactive()) { print(x) }
+interactive_print <- function(x) if (interactive()) { print(x) }
 
 
 #' @export

@@ -80,7 +80,7 @@ unPackData <- function(submission_path = NA,
     msg<-"Checking the file exists..."
     interactive_print(msg)
     
-    if (!can_read_import_file( submission_path )) {
+    if (!can_read_import_file(d$keychain$submission_path)) {
       stop("Submission workbook could not be read!")
     }
     
@@ -106,6 +106,9 @@ unPackData <- function(submission_path = NA,
 
   # Combine Targets with SNU x IM for PSNU x IM level targets
     d <- rePackPSNUxIM(d)
+    
+  # Prepare SNU x IM dataset for DATIM validation checks
+    d$datim$PSNUxIM <- packForDATIM(d$data$distributedMER)
 
   # Package FAST export
     d <- FASTforward(d)
