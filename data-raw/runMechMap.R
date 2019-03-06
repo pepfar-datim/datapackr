@@ -11,3 +11,6 @@ secrets <- "/Users/scott/.secrets/triage.json"
 datapackr::loginToDATIM(secrets)
 
 datapackr::packMechMap(datapack_uid, FY, output_path)
+
+
+View(datapackr::dataPackMap)

@@ -376,8 +376,9 @@ unPackSheet <- function(d) {
     dplyr::select(PSNU, psnuid, sheet_name, indicatorCode, Age, Sex, KeyPop, value) %>%
     # Drop zeros, NAs, dashes, and space-only entries
         tidyr::drop_na(value) %>%
-        dplyr::filter(value != 0
-                      & !value %in% c("-"," ")) %>%
+        dplyr::filter(
+          !is.na(suppressWarnings(as.numeric(value)))
+          & value != 0) %>%
         dplyr::mutate(value = as.numeric(value))
 
   # TEST for Negative values
@@ -617,6 +618,7 @@ unPackSNUxIM <- function(d) {
       -PSNU, -sheet_name, -indicatorCode, -CoarseAge, -Sex, -KeyPop) %>%
     ## Drop all NA values
     tidyr::drop_na(value) %>%
+    dplyr::filter(value > 0) %>%
     dplyr::group_by(PSNU, sheet_name, indicatorCode, CoarseAge, Sex, KeyPop) %>%
     dplyr::mutate(distribution = value / sum(value)) %>%
     dplyr::ungroup() %>%
