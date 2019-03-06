@@ -40,21 +40,26 @@ frameMechMap <- function(datapack_uid) {
                         xy = c(1,1),
                         colNames = FALSE)
     
-  # Write other headers into Mech Map sheet ####
+  # Write New Mechanism title ####
     openxlsx::writeData(wb = wb,
                         sheet = "Mechanism Map",
-                        x = c(
-                          A = "Old Mechanism",
-                          B = "PSNU",
-                          C = "Indicator",
-                          D = "Type",
-                          E = "Distribution Check"),
+                        x = "New Mechanisms",
+                        xy = c(6,2),
+                        colNames = FALSE)
+    
+  # Write other headers into Mech Map sheet ####
+    headers = tibble::tribble(
+      ~A,~B,~C,~D,~E,
+      "Old Mechanism", "PSNU", "Indicator", "Type", "Distribution Check")
+    openxlsx::writeData(wb = wb,
+                        sheet = "Mechanism Map",
+                        x = headers,
                         xy = c(1,3),
                         colNames = FALSE)
     
   # Add dist check to Mech Map ####
     checkFx <- paste0(
-      '=IF(A', 4:200, '<>"",SUM(A', 4:200, ':AD', 4:200, '),"")')
+      '=IF(A', 4:200, '<>"",SUM(F', 4:200, ':AD', 4:200, '),"")')
     
     openxlsx::writeFormula(
       wb, sheet = "Mechanism Map",
@@ -92,6 +97,11 @@ frameMechMap <- function(datapack_uid) {
                            sheet = "Mechanism Map",
                            cols = 1:30,
                            widths = c(33,33,33,"auto","auto",rep(5,25)))
+    
+    ## New Mech header
+    openxlsx::addStyle(wb, "Mechanism Map",
+                       style = openxlsx::createStyle(textDecoration = "bold"),
+                       rows = 2, cols = 6, stack = TRUE)
     
   # Freeze Panes ####
     openxlsx::freezePane(wb = wb, sheet = "Mechanism Map",
@@ -180,8 +190,8 @@ packMechMap <- function(datapack_uid, FY, output_path = NA) {
         ) %>%
       dplyr::select(indicator) %>%
       dplyr::arrange(indicator) %>%
-      dplyr::distinct() %>%
-      tibble::add_row(indicator = "(All)",.before = 1)
+      dplyr::distinct() #%>%
+      #tibble::add_row(indicator = "(All)",.before = 1)
     
     openxlsx::writeDataTable(
       wb = wb,
