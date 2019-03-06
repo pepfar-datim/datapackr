@@ -103,6 +103,12 @@ frameMechMap <- function(datapack_uid) {
                        style = openxlsx::createStyle(textDecoration = "bold"),
                        rows = 2, cols = 6, stack = TRUE)
     
+    ## Percentage Styles
+    openxlsx::addStyle(wb, "Mechanism Map",
+                       style = openxlsx::createStyle(numFmt = "0%"),
+                       rows = 4:200, cols = 5:30,
+                       gridExpand = TRUE, stack = TRUE)
+    
   # Freeze Panes ####
     openxlsx::freezePane(wb = wb, sheet = "Mechanism Map",
                          firstActiveRow = 4, firstActiveCol = 6)
@@ -205,13 +211,15 @@ packMechMap <- function(datapack_uid, FY, output_path = NA) {
     )
     
   # Write type options (DSD/TA) ####
-    openxlsx::writeData(
+    openxlsx::writeDataTable(
       wb,
       sheet = "Validations",
       x = data.frame(type = c("DSD", "TA")),
       xy = c(5,1),
-      colNames = F,
-      name = "dsdta"
+      colNames = TRUE,
+      tableName = "dsdta",
+      tableStyle = "none",
+      withFilter = TRUE
     )
     
   # Add validations to Mechanism Map tab ####
