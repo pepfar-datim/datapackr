@@ -670,7 +670,9 @@ rePackPSNUxIM <- function(d) {
     tidyr::drop_na(value)
   
   return(d)
+  
 }
+
 
 #' @importFrom magrittr %>% %<>%
 #' @title FASTforward(d)
@@ -759,11 +761,10 @@ FASTforward <- function(d) {
 #'
 #' @param d datapackr list object containing at least
 #'     \code{d$data$SUBNAT_IMPATT}.
-#' @return A datapackr list object, \code{d}, storing at least 1 dataframe of
-#'    SUBNAT & IMPATT data (\code{d$datim$SUBNAT_IMPATT}) ready for DATIM
-#'    ingestion.
-packSUBNAT_IMPATT <- function(d) {
-  d$datim$SUBNAT_IMPATT <- d$data$SUBNAT_IMPATT %>%
+#' @return Dataframe of SUBNAT & IMPATT data ready for DATIM ingestion.
+#' 
+packSUBNAT_IMPATT <- function(data) {
+  importFile <- data %>%
     dplyr::left_join((
       datapackr::indicatorMap %>%
         dplyr::filter(dataset %in% c("SUBNAT", "IMPATT")) %>%
@@ -801,5 +802,66 @@ packSUBNAT_IMPATT <- function(d) {
     dplyr::ungroup() %>%
     dplyr::mutate(value = as.character(value))
   
-  return(d)
+  return(importFile)
 }
+
+
+
+#' @importFrom magrittr %>% %<>%
+#' @title packForDATIM(data)
+#' 
+#' @description 
+#' Flexible function that allows packaging of a variety of datapackr outputs as
+#' DATIM import files.
+#' 
+#' @param data Data frame or tibble ready for DATIM import prep
+#' 
+#' @return Data frame ready for DATIM import
+#' 
+packForDATIM <- function(data, type = NA) {
+  if (is.na(type)) {
+    stop("Please specify data type: 'PSNUxIM', 'SUBNAT_IMPATT', or 'Site'")
+  }
+  
+  if (type == "SUBNAT_IMPATT") {
+    importFile <- packSUBNAT_IMPATT(data)
+  }
+  
+  if (type == "PSNUxIM") {
+    importFile <- data %>%
+      dplyr::mutate(
+        period = "2019Oct",
+        mechanismCode = stringr::str_replace(mechanismCode,"Dedupe","00000"),
+        value = round_trunc(as.numeric(value))) %>%
+      dplyr::filter(
+        !is.na(suppressWarnings(as.numeric(value)))
+        & !(value < 1)) %>%
+      dplyr::left_join(datapackr::PSNUxIM_to_DATIM %>%
+                         dplyr::filter(dataset == "MER") %>%
+                         dplyr::select(-sheet_name, -typeOptions, -dataset),
+                       by = c("indicatorCode" = "indicatorCode",
+                              "Age" = "validAges",
+                              "Sex" = "validSexes",
+                              "KeyPop" = "validKPs")) %>%
+      dplyr::select(
+        dataelement = dataelementuid,
+        period,
+        orgunit = psnuid,
+        categoryoptioncombo = categoryoptioncombouid,
+        mechanismCode,
+        value) %>%
+      tidyr::drop_na() %>%
+      dplyr::group_by(dataelement,
+                      period,
+                      orgunit,
+                      categoryoptioncombo,
+                      mechanismCode) %>%
+      dplyr::summarise(value = sum(value)) %>%
+      dplyr::ungroup()
+  }
+  
+  if (type == "Site") {stop("Sorry! Stay tuned for site data processing!")}
+  
+  return(importFile)
+}
+

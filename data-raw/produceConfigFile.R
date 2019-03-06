@@ -472,36 +472,40 @@ getSiteToolSchema <- function(data_pack_schema) {
     secrets <- "/Users/scott/.secrets/datim.json"
     datapackr::loginToDATIM(secrets)
 
-    ## Config File ####
-        config_path = "./data-raw/DataPackConfiguration.csv"
-        configFile <- readr::read_csv(config_path)
-        save(configFile, file = "./data/configFile.rda")
-        
-    ## Data Pack Map (i.e., Updated Config File) ####
-        dataPackMap <- produceConfig()
-        save(dataPackMap, file = "./data/dataPackMap.rda")
+  ## Config File ####
+    config_path = "./data-raw/DataPackConfiguration.csv"
+    configFile <- readr::read_csv(config_path)
+    save(configFile, file = "./data/configFile.rda")
+      
+  ## Data Pack Map (i.e., Updated Config File) ####
+    dataPackMap <- produceConfig()
+    save(dataPackMap, file = "./data/dataPackMap.rda")
 
-    ## Data Pack Schema ####
-        template_path <- "./data-raw/COP19_Data_Pack_Template_vFINAL.xlsx"
-        data_pack_schema <- unPackStructure(template_path)
-        save(data_pack_schema, file = "./data/data_pack_schema.rda")
-        
-    ## Site Tool Schema ####
-        site_tool_schema <- getSiteToolSchema(data_pack_schema)
-        save(site_tool_schema, file = "./data/site_tool_schema.rda")
+  ## Data Pack Schema ####
+    template_path <- "./data-raw/COP19_Data_Pack_Template_vFINAL.xlsx"
+    data_pack_schema <- unPackStructure(template_path)
+    save(data_pack_schema, file = "./data/data_pack_schema.rda")
+      
+  ## Site Tool Schema ####
+    site_tool_schema <- getSiteToolSchema(data_pack_schema)
+    save(site_tool_schema, file = "./data/site_tool_schema.rda")
 
-    ## Valid Data Pack Disaggs ####
-        valid_dp_disaggs <- validDPDisaggs()
-        save(valid_dp_disaggs, file = "./data/valid_dp_disaggs.rda")
+  ## Valid Data Pack Disaggs ####
+    valid_dp_disaggs <- validDPDisaggs()
+    save(valid_dp_disaggs, file = "./data/valid_dp_disaggs.rda")
 
-    ## Prioritization Dictionary ####
-        prioritizations <- prioritizationDict()
-        save(prioritizations, file = "./data/prioritizations.rda")
+  ## Prioritization Dictionary ####
+    prioritizations <- prioritizationDict()
+    save(prioritizations, file = "./data/prioritizations.rda")
 
-    ## Data Pack to DATIM Indicator Map ####
-        indicatorMap <- readr::read_csv("./data-raw/DataPack to DATIM indicator map.csv")
-        save(indicatorMap, file = "./data/indicatorMap.rda")
-        
-    ## Load Openxlsx Style Guide ####
-        styleGuide <- loadStyleGuide()
-        save(styleGuide, file = "./data/styleGuide.rda")
+  ## Data Pack to DATIM Indicator Map ####
+    indicatorMap <- readr::read_csv("./data-raw/DataPack to DATIM indicator map.csv")
+    save(indicatorMap, file = "./data/indicatorMap.rda")
+      
+  ## Load Openxlsx Style Guide ####
+    styleGuide <- loadStyleGuide()
+    save(styleGuide, file = "./data/styleGuide.rda")
+
+  ## Load PSNUxIM to DATIM map ####
+    PSNUxIM_to_DATIM <- readr::read_csv("./data-raw/PSNUxIM_to_DATIM.csv")
+    save(PSNUxIM_to_DATIM, file = "./data/PSNUxIM_to_DATIM.rda")

@@ -108,7 +108,8 @@ unPackData <- function(submission_path = NA,
     d <- rePackPSNUxIM(d)
     
   # Prepare SNU x IM dataset for DATIM validation checks
-    d$datim$PSNUxIM <- packForDATIM(d$data$distributedMER)
+    d$datim$PSNUxIM <- packForDATIM(d$data$distributedMER,
+                                    type = "PSNUxIM")
 
   # Package FAST export
     d <- FASTforward(d)
@@ -119,7 +120,8 @@ unPackData <- function(submission_path = NA,
                   d$info$datapack_name)  }
 
   # Package SUBNAT/IMPATT export
-    d <- packSUBNAT_IMPATT(d)
+    d$datim$SUBNAT_IMPATT <- packForDATIM(d$data$SUBNAT_IMPATT,
+                                          type = "SUBNAT_IMPATT")
     if (export_SUBNAT_IMPATT == TRUE) {
 
       exportPackr(d$data$SUBNAT_IMPATT,
