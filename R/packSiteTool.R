@@ -220,7 +220,7 @@ write_site_level_sheet <- function(wb, sheet, d) {
         cols = which(names(data)=="KeyPop"),
         rows = 6:(NROW(data) + max_row_buffer + 5),
         type = "list",
-        value = "kp")
+        value = "keypops")
   }
   
 # Conform column/row sizes ####
@@ -344,7 +344,7 @@ packSiteTool <- function(d) {
     print("Writing Mechanism List")
     mechList <- datapackr::getMechList(country_uids,
                                        include_dedupe = TRUE,
-                                       FY = 2019) %>%
+                                       FY = NA) %>%
       dplyr::select(name, code) %>%
       dplyr::arrange(code)
     

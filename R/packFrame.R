@@ -234,7 +234,7 @@ addValidationsSite <- function(wb) {
     x = datapackr::valid_dp_disaggs$KP$validKPs,
     xy = c(4,1),
     colNames = F,
-    name = "kp"
+    name = "keypops"
   )
   
   return(wb)
