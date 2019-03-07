@@ -145,8 +145,8 @@ frameDataSheet <- function(wb, sheet, type = "Data Pack") {
 #' @param wb An Openxlsx workbook object
 #'
 addValidationsSite <- function(wb) {
-  openxlsx::addWorksheet(wb, sheetName = "Validations")
-  openxlsx::sheetVisibility(wb)[which(names(wb) == "Validations")] <- "veryHidden"
+  openxlsx::addWorksheet(wb, sheetName = "Validations",visible = FALSE)
+  #openxlsx::sheetVisibility(wb)[which(names(wb) == "Validations")] <- "veryHidden"
   sheet_num <- which(names(wb) == "Validations")
   
 # DSD, TA options ####
@@ -276,8 +276,8 @@ packFrame <- function(datapack_uid, type = "Data Pack") {
       openxlsx::addWorksheet(wb, sheetName = "Site List")
     
     # Add Mech List tab
-      openxlsx::addWorksheet(wb, sheetName = "Mechs")
-      openxlsx::sheetVisibility(wb)[which(names(wb) == "Mechs")] <- "veryHidden"
+      openxlsx::addWorksheet(wb, sheetName = "Mechs", visible = FALSE)
+      #openxlsx::sheetVisibility(wb)[which(names(wb) == "Mechs")] <- "veryHidden"
   }
     
 # Add validations ####

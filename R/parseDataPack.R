@@ -783,7 +783,7 @@ packSUBNAT_IMPATT <- function(data) {
     dplyr::mutate(
       value = round_trunc(value),
       period = "2019Oct",
-      attributeoptioncombo = "HllvX50cXC0"
+      attributeOptionCombo = "HllvX50cXC0"
     ) %>%
     dplyr::filter(value > 0) %>%
     dplyr::select(

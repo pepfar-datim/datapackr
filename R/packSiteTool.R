@@ -128,6 +128,8 @@ write_site_level_sheet <- function(wb, sheet, d) {
     dplyr::slice(1) %>%
     datapackr::swapColumns(., sums)
   
+  sums[is.na(sums)] <- 0
+  
   openxlsx::writeData(wb, sheet, sums,
                       xy = c(row_header_cols + 1,3),
                       colNames = FALSE)
@@ -139,7 +141,7 @@ write_site_level_sheet <- function(wb, sheet, d) {
                      gridExpand = TRUE)
     
 # Inactive column ####
-  max_row_buffer <- 500
+  max_row_buffer <- 0
   formula_cell_numbers <- seq(1, NROW(data) + max_row_buffer) + 5
   
   inactiveFormula <- paste0(
@@ -164,13 +166,13 @@ write_site_level_sheet <- function(wb, sheet, d) {
   openxlsx::dataValidation(wb, sheet,
     cols = 2, rows = 6:(NROW(data) + max_row_buffer + 5),
     type = "list",
-    value = 'INDIRECT("site_list_table[siteID]")')
+    value = 'site_list')
   
   ## Mechanism
   openxlsx::dataValidation(wb, sheet,
     cols = 3, rows = 6:(NROW(data) + max_row_buffer + 5),
     type = "list",
-    value = 'INDIRECT("mech_list[mechID]")')
+    value = 'mech_list')
   
   ## Type
   openxlsx::dataValidation(wb, sheet,
@@ -315,6 +317,10 @@ packSiteTool <- function(d) {
       withFilter = TRUE
     )
     
+    openxlsx::createNamedRegion(wb, sheet = "Site List",
+                                cols = 1, rows = 2:(NROW(siteList) + 1),
+                                name = "site_list")
+    
     openxlsx::setColWidths(
       wb = wb, sheet = "Site List", cols = 1:2,
       #widths = c(rep("auto",4),16))
@@ -323,7 +329,7 @@ packSiteTool <- function(d) {
     openxlsx::dataValidation(
       wb = wb, sheet = "Site List", cols = 2, rows = 2:(NROW(siteList)+1),
       type = "list",
-      value = 'INDIRECT("inactive_options[choices]")')
+      value = 'inactive_options')
     
     datapackr::colorCodeSites(
       wb = wb, sheet = "Site List", cols = 1, rows = 2:(NROW(siteList)+1)
@@ -342,9 +348,13 @@ packSiteTool <- function(d) {
       x = data.frame(mechID = mechList$name),
       xy = c(1,1),
       colNames = TRUE,
-      tableName = "mech_list",
+      tableName = "mech_list_table",
       tableStyle = "none"
     )
+    
+    openxlsx::createNamedRegion(wb, sheet = "Mechs",
+                                cols = 1, rows = 2:(NROW(mechList) + 1),
+                                name = "mech_list")
   
 # Prep Site data ####
     print("Preparing Site-level data...")
@@ -370,10 +380,11 @@ packSiteTool <- function(d) {
     print("Writing site-level data into sheets...")
     data_sheets <- names(wb)[which(!stringr::str_detect(names(wb), "Home|Site List|Mechs|Validations"))]
     
-    write_all_sheets <- function(x) {
-      wb <- datapackr::write_site_level_sheet(wb = wb, sheet = x, d = d)
+    for (i in 1:length(data_sheets)) {
+      wb <- datapackr::write_site_level_sheet(wb = wb,
+                                              sheet = data_sheets[i],
+                                              d = d)
     }
-    sapply(data_sheets, write_all_sheets)
         
 # Export Site Tool ####
     print("Exporting...")
