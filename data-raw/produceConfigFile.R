@@ -460,8 +460,13 @@ getSiteToolSchema <- function(data_pack_schema) {
         indicator_code == "Site" & column == 1 ~ "Status",
         indicator_code == "Site" & column == 3 ~ "Mechanism",
         indicator_code == "Site" & column == 4 ~ "Type",
-        TRUE ~ indicator_code)
-      ) %>%
+        TRUE ~ indicator_code),
+      label = dplyr::if_else(
+        stringr::str_detect(label, stringr::regex("^note", ignore_case = TRUE)),
+        NA_character_,
+        label
+      )
+    ) %>%
     dplyr::select(sheet_num,sheet_name,col = column,col_type,tech_area,label,indicator_code)
   
   return(site_schema)

@@ -54,7 +54,7 @@ colorCodeSites <- function(wb, sheet, cols, rows) {
 #' @param d A datapackr list object.
 #' 
 write_site_level_sheet <- function(wb, sheet, d) {
-print(sheet)
+  print(sheet)
   
 # Order Columns ####
   ## Filter and spread distributed site data
@@ -115,9 +115,18 @@ print(sheet)
     rule = subtotal_cond_format_fx)
 
 # OU sum row ####
-  sums <- data %>%
+  sums <- d$data$distributedMER %>%
+    dplyr::filter(sheet_name == sheet) %>%
+    dplyr::select(indicatorCode, value) %>%
+    dplyr::group_by(indicatorCode) %>%
+    dplyr::summarise(value = sum(value)) %>%
+    dplyr::ungroup() %>%
+    tidyr::spread(key = indicatorCode, value = value, drop = FALSE)
+    
+  sums <- schema %>%
     dplyr::select(data_cols) %>%
-    dplyr::summarise_all(sum, na.rm = TRUE)
+    dplyr::slice(1) %>%
+    datapackr::swapColumns(.,sums)
   
   openxlsx::writeData(wb, sheet, sums,
                       xy = c(row_header_cols + 1,3),
