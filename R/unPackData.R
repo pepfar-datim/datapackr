@@ -71,7 +71,7 @@ unPackData <- function(submission_path = NA,
     }
     
     if ( !can_read_import_file( submission_path ) & interactive() ) {
-      interactive_print("Cannot read the specified file. Please choose another.")
+      interactive_print("Please choose a submission file.")
       d$keychain$submission_path <- file.choose() } else
       {
         d$keychain$submission_path <- submission_path

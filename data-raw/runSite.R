@@ -49,3 +49,6 @@ d$data$site$distributed <- d$data$distributedMER %>%
                 Age,Sex,KeyPop,type,site_tool_label,
                 value,percent,siteValue)
   
+
+
+datapackr::packSiteTool(d)

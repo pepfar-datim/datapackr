@@ -144,20 +144,24 @@ getMilitaryNodes <- function() {
 #' 
 swapColumns <- function(to, from) {
   cols = colnames(from)
-  for (i in 1:length(cols)) {
-    col = cols[i]
-    if (col %in% colnames(to)) {
-      dots <-
-        stats::setNames(list(lazyeval::interp(
-          ~ magrittr::use_series(from, x), x = as.name(col)
-        )), col)
-      to <- to %>%
-        dplyr::mutate_(.dots = dots)
-    } else {
-      next
+  
+  if (length(cols) != 0) {
+    for (i in 1:length(cols)) {
+      col = cols[i]
+      if (col %in% colnames(to)) {
+        dots <-
+          stats::setNames(list(lazyeval::interp(
+            ~ magrittr::use_series(from, x), x = as.name(col)
+          )), col)
+        to <- to %>%
+          dplyr::mutate_(.dots = dots)
+      } else {
+        next
+      }
     }
   }
   return(to)
+ 
 }
 
 #' @export

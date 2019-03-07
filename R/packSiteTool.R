@@ -126,7 +126,7 @@ write_site_level_sheet <- function(wb, sheet, d) {
   sums <- schema %>%
     dplyr::select(data_cols) %>%
     dplyr::slice(1) %>%
-    datapackr::swapColumns(.,sums)
+    datapackr::swapColumns(., sums)
   
   openxlsx::writeData(wb, sheet, sums,
                       xy = c(row_header_cols + 1,3),
@@ -373,7 +373,7 @@ packSiteTool <- function(d) {
     write_all_sheets <- function(x) {
       wb <- datapackr::write_site_level_sheet(wb = wb, sheet = x, d = d)
     }
-    wb <- sapply(data_sheets, write_all_sheets)
+    sapply(data_sheets, write_all_sheets)
         
 # Export Site Tool ####
     print("Exporting...")
