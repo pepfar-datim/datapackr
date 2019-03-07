@@ -759,8 +759,9 @@ FASTforward <- function(d) {
 #'     recompiles the dataframe containing SUBNAT and IMPATT data,
 #'     \code{d$data$SUBNAT_IMPATT} into a standard DATIM import file.
 #'
-#' @param d datapackr list object containing at least
-#'     \code{d$data$SUBNAT_IMPATT}.
+#' @param data Data frame of SUBNAT and IMPATT data ready for DATIM import
+#' review.
+#' 
 #' @return Dataframe of SUBNAT & IMPATT data ready for DATIM ingestion.
 #' 
 packSUBNAT_IMPATT <- function(data) {
@@ -814,7 +815,9 @@ packSUBNAT_IMPATT <- function(data) {
 #' Flexible function that allows packaging of a variety of datapackr outputs as
 #' DATIM import files.
 #' 
-#' @param data Data frame or tibble ready for DATIM import prep
+#' @param data Data frame or tibble ready for DATIM import prep.
+#' @param type Type of dataset to prep for DATIM. Choose from \code{PSNUxIM},
+#' \code{SUBNAT_IMPATT}, or \code{Site}.
 #' 
 #' @return Data frame ready for DATIM import
 #' 

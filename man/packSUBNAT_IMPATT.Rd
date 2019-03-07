@@ -7,8 +7,8 @@
 packSUBNAT_IMPATT(data)
 }
 \arguments{
-\item{d}{datapackr list object containing at least
-\code{d$data$SUBNAT_IMPATT}.}
+\item{data}{Data frame of SUBNAT and IMPATT data ready for DATIM import
+review.}
 }
 \value{
 Dataframe of SUBNAT & IMPATT data ready for DATIM ingestion.

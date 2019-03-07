@@ -7,7 +7,10 @@
 packForDATIM(data, type = NA)
 }
 \arguments{
-\item{data}{Data frame or tibble ready for DATIM import prep}
+\item{data}{Data frame or tibble ready for DATIM import prep.}
+
+\item{type}{Type of dataset to prep for DATIM. Choose from \code{PSNUxIM},
+\code{SUBNAT_IMPATT}, or \code{Site}.}
 }
 \value{
 Data frame ready for DATIM import
