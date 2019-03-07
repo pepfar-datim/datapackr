@@ -786,18 +786,18 @@ packSUBNAT_IMPATT <- function(data) {
     ) %>%
     dplyr::filter(value > 0) %>%
     dplyr::select(
-      dataelement = dataelementuid,
+      dataElement = dataelementuid,
       period,
-      orgunit = psnuid,
-      categoryoptioncombo = categoryoptioncombouid,
-      attributeoptioncombo,
+      orgUnit = psnuid,
+      categoryOptionCombo = categoryoptioncombouid,
+      attributeOptionCombo,
       value
     ) %>%
-    dplyr::group_by(dataelement,
+    dplyr::group_by(dataElement,
                     period,
-                    orgunit,
-                    categoryoptioncombo,
-                    attributeoptioncombo) %>%
+                    orgUnit,
+                    categoryOptionCombo,
+                    attributeOptionCombo) %>%
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(value = as.character(value))
@@ -844,17 +844,17 @@ packForDATIM <- function(data, type = NA) {
                               "Sex" = "validSexes",
                               "KeyPop" = "validKPs")) %>%
       dplyr::select(
-        dataelement = dataelementuid,
+        dataElement = dataelementuid,
         period,
-        orgunit = psnuid,
-        categoryoptioncombo = categoryoptioncombouid,
+        orgUnit = psnuid,
+        categoryOptionCombo = categoryoptioncombouid,
         mechanismCode,
         value) %>%
       tidyr::drop_na() %>%
-      dplyr::group_by(dataelement,
+      dplyr::group_by(dataElement,
                       period,
-                      orgunit,
-                      categoryoptioncombo,
+                      orgUnit,
+                      categoryOptionCombo,
                       mechanismCode) %>%
       dplyr::summarise(value = sum(value)) %>%
       dplyr::ungroup()
