@@ -299,8 +299,10 @@ packSiteTool <- function(d) {
       dplyr::filter(data_pack_name == d$info$datapack_name) %>%
       dplyr::pull(country_uid)
     
-    siteList <- datapackr::getSiteList(country_uids,
-                                       include_mil = TRUE) %>%
+    sites <- datapackr::getSiteList(country_uids,
+                                    include_mil = TRUE)
+    
+    siteList <- sites %>%
       #dplyr::select(country_name,psnu,siteID = site_tool_label,site_type) %>%
       dplyr::select(siteID = site_tool_label) %>%
       dplyr::mutate(status = "Active") %>%
@@ -341,7 +343,11 @@ packSiteTool <- function(d) {
 # Write mech list ####
     print("Writing Mechanism List")
     mechList <- datapackr::getMechList(country_uids,
-                                       FY = 2019)
+                                       include_dedupe = TRUE,
+                                       FY = 2019) %>%
+      dplyr::select(name, code) %>%
+      dplyr::arrange(code)
+    
     openxlsx::writeDataTable(
       wb = wb,
       sheet = "Mechs",
@@ -363,6 +369,10 @@ packSiteTool <- function(d) {
       dplyr::left_join((mechList %>%
                           dplyr::select(code,mechanism = name)),
                        by = c("mechanismCode" = "code")) %>%
+    ## Pull in Site Tool Label
+      dplyr::left_join((sites %>%
+                          dplyr::select(site_tool_label, id)),
+                       by = c("org_unit" = "id")) %>%
     ## Mark what wasn't distributed
       dplyr::mutate(
         site_tool_label = dplyr::case_when(

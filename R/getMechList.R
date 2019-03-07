@@ -11,6 +11,8 @@
 #' @param country_uids Character vector of DATIM country IDs. This can only
 #' include countries. Regional Operating Unit uids will not be accepted. If not
 #' supplied, returns entire mechanism list, trimmed to user's DATIM permissions.
+#' @param include_dedupe Logical. If TRUE will include deduplication mechanisms.
+#' Default is FALSE.
 #' @param FY Numeric value of Fiscal Year to filter mechanism list by. If a FY
 #' is not supplied, returns entire mechanism list.
 #' 
@@ -18,6 +20,7 @@
 #' code, partner name, funding agency, and related country.
 #'
 getMechList <- function(country_uids = NA,
+                        include_dedupe = FALSE,
                         FY = NA) {
   
   datapackr::loginToDATIM(getOption("secrets"))
@@ -35,7 +38,7 @@ getMechList <- function(country_uids = NA,
                !all(is.na(country_uids)),
                paste0("&filter=categoryOptions.organisationUnits.id:in:[",
                       paste0(country_uids,collapse = ","),"]"),
-                      ""),
+               "&filter=code:!in:[00000,00001,00100,00200]"),
              "&fields=id,name,code,categoryOptions[startDate,endDate,categoryOptionGroups[id,name,groupSets[id,name]],organisationUnits[id,name]]"
              ) %>%
       utils::URLencode() %>%
@@ -47,25 +50,24 @@ getMechList <- function(country_uids = NA,
   # Tag Metadata ####
     mechList %<>%
       dplyr::mutate(
-        start_date = as.Date(purrr::map_chr(categoryOptions,
-                                     function(x) magrittr::use_series(x, startDate))),
-        end_date = as.Date(purrr::map_chr(categoryOptions,
-                                  function(x) magrittr::use_series(x, endDate))),
+        start_date = as.Date(
+          purrr::map_chr(categoryOptions, "startDate", .default = NA)),
+        end_date = as.Date(
+          purrr::map_chr(categoryOptions, "endDate", .default = NA)),
         organisation_unit_name =
           purrr::map_chr(categoryOptions,
-            function(x) magrittr::use_series(x, organisationUnits) %>%
-              magrittr::extract2(1) %>%
-              magrittr::use_series(name)),
+                         list("organisationUnits",1,"name"),
+                         .default = NA),
         organisation_unit_id =
           purrr::map_chr(categoryOptions,
-            function(x) magrittr::use_series(x, organisationUnits) %>%
-              magrittr::extract2(1) %>%
-              magrittr::use_series(id)),
+                         list("organisationUnits",1,"id"),
+                         .default = NA),
         categoryOptionGroups =
           purrr::map(categoryOptions,
-            function(x) magrittr::use_series(x, categoryOptionGroups) %>%
-              magrittr::extract2(1) %>%
-              dplyr::filter(stringr::str_detect(as.character(groupSets),"Partner|Agency"))),
+                     list("categoryOptionGroups",1),
+                     .default = NA)) %>%
+      dplyr::filter(!is.na(categoryOptionGroups)) %>%
+      dplyr::mutate(
         partner = 
           purrr::map_chr(categoryOptionGroups,
             function(x) dplyr::filter(x,stringr::str_detect(as.character(groupSets),"Partner")) %>%
@@ -76,12 +78,30 @@ getMechList <- function(country_uids = NA,
                magrittr::use_series(name))
       ) %>%
       dplyr::select(-categoryOptions, -categoryOptionGroups)
+    
+  # Add Dedupes
+    if (include_dedupe) {
+      mechList %<>%
+        tibble::add_row(
+          code = c("00000","00001"),
+          name = c("De-duplication adjustment","De-duplication adjustment (DSD-TA)"),
+          id = c("X8hrDf6bLDC","YGT1o7UxfFu"),
+          start_date = c(NA_character_,NA_character_),
+          end_date = c(NA_character_,NA_character_),
+          organisation_unit_name = c(NA_character_,NA_character_),
+          organisation_unit_id = c(NA_character_,NA_character_),
+          partner = c("Dedupe adjustments Partner","Dedupe adjustments Partner"),
+          agency = c("Dedupe adjustments Agency","Dedupe adjustments Agency")
+        )
+    }
+      
   
   # Filter by Fiscal Year ####
     if (!is.na(FY)) {
       mechList %<>%
-        dplyr::filter(start_date < paste0(FY,"-10-01"),
+        dplyr::filter((start_date < paste0(FY,"-10-01") &
                       end_date > paste0(FY-1,"-09-30"))
+                      | code %in% c("00000","00001"))
     }
     
   return(mechList)
