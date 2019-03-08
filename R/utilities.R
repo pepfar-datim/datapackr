@@ -62,7 +62,7 @@ selectOU <- function() {
 #'
 getIMPATTLevels <- function(){
   
-  datapackr::loginToDATIM(getOption("secrets"))
+  loginToDATIM(getOption("secrets"))
   
   impatt_levels <-
     paste0(getOption("baseurl"),"api/",datapackr::api_version(),
@@ -93,7 +93,7 @@ getIMPATTLevels <- function(){
 #' and Countries.
 #' 
 getMilitaryNodes <- function() {
-  datapackr::loginToDATIM(getOption("secrets"))
+  loginToDATIM(getOption("secrets"))
   
   militaryNodes <- paste0(
     getOption("baseurl"),"api/",datapackr::api_version(),

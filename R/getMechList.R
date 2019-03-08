@@ -23,7 +23,7 @@ getMechList <- function(country_uids = NA,
                         include_dedupe = FALSE,
                         FY = NA) {
   
-  datapackr::loginToDATIM(getOption("secrets"))
+  loginToDATIM(getOption("secrets"))
   
   # Check user has correct permissions to query against country_uids ####
     # TODO: Configure to allow non-global users to generate Site Tools

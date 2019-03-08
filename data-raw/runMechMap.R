@@ -2,15 +2,13 @@ output_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 19/5) Maintenan
 
 FY = 2019
 
-datapack_uid = "PqlFzhuPcF1"
+datapack_names = c("Uganda","South Sudan","Tanzania",
+                   "Ethiopia","Malawi","Burundi","Rwanda")
 
 secrets <- "/Users/scott/.secrets/triage.json"
-
 
 ## Don't touch ####
 datapackr::loginToDATIM(secrets)
 
-datapackr::packMechMap(datapack_uid, FY, output_path)
-
-
-View(datapackr::dataPackMap)
+mapply(function(x) datapackr::packMechMap(x, FY, output_path),
+       datapack_names)

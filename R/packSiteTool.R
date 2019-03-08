@@ -54,8 +54,6 @@ colorCodeSites <- function(wb, sheet, cols, rows) {
 #' @param d A datapackr list object.
 #' 
 write_site_level_sheet <- function(wb, sheet, d) {
-  print(sheet)
-  
 # Order Columns ####
   ## Filter and spread distributed site data
   data <- d$data$site$distributed %>%
@@ -84,7 +82,7 @@ write_site_level_sheet <- function(wb, sheet, d) {
     
     ## Morph the distributed data into shape
   data <- schema %>%
-    datapackr::swapColumns(., data) %>%
+    swapColumns(., data) %>%
     as.data.frame(.)
   
   data_cols <- names(data)[(row_header_cols + 1):length(data)]
@@ -103,7 +101,7 @@ write_site_level_sheet <- function(wb, sheet, d) {
   subtotal_fxs <- paste0('=SUBTOTAL(109,',tolower(sheet),'[',data_cols,'])')
     
   ## Write Formula
-  datapackr::writeFxColumnwise(wb, sheet, subtotal_fxs, xy = c(row_header_cols+1,4))
+  writeFxColumnwise(wb, sheet, subtotal_fxs, xy = c(row_header_cols+1,4))
     
   ## Add red conditional formatting for discrepancies
   subtotal_colStart_letter <- openxlsx::int2col(row_header_cols+1)
@@ -126,7 +124,7 @@ write_site_level_sheet <- function(wb, sheet, d) {
   sums <- schema %>%
     dplyr::select(data_cols) %>%
     dplyr::slice(1) %>%
-    datapackr::swapColumns(., sums)
+    swapColumns(., sums)
   
   sums[is.na(sums)] <- 0
   
@@ -154,7 +152,7 @@ write_site_level_sheet <- function(wb, sheet, d) {
   openxlsx::writeFormula(wb, sheet, inactiveFormula, xy = c(1, 6))
   
 # Conditional formatting ####
-  datapackr::colorCodeSites(
+  colorCodeSites(
     wb = wb, sheet = sheet, cols = 2, rows = 6:(NROW(data) + max_row_buffer + 5))
   openxlsx::conditionalFormatting(
     wb = wb, sheet = sheet,
@@ -289,18 +287,16 @@ packSiteTool <- function(d) {
   
   
 # Build Site Tool frame ####
-  print("Building Site Tool frame...")  
-  wb <- datapackr::packFrame(datapack_uid = d$info$datapack_uid,
-                               type = "Site Tool")
+  wb <- packFrame(datapack_uid = d$info$datapack_uid,
+                  type = "Site Tool")
   
 # Write site list (TODO: SPEED THIS UP) ####
-  print("Writing Site List...")
     country_uids <- datapackr::dataPackMap %>%
       dplyr::filter(data_pack_name == d$info$datapack_name) %>%
       dplyr::pull(country_uid)
     
-    sites <- datapackr::getSiteList(country_uids,
-                                    include_mil = TRUE)
+    sites <- getSiteList(country_uids,
+                        include_mil = TRUE)
     
     siteList <- sites %>%
       #dplyr::select(country_name,psnu,siteID = site_tool_label,site_type) %>%
@@ -333,7 +329,7 @@ packSiteTool <- function(d) {
       type = "list",
       value = 'inactive_options')
     
-    datapackr::colorCodeSites(
+    colorCodeSites(
       wb = wb, sheet = "Site List", cols = 1, rows = 2:(NROW(siteList)+1)
     )
     openxlsx::conditionalFormatting(
@@ -341,10 +337,9 @@ packSiteTool <- function(d) {
       rule = '$E2="Inactive"', style = datapackr::styleGuide$siteList$inactive)
     
 # Write mech list ####
-    print("Writing Mechanism List")
-    mechList <- datapackr::getMechList(country_uids,
-                                       include_dedupe = TRUE,
-                                       FY = NA) %>%
+    mechList <- getMechList(country_uids,
+                            include_dedupe = TRUE,
+                            FY = NA) %>%
       dplyr::select(name, code) %>%
       dplyr::arrange(code)
     
@@ -363,7 +358,6 @@ packSiteTool <- function(d) {
                                 name = "mech_list")
   
 # Prep Site data ####
-    print("Preparing Site-level data...")
     d$data$site$distributed %<>%
     ## Pull in mechanism names
       dplyr::left_join((mechList %>%
@@ -380,25 +374,23 @@ packSiteTool <- function(d) {
           TRUE ~ site_tool_label
             ),
         siteValue = dplyr::case_when(is.na(siteValue) ~ value, TRUE ~ siteValue),
-        siteValue = datapackr::round_trunc(siteValue),
+        siteValue = round_trunc(siteValue),
         mechanism = dplyr::case_when(mechanismCode == "Dedupe" ~ "Dedupe", TRUE ~ mechanism)
         ) %>%
       dplyr::select(sheet_name,Site = site_tool_label,Mechanism = mechanism,
                     Age,Sex,KeyPop,Type = type,indicatorCode,siteValue)
     
 # Populate Site Tool ####
-    print("Writing site-level data into sheets...")
     data_sheets <- names(wb)[which(!stringr::str_detect(names(wb), "Home|Site List|Mechs|Validations"))]
     
     for (i in 1:length(data_sheets)) {
-      wb <- datapackr::write_site_level_sheet(wb = wb,
-                                              sheet = data_sheets[i],
-                                              d = d)
+      wb <- write_site_level_sheet(wb = wb,
+                                    sheet = data_sheets[i],
+                                    d = d)
     }
         
 # Export Site Tool ####
-    print("Exporting...")
-    datapackr::exportPackr(wb,
+    exportPackr(wb,
                 d$keychain$output_path,
                 type = "Site Tool",
                 d$info$datapack_name)

@@ -20,18 +20,17 @@ frameMechMap <- function(datapack_uid) {
     openxlsx::modifyBaseFont(wb, fontName = "Calibri", fontSize = 11)
     
   # Add Home tab ####
-    wb <- datapackr::writeHomeTab(wb = wb,
-                                  data_pack_uid = datapack_uid,
-                                  type = "Mechanism Map")
+    wb <- writeHomeTab(wb = wb,
+                        data_pack_uid = datapack_uid,
+                        type = "Mechanism Map")
     
   # Add other tabs ####
     sheet_names <- c("Old Mechs", "New Mechs", "Validations", "Mechanism Map")
     visible <- c(TRUE, TRUE, FALSE, TRUE)
-    for (i in 1:length(sheet_names)) {
-      openxlsx::addWorksheet(wb,
-                             sheetName = sheet_names[i],
-                             visible = visible[i])  
-    }
+    
+    mapply(function(x, y) openxlsx::addWorksheet(wb, sheetName = x, visible = y),
+           sheet_names,
+           visible)
     
   # Write title into Mechanism Map sheet ####
     openxlsx::writeData(wb = wb,
@@ -128,29 +127,45 @@ frameMechMap <- function(datapack_uid) {
 #' Implementing Mechanism service patterns to allow automated distribution of
 #' site-level data between distinct mechanisms.
 #' 
-#' @param datapack_uid A unique ID specifying the PEPFAR Operating Unit 
-#' the Site Tool belongs to.
+#' @param datapack_name Usually the same as Operating Unit, except in rare
+#'   cases for some PEPFAR Regional Operating Units. Call
+#'   \code{datapackr::dataPackMap} to see syntax for Regional Programs.
 #' @param FY Numeric value of COP Fiscal Year. (For COP19/FY20 targets, enter
 #' \code{2019}.)
 #' @param output_path A local path directing to the folder where you would like
 #' outputs to be saved. If not supplied, will output to working directory.
+#' @param includeFACTS Logical. If \code{TRUE}, \code{packMechMap} will corrob-
+#' orate FY2019 DATIM mechanisms against FACTS Info Mechanisms and add any
+#' missing mechanisms. Default is \code{FALSE}.
+#' @param FACTSMechs_path A local file path directing to the extract of FY2019
+#' FACTS Info Mechanisms. Default is \code{NA}.
 #' 
-#' @return Excel workbook containing needed features to allow various mechanism
+#' @return Excel workbook containing features necessary to allow various mechanism
 #' mapping scenarios, which can be fed back into the Data Pack site distribution
 #' process.
 #' 
-packMechMap <- function(datapack_uid, FY, output_path = NA) {
+packMechMap <- function(datapack_name,
+                        FY,
+                        output_path = NA,
+                        includeFACTS = FALSE,
+                        FACTSMechs_path = NA) {
 
   # Log into DATIM ####
   #    If user has not already logged in using DATIM credentials, request
   #    credentials via console and getPass.
     #datapackr::loginToDATIM(getOption("secrets"))
 
+  datapack_uid <- datapackr::dataPackMap %>%
+    dplyr::filter(data_pack_name == datapack_name) %>%
+    dplyr::select(model_uid) %>%
+    dplyr::distinct() %>%
+    dplyr::pull(model_uid)
+  
   # Frame Workbook ####
     wb <- frameMechMap(datapack_uid)
   
   # Write PSNU list ####
-    PSNUs <- datapackr::getPSNUs(datapack_uid) %>%
+    PSNUs <- getPSNUs(datapack_uid) %>%
       dplyr::select(PSNU = DataPackSiteID)
     
     openxlsx::writeDataTable(
@@ -168,10 +183,51 @@ packMechMap <- function(datapack_uid, FY, output_path = NA) {
     country_uids <- datapackr::dataPackMap %>%
       dplyr::filter(model_uid == datapack_uid) %>%
       dplyr::pull(country_uid)
-    oldMechList <- datapackr::getMechList(country_uids,
-                                          FY = (FY-1))
-    newMechList <- datapackr::getMechList(country_uids,
-                                       FY = FY)
+    oldMechList <- getMechList(country_uids,
+                              FY = (FY-1))
+    newMechList <- getMechList(country_uids,
+                              FY = FY)
+    
+    ## PATCH for Missing FACTS Mechs
+    if (includeFACTS) {
+      if (is.na(FACTSMechs_path)) {
+        stop("Please supply file path to FACTS Mechanism Extract!!")
+      }
+      
+      country_names <- datapackr::dataPackMap %>%
+        dplyr::filter(data_pack_name == datapack_name) %>%
+        dplyr::pull(country_name) %>%
+        unique()
+      
+      FACTSMechs <- readr::read_csv(file = FACTSMechs_path,
+                                    na = "NULL",
+                                    col_types = readr::cols(.default = "c")) %>%
+        dplyr::select(code = HQID, name = IM,
+                      start_date = StartDate, end_date = EndDate,
+                      organisation_unit_name = Country,
+                      partner = PrimePartner, agency = Agency) %>%
+        dplyr::mutate(start_date = lubridate::mdy(start_date),
+                      end_date = lubridate::mdy(end_date),
+                      name = paste0(code, " - ", name),
+                      id = NA_character_,
+                      organisation_unit_id = NA_character_) %>%
+        dplyr::filter(!stringr::str_detect(agency,"State")
+                      & !organisation_unit_name %in% c("Asia Region",
+                                        "West-Central Africa Region",
+                                        "Western Hemisphere Region")
+                      ) %>%
+        dplyr::select(code, name, id, start_date, end_date,
+                      organisation_unit_name, organisation_unit_id,
+                      partner, agency) %>%
+        dplyr::filter(organisation_unit_name == datapack_name,
+                      !code %in% (newMechList %>%
+                                    dplyr::pull(code) %>%
+                                    unique()))
+    
+      newMechList %<>%
+        dplyr::bind_rows(FACTSMechs)
+    }
+    
     openxlsx::writeDataTable(
       wb = wb, sheet = "Old Mechs",
       x = data.frame(oldMechList),
@@ -269,5 +325,5 @@ packMechMap <- function(datapack_uid, FY, output_path = NA) {
       dplyr::pull(data_pack_name) %>%
       unique()
     
-    datapackr::exportPackr(wb, output_path, "Mechanism Map", data_pack_name)
+    exportPackr(wb, output_path, "Mechanism Map", data_pack_name)
 }

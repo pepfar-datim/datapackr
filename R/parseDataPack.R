@@ -576,8 +576,8 @@ unPackSNUxIM <- function(d) {
     dplyr::select_if(~!all(is.na(.))) %>%
     dplyr::mutate(
       sum = rowSums(dplyr::select(.,dplyr::matches("\\d+|Dedupe")), na.rm = TRUE)) %>%
-    dplyr::mutate(DataPackTarget = datapackr::round_trunc(DataPackTarget),
-                  sum = datapackr::round_trunc(sum))
+    dplyr::mutate(DataPackTarget = round_trunc(DataPackTarget),
+                  sum = round_trunc(sum))
   
   # TEST where DataPackTarget != sum of mechanism values
   mismatch <- d$data$SNUxIM %>%

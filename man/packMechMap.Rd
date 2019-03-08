@@ -4,11 +4,12 @@
 \alias{packMechMap}
 \title{Create Mechanism Mapping tool}
 \usage{
-packMechMap(datapack_uid, FY, output_path = NA)
+packMechMap(datapack_name, FY, output_path = NA)
 }
 \arguments{
-\item{datapack_uid}{A unique ID specifying the PEPFAR Operating Unit 
-the Site Tool belongs to.}
+\item{datapack_name}{Usually the same as Operating Unit, except in rare
+cases for some PEPFAR Regional Operating Units. Call
+\code{datapackr::dataPackMap} to see syntax for Regional Programs.}
 
 \item{FY}{Numeric value of COP Fiscal Year. (For COP19/FY20 targets, enter
 \code{2019}.)}
