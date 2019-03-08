@@ -4,7 +4,8 @@
 \alias{packMechMap}
 \title{Create Mechanism Mapping tool}
 \usage{
-packMechMap(datapack_name, FY, output_path = NA)
+packMechMap(datapack_name, FY, output_path = NA, includeFACTS = FALSE,
+  FACTSMechs_path = NA)
 }
 \arguments{
 \item{datapack_name}{Usually the same as Operating Unit, except in rare
@@ -16,9 +17,16 @@ cases for some PEPFAR Regional Operating Units. Call
 
 \item{output_path}{A local path directing to the folder where you would like
 outputs to be saved. If not supplied, will output to working directory.}
+
+\item{includeFACTS}{Logical. If \code{TRUE}, \code{packMechMap} will corrob-
+orate FY2019 DATIM mechanisms against FACTS Info Mechanisms and add any
+missing mechanisms. Default is \code{FALSE}.}
+
+\item{FACTSMechs_path}{A local file path directing to the extract of FY2019
+FACTS Info Mechanisms. Default is \code{NA}.}
 }
 \value{
-Excel workbook containing needed features to allow various mechanism
+Excel workbook containing features necessary to allow various mechanism
 mapping scenarios, which can be fed back into the Data Pack site distribution
 process.
 }

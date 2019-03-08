@@ -63,7 +63,7 @@ unPackData <- function(submission_path = NA,
       d$keychain$output_path = getwd()
     }
     
-    can_read_import_file<-function(submission_path) {
+    can_read_import_file <- function(submission_path) {
       
       if (is.na(submission_path)) { return(FALSE)}
       
