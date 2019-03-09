@@ -290,8 +290,8 @@ getPSNUs <- function(datapack_uid) {
         countryName = stringr::str_replace(countryName,
                                            "d'Ivoire",
                                            "d Ivoire")) %>%
-      unique() %>%
       dplyr::pull(countryName) %>%
+      unique() %>%
       paste(collapse = ",") %>%
       stringr::str_replace_all("&","%26") %>%
       stringr::str_replace_all(" ","%20")
@@ -311,7 +311,7 @@ getPSNUs <- function(datapack_uid) {
     PSNUs <- as.data.frame(PSNUs$rows,stringsAsFactors = FALSE) %>%
       setNames(.,PSNUs$headers$name) %>%
       dplyr::select(country = operating_unit, uid, name) %>%
-      unique()
+      dplyr::distinct()
   
   # Add new new countries as PSNUs
     newCountries <- datapackr::configFile %>%
@@ -335,7 +335,7 @@ getPSNUs <- function(datapack_uid) {
       dplyr::filter(model_uid == datapack_uid,
              !is.na(milPSNU)) %>%
       dplyr::select(DataPack_name, milPSNU, milPSNUuid, milPSNU_in_DATIM) %>%
-      unique()
+      dplyr::distinct()
     
     PSNUs <- PSNUs %>%
       dplyr::bind_rows(milPSNUs %>%
@@ -363,7 +363,7 @@ getPSNUs <- function(datapack_uid) {
       JamaicaSuriname <- as.data.frame(Export$rows,stringsAsFactors = FALSE) %>%
         setNames(.,Export$headers$name) %>%
         dplyr::select(country = level4name, uid = organisationunituid, name) %>%
-        unique() %>%
+        dplyr::distinct() %>%
         dplyr::bind_rows(JamaicaSuriname,.)
     }
     
@@ -375,16 +375,15 @@ getPSNUs <- function(datapack_uid) {
   # Create Data Pack Site ID & tag with country name breadcrumb where country != PSNU
   isRegion = datapackr::configFile %>%
     dplyr::filter(model_uid == datapack_uid) %>%
-    dplyr::select(isRegion) %>%
-    unique() %>%
-    dplyr::pull(isRegion)
+    dplyr::pull(isRegion) %>%
+    unique()
+    
   needsCountryTag = datapackr::configFile %>%
     dplyr::filter(model_uid == datapack_uid &
                   Prioritizing_at_Natl_or_SNU == "SNU" &
                   isRegion == 1) %>%
-    dplyr::select(countryName) %>%
-    unique() %>%
-    dplyr::pull(countryName)
+    dplyr::pull(countryName) %>%
+    unique()
     
     PSNUs <- PSNUs %>%
       dplyr::mutate(DataPackSiteID = paste0(
