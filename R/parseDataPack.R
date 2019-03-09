@@ -765,6 +765,8 @@ FASTforward <- function(d) {
 #' @return Dataframe of SUBNAT & IMPATT data ready for DATIM ingestion.
 #' 
 packSUBNAT_IMPATT <- function(data) {
+  options("default" = "HllvX50cXC0")
+  
   importFile <- data %>%
     dplyr::left_join((
       datapackr::indicatorMap %>%
@@ -783,7 +785,7 @@ packSUBNAT_IMPATT <- function(data) {
     dplyr::mutate(
       value = round_trunc(value),
       period = "2019Oct",
-      attributeOptionCombo = "HllvX50cXC0"
+      attributeOptionCombo = getOption("default")
     ) %>%
     dplyr::filter(value > 0) %>%
     dplyr::select(
