@@ -143,23 +143,29 @@ getMilitaryNodes <- function() {
 #' @return dataframe with swapped columns
 #' 
 swapColumns <- function(to, from) {
-  cols = colnames(from)
+  # Grab column names from `from`
+    cols = colnames(from)
   
-  if (length(cols) != 0) {
-    for (i in 1:length(cols)) {
-      col = cols[i]
-      if (col %in% colnames(to)) {
-        dots <-
-          stats::setNames(list(lazyeval::interp(
-            ~ magrittr::use_series(from, x), x = as.name(col)
-          )), col)
-        to <- to %>%
-          dplyr::mutate_(.dots = dots)
-      } else {
-        next
+  # If `from` is a null dataframe, skip and return `to`
+    if (length(cols) != 0) {
+  
+  # Loop through `from` columns and if there's a match in `to`, copy and paste
+  #   it into `to`
+      for (i in 1:length(cols)) {
+        col = cols[i]
+        if (col %in% colnames(to)) {
+          dots <-
+            stats::setNames(list(lazyeval::interp(
+              ~ magrittr::use_series(from, x), x = as.name(col)
+            )), col)
+          to <- to %>%
+            dplyr::mutate_(.dots = dots)
+        } else {
+          next
+        }
       }
     }
-  }
+    
   return(to)
  
 }
