@@ -293,6 +293,8 @@ getPSNUs <- function(datapack_uid) {
       dplyr::pull(countryName) %>%
       unique() %>%
       paste(collapse = ",") %>%
+    # & is a reserved character for DATIM API. URLencode() doesn't convert `&`,
+    #   and URLencode(..., reserved = false) introduces unintended consequences
       stringr::str_replace_all("&","%26") %>%
       stringr::str_replace_all(" ","%20")
 
