@@ -282,7 +282,7 @@ interactive_print <- function(x) if (interactive()) { print(x) }
 #' 
 getPSNUs <- function(datapack_uid) {
   # Pull PSNUs from DATIM SQL view
-    DATIMcountryNameString <- datapackr::configFile %>%
+    datim_country_name_string <- datapackr::configFile %>%
       dplyr::filter(model_uid == datapack_uid,
              Currently_in_DATIM == "Y") %>%
       dplyr::select(countryName) %>%
@@ -303,7 +303,7 @@ getPSNUs <- function(datapack_uid) {
                     "fields=operating_unit,uid,name",
                     "&filter=name:!like:_Military",
                     "&filter=operating_unit:in:[",
-                    DATIMcountryNameString,"]") %>%
+                    datim_country_name_string,"]") %>%
       URLencode() %>%
       httr::GET() %>%
       httr::content(., "text") %>%
