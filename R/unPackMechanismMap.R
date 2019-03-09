@@ -52,7 +52,7 @@ unPackMechanismMap <- function(mechMap_path = NA) {
         col_types = ct) %>%
       tidyr::gather(
         key = "newMech",
-        value = "percent",
+        value = "weight",
         -`Old Mechanism`, -PSNU, -Indicator, -Type, -`Distribution Check`,
         na.rm = TRUE) %>%
       dplyr::mutate(
@@ -71,7 +71,7 @@ unPackMechanismMap <- function(mechMap_path = NA) {
         remove = TRUE,
         extra = "merge") %>%
       dplyr::select(psnuid, `Technical Area`, `Numerator / Denominator`,
-                    `Support Type` = Type, oldMech, newMech, percent)
+                    `Support Type` = Type, oldMech, newMech, weight)
     
   return(mechMap)
   
