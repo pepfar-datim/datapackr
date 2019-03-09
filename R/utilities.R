@@ -238,7 +238,7 @@ exportPackr <- function(data, output_path, type, datapack_name) {
     
     output_file_name <- packName(output_path, type, datapack_name, extension = ".xlsx")
     
-    openxlsx::saveWorkbook(data, output_file_name, overwrite = TRUE)
+    openxlsx::saveWorkbook(wb = data, file = output_file_name, overwrite = TRUE)
   }
   
   if (type %in% c("FAST Export","SUBNAT IMPATT")) {
