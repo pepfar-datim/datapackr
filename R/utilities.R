@@ -298,7 +298,7 @@ getPSNUs <- function(datapack_uid) {
       stringr::str_replace_all("&","%26") %>%
       stringr::str_replace_all(" ","%20")
 
-    PSNUs <- paste0(getOption("baseurl"),
+    r <- paste0(getOption("baseurl"),
                     "api/",
                     datapackr::api_version(),
                     "/sqlViews/PjjAyeXUbBd/data.json?",
@@ -310,8 +310,11 @@ getPSNUs <- function(datapack_uid) {
       httr::GET() %>%
       httr::content(., "text") %>%
       jsonlite::fromJSON(., flatten = TRUE)
-    PSNUs <- as.data.frame(PSNUs$rows,stringsAsFactors = FALSE) %>%
-      setNames(.,PSNUs$headers$name) %>%
+    
+    columnNames <- purrr::pluck(r, "headers", "name")
+    
+    PSNUs <- as.data.frame(r$rows,stringsAsFactors = FALSE) %>%
+      setNames(., columnNames) %>%
       dplyr::select(country = operating_unit, uid, name) %>%
       dplyr::distinct()
   
