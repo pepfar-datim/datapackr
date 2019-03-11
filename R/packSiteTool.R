@@ -433,9 +433,9 @@ packSiteTool <- function(d,
     data_sheets <- names(wb)[which(!stringr::str_detect(names(wb), "Home|Site List|Mechs|Validations"))]
     
     for (i in 1:length(data_sheets)) {
-      wb <- write_site_level_sheet(wb = wb,
-                                    sheet = data_sheets[i],
-                                    d = d)
+     wb <- write_site_level_sheet(wb = wb,
+                                   sheet = data_sheets[i],
+                                   d = d)
     }
         
 # Export Site Tool ####

@@ -3,20 +3,48 @@ output_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 19/5) Maintenan
 secrets <- "/Users/scott/.secrets/triage.json"
 
 ### END EDITS #####
+devtools::install_git(repo = "https://github.com/pepfar-datim/data-pack-commons.git",
+                      ref = "prod",
+                      upgrade = FALSE)
+
+devtools::install_git(repo = "https://github.com/pepfar-datim/datapackr.git",
+                      ref = "prod",
+                      upgrade = FALSE)
+
 datapackr::loginToDATIM(secrets)
 
-#Read Data Pack
-d <- datapackr::unPackData(output_path = output_path)
+# Read Data Pack
+d <- datapackr::unPackData()
 
-# Grab density
-density <- readDensity(support_files)
+# Grab densities
+country_name <- d$info$datapack_name
 
-#Distribute to Site
+density_data_files <-
+  list.files(
+    paste0(support_files,
+           if (is.na(stringr::str_extract(support_files,"/$"))) {"/"} else {},
+           "density_data/"),
+    pattern = country_name) %>% 
+  sort(decreasing = TRUE)
+
+density <- readr::read_rds(
+  paste0(support_files,
+         if (is.na(stringr::str_extract(support_files,"/$"))) {"/"} else {},
+         "density_data/",
+         density_data_files[1]
+         )
+  )
+
+# Pull Mechanism Information
+if(!exists("mechanisms_19T")){
+  mechanisms_19T <<- datapackcommons::Get19TMechanisms(getOption("baseurl"))
+}
+
+# Distribute to Site
 d <- datapackcommons::DistributeToSites(d,
                                         mechanisms = mechanisms_19T,
                                         site_densities = density)
 
-d <- eswatini_site_density
-
 # Pack Site Tool
 datapackr::packSiteTool(d)
+

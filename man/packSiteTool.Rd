@@ -4,10 +4,17 @@
 \alias{packSiteTool}
 \title{Pack a Site Tool}
 \usage{
-packSiteTool(d)
+packSiteTool(d, includeFACTS = FALSE, FACTSMechs_path = NA)
 }
 \arguments{
 \item{d}{A datapackr list object.}
+
+\item{includeFACTS}{Logical. If \code{TRUE}, \code{packSiteTool} will corrob-
+orate FY2019 DATIM mechanisms against FACTS Info Mechanisms and add any
+missing mechanisms. Default is \code{FALSE}.}
+
+\item{FACTSMechs_path}{A local file path directing to the extract of FY2019
+FACTS Info Mechanisms. Default is \code{NA}.}
 }
 \description{
 Takes data from the Data Pack, distributes it to site level, then creates a
