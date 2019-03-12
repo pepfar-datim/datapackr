@@ -82,7 +82,7 @@ checkWorkbookStructure <- function(d) {
     dplyr::mutate(submission_order = as.integer(1:(dplyr::n()) + 4))
   
   # Check all tabs present and accounted for
-  sheets_check <- datapackr::template_schema %>%
+  sheets_check <- datapackr::data_pack_schema %>%
     dplyr::select(sheet_name, template_order = sheet_num) %>%
     dplyr::distinct() %>%
     dplyr::full_join(submission_sheets, by = c("sheet_name")) %>%
@@ -130,7 +130,7 @@ checkWorkbookStructure <- function(d) {
        data processing, and this issue may be related to missing, 
        added, or renamed sheets. : ", paste(out_of_order, collapse = ","),"")
     
-    d$info$warningMsg<-append(msg,d$info$warningMsg)
+    d$info$warningMsg <- append(msg,d$info$warningMsg)
   }
   
   return(d)
@@ -157,10 +157,10 @@ checkColStructure <- function(d) {
     dplyr::select(indicatorCode = value) %>%
     dplyr::mutate(submission_order = as.integer(1:(dplyr::n())))
   
-  col_check <- datapackr::template_schema %>%
+  col_check <- datapackr::data_pack_schema %>%
     dplyr::filter(sheet_name == d$data$sheet) %>%
-    dplyr::select(indicatorCode, template_order = col) %>%
-    dplyr::full_join(submission_cols, by = c("indicatorCode")) %>%
+    dplyr::select(indicator_code, template_order = col) %>%
+    dplyr::full_join(submission_cols, by = c("indicator_code" = "indicatorCode")) %>%
     dplyr::mutate(order_check = template_order == submission_order)
   
   ## Alert to missing cols
@@ -331,11 +331,11 @@ unPackSheet <- function(d) {
 
   d <- checkColStructure(d)
   
-  # List FY20 Target Columns
-  targetCols <- datapackr::template_schema %>%
+  # List Target Columns
+  targetCols <- datapackr::data_pack_schema %>%
     dplyr::filter(sheet_name == d$data$sheet,
-                  colType == "FY20 Target") %>%
-    dplyr::pull(indicatorCode)
+                  col_type == "Target") %>%
+    dplyr::pull(indicator_code)
   
   # Add cols to allow compiling with other sheets
   d$data$extract %<>%
@@ -376,8 +376,9 @@ unPackSheet <- function(d) {
     dplyr::select(PSNU, psnuid, sheet_name, indicatorCode, Age, Sex, KeyPop, value) %>%
     # Drop zeros, NAs, dashes, and space-only entries
         tidyr::drop_na(value) %>%
-        dplyr::filter(value != 0
-                      & !value %in% c("-"," ")) %>%
+        dplyr::filter(
+          !is.na(suppressWarnings(as.numeric(value)))
+          & value != 0) %>%
         dplyr::mutate(value = as.numeric(value))
 
   # TEST for Negative values
@@ -475,20 +476,20 @@ separateDataSets <- function(d) {
   d$data$MER <- d$data$targets %>%
     dplyr::filter(
       indicatorCode %in% (
-        datapackr::template_schema %>%
-          dplyr::filter(colType == "FY20 Target",
+        datapackr::data_pack_schema %>%
+          dplyr::filter(col_type == "Target",
                         dataset == "MER") %>%
-          dplyr::pull(indicatorCode)
+          dplyr::pull(indicator_code)
       )
     )
   
   d$data$SUBNAT_IMPATT <- d$data$targets %>%
     dplyr::filter(
       indicatorCode %in% (
-        datapackr::template_schema %>%
-          dplyr::filter(colType == "FY20 Target",
+        datapackr::data_pack_schema %>%
+          dplyr::filter(col_type == "Target",
                         dataset %in% c("SUBNAT", "IMPATT")) %>%
-          dplyr::pull(indicatorCode)
+          dplyr::pull(indicator_code)
       )
     )
   d$data <-
@@ -516,7 +517,7 @@ separateDataSets <- function(d) {
 #'    datasets from DATIM that can be imported into DATIM at the PSNU level.
 unPackSheets <- function(d) {
   # Get sheets list
-  sheets <- datapackr::template_schema %>%
+  sheets <- datapackr::data_pack_schema %>%
     dplyr::select(sheet_name) %>%
     dplyr::filter(sheet_name != "SNU x IM") %>%
     dplyr::distinct() %>%
@@ -575,8 +576,8 @@ unPackSNUxIM <- function(d) {
     dplyr::select_if(~!all(is.na(.))) %>%
     dplyr::mutate(
       sum = rowSums(dplyr::select(.,dplyr::matches("\\d+|Dedupe")), na.rm = TRUE)) %>%
-    dplyr::mutate(DataPackTarget = datapackr::round_trunc(DataPackTarget),
-                  sum = datapackr::round_trunc(sum))
+    dplyr::mutate(DataPackTarget = round_trunc(DataPackTarget),
+                  sum = round_trunc(sum))
   
   # TEST where DataPackTarget != sum of mechanism values
   mismatch <- d$data$SNUxIM %>%
@@ -588,7 +589,8 @@ unPackSNUxIM <- function(d) {
       msg,
       "    ",
       NROW(mismatch),
-      " cases where Data Pack Targets are not correctly distributed among mechanisms.
+      " cases where Data Pack Targets are not correctly distributed among mechanisms. ",
+      "To address this, go to your Data Pack's SNU x IM tab and filter the Rollup column for Pink cells. 
       "
     )
     d$info$warningMsg<-append(msg,d$info$warningMsg)
@@ -617,6 +619,7 @@ unPackSNUxIM <- function(d) {
       -PSNU, -sheet_name, -indicatorCode, -CoarseAge, -Sex, -KeyPop) %>%
     ## Drop all NA values
     tidyr::drop_na(value) %>%
+    dplyr::filter(value > 0) %>%
     dplyr::group_by(PSNU, sheet_name, indicatorCode, CoarseAge, Sex, KeyPop) %>%
     dplyr::mutate(distribution = value / sum(value)) %>%
     dplyr::ungroup() %>%
@@ -668,7 +671,9 @@ rePackPSNUxIM <- function(d) {
     tidyr::drop_na(value)
   
   return(d)
+  
 }
+
 
 #' @importFrom magrittr %>% %<>%
 #' @title FASTforward(d)
@@ -755,13 +760,13 @@ FASTforward <- function(d) {
 #'     recompiles the dataframe containing SUBNAT and IMPATT data,
 #'     \code{d$data$SUBNAT_IMPATT} into a standard DATIM import file.
 #'
-#' @param d datapackr list object containing at least
-#'     \code{d$data$SUBNAT_IMPATT}.
-#' @return A datapackr list object, \code{d}, storing at least 1 dataframe of
-#'    SUBNAT & IMPATT data (\code{d$datim$SUBNAT_IMPATT}) ready for DATIM
-#'    ingestion.
-packSUBNAT_IMPATT <- function(d) {
-  d$datim$SUBNAT_IMPATT <- d$data$SUBNAT_IMPATT %>%
+#' @param data Data frame of SUBNAT and IMPATT data ready for DATIM import
+#' review.
+#' 
+#' @return Dataframe of SUBNAT & IMPATT data ready for DATIM ingestion.
+#' 
+packSUBNAT_IMPATT <- function(data) {
+  importFile <- data %>%
     dplyr::left_join((
       datapackr::indicatorMap %>%
         dplyr::filter(dataset %in% c("SUBNAT", "IMPATT")) %>%
@@ -778,26 +783,89 @@ packSUBNAT_IMPATT <- function(d) {
     tidyr::drop_na(dataelementuid, categoryoptioncombouid, value) %>%
     dplyr::mutate(
       value = round_trunc(value),
-      period = "2019Oct",
-      attributeoptioncombo = "HllvX50cXC0"
+      period = datapackr::periodInfo$iso,
+      attributeOptionCombo = datapackr::default_catOptCombo()
     ) %>%
     dplyr::filter(value > 0) %>%
     dplyr::select(
-      dataelement = dataelementuid,
+      dataElement = dataelementuid,
       period,
-      orgunit = psnuid,
-      categoryoptioncombo = categoryoptioncombouid,
-      attributeoptioncombo,
+      orgUnit = psnuid,
+      categoryOptionCombo = categoryoptioncombouid,
+      attributeOptionCombo,
       value
     ) %>%
-    dplyr::group_by(dataelement,
+    dplyr::group_by(dataElement,
                     period,
-                    orgunit,
-                    categoryoptioncombo,
-                    attributeoptioncombo) %>%
+                    orgUnit,
+                    categoryOptionCombo,
+                    attributeOptionCombo) %>%
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(value = as.character(value))
   
-  return(d)
+  return(importFile)
 }
+
+
+
+#' @importFrom magrittr %>% %<>%
+#' @title packForDATIM(data)
+#' 
+#' @description 
+#' Flexible function that allows packaging of a variety of datapackr outputs as
+#' DATIM import files.
+#' 
+#' @param data Data frame or tibble ready for DATIM import prep.
+#' @param type Type of dataset to prep for DATIM. Choose from \code{PSNUxIM},
+#' \code{SUBNAT_IMPATT}, or \code{Site}.
+#' 
+#' @return Data frame ready for DATIM import
+#' 
+packForDATIM <- function(data, type = NA) {
+  if (is.na(type)) {
+    stop("Please specify data type: 'PSNUxIM', 'SUBNAT_IMPATT', or 'Site'")
+  }
+  
+  if (type == "SUBNAT_IMPATT") {
+    importFile <- packSUBNAT_IMPATT(data)
+  }
+  
+  if (type == "PSNUxIM") {
+    importFile <- data %>%
+      dplyr::mutate(
+        period = datapackr::periodInfo$iso,
+        mechanismCode = stringr::str_replace(mechanismCode,"Dedupe","00000"),
+        value = round_trunc(as.numeric(value))) %>%
+      dplyr::filter(
+        !is.na(suppressWarnings(as.numeric(value)))
+        & !(value < 1)) %>%
+      dplyr::left_join(datapackr::PSNUxIM_to_DATIM %>%
+                         dplyr::filter(dataset == "MER") %>%
+                         dplyr::select(-sheet_name, -typeOptions, -dataset),
+                       by = c("indicatorCode" = "indicatorCode",
+                              "Age" = "validAges",
+                              "Sex" = "validSexes",
+                              "KeyPop" = "validKPs")) %>%
+      dplyr::select(
+        dataElement = dataelementuid,
+        period,
+        orgUnit = psnuid,
+        categoryOptionCombo = categoryoptioncombouid,
+        mechanismCode,
+        value) %>%
+      tidyr::drop_na() %>%
+      dplyr::group_by(dataElement,
+                      period,
+                      orgUnit,
+                      categoryOptionCombo,
+                      mechanismCode) %>%
+      dplyr::summarise(value = sum(value)) %>%
+      dplyr::ungroup()
+  }
+  
+  if (type == "Site") {stop("Sorry! Stay tuned for site data processing!")}
+  
+  return(importFile)
+}
+

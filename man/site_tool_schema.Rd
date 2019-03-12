@@ -11,8 +11,8 @@
   and Site Tool.}
   \item{col}{Value describing the column position of each 
   \code{indicator_code}.}
-  \item{col_type}{Flags whether an \code{indicator_code} is a FY20 Target
-  (\code{"FY20 Target"}), row header (\code{Row Header}) or not (\code{NA}).}
+  \item{col_type}{Flags whether an \code{indicator_code} is a Target
+  (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
   \item{tech_area}{Header text used to distinguish groups of
   \code{indicator_codes}.}
   \item{label}{String label used to describe \code{indicator_code}.}

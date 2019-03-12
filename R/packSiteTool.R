@@ -54,8 +54,6 @@ colorCodeSites <- function(wb, sheet, cols, rows) {
 #' @param d A datapackr list object.
 #' 
 write_site_level_sheet <- function(wb, sheet, d) {
-print(sheet)
-  
 # Order Columns ####
   ## Filter and spread distributed site data
   data <- d$data$site$distributed %>%
@@ -69,7 +67,10 @@ print(sheet)
     dplyr::filter(sheet_name == sheet)
   
   ## Remember num of row_header columns
-  row_header_cols <- NROW(schema[schema$col_type == "Row Header",])
+  row_header_names <- schema %>%
+    dplyr::filter(col_type == "Row Header") %>%
+    dplyr::pull(indicator_code)
+  row_header_cols <- NROW(row_header_names)
   
   schema %<>%
     dplyr::select(indicator_code) %>%
@@ -84,8 +85,16 @@ print(sheet)
     
     ## Morph the distributed data into shape
   data <- schema %>%
-    datapackr::swapColumns(., data) %>%
+    swapColumns(., data) %>%
     as.data.frame(.)
+  
+  # TODO: RESOLVE issues with NAs and coerced zeros
+  if (sheet == "PMTCT_EID") {
+    data %<>%
+      dplyr::group_by_at(row_header_names) %>%
+      dplyr::summarise_all(sum, na.rm = TRUE) %>%
+      dplyr::ungroup()
+  }
   
   data_cols <- names(data)[(row_header_cols + 1):length(data)]
     
@@ -103,7 +112,7 @@ print(sheet)
   subtotal_fxs <- paste0('=SUBTOTAL(109,',tolower(sheet),'[',data_cols,'])')
     
   ## Write Formula
-  datapackr::writeFxColumnwise(wb, sheet, subtotal_fxs, xy = c(row_header_cols+1,4))
+  writeFxColumnwise(wb, sheet, subtotal_fxs, xy = c(row_header_cols+1,4))
     
   ## Add red conditional formatting for discrepancies
   subtotal_colStart_letter <- openxlsx::int2col(row_header_cols+1)
@@ -115,9 +124,20 @@ print(sheet)
     rule = subtotal_cond_format_fx)
 
 # OU sum row ####
-  sums <- data %>%
+  sums <- d$data$distributedMER %>%
+    dplyr::filter(sheet_name == sheet) %>%
+    dplyr::select(indicatorCode, value) %>%
+    dplyr::group_by(indicatorCode) %>%
+    dplyr::summarise(value = sum(value)) %>%
+    dplyr::ungroup() %>%
+    tidyr::spread(key = indicatorCode, value = value, drop = FALSE)
+    
+  sums <- schema %>%
     dplyr::select(data_cols) %>%
-    dplyr::summarise_all(sum, na.rm = TRUE)
+    dplyr::slice(1) %>%
+    swapColumns(., sums)
+  
+  sums[is.na(sums)] <- 0
   
   openxlsx::writeData(wb, sheet, sums,
                       xy = c(row_header_cols + 1,3),
@@ -130,7 +150,7 @@ print(sheet)
                      gridExpand = TRUE)
     
 # Inactive column ####
-  max_row_buffer <- 500
+  max_row_buffer <- 0
   formula_cell_numbers <- seq(1, NROW(data) + max_row_buffer) + 5
   
   inactiveFormula <- paste0(
@@ -143,25 +163,75 @@ print(sheet)
   openxlsx::writeFormula(wb, sheet, inactiveFormula, xy = c(1, 6))
   
 # Conditional formatting ####
-  datapackr::colorCodeSites(
+  colorCodeSites(
     wb = wb, sheet = sheet, cols = 2, rows = 6:(NROW(data) + max_row_buffer + 5))
   openxlsx::conditionalFormatting(
     wb = wb, sheet = sheet,
     cols = 1:length(data), rows = 6:(NROW(data) + max_row_buffer + 5),
     rule = 'OR($A6=="Inactive",$A6=="NOT A SITE")')
   
+  invalidDisaggFormatting <- function(colNameRegex, rule) {
+    formatCols <- datapackr::site_tool_schema %>%
+      dplyr::filter(sheet_name == sheet,
+                    stringr::str_detect(indicator_code, colNameRegex)) %>%
+      dplyr::pull(col)
+    
+    openxlsx::conditionalFormatting(
+      wb = wb, sheet = sheet,
+      cols = formatCols,
+      rows = 6:(NROW(data) + max_row_buffer + 5),
+      rule = rule,
+      style = datapackr::styleGuide$data$invalidDisagg
+    )
+  }
+  
+  if (sheet == "HTS") {
+  ## Pediatrics & Malnutrition
+    invalidDisaggFormatting(colNameRegex = "Pediatric|Malnutrition",
+                            rule = '=OR($E6="05-09",$E6="10-14",$E6="15-19",$E6="20-24",$E6="25-29",$E6="30-34",$E6="35-39",$E6="40-44",$E6="45-49",$E6="50+")')
+    
+  ## HTS_SELF
+    invalidDisaggFormatting(colNameRegex = "HTS_SELF",
+                            rule = '=OR($E6="01-04",$E6="05-09")')
+    
+  ## HTS_RECENT
+    invalidDisaggFormatting(colNameRegex = "HTS_RECENT",
+                            rule = '=OR($E6="01-04",$E6="05-09",$E6="10-14")')
+  }
+  
+  if (sheet == "KP") {
+  ## KP_MAT
+    invalidDisaggFormatting(colNameRegex = "KP_MAT",
+                            rule = '=OR($E6="PWID",$E6="FSW",$E6="MSM not SW",$E6="MSM SW",$E6="MSM",$E6="People in prisons and other enclosed settings",$E6="TG SW",$E6="TG not SW",$E6="TG")')
+    
+  ## KP_PREV
+    invalidDisaggFormatting(colNameRegex = "KP_PREV",
+                            rule = '=OR($E6="PWID",$E6="MSM",$E6="TG")')
+    
+  ## Others
+    invalidDisaggFormatting(colNameRegex = "HTS_TST|TX_NEW|PrEP",
+                            rule = '=OR($E6="Female PWID",$E6="Male PWID",$E6="MSM not SW",$E6="MSM SW",$E6="TG SW",$E6="TG not SW")')
+  }
+  
+  if (sheet == "OVC") {
+    ## OVC_HIVSTAT
+    invalidDisaggFormatting(colNameRegex = "OVC_HIVSTAT",
+                            rule = '=OR($E6="<01",$E6="01-04",$E6="05-09",$E6="10-14",$E6="15-17",$E6="18+",$F6="Male",$F6="Female")')
+    
+    }
+  
 # Validation ####
   ## Site
   openxlsx::dataValidation(wb, sheet,
     cols = 2, rows = 6:(NROW(data) + max_row_buffer + 5),
     type = "list",
-    value = 'INDIRECT("site_list_table[siteID]")')
+    value = 'site_list')
   
   ## Mechanism
   openxlsx::dataValidation(wb, sheet,
     cols = 3, rows = 6:(NROW(data) + max_row_buffer + 5),
     type = "list",
-    value = 'INDIRECT("mech_list[mechID]")')
+    value = 'mech_list')
   
   ## Type
   openxlsx::dataValidation(wb, sheet,
@@ -209,7 +279,7 @@ print(sheet)
         cols = which(names(data)=="KeyPop"),
         rows = 6:(NROW(data) + max_row_buffer + 5),
         type = "list",
-        value = "kp")
+        value = "keypops")
   }
   
 # Conform column/row sizes ####
@@ -252,6 +322,14 @@ print(sheet)
 #' for Site Tool features.
 #' 
 #' @param d A datapackr list object.
+#' @param includeFACTS Logical. If \code{TRUE}, \code{packSiteTool} will corrob-
+#' orate FY2019 DATIM mechanisms against FACTS Info Mechanisms and add any
+#' missing mechanisms. Default is \code{FALSE}.
+#' @param FACTSMechs_path A local file path directing to the extract of FY2019
+#' FACTS Info Mechanisms. Default is \code{NA}.
+#' @param output_path A local folder where you would like Site Tool to be saved.
+#' 
+#' @return An XLSX Site Tool saved to \code{output_path}.
 #' 
 #' @details
 #' Executes the following operations:
@@ -272,24 +350,27 @@ print(sheet)
 #'     \item Exports Site Tool for use by Country Teams
 #' }
 #'
-packSiteTool <- function(d) {
+packSiteTool <- function(d,
+                         includeFACTS = FALSE,
+                         FACTSMechs_path = NA,
+                         output_path) {
   
 # Make sure login creds allow export of data from DATIM for specified OU ####
   
   
 # Build Site Tool frame ####
-  print("Building Site Tool frame...")  
-  wb <- datapackr::packFrame(datapack_uid = d$info$datapack_uid,
-                               type = "Site Tool")
+  wb <- packFrame(datapack_uid = d$info$datapack_uid,
+                  type = "Site Tool")
   
 # Write site list (TODO: SPEED THIS UP) ####
-  print("Writing Site List...")
     country_uids <- datapackr::dataPackMap %>%
       dplyr::filter(data_pack_name == d$info$datapack_name) %>%
       dplyr::pull(country_uid)
     
-    siteList <- datapackr::getSiteList(country_uids,
-                                       include_mil = TRUE) %>%
+    sites <- getSiteList(country_uids,
+                        include_mil = TRUE)
+    
+    siteList <- sites %>%
       #dplyr::select(country_name,psnu,siteID = site_tool_label,site_type) %>%
       dplyr::select(siteID = site_tool_label) %>%
       dplyr::mutate(status = "Active") %>%
@@ -306,6 +387,10 @@ packSiteTool <- function(d) {
       withFilter = TRUE
     )
     
+    openxlsx::createNamedRegion(wb, sheet = "Site List",
+                                cols = 1, rows = 2:(NROW(siteList) + 1),
+                                name = "site_list")
+    
     openxlsx::setColWidths(
       wb = wb, sheet = "Site List", cols = 1:2,
       #widths = c(rep("auto",4),16))
@@ -314,62 +399,113 @@ packSiteTool <- function(d) {
     openxlsx::dataValidation(
       wb = wb, sheet = "Site List", cols = 2, rows = 2:(NROW(siteList)+1),
       type = "list",
-      value = 'INDIRECT("inactive_options[choices]")')
+      value = 'inactive_options')
     
-    datapackr::colorCodeSites(
+    colorCodeSites(
       wb = wb, sheet = "Site List", cols = 1, rows = 2:(NROW(siteList)+1)
     )
     openxlsx::conditionalFormatting(
       wb = wb,sheet = "Site List", cols = 1,rows = 2:(NROW(siteList)+1),
-      rule = '$E2="Inactive"', style = datapackr::styleGuide$siteList$inactive)
+      rule = '$B2="Inactive"', style = datapackr::styleGuide$siteList$inactive)
     
 # Write mech list ####
-    print("Writing Mechanism List")
-    mechList <- datapackr::getMechList(country_uids,
-                                       FY = 2019)
+    mechList <- getMechList(country_uids,
+                            include_dedupe = TRUE,
+                            FY = datapackr::cop_year()) %>%
+      dplyr::select(name, code) %>%
+      dplyr::arrange(code)
+    
+    ## PATCH for Missing FACTS Mechs
+    if (includeFACTS) {
+      if (is.na(FACTSMechs_path)) {
+        stop("Please supply file path to FACTS Mechanism Extract!!")
+      }
+      
+      country_names <- datapackr::dataPackMap %>%
+        dplyr::filter(data_pack_name == d$info$datapack_name) %>%
+        dplyr::pull(country_name) %>%
+        unique()
+      
+      FACTSMechs <- readr::read_csv(file = FACTSMechs_path,
+                                    na = "NULL",
+                                    col_types = readr::cols(.default = "c")) %>%
+        dplyr::select(code = HQID, name = IM,
+                      start_date = StartDate, end_date = EndDate,
+                      organisation_unit_name = Country,
+                      partner = PrimePartner, agency = Agency) %>%
+        dplyr::mutate(start_date = lubridate::mdy(start_date),
+                      end_date = lubridate::mdy(end_date),
+                      name = paste0(code, " - ", name),
+                      id = NA_character_,
+                      organisation_unit_id = NA_character_) %>%
+        dplyr::filter(!stringr::str_detect(agency,"State")
+                      & !organisation_unit_name %in% c("Asia Region",
+                                                       "West-Central Africa Region",
+                                                       "Western Hemisphere Region")
+        ) %>%
+        dplyr::select(code, name, id, start_date, end_date,
+                      organisation_unit_name, organisation_unit_id,
+                      partner, agency) %>%
+        dplyr::filter(organisation_unit_name == d$info$datapack_name,
+                      !code %in% (mechList %>%
+                                    dplyr::pull(code) %>%
+                                    unique()))
+      
+      mechList %<>%
+        dplyr::bind_rows(FACTSMechs)
+    }
+      
+    
     openxlsx::writeDataTable(
       wb = wb,
       sheet = "Mechs",
       x = data.frame(mechID = mechList$name),
       xy = c(1,1),
       colNames = TRUE,
-      tableName = "mech_list",
+      tableName = "mech_list_table",
       tableStyle = "none"
     )
+    
+    openxlsx::createNamedRegion(wb, sheet = "Mechs",
+                                cols = 1, rows = 2:(NROW(mechList) + 1),
+                                name = "mech_list")
   
 # Prep Site data ####
-    print("Preparing Site-level data...")
     d$data$site$distributed %<>%
     ## Pull in mechanism names
       dplyr::left_join((mechList %>%
                           dplyr::select(code,mechanism = name)),
                        by = c("mechanismCode" = "code")) %>%
+    ## Pull in Site Tool Label
+      dplyr::left_join((sites %>%
+                          dplyr::select(site_tool_label, id)),
+                       by = c("org_unit" = "id")) %>%
     ## Mark what wasn't distributed
       dplyr::mutate(
         site_tool_label = dplyr::case_when(
           is.na(site_tool_label) ~ paste0(PSNU," > NOT YET DISTRIBUTED"),
-          TRUE ~ site_tool_label
-            ),
+          TRUE ~ site_tool_label),
         siteValue = dplyr::case_when(is.na(siteValue) ~ value, TRUE ~ siteValue),
-        siteValue = datapackr::round_trunc(siteValue),
-        mechanism = dplyr::case_when(mechanismCode == "Dedupe" ~ "Dedupe", TRUE ~ mechanism)
+        siteValue = round_trunc(siteValue),
+        mechanism = dplyr::case_when(mechanismCode == "Dedupe" ~ "Dedupe",
+                                     is.na(mechanism) ~ mechanismCode,
+                                     TRUE ~ mechanism)
         ) %>%
       dplyr::select(sheet_name,Site = site_tool_label,Mechanism = mechanism,
                     Age,Sex,KeyPop,Type = type,indicatorCode,siteValue)
     
 # Populate Site Tool ####
-    print("Writing site-level data into sheets...")
     data_sheets <- names(wb)[which(!stringr::str_detect(names(wb), "Home|Site List|Mechs|Validations"))]
     
-    write_all_sheets <- function(x) {
-      wb <- datapackr::write_site_level_sheet(wb = wb, sheet = x, d = d)
+    for (sheet in data_sheets) {
+     wb <- write_site_level_sheet(wb = wb,
+                                   sheet = sheet,
+                                   d = d)
     }
-    wb <- sapply(data_sheets, write_all_sheets)
         
 # Export Site Tool ####
-    print("Exporting...")
-    datapackr::exportPackr(wb,
-                d$keychain$output_path,
+    exportPackr(wb,
+                output_path,
                 type = "Site Tool",
                 d$info$datapack_name)
 }

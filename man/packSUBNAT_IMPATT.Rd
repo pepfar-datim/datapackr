@@ -4,16 +4,14 @@
 \alias{packSUBNAT_IMPATT}
 \title{packSUBNAT_IMPATT(d)}
 \usage{
-packSUBNAT_IMPATT(d)
+packSUBNAT_IMPATT(data)
 }
 \arguments{
-\item{d}{datapackr list object containing at least
-\code{d$data$SUBNAT_IMPATT}.}
+\item{data}{Data frame of SUBNAT and IMPATT data ready for DATIM import
+review.}
 }
 \value{
-A datapackr list object, \code{d}, storing at least 1 dataframe of
-   SUBNAT & IMPATT data (\code{d$datim$SUBNAT_IMPATT}) ready for DATIM
-   ingestion.
+Dataframe of SUBNAT & IMPATT data ready for DATIM ingestion.
 }
 \description{
 Takes the outputs of the \code{\link{unPackSheets}} function and

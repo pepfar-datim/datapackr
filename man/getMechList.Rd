@@ -4,12 +4,15 @@
 \alias{getMechList}
 \title{Compile Mechanism List for Site Tool}
 \usage{
-getMechList(country_uids = NA, FY = NA)
+getMechList(country_uids = NA, include_dedupe = FALSE, FY = NA)
 }
 \arguments{
 \item{country_uids}{Character vector of DATIM country IDs. This can only
 include countries. Regional Operating Unit uids will not be accepted. If not
 supplied, returns entire mechanism list, trimmed to user's DATIM permissions.}
+
+\item{include_dedupe}{Logical. If TRUE will include deduplication mechanisms.
+Default is FALSE.}
 
 \item{FY}{Numeric value of Fiscal Year to filter mechanism list by. If a FY
 is not supplied, returns entire mechanism list.}

@@ -63,7 +63,7 @@ unPackData <- function(submission_path = NA,
       d$keychain$output_path = getwd()
     }
     
-    can_read_import_file<-function(submission_path) {
+    can_read_import_file <- function(submission_path) {
       
       if (is.na(submission_path)) { return(FALSE)}
       
@@ -71,7 +71,7 @@ unPackData <- function(submission_path = NA,
     }
     
     if ( !can_read_import_file( submission_path ) & interactive() ) {
-      interactive_print("Cannot read the specified file. Please choose another.")
+      interactive_print("Please choose a submission file.")
       d$keychain$submission_path <- file.choose() } else
       {
         d$keychain$submission_path <- submission_path
@@ -80,7 +80,7 @@ unPackData <- function(submission_path = NA,
     msg<-"Checking the file exists..."
     interactive_print(msg)
     
-    if (!can_read_import_file( submission_path )) {
+    if (!can_read_import_file(d$keychain$submission_path)) {
       stop("Submission workbook could not be read!")
     }
     
@@ -106,6 +106,10 @@ unPackData <- function(submission_path = NA,
 
   # Combine Targets with SNU x IM for PSNU x IM level targets
     d <- rePackPSNUxIM(d)
+    
+  # Prepare SNU x IM dataset for DATIM validation checks
+    d$datim$PSNUxIM <- packForDATIM(d$data$distributedMER,
+                                    type = "PSNUxIM")
 
   # Package FAST export
     d <- FASTforward(d)
@@ -116,7 +120,8 @@ unPackData <- function(submission_path = NA,
                   d$info$datapack_name)  }
 
   # Package SUBNAT/IMPATT export
-    d <- packSUBNAT_IMPATT(d)
+    d$datim$SUBNAT_IMPATT <- packForDATIM(d$data$SUBNAT_IMPATT,
+                                          type = "SUBNAT_IMPATT")
     if (export_SUBNAT_IMPATT == TRUE) {
 
       exportPackr(d$data$SUBNAT_IMPATT,

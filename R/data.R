@@ -123,9 +123,9 @@
 #'   \code{indicatorCode}.}
 #'   \item{indicatorCode}{Code used in the Data Pack and Site Tool to uniquely
 #'   identify each distinct programmatic area of target setting.}
-#'   \item{colType}{Flags whether an \code{indicatorCode} is a FY20 Target
-#'   (\code{"FY20 Target"}) or not (\code{NA}).}
-#'   \item{dataset}{For indicatorCodes listed as "FY20 Targets" in the 
+#'   \item{colType}{Flags whether an \code{indicatorCode} is a Target
+#'   (\code{"Target"}) or not (\code{NA}).}
+#'   \item{dataset}{For indicatorCodes listed as "Targets" in the 
 #'   \code{colType} field, documents the dataset, either "MER", "IMPATT", or
 #'   "SUBNAT"}
 #' }
@@ -236,9 +236,9 @@
 #'   \item{indicator_code}{Code used in the Data Pack and Site Tool to uniquely
 #'   identify each distinct programmatic area of target setting.}
 #'   \item{formula}{Excel formula defined for \code{indicator_code}.}
-#'   \item{col_type}{Flags whether an \code{indicator_code} is a FY20 Target
-#'   (\code{"FY20 Target"}), row header (\code{Row Header}) or not (\code{NA}).}
-#'   \item{dataset}{For \code{indicator_codes} listed as "\code{FY20 Targets}"
+#'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
+#'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
+#'   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
 #'   in the \code{col_type} field, documents the dataset, either \code{MER},
 #'   \code{IMPATT}, or \code{SUBNAT}.}
 #' }
@@ -260,8 +260,8 @@
 #'   and Site Tool.}
 #'   \item{col}{Value describing the column position of each 
 #'   \code{indicator_code}.}
-#'   \item{col_type}{Flags whether an \code{indicator_code} is a FY20 Target
-#'   (\code{"FY20 Target"}), row header (\code{Row Header}) or not (\code{NA}).}
+#'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
+#'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
 #'   \item{tech_area}{Header text used to distinguish groups of
 #'   \code{indicator_codes}.}
 #'   \item{label}{String label used to describe \code{indicator_code}.}
@@ -269,3 +269,29 @@
 #'   identify each distinct programmatic area of target setting.}
 #' }
 "site_tool_schema"
+
+#' @docType data
+#' @title Map of indicators from PSNU x IM dataset to DATIM
+#' 
+#' @description 
+#' Dataset that maps Data Pack indicators to DSD dataelements and
+#' categoryoptioncombos in DATIM, used for mapping PSNU x IM datasets
+#' extracted from Data Packs to DATIM import file structure.
+#' 
+#' @format 
+#' \describe{
+#'   \item{sheet_name}{Lists the sheet/tab name as used in the Data Pack.}
+#'   \item{indicatorCode}{Code used in the Data Pack to uniquely identify each
+#'   distinct programmatic area of target setting.}
+#'   \item{typeOptions}{Either DSD or TA. The crossing of these with
+#'   \code{indicatorCode} roughly corresponds to DATIM dataelements.}
+#'   \item{dataelementuid}{DATIM uid for dataElements.}
+#'   \item{dataset}{Name of DATIM dataset associated with the listed
+#'   \code{dataelementuid}, either "MER", "SUBNAT", or "IMPATT".}
+#'   \item{validAges}{Age disaggregate.}
+#'   \item{validSexes}{Sex disaggregate.}
+#'   \item{validKPs}{Key Population disaggregate.}
+#'   \item{categoryoptioncombouid}{DATIM uid for categoryOptionCombos.}
+#' }
+#' 
+"PSNUxIM_to_DATIM"

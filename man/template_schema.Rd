@@ -13,9 +13,9 @@
   \code{indicatorCode}.}
   \item{indicatorCode}{Code used in the Data Pack and Site Tool to uniquely
   identify each distinct programmatic area of target setting.}
-  \item{colType}{Flags whether an \code{indicatorCode} is a FY20 Target
-  (\code{"FY20 Target"}) or not (\code{NA}).}
-  \item{dataset}{For indicatorCodes listed as "FY20 Targets" in the 
+  \item{colType}{Flags whether an \code{indicatorCode} is a Target
+  (\code{"Target"}) or not (\code{NA}).}
+  \item{dataset}{For indicatorCodes listed as "Targets" in the 
   \code{colType} field, documents the dataset, either "MER", "IMPATT", or
   "SUBNAT"}
 }}
