@@ -36,7 +36,8 @@ Imports:
     getPass (>= 0.2-2),
     openxlsx,
     lazyeval,
-    stats
+    stats,
+    lubridate
 Suggests:
     devtools (>= 2.0.1)
 Remotes: jason-p-pickering/openxlsx

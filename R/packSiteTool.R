@@ -314,6 +314,7 @@ write_site_level_sheet <- function(wb, sheet, d) {
 
 #' @export
 #' @importFrom magrittr %>% %<>%
+#' @importFrom lubridate mdy
 #' @title Pack a Site Tool
 #' 
 #' @description
