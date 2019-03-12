@@ -3,9 +3,11 @@ output_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 19/5) Maintenan
 secrets <- "/Users/scott/.secrets/triage.json"
 
 ### END EDITS #####
-devtools::install_git(url = "https://github.com/pepfar-datim/data-pack-commons.git",
-                      ref = "prod",
-                      upgrade = FALSE)
+# devtools::install_git(url = "https://github.com/pepfar-datim/data-pack-commons.git",
+#                       ref = "prod",
+#                       upgrade = FALSE)
+
+
 
 devtools::install_git(url = "https://github.com/pepfar-datim/datapackr.git",
                       ref = "prod",

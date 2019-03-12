@@ -23,8 +23,6 @@ getMechList <- function(country_uids = NA,
                         include_dedupe = FALSE,
                         FY = NA) {
   
-  loginToDATIM(getOption("secrets"))
-  
   # Check user has correct permissions to query against country_uids ####
     # TODO: Configure to allow non-global users to generate Site Tools
   
@@ -34,11 +32,6 @@ getMechList <- function(country_uids = NA,
              "/categoryOptionCombos.json",
              "?paging=false",
              "&filter=categoryCombo.name:eq:Funding%20Mechanism",
-             dplyr::if_else(
-               !all(is.na(country_uids)),
-               paste0("&filter=categoryOptions.organisationUnits.id:in:[",
-                      paste0(country_uids,collapse = ","),"]"),
-               "&filter=code:!in:[00000,00001,00100,00200]"),
              "&fields=id,name,code,categoryOptions[startDate,endDate,categoryOptionGroups[id,name,groupSets[id,name]],organisationUnits[id,name]]"
              ) %>%
       utils::URLencode() %>%
@@ -79,29 +72,25 @@ getMechList <- function(country_uids = NA,
       ) %>%
       dplyr::select(-categoryOptions, -categoryOptionGroups)
     
-  # Add Dedupes
-    if (include_dedupe) {
+  # Filter country_uids ####
+    if (!is.na(country_uids)) {
       mechList %<>%
-        tibble::add_row(
-          code = c("00000","00001"),
-          name = c("De-duplication adjustment","De-duplication adjustment (DSD-TA)"),
-          id = c("X8hrDf6bLDC","YGT1o7UxfFu"),
-          start_date = c(NA_character_,NA_character_),
-          end_date = c(NA_character_,NA_character_),
-          organisation_unit_name = c(NA_character_,NA_character_),
-          organisation_unit_id = c(NA_character_,NA_character_),
-          partner = c("Dedupe adjustments Partner","Dedupe adjustments Partner"),
-          agency = c("Dedupe adjustments Agency","Dedupe adjustments Agency")
-        )
+        dplyr::filter(organisation_unit_id %in% country_uids
+                        | code %in% c("00000","00001"))
     }
-      
-  
+    
   # Filter by Fiscal Year ####
     if (!is.na(FY)) {
       mechList %<>%
         dplyr::filter((start_date < paste0(FY,"-10-01") &
-                      end_date > paste0(FY-1,"-09-30"))
+                         end_date > paste0(FY-1,"-09-30"))
                       | code %in% c("00000","00001"))
+    }
+    
+  # Handle Dedupes ####
+    if (!include_dedupe) {
+      mechList %<>%
+        dplyr::filter(!code %in% c("00000","00001"))
     }
     
   return(mechList)

@@ -67,7 +67,10 @@ write_site_level_sheet <- function(wb, sheet, d) {
     dplyr::filter(sheet_name == sheet)
   
   ## Remember num of row_header columns
-  row_header_cols <- NROW(schema[schema$col_type == "Row Header",])
+  row_header_names <- schema %>%
+    dplyr::filter(col_type == "Row Header") %>%
+    dplyr::pull(indicator_code)
+  row_header_cols <- NROW(row_header_names)
   
   schema %<>%
     dplyr::select(indicator_code) %>%
@@ -83,7 +86,10 @@ write_site_level_sheet <- function(wb, sheet, d) {
     ## Morph the distributed data into shape
   data <- schema %>%
     swapColumns(., data) %>%
-    as.data.frame(.)
+    as.data.frame(.) %>%
+    dplyr::group_by_at(row_header_names) %>%
+    dplyr::summarise_all(sum, na.rm = TRUE) %>%
+    dplyr::ungroup()
   
   data_cols <- names(data)[(row_header_cols + 1):length(data)]
     
@@ -400,7 +406,7 @@ packSiteTool <- function(d,
 # Write mech list ####
     mechList <- getMechList(country_uids,
                             include_dedupe = TRUE,
-                            FY = 2019) %>%
+                            FY = datapackr::cop_year()) %>%
       dplyr::select(name, code) %>%
       dplyr::arrange(code)
     
