@@ -177,35 +177,35 @@ write_site_level_sheet <- function(wb, sheet, d) {
   if (sheet == "HTS") {
   ## Pediatrics & Malnutrition
     invalidDisaggFormatting(colNameRegex = "Pediatric|Malnutrition",
-                            rule = '=OR($E1="05-09",$E1="10-14",$E1="15-19",$E1="20-24",$E1="25-29",$E1="30-34",$E1="35-39",$E1="40-44",$E1="45-49",$E1="50+")')
+                            rule = '=OR($E6="05-09",$E6="10-14",$E6="15-19",$E6="20-24",$E6="25-29",$E6="30-34",$E6="35-39",$E6="40-44",$E6="45-49",$E6="50+")')
     
   ## HTS_SELF
     invalidDisaggFormatting(colNameRegex = "HTS_SELF",
-                            rule = '=OR($E1="01-04",$E1="05-09")')
+                            rule = '=OR($E6="01-04",$E6="05-09")')
     
   ## HTS_RECENT
     invalidDisaggFormatting(colNameRegex = "HTS_RECENT",
-                            rule = '=OR($E1="01-04",$E1="05-09",$E1="10-14")')
+                            rule = '=OR($E6="01-04",$E6="05-09",$E6="10-14")')
   }
   
   if (sheet == "KP") {
   ## KP_MAT
     invalidDisaggFormatting(colNameRegex = "KP_MAT",
-                            rule = '=OR($E1="PWID",$E1="FSW",$E1="MSM not SW",$E1="MSM SW",$E1="MSM",$E1="People in prisons and other enclosed settings",$E1="TG SW",$E1="TG not SW",$E1="TG")')
+                            rule = '=OR($E6="PWID",$E6="FSW",$E6="MSM not SW",$E6="MSM SW",$E6="MSM",$E6="People in prisons and other enclosed settings",$E6="TG SW",$E6="TG not SW",$E6="TG")')
     
   ## KP_PREV
     invalidDisaggFormatting(colNameRegex = "KP_PREV",
-                            rule = '=OR($E1="PWID",$E1="MSM",$E1="TG")')
+                            rule = '=OR($E6="PWID",$E6="MSM",$E6="TG")')
     
   ## Others
     invalidDisaggFormatting(colNameRegex = "HTS_TST|TX_NEW|PrEP",
-                            rule = '=OR($E1="Female PWID",$E1="Male PWID",$E1="MSM not SW",$E1="MSM SW",$E1="TG SW",$E1="TG not SW")')
+                            rule = '=OR($E6="Female PWID",$E6="Male PWID",$E6="MSM not SW",$E6="MSM SW",$E6="TG SW",$E6="TG not SW")')
   }
   
   if (sheet == "OVC") {
     ## OVC_HIVSTAT
     invalidDisaggFormatting(colNameRegex = "OVC_HIVSTAT",
-                            rule = '=OR($E1="<01",$E1="01-04",$E1="05-09",$E1="10-14",$E1="15-17",$E1="18+",$F1="Male",$F1="Female")')
+                            rule = '=OR($E6="<01",$E6="01-04",$E6="05-09",$E6="10-14",$E6="15-17",$E6="18+",$F6="Male",$F6="Female")')
     
     }
   
