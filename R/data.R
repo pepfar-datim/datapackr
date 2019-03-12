@@ -295,3 +295,21 @@
 #' }
 #' 
 "PSNUxIM_to_DATIM"
+
+
+#' @docType data
+#' @title periodInfo
+#' 
+#' @description 
+#' Dataset of current COP period info.
+#' 
+#' @format 
+#' \describe{
+#'   \item{periodid}{Unique DATIM id corresponding to period.}
+#'   \item{iso}{ISO period name.}
+#'   \item{startdate}{Start date of period.}
+#'   \item{enddate}{End date of period.}
+#'   \item{periodtype}{Period type, whether Financial, Quarterly, etc.}
+#' }
+#' 
+"periodInfo"
