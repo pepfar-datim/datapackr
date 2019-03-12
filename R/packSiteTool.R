@@ -341,7 +341,7 @@ packSiteTool <- function(d,
     )
     openxlsx::conditionalFormatting(
       wb = wb,sheet = "Site List", cols = 1,rows = 2:(NROW(siteList)+1),
-      rule = '$E2="Inactive"', style = datapackr::styleGuide$siteList$inactive)
+      rule = '$B2="Inactive"', style = datapackr::styleGuide$siteList$inactive)
     
 # Write mech list ####
     mechList <- getMechList(country_uids,
