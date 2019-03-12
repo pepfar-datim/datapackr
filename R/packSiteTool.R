@@ -86,10 +86,15 @@ write_site_level_sheet <- function(wb, sheet, d) {
     ## Morph the distributed data into shape
   data <- schema %>%
     swapColumns(., data) %>%
-    as.data.frame(.) %>%
-    dplyr::group_by_at(row_header_names) %>%
-    dplyr::summarise_all(sum, na.rm = TRUE) %>%
-    dplyr::ungroup()
+    as.data.frame(.)
+  
+  # TODO: RESOLVE issues with NAs and coerced zeros
+  if (sheet == "PMTCT_EID") {
+    data %<>%
+      dplyr::group_by_at(row_header_names) %>%
+      dplyr::summarise_all(sum, na.rm = TRUE) %>%
+      dplyr::ungroup()
+  }
   
   data_cols <- names(data)[(row_header_cols + 1):length(data)]
     
