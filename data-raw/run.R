@@ -1,13 +1,13 @@
 support_files <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 19/3) Testing & Deployment/Support Files"
-output_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 19/5) Maintenance & Support/Draft Data Packs/Outputs"
+output_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 19/5) Maintenance & Support/Final Data Packs/Outputs"
 secrets <- "/Users/scott/.secrets/triage.json"
 
 ### END EDITS #####
-devtools::install_git(repo = "https://github.com/pepfar-datim/data-pack-commons.git",
+devtools::install_git(url = "https://github.com/pepfar-datim/data-pack-commons.git",
                       ref = "prod",
                       upgrade = FALSE)
 
-devtools::install_git(repo = "https://github.com/pepfar-datim/datapackr.git",
+devtools::install_git(url = "https://github.com/pepfar-datim/datapackr.git",
                       ref = "prod",
                       upgrade = FALSE)
 
@@ -17,14 +17,12 @@ datapackr::loginToDATIM(secrets)
 d <- datapackr::unPackData()
 
 # Grab densities
-country_name <- d$info$datapack_name
-
 density_data_files <-
   list.files(
     paste0(support_files,
            if (is.na(stringr::str_extract(support_files,"/$"))) {"/"} else {},
            "density_data/"),
-    pattern = country_name) %>% 
+    pattern = d$info$datapack_name) %>% 
   sort(decreasing = TRUE)
 
 density <- readr::read_rds(

@@ -82,7 +82,7 @@ checkWorkbookStructure <- function(d) {
     dplyr::mutate(submission_order = as.integer(1:(dplyr::n()) + 4))
   
   # Check all tabs present and accounted for
-  sheets_check <- datapackr::template_schema %>%
+  sheets_check <- datapackr::data_pack_schema %>%
     dplyr::select(sheet_name, template_order = sheet_num) %>%
     dplyr::distinct() %>%
     dplyr::full_join(submission_sheets, by = c("sheet_name")) %>%
@@ -157,10 +157,10 @@ checkColStructure <- function(d) {
     dplyr::select(indicatorCode = value) %>%
     dplyr::mutate(submission_order = as.integer(1:(dplyr::n())))
   
-  col_check <- datapackr::template_schema %>%
+  col_check <- datapackr::data_pack_schema %>%
     dplyr::filter(sheet_name == d$data$sheet) %>%
-    dplyr::select(indicatorCode, template_order = col) %>%
-    dplyr::full_join(submission_cols, by = c("indicatorCode")) %>%
+    dplyr::select(indicator_code, template_order = col) %>%
+    dplyr::full_join(submission_cols, by = c("indicator_code" = "indicatorCode")) %>%
     dplyr::mutate(order_check = template_order == submission_order)
   
   ## Alert to missing cols
@@ -332,10 +332,10 @@ unPackSheet <- function(d) {
   d <- checkColStructure(d)
   
   # List Target Columns
-  targetCols <- datapackr::template_schema %>%
+  targetCols <- datapackr::data_pack_schema %>%
     dplyr::filter(sheet_name == d$data$sheet,
-                  colType == "Target") %>%
-    dplyr::pull(indicatorCode)
+                  col_type == "Target") %>%
+    dplyr::pull(indicator_code)
   
   # Add cols to allow compiling with other sheets
   d$data$extract %<>%
@@ -476,20 +476,20 @@ separateDataSets <- function(d) {
   d$data$MER <- d$data$targets %>%
     dplyr::filter(
       indicatorCode %in% (
-        datapackr::template_schema %>%
-          dplyr::filter(colType == "Target",
+        datapackr::data_pack_schema %>%
+          dplyr::filter(col_type == "Target",
                         dataset == "MER") %>%
-          dplyr::pull(indicatorCode)
+          dplyr::pull(indicator_code)
       )
     )
   
   d$data$SUBNAT_IMPATT <- d$data$targets %>%
     dplyr::filter(
       indicatorCode %in% (
-        datapackr::template_schema %>%
-          dplyr::filter(colType == "Target",
+        datapackr::data_pack_schema %>%
+          dplyr::filter(col_type == "Target",
                         dataset %in% c("SUBNAT", "IMPATT")) %>%
-          dplyr::pull(indicatorCode)
+          dplyr::pull(indicator_code)
       )
     )
   d$data <-
@@ -517,7 +517,7 @@ separateDataSets <- function(d) {
 #'    datasets from DATIM that can be imported into DATIM at the PSNU level.
 unPackSheets <- function(d) {
   # Get sheets list
-  sheets <- datapackr::template_schema %>%
+  sheets <- datapackr::data_pack_schema %>%
     dplyr::select(sheet_name) %>%
     dplyr::filter(sheet_name != "SNU x IM") %>%
     dplyr::distinct() %>%
