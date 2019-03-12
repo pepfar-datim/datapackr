@@ -1,3 +1,20 @@
+#' @export
+#' @title Returns `default` categoryOptionCombo uid.
+#'
+#' @return `Default` categoryOptionCombo uid.
+#' 
+default_catOptCombo <- function() { "HllvX50cXC0" }
+
+
+#' @export
+#' @title Returns current COP Year
+#'
+#' @return Current COP Year. (e.g., for COP19, returns 2019)
+#' 
+cop_year <- function() { 2019 }
+
+
+
 #' @title Round at 0.5 toward integer with highest absolute value
 #'
 #' @description
@@ -405,4 +422,99 @@ getPSNUs <- function(datapack_uid) {
     )
   
   return(PSNUs)
+}
+
+
+#' @export
+#' @title Pull list of Countries from DATIM.
+#' 
+#' @description
+#' Queries DATIM to extract list of Countries for specified Data Pack UID and
+#' adds additional Countries not currently in DATIM as needed.
+#' 
+#' @param datapack_uid A unique ID specifying the PEPFAR Operating Unit or
+#' specific Data Pack country grouping. If left unspecified, will pull all
+#' Country Names.
+#' 
+#' @return Data frame of Countries
+#' 
+getCountries <- function(datapack_uid = NA) {
+  # Manually add new countries if not already grouped under Country orgunitgroupset
+  # Remove upon resolution of https://github.com/pepfar-datim/Global/issues/4655
+    newCountryUIDs <- c("joGQFpKiHl9", #Brazil
+                        "YlSE5fOVJMa", #Nepal
+                        "ODOymOOWyl0", #Sierra Leone
+                        "N3xTKNKu5KM", #Mali
+                        "ZeB2eGmDfGw", #Burkina Faso
+                        "EIUtrKbw8PQ", #Togo
+                        "kH29I939rDQ", #Liberia
+                        "N5GhQWVpVFs") %>% #Senegal
+      paste(collapse = ",")
+  
+  # Pull Country List
+    countries <-
+      paste0(
+        getOption("baseurl"),"api/",datapackr::api_version(),
+        "/organisationUnits.json?paging=false",
+        ## Filter to just countries
+        "&filter=organisationUnitGroups.id:eq:cNzfcPWEGSH",
+        "&filter=id:in:[",newCountryUIDs,"]",
+        "&rootJunction=OR",
+        "&fields=id,name,level,ancestors[id,name]") %>%
+      utils::URLencode() %>%
+      httr::GET() %>%
+      httr::content(., "text") %>%
+      jsonlite::fromJSON(., flatten = TRUE) %>%
+      do.call(rbind.data.frame, .) %>%
+    
+  # Remove countries no longer supported
+      dplyr::filter(!name %in% 
+                      c("Antigua & Barbuda","Bahamas","Belize","China","Dominica","Grenada",
+                        "Saint Kitts & Nevis","Saint Lucia","Saint Vincent & the Grenadines",
+                        "Turkmenistan","Uzbekistan")) %>%
+      dplyr::select(country_name = name, country_uid = id, dplyr::everything()) %>%
+  
+  # Add metadata
+      dplyr::mutate(
+        data_pack_name = dplyr::case_when(
+          country_name %in% c("Burma","Cambodia","India","Indonesia",
+                              "Kazakhstan","Kyrgyzstan","Laos",
+                              "Nepal","Papua New Guinea","Tajikistan",
+                              "Thailand") ~ "Asia Region",
+          country_name %in% c("Barbados","Guyana","Jamaica","Suriname",
+                              "Trinidad & Tobago") ~ "Caribbean Region",
+          country_name %in% c("Brazil","Costa Rica","El Salvador",
+                              "Guatemala","Honduras","Nicaragua",
+                              "Panama") ~ "Central America Region",
+          country_name %in% c("Burkina Faso","Ghana","Liberia","Mali",
+                              "Senegal","Sierra Leone","Togo") 
+                              ~ "West Africa Region",
+          TRUE ~ country_name),
+        model_uid = dplyr::case_when(
+          data_pack_name == "Asia Region" ~ "Asia_Regional_Data_Pack",
+          data_pack_name == "Caribbean Region" ~ "Caribbean_Data_Pack",
+          data_pack_name == "Central America Region" ~ "Central_America_Data_Pack",
+          data_pack_name == "West Africa Region" ~ "Western_Africa_Data_Pack",
+          TRUE ~ country_uid
+        ),
+        is_region = data_pack_name %in% c("Asia Region",
+                                          "Caribbean Region",
+                                          "Central America Region",
+                                          "West Africa Region"),
+        level3name = purrr::map_chr(ancestors, list("name", 3), .default = NA),
+        level3name = dplyr::if_else(level == 3, country_name, level3name),
+        uidlevel3 = purrr::map_chr(ancestors, list("id", 3), .default = NA),
+        uidlevel3 = dplyr::if_else(level == 3, country_uid, uidlevel3),
+        level4name = dplyr::case_when(level == 4 ~ country_name),
+        uidlevel4 = dplyr::case_when(level == 4 ~ country_uid),
+        country_in_datim = TRUE
+      )
+    
+  if (!is.na(datapack_uid)) {
+    countries %<>%
+      dplyr::filter(model_uid == datapack_uid)
+  }
+    
+  return(countries)
+    
 }

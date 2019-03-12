@@ -123,9 +123,9 @@
 #'   \code{indicatorCode}.}
 #'   \item{indicatorCode}{Code used in the Data Pack and Site Tool to uniquely
 #'   identify each distinct programmatic area of target setting.}
-#'   \item{colType}{Flags whether an \code{indicatorCode} is a FY20 Target
-#'   (\code{"FY20 Target"}) or not (\code{NA}).}
-#'   \item{dataset}{For indicatorCodes listed as "FY20 Targets" in the 
+#'   \item{colType}{Flags whether an \code{indicatorCode} is a Target
+#'   (\code{"Target"}) or not (\code{NA}).}
+#'   \item{dataset}{For indicatorCodes listed as "Targets" in the 
 #'   \code{colType} field, documents the dataset, either "MER", "IMPATT", or
 #'   "SUBNAT"}
 #' }
@@ -236,9 +236,9 @@
 #'   \item{indicator_code}{Code used in the Data Pack and Site Tool to uniquely
 #'   identify each distinct programmatic area of target setting.}
 #'   \item{formula}{Excel formula defined for \code{indicator_code}.}
-#'   \item{col_type}{Flags whether an \code{indicator_code} is a FY20 Target
-#'   (\code{"FY20 Target"}), row header (\code{Row Header}) or not (\code{NA}).}
-#'   \item{dataset}{For \code{indicator_codes} listed as "\code{FY20 Targets}"
+#'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
+#'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
+#'   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
 #'   in the \code{col_type} field, documents the dataset, either \code{MER},
 #'   \code{IMPATT}, or \code{SUBNAT}.}
 #' }
@@ -260,8 +260,8 @@
 #'   and Site Tool.}
 #'   \item{col}{Value describing the column position of each 
 #'   \code{indicator_code}.}
-#'   \item{col_type}{Flags whether an \code{indicator_code} is a FY20 Target
-#'   (\code{"FY20 Target"}), row header (\code{Row Header}) or not (\code{NA}).}
+#'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
+#'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
 #'   \item{tech_area}{Header text used to distinguish groups of
 #'   \code{indicator_codes}.}
 #'   \item{label}{String label used to describe \code{indicator_code}.}

@@ -15,9 +15,9 @@
   \item{indicator_code}{Code used in the Data Pack and Site Tool to uniquely
   identify each distinct programmatic area of target setting.}
   \item{formula}{Excel formula defined for \code{indicator_code}.}
-  \item{col_type}{Flags whether an \code{indicator_code} is a FY20 Target
-  (\code{"FY20 Target"}), row header (\code{Row Header}) or not (\code{NA}).}
-  \item{dataset}{For \code{indicator_codes} listed as "\code{FY20 Targets}"
+  \item{col_type}{Flags whether an \code{indicator_code} is a Target
+  (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
+  \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
   in the \code{col_type} field, documents the dataset, either \code{MER},
   \code{IMPATT}, or \code{SUBNAT}.}
 }}

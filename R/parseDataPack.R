@@ -130,7 +130,7 @@ checkWorkbookStructure <- function(d) {
        data processing, and this issue may be related to missing, 
        added, or renamed sheets. : ", paste(out_of_order, collapse = ","),"")
     
-    d$info$warningMsg<-append(msg,d$info$warningMsg)
+    d$info$warningMsg <- append(msg,d$info$warningMsg)
   }
   
   return(d)
@@ -331,10 +331,10 @@ unPackSheet <- function(d) {
 
   d <- checkColStructure(d)
   
-  # List FY20 Target Columns
+  # List Target Columns
   targetCols <- datapackr::template_schema %>%
     dplyr::filter(sheet_name == d$data$sheet,
-                  colType == "FY20 Target") %>%
+                  colType == "Target") %>%
     dplyr::pull(indicatorCode)
   
   # Add cols to allow compiling with other sheets
@@ -477,7 +477,7 @@ separateDataSets <- function(d) {
     dplyr::filter(
       indicatorCode %in% (
         datapackr::template_schema %>%
-          dplyr::filter(colType == "FY20 Target",
+          dplyr::filter(colType == "Target",
                         dataset == "MER") %>%
           dplyr::pull(indicatorCode)
       )
@@ -487,7 +487,7 @@ separateDataSets <- function(d) {
     dplyr::filter(
       indicatorCode %in% (
         datapackr::template_schema %>%
-          dplyr::filter(colType == "FY20 Target",
+          dplyr::filter(colType == "Target",
                         dataset %in% c("SUBNAT", "IMPATT")) %>%
           dplyr::pull(indicatorCode)
       )
@@ -766,8 +766,6 @@ FASTforward <- function(d) {
 #' @return Dataframe of SUBNAT & IMPATT data ready for DATIM ingestion.
 #' 
 packSUBNAT_IMPATT <- function(data) {
-  options("default" = "HllvX50cXC0")
-  
   importFile <- data %>%
     dplyr::left_join((
       datapackr::indicatorMap %>%
@@ -785,8 +783,8 @@ packSUBNAT_IMPATT <- function(data) {
     tidyr::drop_na(dataelementuid, categoryoptioncombouid, value) %>%
     dplyr::mutate(
       value = round_trunc(value),
-      period = "2019Oct",
-      attributeOptionCombo = getOption("default")
+      period = datapackr::periodInfo$iso,
+      attributeOptionCombo = datapackr::default_catOptCombo()
     ) %>%
     dplyr::filter(value > 0) %>%
     dplyr::select(
@@ -836,7 +834,7 @@ packForDATIM <- function(data, type = NA) {
   if (type == "PSNUxIM") {
     importFile <- data %>%
       dplyr::mutate(
-        period = "2019Oct",
+        period = datapackr::periodInfo$iso,
         mechanismCode = stringr::str_replace(mechanismCode,"Dedupe","00000"),
         value = round_trunc(as.numeric(value))) %>%
       dplyr::filter(

@@ -159,6 +159,56 @@ write_site_level_sheet <- function(wb, sheet, d) {
     cols = 1:length(data), rows = 6:(NROW(data) + max_row_buffer + 5),
     rule = 'OR($A6=="Inactive",$A6=="NOT A SITE")')
   
+  invalidDisaggFormatting <- function(colNameRegex, rule) {
+    formatCols <- datapackr::site_tool_schema %>%
+      dplyr::filter(sheet_name == sheet,
+                    stringr::str_detect(indicator_code, colNameRegex)) %>%
+      dplyr::pull(col)
+    
+    openxlsx::conditionalFormatting(
+      wb = wb, sheet = sheet,
+      cols = formatCols,
+      rows = 6:(NROW(data) + max_row_buffer + 5),
+      rule = rule,
+      style = datapackr::styleGuide$data$invalidDisagg
+    )
+  }
+  
+  if (sheet == "HTS") {
+  ## Pediatrics & Malnutrition
+    invalidDisaggFormatting(colNameRegex = "Pediatric|Malnutrition",
+                            rule = '=OR($E1="05-09",$E1="10-14",$E1="15-19",$E1="20-24",$E1="25-29",$E1="30-34",$E1="35-39",$E1="40-44",$E1="45-49",$E1="50+")')
+    
+  ## HTS_SELF
+    invalidDisaggFormatting(colNameRegex = "HTS_SELF",
+                            rule = '=OR($E1="01-04",$E1="05-09")')
+    
+  ## HTS_RECENT
+    invalidDisaggFormatting(colNameRegex = "HTS_RECENT",
+                            rule = '=OR($E1="01-04",$E1="05-09",$E1="10-14")')
+  }
+  
+  if (sheet == "KP") {
+  ## KP_MAT
+    invalidDisaggFormatting(colNameRegex = "KP_MAT",
+                            rule = '=OR($E1="PWID",$E1="FSW",$E1="MSM not SW",$E1="MSM SW",$E1="MSM",$E1="People in prisons and other enclosed settings",$E1="TG SW",$E1="TG not SW",$E1="TG")')
+    
+  ## KP_PREV
+    invalidDisaggFormatting(colNameRegex = "KP_PREV",
+                            rule = '=OR($E1="PWID",$E1="MSM",$E1="TG")')
+    
+  ## Others
+    invalidDisaggFormatting(colNameRegex = "HTS_TST|TX_NEW|PrEP",
+                            rule = '=OR($E1="Female PWID",$E1="Male PWID",$E1="MSM not SW",$E1="MSM SW",$E1="TG SW",$E1="TG not SW")')
+  }
+  
+  if (sheet == "OVC") {
+    ## OVC_HIVSTAT
+    invalidDisaggFormatting(colNameRegex = "OVC_HIVSTAT",
+                            rule = '=OR($E1="<01",$E1="01-04",$E1="05-09",$E1="10-14",$E1="15-17",$E1="18+",$F1="Male",$F1="Female")')
+    
+    }
+  
 # Validation ####
   ## Site
   openxlsx::dataValidation(wb, sheet,

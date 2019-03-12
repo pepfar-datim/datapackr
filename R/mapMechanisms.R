@@ -243,7 +243,7 @@ packMechMap <- function(datapack_name,
   
   # Write valid indicators ####
     indicators <- datapackr::site_tool_schema %>%
-      dplyr::filter(col_type == "FY20 Target") %>%
+      dplyr::filter(col_type == "Target") %>%
       dplyr::mutate(
         indicator =
           stringr::str_extract(
