@@ -318,7 +318,8 @@ getPSNUs <- function(datapack_uid) {
       dplyr::select(country = operating_unit, uid, name) %>%
       dplyr::distinct()
   
-  # Add new new countries as PSNUs
+  # Add new new countries as PSNUs.
+    # REMOVE THIS dependent upon https://github.com/pepfar-datim/Global/issues/4655
     newCountries <- datapackr::configFile %>%
       dplyr::filter(
         model_uid == datapack_uid,
@@ -335,7 +336,8 @@ getPSNUs <- function(datapack_uid) {
                                       name))
   }
   
-  # No Mil PSNUs at this point. Add them from Config file
+  # No Mil PSNUs at this point. Add them from Config file.
+    # REMOVE THIS dependent upon https://github.com/pepfar-datim/Global/issues/4655
     milPSNUs <- datapackr::configFile %>%
       dplyr::filter(model_uid == datapack_uid,
              !is.na(milPSNU)) %>%
@@ -349,6 +351,7 @@ getPSNUs <- function(datapack_uid) {
                               name = milPSNU))
   
   # Patch for Suriname and Jamaica
+    # REMOVE THIS dependent upon https://github.com/pepfar-datim/Global/issues/4655
   if(datapack_uid == "Caribbean_Data_Pack") {
     patchList <- c("Suriname","Jamaica")
     

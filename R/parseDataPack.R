@@ -589,7 +589,8 @@ unPackSNUxIM <- function(d) {
       msg,
       "    ",
       NROW(mismatch),
-      " cases where Data Pack Targets are not correctly distributed among mechanisms.
+      " cases where Data Pack Targets are not correctly distributed among mechanisms. ",
+      "To address this, go to your Data Pack's SNU x IM tab and filter the Rollup column for Pink cells. 
       "
     )
     d$info$warningMsg<-append(msg,d$info$warningMsg)

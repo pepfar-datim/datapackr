@@ -432,9 +432,9 @@ packSiteTool <- function(d,
 # Populate Site Tool ####
     data_sheets <- names(wb)[which(!stringr::str_detect(names(wb), "Home|Site List|Mechs|Validations"))]
     
-    for (i in 1:length(data_sheets)) {
+    for (sheet in data_sheets) {
      wb <- write_site_level_sheet(wb = wb,
-                                   sheet = data_sheets[i],
+                                   sheet = sheet,
                                    d = d)
     }
         
