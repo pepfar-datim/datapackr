@@ -44,5 +44,12 @@ d <- datapackcommons::DistributeToSites(d,
                                         site_densities = density)
 
 # Pack Site Tool
-datapackr::packSiteTool(d)
+FACTSMechs_path = paste0(
+  support_files,
+  if (is.na(stringr::str_extract(output_path,"/$"))) {"/"} else {},
+  "FACTSMechanismExtract.csv")
 
+datapackr::packSiteTool(d,
+                        includeFACTS = TRUE,
+                        FACTSMechs_path = FACTSMechs_path,
+                        output_path = output_path)

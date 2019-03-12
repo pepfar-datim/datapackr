@@ -316,6 +316,9 @@ write_site_level_sheet <- function(wb, sheet, d) {
 #' missing mechanisms. Default is \code{FALSE}.
 #' @param FACTSMechs_path A local file path directing to the extract of FY2019
 #' FACTS Info Mechanisms. Default is \code{NA}.
+#' @param output_path A local folder where you would like Site Tool to be saved.
+#' 
+#' @return An XLSX Site Tool saved to \code{output_path}.
 #' 
 #' @details
 #' Executes the following operations:
@@ -338,7 +341,8 @@ write_site_level_sheet <- function(wb, sheet, d) {
 #'
 packSiteTool <- function(d,
                          includeFACTS = FALSE,
-                         FACTSMechs_path = NA) {
+                         FACTSMechs_path = NA,
+                         output_path) {
   
 # Make sure login creds allow export of data from DATIM for specified OU ####
   
@@ -431,8 +435,8 @@ packSiteTool <- function(d,
         dplyr::select(code, name, id, start_date, end_date,
                       organisation_unit_name, organisation_unit_id,
                       partner, agency) %>%
-        dplyr::filter(organisation_unit_name == datapack_name,
-                      !code %in% (newMechList %>%
+        dplyr::filter(organisation_unit_name == d$info$datapack_name,
+                      !code %in% (mechList %>%
                                     dplyr::pull(code) %>%
                                     unique()))
       
@@ -490,7 +494,7 @@ packSiteTool <- function(d,
         
 # Export Site Tool ####
     exportPackr(wb,
-                d$keychain$output_path,
+                output_path,
                 type = "Site Tool",
                 d$info$datapack_name)
 }

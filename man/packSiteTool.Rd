@@ -4,7 +4,8 @@
 \alias{packSiteTool}
 \title{Pack a Site Tool}
 \usage{
-packSiteTool(d, includeFACTS = FALSE, FACTSMechs_path = NA)
+packSiteTool(d, includeFACTS = FALSE, FACTSMechs_path = NA,
+  output_path)
 }
 \arguments{
 \item{d}{A datapackr list object.}
@@ -15,6 +16,11 @@ missing mechanisms. Default is \code{FALSE}.}
 
 \item{FACTSMechs_path}{A local file path directing to the extract of FY2019
 FACTS Info Mechanisms. Default is \code{NA}.}
+
+\item{output_path}{A local folder where you would like Site Tool to be saved.}
+}
+\value{
+An XLSX Site Tool saved to \code{output_path}.
 }
 \description{
 Takes data from the Data Pack, distributes it to site level, then creates a
