@@ -17,3 +17,6 @@ mapply(function(x) datapackr::packMechMap(datapack_name = x,
                                           includeFACTS = TRUE,
                                           FACTSMechs_path = FACTSMechs_path),
        datapack_names)
+
+mechMap_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 19/5) Maintenance & Support/Final Data Packs/Mechanism Map_Tanzania_11March2019_Merged.xlsx"
+m <- datapackr::unPackMechanismMap(mechMap_path)
