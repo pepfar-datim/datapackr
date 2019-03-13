@@ -10,7 +10,7 @@ secrets <- "/Users/scott/.secrets/triage.json"
 
 
 devtools::install_git(url = "https://github.com/pepfar-datim/datapackr.git",
-                      ref = "prod",
+                      ref = "master",
                       upgrade = FALSE)
 
 datapackr::loginToDATIM(secrets)

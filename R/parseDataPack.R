@@ -167,7 +167,7 @@ checkColStructure <- function(d) {
   if (any(is.na(col_check$submission_order))) {
     missing_cols <- col_check %>%
       dplyr::filter(is.na(submission_order)) %>%
-      dplyr::pull(indicatorCode)
+      dplyr::pull(indicator_code)
     msg <- paste0("In tab",d$data$sheet, 
       " MISSING COLUMNS: Note that this may be due to missing/renamed sheets,
        or added or renamed columns.:  ",
@@ -179,7 +179,7 @@ checkColStructure <- function(d) {
   if (any(is.na(col_check$template_order))) {
     added_cols <- col_check %>%
       dplyr::filter(is.na(template_order)) %>%
-      dplyr::pull(indicatorCode)
+      dplyr::pull(indicator_code)
     msg <- paste0( "In tab ",d$data$sheet, 
                  " ADDED/RENAMED COLUMNS: DO NOT rename columns.
                    Adding columns is ok : ", 
@@ -191,7 +191,7 @@ checkColStructure <- function(d) {
   if (!all(col_check$order_check, na.rm = TRUE)) {
     out_of_order <- col_check %>%
       dplyr::filter(order_check == FALSE) %>%
-      dplyr::pull(indicatorCode)
+      dplyr::pull(indicator_code)
     msg <- paste0("In tab ",d$data$sheet,
       " COLUMNS OUT OF ORDER: Note that this may be due to missing, 
         added, or renamed columns: ", 
