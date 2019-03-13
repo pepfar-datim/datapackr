@@ -36,24 +36,30 @@ unPackMechanismMap <- function(mechMap_path = NA) {
     }
   
   # Read in file ####
-    col_num <- length(
-        readxl::read_excel(
-          path = mechMap_path,
-          sheet = "Mechanism Map",
-          range = readxl::cell_rows(3))
-      )
-    
-    ct <- c(rep("text",4),rep("numeric",col_num-4))
+    col_names <- readxl::read_excel(path = mechMap_path,
+                                    sheet = "Mechanism Map",
+                                    range = readxl::cell_rows(3),
+                                    col_names = FALSE)
+    ct <- col_names %>%
+      tidyr::gather(key = "col", value = "col_name") %>%
+      dplyr::mutate(
+        col_type = dplyr::case_when(
+          col_name %in% c("Old Mechanism","PSNU","Indicator","Type") ~ "text",
+          stringr::str_detect(col_name,"Distribution Check|(\\d)+") ~ "numeric",
+          TRUE ~ "guess")
+        ) %>%
+      dplyr::pull(col_type)
     
     mechMap <- readxl::read_excel(
         path = mechMap_path,
         sheet = "Mechanism Map",
         range = readxl::cell_limits(c(3,1), c(NA, NA)),
         col_types = ct) %>%
+      dplyr::select(dplyr::matches("Old Mechanism|PSNU|Indicator|Type|(\\d)+")) %>%
       tidyr::gather(
         key = "newMech",
         value = "weight",
-        -`Old Mechanism`, -PSNU, -Indicator, -Type, -`Distribution Check`,
+        -`Old Mechanism`, -PSNU, -Indicator, -Type,
         na.rm = TRUE) %>%
       dplyr::mutate(
         newMech = stringr::str_extract(newMech, "^[^ ]+"),
