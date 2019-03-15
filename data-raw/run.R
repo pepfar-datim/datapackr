@@ -51,7 +51,11 @@ FACTSMechs_path = paste0(
   if (is.na(stringr::str_extract(output_path,"/$"))) {"/"} else {},
   "FACTSMechanismExtract.csv")
 
+#d <- readRDS("/Users/scott/Google Drive/PEPFAR/COP Targets/COP 19/5) Maintenance & Support/Final Data Packs/Outputs/Tanzania_distributed_20190313_130136.rds")
+
 datapackr::packSiteTool(d,
                         includeFACTS = TRUE,
                         FACTSMechs_path = FACTSMechs_path,
                         output_path = output_path)
+
+
