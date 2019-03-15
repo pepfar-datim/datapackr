@@ -864,8 +864,44 @@ packForDATIM <- function(data, type = NA) {
       dplyr::ungroup()
   }
   
-  if (type == "Site") {stop("Sorry! Stay tuned for site data processing!")}
-  
-  return(importFile)
+  if (type == "Site") {
+    
+    importFile <- data$data$targets %>%
+      dplyr::select(site_uid,mech_code,indicatorCode,Type,Age,Sex,KeyPop,value) %>%
+      dplyr::filter(
+        !is.na(suppressWarnings(as.numeric(value)))) %>%
+      dplyr::group_by(site_uid,mech_code,indicatorCode,Type,Age,Sex,KeyPop) %>%
+      dplyr::summarise(value=sum(value)) %>%
+      dplyr::ungroup() %>% 
+      dplyr::mutate(
+        period = datapackr::periodInfo$iso,
+        value = round_trunc(as.numeric(value))) %>%
+      dplyr::left_join(datapackr::PSNUxIM_to_DATIM %>%
+                         dplyr::filter(dataset == "MER") %>%
+                         dplyr::select(-sheet_name, -typeOptions, -dataset),
+                       by = c("indicatorCode" = "indicatorCode",
+                              "Age" = "validAges",
+                              "Sex" = "validSexes",
+                              "KeyPop" = "validKPs")) %>%
+      dplyr::select(
+        dataElement = dataelementuid,
+        period,
+        orgUnit = site_uid,
+        categoryOptionCombo = categoryoptioncombouid,
+        attributeOptionCombo= mech_code,
+        value) 
+    
+    if( any(is.na(importFile)) ) {
+      
+        msg<-paste0("ERROR! Empty values found in DATIM export. These will
+                     be filtered.")
+        data$info$warningMsg<-append(msg,data$info$warningMsg)
+        data$info$has_error<-TRUE
+    }
+   
+    data$datim$site_data <- importFile %>% 
+      dplyr::filter( purrr::reduce(purrr::map(., is.na), `+`) == 0 )
+  }
+  return(data)
 }
 
