@@ -16,7 +16,7 @@
 getSiteList <- function(country_uids,
                         include_mil = TRUE) {
   
-  loginToDATIM(getOption("secrets"))
+  #loginToDATIM(getOption("secrets"))
   
   country_names <- datapackr::dataPackMap %>%
     dplyr::filter(country_uid %in% country_uids) %>%
