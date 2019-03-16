@@ -901,7 +901,7 @@ packForDATIM <- function(d, type = NA) {
       
         msg<-paste0("ERROR! Empty values found in DATIM export. These will
                      be filtered.")
-        d$info$warningMsg<-append(msg,data$info$warningMsg)
+        d$info$warningMsg<-append(msg,d$info$warningMsg)
         d$info$has_error<-TRUE
     }
    
