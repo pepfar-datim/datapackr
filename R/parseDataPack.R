@@ -865,7 +865,7 @@ packForDATIM <- function(d, type = NA) {
                       orgUnit,
                       categoryOptionCombo,
                       mechanismCode) %>%
-      dplyr::summarise(value = sum(value)) %>%
+      dplyr::summarise(value = round_trunc(sum(value))) %>%
       dplyr::ungroup()
     
   }
@@ -901,8 +901,8 @@ packForDATIM <- function(d, type = NA) {
       
         msg<-paste0("ERROR! Empty values found in DATIM export. These will
                      be filtered.")
-        data$info$warningMsg<-append(msg,data$info$warningMsg)
-        data$info$has_error<-TRUE
+        d$info$warningMsg<-append(msg,data$info$warningMsg)
+        d$info$has_error<-TRUE
     }
    
     d$datim$site_data <- importFile %>% 
