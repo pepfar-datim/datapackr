@@ -872,7 +872,7 @@ packForDATIM <- function(d, type = NA) {
   
   if (type == "Site") {
     
-    importFile <- data$data$targets %>%
+    importFile <- d$data$targets %>%
       dplyr::select(site_uid,mech_code,indicatorCode,Type,Age,Sex,KeyPop,value) %>%
       dplyr::filter(
         !is.na(suppressWarnings(as.numeric(value)))) %>%
@@ -905,11 +905,11 @@ packForDATIM <- function(d, type = NA) {
         data$info$has_error<-TRUE
     }
    
-    data$datim$site_data <- importFile %>% 
+    d$datim$site_data <- importFile %>% 
       dplyr::filter( purrr::reduce(purrr::map(., is.na), `+`) == 0 )
     
   }
   
-  return(data)
+  return(d)
 }
 
