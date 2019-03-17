@@ -765,8 +765,9 @@ FASTforward <- function(d) {
 #' 
 #' @return Dataframe of SUBNAT & IMPATT data ready for DATIM ingestion.
 #' 
-packSUBNAT_IMPATT <- function(data) {
-  importFile <- data %>%
+packSUBNAT_IMPATT <- function(d) {
+  
+  d$datim$SUBNAT_IMPATT <- d$data$SUBNAT_IMPATT %>%
     dplyr::left_join((
       datapackr::indicatorMap %>%
         dplyr::filter(dataset %in% c("SUBNAT", "IMPATT")) %>%
@@ -804,7 +805,7 @@ packSUBNAT_IMPATT <- function(data) {
     dplyr::ungroup() %>%
     dplyr::mutate(value = as.character(value))
   
-  return(importFile)
+  return(d)
 }
 
 
@@ -816,23 +817,27 @@ packSUBNAT_IMPATT <- function(data) {
 #' Flexible function that allows packaging of a variety of datapackr outputs as
 #' DATIM import files.
 #' 
-#' @param data Data frame or tibble ready for DATIM import prep.
+#' @param d Data packr object.
 #' @param type Type of dataset to prep for DATIM. Choose from \code{PSNUxIM},
 #' \code{SUBNAT_IMPATT}, or \code{Site}.
 #' 
 #' @return Data frame ready for DATIM import
 #' 
-packForDATIM <- function(data, type = NA) {
+packForDATIM <- function(d, type = NA) {
+  
   if (is.na(type)) {
     stop("Please specify data type: 'PSNUxIM', 'SUBNAT_IMPATT', or 'Site'")
   }
   
   if (type == "SUBNAT_IMPATT") {
-    importFile <- packSUBNAT_IMPATT(data)
-  }
+    
+    d <- packSUBNAT_IMPATT(d)
+  
+    }
   
   if (type == "PSNUxIM") {
-    importFile <- data %>%
+    
+    d$datim$PSNUxIM <- d$data$distributedMER %>%
       dplyr::mutate(
         period = datapackr::periodInfo$iso,
         mechanismCode = stringr::str_replace(mechanismCode,"Dedupe","00000"),
@@ -860,12 +865,51 @@ packForDATIM <- function(data, type = NA) {
                       orgUnit,
                       categoryOptionCombo,
                       mechanismCode) %>%
-      dplyr::summarise(value = sum(value)) %>%
+      dplyr::summarise(value = round_trunc(sum(value))) %>%
       dplyr::ungroup()
+    
   }
   
-  if (type == "Site") {stop("Sorry! Stay tuned for site data processing!")}
+  if (type == "Site") {
+    
+    importFile <- d$data$targets %>%
+      dplyr::select(site_uid,mech_code,indicatorCode,Type,Age,Sex,KeyPop,value) %>%
+      dplyr::filter(
+        !is.na(suppressWarnings(as.numeric(value)))) %>%
+      dplyr::group_by(site_uid,mech_code,indicatorCode,Type,Age,Sex,KeyPop) %>%
+      dplyr::summarise(value=sum(value)) %>%
+      dplyr::ungroup() %>% 
+      dplyr::mutate(
+        period = datapackr::periodInfo$iso,
+        value = round_trunc(as.numeric(value))) %>%
+      dplyr::left_join(datapackr::PSNUxIM_to_DATIM %>%
+                         dplyr::filter(dataset == "MER") %>%
+                         dplyr::select(-sheet_name, -typeOptions, -dataset),
+                       by = c("indicatorCode" = "indicatorCode",
+                              "Age" = "validAges",
+                              "Sex" = "validSexes",
+                              "KeyPop" = "validKPs")) %>%
+      dplyr::select(
+        dataElement = dataelementuid,
+        period,
+        orgUnit = site_uid,
+        categoryOptionCombo = categoryoptioncombouid,
+        attributeOptionCombo= mech_code,
+        value) 
+    
+    if( any(is.na(importFile)) ) {
+      
+        msg<-paste0("ERROR! Empty values found in DATIM export. These will
+                     be filtered.")
+        d$info$warningMsg<-append(msg,d$info$warningMsg)
+        d$info$has_error<-TRUE
+    }
+   
+    d$datim$site_data <- importFile %>% 
+      dplyr::filter( purrr::reduce(purrr::map(., is.na), `+`) == 0 )
+    
+  }
   
-  return(importFile)
+  return(d)
 }
 
