@@ -205,7 +205,7 @@ checkSiteToolColStructure <- function(d) {
     dplyr::select(indicatorCode = value) %>%
     dplyr::mutate(submission_order = as.integer(1:(dplyr::n())))
   
-  col_check <- datapackr::data_pack_schema %>%
+  col_check <- datapackr::site_tool_schema %>%
     dplyr::filter(sheet_name == d$data$sheet) %>%
     dplyr::select(indicator_code, template_order = col) %>%
     dplyr::full_join(submission_cols, by = c("indicator_code" = "indicatorCode")) %>%
