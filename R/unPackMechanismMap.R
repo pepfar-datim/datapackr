@@ -77,7 +77,8 @@ unPackMechanismMap <- function(mechMap_path = NA) {
         remove = TRUE,
         extra = "merge") %>%
       dplyr::select(psnuid, `Technical Area`, `Numerator / Denominator`,
-                    `Support Type` = Type, oldMech, newMech, weight)
+                    `Support Type` = Type, oldMech, newMech, weight) %>% 
+      dplyr::distinct()
     
   return(mechMap)
   
