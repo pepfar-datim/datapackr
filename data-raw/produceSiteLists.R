@@ -1,7 +1,10 @@
 output_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 19/5) Maintenance & Support/Site Lists"
 
-datapack_names <- c("Uganda","South Sudan","Tanzania",
-                   "Ethiopia","Malawi","Burundi","Rwanda")
+datapack_names <- c("Cameroon","Cote d'Ivoire","Democratic Republic of the Congo",
+                   "Nigeria","Ukraine","Vietnam","West Africa Region")
+
+secrets <- "/Users/scott/.secrets/datim.json"
+datapackr::loginToDATIM(secrets)
 
 for (i in 1:length(datapack_names)) {
   datapack_name <- datapack_names[i] 
@@ -27,3 +30,4 @@ for (i in 1:length(datapack_names)) {
   readr::write_csv(sites, path)
   
 }
+
