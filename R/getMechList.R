@@ -13,15 +13,16 @@
 #' supplied, returns entire mechanism list, trimmed to user's DATIM permissions.
 #' @param include_dedupe Logical. If TRUE will include deduplication mechanisms.
 #' Default is FALSE.
-#' @param FY Numeric value of Fiscal Year to filter mechanism list by. If a FY
-#' is not supplied, returns entire mechanism list.
+#' @param COP_FY Numeric value of COP Fiscal Year to filter mechanism list by.
+#' Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
+#' \code{2019}. If a FY is not supplied, returns entire mechanism list.
 #' 
 #' @return A dataframe of mechanisms, including start and end dates, mechanism
 #' code, partner name, funding agency, and related country.
 #'
 getMechList <- function(country_uids = NA,
                         include_dedupe = FALSE,
-                        FY = NA) {
+                        COP_FY = NA) {
   
   # Check user has correct permissions to query against country_uids ####
     # TODO: Configure to allow non-global users to generate Site Tools
@@ -80,10 +81,10 @@ getMechList <- function(country_uids = NA,
     }
     
   # Filter by Fiscal Year ####
-    if (!is.na(FY)) {
+    if (!is.na(COP_FY)) {
       mechList %<>%
-        dplyr::filter((start_date < paste0(FY,"-10-01") &
-                         end_date > paste0(FY-1,"-09-30"))
+        dplyr::filter((start_date < paste0(COP_FY+1,"-10-01") &
+                         end_date > paste0(COP_FY,"-09-30"))
                       | code %in% c("00000","00001"))
     }
     
