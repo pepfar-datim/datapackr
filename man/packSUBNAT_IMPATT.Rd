@@ -4,7 +4,7 @@
 \alias{packSUBNAT_IMPATT}
 \title{packSUBNAT_IMPATT(d)}
 \usage{
-packSUBNAT_IMPATT(data)
+packSUBNAT_IMPATT(d)
 }
 \arguments{
 \item{data}{Data frame of SUBNAT and IMPATT data ready for DATIM import

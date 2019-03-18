@@ -4,10 +4,10 @@
 \alias{packForDATIM}
 \title{packForDATIM(data)}
 \usage{
-packForDATIM(data, type = NA)
+packForDATIM(d, type = NA)
 }
 \arguments{
-\item{data}{Data frame or tibble ready for DATIM import prep.}
+\item{d}{Data packr object.}
 
 \item{type}{Type of dataset to prep for DATIM. Choose from \code{PSNUxIM},
 \code{SUBNAT_IMPATT}, or \code{Site}.}
