@@ -4,7 +4,7 @@
 \alias{getMechList}
 \title{Compile Mechanism List for Site Tool}
 \usage{
-getMechList(country_uids = NA, include_dedupe = FALSE, FY = NA)
+getMechList(country_uids = NA, include_dedupe = FALSE, COP_FY = NA)
 }
 \arguments{
 \item{country_uids}{Character vector of DATIM country IDs. This can only
@@ -14,8 +14,9 @@ supplied, returns entire mechanism list, trimmed to user's DATIM permissions.}
 \item{include_dedupe}{Logical. If TRUE will include deduplication mechanisms.
 Default is FALSE.}
 
-\item{FY}{Numeric value of Fiscal Year to filter mechanism list by. If a FY
-is not supplied, returns entire mechanism list.}
+\item{COP_FY}{Numeric value of COP Fiscal Year to filter mechanism list by.
+Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
+\code{2019}. If a FY is not supplied, returns entire mechanism list.}
 }
 \value{
 A dataframe of mechanisms, including start and end dates, mechanism

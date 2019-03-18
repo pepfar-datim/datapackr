@@ -185,9 +185,9 @@ packMechMap <- function(datapack_name,
       dplyr::filter(model_uid == datapack_uid) %>%
       dplyr::pull(country_uid)
     oldMechList <- getMechList(country_uids,
-                              FY = (FY-1))
+                              COP_FY = (FY-1))
     newMechList <- getMechList(country_uids,
-                              FY = FY)
+                              COP_FY = FY)
     
     ## PATCH for Missing FACTS Mechs
     if (includeFACTS) {

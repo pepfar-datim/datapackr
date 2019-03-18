@@ -1,6 +1,6 @@
 support_files <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 19/3) Testing & Deployment/Support Files"
 output_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 19/5) Maintenance & Support/Final Data Packs/Outputs"
-secrets <- "/Users/scott/.secrets/triage.json"
+secrets <- "/Users/scott/.secrets/datim.json"
 
 ### END EDITS #####
 # devtools::install_git(url = "https://github.com/pepfar-datim/data-pack-commons.git",
@@ -48,10 +48,10 @@ d <- datapackcommons::DistributeToSites(d,
 # Pack Site Tool
 FACTSMechs_path = paste0(
   support_files,
-  if (is.na(stringr::str_extract(output_path,"/$"))) {"/"} else {},
+  if (is.na(stringr::str_extract(support_files,"/$"))) {"/"} else {},
   "FACTSMechanismExtract.csv")
 
-#d <- readRDS("/Users/scott/Google Drive/PEPFAR/COP Targets/COP 19/5) Maintenance & Support/Final Data Packs/Outputs/Tanzania_distributed_20190313_130136.rds")
+d <- readRDS("/Users/scott/Google Drive/PEPFAR/COP Targets/COP 19/5) Maintenance & Support/Final Data Packs/Namibia_distributed_20190314_213054.rds")
 
 datapackr::packSiteTool(d,
                         includeFACTS = TRUE,
@@ -59,3 +59,23 @@ datapackr::packSiteTool(d,
                         output_path = output_path)
 
 
+
+datapackr::exportPackr(d,
+                       output_path,
+                       type = "Results Archive",
+                       d$info$datapack_name)
+
+filepath = paste0(output_path,
+              if (is.na(stringr::str_extract(output_path,"/$"))) {"/"} else {},
+              type,"_",
+              d$info$datapack_name,"_",
+              format(Sys.time(), "%Y%m%d%H%M%S"),
+              extension
+            )
+
+readr::write_csv(d$datim$PSNUxIM,
+                 filepath)
+
+
+mechs <- datapackr::getMechList(include_dedupe = TRUE,
+                                FY = 2020)

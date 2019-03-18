@@ -2,15 +2,18 @@
 % Please edit documentation in R/unPackSiteTool.R
 \name{unPackSiteToolData}
 \alias{unPackSiteToolData}
-\title{unPackSiteToolData(submission_path,output_path)}
+\title{unPackSiteToolData(submission_path,output_path,archive_results)}
 \usage{
-unPackSiteToolData(submission_path = NA, output_path = NA)
+unPackSiteToolData(submission_path = NA, output_path = NA,
+  archive_results = FALSE)
 }
 \arguments{
 \item{submission_path}{Local path to the file to import.}
 
 \item{output_path}{A local path directing to the folder where you would like
 outputs to be saved. If not supplied, will output to working directory.}
+
+\item{Archive}{results as an RDS object.}
 }
 \description{
 Processes a submitted Site Tool (in .xlsx format) by identifying integrity
@@ -20,6 +23,5 @@ Processes a submitted Site Tool (in .xlsx format) by identifying integrity
 Executes the following operations in relation to a submitted Site Tool
 \enumerate{
     \item Performs integrity checks on file structure;
-    \item Runs DATIM validation tests;
 }
 }
