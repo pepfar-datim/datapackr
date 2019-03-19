@@ -843,8 +843,7 @@ packForDATIM <- function(d, type = NA) {
         mechanismCode = stringr::str_replace(mechanismCode,"Dedupe","00000"),
         value = as.numeric(value)) %>%
       dplyr::filter(
-        !is.na(suppressWarnings(as.numeric(value)))
-        & !(value < 1)) %>%
+        !is.na(suppressWarnings(as.numeric(value)))) %>%
       dplyr::left_join(datapackr::PSNUxIM_to_DATIM %>%
                          dplyr::filter(dataset == "MER") %>%
                          dplyr::select(-sheet_name, -typeOptions, -dataset),
@@ -865,7 +864,7 @@ packForDATIM <- function(d, type = NA) {
                       orgUnit,
                       categoryOptionCombo,
                       mechanismCode) %>%
-      dplyr::summarise(value = round_trunc(sum(value))) %>%
+      dplyr::summarise(value = sum(value)) %>%
       dplyr::ungroup()
     
   }
