@@ -841,7 +841,7 @@ packForDATIM <- function(d, type = NA) {
       dplyr::mutate(
         period = datapackr::periodInfo$iso,
         mechanismCode = stringr::str_replace(mechanismCode,"Dedupe","00000"),
-        value = round_trunc(as.numeric(value))) %>%
+        value = as.numeric(value)) %>%
       dplyr::filter(
         !is.na(suppressWarnings(as.numeric(value)))
         & !(value < 1)) %>%
