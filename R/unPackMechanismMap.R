@@ -112,7 +112,7 @@ unPackMechanismMap <- function(mechMap_path = NA) {
       d$info$warningMsg <- append(msg, d$info$warningMsg)
       }
 
-    all_psnuid_are_uid = grepl("^[A-Za-z][A-Za-z0-9]{10}$", mechMap$psnuid) %>% 
+    all_psnuid_are_uid <- grepl("^[A-Za-z][A-Za-z0-9]{10}$", mechMap$psnuid) %>% 
       all()
 
     if(!all_psnuid_are_uid){
