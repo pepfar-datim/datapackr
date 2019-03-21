@@ -374,12 +374,21 @@ unPackSheet <- function(d) {
                   -KeyPop,
                   -sheet_name) %>%
     dplyr::select(PSNU, psnuid, sheet_name, indicatorCode, Age, Sex, KeyPop, value) %>%
-    # Drop zeros, NAs, dashes, and space-only entries
-        tidyr::drop_na(value) %>%
-        dplyr::filter(
-          !is.na(suppressWarnings(as.numeric(value)))
-          & value != 0) %>%
-        dplyr::mutate(value = as.numeric(value))
+  # Drop zeros & NAs
+    tidyr::drop_na(value) %>%
+    dplyr::filter(value != 0)
+  
+  # TEST for non-numeric entries
+    nonNumeric <- d$data$extract %>%
+      dplyr::filter(!is.numeric(value)) %>%
+      dplyr::select(value)
+    
+    if(NROW(nonNumeric) > 0) {
+      msg <- paste0("In tab ", d$data$sheet, ": NON-NUMERIC VALUES found! -> ",
+                    nonNumeric)
+      d$info$warningMsg <- append(msg, d$info$warningMsg)
+    }
+      
 
   # TEST for Negative values
   has_negative_numbers <- d$data$extract$value < 0
@@ -453,6 +462,10 @@ unPackSheet <- function(d) {
               )
             )
         }
+  
+  d$data$extract %<>%
+    dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
+    tidyr::drop_na(value)
 
     return(d)
 
@@ -617,9 +630,10 @@ unPackSNUxIM <- function(d) {
       key = "mechanismCode",
       value = "value",
       -PSNU, -sheet_name, -indicatorCode, -CoarseAge, -Sex, -KeyPop) %>%
+    ## Coerce to numeric
+    dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
     ## Drop all NA values
-    tidyr::drop_na(value) %>%
-    dplyr::filter(value > 0) %>%
+    tidyr::drop_na(value)
     dplyr::group_by(PSNU, sheet_name, indicatorCode, CoarseAge, Sex, KeyPop) %>%
     dplyr::mutate(distribution = value / sum(value)) %>%
     dplyr::ungroup() %>%
@@ -630,7 +644,7 @@ unPackSNUxIM <- function(d) {
                   KeyPop, mechanismCode, distribution)
   
   return(d)
-  }
+}
 
 #' @importFrom magrittr %>% %<>%
 #' @title rePackSNUxIM(d)
@@ -783,7 +797,6 @@ packSUBNAT_IMPATT <- function(d) {
     )) %>%
     tidyr::drop_na(dataelementuid, categoryoptioncombouid, value) %>%
     dplyr::mutate(
-      value = round_trunc(value),
       period = datapackr::periodInfo$iso,
       attributeOptionCombo = datapackr::default_catOptCombo()
     ) %>%
@@ -803,7 +816,7 @@ packSUBNAT_IMPATT <- function(d) {
                     attributeOptionCombo) %>%
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(value = as.character(value))
+    dplyr::mutate(value = as.character(round_trunc(value)))
   
   return(d)
 }
@@ -840,10 +853,7 @@ packForDATIM <- function(d, type = NA) {
     d$datim$PSNUxIM <- d$data$distributedMER %>%
       dplyr::mutate(
         period = datapackr::periodInfo$iso,
-        mechanismCode = stringr::str_replace(mechanismCode,"Dedupe","00000"),
-        value = as.numeric(value)) %>%
-      dplyr::filter(
-        !is.na(suppressWarnings(as.numeric(value)))) %>%
+        mechanismCode = stringr::str_replace(mechanismCode,"Dedupe","00000"))
       dplyr::left_join(datapackr::PSNUxIM_to_DATIM %>%
                          dplyr::filter(dataset == "MER") %>%
                          dplyr::select(-sheet_name, -typeOptions, -dataset),
@@ -858,7 +868,6 @@ packForDATIM <- function(d, type = NA) {
         categoryOptionCombo = categoryoptioncombouid,
         mechanismCode,
         value) %>%
-      tidyr::drop_na() %>%
       dplyr::group_by(dataElement,
                       period,
                       orgUnit,
@@ -866,7 +875,7 @@ packForDATIM <- function(d, type = NA) {
                       mechanismCode) %>%
       dplyr::summarise(value = sum(value)) %>%
       dplyr::ungroup()
-    
+      
   }
   
   if (type == "Site") {
