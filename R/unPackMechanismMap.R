@@ -69,7 +69,10 @@ unPackMechanismMap <- function(mechMap_path = NA) {
             "(?<=\\()([A-Za-z][A-Za-z0-9]{10})(?=\\)$)"
           ),
         oldMech = stringr::str_extract(`Old Mechanism`, "^[^ ]+")
-      ) %>%
+      ) %>% 
+      dplyr::mutate(Indicator = dplyr::if_else(Indicator == "(ALL)", 
+                                               "(ALL).(ALL)", 
+                                               Indicator)) %>% 
       tidyr::separate(
         col = Indicator,
         into = c("Technical Area","Numerator / Denominator"),
@@ -109,7 +112,7 @@ unPackMechanismMap <- function(mechMap_path = NA) {
       msg <-
         "Mechanism map contains mappings to and from the SAME mechanism with weight of 1."
       interactive_print(paste(str(newMechs_same_as_oldMechs), msg))
-      d$info$warningMsg <- append(msg, d$info$warningMsg)
+      # d$info$warningMsg <- append(msg, d$info$warningMsg) 
       }
 
     all_psnuid_are_uid <- grepl("^[A-Za-z][A-Za-z0-9]{10}$", mechMap$psnuid) %>% 
@@ -133,7 +136,7 @@ unPackMechanismMap <- function(mechMap_path = NA) {
       dplyr::distinct()
 
     unmatched_indicators <- stringr::str_c(mechMap$`Technical Area`, "." , mechMap$`Numerator / Denominator`) %>% 
-      dplyr::setdiff(c(indicators$indicator, "(ALL)"))
+      dplyr::setdiff(c(indicators$indicator, "(ALL).(ALL)"))
 
     if(length(unmatched_indicators) > 0){
       critical_issues <- c(critical_issues, 
