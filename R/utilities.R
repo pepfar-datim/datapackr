@@ -79,8 +79,6 @@ selectOU <- function() {
 #'
 getIMPATTLevels <- function(){
   
-  #loginToDATIM(getOption("secrets"))
-  
   impatt_levels <-
     paste0(getOption("baseurl"),"api/",datapackr::api_version(),
            "/dataStore/dataSetAssignments/ous") %>%
@@ -88,11 +86,10 @@ getIMPATTLevels <- function(){
     httr::content(., "text") %>%
     jsonlite::fromJSON(., flatten = TRUE) %>%
     do.call(rbind.data.frame, .) %>%
-    dplyr::select(operating_unit = name3, country_name = name4, dplyr::everything()) %>%
     dplyr::mutate_if(is.factor, as.character) %>%
     dplyr::mutate(country_name =
-                    dplyr::case_when(country_name == "" ~ operating_unit,
-                                     TRUE ~ country_name))
+                    dplyr::case_when(country == 3 ~ name3,
+                                     country == 4 ~ name4))
   
   return(impatt_levels)
 }

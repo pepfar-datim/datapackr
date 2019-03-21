@@ -11,9 +11,9 @@ for (i in 1:length(datapack_names)) {
   
   country_uids <- datapackr::dataPackMap %>%
     dplyr::filter(data_pack_name == datapack_name) %>%
-    dplyr::select(model_uid) %>%
+    dplyr::select(country_uid) %>%
     dplyr::distinct() %>%
-    dplyr::pull(model_uid)
+    dplyr::pull(country_uid)
   
   sites <- getSiteList(country_uids = country_uids,
                         include_mil = TRUE) %>%
