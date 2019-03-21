@@ -79,7 +79,80 @@ unPackMechanismMap <- function(mechMap_path = NA) {
       dplyr::select(psnuid, `Technical Area`, `Numerator / Denominator`,
                     `Support Type` = Type, oldMech, newMech, weight) %>% 
       dplyr::distinct()
-    
-  return(mechMap)
-  
-}
+
+# some validation checks on the resulting mechanism map
+# 1 - weight should sum to 1 within groups - Critical
+# 2 - old mech and new mech shouldn't match if weight = 1
+# 3 - psnuid should be a valid uid
+# 4 - indicator (technical area and numerator/denominator) should be valid
+# 5 - support type should be valid
+
+    critical_issues <- NULL
+
+    grp_weights_ne_one <-  mechMap %>% 
+      dplyr::group_by(psnuid, `Technical Area`, 
+                      `Numerator / Denominator`, 
+                      `Support Type`, oldMech) %>% 
+      dplyr::summarise(grp_total = sum(weight)) %>% 
+      dplyr::ungroup() %>% dplyr::filter(grp_total != 1) 
+
+    if(NROW(grp_weights_ne_one) > 0){
+      critical_issues <- c(critical_issues, 
+                           paste("\nErrors in Mechanism to Mechanism map. Some group weights do not sum to 1."))
+      }
+
+    newMechs_same_as_oldMechs <- mechMap %>% 
+      dplyr::filter(oldMech == newMech, 
+                    weight == 1)
+
+    if (NROW(newMechs_same_as_oldMechs) > 0) {
+      msg <-
+        "Mechanism map contains mappings to and from the SAME mechanism with weight of 1."
+      interactive_print(paste(str(newMechs_same_as_oldMechs), msg))
+      d$info$warningMsg <- append(msg, d$info$warningMsg)
+      }
+
+    all_psnuid_are_uid <- grepl("^[A-Za-z][A-Za-z0-9]{10}$", mechMap$psnuid) %>% 
+      all()
+
+    if(!all_psnuid_are_uid){
+      critical_issues <- c(critical_issues, 
+                           paste("\nErrors in Mechanism to Mechanism map. Some psnuids are not valid uids."))
+      }
+
+# TODO copied and pasted from mapMechanisms should be pulled into a function    
+    indicators <- datapackr::site_tool_schema %>%
+      dplyr::filter(col_type == "Target") %>%
+      dplyr::mutate(
+        indicator = stringr::str_extract(
+        indicator_code,"^([^\\.]+\\.[^\\.]+)"
+        )
+        ) %>%
+      dplyr::select(indicator) %>%
+      dplyr::arrange(indicator) %>%
+      dplyr::distinct()
+
+    unmatched_indicators <- stringr::str_c(mechMap$`Technical Area`, "." , mechMap$`Numerator / Denominator`) %>% 
+      dplyr::setdiff(c(indicators$indicator, "(ALL)"))
+
+    if(length(unmatched_indicators) > 0){
+      critical_issues <- c(critical_issues, 
+                           paste("\nErrors in Mechanism to Mechanism map. Some indicators are not valid. ", 
+                                 unmatched_indicators))
+      }
+
+    unmatched_support_types <- dplyr::setdiff(mechMap$`Support Type`,
+                                              c("DSD", "TA", "(BOTH)"))
+
+    if(length(unmatched_support_types) > 0){
+      critical_issues <- c(critical_issues, 
+                           paste("\nErrors in Mechanism to Mechanism map. Some support types are not valid. ", 
+                                 unmatched_support_types))
+      }
+
+    if(!is.null(critical_issues)){
+      stop(critical_issues)
+      }
+
+    return(mechMap)
+    }
