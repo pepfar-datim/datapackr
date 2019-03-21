@@ -853,7 +853,7 @@ packForDATIM <- function(d, type = NA) {
     d$datim$PSNUxIM <- d$data$distributedMER %>%
       dplyr::mutate(
         period = datapackr::periodInfo$iso,
-        mechanismCode = stringr::str_replace(mechanismCode,"Dedupe","00000"))
+        mechanismCode = stringr::str_replace(mechanismCode,"Dedupe","00000")) %>% 
       dplyr::left_join(datapackr::PSNUxIM_to_DATIM %>%
                          dplyr::filter(dataset == "MER") %>%
                          dplyr::select(-sheet_name, -typeOptions, -dataset),
