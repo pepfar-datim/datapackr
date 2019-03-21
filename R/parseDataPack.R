@@ -633,7 +633,7 @@ unPackSNUxIM <- function(d) {
     ## Coerce to numeric
     dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
     ## Drop all NA values
-    tidyr::drop_na(value)
+    tidyr::drop_na(value) %>%
     dplyr::group_by(PSNU, sheet_name, indicatorCode, CoarseAge, Sex, KeyPop) %>%
     dplyr::mutate(distribution = value / sum(value)) %>%
     dplyr::ungroup() %>%
