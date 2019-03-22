@@ -774,8 +774,7 @@ FASTforward <- function(d) {
 #'     recompiles the dataframe containing SUBNAT and IMPATT data,
 #'     \code{d$data$SUBNAT_IMPATT} into a standard DATIM import file.
 #'
-#' @param data Data frame of SUBNAT and IMPATT data ready for DATIM import
-#' review.
+#' @param d Datapackr list object
 #' 
 #' @return Dataframe of SUBNAT & IMPATT data ready for DATIM ingestion.
 #' 
