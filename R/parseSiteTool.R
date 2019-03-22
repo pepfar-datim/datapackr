@@ -354,12 +354,18 @@ unPackSiteToolSheet <- function(d) {
     dplyr::mutate(value = as.numeric(value))
   
   #Has decimal numbers
-  all_integer_values <- any(d$data$extract$value != as.integer(d$data$extract$value))
+  has_decimals <- d$data$extract$value%%1 != 0
   
-  if (!all_integer_values){
-    msg<-paste0("ERROR! In tab ", d$data$sheet, ":" , sum(all_integer_values)," DECIMAL VALUES found!")
-    d$info$warningMsg<-append(msg,d$info$warningMsg)
-    d$info$has_error<-TRUE
+  if (any(has_decimals)){
+    msg <-
+      paste0(
+        "ERROR! In tab ",
+        d$data$sheet,
+        ":" ,
+        sum(has_decimals),
+        " DECIMAL VALUES found!")
+    d$info$warningMsg <- append(msg, d$info$warningMsg)
+    d$info$has_error <- TRUE
   }
   
   #Is dedupe
@@ -412,8 +418,7 @@ unPackSiteToolSheet <- function(d) {
     dplyr::pull(row_id)
   
   if (NROW(any_dups) > 0) {
-    msg<- paste0("In tab ", d$data$sheet, ": DUPLICATE ROWS. These will be aggregated ! -> ", 
-                 paste(any_dups, collapse = ","))
+    msg<- paste0("In tab ", d$data$sheet, ":" , NROW(any_dups)," DUPLICATE ROWS. These will be aggregated!" ) 
     d$info$warningMsg<-append(msg,d$info$warningMsg)
   }
   
