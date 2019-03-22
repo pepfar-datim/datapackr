@@ -163,7 +163,7 @@ checkSiteToolStructure <- function(d) {
 #'    datasets from DATIM that can be imported into DATIM at the PSNU level.
 unPackSiteToolSheets <- function(d) {
   # Get sheets list
-  sheets <- datapackr::data_pack_schema %>%
+  sheets <- datapackr::site_tool_schema %>%
     dplyr::select(sheet_name) %>%
     dplyr::distinct() %>%
     dplyr::pull(sheet_name)
