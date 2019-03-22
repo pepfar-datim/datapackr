@@ -880,6 +880,13 @@ packForDATIM <- function(d, type = NA) {
   
   if (type == "Site") {
     
+    d$datim$decimal_values <- d$data$targets %>% 
+      dplyr::filter(value %% 1 != 0)
+    
+    d$datim$negative_values <- d$data$targets %>% 
+      dplyr::filter(mech_code != "00000") %>%
+      dplyr::filter(value < 0 )
+    
     importFile <- d$data$targets %>%
       dplyr::select(site_uid,mech_code,indicatorCode,Type,Age,Sex,KeyPop,value) %>%
       dplyr::filter(

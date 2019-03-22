@@ -354,7 +354,7 @@ unPackSiteToolSheet <- function(d) {
     dplyr::mutate(value = as.numeric(value))
   
   #Has decimal numbers
-  has_decimals <- d$data$extract$value%%1 != 0
+  has_decimals <- d$data$extract$value %% 1 != 0
   
   if (any(has_decimals)){
     msg <-
