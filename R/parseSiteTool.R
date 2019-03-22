@@ -185,8 +185,6 @@ unPackSiteToolSheets <- function(d) {
   return(d)
 }
 
-
-
 #' @title checkSiteToolColStructure(d)
 #'
 #' @description Checks structural integrity of columns on critical sheets for
@@ -355,8 +353,16 @@ unPackSiteToolSheet <- function(d) {
       !is.na(suppressWarnings(as.numeric(value)))) %>%
     dplyr::mutate(value = as.numeric(value))
   
-  #Is dedupe
+  #Has decimal numbers
+  all_integer_values <- any(d$data$extract$value != as.integer(d$data$extract$value))
   
+  if (!all_integer_values){
+    msg<-paste0("ERROR! In tab ", d$data$sheet, ":" , sum(all_integer_values)," DECIMAL VALUES found!")
+    d$info$warningMsg<-append(msg,d$info$warningMsg)
+    d$info$has_error<-TRUE
+  }
+  
+  #Is dedupe
   is_dedupe <- stringr::str_detect("00000",d$data$extract$mech_code)
   # TEST for Negative values in non-dedupe mechanisms
   has_negative_numbers <-   ( d$data$extract$value < 0 ) & !is_dedupe
