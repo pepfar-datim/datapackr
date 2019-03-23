@@ -402,13 +402,13 @@ packSiteTool <- function(d,
     mechList <- getMechList(country_uids,
                             include_dedupe = TRUE,
                             COP_FY = datapackr::cop_year()) %>%
-      dplyr::select(name, code) %>%
+      dplyr::select(mechanism, code) %>%
       dplyr::arrange(code)
     
     openxlsx::writeDataTable(
       wb = wb,
       sheet = "Mechs",
-      x = data.frame(mechID = mechList$name),
+      x = data.frame(mechID = mechList$mechanism),
       xy = c(1,1),
       colNames = TRUE,
       tableName = "mech_list_table",
@@ -423,7 +423,7 @@ packSiteTool <- function(d,
     d$data$site$distributed %<>%
     ## Pull in mechanism names
       dplyr::left_join((mechList %>%
-                          dplyr::select(code,mechanism = name)),
+                          dplyr::select(code,mechanism)),
                        by = c("mechanismCode" = "code")) %>%
     ## Pull in Site Tool Label
       dplyr::left_join((sites %>%
