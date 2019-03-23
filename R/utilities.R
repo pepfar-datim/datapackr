@@ -78,9 +78,6 @@ selectOU <- function() {
 #' country, community, and facility levels in DATIM organization hierarchy.
 #'
 getIMPATTLevels <- function(){
-  
-  #loginToDATIM(getOption("secrets"))
-  
   impatt_levels <-
     paste0(getOption("baseurl"),"api/",datapackr::api_version(),
            "/dataStore/dataSetAssignments/ous") %>%
@@ -91,10 +88,11 @@ getIMPATTLevels <- function(){
     dplyr::select(operating_unit = name3, country_name = name4, dplyr::everything()) %>%
     dplyr::mutate_if(is.factor, as.character) %>%
     dplyr::mutate(country_name =
-                    dplyr::case_when(country_name == "" ~ operating_unit,
-                                     TRUE ~ country_name))
+                    dplyr::case_when(country == 3 ~ operating_unit,
+                                     country == 4 ~ country_name))
   
   return(impatt_levels)
+  
 }
 
 
