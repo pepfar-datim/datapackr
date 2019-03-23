@@ -20,7 +20,7 @@ Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
 }
 \value{
 A dataframe of mechanisms, including start and end dates, mechanism
-code, partner name, funding agency, and related country.
+code, partner name, funding agency, and related OU.
 }
 \description{
 Extracts full list of valid mechanisms from DATIM for Fiscal Year & countries

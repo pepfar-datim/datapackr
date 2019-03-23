@@ -8,7 +8,7 @@
 #' @param submission_path Local path to the file to import. 
 #' @param output_path A local path directing to the folder where you would like
 #' outputs to be saved. If not supplied, will output to working directory.
-#' @param Archive results as an RDS object. 
+#' @param archive_results Results as an RDS object. 
 #' 
 #' @details
 #' Executes the following operations in relation to a submitted Site Tool

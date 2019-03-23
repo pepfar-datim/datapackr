@@ -323,11 +323,6 @@ write_site_level_sheet <- function(wb, sheet, d) {
 #' for Site Tool features.
 #' 
 #' @param d A datapackr list object.
-#' @param includeFACTS Logical. If \code{TRUE}, \code{packSiteTool} will corrob-
-#' orate FY2019 DATIM mechanisms against FACTS Info Mechanisms and add any
-#' missing mechanisms. Default is \code{FALSE}.
-#' @param FACTSMechs_path A local file path directing to the extract of FY2019
-#' FACTS Info Mechanisms. Default is \code{NA}.
 #' @param output_path A local folder where you would like Site Tool to be saved.
 #' 
 #' @return An XLSX Site Tool saved to \code{output_path}.
@@ -352,13 +347,7 @@ write_site_level_sheet <- function(wb, sheet, d) {
 #' }
 #'
 packSiteTool <- function(d,
-                         includeFACTS = FALSE,
-                         FACTSMechs_path = NA,
                          output_path) {
-  
-# Make sure login creds allow export of data from DATIM for specified OU ####
-  
-  
 # Build Site Tool frame ####
   wb <- packFrame(datapack_uid = d$info$datapack_uid,
                   type = "Site Tool")
@@ -415,47 +404,6 @@ packSiteTool <- function(d,
                             COP_FY = datapackr::cop_year()) %>%
       dplyr::select(name, code) %>%
       dplyr::arrange(code)
-    
-    ## PATCH for Missing FACTS Mechs
-    if (includeFACTS) {
-      if (is.na(FACTSMechs_path)) {
-        stop("Please supply file path to FACTS Mechanism Extract!!")
-      }
-      
-      country_names <- datapackr::dataPackMap %>%
-        dplyr::filter(data_pack_name == d$info$datapack_name) %>%
-        dplyr::pull(country_name) %>%
-        unique()
-      
-      FACTSMechs <- readr::read_csv(file = FACTSMechs_path,
-                                    na = "NULL",
-                                    col_types = readr::cols(.default = "c")) %>%
-        dplyr::select(code = HQID, name = IM,
-                      start_date = StartDate, end_date = EndDate,
-                      organisation_unit_name = Country,
-                      partner = PrimePartner, agency = Agency) %>%
-        dplyr::mutate(start_date = lubridate::mdy(start_date),
-                      end_date = lubridate::mdy(end_date),
-                      name = paste0(code, " - ", name),
-                      id = NA_character_,
-                      organisation_unit_id = NA_character_) %>%
-        dplyr::filter(!stringr::str_detect(agency,"State")
-                      & !organisation_unit_name %in% c("Asia Region",
-                                                       "West-Central Africa Region",
-                                                       "Western Hemisphere Region")
-        ) %>%
-        dplyr::select(code, name, id, start_date, end_date,
-                      organisation_unit_name, organisation_unit_id,
-                      partner, agency) %>%
-        dplyr::filter(organisation_unit_name == d$info$datapack_name,
-                      !code %in% (mechList %>%
-                                    dplyr::pull(code) %>%
-                                    unique()))
-      
-      mechList %<>%
-        dplyr::bind_rows(FACTSMechs)
-    }
-      
     
     openxlsx::writeDataTable(
       wb = wb,

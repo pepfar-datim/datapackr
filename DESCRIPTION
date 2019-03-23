@@ -29,6 +29,7 @@ Imports:
     purrr (>= 0.3.0),
     tibble (>= 2.0.1),
     stringr (>= 1.4.0),
+    stringi,
     httr (>= 1.4.0),
     rlist (>= 0.4.6.1),
     magrittr (>= 1.5),

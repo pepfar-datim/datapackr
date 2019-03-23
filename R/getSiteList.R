@@ -21,9 +21,6 @@ getSiteList <- function(country_uids,
   country_names <- datapackr::dataPackMap %>%
     dplyr::filter(country_uid %in% country_uids) %>%
     dplyr::pull(country_name)
-  
-  # Check user has correct permissions to query against country_uids ####
-    # TODO: Configure to allow non-global users to generate Site Tools
       
   # Is this country in a regional program? ####
     isRegion <- datapackr::dataPackMap %>%

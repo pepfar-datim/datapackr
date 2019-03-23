@@ -13,7 +13,7 @@ unPackSiteToolData(submission_path = NA, output_path = NA,
 \item{output_path}{A local path directing to the folder where you would like
 outputs to be saved. If not supplied, will output to working directory.}
 
-\item{Archive}{results as an RDS object.}
+\item{archive_results}{Results as an RDS object.}
 }
 \description{
 Processes a submitted Site Tool (in .xlsx format) by identifying integrity

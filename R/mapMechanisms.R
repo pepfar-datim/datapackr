@@ -135,39 +135,28 @@ frameMechMap <- function(datapack_uid) {
 #' \code{2019}.)
 #' @param output_path A local path directing to the folder where you would like
 #' outputs to be saved. If not supplied, will output to working directory.
-#' @param includeFACTS Logical. If \code{TRUE}, \code{packMechMap} will corrob-
-#' orate FY2019 DATIM mechanisms against FACTS Info Mechanisms and add any
-#' missing mechanisms. Default is \code{FALSE}.
-#' @param FACTSMechs_path A local file path directing to the extract of FY2019
-#' FACTS Info Mechanisms. Default is \code{NA}.
 #' 
 #' @return Excel workbook containing features necessary to allow various mechanism
 #' mapping scenarios, which can be fed back into the Data Pack site distribution
 #' process.
 #' 
-packMechMap <- function(datapack_name,
-                        FY,
-                        output_path = NA,
-                        includeFACTS = FALSE,
-                        FACTSMechs_path = NA) {
-
-  # Log into DATIM ####
-  #    If user has not already logged in using DATIM credentials, request
-  #    credentials via console and getPass.
-    #datapackr::loginToDATIM(getOption("secrets"))
+packMechMap <- function(datapack_name, FY, output_path = NA) {
 
   datapack_uid <- datapackr::dataPackMap %>%
     dplyr::filter(data_pack_name == datapack_name) %>%
-    dplyr::select(model_uid) %>%
-    dplyr::distinct() %>%
-    dplyr::pull(model_uid)
+    dplyr::pull(model_uid) %>%
+    unique()
   
   # Frame Workbook ####
     wb <- frameMechMap(datapack_uid)
   
   # Write PSNU list ####
-    PSNUs <- getPSNUs(datapack_uid) %>%
-      dplyr::select(PSNU = DataPackSiteID)
+    country_uids <- datapackr::dataPackMap %>%
+      dplyr::filter(data_pack_name == datapack_name) %>%
+      dplyr::pull(country_uid)
+    
+    PSNUs <- getPSNUs(country_uids) %>%
+      dplyr::select(PSNU = dp_psnu)
     
     openxlsx::writeDataTable(
       wb = wb,
@@ -181,53 +170,12 @@ packMechMap <- function(datapack_name,
     )
   
   # Write Mech Lists ####
-    country_uids <- datapackr::dataPackMap %>%
-      dplyr::filter(model_uid == datapack_uid) %>%
-      dplyr::pull(country_uid)
     oldMechList <- getMechList(country_uids,
-                              COP_FY = (FY-1))
+                              COP_FY = (FY-1)) %>%
+      dplyr::select(-code, -uid, -primeid)
     newMechList <- getMechList(country_uids,
-                              COP_FY = FY)
-    
-    ## PATCH for Missing FACTS Mechs
-    if (includeFACTS) {
-      if (is.na(FACTSMechs_path)) {
-        stop("Please supply file path to FACTS Mechanism Extract!!")
-      }
-      
-      country_names <- datapackr::dataPackMap %>%
-        dplyr::filter(data_pack_name == datapack_name) %>%
-        dplyr::pull(country_name) %>%
-        unique()
-      
-      FACTSMechs <- readr::read_csv(file = FACTSMechs_path,
-                                    na = "NULL",
-                                    col_types = readr::cols(.default = "c")) %>%
-        dplyr::select(code = HQID, name = IM,
-                      start_date = StartDate, end_date = EndDate,
-                      organisation_unit_name = Country,
-                      partner = PrimePartner, agency = Agency) %>%
-        dplyr::mutate(start_date = lubridate::mdy(start_date),
-                      end_date = lubridate::mdy(end_date),
-                      name = paste0(code, " - ", name),
-                      id = NA_character_,
-                      organisation_unit_id = NA_character_) %>%
-        dplyr::filter(!stringr::str_detect(agency,"State")
-                      & !organisation_unit_name %in% c("Asia Region",
-                                        "West-Central Africa Region",
-                                        "Western Hemisphere Region")
-                      ) %>%
-        dplyr::select(code, name, id, start_date, end_date,
-                      organisation_unit_name, organisation_unit_id,
-                      partner, agency) %>%
-        dplyr::filter(organisation_unit_name == datapack_name,
-                      !code %in% (newMechList %>%
-                                    dplyr::pull(code) %>%
-                                    unique()))
-    
-      newMechList %<>%
-        dplyr::bind_rows(FACTSMechs)
-    }
+                              COP_FY = FY) %>%
+      dplyr::select(-code, -uid, -primeid)
     
     openxlsx::writeDataTable(
       wb = wb, sheet = "Old Mechs",
@@ -253,8 +201,8 @@ packMechMap <- function(datapack_name,
         ) %>%
       dplyr::select(indicator) %>%
       dplyr::arrange(indicator) %>%
-      dplyr::distinct() #%>%
-      #tibble::add_row(indicator = "(All)",.before = 1)
+      dplyr::distinct() %>%
+      tibble::add_row(indicator = "(ALL)", .before = 1)
     
     openxlsx::writeDataTable(
       wb = wb,
@@ -271,7 +219,7 @@ packMechMap <- function(datapack_name,
     openxlsx::writeDataTable(
       wb,
       sheet = "Validations",
-      x = data.frame(type = c("DSD", "TA")),
+      x = data.frame(type = c("(BOTH)", "DSD", "TA")),
       xy = c(5,1),
       colNames = TRUE,
       tableName = "dsdta",
@@ -285,7 +233,7 @@ packMechMap <- function(datapack_name,
         wb, sheet = "Mechanism Map",
         cols = 1, rows = 4:200,
         type = "list",
-        value = 'INDIRECT("old_mechs[name]")'
+        value = 'INDIRECT("old_mechs[mechanism]")'
       )
     ## PSNUs
       openxlsx::dataValidation(
@@ -313,7 +261,7 @@ packMechMap <- function(datapack_name,
         wb, sheet = "Mechanism Map",
         cols = 6:30, rows = 3,
         type = "list",
-        value = 'INDIRECT("new_mechs[name]")'
+        value = 'INDIRECT("new_mechs[mechanism]")'
       )
       
   # Export ####
