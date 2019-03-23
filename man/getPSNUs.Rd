@@ -4,11 +4,11 @@
 \alias{getPSNUs}
 \title{Pull list of PSNUs from DATIM and format based on datapackr structure.}
 \usage{
-getPSNUs(datapack_uid)
+getPSNUs(country_uids = NA)
 }
 \arguments{
-\item{datapack_uid}{A unique ID specifying the PEPFAR Operating Unit 
-the Site Tool belongs to.}
+\item{country_uids}{Character vector of DATIM country IDs. This can only
+include countries. Regional Operating Unit uids will not be accepted}
 }
 \value{
 Data frame of PSNUs

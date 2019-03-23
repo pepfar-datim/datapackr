@@ -144,16 +144,19 @@ packMechMap <- function(datapack_name, FY, output_path = NA) {
 
   datapack_uid <- datapackr::dataPackMap %>%
     dplyr::filter(data_pack_name == datapack_name) %>%
-    dplyr::select(model_uid) %>%
-    dplyr::distinct() %>%
-    dplyr::pull(model_uid)
+    dplyr::pull(model_uid) %>%
+    unique()
   
   # Frame Workbook ####
     wb <- frameMechMap(datapack_uid)
   
   # Write PSNU list ####
-    PSNUs <- getPSNUs(datapack_uid) %>%
-      dplyr::select(PSNU = DataPackSiteID)
+    country_uids <- datapackr::dataPackMap %>%
+      dplyr::filter(data_pack_name == datapack_name) %>%
+      dplyr::pull(country_uid)
+    
+    PSNUs <- getPSNUs(country_uids) %>%
+      dplyr::select(PSNU = dp_psnu)
     
     openxlsx::writeDataTable(
       wb = wb,
@@ -167,14 +170,12 @@ packMechMap <- function(datapack_name, FY, output_path = NA) {
     )
   
   # Write Mech Lists ####
-    country_uids <- datapackr::dataPackMap %>%
-      dplyr::filter(model_uid == datapack_uid) %>%
-      dplyr::pull(country_uid)
-    
     oldMechList <- getMechList(country_uids,
-                              COP_FY = (FY-1))
+                              COP_FY = (FY-1)) %>%
+      dplyr::select(-code, -uid, -primeid)
     newMechList <- getMechList(country_uids,
-                              COP_FY = FY)
+                              COP_FY = FY) %>%
+      dplyr::select(-code, -uid, -primeid)
     
     openxlsx::writeDataTable(
       wb = wb, sheet = "Old Mechs",
@@ -200,8 +201,8 @@ packMechMap <- function(datapack_name, FY, output_path = NA) {
         ) %>%
       dplyr::select(indicator) %>%
       dplyr::arrange(indicator) %>%
-      dplyr::distinct() #%>%
-      #tibble::add_row(indicator = "(All)",.before = 1)
+      dplyr::distinct() %>%
+      tibble::add_row(indicator = "(ALL)", .before = 1)
     
     openxlsx::writeDataTable(
       wb = wb,
@@ -218,7 +219,7 @@ packMechMap <- function(datapack_name, FY, output_path = NA) {
     openxlsx::writeDataTable(
       wb,
       sheet = "Validations",
-      x = data.frame(type = c("DSD", "TA")),
+      x = data.frame(type = c("(BOTH)", "DSD", "TA")),
       xy = c(5,1),
       colNames = TRUE,
       tableName = "dsdta",
@@ -232,7 +233,7 @@ packMechMap <- function(datapack_name, FY, output_path = NA) {
         wb, sheet = "Mechanism Map",
         cols = 1, rows = 4:200,
         type = "list",
-        value = 'INDIRECT("old_mechs[name]")'
+        value = 'INDIRECT("old_mechs[mechanism]")'
       )
     ## PSNUs
       openxlsx::dataValidation(
@@ -260,7 +261,7 @@ packMechMap <- function(datapack_name, FY, output_path = NA) {
         wb, sheet = "Mechanism Map",
         cols = 6:30, rows = 3,
         type = "list",
-        value = 'INDIRECT("new_mechs[name]")'
+        value = 'INDIRECT("new_mechs[mechanism]")'
       )
       
   # Export ####
