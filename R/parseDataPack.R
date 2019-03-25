@@ -212,9 +212,12 @@ checkColStructure <- function(d) {
 #'
 #' @param d datapackr list object containing at least d$data$extract of data
 #'     from a single sheet in submission file.
+#' @param type Either "Data Pack" or "Site Tool".
+#'     
 #' @return A datapackr list object, \code{d}, storing a dataframe of defunct
 #'    disaggs used in a specific sheet.
-defunctDisaggs <- function(d) {
+defunctDisaggs <- function(d,
+                           type = "Data Pack") {
   defunct <- d$data$extract %>%
     replace(is.na(.), "") %>%
     dplyr::filter(
@@ -281,15 +284,26 @@ defunctDisaggs <- function(d) {
         )
       |
         (
-          stringr::str_detect(indicatorCode, "OVC_HIVSTAT|OVC_SERV") &
-            !Age %in% c("<01", "01-04", "05-09", "10-14", "15-17", "18+")
-        )
-      |
-        (
           stringr::str_detect(indicatorCode, "VMMC") &
             (Age %in% c("<01", "01-04", "05-09") | Sex == "Female")
         )
-    ) %>%
+    )
+  
+  if(type == "Data Pack") {
+    defunct %<>%
+      dplyr::filter(
+        stringr::str_detect(indicatorCode, "OVC_HIVSTAT|OVC_SERV") &
+        !Age %in% c("<01", "01-04", "05-09", "10-14", "15-17", "18+"))
+  }
+  
+  if(type == "Site Tool") {
+    defunct %<>%
+      dplyr::filter(
+        stringr::str_detect(indicatorCode, "OVC_HIVSTAT|OVC_SERV") &
+          !Age %in% c(""))
+  }
+  
+  defunct %<>%
     dplyr::select(indicatorCode, Age, Sex, KeyPop) %>%
     dplyr::distinct()
   
