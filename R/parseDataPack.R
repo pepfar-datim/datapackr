@@ -278,6 +278,11 @@ defunctDisaggs <- function(d,
       )
       |
         (
+          stringr::str_detect(indicatorCode, "OVC_SERV") &
+            !Age %in% c("<01", "01-04", "05-09", "10-14", "15-17", "18+")
+        )
+      |
+        (
           stringr::str_detect(indicatorCode, "PRIORITY_SNU") &
             !value %in% (datapackr::prioritizations %>%
                            dplyr::pull(value))
@@ -290,17 +295,21 @@ defunctDisaggs <- function(d,
     )
   
   if(type == "Data Pack") {
-    defunct %<>%
+    defunct <- d$data$extract %>%
+      replace(is.na(.), "") %>%
       dplyr::filter(
-        stringr::str_detect(indicatorCode, "OVC_HIVSTAT|OVC_SERV") &
-        !Age %in% c("<01", "01-04", "05-09", "10-14", "15-17", "18+"))
+        stringr::str_detect(indicatorCode, "OVC_HIVSTAT") &
+        !Age %in% c("<01", "01-04", "05-09", "10-14", "15-17", "18+")) %>%
+      dplyr::bind_rows(defunct)
   }
   
   if(type == "Site Tool") {
-    defunct %<>%
+    defunct <- d$data$extract %>%
+      replace(is.na(.), "") %>%
       dplyr::filter(
-        stringr::str_detect(indicatorCode, "OVC_HIVSTAT|OVC_SERV") &
-          !Age %in% c(""))
+        stringr::str_detect(indicatorCode, "OVC_HIVSTAT") &
+          !Age %in% c("")) %>%
+      dplyr::bind_rows(defunct)
   }
   
   defunct %<>%

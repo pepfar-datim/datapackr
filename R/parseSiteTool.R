@@ -424,7 +424,8 @@ unPackSiteToolSheet <- function(d) {
   }
   
   # TEST for defunct disaggs
-  defunct <- defunctDisaggs(d)
+  defunct <- defunctDisaggs(d,
+                            type = "Site Tool")
   
   if (NROW(defunct) > 0) {
     defunctMsg <- defunct %>%
