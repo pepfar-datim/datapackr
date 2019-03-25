@@ -17,7 +17,7 @@
 #' }
 #'     
 unPackSiteToolData <- function(submission_path = NA,
-                       output_path = NA ,
+                       output_path = NA,
                        archive_results = FALSE) {
   
   # Create data train for use across remainder of program
@@ -46,7 +46,7 @@ unPackSiteToolData <- function(submission_path = NA,
       d$keychain$submission_path <- submission_path
     }
   
-  msg<-"Checking the file exists..."
+  msg <- "Checking the file exists..."
   interactive_print(msg)
   
   if (!can_read_import_file(d$keychain$submission_path)) {
@@ -59,23 +59,25 @@ unPackSiteToolData <- function(submission_path = NA,
   
   # Start running log of all warning and information messages
   d$info$warningMsg <- NULL
-  d$info$has_error<-FALSE
+  d$info$has_error <- FALSE
   
   # Check OU name and UID match up
   interactive_print("Checking the OU name and UID on HOME tab...")
   d <- checkSiteToolOUinfo(d)
   
-  # # Check integrity of site tool tabs
+  # Check integrity of site tool tabs
   d <- checkSiteToolStructure(d)
-  # 
-  # # Unpack the Targets
+  
+  # Unpack the Targets
   d <- unPackSiteToolSheets(d)
   
-  # # Prepare SNU x IM dataset for DATIM validation checks
+  # Derive non-Data Pack targets
+  d$data$targets <- deriveTargets(d$data$targets, type = "Site Tool")
+  
+  # Prepare SNU x IM dataset for DATIM validation checks
   d <- packForDATIM(d, type = "Site")
   
-  # 
-  # # If warnings, show all grouped by sheet and issue
+  # If warnings, show all grouped by sheet and issue
    if (!is.null(d$info$warningMsg) & interactive()) {
      options(warning.length = 8170)
      

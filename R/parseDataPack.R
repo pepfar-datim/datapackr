@@ -896,31 +896,35 @@ packForDATIM <- function(d, type = NA) {
       dplyr::mutate(
         period = datapackr::periodInfo$iso,
         value = round_trunc(as.numeric(value))) %>%
-      dplyr::left_join(datapackr::PSNUxIM_to_DATIM %>%
+      dplyr::left_join(datapackr::SiteToDATIM %>%
                          dplyr::filter(dataset == "MER") %>%
-                         dplyr::select(-sheet_name, -typeOptions, -dataset),
-                       by = c("indicatorCode" = "indicatorCode",
-                              "Age" = "validAges",
-                              "Sex" = "validSexes",
-                              "KeyPop" = "validKPs")) %>%
+                         dplyr::select(-sheet_name, -dataset, -tech_area, -num_den),
+                       by = c("indicatorCode" = "indicator_code",
+                              "Age" = "valid_ages",
+                              "Sex" = "valid_sexes",
+                              "KeyPop" = "valid_kps")) %>%
+      tidyr::drop_na(dataelementuid) %>%
+      dplyr::group_by_at(dplyr::vars(-value)) %>%
+      dplyr::summarise(value = sum(value)) %>%
+      dplyr::ungroup() %>%
       dplyr::select(
         dataElement = dataelementuid,
         period,
         orgUnit = site_uid,
         categoryOptionCombo = categoryoptioncombouid,
-        attributeOptionCombo= mech_code,
+        attributeOptionCombo = mech_code,
         value) 
     
-    if( any(is.na(importFile)) ) {
+    if(any(is.na(importFile)) ) {
       
-        msg<-paste0("ERROR! Empty values found in DATIM export. These will
+        msg <- paste0("ERROR! Empty values found in DATIM export. These will
                      be filtered.")
-        d$info$warningMsg<-append(msg,d$info$warningMsg)
-        d$info$has_error<-TRUE
+        d$info$warningMsg <- append(msg,d$info$warningMsg)
+        d$info$has_error <- TRUE
     }
    
     d$datim$site_data <- importFile %>% 
-      dplyr::filter( purrr::reduce(purrr::map(., is.na), `+`) == 0 )
+      dplyr::filter(purrr::reduce(purrr::map(., is.na), `+`) == 0 )
     
   }
   
