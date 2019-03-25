@@ -923,6 +923,7 @@ packForDATIM <- function(d, type = NA) {
                          dplyr::filter(dataset == "MER") %>%
                          dplyr::select(-sheet_name, -dataset, -tech_area, -num_den),
                        by = c("indicatorCode" = "indicator_code",
+                              "Type" = "type_options",
                               "Age" = "valid_ages",
                               "Sex" = "valid_sexes",
                               "KeyPop" = "valid_kps")) %>%
