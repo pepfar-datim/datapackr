@@ -145,7 +145,7 @@ unPackMechanismMap <- function(mechMap_path = NA) {
       }
 
     unmatched_support_types <- dplyr::setdiff(mechMap$`Support Type`,
-                                              c("DSD", "TA", "(BOTH)"))
+                                              c("DSD", "TA", "(BOTH)", "(ALL)"))
 
     if(length(unmatched_support_types) > 0){
       critical_issues <- c(critical_issues, 
