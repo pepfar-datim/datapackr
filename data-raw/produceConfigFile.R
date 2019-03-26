@@ -457,6 +457,13 @@ getPeriodInfo <- function(FY = NA) {
   ## Load PSNUxIM to DATIM map ####
     PSNUxIM_to_DATIM <- readr::read_csv("./data-raw/PSNUxIM_to_DATIM.csv")
     save(PSNUxIM_to_DATIM, file = "./data/PSNUxIM_to_DATIM.rda")
+  ## Load SiteToDATIM map ####
+    SiteToDATIM <- readxl::read_excel(
+      path = "./data-raw/DataPack_to_DATIM_indicator_map.xlsx",
+      sheet = "Site Tool",
+      col_types = "text")
+    save(SiteToDATIM, file = "./data/SiteToDATIM.rda")
+      
   ## Load Period Info ####
     periodInfo <- getPeriodInfo(datapackr::cop_year())
     save(periodInfo, file = "./data/periodInfo.rda")

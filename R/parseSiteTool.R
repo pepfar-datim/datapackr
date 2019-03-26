@@ -350,26 +350,15 @@ unPackSiteToolSheet <- function(d) {
     # Drop zeros, NAs, dashes, and space-only entries
     tidyr::drop_na(value) %>%
     dplyr::filter(
-      !is.na(suppressWarnings(as.numeric(value)))) %>%
+      !is.na(suppressWarnings(as.numeric(value)))) %>% 
     dplyr::mutate(value = as.numeric(value))
-  
-  #Has decimal numbers
-  has_decimals <- d$data$extract$value %% 1 != 0
-  
-  if (any(has_decimals)){
-    msg <-
-      paste0(
-        "ERROR! In tab ",
-        d$data$sheet,
-        ":" ,
-        sum(has_decimals),
-        " DECIMAL VALUES found!")
-    d$info$warningMsg <- append(msg, d$info$warningMsg)
-    d$info$has_error <- TRUE
-  }
   
   #Is dedupe
   is_dedupe <- stringr::str_detect("00000",d$data$extract$mech_code)
+  
+  #Go ahead and filter any zeros, which are not dedupe
+  d$data$extract %<>% dplyr::filter(value == 0 & !is_dedupe)
+  
   # TEST for Negative values in non-dedupe mechanisms
   has_negative_numbers <-   ( d$data$extract$value < 0 ) & !is_dedupe
   
@@ -385,7 +374,6 @@ unPackSiteToolSheet <- function(d) {
     d$info$warningMsg<-append(msg,d$info$warningMsg)
     d$info$has_error<-TRUE
   }
-  
   
   # TEST for positive values in dedupe mechanisms
   
@@ -405,6 +393,22 @@ unPackSiteToolSheet <- function(d) {
     d$info$has_error<-TRUE
   }
   
+  #Test for decimals
+  has_decimals <- d$data$extract$value %% 1 != 0
+  
+  if (any(has_decimals)){
+    msg <-
+      paste0(
+        "ERROR! In tab ",
+        d$data$sheet,
+        ":" ,
+        sum(has_decimals),
+        " DECIMAL VALUES found!")
+    d$info$warningMsg <- append(msg, d$info$warningMsg)
+    d$info$has_error <- TRUE
+  }
+  
+  
   # TEST for duplicates
   any_dups <- d$data$extract %>%
     dplyr::select(sheet_name, Site, mech_code, Age, Sex, KeyPop, Type, indicatorCode) %>%
@@ -423,7 +427,8 @@ unPackSiteToolSheet <- function(d) {
   }
   
   # TEST for defunct disaggs
-  defunct <- defunctDisaggs(d)
+  defunct <- defunctDisaggs(d,
+                            type = "Site Tool")
   
   if (NROW(defunct) > 0) {
     defunctMsg <- defunct %>%
@@ -431,7 +436,7 @@ unPackSiteToolSheet <- function(d) {
         paste0(indicatorCode, ":"), Age, Sex, KeyPop
       ))) %>%
       dplyr::pull(msg)
-    msg <- paste0("In tab ", d$data$sheet, ": DEFUNCT DISAGGS ->",
+    msg <- paste0("ERROR! In tab ", d$data$sheet, ": DEFUNCT DISAGGS ->",
                   paste(defunctMsg, collapse = ","))
     d$info$warningMsg<-append(msg,d$info$warningMsg)
     d$info$has_error<-TRUE
@@ -442,12 +447,62 @@ unPackSiteToolSheet <- function(d) {
   not_yet_distributed <- stringr::str_detect(d$data$extract$Site,'NOT YET')
   
   if (any(not_yet_distributed)) {
-    msg<- paste0("In tab ", d$data$sheet, ": UNALLOCATED VALUES FOUND!")
+    msg<- paste0("ERROR! In tab ", d$data$sheet, ": UNALLOCATED VALUES FOUND!")
     d$info$warningMsg<-append(msg,d$info$warningMsg)
     d$info$has_error<-TRUE
   }
                       
   
   return(d)
+  
+}
+
+
+#' @title Derive non-Data Pack targets from others in the Data Pack/Site Tool
+#' 
+#' @description
+#' Takes Data Pack or Site Tool data and derives other targets not explicitly
+#' set during COP.
+#' 
+#' @param data Dataframe with either Data Pack or Site Tool data.
+#' @param type Type of data, either \code{Data Pack}, or \code{Site Tool}.
+#' 
+#' @return Dataframe with added, derived targets.
+#' 
+deriveTargets <- function(data, type) {
+  derived <- data %>%
+    dplyr::filter(
+      stringr::str_detect(
+        indicatorCode, 
+        paste0(
+          "VMMC_CIRC\\.N\\.Age/Sex/HIVStatus\\.20T"
+          # If we derive the SUBNAT/IMPATT ones, paste0 here
+        )
+      )
+    )
+  
+  if(NROW(derived) > 0) {
+    derived %<>%
+      dplyr::mutate(
+        indicatorCode =
+          dplyr::case_when(
+            stringr::str_detect(
+              indicatorCode,
+              "VMMC_CIRC\\.N\\.Age/Sex/HIVStatus\\.20T")
+              ~ "VMMC_CIRC.N.Age/Sex.20T",
+            # If we derive SUBNAT/IMPATT ones, add conditions here
+            TRUE ~ indicatorCode
+          )
+      ) %>%
+      dplyr::group_by_at(dplyr::vars(-value)) %>%
+      dplyr::summarise(value = sum(value)) %>%
+      dplyr::ungroup()
+    
+    combined <- data %>%
+      dplyr::bind_rows(derived)
+    
+    return(combined)
+    
+  } else {return(data)}
   
 }

@@ -212,9 +212,12 @@ checkColStructure <- function(d) {
 #'
 #' @param d datapackr list object containing at least d$data$extract of data
 #'     from a single sheet in submission file.
+#' @param type Either "Data Pack" or "Site Tool".
+#'     
 #' @return A datapackr list object, \code{d}, storing a dataframe of defunct
 #'    disaggs used in a specific sheet.
-defunctDisaggs <- function(d) {
+defunctDisaggs <- function(d,
+                           type = "Data Pack") {
   defunct <- d$data$extract %>%
     replace(is.na(.), "") %>%
     dplyr::filter(
@@ -275,21 +278,41 @@ defunctDisaggs <- function(d) {
       )
       |
         (
+          stringr::str_detect(indicatorCode, "OVC_SERV") &
+            !Age %in% c("<01", "01-04", "05-09", "10-14", "15-17", "18+")
+        )
+      |
+        (
           stringr::str_detect(indicatorCode, "PRIORITY_SNU") &
             !value %in% (datapackr::prioritizations %>%
                            dplyr::pull(value))
         )
       |
         (
-          stringr::str_detect(indicatorCode, "OVC_HIVSTAT|OVC_SERV") &
-            !Age %in% c("<01", "01-04", "05-09", "10-14", "15-17", "18+")
-        )
-      |
-        (
           stringr::str_detect(indicatorCode, "VMMC") &
             (Age %in% c("<01", "01-04", "05-09") | Sex == "Female")
         )
-    ) %>%
+    )
+  
+  if(type == "Data Pack") {
+    defunct <- d$data$extract %>%
+      replace(is.na(.), "") %>%
+      dplyr::filter(
+        stringr::str_detect(indicatorCode, "OVC_HIVSTAT") &
+        !Age %in% c("<01", "01-04", "05-09", "10-14", "15-17", "18+")) %>%
+      dplyr::bind_rows(defunct)
+  }
+  
+  if(type == "Site Tool") {
+    defunct <- d$data$extract %>%
+      replace(is.na(.), "") %>%
+      dplyr::filter(
+        stringr::str_detect(indicatorCode, "OVC_HIVSTAT") &
+          !Age %in% c("")) %>%
+      dplyr::bind_rows(defunct)
+  }
+  
+  defunct %<>%
     dplyr::select(indicatorCode, Age, Sex, KeyPop) %>%
     dplyr::distinct()
   
@@ -896,31 +919,36 @@ packForDATIM <- function(d, type = NA) {
       dplyr::mutate(
         period = datapackr::periodInfo$iso,
         value = round_trunc(as.numeric(value))) %>%
-      dplyr::left_join(datapackr::PSNUxIM_to_DATIM %>%
+      dplyr::left_join(datapackr::SiteToDATIM %>%
                          dplyr::filter(dataset == "MER") %>%
-                         dplyr::select(-sheet_name, -typeOptions, -dataset),
-                       by = c("indicatorCode" = "indicatorCode",
-                              "Age" = "validAges",
-                              "Sex" = "validSexes",
-                              "KeyPop" = "validKPs")) %>%
+                         dplyr::select(-sheet_name, -dataset, -tech_area, -num_den),
+                       by = c("indicatorCode" = "indicator_code",
+                              "Type" = "type_options",
+                              "Age" = "valid_ages",
+                              "Sex" = "valid_sexes",
+                              "KeyPop" = "valid_kps")) %>%
+      tidyr::drop_na(dataelementuid) %>%
+      dplyr::group_by_at(dplyr::vars(-value)) %>%
+      dplyr::summarise(value = sum(value)) %>%
+      dplyr::ungroup() %>%
       dplyr::select(
         dataElement = dataelementuid,
         period,
         orgUnit = site_uid,
         categoryOptionCombo = categoryoptioncombouid,
-        attributeOptionCombo= mech_code,
+        attributeOptionCombo = mech_code,
         value) 
     
-    if( any(is.na(importFile)) ) {
+    if(any(is.na(importFile)) ) {
       
-        msg<-paste0("ERROR! Empty values found in DATIM export. These will
+        msg <- paste0("ERROR! Empty values found in DATIM export. These will
                      be filtered.")
-        d$info$warningMsg<-append(msg,d$info$warningMsg)
-        d$info$has_error<-TRUE
+        d$info$warningMsg <- append(msg,d$info$warningMsg)
+        d$info$has_error <- TRUE
     }
    
     d$datim$site_data <- importFile %>% 
-      dplyr::filter( purrr::reduce(purrr::map(., is.na), `+`) == 0 )
+      dplyr::filter(purrr::reduce(purrr::map(., is.na), `+`) == 0 )
     
   }
   
