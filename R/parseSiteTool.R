@@ -350,27 +350,15 @@ unPackSiteToolSheet <- function(d) {
     # Drop zeros, NAs, dashes, and space-only entries
     tidyr::drop_na(value) %>%
     dplyr::filter(
-      !is.na(suppressWarnings(as.numeric(value)))
-      & value != 0) %>%
+      !is.na(suppressWarnings(as.numeric(value)))) %>% 
     dplyr::mutate(value = as.numeric(value))
-  
-  #Has decimal numbers
-  has_decimals <- d$data$extract$value %% 1 != 0
-  
-  if (any(has_decimals)){
-    msg <-
-      paste0(
-        "ERROR! In tab ",
-        d$data$sheet,
-        ":" ,
-        sum(has_decimals),
-        " DECIMAL VALUES found!")
-    d$info$warningMsg <- append(msg, d$info$warningMsg)
-    d$info$has_error <- TRUE
-  }
   
   #Is dedupe
   is_dedupe <- stringr::str_detect("00000",d$data$extract$mech_code)
+  
+  #Go ahead and filter any zeros, which are not dedupe
+  d$data$extract %<>% dplyr::filter(value == 0 & !is_dedupe)
+  
   # TEST for Negative values in non-dedupe mechanisms
   has_negative_numbers <-   ( d$data$extract$value < 0 ) & !is_dedupe
   
@@ -386,7 +374,6 @@ unPackSiteToolSheet <- function(d) {
     d$info$warningMsg<-append(msg,d$info$warningMsg)
     d$info$has_error<-TRUE
   }
-  
   
   # TEST for positive values in dedupe mechanisms
   
@@ -405,6 +392,22 @@ unPackSiteToolSheet <- function(d) {
     d$info$warningMsg<-append(msg,d$info$warningMsg)
     d$info$has_error<-TRUE
   }
+  
+  #Test for decimals
+  has_decimals <- d$data$extract$value %% 1 != 0
+  
+  if (any(has_decimals)){
+    msg <-
+      paste0(
+        "ERROR! In tab ",
+        d$data$sheet,
+        ":" ,
+        sum(has_decimals),
+        " DECIMAL VALUES found!")
+    d$info$warningMsg <- append(msg, d$info$warningMsg)
+    d$info$has_error <- TRUE
+  }
+  
   
   # TEST for duplicates
   any_dups <- d$data$extract %>%
@@ -433,7 +436,7 @@ unPackSiteToolSheet <- function(d) {
         paste0(indicatorCode, ":"), Age, Sex, KeyPop
       ))) %>%
       dplyr::pull(msg)
-    msg <- paste0("In tab ", d$data$sheet, ": DEFUNCT DISAGGS ->",
+    msg <- paste0("ERROR! In tab ", d$data$sheet, ": DEFUNCT DISAGGS ->",
                   paste(defunctMsg, collapse = ","))
     d$info$warningMsg<-append(msg,d$info$warningMsg)
     d$info$has_error<-TRUE
@@ -444,7 +447,7 @@ unPackSiteToolSheet <- function(d) {
   not_yet_distributed <- stringr::str_detect(d$data$extract$Site,'NOT YET')
   
   if (any(not_yet_distributed)) {
-    msg<- paste0("In tab ", d$data$sheet, ": UNALLOCATED VALUES FOUND!")
+    msg<- paste0("ERROR! In tab ", d$data$sheet, ": UNALLOCATED VALUES FOUND!")
     d$info$warningMsg<-append(msg,d$info$warningMsg)
     d$info$has_error<-TRUE
   }
