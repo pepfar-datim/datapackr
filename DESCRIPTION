@@ -40,7 +40,8 @@ Imports:
     stats,
     lubridate
 Suggests:
-    devtools (>= 2.0.1)
+    devtools (>= 2.0.1),
+    testthat
 Remotes: jason-p-pickering/openxlsx
 License: GPL-2
 Encoding: UTF-8

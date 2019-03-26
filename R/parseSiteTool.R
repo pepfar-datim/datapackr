@@ -357,11 +357,11 @@ unPackSiteToolSheet <- function(d) {
   is_dedupe <- stringr::str_detect("00000",d$data$extract$mech_code)
   
   #Go ahead and filter any zeros, which are not dedupe
-  d$data$extract %<>% dplyr::filter(value == 0 & !is_dedupe)
+  d$data$extract %<>% dplyr::filter( value != 0 & !is_dedupe)
+  is_dedupe <- stringr::str_detect("00000",d$data$extract$mech_code)
   
   # TEST for Negative values in non-dedupe mechanisms
   has_negative_numbers <-   ( d$data$extract$value < 0 ) & !is_dedupe
-  
   if (any(has_negative_numbers)) {
     negCols <- d$data$extract %>%
       dplyr::filter(value < 0) %>%
