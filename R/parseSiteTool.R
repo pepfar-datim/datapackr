@@ -291,31 +291,42 @@ unPackSiteToolSheet <- function(d) {
       data[add] <- NA_character_
     return(data)
   }
-  
+
   d$data$extract <-
     readxl::read_excel(
       path = d$keychain$submission_path,
       sheet = d$data$sheet,
       range = readxl::cell_limits(c(5, 1), c(NA, NA))
-    ) %>% dplyr::filter_all(dplyr::any_vars(!is.na(.)))
+    ) 
+  
+  actual_cols <- names(d$data$extract)
+  
+  # Run structural checks before any filtering
+  d <- checkSiteToolColStructure(d)
   
   if (NROW(d$data$extract) ==  0) {
     d$data$extract<-emptySiteToolSheetFrame()
     return(d)
   }
   
-  # Run structural checks
-  
-  d <- checkSiteToolColStructure(d)
+  #Static columns
+  static_cols<-c("Status","Site",
+                 "Mechanism","Type","Age","Sex","KeyPop")
   
   # List Target Columns
   targetCols <- datapackr::site_tool_schema %>%
     dplyr::filter(sheet_name == d$data$sheet,
                   col_type == "Target") %>%
-    dplyr::pull(indicator_code)
+    dplyr::pull(indicator_code) %>%
+    append(static_cols,.)
+  
+  import_cols<-actual_cols[actual_cols %in% targetCols]
   
   # Add cols to allow compiling with other sheets
   d$data$extract %<>%
+    #Only process needed columns
+    dplyr::select(import_cols) %>%
+    dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
     #Filter out any unallocated dedupe values
     dplyr::filter( stringr::str_detect(Mechanism,pattern = "Dedupe", negate = TRUE)) %>%
     addcols(c("KeyPop", "Age", "Sex")) %>%
@@ -451,12 +462,24 @@ unPackSiteToolSheet <- function(d) {
     d$info$warningMsg<-append(msg,d$info$warningMsg)
     d$info$has_error<-TRUE
   }
-                      
+
+  #Test for any missing mechanisms
+  if ( sum(is.na(d$data$extract$mech_code)) ) {
+    msg<- paste0("ERROR! In tab ", d$data$sheet, ": blank mechanisms found!")
+    d$info$warningMsg<-append(msg,d$info$warningMsg)
+    d$info$has_error<-TRUE
+  }
+  
+  #Test for any missing mechanisms
+  if ( sum(is.na(d$data$extract$Type)) ) {
+    msg<- paste0("ERROR! In tab ", d$data$sheet, ": missing DSD/TA attributtion found!")
+    d$info$warningMsg<-append(msg,d$info$warningMsg)
+    d$info$has_error<-TRUE
+  }
   
   return(d)
   
 }
-
 
 #' @title Derive non-Data Pack targets from others in the Data Pack/Site Tool
 #' 
