@@ -178,9 +178,13 @@ unPackSiteToolSheets <- function(d) {
     d$data$sheet = sheets_to_read[i]
     interactive_print(d$data$sheet)
     d <- unPackSiteToolSheet(d)
-    d$data$targets <-
-      dplyr::bind_rows(d$data$targets, d$data$extract)
-  }
+    
+    if (!is.null(d$data$extract)) {
+      d$data$targets <-
+        dplyr::bind_rows(d$data$targets, d$data$extract)
+    }
+  
+}
   
   return(d)
 }
@@ -298,6 +302,18 @@ unPackSiteToolSheet <- function(d) {
       sheet = d$data$sheet,
       range = readxl::cell_limits(c(5, 1), c(NA, NA))
     ) 
+  
+  is_empty_data_frame<-function(x) {
+    
+    d$data$extract %>% 
+      na.omit(.) %>%
+      NROW(.) == 0
+  }
+  
+  if ( is_empty_data_frame(d$data$extract) ) {
+    d$data$extract <-NULL
+    return(d)
+  }
   
   actual_cols <- names(d$data$extract)
   
