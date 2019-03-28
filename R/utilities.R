@@ -280,6 +280,17 @@ exportPackr <- function(data, output_path, type, datapack_name) {
 }
 
 
+#' @export
+#' 
+#' @title Prints message if session is interactive.
+#' 
+#' @description 
+#' Supplied a message, will print it only if the session is currently interactive.
+#' 
+#' @param x Message to print.
+#' 
+#' @return Printed message, \code{x}.
+#' 
 interactive_print <- function(x) if (interactive()) { print(x) }
 
 
@@ -292,10 +303,13 @@ interactive_print <- function(x) if (interactive()) { print(x) }
 #' 
 #' @param country_uids Character vector of DATIM country IDs. This can only
 #' include countries. Regional Operating Unit uids will not be accepted
+#' @param include_mil Logical. If \code{TRUE}, will also include _Military nodes
+#' related to \code{country_uids}. Default is \code{FALSE}.
 #' 
 #' @return Data frame of PSNUs
 #' 
-getPSNUs <- function(country_uids = NA) {
+getPSNUs <- function(country_uids = NA,
+                     include_mil = FALSE) {
   
   countries <- datapackr::api_call("organisationUnits") %>%
     datapackr::api_filter("organisationUnitGroups.id:eq:cNzfcPWEGSH") %>%
@@ -303,7 +317,9 @@ getPSNUs <- function(country_uids = NA) {
     datapackr::api_get()
   
   PSNUs <- datapackr::api_call("organisationUnits") %>%
-    datapackr::api_filter("organisationUnitGroups.id:in:[AVy8gJXym2D,nwQbMeALRjL]") %>%
+    datapackr::api_filter(paste0("organisationUnitGroups.id:in:[AVy8gJXym2D",
+                                 dplyr::if_else(include_mil, ",nwQbMeALRjL", ""),
+                                 "]")) %>%
     datapackr::api_fields("id,name,level,ancestors[id,name],organisationUnitGroups[id,name]") %>%
     datapackr::api_get() %>%
     dplyr::mutate(
@@ -472,4 +488,116 @@ getCountries <- function(datapack_uid = NA) {
     
   return(countries)
     
+}
+
+
+
+#' @export
+#' @title Test for file read access
+#' 
+#' @description 
+#' Given a file path, will test whether the file can be read.
+#' 
+#' @param path Filepath to test.
+#' 
+#' @return Logical. \code{TRUE} if file can be read, \code{FALSE} if not.
+#'
+can_read_file <- function(path) {
+  if (is.na(path)) {return(FALSE)}
+  file.access(path, 4) == 0
+}
+
+
+
+#' @export
+#' @title Test an input file for read access and type. Prompt if issues.
+#' 
+#' @description 
+#' Supplied a filepath, will test that this file is readable and is of the
+#' correct filetype. If either readability or file type is invalid, will prompt
+#' for user selection of correct filepath via computer window.
+#' 
+#' @param path Filepath to test and use.
+#' @param extension File extension to test for. (Do not include leading period.)
+#' 
+#' @return Character vector containing valid filepath for further use.
+#' 
+handshake_file <- function(path = NA, extension) {
+  
+  if (!can_read_file(path) & interactive()) {
+    interactive_print("Please choose a file.")
+    path <- file.choose()
+  }
+
+  msg <- "Checking the file exists..."
+  interactive_print(msg)
+
+  if (!can_read_file(path)) {
+    stop("File could not be read!")
+  }
+  
+  if (tools::file_ext(path) != tolower(extension)) {
+    stop(paste0("File is not the correct format! File must have extension .",
+                extension))
+  } else {
+  
+    return(path)
+  }
+
+}
+
+
+
+#' @export
+#' @title Extract and save schema from Data Pack template.
+#' 
+#' @description
+#' Supplied a filepath to a Data Pack template (XLSX), will extract and save a
+#' schema based on the template as a global object.
+#' 
+#' @param path Local filepath for a Data Pack template (XLSX).
+#' 
+#' @return Data Pack schema saved as a global object.
+#'
+unPackSchema <- function(path) {
+  sheets <- tidyxl::xlsx_sheet_names(path)
+  sheets_to_loop <- sheets[which(!stringr::str_detect(sheets, "Home|Quotes|Summary|Spectrum|Visualizations|Validations"))]
+  
+  schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = FALSE) %>%
+    dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
+  
+  data.table::setDT(schema)[,sheet_num:=.GRP, by = c("sheet_name")]
+  
+  schema %<>%
+    dplyr::filter(sheet_name %in% sheets_to_loop,
+                  row %in% c(3,5,6)) %>%
+    tidyr::gather(key,value,-sheet_num,-sheet_name,-col,-row) %>%
+    tidyr::unite(new.col, c(key,row)) %>%
+    tidyr::spread(new.col,value) %>%
+    dplyr::select(sheet_num,sheet_name,col,
+                  label = character_3,
+                  indicator_code = character_5,
+                  formula = formula_6,
+                  value = numeric_6) %>%
+    dplyr::mutate(
+      formula = dplyr::case_when(is.na(formula) ~ value,
+                                 TRUE ~ formula),
+      col_type = dplyr::case_when(
+        stringr::str_detect(indicator_code, "20T")
+        & !(sheet_name == "Prioritization" & indicator_code != "IMPATT.PRIORITY_SNU.20T")
+        & !(sheet_name == "HTS" & (!stringr::str_detect(indicator_code,"^HTS_") | stringr::str_detect(indicator_code,"HTS_TST_PMTCT")))
+        & !(sheet_name == "VMMC" & stringr::str_detect(indicator_code, "POP_EST|coverage"))
+        ~ "Target",
+        indicator_code %in% c("PSNU","Age","Sex","ID","AgeCoarse","IDAgeCoarse",
+                              "PSNUCheck","KeyPop","sheet_name","indicatorCode",
+                              "CoarseAge","sheet_num")
+        ~ "Row Header"),
+      dataset = dplyr::case_when(
+        col_type == "Target" & stringr::str_detect(indicator_code,"SUBNAT|VL_SUPPRESSED") ~ "SUBNAT",
+        col_type == "Target" & stringr::str_detect(indicator_code,"PLHIV|POP_EST|HIV_PREV|PRIORITY|KP_ESTIMATES") ~ "IMPATT",
+        col_type == "Target" ~ "MER")) %>%
+    dplyr::select(-value) %>%
+    dplyr::arrange(sheet_num, col)
+  
+  return(schema)
 }

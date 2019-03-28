@@ -4,11 +4,14 @@
 \alias{getPSNUs}
 \title{Pull list of PSNUs from DATIM and format based on datapackr structure.}
 \usage{
-getPSNUs(country_uids = NA)
+getPSNUs(country_uids = NA, include_mil = FALSE)
 }
 \arguments{
 \item{country_uids}{Character vector of DATIM country IDs. This can only
 include countries. Regional Operating Unit uids will not be accepted}
+
+\item{include_mil}{Logical. If \code{TRUE}, will also include _Military nodes
+related to \code{country_uids}. Default is \code{FALSE}.}
 }
 \value{
 Data frame of PSNUs
