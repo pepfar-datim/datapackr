@@ -99,7 +99,7 @@ comparePacks <- function(datapack_path, sitetool_path, output_path) {
   # Summarize diffs
     summary.categories <- diffs %>%
       dplyr::group_by(category) %>%
-      dplyr::summarise(n = dplyr::n()) %>%
+      dplyr::summarise(count = dplyr::n()) %>%
       dplyr::ungroup()
     
     summary.indicators <- comparison %>%
@@ -114,7 +114,7 @@ comparePacks <- function(datapack_path, sitetool_path, output_path) {
                        valueRounded.datapack = sum(valueRounded.datapack),
                        value.sitetool = sum(value.sitetool)) %>%
       dplyr::ungroup() %>%
-      dplyr::mutate(diff = value.datapack - value.sitetool) %>%
+      dplyr::mutate(diff = (value.sitetool - value.datapack)/value.datapack) %>%
       dplyr::arrange(dplyr::desc(abs(diff)))
      
   # Write to Excel Document
