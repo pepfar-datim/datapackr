@@ -30,6 +30,7 @@ if (getRversion() >= "2.15.1")
       "ancestors",
       "attributeoptioncombo",
       "attributeOptionCombo",
+      "category",
       "categoryoptioncombo",
       "categoryOptionCombo",
       "categoryoptioncombouid",
@@ -172,6 +173,9 @@ if (getRversion() >= "2.15.1")
       "validKPs",
       "validSexes",
       "value",
+      "value.datapack",
+      "value.sitetool",
+      "valueRounded.datapack",
       "wb",
       "weight"
     )

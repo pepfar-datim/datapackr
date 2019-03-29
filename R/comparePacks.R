@@ -115,7 +115,7 @@ comparePacks <- function(datapack_path, sitetool_path, output_path) {
                        value.sitetool = sum(value.sitetool)) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(diff = value.datapack - value.sitetool) %>%
-      dplyr::arrange(desc(abs(diff)))
+      dplyr::arrange(dplyr::desc(abs(diff)))
      
   # Write to Excel Document
     wb <- openxlsx::createWorkbook()
