@@ -261,7 +261,7 @@ loadStyleGuide <- function() {
                                   halign = "left",
                                   valign = "center"),
     ## Home Tab OU Name
-    data_pack_name = openxlsx::createStyle(fontColour = "#9CBEBD",
+    datapack_name = openxlsx::createStyle(fontColour = "#9CBEBD",
                                             fontSize = 64,
                                             textDecoration = "bold",
                                             halign = "left",

@@ -302,30 +302,31 @@ unPackSiteToolSheet <- function(d) {
       sheet = d$data$sheet,
       range = readxl::cell_limits(c(5, 1), c(NA, NA))
     ) 
-  
-  is_empty_data_frame<-function(x) {
-    
-    d$data$extract %>% 
-      na.omit(.) %>%
-      NROW(.) == 0
-  }
-  
-  if ( is_empty_data_frame(d$data$extract) ) {
-    d$data$extract <-NULL
+  #No rows
+  if (NROW(d$data$extract) ==  0) {
+    d$data$extract<-NULL
     return(d)
   }
   
-  actual_cols <- names(d$data$extract)
+  #Only empty rows
+  is_empty_row <- function(x) {
+    
+  purrr::reduce(purrr::map(x, is.na), `+`) == NCOL(foo)
+    
+  }
+  
+  empty_rows<-is_empty_row(d$data$extract)
+  
+   if ( all(empty_rows) ) {
+     d$data$extract <-NULL
+   return(d)
+   }
   
   # Run structural checks before any filtering
   d <- checkSiteToolColStructure(d)
   
-  if (NROW(d$data$extract) ==  0) {
-    d$data$extract<-emptySiteToolSheetFrame()
-    return(d)
-  }
-  
-  #Static columns
+  actual_cols <- names(d$data$extract)
+  # Static columns
   static_cols<-c("Status","Site",
                  "Mechanism","Type","Age","Sex","KeyPop")
   
@@ -344,6 +345,7 @@ unPackSiteToolSheet <- function(d) {
     dplyr::select(import_cols) %>%
     dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
     #Filter out any unallocated dedupe values
+    #TODO Not sure we should really be filtering Dedupe here?? 
     dplyr::filter( stringr::str_detect(Mechanism,pattern = "Dedupe", negate = TRUE)) %>%
     addcols(c("KeyPop", "Age", "Sex")) %>%
     # Extract Site

@@ -1,53 +1,78 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
 #' @importFrom utils packageVersion
-#' @title writeHomeTab(wb, data_pack_uid, type = "Data Pack")
+#' @title writeHomeTab(wb, datapack_uid, type = "Data Pack")
 #' 
 #' @description
 #' Function to write Home tab details into either Data Pack or Site Tool, as
 #' specified.
 #' 
 #' @param wb Openxlsx workbook object.
-#' @param data_pack_uid Unique ID designating which Data Pack the Home tab should
+#' @param datapack_uid Unique ID designating which Data Pack the Home tab should
 #' list.
 #' @param type Either "Data Pack" or "Site Tool". Defaults to "Data Pack".
 #' 
 #' @return Openxlsx workbook object with added, styled Home tab.
 #' 
-writeHomeTab <- function(wb, data_pack_uid, type = "Data Pack") {
-# Add Tab ####
-  openxlsx::addWorksheet(wb,
-                         sheetName = "Home",
-                         gridLines = FALSE)
-# PEPFAR banner ####
-  openxlsx::writeData(wb, "Home", "PEPFAR", xy = c(2,2), colNames = F)
-  openxlsx::addStyle(wb, "Home", datapackr::styleGuide$home$pepfar, rows = 2, cols = 2)
+writeHomeTab <- function(wb, datapack_uid, type = "Data Pack") {
   
-# Title ####
-  openxlsx::writeData(wb, "Home", paste0("COP19 ",type), xy = c(2,10), colNames = F)
-  openxlsx::addStyle(wb, "Home", datapackr::styleGuide$home$title, rows = 10, cols = 2)
   
-# ou_name ####
-  data_pack_name <- datapackr::dataPackMap %>%
-    dplyr::filter(model_uid == data_pack_uid) %>%
-    dplyr::pull(data_pack_name) %>%
-    unique()
-  openxlsx::writeData(wb, "Home", data_pack_name, xy = c(2,20), colNames = F)
-  openxlsx::addStyle(wb, "Home", datapackr::styleGuide$home$data_pack_name, rows = 20, cols = 2)
+  # Add Tab ####
+  if(!stringr::str_detect(names(wb), "Home")) {
+      openxlsx::addWorksheet(wb,
+                             sheetName = "Home",
+                             gridLines = FALSE)
+  }
   
-# data_pack_uid ####
-  openxlsx::writeData(wb, "Home", data_pack_uid, xy = c(2,25), colNames = F)
-  
-# Generated: ####
-  openxlsx::writeData(wb, "Home", paste("Generated on:", Sys.time()), xy = c(2, 27), colNames = F)
-
-# Package version ####
-  openxlsx::writeData(wb,"Home",
-                      paste("Package version:",
-                        as.character(utils::packageVersion("datapackr"))),
-                      xy = c(2, 29))
+  # PEPFAR banner ####
+    openxlsx::writeData(wb, "Home", "PEPFAR", xy = c(2,2), colNames = F)
+    openxlsx::addStyle(wb, "Home",
+                       datapackr::styleGuide$home$pepfar,
+                       rows = 2, cols = 2)
     
-return(wb)
+  # Title ####
+    openxlsx::writeData(wb, "Home",
+                        x = paste0("COP",
+                                   stringr::str_sub(cop_year(), -2,-1),
+                                   " ",
+                                   type),
+                        xy = c(2,10),
+                        colNames = F)
+    openxlsx::addStyle(wb, "Home",
+                       datapackr::styleGuide$home$title,
+                       rows = 10, cols = 2)
+    
+  # datapack_name ####
+    datapack_name <- datapackr::dataPackMap %>%
+      dplyr::filter(model_uid == datapack_uid) %>%
+      dplyr::pull(datapack_name) %>%
+      unique()
+    openxlsx::writeData(wb, "Home", datapack_name, xy = c(2,20), colNames = F)
+    openxlsx::addStyle(wb, "Home",
+                       datapackr::styleGuide$home$datapack_name,
+                       rows = 20, cols = 2)
+    
+  # datapack_uid ####
+    openxlsx::writeData(wb, "Home", datapack_uid, xy = c(2,25), colNames = F)
+    
+  # Generated: ####
+    openxlsx::writeData(wb, "Home",
+                        paste("Generated on:", Sys.time()),
+                        xy = c(2, 27),
+                        colNames = F)
+  
+  # Package version ####
+    openxlsx::writeData(wb, "Home",
+                        paste("Package version:",
+                              as.character(utils::packageVersion("datapackr"))),
+                        xy = c(2, 29))
+    
+  # COP Year ####
+    openxlsx::writeData(wb, "Home",
+                        cop_year(),
+                        xy = c(2, 31))
+      
+  return(wb)
 }
 
 
@@ -267,7 +292,7 @@ packFrame <- function(datapack_uid, type = "Data Pack") {
     options("openxlsx.numFmt" = "#,##0")
     
 # Write Home Page ####
-    wb <- writeHomeTab(wb = wb, data_pack_uid = datapack_uid, type = type)
+    wb <- writeHomeTab(wb = wb, datapack_uid = datapack_uid, type = type)
   
 # Add Tool specific tabs ####
   if (type == "Site Tool") {

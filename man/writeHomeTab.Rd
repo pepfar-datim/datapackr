@@ -2,14 +2,14 @@
 % Please edit documentation in R/packFrame.R
 \name{writeHomeTab}
 \alias{writeHomeTab}
-\title{writeHomeTab(wb, data_pack_uid, type = "Data Pack")}
+\title{writeHomeTab(wb, datapack_uid, type = "Data Pack")}
 \usage{
-writeHomeTab(wb, data_pack_uid, type = "Data Pack")
+writeHomeTab(wb, datapack_uid, type = "Data Pack")
 }
 \arguments{
 \item{wb}{Openxlsx workbook object.}
 
-\item{data_pack_uid}{Unique ID designating which Data Pack the Home tab should
+\item{datapack_uid}{Unique ID designating which Data Pack the Home tab should
 list.}
 
 \item{type}{Either "Data Pack" or "Site Tool". Defaults to "Data Pack".}
