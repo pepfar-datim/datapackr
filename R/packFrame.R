@@ -15,10 +15,9 @@
 #' @return Openxlsx workbook object with added, styled Home tab.
 #' 
 writeHomeTab <- function(wb, datapack_uid, type = "Data Pack") {
-  
-  
+
   # Add Tab ####
-  if(length(names(wb)) == 0 | !stringr::str_detect(names(wb), "Home")) {
+  if(length(wb$sheet_names) == 0 || !stringr::str_detect(names(wb), "Home")) {
       openxlsx::addWorksheet(wb,
                              sheetName = "Home",
                              gridLines = FALSE)
@@ -45,7 +44,7 @@ writeHomeTab <- function(wb, datapack_uid, type = "Data Pack") {
   # datapack_name ####
     datapack_name <- datapackr::dataPackMap %>%
       dplyr::filter(model_uid == datapack_uid) %>%
-      dplyr::pull(datapack_name) %>%
+      dplyr::pull(data_pack_name) %>%
       unique()
     openxlsx::writeData(wb, "Home", datapack_name, xy = c(2,20), colNames = F)
     openxlsx::addStyle(wb, "Home",
