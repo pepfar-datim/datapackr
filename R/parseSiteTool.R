@@ -303,10 +303,10 @@ unPackSiteToolSheet <- function(d) {
       range = readxl::cell_limits(c(5, 1), c(NA, NA))
     ) 
   
-  is_empty_data_frame<-function(x) {
+  is_empty_data_frame <- function(x) {
     
     d$data$extract %>% 
-      na.omit(.) %>%
+      stats::na.omit(.) %>%
       NROW(.) == 0
   }
   

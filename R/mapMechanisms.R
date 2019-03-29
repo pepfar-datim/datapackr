@@ -21,7 +21,7 @@ frameMechMap <- function(datapack_uid) {
     
   # Add Home tab ####
     wb <- writeHomeTab(wb = wb,
-                        data_pack_uid = datapack_uid,
+                        datapack_uid = datapack_uid,
                         type = "Mechanism Map")
     
   # Add other tabs ####

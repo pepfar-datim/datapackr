@@ -50,6 +50,9 @@ packDataPack <- function(datapack_uid,
   
   wb <- openxlsx::loadWorkbook(d$keychain$template_path)
   
+  # Derive schema from template####
+  
+  
   # Write Home Sheet info ####
   wb <- writeHomeTab(wb = wb,
                      datapack_uid = d$info$datapack_uid,
@@ -61,7 +64,8 @@ packDataPack <- function(datapack_uid,
   
   # Write Main Sheets ####
   sheets <- readxl::excel_sheets(d$keychain$template_path)
-  sheets_to_loop <- sheets[which(!stringr::str_detect(sheets, "Home|Quotes|Summary|Spectrum|SNU x IM|Visualizations"))]
+  sheets_to_loop <- sheets[which(!stringr::str_detect(sheets, "Home|Quotes|Summary|Spectrum|SNU x IM|Visualizations|Validations"))]
+  
   
   
   # Write SNU x IM tab ####
