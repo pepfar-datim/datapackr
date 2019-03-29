@@ -18,7 +18,7 @@ writeHomeTab <- function(wb, datapack_uid, type = "Data Pack") {
   
   
   # Add Tab ####
-  if(!stringr::str_detect(names(wb), "Home")) {
+  if(length(names(wb)) == 0 | !stringr::str_detect(names(wb), "Home")) {
       openxlsx::addWorksheet(wb,
                              sheetName = "Home",
                              gridLines = FALSE)
