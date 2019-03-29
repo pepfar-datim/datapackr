@@ -311,7 +311,7 @@ unPackSiteToolSheet <- function(d) {
   #Only empty rows
   is_empty_row <- function(x) {
     
-  purrr::reduce(purrr::map(x, is.na), `+`) == NCOL(.)
+  purrr::reduce(purrr::map(x, is.na), `+`) == NCOL(x)
     
   }
   
