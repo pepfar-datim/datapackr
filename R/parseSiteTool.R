@@ -310,10 +310,10 @@ unPackSiteToolSheet <- function(d) {
       NROW(.) == 0
   }
   
-  if ( is_empty_data_frame(d$data$extract) ) {
-    d$data$extract <-NULL
-    return(d)
-  }
+  # if ( is_empty_data_frame(d$data$extract) ) {
+  #   d$data$extract <-NULL
+  #   return(d)
+  # }
   
   actual_cols <- names(d$data$extract)
   
@@ -325,7 +325,7 @@ unPackSiteToolSheet <- function(d) {
     return(d)
   }
   
-  #Static columns
+  # Static columns
   static_cols<-c("Status","Site",
                  "Mechanism","Type","Age","Sex","KeyPop")
   
