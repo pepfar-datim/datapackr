@@ -395,8 +395,7 @@ unPackSiteToolSheet <- function(d) {
 
 if (any(has_negative_numbers)) {
   negCols <- d$data$extract %>%
-    dplyr::filter(value < 0) %>%
-    dplyr::filter( stringr::str_detect("00000", mech_code,negate = TRUE)) %>%
+    dplyr::filter( has_negative_numbers) %>% 
     dplyr::pull(indicatorCode) %>%
     unique() %>%
     paste(collapse = ", ")
