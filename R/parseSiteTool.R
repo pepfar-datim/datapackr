@@ -303,7 +303,7 @@ unPackSiteToolSheet <- function(d) {
       range = readxl::cell_limits(c(5, 1), c(NA, NA))
     ) %>% 
     #TODO Ugly hack for NOT A SITE ROWS
-    dplyr::filter(Status == "NOT A SITE")
+    dplyr::filter(Status != "NOT A SITE")
   #No rows
   if (NROW(d$data$extract) ==  0) {
     d$data$extract<-NULL
