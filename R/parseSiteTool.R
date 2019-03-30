@@ -409,7 +409,7 @@ if (any(has_negative_numbers)) {
   
   has_positive_dedupe <-
     (d$data$extract$value > 0) &
-    stringr::str_detect("00000", d$data$extract$mech_code, negate = TRUE)
+    stringr::str_detect("00000", d$data$extract$mech_code)
   
   if ( any( has_positive_dedupe ) ) {
     
