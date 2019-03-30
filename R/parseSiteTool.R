@@ -384,22 +384,22 @@ unPackSiteToolSheet <- function(d) {
       !is.na(suppressWarnings(as.numeric(value)))) %>% 
     dplyr::mutate(value = as.numeric(value))
   
-  #Is dedupe
-  is_dedupe <- stringr::str_detect("00000",d$data$extract$mech_code)
-  
   #Go ahead and filter any zeros, which are not dedupe
-  d$data$extract %<>% dplyr::filter( value != 0 & !is_dedupe)
-  is_dedupe <- stringr::str_detect("00000",d$data$extract$mech_code)
+  d$data$extract %<>% dplyr::filter(value != 0 &
+                                      stringr::str_detect("00000", mech_code,negate = TRUE))
   
   # TEST for Negative values in non-dedupe mechanisms
-  has_negative_numbers <-   ( d$data$extract$value < 0 ) & !is_dedupe
-  if (any(has_negative_numbers)) {
-    negCols <- d$data$extract %>%
-      dplyr::filter(value < 0) %>%
-      dplyr::filter(!is_dedupe) %>% 
-      dplyr::pull(indicatorCode) %>%
-      unique() %>%
-      paste(collapse = ", ")
+  has_negative_numbers <-
+    ( d$data$extract$value < 0 ) &
+    stringr::str_detect("00000", d$data$extract$mech_code, negate = TRUE)
+
+if (any(has_negative_numbers)) {
+  negCols <- d$data$extract %>%
+    dplyr::filter(value < 0) %>%
+    dplyr::filter( stringr::str_detect("00000", mech_code,negate = TRUE)) %>%
+    dplyr::pull(indicatorCode) %>%
+    unique() %>%
+    paste(collapse = ", ")
     
     msg<-paste0("ERROR! In tab ", d$data$sheet, ": NEGATIVE VALUES found! -> ", negCols, "")
     d$info$warningMsg<-append(msg,d$info$warningMsg)
@@ -408,13 +408,14 @@ unPackSiteToolSheet <- function(d) {
   
   # TEST for positive values in dedupe mechanisms
   
-  has_positive_dedupe <- ( d$data$extract$value > 0 ) & is_dedupe
+  has_positive_dedupe <-
+    (d$data$extract$value > 0) &
+    stringr::str_detect("00000", d$data$extract$mech_code, negate = TRUE)
   
   if ( any( has_positive_dedupe ) ) {
     
     negCols <- d$data$extract %>%
-      dplyr::filter(value > 0) %>%
-      dplyr::filter(is_dedupe) %>% 
+      dplyr::filter(has_positive_dedupe) %>% 
       dplyr::pull(indicatorCode) %>%
       unique() %>%
       paste(collapse = ", ")
