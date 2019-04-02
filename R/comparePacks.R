@@ -7,11 +7,10 @@
 #' 
 #' @param datapack_path Local filepath leading to Data Pack to analyze.
 #' @param sitetool_path Local filepath leading to Site Tool to analyze.
-#' @param output_path Local folder where you want output written.
 #' 
-#' @return Log of differences in target totals.
+#' @return List of data frames
 #' 
-comparePacks <- function(datapack_path, sitetool_path, output_path) {
+comparePacks <- function(datapack_path, sitetool_path) {
   
   dp <- unPackData(submission_path = datapack_path)
   
@@ -117,32 +116,55 @@ comparePacks <- function(datapack_path, sitetool_path, output_path) {
       dplyr::mutate(diff = (value.sitetool - value.datapack)/value.datapack) %>%
       dplyr::arrange(dplyr::desc(abs(diff)))
      
-  # Write to Excel Document
-    wb <- openxlsx::createWorkbook()
     
-    sheetNames <- c("Data Pack Data", "Site Tool Data", "Comparison", "Diffs",
-                    "Category Summary", "Indicator Summary")
-    
-    invisible(sapply(sheetNames, function(x) openxlsx::addWorksheet(wb, sheetName = x)))
-    
-    openxlsx::writeData(wb, sheet = 1, x = datapack_data)
-    openxlsx::writeData(wb, sheet = 2, x = sitetool_data)
-    openxlsx::writeData(wb, sheet = 3, x = comparison)
-    openxlsx::writeData(wb, sheet = 4, x = diffs)
-    openxlsx::writeData(wb, sheet = 5, x = summary.categories)
-    openxlsx::writeData(wb, sheet = 6, x = summary.indicators)
+    list(datapack_data = datapack_data,
+         sitetool_data = sitetool_data,
+         comparison = comparison,
+         diffs = diffs,
+         summary.categories = summary.categories,
+         summary.indicators = summary.indicators,
+         country_name = st$info$datapack_name)
     
 
-    filename = paste0(
-      output_path,
-      if (is.na(stringr::str_extract(output_path,"/$"))) {"/"} else {},
-      "DataPack_SiteTool_Comparison_",
-      st$info$datapack_name,
-      "_",
-      format(Sys.time(), "%Y%m%d%H%M%S"),
-      ".xlsx"
-    )
-        
-    openxlsx::saveWorkbook(wb, file = filename)
-      
+  }
+
+#' @export
+#' @title Write a comparison workbook
+#' 
+#' @description 
+#' Writes an XLSX workbook from a object from comparePacks
+#' 
+#' 
+#' @param d List of data frames from comparePacks
+#' @param output_path Local folder where you want output written.
+#' 
+
+writeComparisonWorkbook <- function(d, output_path) {
+  
+  # Write to Excel Document
+  wb <- openxlsx::createWorkbook()
+  sheetNames <- c("Data Pack Data", "Site Tool Data", "Comparison", "Diffs",
+                  "Category Summary", "Indicator Summary")
+  
+  invisible(sapply(sheetNames, function(x) openxlsx::addWorksheet(wb, sheetName = x)))
+  
+  openxlsx::writeData(wb, sheet = 1, x = d$datapack_data)
+  openxlsx::writeData(wb, sheet = 2, x = d$sitetool_data)
+  openxlsx::writeData(wb, sheet = 3, x = d$comparison)
+  openxlsx::writeData(wb, sheet = 4, x = d$diffs)
+  openxlsx::writeData(wb, sheet = 5, x = d$summary.categories)
+  openxlsx::writeData(wb, sheet = 6, x = d$summary.indicators)
+  
+  filename = paste0(
+    output_path,
+    if (is.na(stringr::str_extract(output_path,"/$"))) {"/"} else {},
+    "DataPack_SiteTool_Comparison_",
+    st$info$datapack_name,
+    "_",
+    format(Sys.time(), "%Y%m%d%H%M%S"),
+    ".xlsx"
+  )
+  
+  openxlsx::saveWorkbook(wb, file = filename)
+  
 }
