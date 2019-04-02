@@ -29,11 +29,14 @@ comparePacks <- function(datapack_path, sitetool_path) {
     
     siteList <- getSiteList(country_uids, include_mil = TRUE)
     
-    sitetool_data <- st$data$targets %>%
+    sitetool_data_raw <- st$data$targets %>%
       dplyr::filter(indicatorCode != "VMMC_CIRC.N.Age/Sex.20T") %>%
       dplyr::left_join(siteList %>%
                          dplyr::select(id, psnu, psnu_uid, country_name, country_uid),
-                       by = c("site_uid" = "id")) %>%
+                       by = c("site_uid" = "id"))
+    
+    
+    sitetool_data_summary <- sitetool_data_raw %>%
       dplyr::select(-Type, -sheet_name, -Site, -site_uid) %>%
       dplyr::group_by(country_name, country_uid, psnu, psnu_uid, mech_code,
                       indicatorCode, Age, Sex, KeyPop) %>%
@@ -42,6 +45,11 @@ comparePacks <- function(datapack_path, sitetool_path) {
       dplyr::select(country_name, country_uid, psnu, psnu_uid,
                     indicatorCode, Age, Sex, KeyPop, mech_code,
                     value.sitetool)
+
+    sitetool_data_raw %<>%
+      dplyr::select(country_name,  psnu, Site,
+                    indicatorCode, Type, Age, Sex, KeyPop, mech_code,
+                    value)
     
   # Prepare Data Pack data
     datapack_data <- dp$data$distributedMER %>%
@@ -59,7 +67,7 @@ comparePacks <- function(datapack_path, sitetool_path) {
                     value.datapack = value, valueRounded.datapack)
     
   # Compare
-    comparison <- sitetool_data %>%
+    comparison <- sitetool_data_summary %>%
       dplyr::full_join(datapack_data,
                        by = c("country_name",
                               "country_uid",
@@ -118,12 +126,12 @@ comparePacks <- function(datapack_path, sitetool_path) {
      
     
     list(datapack_data = datapack_data,
-         sitetool_data = sitetool_data,
+         sitetool_data = sitetool_data_raw,
          comparison = comparison,
          diffs = diffs,
          summary.categories = summary.categories,
          summary.indicators = summary.indicators,
-         country_name = st$info$datapack_name)
+         datapack_name = st$info$datapack_name)
     
 
   }
@@ -139,7 +147,7 @@ comparePacks <- function(datapack_path, sitetool_path) {
 #' @param output_path Local folder where you want output written.
 #' 
 
-writeComparisonWorkbook <- function(d, output_path) {
+writeComparisonWorkbook <- function(d, filename) {
   
   # Write to Excel Document
   wb <- openxlsx::createWorkbook()
@@ -155,16 +163,8 @@ writeComparisonWorkbook <- function(d, output_path) {
   openxlsx::writeData(wb, sheet = 5, x = d$summary.categories)
   openxlsx::writeData(wb, sheet = 6, x = d$summary.indicators)
   
-  filename = paste0(
-    output_path,
-    if (is.na(stringr::str_extract(output_path,"/$"))) {"/"} else {},
-    "DataPack_SiteTool_Comparison_",
-    st$info$datapack_name,
-    "_",
-    format(Sys.time(), "%Y%m%d%H%M%S"),
-    ".xlsx"
-  )
-  
   openxlsx::saveWorkbook(wb, file = filename)
   
 }
+
+
