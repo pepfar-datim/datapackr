@@ -302,8 +302,8 @@ unPackSiteToolSheet <- function(d) {
       sheet = d$data$sheet,
       range = readxl::cell_limits(c(5, 1), c(NA, NA))
     ) %>% 
-    #TODO Ugly hack for NOT A SITE ROWS
-    dplyr::filter(Status != "NOT A SITE")
+    #TODO Ugly hack for NOT A SITE ROWS which have no site
+    dplyr::filter(Status != "NOT A SITE" & !is.na(Site))
   #No rows
   if (NROW(d$data$extract) ==  0) {
     d$data$extract<-NULL
@@ -409,7 +409,7 @@ if (any(has_negative_numbers)) {
   
   has_positive_dedupe <-
     (d$data$extract$value > 0) &
-    stringr::str_detect("00000", d$data$extract$mech_code, negate = TRUE)
+    stringr::str_detect("00000", d$data$extract$mech_code)
   
   if ( any( has_positive_dedupe ) ) {
     

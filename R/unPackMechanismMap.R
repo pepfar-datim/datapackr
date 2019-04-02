@@ -100,8 +100,11 @@ unPackMechanismMap <- function(mechMap_path = NA) {
       dplyr::ungroup() %>% dplyr::filter(grp_total != 1) 
 
     if(NROW(grp_weights_ne_one) > 0){
-      critical_issues <- c(critical_issues, 
-                           paste("\nErrors in Mechanism to Mechanism map. Some group weights do not sum to 1."))
+      # critical_issues <- c(critical_issues, 
+      #                      paste("\nErrors in Mechanism to Mechanism map. Some group weights do not sum to 1."))
+      msg <-
+        "WARNING: In Mechanism to Mechanism map, some group weights do not sum to 1."
+      interactive_print(paste(str(grp_weights_ne_one), msg))
       }
 
     newMechs_same_as_oldMechs <- mechMap %>% 
