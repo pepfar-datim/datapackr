@@ -348,7 +348,8 @@ unPackSiteToolSheet <- function(d) {
     dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
     #Filter out any unallocated dedupe values
     #TODO Not sure we should really be filtering Dedupe here?? 
-    dplyr::filter( stringr::str_detect(Mechanism,pattern = "Dedupe", negate = TRUE)) %>%
+    #dplyr::filter( stringr::str_detect(Mechanism,pattern = "Dedupe", negate = TRUE)) %>%
+    dplyr::mutate( Mechanism = stringr::str_replace(Mechanism,"Dedupe","00000 - Deduplication") ) %>%
     addcols(c("KeyPop", "Age", "Sex")) %>%
     # Extract Site
     dplyr::mutate(
@@ -385,8 +386,7 @@ unPackSiteToolSheet <- function(d) {
     dplyr::mutate(value = as.numeric(value))
   
   #Go ahead and filter any zeros, which are not dedupe
-  d$data$extract %<>% dplyr::filter(value != 0 &
-                                      stringr::str_detect("00000", mech_code,negate = TRUE))
+  d$data$extract %<>% dplyr::filter(value != 0 |  stringr::str_detect("00000", mech_code))
   
   # TEST for Negative values in non-dedupe mechanisms
   has_negative_numbers <-
@@ -452,8 +452,8 @@ if (any(has_negative_numbers)) {
     dplyr::arrange(row_id) %>%
     dplyr::pull(row_id)
   
-  if (NROW(any_dups) > 0) {
-    msg<- paste0("In tab ", d$data$sheet, ":" , NROW(any_dups)," DUPLICATE ROWS. These will be aggregated!" ) 
+  if (length(any_dups) > 0) {
+    msg<- paste0("In tab ", d$data$sheet, ":" , length(any_dups)," DUPLICATE ROWS. These will be aggregated!" ) 
     d$info$warningMsg<-append(msg,d$info$warningMsg)
   }
   

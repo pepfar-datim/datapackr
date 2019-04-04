@@ -61,7 +61,8 @@ comparePacks <- function(datapack_path, sitetool_path) {
                     Age =
                       dplyr::case_when(
                         stringr::str_detect(indicatorCode, "PMTCT_EID") ~ NA_character_,
-                        TRUE ~ Age)) %>%
+                        TRUE ~ Age),
+                    mechanismCode = stringr::str_replace(mechanismCode,"Dedupe","00000") )  %>%
       dplyr::select(country_name, country_uid, psnu, psnu_uid = psnuid,
                     indicatorCode, Age, Sex, KeyPop, mech_code = mechanismCode,
                     value.datapack = value, valueRounded.datapack)
