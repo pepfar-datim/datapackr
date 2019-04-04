@@ -896,7 +896,10 @@ packForDATIM <- function(d, type = NA) {
                       categoryOptionCombo,
                       mechanismCode) %>%
       dplyr::summarise(value = sum(value)) %>%
-      dplyr::ungroup()
+      dplyr::ungroup() %>%
+      #Remove anything which is NA here, 
+      #like TX_PVLS.N.Age/Sex/Indication/HIVStatus.20T.Routine
+      dplyr::filter(complete.cases(.))
       
   }
   
