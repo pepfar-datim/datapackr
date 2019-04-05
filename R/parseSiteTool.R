@@ -300,7 +300,8 @@ unPackSiteToolSheet <- function(d) {
     readxl::read_excel(
       path = d$keychain$submission_path,
       sheet = d$data$sheet,
-      range = readxl::cell_limits(c(5, 1), c(NA, NA))
+      range = readxl::cell_limits(c(5, 1), c(NA, NA)),
+      col_types = "text"
     ) %>% 
     #TODO Ugly hack for NOT A SITE ROWS which have no site
     dplyr::filter(Status != "NOT A SITE" & !is.na(Site))
@@ -354,7 +355,7 @@ unPackSiteToolSheet <- function(d) {
     # Extract Site
     dplyr::mutate(
       site_uid = stringr::str_extract(Site, "(?<=\\[)([A-Za-z][A-Za-z0-9]{10})(?=\\]$)"),
-      mech_code = stringi::stri_extract_first_regex(Mechanism, "^[0-9]{4,5}(?=\\s-)"),
+      mech_code = stringi::stri_extract_first_regex(Mechanism, "^[0-9]{4,6}(?=\\s-)"),
       # Tag sheet name
       sheet_name = d$data$sheet
     ) %>% 
