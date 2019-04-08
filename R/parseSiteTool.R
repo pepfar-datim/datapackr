@@ -302,9 +302,21 @@ unPackSiteToolSheet <- function(d) {
       sheet = d$data$sheet,
       range = readxl::cell_limits(c(5, 1), c(NA, NA)),
       col_types = "text"
-    ) %>% 
+    ) 
+  #Check for unallocated values
+  has_unallocated<-grepl("NOT A SITE",d$data$extract$Status) & grepl("NOT YET DISTRIBUTED",d$data$extract$Site)
+  
+  if (any(has_unallocated)) {
+    msg<-paste0("ERROR! In tab ", d$data$sheet, ": Unallocated values found!")
+    d$info$warningMsg<-append(msg,d$info$warningMsg)
+    d$info$has_error<-TRUE
+  }
+  
+  #Proceed by removing unallocated rows
+  d$data$extract%<>% 
     #TODO Ugly hack for NOT A SITE ROWS which have no site
-    dplyr::filter(Status != "NOT A SITE" & !is.na(Site))
+    dplyr::filter(Status != "NOT A SITE") 
+  
   #No rows
   if (NROW(d$data$extract) ==  0) {
     d$data$extract<-NULL
