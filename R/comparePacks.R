@@ -80,6 +80,7 @@ comparePacks <- function(datapack_path, sitetool_path) {
                               "KeyPop",
                               "mech_code")) %>%
       dplyr::mutate(
+        delta = (value.sitetool - valueRounded.datapack),
         diff = (value.sitetool - value.datapack)/value.datapack,
         diffRounded = (value.sitetool - valueRounded.datapack)/valueRounded.datapack) %>%
       dplyr::select(country_name, country_uid, psnu, psnu_uid,
@@ -90,7 +91,7 @@ comparePacks <- function(datapack_path, sitetool_path) {
     
   # Isolate diffs
     diffs <- comparison %>%
-      dplyr::filter(abs(diffRounded) >= 0.05 | is.na(diffRounded)) %>%
+      dplyr::filter(abs(diffRounded) >= 0.05 | is.na(diffRounded) | abs(delta) >= 1 ) %>%
       dplyr::mutate(
         category =
           dplyr::case_when(
@@ -122,7 +123,8 @@ comparePacks <- function(datapack_path, sitetool_path) {
                        valueRounded.datapack = sum(valueRounded.datapack),
                        value.sitetool = sum(value.sitetool)) %>%
       dplyr::ungroup() %>%
-      dplyr::mutate(diff = (value.sitetool - value.datapack)/value.datapack) %>%
+      dplyr::mutate( delta = value.sitetool - value.datapack,
+        diff = (value.sitetool - value.datapack)/value.datapack) %>%
       dplyr::arrange(dplyr::desc(abs(diff)))
      
     
