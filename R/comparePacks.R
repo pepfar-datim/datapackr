@@ -85,7 +85,7 @@ comparePacks <- function(datapack_path, sitetool_path) {
         diffRounded = (value.sitetool - valueRounded.datapack)/valueRounded.datapack) %>%
       dplyr::select(country_name, country_uid, psnu, psnu_uid,
                     indicatorCode, Age, Sex, KeyPop, mech_code,
-                    value.datapack, valueRounded.datapack, value.sitetool,
+                    value.datapack, valueRounded.datapack, value.sitetool, delta,
                     diff, diffRounded) %>%
       dplyr::arrange(country_name, psnu, indicatorCode, Age, Sex, KeyPop, mech_code)
     
