@@ -29,11 +29,13 @@ checkSiteToolOUinfo <- function(d) {
       range = "B21"
     ))
   
-  d$info$datapack_name<-ifelse(!is.na(regional_country_name),regional_country_name,datapack_region_name )
+  is_regional_country_pack<-length(regional_country_name) != 0
   
-  regional_country <-ifelse(!is.na(regional_country_name), "countryName","DataPack_name") 
+  d$info$datapack_name<-ifelse( is_regional_country_pack,regional_country_name,datapack_region_name )
   
-  regional_country_uid<-ifelse(!is.na(regional_country_name), "countryUID", "model_uid")
+  regional_country <-ifelse( is_regional_country_pack, "countryName","DataPack_name") 
+  
+  regional_country_uid<-ifelse(is_regional_country_pack, "countryUID", "model_uid")
   
   # Check ou_name and ou_uid match
   
