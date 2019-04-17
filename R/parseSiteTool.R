@@ -14,56 +14,80 @@ checkSiteToolOUinfo <- function(d) {
       sheet = "Home",
       range = "B25"
     ))
-  d$info$datapack_name <-
+  
+   datapack_region_name <-
     names(readxl::read_excel(
       d$keychain$submission_path,
       sheet = "Home",
       range = "B20"
     ))
   
-  d$info$regional_country_name <- 
+  regional_country_name <- 
     names(readxl::read_excel(
       d$keychain$submission_path,
       sheet = "Home",
       range = "B21"
     ))
   
+  d$info$datapack_name<-ifelse(!is.na(regional_country_name),regional_country_name,datapack_region_name )
+  
+  regional_country_switch <-ifelse(!is.na(regional_country_name), "countryName","DataPack_name") 
+  
+  regional_country_uid_switch<-ifelse(!is.na(regional_country_name), "countryUID", "model_uid")
+  
   # Check ou_name and ou_uid match
-  datapack_name <- datapackr::configFile %>%
-    dplyr::filter(model_uid == d$info$datapack_uid) %>%
-    dplyr::select(DataPack_name) %>%
-    unique() %>%
-    dplyr::pull(DataPack_name)
   
-  datapack_uid <- datapackr::configFile %>%
-    dplyr::filter(DataPack_name == d$info$datapack_name) %>%
-    dplyr::select(model_uid) %>%
-    dplyr::pull(model_uid) %>% 
-    unique()
-  
-  # If OU name and UID do not match, force identification via user prompt in Console
-  if (d$info$datapack_name != datapack_name |
-      d$info$datapack_uid != datapack_uid) {
-    msg <-
-      "The OU UID and OU name used in this submission don't match up!"
-    interactive_print(msg)
-    d$info$warningMsg <- append(msg, d$info$warningMsg)
+  verifyDataPackNameWithUID<-function(d,regional_country_uid_switch,regional_country_switch ) {
     
-    if (interactive()) {
-      d$info$datapack_name <- selectOU()
-    } else {
-      stop(msg)
+    regional_country_uid_switch <- rlang::sym(regional_country_uid_switch)
+    regional_country_switch <- rlang::sym(regional_country_swtich)
+    
+    datapack_name <- datapackr::configFile %>%
+      dplyr::filter(!!regional_country_uid_switch == d$info$datapack_uid) %>%
+      dplyr::select(!!regional_country_switch) %>%
+      dplyr::pull(!!regional_country_switch) %>% 
+      unique()
+     
+    #If we get nothing here (like the UID does not exist, we need to bail early)
+    if ( length(datapack_name) == 0  ) {
+      stop("Unknown DataPack Name. Please contact the DataPack Support Team!")
     }
     
-    d$info$datapack_uid <- datapackr::configFile %>%
-      dplyr::filter(DataPack_name == d$info$datapack_name) %>%
-      dplyr::select(model_uid) %>%
-      unique() %>%
-      dplyr::pull(model_uid)
-  }
+    
+    
+     datapack_uid <- datapackr::configFile %>%
+       dplyr::filter(!!regional_country_switch == d$info$datapack_name) %>%
+       dplyr::select(!!regional_country_uid_switch) %>%
+       dplyr::pull(!!regional_country_uid_switch) %>% 
+       unique()
+     
+     #If we get nothing here (like the UID does not exist, we need to bail early)
+     if ( length(datapack_uid) == 0 ) {
+       stop("Unknown DataPack UID. Please contact the DataPack Support Team!")
+     }
+     
+     
+     # If OU name and UID do not match, force identification via user prompt in Console
+     if (d$info$datapack_name != datapack_name |
+         d$info$datapack_uid != datapack_uid) {
+       msg <-
+         "The OU UID and OU name used in this submission don't match up!"
+       interactive_print(msg)
+       d$info$warningMsg <- append(msg, d$info$warningMsg)
+       if (interactive()) {
+         d$info$datapack_name <- selectOU()
+       } else {
+         stop(msg)
+       }
+     }
+     
+     d
+     
+     }
   
-  return(d)
-}
+  verifyDataPackNameWithUID(d,regional_country_uid_switch,regional_country_swtich)
+
+  }
 
 #' @title checkSiteToolStructure(d)
 #'
