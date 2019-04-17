@@ -1,15 +1,15 @@
 "DataPack_name","model_uid","countryName","countryUID","milPSNU","milPSNUuid","level3name","uidlevel3","level4name","uidlevel4","Currently_in_DATIM","Military_nested_underneath","milPSNU_in_DATIM","Current_Prioritization_Level","Prioritizing_at_Natl_or_SNU","isRegion","isMil"
 "Asia Region","ptVxnBssua6","Burma","wChmwjpXOw2","_Military Burma","Q6SLJ0iou4u","Burma","wChmwjpXOw2",,,"Y","Y","Y",6,"SNU",1,0
-"Asia Region","ptVxnBssua7","Cambodia","XWZK2nop7pM","_Military Cambodia","pcib7Ubi755","Cambodia","XWZK2nop7pM",,,"Y","Y","Y",4,"SNU",1,0
-"Asia Region","ptVxnBssua8","India","skj3e4YSiJY","_Military India","bIYjUuqf1sf","India","skj3e4YSiJY",,,"Y","Y","Y",5,"SNU",1,0
-"Asia Region","ptVxnBssua9","Indonesia","W73PRZcjFIU","_Military Indonesia","P9Plp51eAEF","Indonesia","W73PRZcjFIU",,,"Y","Y","Y",5,"SNU",1,0
-"Asia Region","ptVxnBssua10","Kazakhstan","xVvOdyoS7wi","_Military Kazakhstan","TBD00000010","Central Asia Region","t25400wXrNB","Kazakhstan","xVvOdyoS7wi","Y","Y","N",5,"SNU",1,0
-"Asia Region","ptVxnBssua11","Kyrgyzstan","vm58KTm9wvy","_Military Kyrgyzstan","TBD00000011","Central Asia Region","t25400wXrNB","Kyrgyzstan","vm58KTm9wvy","Y","Y","N",5,"SNU",1,0
-"Asia Region","ptVxnBssua12","Laos","PcXTNoVUrUc","_Military Laos","TBD00000012","Asia Regional Program","iD2i0aynOGm","Laos","PcXTNoVUrUc","Y","Y","N",5,"SNU",1,0
-"Asia Region","ptVxnBssua13","Nepal","TBD00000001","_Military Nepal","TBD00000013",,,,,"N","Y","N",,"Natl",1,0
-"Asia Region","ptVxnBssua14","Papua New Guinea","cl7jVQOW3Ks","_Military Papua New Guinea","taJjLW2MrND","Papua New Guinea","cl7jVQOW3Ks",,,"Y","Y","Y",4,"SNU",1,0
-"Asia Region","ptVxnBssua15","Tajikistan","ZtoVYbNCnsj","_Military Tajikistan","TBD00000014","Central Asia Region","t25400wXrNB","Tajikistan","ZtoVYbNCnsj","Y","Y","N",5,"SNU",1,0
-"Asia Region","ptVxnBssua16","Thailand","Gv5ApcpDrIB","_Military Thailand","TBD00000015","Asia Regional Program","iD2i0aynOGm","Thailand","Gv5ApcpDrIB","Y","Y","N",5,"SNU",1,0
+"Asia Region","ptVxnBssua6","Cambodia","XWZK2nop7pM","_Military Cambodia","pcib7Ubi755","Cambodia","XWZK2nop7pM",,,"Y","Y","Y",4,"SNU",1,0
+"Asia Region","ptVxnBssua6","India","skj3e4YSiJY","_Military India","bIYjUuqf1sf","India","skj3e4YSiJY",,,"Y","Y","Y",5,"SNU",1,0
+"Asia Region","ptVxnBssua6","Indonesia","W73PRZcjFIU","_Military Indonesia","P9Plp51eAEF","Indonesia","W73PRZcjFIU",,,"Y","Y","Y",5,"SNU",1,0
+"Asia Region","ptVxnBssua6","Kazakhstan","xVvOdyoS7wi","_Military Kazakhstan","TBD00000010","Central Asia Region","t25400wXrNB","Kazakhstan","xVvOdyoS7wi","Y","Y","N",5,"SNU",1,0
+"Asia Region","ptVxnBssua6","Kyrgyzstan","vm58KTm9wvy","_Military Kyrgyzstan","TBD00000011","Central Asia Region","t25400wXrNB","Kyrgyzstan","vm58KTm9wvy","Y","Y","N",5,"SNU",1,0
+"Asia Region","ptVxnBssua6","Laos","PcXTNoVUrUc","_Military Laos","TBD00000012","Asia Regional Program","iD2i0aynOGm","Laos","PcXTNoVUrUc","Y","Y","N",5,"SNU",1,0
+"Asia Region","ptVxnBssua6","Nepal","TBD00000001","_Military Nepal","TBD00000013",,,,,"N","Y","N",,"Natl",1,0
+"Asia Region","ptVxnBssua6","Papua New Guinea","cl7jVQOW3Ks","_Military Papua New Guinea","taJjLW2MrND","Papua New Guinea","cl7jVQOW3Ks",,,"Y","Y","Y",4,"SNU",1,0
+"Asia Region","ptVxnBssua6","Tajikistan","ZtoVYbNCnsj","_Military Tajikistan","TBD00000014","Central Asia Region","t25400wXrNB","Tajikistan","ZtoVYbNCnsj","Y","Y","N",5,"SNU",1,0
+"Asia Region","ptVxnBssua6","Thailand","Gv5ApcpDrIB","_Military Thailand","TBD00000015","Asia Regional Program","iD2i0aynOGm","Thailand","Gv5ApcpDrIB","Y","Y","N",5,"SNU",1,0
 "Caribbean Region","nBo9Y4yZubB","Barbados","RKoVudgb05Y",,,"Caribbean Region","nBo9Y4yZubB","Barbados","RKoVudgb05Y","Y","N",,4,"Natl",1,0
 "Caribbean Region","nBo9Y4yZubB","_Military Caribbean Region","utFDiGSMhJh","_Military Caribbean Region","utFDiGSMhJh","Caribbean Region","nBo9Y4yZubB","_Military Caribbean Region","utFDiGSMhJh","Y","N","Y",4,"Regional",1,1
 "Caribbean Region","nBo9Y4yZubB","Guyana","PeOHqAwdtez",,,"Caribbean Region","nBo9Y4yZubB","Guyana","PeOHqAwdtez","Y","N",,5,"SNU",1,0

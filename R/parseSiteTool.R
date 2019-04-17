@@ -21,6 +21,13 @@ checkSiteToolOUinfo <- function(d) {
       range = "B20"
     ))
   
+  d$info$regional_country_name <- 
+    names(readxl::read_excel(
+      d$keychain$submission_path,
+      sheet = "Home",
+      range = "B21"
+    ))
+  
   # Check ou_name and ou_uid match
   datapack_name <- datapackr::configFile %>%
     dplyr::filter(model_uid == d$info$datapack_uid) %>%
@@ -31,8 +38,8 @@ checkSiteToolOUinfo <- function(d) {
   datapack_uid <- datapackr::configFile %>%
     dplyr::filter(DataPack_name == d$info$datapack_name) %>%
     dplyr::select(model_uid) %>%
-    unique() %>%
-    dplyr::pull(model_uid)
+    dplyr::pull(model_uid) %>% 
+    unique()
   
   # If OU name and UID do not match, force identification via user prompt in Console
   if (d$info$datapack_name != datapack_name |
