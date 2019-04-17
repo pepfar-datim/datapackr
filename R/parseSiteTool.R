@@ -37,7 +37,7 @@ checkSiteToolOUinfo <- function(d) {
   
   # Check ou_name and ou_uid match
   
-  verifyDataPackNameWithUID<-function(d,regional_country_uid_switch,regional_country_switch ) {
+  verifyDataPackNameWithUID<-function(d,regional_country_uid_switch,regional_country_swtich ) {
     
     regional_country_uid_switch <- rlang::sym(regional_country_uid_switch)
     regional_country_switch <- rlang::sym(regional_country_swtich)
