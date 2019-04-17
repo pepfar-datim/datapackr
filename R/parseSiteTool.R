@@ -31,21 +31,21 @@ checkSiteToolOUinfo <- function(d) {
   
   d$info$datapack_name<-ifelse(!is.na(regional_country_name),regional_country_name,datapack_region_name )
   
-  regional_country_switch <-ifelse(!is.na(regional_country_name), "countryName","DataPack_name") 
+  regional_country <-ifelse(!is.na(regional_country_name), "countryName","DataPack_name") 
   
-  regional_country_uid_switch<-ifelse(!is.na(regional_country_name), "countryUID", "model_uid")
+  regional_country_uid<-ifelse(!is.na(regional_country_name), "countryUID", "model_uid")
   
   # Check ou_name and ou_uid match
   
-  verifyDataPackNameWithUID<-function(d,regional_country_uid_switch,regional_country_swtich ) {
+  verifyDataPackNameWithUID<-function(d,regional_country_uid,regional_country ) {
     
-    regional_country_uid_switch <- rlang::sym(regional_country_uid_switch)
-    regional_country_switch <- rlang::sym(regional_country_swtich)
+    regional_country_uid <- rlang::sym(regional_country_uid)
+    regional_country <- rlang::sym(regional_country)
     
     datapack_name <- datapackr::configFile %>%
-      dplyr::filter(!!regional_country_uid_switch == d$info$datapack_uid) %>%
-      dplyr::select(!!regional_country_switch) %>%
-      dplyr::pull(!!regional_country_switch) %>% 
+      dplyr::filter(!!regional_country_uid == d$info$datapack_uid) %>%
+      dplyr::select(!!regional_country) %>%
+      dplyr::pull(!!regional_country) %>% 
       unique()
      
     #If we get nothing here (like the UID does not exist, we need to bail early)
@@ -56,9 +56,9 @@ checkSiteToolOUinfo <- function(d) {
     
     
      datapack_uid <- datapackr::configFile %>%
-       dplyr::filter(!!regional_country_switch == d$info$datapack_name) %>%
-       dplyr::select(!!regional_country_uid_switch) %>%
-       dplyr::pull(!!regional_country_uid_switch) %>% 
+       dplyr::filter(!!regional_country == d$info$datapack_name) %>%
+       dplyr::select(!!regional_country_uid) %>%
+       dplyr::pull(!!regional_country_uid) %>% 
        unique()
      
      #If we get nothing here (like the UID does not exist, we need to bail early)
