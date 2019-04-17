@@ -85,7 +85,7 @@ checkSiteToolOUinfo <- function(d) {
      
      }
   
-  verifyDataPackNameWithUID(d,regional_country_uid_switch,regional_country_swtich)
+  verifyDataPackNameWithUID(d,regional_country_uid,regional_country)
 
   }
 
