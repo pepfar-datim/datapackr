@@ -462,10 +462,10 @@ getCountries <- function(datapack_uid = NA) {
                               ~ "West Africa Region",
           TRUE ~ country_name),
         model_uid = dplyr::case_when(
-          data_pack_name == "Asia Region" ~ "Asia_Regional_Data_Pack",
-          data_pack_name == "Caribbean Region" ~ "Caribbean_Data_Pack",
-          data_pack_name == "Central America Region" ~ "Central_America_Data_Pack",
-          data_pack_name == "West Africa Region" ~ "Western_Africa_Data_Pack",
+          data_pack_name == "Asia Region" ~ "ptVxnBssua6",
+          data_pack_name == "Caribbean Region" ~ "nBo9Y4yZubB",
+          data_pack_name == "Central America Region" ~ "vSu0nPMbq7b",
+          data_pack_name == "West Africa Region" ~ "G0BT4KrJouu",
           TRUE ~ country_uid
         ),
         is_region = data_pack_name %in% c("Asia Region",

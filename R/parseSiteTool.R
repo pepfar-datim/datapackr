@@ -145,7 +145,6 @@ checkSiteToolStructure <- function(d) {
   
 }
 
-
 #' @title unPackSiteToolSheets(d)
 #'
 #' @description Loops through all critical sheets in a submitted 

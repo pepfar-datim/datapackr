@@ -1,59 +1,59 @@
-DataPack_name,model_uid,countryName,countryUID,milPSNU,milPSNUuid,level3name,uidlevel3,level4name,uidlevel4,Currently_in_DATIM,Military_nested_underneath,milPSNU_in_DATIM,Current_Prioritization_Level,Prioritizing_at_Natl_or_SNU,isRegion,isMil
-Asia Region,Asia_Regional_Data_Pack,Burma,wChmwjpXOw2,_Military Burma,Q6SLJ0iou4u,Burma,wChmwjpXOw2,,,Y,Y,Y,6,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Cambodia,XWZK2nop7pM,_Military Cambodia,pcib7Ubi755,Cambodia,XWZK2nop7pM,,,Y,Y,Y,4,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,India,skj3e4YSiJY,_Military India,bIYjUuqf1sf,India,skj3e4YSiJY,,,Y,Y,Y,5,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Indonesia,W73PRZcjFIU,_Military Indonesia,P9Plp51eAEF,Indonesia,W73PRZcjFIU,,,Y,Y,Y,5,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Kazakhstan,xVvOdyoS7wi,_Military Kazakhstan,TBD00000010,Central Asia Region,t25400wXrNB,Kazakhstan,xVvOdyoS7wi,Y,Y,N,5,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Kyrgyzstan,vm58KTm9wvy,_Military Kyrgyzstan,TBD00000011,Central Asia Region,t25400wXrNB,Kyrgyzstan,vm58KTm9wvy,Y,Y,N,5,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Laos,PcXTNoVUrUc,_Military Laos,TBD00000012,Asia Regional Program,iD2i0aynOGm,Laos,PcXTNoVUrUc,Y,Y,N,5,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Nepal,TBD00000001,_Military Nepal,TBD00000013,,,,,N,Y,N,,Natl,1,0
-Asia Region,Asia_Regional_Data_Pack,Papua New Guinea,cl7jVQOW3Ks,_Military Papua New Guinea,taJjLW2MrND,Papua New Guinea,cl7jVQOW3Ks,,,Y,Y,Y,4,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Tajikistan,ZtoVYbNCnsj,_Military Tajikistan,TBD00000014,Central Asia Region,t25400wXrNB,Tajikistan,ZtoVYbNCnsj,Y,Y,N,5,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Thailand,Gv5ApcpDrIB,_Military Thailand,TBD00000015,Asia Regional Program,iD2i0aynOGm,Thailand,Gv5ApcpDrIB,Y,Y,N,5,SNU,1,0
-Caribbean Region,Caribbean_Data_Pack,Barbados,RKoVudgb05Y,,,Caribbean Region,nBo9Y4yZubB,Barbados,RKoVudgb05Y,Y,N,,4,Natl,1,0
-Caribbean Region,Caribbean_Data_Pack,_Military Caribbean Region,utFDiGSMhJh,_Military Caribbean Region,utFDiGSMhJh,Caribbean Region,nBo9Y4yZubB,_Military Caribbean Region,utFDiGSMhJh,Y,N,Y,4,Regional,1,1
-Caribbean Region,Caribbean_Data_Pack,Guyana,PeOHqAwdtez,,,Caribbean Region,nBo9Y4yZubB,Guyana,PeOHqAwdtez,Y,N,,5,SNU,1,0
-Caribbean Region,Caribbean_Data_Pack,Jamaica,WuxG6jzaypt,,,Caribbean Region,nBo9Y4yZubB,Jamaica,WuxG6jzaypt,Y,N,,6,SNU,1,0
-Caribbean Region,Caribbean_Data_Pack,Suriname,zhJINyURZ5Y,,,Caribbean Region,nBo9Y4yZubB,Suriname,zhJINyURZ5Y,Y,N,,5,SNU,1,0
-Caribbean Region,Caribbean_Data_Pack,Trinidad & Tobago,WSl5y9jxCpC,,,Caribbean Region,nBo9Y4yZubB,Trinidad & Tobago,WSl5y9jxCpC,Y,N,,4,Natl,1,0
-Central America Region,Central_America_Data_Pack,Brazil,TBD00000002,,,,,,,N,N,,,Natl,1,0
-Central America Region,Central_America_Data_Pack,_Military Central America Region,jAW4qOepbSh,_Military Central America Region,jAW4qOepbSh,Central America Region,vSu0nPMbq7b,_Military Central America Region,jAW4qOepbSh,Y,N,Y,4,Regional,1,1
-Central America Region,Central_America_Data_Pack,Costa Rica,QKD4CzBG2GM,,,Central America Region,vSu0nPMbq7b,Costa Rica,QKD4CzBG2GM,Y,N,,5,SNU,1,0
-Central America Region,Central_America_Data_Pack,El Salvador,N7QAPGSaODP,,,Central America Region,vSu0nPMbq7b,El Salvador,N7QAPGSaODP,Y,N,,5,SNU,1,0
-Central America Region,Central_America_Data_Pack,Guatemala,EXVC4bNtv84,,,Central America Region,vSu0nPMbq7b,Guatemala,EXVC4bNtv84,Y,N,,5,SNU,1,0
-Central America Region,Central_America_Data_Pack,Honduras,w5NMe34EjPN,,,Central America Region,vSu0nPMbq7b,Honduras,w5NMe34EjPN,Y,N,,5,SNU,1,0
-Central America Region,Central_America_Data_Pack,Nicaragua,aUTsSmqqu9O,,,Central America Region,vSu0nPMbq7b,Nicaragua,aUTsSmqqu9O,Y,N,,5,SNU,1,0
-Central America Region,Central_America_Data_Pack,Panama,oK0gC85xx2f,,,Central America Region,vSu0nPMbq7b,Panama,oK0gC85xx2f,Y,N,,5,SNU,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,Burkina Faso,TBD00000003,,,,,,,N,N,,,Natl,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,Ghana,y3zhsvdXlhN,,,Ghana,y3zhsvdXlhN,,,Y,N,,4,SNU,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,Liberia,TBD00000004,,,,,,,N,N,,,Natl,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,Mali,TBD00000005,,,,,,,N,N,,,Natl,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,Senegal,TBD00000006,,,,,,,N,N,,,Natl,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,Sierra Leone,TBD00000007,,,,,,,N,N,,,Natl,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,Togo,TBD00000008,,,,,,,N,N,,,Natl,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,_Military West-Central Africa Region,TBD00000009,_Military West-Central Africa Region,TBD00000009,,,,,N,N,N,,Regional,1,1
-Angola,XOivy2uDpMF,Angola,XOivy2uDpMF,_Military Angola,bSwiBL5Y4SW,Angola,XOivy2uDpMF,,,Y,Y,Y,4,SNU,0,0
-Botswana,l1KFEXKI4Dg,Botswana,l1KFEXKI4Dg,_Military Botswana,YUdVS82TqXZ,Botswana,l1KFEXKI4Dg,,,Y,Y,Y,5,SNU,0,0
-Burundi,Qh4XMQJhbk8,Burundi,Qh4XMQJhbk8,_Military Burundi,yDmdrNI3wNW,Burundi,Qh4XMQJhbk8,,,Y,Y,Y,4,SNU,0,0
-Cameroon,bQQJe0cC1eD,Cameroon,bQQJe0cC1eD,_Military Cameroon,eky41asIrS2,Cameroon,bQQJe0cC1eD,,,Y,Y,Y,5,SNU,0,0
-Cote d'Ivoire,ds0ADyc9UCU,Cote d'Ivoire,ds0ADyc9UCU,_Military Cote d'Ivoire,Ycl4U8e7gy2,Cote d'Ivoire,ds0ADyc9UCU,,,Y,Y,Y,5,SNU,0,0
-Democratic Republic of the Congo,ANN4YCOufcP,Democratic Republic of the Congo,ANN4YCOufcP,_Military Democratic Republic of the Congo,MTlUjdz0HYY,Democratic Republic of the Congo,ANN4YCOufcP,,,Y,Y,Y,5,SNU,0,0
-Dominican Republic,NzelIFhEv3C,Dominican Republic,NzelIFhEv3C,_Military Dominican Republic,r3Vu39JRKMk,Dominican Republic,NzelIFhEv3C,,,Y,Y,Y,5,SNU,0,0
-Eswatini,V0qMZH29CtN,Eswatini,V0qMZH29CtN,_Military Eswatini,WtniIbuJk7k,Eswatini,V0qMZH29CtN,,,Y,Y,Y,4,SNU,0,0
-Ethiopia,IH1kchw86uA,Ethiopia,IH1kchw86uA,_Military Ethiopia,zlwN645D4X7,Ethiopia,IH1kchw86uA,,,Y,Y,Y,6,SNU,0,0
-Haiti,JTypsdEUNPw,Haiti,JTypsdEUNPw,_Military Haiti,tfnVnn3ePQo,Haiti,JTypsdEUNPw,,,Y,Y,Y,5,SNU,0,0
-Kenya,HfVjCurKxh2,Kenya,HfVjCurKxh2,_Military Kenya,K8QjRAXFqNS,Kenya,HfVjCurKxh2,,,Y,Y,Y,4,SNU,0,0
-Lesotho,qllxzIjjurr,Lesotho,qllxzIjjurr,_Military Lesotho,dDOqoFnD5Be,Lesotho,qllxzIjjurr,,,Y,Y,Y,4,SNU,0,0
-Malawi,lZsCb6y0KDX,Malawi,lZsCb6y0KDX,_Military Malawi,PQZgU9dagaH,Malawi,lZsCb6y0KDX,,,Y,Y,Y,6,SNU,0,0
-Mozambique,h11OyvlPxpJ,Mozambique,h11OyvlPxpJ,_Military Mozambique,siMZUtd2cJW,Mozambique,h11OyvlPxpJ,,,Y,Y,Y,5,SNU,0,0
-Namibia,FFVkaV9Zk1S,Namibia,FFVkaV9Zk1S,_Military Namibia,IQRztMexXwm,Namibia,FFVkaV9Zk1S,,,Y,Y,Y,5,SNU,0,0
-Nigeria,PqlFzhuPcF1,Nigeria,PqlFzhuPcF1,_Military Nigeria,Z1raiKJH6yv,Nigeria,PqlFzhuPcF1,,,Y,Y,Y,5,SNU,0,0
-Rwanda,XtxUYCsDWrR,Rwanda,XtxUYCsDWrR,_Military Rwanda,OAIa0wJPpZ2,Rwanda,XtxUYCsDWrR,,,Y,Y,Y,4,SNU,0,0
-South Africa,cDGPF739ZZr,South Africa,cDGPF739ZZr,_Military South Africa,YuCXbH1INNN,South Africa,cDGPF739ZZr,,,Y,Y,Y,5,SNU,0,0
-South Sudan,WLG0z5NxQs8,South Sudan,WLG0z5NxQs8,_Military South Sudan,mEB5xPggDEd,South Sudan,WLG0z5NxQs8,,,Y,Y,Y,5,SNU,0,0
-Tanzania,mdXu6iCbn2G,Tanzania,mdXu6iCbn2G,_Military Tanzania,m4ZIAwNvHGu,Tanzania,mdXu6iCbn2G,,,Y,Y,Y,5,SNU,0,0
-Uganda,FETQ6OmnsKB,Uganda,FETQ6OmnsKB,_Military Uganda,OELkOLxvZxB,Uganda,FETQ6OmnsKB,,,Y,Y,Y,5,SNU,0,0
-Ukraine,ligZVIYs2rL,Ukraine,ligZVIYs2rL,_Military Ukraine,dmUww3Yc2a3,Ukraine,ligZVIYs2rL,,,Y,Y,Y,4,SNU,0,0
-Vietnam,YM6xn5QxNpY,Vietnam,YM6xn5QxNpY,_Military Vietnam,EflfBjOI6Ph,Vietnam,YM6xn5QxNpY,,,Y,Y,Y,4,SNU,0,0
-Zambia,f5RoebaDLMx,Zambia,f5RoebaDLMx,_Military Zambia,y0cygdhumHI,Zambia,f5RoebaDLMx,,,Y,Y,Y,5,SNU,0,0
-Zimbabwe,a71G4Gtcttv,Zimbabwe,a71G4Gtcttv,_Military Zimbabwe,BWcCmgezmbV,Zimbabwe,a71G4Gtcttv,,,Y,Y,Y,5,SNU,0,0
+"DataPack_name","model_uid","countryName","countryUID","milPSNU","milPSNUuid","level3name","uidlevel3","level4name","uidlevel4","Currently_in_DATIM","Military_nested_underneath","milPSNU_in_DATIM","Current_Prioritization_Level","Prioritizing_at_Natl_or_SNU","isRegion","isMil"
+"Asia Region","ptVxnBssua6","Burma","wChmwjpXOw2","_Military Burma","Q6SLJ0iou4u","Burma","wChmwjpXOw2",,,"Y","Y","Y",6,"SNU",1,0
+"Asia Region","ptVxnBssua7","Cambodia","XWZK2nop7pM","_Military Cambodia","pcib7Ubi755","Cambodia","XWZK2nop7pM",,,"Y","Y","Y",4,"SNU",1,0
+"Asia Region","ptVxnBssua8","India","skj3e4YSiJY","_Military India","bIYjUuqf1sf","India","skj3e4YSiJY",,,"Y","Y","Y",5,"SNU",1,0
+"Asia Region","ptVxnBssua9","Indonesia","W73PRZcjFIU","_Military Indonesia","P9Plp51eAEF","Indonesia","W73PRZcjFIU",,,"Y","Y","Y",5,"SNU",1,0
+"Asia Region","ptVxnBssua10","Kazakhstan","xVvOdyoS7wi","_Military Kazakhstan","TBD00000010","Central Asia Region","t25400wXrNB","Kazakhstan","xVvOdyoS7wi","Y","Y","N",5,"SNU",1,0
+"Asia Region","ptVxnBssua11","Kyrgyzstan","vm58KTm9wvy","_Military Kyrgyzstan","TBD00000011","Central Asia Region","t25400wXrNB","Kyrgyzstan","vm58KTm9wvy","Y","Y","N",5,"SNU",1,0
+"Asia Region","ptVxnBssua12","Laos","PcXTNoVUrUc","_Military Laos","TBD00000012","Asia Regional Program","iD2i0aynOGm","Laos","PcXTNoVUrUc","Y","Y","N",5,"SNU",1,0
+"Asia Region","ptVxnBssua13","Nepal","TBD00000001","_Military Nepal","TBD00000013",,,,,"N","Y","N",,"Natl",1,0
+"Asia Region","ptVxnBssua14","Papua New Guinea","cl7jVQOW3Ks","_Military Papua New Guinea","taJjLW2MrND","Papua New Guinea","cl7jVQOW3Ks",,,"Y","Y","Y",4,"SNU",1,0
+"Asia Region","ptVxnBssua15","Tajikistan","ZtoVYbNCnsj","_Military Tajikistan","TBD00000014","Central Asia Region","t25400wXrNB","Tajikistan","ZtoVYbNCnsj","Y","Y","N",5,"SNU",1,0
+"Asia Region","ptVxnBssua16","Thailand","Gv5ApcpDrIB","_Military Thailand","TBD00000015","Asia Regional Program","iD2i0aynOGm","Thailand","Gv5ApcpDrIB","Y","Y","N",5,"SNU",1,0
+"Caribbean Region","nBo9Y4yZubB","Barbados","RKoVudgb05Y",,,"Caribbean Region","nBo9Y4yZubB","Barbados","RKoVudgb05Y","Y","N",,4,"Natl",1,0
+"Caribbean Region","nBo9Y4yZubB","_Military Caribbean Region","utFDiGSMhJh","_Military Caribbean Region","utFDiGSMhJh","Caribbean Region","nBo9Y4yZubB","_Military Caribbean Region","utFDiGSMhJh","Y","N","Y",4,"Regional",1,1
+"Caribbean Region","nBo9Y4yZubB","Guyana","PeOHqAwdtez",,,"Caribbean Region","nBo9Y4yZubB","Guyana","PeOHqAwdtez","Y","N",,5,"SNU",1,0
+"Caribbean Region","nBo9Y4yZubB","Jamaica","WuxG6jzaypt",,,"Caribbean Region","nBo9Y4yZubB","Jamaica","WuxG6jzaypt","Y","N",,6,"SNU",1,0
+"Caribbean Region","nBo9Y4yZubB","Suriname","zhJINyURZ5Y",,,"Caribbean Region","nBo9Y4yZubB","Suriname","zhJINyURZ5Y","Y","N",,5,"SNU",1,0
+"Caribbean Region","nBo9Y4yZubB","Trinidad & Tobago","WSl5y9jxCpC",,,"Caribbean Region","nBo9Y4yZubB","Trinidad & Tobago","WSl5y9jxCpC","Y","N",,4,"Natl",1,0
+"Central America Region","vSu0nPMbq7b","Brazil","TBD00000002",,,,,,,"N","N",,,"Natl",1,0
+"Central America Region","vSu0nPMbq7b","_Military Central America Region","jAW4qOepbSh","_Military Central America Region","jAW4qOepbSh","Central America Region","vSu0nPMbq7b","_Military Central America Region","jAW4qOepbSh","Y","N","Y",4,"Regional",1,1
+"Central America Region","vSu0nPMbq7b","Costa Rica","QKD4CzBG2GM",,,"Central America Region","vSu0nPMbq7b","Costa Rica","QKD4CzBG2GM","Y","N",,5,"SNU",1,0
+"Central America Region","vSu0nPMbq7b","El Salvador","N7QAPGSaODP",,,"Central America Region","vSu0nPMbq7b","El Salvador","N7QAPGSaODP","Y","N",,5,"SNU",1,0
+"Central America Region","vSu0nPMbq7b","Guatemala","EXVC4bNtv84",,,"Central America Region","vSu0nPMbq7b","Guatemala","EXVC4bNtv84","Y","N",,5,"SNU",1,0
+"Central America Region","vSu0nPMbq7b","Honduras","w5NMe34EjPN",,,"Central America Region","vSu0nPMbq7b","Honduras","w5NMe34EjPN","Y","N",,5,"SNU",1,0
+"Central America Region","vSu0nPMbq7b","Nicaragua","aUTsSmqqu9O",,,"Central America Region","vSu0nPMbq7b","Nicaragua","aUTsSmqqu9O","Y","N",,5,"SNU",1,0
+"Central America Region","vSu0nPMbq7b","Panama","oK0gC85xx2f",,,"Central America Region","vSu0nPMbq7b","Panama","oK0gC85xx2f","Y","N",,5,"SNU",1,0
+"West-Central Africa Region","G0BT4KrJouu","Burkina Faso","TBD00000003",,,,,,,"N","N",,,"Natl",1,0
+"West-Central Africa Region","G0BT4KrJouu","Ghana","y3zhsvdXlhN",,,"Ghana","y3zhsvdXlhN",,,"Y","N",,4,"SNU",1,0
+"West-Central Africa Region","G0BT4KrJouu","Liberia","TBD00000004",,,,,,,"N","N",,,"Natl",1,0
+"West-Central Africa Region","G0BT4KrJouu","Mali","TBD00000005",,,,,,,"N","N",,,"Natl",1,0
+"West-Central Africa Region","G0BT4KrJouu","Senegal","TBD00000006",,,,,,,"N","N",,,"Natl",1,0
+"West-Central Africa Region","G0BT4KrJouu","Sierra Leone","TBD00000007",,,,,,,"N","N",,,"Natl",1,0
+"West-Central Africa Region","G0BT4KrJouu","Togo","TBD00000008",,,,,,,"N","N",,,"Natl",1,0
+"West-Central Africa Region","G0BT4KrJouu","_Military West-Central Africa Region","TBD00000009","_Military West-Central Africa Region","TBD00000009",,,,,"N","N","N",,"Regional",1,1
+"Angola","XOivy2uDpMF","Angola","XOivy2uDpMF","_Military Angola","bSwiBL5Y4SW","Angola","XOivy2uDpMF",,,"Y","Y","Y",4,"SNU",0,0
+"Botswana","l1KFEXKI4Dg","Botswana","l1KFEXKI4Dg","_Military Botswana","YUdVS82TqXZ","Botswana","l1KFEXKI4Dg",,,"Y","Y","Y",5,"SNU",0,0
+"Burundi","Qh4XMQJhbk8","Burundi","Qh4XMQJhbk8","_Military Burundi","yDmdrNI3wNW","Burundi","Qh4XMQJhbk8",,,"Y","Y","Y",4,"SNU",0,0
+"Cameroon","bQQJe0cC1eD","Cameroon","bQQJe0cC1eD","_Military Cameroon","eky41asIrS2","Cameroon","bQQJe0cC1eD",,,"Y","Y","Y",5,"SNU",0,0
+"Cote d'Ivoire","ds0ADyc9UCU","Cote d'Ivoire","ds0ADyc9UCU","_Military Cote d'Ivoire","Ycl4U8e7gy2","Cote d'Ivoire","ds0ADyc9UCU",,,"Y","Y","Y",5,"SNU",0,0
+"Democratic Republic of the Congo","ANN4YCOufcP","Democratic Republic of the Congo","ANN4YCOufcP","_Military Democratic Republic of the Congo","MTlUjdz0HYY","Democratic Republic of the Congo","ANN4YCOufcP",,,"Y","Y","Y",5,"SNU",0,0
+"Dominican Republic","NzelIFhEv3C","Dominican Republic","NzelIFhEv3C","_Military Dominican Republic","r3Vu39JRKMk","Dominican Republic","NzelIFhEv3C",,,"Y","Y","Y",5,"SNU",0,0
+"Eswatini","V0qMZH29CtN","Eswatini","V0qMZH29CtN","_Military Eswatini","WtniIbuJk7k","Eswatini","V0qMZH29CtN",,,"Y","Y","Y",4,"SNU",0,0
+"Ethiopia","IH1kchw86uA","Ethiopia","IH1kchw86uA","_Military Ethiopia","zlwN645D4X7","Ethiopia","IH1kchw86uA",,,"Y","Y","Y",6,"SNU",0,0
+"Haiti","JTypsdEUNPw","Haiti","JTypsdEUNPw","_Military Haiti","tfnVnn3ePQo","Haiti","JTypsdEUNPw",,,"Y","Y","Y",5,"SNU",0,0
+"Kenya","HfVjCurKxh2","Kenya","HfVjCurKxh2","_Military Kenya","K8QjRAXFqNS","Kenya","HfVjCurKxh2",,,"Y","Y","Y",4,"SNU",0,0
+"Lesotho","qllxzIjjurr","Lesotho","qllxzIjjurr","_Military Lesotho","dDOqoFnD5Be","Lesotho","qllxzIjjurr",,,"Y","Y","Y",4,"SNU",0,0
+"Malawi","lZsCb6y0KDX","Malawi","lZsCb6y0KDX","_Military Malawi","PQZgU9dagaH","Malawi","lZsCb6y0KDX",,,"Y","Y","Y",6,"SNU",0,0
+"Mozambique","h11OyvlPxpJ","Mozambique","h11OyvlPxpJ","_Military Mozambique","siMZUtd2cJW","Mozambique","h11OyvlPxpJ",,,"Y","Y","Y",5,"SNU",0,0
+"Namibia","FFVkaV9Zk1S","Namibia","FFVkaV9Zk1S","_Military Namibia","IQRztMexXwm","Namibia","FFVkaV9Zk1S",,,"Y","Y","Y",5,"SNU",0,0
+"Nigeria","PqlFzhuPcF1","Nigeria","PqlFzhuPcF1","_Military Nigeria","Z1raiKJH6yv","Nigeria","PqlFzhuPcF1",,,"Y","Y","Y",5,"SNU",0,0
+"Rwanda","XtxUYCsDWrR","Rwanda","XtxUYCsDWrR","_Military Rwanda","OAIa0wJPpZ2","Rwanda","XtxUYCsDWrR",,,"Y","Y","Y",4,"SNU",0,0
+"South Africa","cDGPF739ZZr","South Africa","cDGPF739ZZr","_Military South Africa","YuCXbH1INNN","South Africa","cDGPF739ZZr",,,"Y","Y","Y",5,"SNU",0,0
+"South Sudan","WLG0z5NxQs8","South Sudan","WLG0z5NxQs8","_Military South Sudan","mEB5xPggDEd","South Sudan","WLG0z5NxQs8",,,"Y","Y","Y",5,"SNU",0,0
+"Tanzania","mdXu6iCbn2G","Tanzania","mdXu6iCbn2G","_Military Tanzania","m4ZIAwNvHGu","Tanzania","mdXu6iCbn2G",,,"Y","Y","Y",5,"SNU",0,0
+"Uganda","FETQ6OmnsKB","Uganda","FETQ6OmnsKB","_Military Uganda","OELkOLxvZxB","Uganda","FETQ6OmnsKB",,,"Y","Y","Y",5,"SNU",0,0
+"Ukraine","ligZVIYs2rL","Ukraine","ligZVIYs2rL","_Military Ukraine","dmUww3Yc2a3","Ukraine","ligZVIYs2rL",,,"Y","Y","Y",4,"SNU",0,0
+"Vietnam","YM6xn5QxNpY","Vietnam","YM6xn5QxNpY","_Military Vietnam","EflfBjOI6Ph","Vietnam","YM6xn5QxNpY",,,"Y","Y","Y",4,"SNU",0,0
+"Zambia","f5RoebaDLMx","Zambia","f5RoebaDLMx","_Military Zambia","y0cygdhumHI","Zambia","f5RoebaDLMx",,,"Y","Y","Y",5,"SNU",0,0
+"Zimbabwe","a71G4Gtcttv","Zimbabwe","a71G4Gtcttv","_Military Zimbabwe","BWcCmgezmbV","Zimbabwe","a71G4Gtcttv",,,"Y","Y","Y",5,"SNU",0,0
