@@ -4,17 +4,15 @@
 \alias{comparePacks}
 \title{Compare Data Pack and Site Tool data}
 \usage{
-comparePacks(datapack_path, sitetool_path, output_path)
+comparePacks(datapack_path, sitetool_path)
 }
 \arguments{
 \item{datapack_path}{Local filepath leading to Data Pack to analyze.}
 
 \item{sitetool_path}{Local filepath leading to Site Tool to analyze.}
-
-\item{output_path}{Local folder where you want output written.}
 }
 \value{
-Log of differences in target totals.
+List of data frames
 }
 \description{
 Takes a Data Pack and a Site Tool and unpacks both for easy comparison of

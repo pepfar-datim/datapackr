@@ -63,7 +63,7 @@ unPackSiteToolData <- function(submission_path = NA,
   
   # Check OU name and UID match up
   interactive_print("Checking the OU name and UID on HOME tab...")
-  d <- checkSiteToolOUinfo(d)
+  d <- checkOUinfo(d)
   
   # Check integrity of site tool tabs
   d <- checkSiteToolStructure(d)

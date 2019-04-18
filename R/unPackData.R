@@ -93,7 +93,7 @@ unPackData <- function(submission_path = NA,
 
     # Check OU name and UID match up
     interactive_print("Checking the OU name and UID on HOME tab...")
-    d <- checkOUinfo(d)
+    d <- checkSiteToolOUinfo(d)
 
   # Check integrity of Workbook tabs
     d <- checkWorkbookStructure(d)
