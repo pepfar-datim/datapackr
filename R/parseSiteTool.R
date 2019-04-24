@@ -394,8 +394,8 @@ if (any(has_negative_numbers)) {
   
   # TEST for duplicates
   any_dups <- d$data$extract %>%
-    dplyr::select(sheet_name, Site, mech_code, Age, Sex, KeyPop, Type, indicatorCode) %>%
-    dplyr::group_by(sheet_name, Site, mech_code, Age, Sex, KeyPop, Type, indicatorCode) %>%
+    dplyr::select( Site, mech_code, Age, Sex, KeyPop, Type, indicatorCode) %>%
+    dplyr::group_by( Site, mech_code, Age, Sex, KeyPop, Type, indicatorCode) %>%
     dplyr::summarise(n = (dplyr::n())) %>%
     dplyr::filter(n > 1) %>%
     dplyr::ungroup() %>%
