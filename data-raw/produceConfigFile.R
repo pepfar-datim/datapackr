@@ -365,7 +365,7 @@ getSiteToolSchema <- function(data_pack_schema) {
     dplyr::ungroup() %>%
   # Recalibrate sheet number
     dplyr::mutate(
-      sheet_num = sheet_num - 5,
+      sheet_num = sheet_num - 4,
   # Rename mechanism and type columns
       indicator_code = dplyr::case_when(
         indicator_code == "Site" & column == 1 ~ "Status",

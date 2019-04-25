@@ -76,238 +76,48 @@ checkWorkbookStructure <- function(d) {
   }
 
 
-#' @importFrom magrittr %>% %<>%
-#' @title checkColStructure(d)
-#'
-#' @description Checks structural integrity of columns on critical sheets for
-#'    submitted Data Pack or Site Tool.
-#'
-#' @param d datapackr list object containing at least d$data$extract,
-#'     d$data$sheet & d$info$warningMsg.
-#' @return A datapackr list object, \code{d}, storing a warning message of all
-#'    issues related to Data Pack or Site Tool columns names or order.
-checkColStructure <- function(d) {
-  # Check column structure
-  msg <- NULL
-  
-  submission_cols <- names(d$data$extract) %>%
-    tibble::as_tibble() %>%
-    dplyr::select(indicatorCode = value) %>%
-    dplyr::mutate(submission_order = as.integer(1:(dplyr::n())))
-  
-  col_check <- datapackr::data_pack_schema %>%
-    dplyr::filter(sheet_name == d$data$sheet) %>%
-    dplyr::select(indicator_code, template_order = col) %>%
-    dplyr::full_join(submission_cols, by = c("indicator_code" = "indicatorCode")) %>%
-    dplyr::mutate(order_check = template_order == submission_order)
-  
-  ## Alert to missing cols
-  if (any(is.na(col_check$submission_order))) {
-    missing_cols <- col_check %>%
-      dplyr::filter(is.na(submission_order)) %>%
-      dplyr::pull(indicator_code)
-    msg <- paste0("In tab",d$data$sheet, 
-      " MISSING COLUMNS: Note that this may be due to missing/renamed sheets,
-       or added or renamed columns.:  ",
-      paste(missing_cols, collapse = ", "),"")
-    d$info$warningMsg<-append(msg,d$info$warningMsg)
-  }
-  
-  ## Alert to added Columns
-  if (any(is.na(col_check$template_order))) {
-    added_cols <- col_check %>%
-      dplyr::filter(is.na(template_order)) %>%
-      dplyr::pull(indicator_code)
-    msg <- paste0( "In tab ",d$data$sheet, 
-                 " ADDED/RENAMED COLUMNS: DO NOT rename columns.
-                   Adding columns is ok : ", 
-                   paste(added_cols, collapse = ","),"")
-    d$info$warningMsg<-append(msg,d$info$warningMsg)
-  }
-  
-  ## Alert to surprises in column order
-  if (!all(col_check$order_check, na.rm = TRUE)) {
-    out_of_order <- col_check %>%
-      dplyr::filter(order_check == FALSE) %>%
-      dplyr::pull(indicator_code)
-    msg <- paste0("In tab ",d$data$sheet,
-      " COLUMNS OUT OF ORDER: Note that this may be due to missing, 
-        added, or renamed columns: ", 
-        paste(out_of_order, collapse = ","),"")
-    d$info$warningMsg<-append(msg,d$info$warningMsg)
-  }
-  
-  return(d)
-  }
 
 
 #' @importFrom magrittr %>% %<>%
-#' @title defunctDisaggs(d)
-#'
-#' @description Checks data extracted from a sheet in a submitted Data Pack or
-#'    Site Tool to identify cases where invalid Disaggregate combinations have
-#'    been used.
-#'
-#' @param d datapackr list object containing at least d$data$extract of data
-#'     from a single sheet in submission file.
-#' @param type Either "Data Pack" or "Site Tool".
-#'     
-#' @return A datapackr list object, \code{d}, storing a dataframe of defunct
-#'    disaggs used in a specific sheet.
-defunctDisaggs <- function(d,
-                           type = "Data Pack") {
-  defunct <- d$data$extract %>%
-    replace(is.na(.), "") %>%
-    dplyr::filter(
-      (
-        stringr::str_detect(indicatorCode, "Malnutrition|Pediatric") &
-          Age != "01-04"
-      )
-      |
-        (
-          stringr::str_detect(indicatorCode, "HTS_RECENT|PrEP") &
-            Age %in% c("01-04", "05-09", "10-14")
-        )
-      |
-        (
-          stringr::str_detect(
-            indicatorCode,
-            "HTS_TST_PMTCTPostANC1|PMTCT_STAT|PMTCT_ART"
-          ) & (Age %in% c("<01", "01-04", "05-09") | Sex == "Male")
-        )
-      |
-        (
-          stringr::str_detect(indicatorCode, "HTS_SELF|PP_PREV") &
-            Age %in% c("01-04", "05-09")
-        )
-      |
-        (
-          stringr::str_detect(
-            indicatorCode,
-            "(HTS_TST|KP_ESTIMATES|PrEP|TX_NEW)(.)+KeyPop"
-          )
-          &
-            !KeyPop %in% c(
-              "FSW",
-              "MSM",
-              "People in prisons and other enclosed settings",
-              "PWID",
-              "TG"
-            )
-        )
-      |
-        (
-          stringr::str_detect(indicatorCode, "KP_MAT") &
-            !KeyPop %in% c("Female PWID", "Male PWID")
-        )
-      | (
-        stringr::str_detect(indicatorCode, "KP_PREV")
-        &
-          !KeyPop %in% c(
-            "Female PWID",
-            "Male PWID",
-            "FSW",
-            "MSM not SW",
-            "MSM SW",
-            "People in prisons and other enclosed settings",
-            "TG not SW",
-            "TG SW"
-          )
-      )
-      |
-        (
-          stringr::str_detect(indicatorCode, "OVC_SERV") &
-            !Age %in% c("<01", "01-04", "05-09", "10-14", "15-17", "18+")
-        )
-      |
-        (
-          stringr::str_detect(indicatorCode, "PRIORITY_SNU") &
-            !value %in% (datapackr::prioritizations %>%
-                           dplyr::pull(value))
-        )
-      |
-        (
-          stringr::str_detect(indicatorCode, "VMMC") &
-            (Age %in% c("<01", "01-04", "05-09") | Sex == "Female")
-        )
-    )
-  
-  if(type == "Data Pack") {
-    defunct <- d$data$extract %>%
-      replace(is.na(.), "") %>%
-      dplyr::filter(
-        stringr::str_detect(indicatorCode, "OVC_HIVSTAT") &
-        !Age %in% c("<01", "01-04", "05-09", "10-14", "15-17", "18+")) %>%
-      dplyr::bind_rows(defunct)
-  }
-  
-  if(type == "Site Tool") {
-    defunct <- d$data$extract %>%
-      replace(is.na(.), "") %>%
-      dplyr::filter(
-        stringr::str_detect(indicatorCode, "OVC_HIVSTAT") &
-          !Age %in% c("")) %>%
-      dplyr::bind_rows(defunct)
-  }
-  
-  defunct %<>%
-    dplyr::select(indicatorCode, Age, Sex, KeyPop) %>%
-    dplyr::distinct()
-  
-  return(defunct)
-}
-
-
-#' @importFrom magrittr %>% %<>%
-#' @title unPackSheet(d)
+#' @title unPackDataPackSheet(d)
 #'
 #' @description Within a submitted Data Pack or Site Tool (directed to by
 #'    \code{d$keychain$submission_path}), extract data from a single sheet specified
 #'    in \code{d$data$sheet}.
 #'
-#' @param d datapackr list object containing at least
-#'     \code{d$keychain$submission_path},
-#'     \code{d$data$sheet}, & \code{d$info$warningMsg}.
-#' @return A datapackr list object, \code{d}, storing a dataframe of extracted
-#'    data (\code{d$data$extract}) and a warning message
-#'    (\code{d$info$warningMsg}) compiled with errors discovered while
-#'    extracting data from sheet specified in \code{d$data$sheet}.
-unPackSheet <- function(d) {
-  addcols <- function(data, cname) {
-    add <- cname[!cname %in% names(data)]
-    
-    if (length(add) != 0)
-      data[add] <- NA_character_
-    return(data)
-  }
-  
+#' @param d Datapackr object
+#' @param sheet Sheet to unpack.
+#'     
+#' @return d
+#' 
+unPackDataPackSheet <- function(d, sheet) {
   d$data$extract <-
     readxl::read_excel(
       path = d$keychain$submission_path,
-      sheet = d$data$sheet,
-      range = readxl::cell_limits(c(5, 1), c(NA, NA))
+      sheet = sheet,
+      range = readxl::cell_limits(c(5, 1), c(NA, NA)),
+      col_types = "text"
     )
   
   # Run structural checks
-
-  d <- checkColStructure(d)
+  d <- checkColStructure(d, sheet)
   
   # List Target Columns
   targetCols <- datapackr::data_pack_schema %>%
-    dplyr::filter(sheet_name == d$data$sheet,
+    dplyr::filter(sheet_name == sheet,
                   col_type == "Target") %>%
     dplyr::pull(indicator_code)
   
   # Add cols to allow compiling with other sheets
   d$data$extract %<>%
     addcols(c("KeyPop", "Age", "Sex")) %>%
-    # Extract PSNU uid
+  # Extract PSNU uid
     dplyr::mutate(
       psnuid = stringr::str_extract(PSNU, "(?<=\\()([A-Za-z][A-Za-z0-9]{10})(?=\\)$)"),
-      # Tag sheet name
-      sheet_name = d$data$sheet
+  # Tag sheet name
+      sheet_name = sheet
     ) %>%
-    # Select only target-related columns
+  # Select only target-related columns
     dplyr::select(PSNU,
                   psnuid,
                   sheet_name,
@@ -317,16 +127,23 @@ unPackSheet <- function(d) {
                   dplyr::one_of(targetCols))
   
   
-  if (d$data$sheet == "Prioritization") {
+  if (sheet == "Prioritization") {
     d$data$extract %<>%
-      dplyr::mutate(IMPATT.PRIORITY_SNU.20T = as.numeric(stringr::str_sub(
-        IMPATT.PRIORITY_SNU.20T, start = 1, end = 2
-      )))
+      dplyr::mutate(
+        IMPATT.PRIORITY_SNU.20T = 
+          as.numeric(
+            stringr::str_sub(
+              IMPATT.PRIORITY_SNU.20T,
+              start = 1,
+              end = 2
+            )
+          )
+      )
   }
   
-  
+  # Gather all indicators as single column for easier processing
   d$data$extract %<>%
-    tidyr::gather(key = "indicatorCode",
+    tidyr::gather(key = "indicator_code",
                   value = "value",
                   -PSNU,
                   -psnuid,
@@ -334,99 +151,115 @@ unPackSheet <- function(d) {
                   -Sex,
                   -KeyPop,
                   -sheet_name) %>%
-    dplyr::select(PSNU, psnuid, sheet_name, indicatorCode, Age, Sex, KeyPop, value) %>%
+    dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value) %>%
   # Drop zeros & NAs
     tidyr::drop_na(value) %>%
     dplyr::filter(value != 0)
   
   # TEST for non-numeric entries
-    nonNumeric <- d$data$extract %>%
-      dplyr::filter(!is.numeric(value)) %>%
-      dplyr::select(value)
+  non_numeric <- d$data$extract %>%
+    dplyr::mutate(value_numeric = as.numeric(value)) %>%
+    dplyr::filter(is.na(value_numeric)) %>%
+    dplyr::select(value)
+  
+  if(NROW(non_numeric) > 0) {
+    msg <- paste0("In tab ", sheet, ": NON-NUMERIC VALUES found! -> ",
+                  non_numeric)
+    d$info$warning_msg <- append(msg, d$info$warning_msg)
     
-    if(NROW(nonNumeric) > 0) {
-      msg <- paste0("In tab ", d$data$sheet, ": NON-NUMERIC VALUES found! -> ",
-                    nonNumeric)
-      d$info$warningMsg <- append(msg, d$info$warningMsg)
-    }
-      
-
-  # TEST for Negative values
-  has_negative_numbers <- d$data$extract$value < 0
-  
-  if (any(has_negative_numbers)) {
-    negCols <- d$data$extract %>%
-      dplyr::filter(value < 0) %>%
-      dplyr::pull(indicatorCode) %>%
-      unique() %>%
-      paste(collapse = ", ")
-    
-    msg<-paste0("In tab ", d$data$sheet, ": NEGATIVE VALUES found! -> ", negCols, "")
-    d$info$warningMsg<-append(msg,d$info$warningMsg)
-        }
-
-  # TEST for duplicates
-  any_dups <- d$data$extract %>%
-    dplyr::select(sheet_name, PSNU, Age, Sex, KeyPop, indicatorCode) %>%
-    dplyr::group_by(sheet_name, PSNU, Age, Sex, KeyPop, indicatorCode) %>%
-    dplyr::summarise(n = (dplyr::n())) %>%
-    dplyr::filter(n > 1) %>%
-    dplyr::ungroup() %>%
-    dplyr::distinct() %>%
-    dplyr::mutate(row_id = paste(PSNU, Age, Sex, KeyPop, indicatorCode, sep = "    ")) %>%
-    dplyr::arrange(row_id) %>%
-    dplyr::pull(row_id)
-  
-  if (NROW(any_dups) > 0) {
-    msg<- paste0("In tab ", d$data$sheet, ": DUPLICATE ROWS -> ", 
-                 paste(any_dups, collapse = ","))
-    d$info$warningMsg<-append(msg,d$info$warningMsg)
   }
-
-  # TEST for defunct disaggs
-  defunct <- defunctDisaggs(d)
-  
-  if (NROW(defunct) > 0) {
-    defunctMsg <- defunct %>%
-      dplyr::mutate(msg = stringr::str_squish(paste(
-        paste0(indicatorCode, ":"), Age, Sex, KeyPop
-      ))) %>%
-      dplyr::pull(msg)
-    msg <- paste0("In tab ", d$data$sheet, ": DEFUNCT DISAGGS ->",
-                  paste(defunctMsg, collapse = ","))
-    d$info$warningMsg<-append(msg,d$info$warningMsg)
-  }
-        
-    # Aggregate OVC_HIVSTAT
-        if (d$data$sheet == "OVC") {
-          d$data$extract %<>%
-            dplyr::mutate(
-              Age = dplyr::case_when(
-                stringr::str_detect(indicatorCode, "OVC_HIVSTAT") ~ NA_character_,
-                TRUE ~ Age),
-              Sex = dplyr::case_when(
-                stringr::str_detect(indicatorCode, "OVC_HIVSTAT") ~ NA_character_,
-                TRUE ~ Sex)) %>%
-            dplyr::group_by(PSNU, psnuid, sheet_name, indicatorCode, Age, Sex, KeyPop) %>%
-            dplyr::summarise(value = sum(value)) %>%
-            dplyr::ungroup()
-        }
-        
-    # Add ages to PMTCT_EID
-        if (d$data$sheet == "PMTCT_EID") {
-          d$data$extract %<>%
-            dplyr::mutate(
-              Age = dplyr::case_when(
-                stringr::str_detect(indicatorCode, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
-                stringr::str_detect(indicatorCode, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
-                TRUE ~ Age
-              )
-            )
-        }
   
   d$data$extract %<>%
     dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
     tidyr::drop_na(value)
+  
+  # TEST for Negative values
+  has_negative_numbers <- d$data$extract$value < 0
+  
+  if (any(has_negative_numbers)) {
+    neg_cols <- d$data$extract %>%
+      dplyr::filter(value < 0) %>%
+      dplyr::pull(indicator_code) %>%
+      unique() %>%
+      paste(collapse = ", ")
+    
+    msg <- paste0("In tab ", sheet, ": NEGATIVE VALUES found! -> ", neg_cols, "")
+    d$info$warning_msg <- append(msg, d$info$warning_msg)
+  }
+
+  # TEST for duplicates
+  any_dups <- d$data$extract %>%
+    dplyr::select(sheet_name, PSNU, Age, Sex, KeyPop, indicator_code) %>%
+    dplyr::group_by(sheet_name, PSNU, Age, Sex, KeyPop, indicator_code) %>%
+    dplyr::summarise(n = (dplyr::n())) %>%
+    dplyr::filter(n > 1) %>%
+    dplyr::ungroup() %>%
+    dplyr::distinct() %>%
+    dplyr::mutate(row_id = paste(PSNU, Age, Sex, KeyPop, indicator_code, sep = "    ")) %>%
+    dplyr::arrange(row_id) %>%
+    dplyr::pull(row_id)
+  
+  if (NROW(any_dups) > 0) {
+    msg <- paste0("In tab ", sheet, ": ",
+                  length(any_dups),
+                  " DUPLICATE ROWS. These will be aggregated! -> ", 
+                 paste(any_dups, collapse = ","))
+    d$info$warning_msg <- append(msg, d$info$warning_msg)
+  }
+
+  # TEST for defunct disaggs
+  defunct <- defunctDisaggs(d, type = "Data Pack")
+  
+  if (NROW(defunct) > 0) {
+    defunct_msg <- defunct %>%
+      dplyr::mutate(
+        msg = stringr::str_squish(
+          paste(paste0(indicator_code, ":"),
+                Age,
+                Sex,
+                KeyPop
+          )
+        )
+      ) %>%
+      dplyr::pull(msg) %>%
+      paste(collapse = ",")
+    
+    msg <- paste0("In tab ", sheet,
+                  ": INVALID DISAGGS ",
+                  "(Check MER Guidance for correct alternatives) ->",
+                  defunct_msg)
+    
+    d$info$warning_msg <- append(msg, d$info$warning_msg)
+  }
+        
+  # Aggregate OVC_HIVSTAT
+  # TODO: Fix this in the Data Pack. Not here...
+  if (sheet == "OVC") {
+    d$data$extract %<>%
+      dplyr::mutate(
+        Age = dplyr::case_when(
+          stringr::str_detect(indicator_code, "OVC_HIVSTAT") ~ NA_character_,
+          TRUE ~ Age),
+        Sex = dplyr::case_when(
+          stringr::str_detect(indicator_code, "OVC_HIVSTAT") ~ NA_character_,
+          TRUE ~ Sex)) %>%
+      dplyr::group_by(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop) %>%
+      dplyr::summarise(value = sum(value)) %>%
+      dplyr::ungroup()
+  }
+    
+  # Add ages to PMTCT_EID
+  # TODO: Fix this in the Data Pack. Not here...
+  if (sheet == "PMTCT_EID") {
+    d$data$extract %<>%
+      dplyr::mutate(
+        Age = dplyr::case_when(
+          stringr::str_detect(indicator_code, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
+          stringr::str_detect(indicator_code, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
+          TRUE ~ Age
+        )
+      )
+  }
 
     return(d)
 
@@ -449,7 +282,7 @@ unPackSheet <- function(d) {
 separateDataSets <- function(d) {
   d$data$MER <- d$data$targets %>%
     dplyr::filter(
-      indicatorCode %in% (
+      indicator_code %in% (
         datapackr::data_pack_schema %>%
           dplyr::filter(col_type == "Target",
                         dataset == "MER") %>%
@@ -459,7 +292,7 @@ separateDataSets <- function(d) {
   
   d$data$SUBNAT_IMPATT <- d$data$targets %>%
     dplyr::filter(
-      indicatorCode %in% (
+      indicator_code %in% (
         datapackr::data_pack_schema %>%
           dplyr::filter(col_type == "Target",
                         dataset %in% c("SUBNAT", "IMPATT")) %>%
@@ -467,50 +300,7 @@ separateDataSets <- function(d) {
       )
     )
   d$data <-
-    rlist::list.remove(d$data, c("targets", "extract", "sheet"))
-  
-  return(d)
-}
-
-
-#' @importFrom magrittr %>% %<>%
-#' @title unPackSheets(d)
-#'
-#' @description Loops through all critical sheets in a submitted Data Pack or
-#'     Site Tool and executes \code{\link{unPackSheet}} to extract data, then
-#'     compiles data into single flat dataframe. Also executes
-#'     \code{\link{separateDataSets}} to separate single dataframe into at least
-#'     two for \code{MER} and \code{SUBNAT/IMPATT}.
-#'
-#' @param d datapackr list object containing at least
-#'     \code{d$keychain$submission_path}.
-#' @return A datapackr list object, \code{d}, storing at least 2 dataframes of
-#'    data extracted from submitted Data Pack or Site Tool: a \code{d$data$MER}
-#'    dataframe containing all MER data to be distributed to site level, and/or
-#'    \code{d$data$SUBNAT_IMPATT} containing data in the SUBNAT and IMPATT
-#'    datasets from DATIM that can be imported into DATIM at the PSNU level.
-unPackSheets <- function(d) {
-  # Get sheets list
-  sheets <- datapackr::data_pack_schema %>%
-    dplyr::select(sheet_name) %>%
-    dplyr::filter(sheet_name != "SNU x IM") %>%
-    dplyr::distinct() %>%
-    dplyr::pull(sheet_name)
-  actual_sheets <-
-    readxl::excel_sheets(d$keychain$submission_path)
-  sheets_to_read <- actual_sheets[actual_sheets %in% sheets]
-  
-  d$data$targets <- NULL
-  
-  for (i in 1:length(sheets_to_read)) {
-    d$data$sheet = sheets_to_read[i]
-    interactive_print(d$data$sheet)
-    d <- unPackSheet(d)
-    d$data$targets <-
-      dplyr::bind_rows(d$data$targets, d$data$extract)
-  }
-  
-  d <- separateDataSets(d)
+    rlist::list.remove(d$data, c("targets", "extract"))
   
   return(d)
 }
@@ -534,18 +324,21 @@ unPackSheets <- function(d) {
 unPackSNUxIM <- function(d) {
   msg <- NULL
   
-  col_num <- length(readxl::read_excel(path = d$keychain$submission_path,
-                                       sheet = "SNU x IM",
-                                       range = readxl::cell_rows(5)))
+  col_num <- readxl::read_excel(path = d$keychain$submission_path,
+                                sheet = "SNU x IM",
+                                range = readxl::cell_rows(5)) %>%
+    length()
+  
   ct <- c(rep("text",8),rep("numeric",col_num-8))
   
   d$data$SNUxIM <- readxl::read_excel(path = d$keychain$submission_path,
                                       sheet = "SNU x IM",
                                       range = readxl::cell_limits(c(5,1), c(NA, col_num)),
                                       col_types = ct) %>%
+    dplyr::rename(indicator_code = indicatorCode) %>%
     dplyr::select(
       dplyr::one_of(
-        c("PSNU","sheet_name","indicatorCode","CoarseAge","Sex","KeyPop","DataPackTarget","Dedupe")),
+        c("PSNU","sheet_name","indicator_code","CoarseAge","Sex","KeyPop","DataPackTarget","Dedupe")),
       dplyr::matches("(\\d){2,}")) %>%
     dplyr::select_if(~!all(is.na(.))) %>%
     dplyr::mutate(
@@ -556,7 +349,7 @@ unPackSNUxIM <- function(d) {
   # TEST where DataPackTarget != sum of mechanism values
   mismatch <- d$data$SNUxIM %>%
     dplyr::filter(DataPackTarget != sum) %>%
-    dplyr::select(PSNU, indicatorCode, CoarseAge, Sex, KeyPop, DataPackTarget, mechanisms = sum)
+    dplyr::select(PSNU, indicator_code, CoarseAge, Sex, KeyPop, DataPackTarget, mechanisms = sum)
   
   if (NROW(mismatch) > 0) {
     msg <- paste0(
@@ -567,21 +360,21 @@ unPackSNUxIM <- function(d) {
       "To address this, go to your Data Pack's SNU x IM tab and filter the Rollup column for Pink cells. 
       "
     )
-    d$info$warningMsg<-append(msg,d$info$warningMsg)
+    d$info$warning_msg <- append(msg,d$info$warning_msg)
   }
   
   d$data$SNUxIM %<>%
     dplyr::mutate(
       # Align PMTCT_EID Age bands with rest of Data Pack
       CoarseAge = dplyr::case_when(
-        stringr::str_detect(indicatorCode, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
-        stringr::str_detect(indicatorCode, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
+        stringr::str_detect(indicator_code, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
+        stringr::str_detect(indicator_code, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
         TRUE ~ CoarseAge),
       Sex = dplyr::case_when(
         # Drop Unknown Sex from PMTCT_EID
-        stringr::str_detect(indicatorCode, "PMTCT_EID") ~ NA_character_,
+        stringr::str_detect(indicator_code, "PMTCT_EID") ~ NA_character_,
         # Fix issues with HTS_SELF (duplicate and split by Male/Female)
-        stringr::str_detect(indicatorCode, "HTS_SELF(.)+Unassisted") ~ "Male|Female",
+        stringr::str_detect(indicator_code, "HTS_SELF(.)+Unassisted") ~ "Male|Female",
         TRUE ~ Sex)) %>%
     tidyr::separate_rows(Sex, sep = "\\|") %>%
     # Create distribution matrix 
@@ -590,18 +383,18 @@ unPackSNUxIM <- function(d) {
     tidyr::gather(
       key = "mechanismCode",
       value = "value",
-      -PSNU, -sheet_name, -indicatorCode, -CoarseAge, -Sex, -KeyPop) %>%
+      -PSNU, -sheet_name, -indicator_code, -CoarseAge, -Sex, -KeyPop) %>%
     ## Coerce to numeric
     dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
     ## Drop all NA values
     tidyr::drop_na(value) %>%
-    dplyr::group_by(PSNU, sheet_name, indicatorCode, CoarseAge, Sex, KeyPop) %>%
+    dplyr::group_by(PSNU, sheet_name, indicator_code, CoarseAge, Sex, KeyPop) %>%
     dplyr::mutate(distribution = value / sum(value)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(
-      psnuid = stringr::str_extract(PSNU,"(?<=\\()([A-Za-z][A-Za-z0-9]{10})(?=\\)$)"),
+      psnuid = stringr::str_extract(PSNU, "(?<=\\()([A-Za-z][A-Za-z0-9]{10})(?=\\)$)"),
       mechanismCode = stringr::str_extract(mechanismCode, "(\\d{1,6})|Dedupe")) %>%
-    dplyr::select(PSNU, psnuid, sheet_name, indicatorCode, CoarseAge, Sex,
+    dplyr::select(PSNU, psnuid, sheet_name, indicator_code, CoarseAge, Sex,
                   KeyPop, mechanismCode, distribution)
   
   return(d)
@@ -622,25 +415,25 @@ rePackPSNUxIM <- function(d) {
   d$data$distributedMER <- d$data$MER %>%
     dplyr::mutate(
       CoarseAge = dplyr::case_when(
-        stringr::str_detect(indicatorCode,"OVC_SERV")
-        & Age %in% c("<01","01-04","05-09","10-14","15-17") ~ "<18",
-        stringr::str_detect(indicatorCode,"OVC_HIVSTAT") ~ NA_character_,
-        stringr::str_detect(indicatorCode,"Malnutrition|Pediatric") ~ "01-04",
-        stringr::str_detect(indicatorCode,"HTS_SELF(.)+Unassisted") ~ NA_character_,
+        stringr::str_detect(indicator_code,"OVC_SERV")
+          & Age %in% c("<01","01-04","05-09","10-14","15-17") ~ "<18",
+        stringr::str_detect(indicator_code,"OVC_HIVSTAT") ~ NA_character_, #TODO: Fix in Data Pack, not here
+        stringr::str_detect(indicator_code,"Malnutrition|Pediatric") ~ "01-04", #TODO: Fix in Data Pack, not here
+        stringr::str_detect(indicator_code,"HTS_SELF(.)+Unassisted") ~ NA_character_, #TODO: Fix in Data Pack, not here
         Age %in% c("<01","01-04","05-09","10-14") ~ "<15",
         Age %in% c("15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+") ~ "15+",
         TRUE ~ Age),
       Sex = dplyr::case_when(
-        stringr::str_detect(indicatorCode,"OVC_HIVSTAT") ~ NA_character_,
-        stringr::str_detect(indicatorCode,"KP_MAT") ~ stringr::str_replace(KeyPop," PWID",""),
+        stringr::str_detect(indicator_code,"OVC_HIVSTAT") ~ NA_character_, #TODO: Fix in Data Pack, not here
+        stringr::str_detect(indicator_code,"KP_MAT") ~ stringr::str_replace(KeyPop," PWID",""), #TODO: Fix in Data Pack, not here
         TRUE ~ Sex),
       KeyPop = dplyr::case_when(
-        stringr::str_detect(indicatorCode,"KP_MAT") ~ NA_character_,
+        stringr::str_detect(indicator_code,"KP_MAT") ~ NA_character_, #TODO: Fix in Data Pack, not here
         TRUE ~ KeyPop)
     ) %>%
     dplyr::left_join(dplyr::select(d$data$SNUxIM,-PSNU)) %>%
     dplyr::mutate(newValue = value * distribution) %>%
-    dplyr::select(PSNU, psnuid, sheet_name, indicatorCode, Age, CoarseAge,
+    dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, CoarseAge,
                   Sex, KeyPop, mechanismCode, value = newValue) %>%
     dplyr::filter(value != 0) %>%
     tidyr::drop_na(value)
@@ -667,13 +460,13 @@ FASTforward <- function(d) {
     dplyr::filter(
       # Detect HTS_TST & HTS_TST_POS cases
       stringr::str_detect(
-        indicatorCode,
+        indicator_code,
         "HTS_TST(.)+Age|(PMTCT|TB)_STAT\\.N(.)+(NewNeg|NewPos)$|VMMC_CIRC\\.(.)+(Negative|Positive)|HTS_INDEX"
       )
       # Detect OVC_SERV, TB_PREV, TX_CURR, TX_NEW, VMMC_CIRC cases
       |
         stringr::str_detect(
-          indicatorCode,
+          indicator_code,
           "OVC_SERV|TB_PREV\\.N|TX_CURR\\.|TX_NEW\\.N\\.Age|VMMC_CIRC\\."
         )
     ) %>%
@@ -683,7 +476,7 @@ FASTforward <- function(d) {
       ## Copy for HTS_TST
       ((.) %>%
          dplyr::filter(
-           stringr::str_detect(indicatorCode, "VMMC_CIRC(.)+(Negative|Positive)")
+           stringr::str_detect(indicator_code, "VMMC_CIRC(.)+(Negative|Positive)")
          ) %>%
          dplyr::mutate(indicator = "HTS_TST")
       ),
@@ -691,7 +484,7 @@ FASTforward <- function(d) {
       ((.) %>%
          dplyr::filter(
            stringr::str_detect(
-             indicatorCode,
+             indicator_code,
              "(VMMC_CIRC|HTS_TST)(.)+Positive|(HTS_INDEX|PMTCT_STAT|TB_STAT)(.)+NewPos$"
            )
          ) %>%
@@ -701,9 +494,9 @@ FASTforward <- function(d) {
     dplyr::mutate(
       indicator = dplyr::case_when(
         !is.na(indicator) ~ indicator,
-        stringr::str_detect(indicatorCode, "PMTCT_STAT|TB_STAT|HTS_INDEX") ~ "HTS_TST",
+        stringr::str_detect(indicator_code, "PMTCT_STAT|TB_STAT|HTS_INDEX") ~ "HTS_TST",
         TRUE ~ stringr::str_extract(
-          indicatorCode,
+          indicator_code,
           "OVC_SERV|HTS_TST|TB_PREV|TX_CURR|TX_NEW|VMMC_CIRC"
         )
       ),
@@ -735,19 +528,20 @@ FASTforward <- function(d) {
 #'     recompiles the dataframe containing SUBNAT and IMPATT data,
 #'     \code{d$data$SUBNAT_IMPATT} into a standard DATIM import file.
 #'
-#' @param d Datapackr list object
+#' @param data SUBNAT/IMPATT dataframe to pack for DATIM.
 #' 
 #' @return Dataframe of SUBNAT & IMPATT data ready for DATIM ingestion.
 #' 
-packSUBNAT_IMPATT <- function(d) {
+packSUBNAT_IMPATT <- function(data) {
   
-  d$datim$SUBNAT_IMPATT <- d$data$SUBNAT_IMPATT %>%
+  SUBNAT_IMPATT <- data %>%
     dplyr::left_join((
       datapackr::indicatorMap %>%
         dplyr::filter(dataset %in% c("SUBNAT", "IMPATT")) %>%
+        dplyr::rename(indicator_code = indicatorCode) %>%
         dplyr::select(
           sheet_name,
-          indicatorCode,
+          indicator_code,
           Age = validAges,
           Sex = validSexes,
           KeyPop = validKPs,
@@ -778,121 +572,5 @@ packSUBNAT_IMPATT <- function(d) {
     dplyr::ungroup() %>%
     dplyr::mutate(value = as.character(round_trunc(value)))
   
-  return(d)
+  return(SUBNAT_IMPATT)
 }
-
-
-
-#' @importFrom magrittr %>% %<>%
-#' @title packForDATIM(data)
-#' 
-#' @description 
-#' Flexible function that allows packaging of a variety of datapackr outputs as
-#' DATIM import files.
-#' 
-#' @param d Data packr object.
-#' @param type Type of dataset to prep for DATIM. Choose from \code{PSNUxIM},
-#' \code{SUBNAT_IMPATT}, or \code{Site}.
-#' 
-#' @return Data frame ready for DATIM import
-#' 
-packForDATIM <- function(d, type = NA) {
-  
-  if (is.na(type)) {
-    stop("Please specify data type: 'PSNUxIM', 'SUBNAT_IMPATT', or 'Site'")
-  }
-  
-  if (type == "SUBNAT_IMPATT") {
-    
-    d <- packSUBNAT_IMPATT(d)
-  
-    }
-  
-  if (type == "PSNUxIM") {
-    
-    d$datim$PSNUxIM <- d$data$distributedMER %>%
-      dplyr::mutate(
-        period = datapackr::periodInfo$iso,
-        mechanismCode = stringr::str_replace(mechanismCode,"Dedupe","00000")) %>% 
-      dplyr::left_join(datapackr::PSNUxIM_to_DATIM %>%
-                         dplyr::filter(dataset == "MER") %>%
-                         dplyr::select(-sheet_name, -typeOptions, -dataset),
-                       by = c("indicatorCode" = "indicatorCode",
-                              "Age" = "validAges",
-                              "Sex" = "validSexes",
-                              "KeyPop" = "validKPs")) %>%
-      dplyr::select(
-        dataElement = dataelementuid,
-        period,
-        orgUnit = psnuid,
-        categoryOptionCombo = categoryoptioncombouid,
-        mechanismCode,
-        value) %>%
-      dplyr::group_by(dataElement,
-                      period,
-                      orgUnit,
-                      categoryOptionCombo,
-                      mechanismCode) %>%
-      dplyr::summarise(value = sum(value)) %>%
-      dplyr::ungroup() %>%
-      #Remove anything which is NA here, 
-      #like TX_PVLS.N.Age/Sex/Indication/HIVStatus.20T.Routine
-      dplyr::filter(complete.cases(.))
-      
-  }
-  
-  if (type == "Site") {
-    
-    d$datim$decimal_values <- d$data$targets %>% 
-      dplyr::filter(value %% 1 != 0)
-    
-    d$datim$negative_values <- d$data$targets %>% 
-      dplyr::filter(mech_code != "00000") %>%
-      dplyr::filter(value < 0 )
-    
-    importFile <- d$data$targets %>%
-      dplyr::select(site_uid,mech_code,indicatorCode,Type,Age,Sex,KeyPop,value) %>%
-      dplyr::filter(
-        !is.na(suppressWarnings(as.numeric(value)))) %>%
-      dplyr::group_by(site_uid,mech_code,indicatorCode,Type,Age,Sex,KeyPop) %>%
-      dplyr::summarise(value=sum(value)) %>%
-      dplyr::ungroup() %>% 
-      dplyr::mutate(
-        period = datapackr::periodInfo$iso,
-        value = round_trunc(as.numeric(value))) %>%
-      dplyr::left_join(datapackr::SiteToDATIM %>%
-                         dplyr::filter(dataset == "MER") %>%
-                         dplyr::select(-sheet_name, -dataset, -tech_area, -num_den),
-                       by = c("indicatorCode" = "indicator_code",
-                              "Type" = "type_options",
-                              "Age" = "valid_ages",
-                              "Sex" = "valid_sexes",
-                              "KeyPop" = "valid_kps")) %>%
-      tidyr::drop_na(dataelementuid) %>%
-      dplyr::group_by_at(dplyr::vars(-value)) %>%
-      dplyr::summarise(value = sum(value)) %>%
-      dplyr::ungroup() %>%
-      dplyr::select(
-        dataElement = dataelementuid,
-        period,
-        orgUnit = site_uid,
-        categoryOptionCombo = categoryoptioncombouid,
-        attributeOptionCombo = mech_code,
-        value) 
-    
-    if(any(is.na(importFile)) ) {
-      
-        msg <- paste0("ERROR! Empty values found in DATIM export. These will
-                     be filtered.")
-        d$info$warningMsg <- append(msg,d$info$warningMsg)
-        d$info$has_error <- TRUE
-    }
-   
-    d$datim$site_data <- importFile %>% 
-      dplyr::filter(purrr::reduce(purrr::map(., is.na), `+`) == 0 )
-    
-  }
-  
-  return(d)
-}
-

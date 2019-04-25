@@ -4,10 +4,10 @@
 \alias{packSUBNAT_IMPATT}
 \title{packSUBNAT_IMPATT(d)}
 \usage{
-packSUBNAT_IMPATT(d)
+packSUBNAT_IMPATT(data)
 }
 \arguments{
-\item{d}{Datapackr list object}
+\item{data}{SUBNAT/IMPATT dataframe to pack for DATIM.}
 }
 \value{
 Dataframe of SUBNAT & IMPATT data ready for DATIM ingestion.

@@ -4,21 +4,18 @@
 \alias{unPackSiteToolSheet}
 \title{unPackSiteToolSheet(d)}
 \usage{
-unPackSiteToolSheet(d)
+unPackSiteToolSheet(d, sheet)
 }
 \arguments{
-\item{d}{datapackr list object containing at least
-\code{d$keychain$submission_path},
-\code{d$data$sheet}, & \code{d$info$warningMsg}.}
+\item{d}{Datapackr object}
+
+\item{sheet}{Sheet to unpack.}
 }
 \value{
-A datapackr list object, \code{d}, storing a dataframe of extracted
-   data (\code{d$data$extract}) and a warning message
-   (\code{d$info$warningMsg}) compiled with errors discovered while
-   extracting data from sheet specified in \code{d$data$sheet}.
+d
 }
 \description{
 Within a submitted Site Tool (directed to by
    \code{d$keychain$submission_path}), extract data from a single sheet specified
-   in \code{d$data$sheet}.
+   in \code{sheet}.
 }

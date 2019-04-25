@@ -1,0 +1,47 @@
+#' @title Unpack data from a submission file.
+#'
+#' @description Loops through all critical sheets in a submitted 
+#'     Tool and extracts data, then compiles data into single flat dataframe.
+#'
+#' @param d Datapackr object.
+#' 
+#' @return d
+#' 
+unPackSheets <- function(d) {
+  # Get schema
+  if (d$info$tool == "Data Pack") {
+    schema <- datapackr::data_pack_schema
+  } else if (d$info$tool == "Site Tool") {
+    schema <- datapackr::site_tool_schema
+  }
+  
+  # Get sheets list
+  sheets <- schema %>%
+    dplyr::select(sheet_name) %>%
+    dplyr::filter(sheet_name != "SNU x IM") %>%
+    dplyr::distinct() %>%
+    dplyr::pull(sheet_name)
+  
+  actual_sheets <- readxl::excel_sheets(d$keychain$submission_path)
+  sheets_to_read <- actual_sheets[actual_sheets %in% sheets]
+  
+  d$data$targets <- NULL
+  
+  for (i in 1:length(sheets_to_read)) {
+    sheet = sheets_to_read[i]
+    interactive_print(sheet)
+    
+    if (d$info$tool == "Data Pack") {
+      d <- unPackDataPackSheet(d, sheet = sheet)
+    } else if (d$info$tool == "Site Tool") {
+      d <- unPackSiteToolSheet(d, sheet = sheet)
+    }
+    
+    if (!is.null(d$data$extract)) {
+      d$data$targets <-
+        dplyr::bind_rows(d$data$targets, d$data$extract)
+    }
+  }
+  
+  return(d)
+}

@@ -1,6 +1,6 @@
 support_files <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 19/3) Testing & Deployment/Support Files"
 output_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 19/5) Maintenance & Support/Final Data Packs/Outputs"
-secrets <- "/Users/scott/.secrets/datim.json"
+secrets <- "/Users/scott/.secrets/jason.json"
 
 ### END EDITS #####
 # devtools::install_git(url = "https://github.com/pepfar-datim/data-pack-commons.git",
@@ -16,7 +16,7 @@ devtools::install_git(url = "https://github.com/pepfar-datim/datapackr.git",
 datapackr::loginToDATIM(secrets)
 
 # Read Data Pack
-d <- datapackr::unPackData()
+d <- datapackr::unPackTool(tool = "Data Pack")
 
 # Grab densities
 density_data_files <-

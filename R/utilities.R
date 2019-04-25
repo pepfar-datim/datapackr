@@ -498,13 +498,25 @@ getCountries <- function(datapack_uid = NA) {
 #' @description 
 #' Given a file path, will test whether the file can be read.
 #' 
-#' @param path Filepath to test.
+#' @param path Filepath to test. Default is NA.
+#' @param type File type, either \code{standard} or \code{template}.
 #' 
 #' @return Logical. \code{TRUE} if file can be read, \code{FALSE} if not.
 #'
-can_read_file <- function(path) {
-  if (is.na(path)) {return(FALSE)}
-  file.access(path, 4) == 0
+canReadFile <- function(path = NA, type = "standard") {
+  
+  # Check that the file path was supplied
+  if (is.na(path)) {
+    return(FALSE)
+    
+  # If the file to read is a template file, check for write permissions
+  } else if (type == "template") {
+    file.access(path, 2) == 0 
+  
+  # If the file to read is a template file, check for read permissions
+  } else {
+    file.access(path, 4) == 0
+  }
 }
 
 
@@ -518,25 +530,31 @@ can_read_file <- function(path) {
 #' for user selection of correct filepath via computer window.
 #' 
 #' @param path Filepath to test and use.
-#' @param extension File extension to test for. (Do not include leading period.)
+#' @param type File type, whether \code{standard} or \code{template}.
+#' @param extension File extension to test for.
 #' 
 #' @return Character vector containing valid filepath for further use.
 #' 
-handshake_file <- function(path = NA, extension) {
+handshakeFile <- function(path = NA, type = "standard", extension) {
   
-  if (!can_read_file(path) & interactive()) {
+  # If path has issues or NA, prompt user to select file from window.
+  if (!canReadFile(path, type = type) & interactive()) {
     interactive_print("Please choose a file.")
     path <- file.choose()
   }
 
   msg <- "Checking the file exists..."
   interactive_print(msg)
-
-  if (!can_read_file(path)) {
+  
+  # Check the file can be read one more time.
+  if (!canReadFile(path, type = type)) {
     stop("File could not be read!")
   }
   
-  if (tools::file_ext(path) != tolower(extension)) {
+  # Check the file has correct extension
+  extension = stringr::str_remove(tolower(extension),"\\.")
+  
+  if (tools::file_ext(path) != extension) {
     stop(paste0("File is not the correct format! File must have extension .",
                 extension))
   } else {
@@ -600,4 +618,30 @@ unPackSchema <- function(path) {
     dplyr::arrange(sheet_num, col)
   
   return(schema)
+}
+
+
+#' @export
+#' @title Add list of columns as NULL columns to supplied dataframe.
+#' 
+#' @description
+#' Supplied a character vector of column names, \code{cnames}, \code{addcols}
+#' will add one new, \code{NULL} column to \code{data} for each element of 
+#' \code{cnames} and name it after the corresponding element of \code{cnames}.
+#' 
+#' @param data Dataframe to add columns.
+#' @param cnames Character vector of one or more column names to be added to
+#' \code{data}.
+#' 
+#' @return Dataframe \code{data} with added columns listed in \code{cnames}.
+#'
+addcols <- function(data, cnames) {
+  add <- cnames[!cnames %in% names(data)]
+  
+  if (length(add) != 0) {
+    data[add] <- NA_character_
+  }
+  
+  return(data)
+  
 }
