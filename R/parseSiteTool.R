@@ -254,7 +254,7 @@ unPackSiteToolSheet <- function(d) {
   #Proceed by removing unallocated rows
   d$data$extract%<>% 
     #TODO Ugly hack for NOT A SITE ROWS which have no site
-    dplyr::filter(Status != "NOT A SITE") 
+    dplyr::filter(!(Status == "NOT A SITE" & is.na(Site)))
   
   #No rows
   if (NROW(d$data$extract) ==  0) {
@@ -262,11 +262,23 @@ unPackSiteToolSheet <- function(d) {
     return(d)
   }
   
+  #We should only have "Active" sites now
+  
+  only_active_sites <- d$data$extract$Status == "Active" & !is.na(d$data$extract$Site)
+  
+  if (!(all(only_active_sites) & all(!is.na(only_active_sites)))) {
+    msg<-paste0("ERROR! In tab ", d$data$sheet, ": Inactive sites found! These will be filtered!")
+    d$info$warningMsg<-append(msg,d$info$warningMsg)
+    d$info$has_error<-TRUE
+  }
+  
+  #Proceed by filtering rows which have site but no "Active" status
+  d$data$extract%<>% 
+    dplyr::filter(only_active_sites)
+  
   #Only empty rows
   is_empty_row <- function(x) {
-    
   purrr::reduce(purrr::map(x, is.na), `+`) == NCOL(x)
-    
   }
   
   empty_rows<-is_empty_row(d$data$extract)
