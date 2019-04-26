@@ -48,9 +48,8 @@ getSiteList <- function(country_uids,
     countries <- datapackr::api_call("organisationUnits") %>%
       datapackr::api_filter("organisationUnitGroups.id:eq:cNzfcPWEGSH") %>%
       datapackr::api_filter(paste0(
-        "id:in:[",
-        paste0(country_uids,collapse = ","),
-        "]")) %>%
+        "path:like:",
+        paste0(country_uids,collapse = ","))) %>%
       datapackr::api_fields("id,name") %>%
       datapackr::api_get() %>%
       dplyr::rename(country_name = name)
