@@ -38,9 +38,7 @@ unPackTool <- function(submission_path = NA,
     extension = "xlsx"
   } else if (d$info$tool == "Site Filter") {
     extension = "csv"
-  } else {
-    stop("Not sure what to do with that kind of tool...")
-  }
+  } else {stop("Cannot process that kind of tool.")}
   
   d$keychain$submission_path <- handshakeFile(path = d$keychain$submission_path,
                                               type = "standard",
@@ -58,7 +56,7 @@ unPackTool <- function(submission_path = NA,
     d <- unPackMechanismMap(d)
   } else if (d$info$tool == "Site Filter") {
     d <- unPackSiteFilter(d)
-  }
+  } else {stop("Cannot process that kind of tool.")}
   
   # If warnings, show all grouped by sheet and issue
   if (!is.null(d$info$warning_msg) & interactive()) {

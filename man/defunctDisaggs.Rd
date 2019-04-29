@@ -4,13 +4,11 @@
 \alias{defunctDisaggs}
 \title{defunctDisaggs(d)}
 \usage{
-defunctDisaggs(d, type = "Data Pack")
+defunctDisaggs(d)
 }
 \arguments{
 \item{d}{datapackr list object containing at least d$data$extract of data
 from a single sheet in submission file.}
-
-\item{type}{Either "Data Pack" or "Site Tool".}
 }
 \value{
 A datapackr list object, \code{d}, storing a dataframe of defunct

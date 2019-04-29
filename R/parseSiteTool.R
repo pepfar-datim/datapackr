@@ -31,14 +31,6 @@ emptySiteToolSheetFrame<-function(){
 #' @return d
 #' 
 unPackSiteToolSheet <- function(d, sheet) {
-  addcols <- function(data, cname) {
-    add <- cname[!cname %in% names(data)]
-    
-    if (length(add) != 0)
-      data[add] <- NA_character_
-    return(data)
-  }
-
   d$data$extract <-
     readxl::read_excel(
       path = d$keychain$submission_path,
@@ -46,73 +38,36 @@ unPackSiteToolSheet <- function(d, sheet) {
       range = readxl::cell_limits(c(5, 1), c(NA, NA)),
       col_types = "text"
     ) %>%
-    dplyr::rename(indicator_code = indicatorCode)
+    dplyr::select(-Status) %>%
+    tidyr::drop_na()
   
-  # Check for unallocated values
-  has_unallocated <- grepl("NOT A SITE",d$data$extract$Status) & grepl("NOT YET DISTRIBUTED",d$data$extract$Site)
-  
-  if (any(has_unallocated)) {
-    msg <- paste0("ERROR! In tab ", sheet, ": Unallocated values found!")
-    d$info$warning_msg <- append(msg, d$info$warning_msg)
-    d$info$has_error <- TRUE
-  }
-  
-  # Proceed by removing unallocated rows
-  d$data$extract %<>% 
-    #TODO Ugly hack for NOT A SITE ROWS which have no site
-    dplyr::filter(Status != "NOT A SITE" &
-                    !stringr::str_detect(Site, "NOT YET DISTRIBUTED"))
-  
-  # No rows
+  # Handle empty tabs
   if (NROW(d$data$extract) ==  0) {
     d$data$extract <- NULL
     return(d)
   }
   
-  # Only empty rows
-  is_empty_row <- function(x) {
-    purrr::reduce(purrr::map(x, is.na), `+`) == NCOL(x)
-  }
-  
-  empty_rows <- is_empty_row(d$data$extract)
-  
-   if (all(empty_rows)) {
-     d$data$extract <- NULL
-   return(d)
-   }
-  
   # Run structural checks before any filtering
   d <- checkColStructure(d, sheet)
-  
-  actual_cols <- names(d$data$extract)
-  # Static columns
-  static_cols <- c("Status","Site",
-                   "Mechanism","Type","Age","Sex","KeyPop")
   
   # List Target Columns
   targetCols <- datapackr::site_tool_schema %>%
     dplyr::filter(sheet_name == sheet,
                   col_type == "Target") %>%
-    dplyr::pull(indicator_code) %>%
-    append(static_cols, .)
-  
-  import_cols <- actual_cols[actual_cols %in% targetCols]
+    dplyr::pull(indicator_code)
   
   # Add cols to allow compiling with other sheets
   d$data$extract %<>%
-    #Only process needed columns
-    dplyr::select(import_cols) %>%
-    dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
-    dplyr::mutate(Mechanism = stringr::str_replace(Mechanism,"Dedupe","00000 - Deduplication") ) %>%
     addcols(c("KeyPop", "Age", "Sex")) %>%
-    # Extract Site id & Mech Code
+  # Extract Site id & Mech Code
     dplyr::mutate(
       site_uid = stringr::str_extract(Site, "(?<=\\[)([A-Za-z][A-Za-z0-9]{10})(?=\\]$)"),
+      Mechanism = stringr::str_replace(Mechanism, "Dedupe", "00000 - Deduplication"),
       mech_code = stringi::stri_extract_first_regex(Mechanism, "^[0-9]{4,6}(?=\\s-)"),
-    # Tag sheet name
+  # Tag sheet name
       sheet_name = sheet
-    ) %>% 
-    # Select only target-related columns
+    ) %>%
+  # Select only target-related columns
     dplyr::select(Site,
                   site_uid,
                   mech_code,
@@ -122,7 +77,8 @@ unPackSiteToolSheet <- function(d, sheet) {
                   Sex,
                   KeyPop,
                   dplyr::one_of(targetCols)) %>%
-    tidyr::gather(key = "indicatorCode",
+  # Gather all indicators as single column for easier processing
+    tidyr::gather(key = "indicator_code",
                   value = "value",
                   -Site,
                   -site_uid,
@@ -132,48 +88,64 @@ unPackSiteToolSheet <- function(d, sheet) {
                   -Sex,
                   -KeyPop,
                   -sheet_name) %>%
-    dplyr::select(Site, site_uid,mech_code,Type, sheet_name, indicatorCode, Age, Sex, KeyPop, value) %>%
-    # Drop zeros, NAs, dashes, and space-only entries
+    dplyr::select(Site, site_uid, mech_code, Type, sheet_name, indicator_code,
+                  Age, Sex, KeyPop, value) %>%
+  # Drop where value is zero, NA, dash, or space-only entry
     tidyr::drop_na(value) %>%
     dplyr::filter(
       !is.na(suppressWarnings(as.numeric(value)))) %>% 
     dplyr::mutate(value = as.numeric(value))
   
-  #Go ahead and filter any zeros, which are not dedupe
-  d$data$extract %<>% dplyr::filter(value != 0 |  stringr::str_detect("00000", mech_code))
+  # Check for non-sites
+  has_unallocated <- grepl("NOT YET DISTRIBUTED", d$data$extract$Site)
+  
+  if (any(has_unallocated)) {
+    msg <- paste0("ERROR! In tab ", sheet, ": Values not allocated to Site level!")
+    d$info$warning_msg <- append(msg, d$info$warning_msg)
+    d$info$has_error <- TRUE
+  }
+  
+  # Proceed by removing unallocated rows
+  d$data$extract %<>%
+    dplyr::filter(stringr::str_detect(Site, "NOT YET DISTRIBUTED", negate = TRUE))
+  
+  # Filter target zeros, allowing for zero-value dedupes
+  d$data$extract %<>%
+    dplyr::filter(value != 0 | stringr::str_detect("00000", mech_code))
   
   # TEST for Negative values in non-dedupe mechanisms
   has_negative_numbers <-
     ( d$data$extract$value < 0 ) &
     stringr::str_detect("00000", d$data$extract$mech_code, negate = TRUE)
 
-if (any(has_negative_numbers)) {
-  negCols <- d$data$extract %>%
-    dplyr::filter( has_negative_numbers) %>% 
-    dplyr::pull(indicator_code) %>%
-    unique() %>%
-    paste(collapse = ", ")
-    
-    msg <- paste0("ERROR! In tab ", sheet, ": NEGATIVE VALUES found! -> ", negCols, "")
-    d$info$warning_msg <- append(msg, d$info$warning_msg)
-    d$info$has_error <- TRUE
-  }
+  if (any(has_negative_numbers)) {
+    negCols <- d$data$extract %>%
+      dplyr::filter( has_negative_numbers) %>% 
+      dplyr::pull(indicator_code) %>%
+      unique() %>%
+      paste(collapse = ", ")
+      
+      msg <- paste0("ERROR! In tab ", sheet,
+                    ": NEGATIVE NON-DEDUPE VALUES found! -> ",
+                    negCols,
+                    "")
+      d$info$warning_msg <- append(msg, d$info$warning_msg)
+      d$info$has_error <- TRUE
+    }
   
   # TEST for positive values in dedupe mechanisms
-  
   has_positive_dedupe <-
     (d$data$extract$value > 0) &
     stringr::str_detect("00000", d$data$extract$mech_code)
   
   if ( any( has_positive_dedupe ) ) {
-    
-    negCols <- d$data$extract %>%
+    posCols <- d$data$extract %>%
       dplyr::filter(has_positive_dedupe) %>% 
       dplyr::pull(indicator_code) %>%
       unique() %>%
       paste(collapse = ", ")
     
-    msg<-paste0("ERROR! In tab ", sheet, ": POSITIVE DEDUPE VALUES found! -> ", negCols, "")
+    msg <- paste0("ERROR! In tab ", sheet, ": POSITIVE DEDUPE VALUES found! -> ", posCols, "")
     d$info$warning_msg <- append(msg, d$info$warning_msg)
     d$info$has_error <- TRUE
   }
@@ -182,27 +154,22 @@ if (any(has_negative_numbers)) {
   has_decimals <- d$data$extract$value %% 1 != 0
   
   if (any(has_decimals)){
-    msg <-
-      paste0(
-        "ERROR! In tab ",
-        sheet,
-        ":" ,
-        sum(has_decimals),
-        " DECIMAL VALUES found!")
+    msg <- paste0("ERROR! In tab ", sheet, ": ",
+                  sum(has_decimals),
+                  " DECIMAL VALUES found!")
     d$info$warning_msg <- append(msg, d$info$warning_msg)
     d$info$has_error <- TRUE
   }
   
-  
   # TEST for duplicates
   any_dups <- d$data$extract %>%
-    dplyr::select(sheet_name, Site, mech_code, Age, Sex, KeyPop, Type, indicator_code) %>%
-    dplyr::group_by(sheet_name, Site, mech_code, Age, Sex, KeyPop, Type, indicator_code) %>%
+    dplyr::select(sheet_name, site_uid, mech_code, Age, Sex, KeyPop, Type, indicator_code) %>%
+    dplyr::group_by(sheet_name, site_uid, mech_code, Age, Sex, KeyPop, Type, indicator_code) %>%
     dplyr::summarise(n = (dplyr::n())) %>%
     dplyr::filter(n > 1) %>%
     dplyr::ungroup() %>%
     dplyr::distinct() %>%
-    dplyr::mutate(row_id = paste( Site, mech_code, Age, Sex, KeyPop, Type, indicator_code, sep = "    ")) %>%
+    dplyr::mutate(row_id = paste(site_uid, mech_code, Age, Sex, KeyPop, Type, indicator_code, sep = "    ")) %>%
     dplyr::arrange(row_id) %>%
     dplyr::pull(row_id)
   
@@ -214,31 +181,37 @@ if (any(has_negative_numbers)) {
   }
   
   # TEST for defunct disaggs
-  defunct <- defunctDisaggs(d,
-                            type = "Site Tool")
+  defunct <- defunctDisaggs(d)
   
   if (NROW(defunct) > 0) {
     defunctMsg <- defunct %>%
-      dplyr::mutate(msg = stringr::str_squish(paste(
-        paste0(indicator_code, ":"), Age, Sex, KeyPop
-      ))) %>%
-      dplyr::pull(msg)
-    msg <- paste0("ERROR! In tab ", sheet, ": DEFUNCT DISAGGS ->",
-                  paste(defunctMsg, collapse = ","))
+      dplyr::mutate(
+        msg = stringr::str_squish(
+          paste(paste0(indicator_code, ":"), Age, Sex, KeyPop)
+        )
+      ) %>%
+      dplyr::pull(msg) %>%
+      paste(collapse = ",")
+    
+    msg <- paste0("ERROR! In tab ", sheet,
+                  ": INVALID DISAGGS ",
+                  "(Check MER Guidance for correct alternatives) ->",
+                  defunctMsg)
+    
     d$info$warning_msg <- append(msg, d$info$warning_msg)
     d$info$has_error <- TRUE
   }
 
   # Test for any missing mechanisms
-  if ( sum(is.na(d$data$extract$mech_code)) ) {
-    msg <- paste0("ERROR! In tab ", sheet, ": blank mechanisms found!")
+  if ( any(is.na(d$data$extract$mech_code)) ) {
+    msg <- paste0("ERROR! In tab ", sheet, ": BLANK MECHANISMS found!")
     d$info$warning_msg <- append(msg, d$info$warning_msg)
     d$info$has_error <- TRUE
   }
   
   #Test for any missing Types
-  if ( sum(is.na(d$data$extract$Type)) ) {
-    msg <- paste0("ERROR! In tab ", sheet, ": missing DSD/TA attributtion found!")
+  if ( any(is.na(d$data$extract$Type)) ) {
+    msg <- paste0("ERROR! In tab ", sheet, ": MISSING DSD/TA ATTRIBUTION found!")
     d$info$warning_msg <- append(msg, d$info$warning_msg)
     d$info$has_error <- TRUE
   }

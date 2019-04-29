@@ -10,39 +10,43 @@
 #' @return Dataframe with added, derived targets.
 #' 
 deriveTargets <- function(data, type) {
-  derived <- data %>%
-    dplyr::filter(
-      stringr::str_detect(
-        indicator_code, 
-        paste0(
-          "VMMC_CIRC\\.N\\.Age/Sex/HIVStatus\\.20T"
-          # If we derive the SUBNAT/IMPATT ones, paste0 here
+  if (type == "Site Tool") {
+    derive_from <- data %>%
+      dplyr::filter(
+        stringr::str_detect(
+          indicator_code, 
+          paste0("VMMC_CIRC\\.N\\.Age/Sex/HIVStatus\\.20T")
         )
       )
-    )
+  } else if (type == "Data Pack") {
+    derive_from <- NULL
+    
+    # If we derive the SUBNAT/IMPATT ones, filter here from data
+  }
   
-  if(NROW(derived) > 0) {
-    derived %<>%
-      dplyr::mutate(
-        indicator_code =
-          dplyr::case_when(
-            stringr::str_detect(
-              indicator_code,
-              "VMMC_CIRC\\.N\\.Age/Sex/HIVStatus\\.20T")
-            ~ "VMMC_CIRC.N.Age/Sex.20T",
-            # If we derive SUBNAT/IMPATT ones, add conditions here
-            TRUE ~ indicator_code
-          )
-      ) %>%
-      dplyr::group_by_at(dplyr::vars(-value)) %>%
-      dplyr::summarise(value = sum(value)) %>%
-      dplyr::ungroup()
+  if(NROW(derive_from) == 0) {
+    return(data)
+  }
+  
+  derived <- derive_from %>%
+    dplyr::mutate(
+      indicator_code =
+        dplyr::case_when(
+          stringr::str_detect(
+            indicator_code,
+            "VMMC_CIRC\\.N\\.Age/Sex/HIVStatus\\.20T")
+          ~ "VMMC_CIRC.N.Age/Sex.20T",
+          # If we derive SUBNAT/IMPATT ones, add conditions here
+          TRUE ~ indicator_code
+        )
+    ) %>%
+    dplyr::group_by_at(dplyr::vars(-value)) %>%
+    dplyr::summarise(value = sum(value)) %>%
+    dplyr::ungroup()
     
-    combined <- data %>%
-      dplyr::bind_rows(derived)
+  combined <- data %>%
+    dplyr::bind_rows(derived)
     
-    return(combined)
-    
-  } else {return(data)}
+  return(combined)
   
 }

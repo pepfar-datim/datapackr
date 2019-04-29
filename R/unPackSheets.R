@@ -13,7 +13,7 @@ unPackSheets <- function(d) {
     schema <- datapackr::data_pack_schema
   } else if (d$info$tool == "Site Tool") {
     schema <- datapackr::site_tool_schema
-  }
+  } else {stop("Cannot process that kind of tool.")}
   
   # Get sheets list
   sheets <- schema %>%
@@ -35,7 +35,7 @@ unPackSheets <- function(d) {
       d <- unPackDataPackSheet(d, sheet = sheet)
     } else if (d$info$tool == "Site Tool") {
       d <- unPackSiteToolSheet(d, sheet = sheet)
-    }
+    } else {stop("Cannot process that kind of tool.")}
     
     if (!is.null(d$data$extract)) {
       d$data$targets <-

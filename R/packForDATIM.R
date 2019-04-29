@@ -62,16 +62,13 @@ packForDATIM <- function(d, type = NA) {
       dplyr::filter(value %% 1 != 0)
     
     d$datim$negative_values <- d$data$targets %>% 
-      dplyr::filter(mech_code != "00000") %>%
-      dplyr::filter(value < 0 )
+      dplyr::filter(mech_code != "00000"
+                    & value < 0 )
     
     importFile <- d$data$targets %>%
       dplyr::select(site_uid,mech_code,indicator_code,Type,Age,Sex,KeyPop,value) %>%
       dplyr::filter(
         !is.na(suppressWarnings(as.numeric(value)))) %>%
-      dplyr::group_by(site_uid,mech_code,indicator_code,Type,Age,Sex,KeyPop) %>%
-      dplyr::summarise(value = sum(value)) %>%
-      dplyr::ungroup() %>% 
       dplyr::mutate(
         period = datapackr::periodInfo$iso,
         value = round_trunc(as.numeric(value))) %>%

@@ -1,3 +1,4 @@
+#' @export
 #' @importFrom magrittr %>% %<>%
 #' @title defunctDisaggs(d)
 #'
@@ -7,12 +8,10 @@
 #'
 #' @param d datapackr list object containing at least d$data$extract of data
 #'     from a single sheet in submission file.
-#' @param type Either "Data Pack" or "Site Tool".
 #'     
 #' @return A datapackr list object, \code{d}, storing a dataframe of defunct
 #'    disaggs used in a specific sheet.
-defunctDisaggs <- function(d,
-                           type = "Data Pack") {
+defunctDisaggs <- function(d) {
   
   defunct <- d$data$extract %>%
     replace(is.na(.), "") %>%
@@ -52,7 +51,7 @@ defunctDisaggs <- function(d,
     )
   
   # Add in specific cases for OVC_HIVSTAT
-  if(type == "Data Pack") {
+  if(d$info$tool == "Data Pack") {
     defunct <- d$data$extract %>%
       replace(is.na(.), "") %>%
       dplyr::filter(
@@ -61,7 +60,7 @@ defunctDisaggs <- function(d,
       dplyr::bind_rows(defunct)
   }
   
-  if(type == "Site Tool") {
+  if(d$info$tool == "Site Tool") {
     defunct <- d$data$extract %>%
       replace(is.na(.), "") %>%
       dplyr::filter(

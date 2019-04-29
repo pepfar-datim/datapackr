@@ -22,7 +22,7 @@ checkColStructure <- function(d, sheet) {
     schema <- datapackr::data_pack_schema
   } else if (d$info$tool == "Site Tool") {
     schema <- datapackr::site_tool_schema
-  } 
+  } else {stop("Cannot process that kind of tool.")}
   
   col_check <- schema %>%
     dplyr::filter(sheet_name == sheet) %>%

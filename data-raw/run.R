@@ -16,7 +16,7 @@ devtools::install_git(url = "https://github.com/pepfar-datim/datapackr.git",
 datapackr::loginToDATIM(secrets)
 
 # Read Data Pack
-d <- datapackr::unPackTool(tool = "Data Pack")
+d <- datapackr::unPackTool(tool = "Site Tool")
 
 # Grab densities
 density_data_files <-

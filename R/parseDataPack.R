@@ -183,8 +183,12 @@ unPackDataPackSheet <- function(d, sheet) {
       unique() %>%
       paste(collapse = ", ")
     
-    msg <- paste0("In tab ", sheet, ": NEGATIVE VALUES found! -> ", neg_cols, "")
+    msg <- paste0("ERROR! In tab ", sheet,
+                  ": NEGATIVE VALUES found! -> ",
+                  neg_cols,
+                  "")
     d$info$warning_msg <- append(msg, d$info$warning_msg)
+    d$info$has_error <- TRUE
   }
 
   # TEST for duplicates
@@ -199,7 +203,7 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::arrange(row_id) %>%
     dplyr::pull(row_id)
   
-  if (NROW(any_dups) > 0) {
+  if (length(any_dups) > 0) {
     msg <- paste0("In tab ", sheet, ": ",
                   length(any_dups),
                   " DUPLICATE ROWS. These will be aggregated! -> ", 
@@ -208,28 +212,25 @@ unPackDataPackSheet <- function(d, sheet) {
   }
 
   # TEST for defunct disaggs
-  defunct <- defunctDisaggs(d, type = "Data Pack")
+  defunct <- defunctDisaggs(d)
   
   if (NROW(defunct) > 0) {
-    defunct_msg <- defunct %>%
+    defunctMsg <- defunct %>%
       dplyr::mutate(
         msg = stringr::str_squish(
-          paste(paste0(indicator_code, ":"),
-                Age,
-                Sex,
-                KeyPop
-          )
+          paste(paste0(indicator_code, ":"), Age, Sex, KeyPop)
         )
       ) %>%
       dplyr::pull(msg) %>%
       paste(collapse = ",")
     
-    msg <- paste0("In tab ", sheet,
+    msg <- paste0("ERROR! In tab ", sheet,
                   ": INVALID DISAGGS ",
                   "(Check MER Guidance for correct alternatives) ->",
-                  defunct_msg)
+                  defunctMsg)
     
     d$info$warning_msg <- append(msg, d$info$warning_msg)
+    d$info$has_error <- TRUE
   }
         
   # Aggregate OVC_HIVSTAT
