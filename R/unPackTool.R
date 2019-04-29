@@ -63,13 +63,14 @@ unPackTool <- function(submission_path = NA,
     options(warning.length = 8170)
     
     messages <-
-      paste(paste(
-        seq_along(d$info$warning_msg),
-        ": " ,
-        stringr::str_squish(gsub("\n", "", d$info$warning_msg))
-      ),
-      sep = "",
-      collapse = "\r\n")
+      paste(
+        paste(
+          seq_along(d$info$warning_msg),
+          ": " ,
+          stringr::str_squish(gsub("\n", "", d$info$warning_msg))
+          ),
+        sep = "",
+        collapse = "\r\n")
     cat(crayon::red("WARNING MESSAGES: \r\n"))
     cat(crayon::red(messages))
     

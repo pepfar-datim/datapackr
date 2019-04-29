@@ -37,15 +37,7 @@ unPackSiteToolSheet <- function(d, sheet) {
       sheet = sheet,
       range = readxl::cell_limits(c(5, 1), c(NA, NA)),
       col_types = "text"
-    ) %>%
-    dplyr::select(-Status) %>%
-    tidyr::drop_na()
-  
-  # Handle empty tabs
-  if (NROW(d$data$extract) ==  0) {
-    d$data$extract <- NULL
-    return(d)
-  }
+    )
   
   # Run structural checks before any filtering
   d <- checkColStructure(d, sheet)
@@ -55,6 +47,16 @@ unPackSiteToolSheet <- function(d, sheet) {
     dplyr::filter(sheet_name == sheet,
                   col_type == "Target") %>%
     dplyr::pull(indicator_code)
+  
+  # Handle empty tabs
+  d$data$extract %<>%
+    dplyr::select(-Status) %>%
+    dplyr::filter_all(., dplyr::any_vars(!is.na(.)))
+  
+  if (NROW(d$data$extract) ==  0) {
+    d$data$extract <- NULL
+    return(d)
+  }
   
   # Add cols to allow compiling with other sheets
   d$data$extract %<>%
