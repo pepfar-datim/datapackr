@@ -7,8 +7,6 @@
 #' extracting data.
 #'
 #' @param submission_path Local path to the file to import.
-#' @param output_path A local path directing to the folder where you would like
-#' outputs to be saved. If not supplied, will output to working directory.
 #' @param tool What type of tool is the submission file? Default is "Data Pack".
 #' Other options include "Site Tool", "Mechanism Map", and "Site Filter".
 #' 
@@ -19,14 +17,12 @@
 #' }
 #'     
 unPackTool <- function(submission_path = NA,
-                       output_path = getwd(),
                        tool = "Data Pack") {
   
   # Create data train for use across remainder of program
   d <- list(
     keychain = list(
-      submission_path = submission_path,
-      output_path = output_path
+      submission_path = submission_path
     ),
     info = list(
       tool = tool
