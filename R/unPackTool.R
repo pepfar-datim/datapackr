@@ -9,6 +9,9 @@
 #' @param submission_path Local path to the file to import.
 #' @param tool What type of tool is the submission file? Default is "Data Pack".
 #' Other options include "Site Tool", "Mechanism Map", and "Site Filter".
+#' @param country_uids List of 11 digit alphanumeric DATIM codes representing
+#' countries. If not provided, will check file for these codes. If not in file,
+#' will flag error.
 #' 
 #' @details
 #' Executes the following operations in relation to a submitted Site Tool
@@ -17,7 +20,8 @@
 #' }
 #'     
 unPackTool <- function(submission_path = NA,
-                       tool = "Data Pack") {
+                       tool = "Data Pack",
+                       country_uids = NA) {
   
   # Create data train for use across remainder of program
   d <- list(
@@ -25,7 +29,8 @@ unPackTool <- function(submission_path = NA,
       submission_path = submission_path
     ),
     info = list(
-      tool = tool
+      tool = tool,
+      country_uids = country_uids
     )
   )
   
@@ -44,6 +49,7 @@ unPackTool <- function(submission_path = NA,
   d$info$warning_msg <- NULL
   d$info$has_error <- FALSE
   
+  # unPack file based on type
   if (d$info$tool == "Data Pack") {
     d <- unPackDataPack(d)
   } else if (d$info$tool == "Site Tool") {

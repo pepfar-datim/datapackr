@@ -78,6 +78,7 @@ checkWorkbookStructure <- function(d) {
 
 
 
+#' @export
 #' @importFrom magrittr %>% %<>%
 #' @title unPackDataPackSheet(d)
 #'
@@ -267,10 +268,11 @@ unPackDataPackSheet <- function(d, sheet) {
 }
 
 #' @importFrom magrittr %>% %<>%
+#' @importFrom rlist list.remove
 #' @title separateDataSets(d)
 #'
-#' @description After data has been extracted from all sheets in a Data Pack or
-#'     Site Tool, this function separates datasets by either \code{MER} or
+#' @description After data has been extracted from all sheets in a Data Pack,
+#'     this function separates datasets by either \code{MER} or
 #'     \code{SUBNAT/IMPATT} and removes elements of \code{d} that are no longer
 #'     necessary (\code{targets}, \code{extract}, and \code{sheet})
 #'
@@ -325,76 +327,92 @@ separateDataSets <- function(d) {
 unPackSNUxIM <- function(d) {
   msg <- NULL
   
-  col_num <- readxl::read_excel(path = d$keychain$submission_path,
-                                sheet = "SNU x IM",
-                                range = readxl::cell_rows(5)) %>%
-    length()
+  d$data$SNUxIM <-
+    readxl::read_excel(
+      path = d$keychain$submission_path,
+      sheet = "SNU x IM",
+      range = readxl::cell_limits(c(5,1), c(NA, NA)),
+      col_types = "text"
+    )
   
-  ct <- c(rep("text",8),rep("numeric",col_num-8))
+  # Run structural checks
+  d <- checkColStructure(d, "SNU x IM")
   
-  d$data$SNUxIM <- readxl::read_excel(path = d$keychain$submission_path,
-                                      sheet = "SNU x IM",
-                                      range = readxl::cell_limits(c(5,1), c(NA, col_num)),
-                                      col_types = ct) %>%
-    dplyr::rename(indicator_code = indicatorCode) %>%
+  # Keep only columns we need
+  toKeep <- datapackr::data_pack_schema %>%
+    dplyr::filter(sheet_name == "SNU x IM"
+                  & !indicator_code %in% c("Mechanism1","ID","sheet_num","Rollup")) %>%
+    dplyr::pull(indicator_code)
+  
+  d$data$SNUxIM %<>%
     dplyr::select(
-      dplyr::one_of(
-        c("PSNU","sheet_name","indicator_code","CoarseAge","Sex","KeyPop","DataPackTarget","Dedupe")),
-      dplyr::matches("(\\d){2,}")) %>%
+      toKeep,
+      dplyr::matches("Dedupe|(\\d){4,6}")) %>%
+    dplyr::rename(indicator_code = indicatorCode) %>%
+    
+  # We don't need columns with all NA targets -- Drop them.
     dplyr::select_if(~!all(is.na(.))) %>%
+    
+  # TEST where Data Pack targets not fully distributed
+    dplyr::mutate_at(
+      dplyr::vars(dplyr::matches("DataPackTarget|Rollup|Dedupe|(\\d){4,6}")),
+      as.numeric) %>%
     dplyr::mutate(
-      sum = rowSums(dplyr::select(.,dplyr::matches("\\d+|Dedupe")), na.rm = TRUE)) %>%
-    dplyr::mutate(DataPackTarget = round_trunc(DataPackTarget),
-                  sum = round_trunc(sum))
+      mechanisms = rowSums(dplyr::select(.,dplyr::matches("(\\d){4,6}|Dedupe")),
+                    na.rm = TRUE),
+      DataPackTarget = round_trunc(DataPackTarget),
+      mechanisms = round_trunc(mechanisms)
+    )
   
-  # TEST where DataPackTarget != sum of mechanism values
-  mismatch <- d$data$SNUxIM %>%
-    dplyr::filter(DataPackTarget != sum) %>%
-    dplyr::select(PSNU, indicator_code, CoarseAge, Sex, KeyPop, DataPackTarget, mechanisms = sum)
+  d$info$SNUxIM_undistributed <- d$data$SNUxIM %>%
+    dplyr::filter(DataPackTarget != mechanisms) %>%
+    dplyr::select(PSNU,
+                  indicator_code,
+                  CoarseAge,
+                  Sex,
+                  KeyPop,
+                  DataPackTarget,
+                  mechanisms)
   
-  if (NROW(mismatch) > 0) {
+  if (NROW(d$info$SNUxIM_undistributed) > 0) {
     msg <- paste0(
       msg,
       "    ",
-      NROW(mismatch),
+      NROW(d$info$SNUxIM_undistributed),
       " cases where Data Pack Targets are not correctly distributed among mechanisms. ",
-      "To address this, go to your Data Pack's SNU x IM tab and filter the Rollup column for Pink cells. 
-      "
+      "To address this, go to your Data Pack's SNU x IM tab and filter the Rollup column for Pink cells."
     )
     d$info$warning_msg <- append(msg,d$info$warning_msg)
   }
   
-  d$data$SNUxIM %<>%
+  # Align PMTCT_EID Age bands with rest of Data Pack (TODO: Fix in Data Pack, not here)
+  sj <- d$data$SNUxIM %>%
     dplyr::mutate(
-      # Align PMTCT_EID Age bands with rest of Data Pack
       CoarseAge = dplyr::case_when(
         stringr::str_detect(indicator_code, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
         stringr::str_detect(indicator_code, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
         TRUE ~ CoarseAge),
       Sex = dplyr::case_when(
-        # Drop Unknown Sex from PMTCT_EID
+  # Drop Unknown Sex from PMTCT_EID (TODO: Fix in Data Pack, not here)
         stringr::str_detect(indicator_code, "PMTCT_EID") ~ NA_character_,
-        # Fix issues with HTS_SELF (duplicate and split by Male/Female)
+  # Fix issues with HTS_SELF (duplicate and split by Male/Female) (TODO: Fix in Data Pack, not here)
         stringr::str_detect(indicator_code, "HTS_SELF(.)+Unassisted") ~ "Male|Female",
         TRUE ~ Sex)) %>%
     tidyr::separate_rows(Sex, sep = "\\|") %>%
-    # Create distribution matrix 
-    dplyr::filter(DataPackTarget != 0 & sum != 0) %>%
-    dplyr::select(-DataPackTarget, -sum) %>%
+  # Create distribution matrix
+    dplyr::filter(mechanisms != 0) %>%
+    dplyr::select(-DataPackTarget, -mechanisms) %>%
     tidyr::gather(
       key = "mechanismCode",
       value = "value",
       -PSNU, -sheet_name, -indicator_code, -CoarseAge, -Sex, -KeyPop) %>%
-    ## Coerce to numeric
-    dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
-    ## Drop all NA values
     tidyr::drop_na(value) %>%
     dplyr::group_by(PSNU, sheet_name, indicator_code, CoarseAge, Sex, KeyPop) %>%
     dplyr::mutate(distribution = value / sum(value)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(
       psnuid = stringr::str_extract(PSNU, "(?<=\\()([A-Za-z][A-Za-z0-9]{10})(?=\\)$)"),
-      mechanismCode = stringr::str_extract(mechanismCode, "(\\d{1,6})|Dedupe")) %>%
+      mechanismCode = stringr::str_extract(mechanismCode, "(\\d{4,6})|Dedupe")) %>%
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, CoarseAge, Sex,
                   KeyPop, mechanismCode, distribution)
   

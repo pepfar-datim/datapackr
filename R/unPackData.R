@@ -36,6 +36,18 @@
 
 unPackDataPack <- function(d) {
 
+  # Determine country_uids
+    if (is.na(d$info$country_uids)) {
+      d$info$country_uids <-
+        readxl::read_excel(
+          path = d$keychain$submission_path,
+          sheet = "Home",
+          range = "B23") %>%
+        names() %>%
+        stringr::str_remove_all("\\s") %>%
+        stringr::str_split(",")
+    }
+  
   # Check integrity of Workbook tabs
     d <- checkStructure(d)
 
@@ -50,6 +62,9 @@ unPackDataPack <- function(d) {
 
   # Combine Targets with SNU x IM for PSNU x IM level targets
     d <- rePackPSNUxIM(d)
+    
+  # Double check country_uid info
+    
     
   # Prepare PSNU x IM dataset for DATIM validation checks
     d <- packForDATIM(d, type = "PSNUxIM")

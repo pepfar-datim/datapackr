@@ -291,7 +291,9 @@ exportPackr <- function(data, output_path, type, datapack_name) {
 #' 
 #' @return Printed message, \code{x}.
 #' 
-interactive_print <- function(x) if (interactive()) { print(x) }
+interactive_print <- function(x) {
+  if (interactive()) { print(x) }
+}
 
 
 #' @export
@@ -513,7 +515,7 @@ canReadFile <- function(path = NA, type = "standard") {
   } else if (type == "template") {
     file.access(path, 2) == 0 
   
-  # If the file to read is a template file, check for read permissions
+  # If the file to read is a standard file, check for at least read permissions
   } else {
     file.access(path, 4) == 0
   }
@@ -522,6 +524,7 @@ canReadFile <- function(path = NA, type = "standard") {
 
 
 #' @export
+#' @importFrom tools file_ext
 #' @title Test an input file for read access and type. Prompt if issues.
 #' 
 #' @description 
@@ -543,10 +546,8 @@ handshakeFile <- function(path = NA, type = "standard", extension) {
     path <- file.choose()
   }
 
-  msg <- "Checking the file exists..."
-  interactive_print(msg)
-  
   # Check the file can be read one more time.
+  interactive_print("Checking the file exists...")
   if (!canReadFile(path, type = type)) {
     stop("File could not be read!")
   }

@@ -13,7 +13,13 @@
 checkColStructure <- function(d, sheet) {
   msg <- NULL
   
-  submission_cols <- names(d$data$extract) %>%
+  if (sheet == "SNU x IM") {
+    data = d$data$SNUxIM
+  } else {
+    data = d$data$extract
+  }
+  
+  submission_cols <- names(data) %>%
     tibble::as_tibble() %>%
     dplyr::select(indicator_code = value) %>%
     dplyr::mutate(submission_order = as.integer(1:(dplyr::n())))
@@ -25,7 +31,8 @@ checkColStructure <- function(d, sheet) {
   } else {stop("Cannot process that kind of tool.")}
   
   col_check <- schema %>%
-    dplyr::filter(sheet_name == sheet) %>%
+    dplyr::filter(sheet_name == sheet
+                  & !(sheet == "SNU x IM" & indicator_code == "Mechanism1")) %>%
     dplyr::select(indicator_code, template_order = col) %>%
     dplyr::full_join(submission_cols, by = c("indicator_code" = "indicator_code")) %>%
     dplyr::mutate(order_check = template_order == submission_order)

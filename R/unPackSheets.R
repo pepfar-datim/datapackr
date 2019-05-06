@@ -1,7 +1,9 @@
-#' @title Unpack data from a submission file.
+#' @export
+#' @title Unpack data from Data Pack or Site Tool sheets.
 #'
 #' @description Loops through all critical sheets in a submitted 
-#'     Tool and extracts data, then compiles data into single flat dataframe.
+#'     Data Pack or Site Tool and extracts data, then compiles data into single
+#'     flat dataframe.
 #'
 #' @param d Datapackr object.
 #' 
