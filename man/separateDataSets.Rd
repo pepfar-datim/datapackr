@@ -17,8 +17,8 @@ A datapackr list object, \code{d}, storing at least 2 dataframes of
    datasets from DATIM that can be imported into DATIM at the PSNU level.
 }
 \description{
-After data has been extracted from all sheets in a Data Pack or
-    Site Tool, this function separates datasets by either \code{MER} or
+After data has been extracted from all sheets in a Data Pack,
+    this function separates datasets by either \code{MER} or
     \code{SUBNAT/IMPATT} and removes elements of \code{d} that are no longer
     necessary (\code{targets}, \code{extract}, and \code{sheet})
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/unPackSheets.R
 \name{unPackSheets}
 \alias{unPackSheets}
-\title{Unpack data from a submission file.}
+\title{Unpack data from Data Pack or Site Tool sheets.}
 \usage{
 unPackSheets(d)
 }
@@ -14,5 +14,6 @@ d
 }
 \description{
 Loops through all critical sheets in a submitted 
-    Tool and extracts data, then compiles data into single flat dataframe.
+    Data Pack or Site Tool and extracts data, then compiles data into single
+    flat dataframe.
 }

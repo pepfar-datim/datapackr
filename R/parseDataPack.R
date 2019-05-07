@@ -267,6 +267,7 @@ unPackDataPackSheet <- function(d, sheet) {
 
 }
 
+#' @export
 #' @importFrom magrittr %>% %<>%
 #' @importFrom rlist list.remove
 #' @title separateDataSets(d)
@@ -309,6 +310,7 @@ separateDataSets <- function(d) {
 }
 
 
+#' @export
 #' @title unPackSNUxIM(d)
 #'
 #' @description Looks inside submitted Data Pack to extract SNU x IM data from
@@ -386,7 +388,7 @@ unPackSNUxIM <- function(d) {
   }
   
   # Align PMTCT_EID Age bands with rest of Data Pack (TODO: Fix in Data Pack, not here)
-  sj <- d$data$SNUxIM %>%
+  d$data$SNUxIM %<>%
     dplyr::mutate(
       CoarseAge = dplyr::case_when(
         stringr::str_detect(indicator_code, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
@@ -419,6 +421,7 @@ unPackSNUxIM <- function(d) {
   return(d)
 }
 
+#' @export
 #' @importFrom magrittr %>% %<>%
 #' @title rePackSNUxIM(d)
 #'
