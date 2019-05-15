@@ -15,7 +15,11 @@
 #'
 getSiteList <- function(country_uids,
                         include_mil = TRUE) {
-      
+#TODO change the paramter name from country_uids to org_unit_uids
+  country_uids <- purrr::map(country_uids, CountriesContained) %>% 
+    purrr::reduce(c)  %>% 
+    unique()
+  
   # Pull Community & Facility Sites ####
     siteList <- 
       datapackr::api_call("organisationUnits") %>%
@@ -93,4 +97,29 @@ getSiteList <- function(country_uids,
 
   return(siteList)
   
+}
+
+#' @importFrom magrittr %>% %<>%
+#' @title CountriesContained
+#' 
+#' @description
+#' Given an org unit uid, returns uids for all countries at or below the UID in the hierarchy. E.g. global
+#' would return all countries' uids, but the main use case is getting a list of
+#' countries in a region
+#'
+#' @param org_unit_uid single org unit uid as a character string
+#' @return character vector of country uids, length of 0 if no countries at or below
+#' the org unit
+#'
+CountriesContained <- function(org_unit_uid, base_url = getOption("baseurl")) {
+#TODO have this make the api call using a standard function once developed such as getMetadata
+# in dataPackCommons
+  assertthat::assert_that(stringr::str_length(org_unit_uid) == 11)
+# get list of countries using the country orgUnitGroup = cNzfcPWEGSH
+  r <- 
+    httr::GET("https://jason.datim.org/api/organisationUnitGroups/cNzfcPWEGSH.csv?fields=organisationUnits[name,id,path]") %>% 
+    httr::content(as = "text") %>% 
+    readr::read_csv(col_names = TRUE, col_types = readr::cols(.default = "c"))
+  
+  dplyr::filter(r, stringr::str_detect(path, org_unit_uid)) %>% .$id %>% as.vector()
 }
