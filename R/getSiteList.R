@@ -9,7 +9,8 @@
 #' Site Tool.
 #'
 #' @param country_uids Character vector of DATIM country IDs. This can only
-#' include countries. Regional Operating Unit uids will not be accepted
+#' include countries. Regional Operating Unit uids will be converted to a list of 
+#' descendant country uids
 #' @param include_mil When TRUE, will append _Military organisation nodes to
 #' site list.
 #'
