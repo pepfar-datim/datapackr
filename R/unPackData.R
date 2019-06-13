@@ -45,7 +45,8 @@ unPackDataPack <- function(d) {
           range = "B23") %>%
         names() %>%
         stringr::str_remove_all("\\s") %>%
-        stringr::str_split(",")
+        stringr::str_split(",") %>%
+        unlist
     }
   
   # Check integrity of Workbook tabs
@@ -64,7 +65,26 @@ unPackDataPack <- function(d) {
     d <- rePackPSNUxIM(d)
     
   # Double check country_uid info
+    site_uids <-
+      datapackr::api_call("organisationUnits") %>%
+      datapackr::api_filter("organisationUnitGroups.name:in:[Military,COP Prioritization SNU]") %>%
+      datapackr::api_filter(
+        paste0(
+          "ancestors.id:in:[",
+          paste0(d$info$country_uids,
+                collapse = ","),
+          "]")
+        ) %>%
+      datapackr::api_fields("id") %>%
+      datapackr::api_get() %>%
+      dplyr::pull(id)
+
+    dp_PSNU_uids <- d$data$distributedMER$psnuid %>%
+      unique()
     
+    country_uid_check <- dp_PSNU_uids[site_uids]
+      
+    # Where data uids !%in% DATIM list, flag error (Need to provide correct uids in either param or DP home tab)
     
   # Prepare PSNU x IM dataset for DATIM validation checks
     d <- packForDATIM(d, type = "PSNUxIM")

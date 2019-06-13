@@ -4,16 +4,16 @@
 #' @description
 #' Constructs URL for DATIM API query against specified table without paging.
 #' 
-#' @param table Character. DATIM API table to query.
+#' @param Endpoint Character. DATIM API endpoint to query.
 #' 
 #' @return Web-encoded URL for DATIM API query.
 #' 
-api_call <- function(table) {
+api_call <- function(endpoint) {
   
   URL <- paste0(
     getOption("baseurl"),"api/",datapackr::api_version(),
     "/",
-    table,
+    endpoint,
     ".json?paging=false") %>%
     utils::URLencode()
   
