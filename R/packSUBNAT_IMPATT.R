@@ -1,3 +1,4 @@
+#' @export
 #' @importFrom magrittr %>% %<>%
 #' @title packSUBNAT_IMPATT(d)
 #'
@@ -5,19 +6,20 @@
 #'     recompiles the dataframe containing SUBNAT and IMPATT data,
 #'     \code{d$data$SUBNAT_IMPATT} into a standard DATIM import file.
 #'
-#' @param d Datapackr list object
+#' @param data SUBNAT/IMPATT dataframe to pack for DATIM.
 #' 
 #' @return Dataframe of SUBNAT & IMPATT data ready for DATIM ingestion.
 #' 
-packSUBNAT_IMPATT <- function(d) {
+packSUBNAT_IMPATT <- function(data) {
   
-  d$datim$SUBNAT_IMPATT <- d$data$SUBNAT_IMPATT %>%
+  SUBNAT_IMPATT <- data %>%
     dplyr::left_join((
       datapackr::indicatorMap %>%
         dplyr::filter(dataset %in% c("SUBNAT", "IMPATT")) %>%
+        dplyr::rename(indicator_code = indicatorCode) %>%
         dplyr::select(
           sheet_name,
-          indicatorCode,
+          indicator_code,
           Age = validAges,
           Sex = validSexes,
           KeyPop = validKPs,
@@ -48,5 +50,5 @@ packSUBNAT_IMPATT <- function(d) {
     dplyr::ungroup() %>%
     dplyr::mutate(value = as.character(round_trunc(value)))
   
-  return(d)
+  return(SUBNAT_IMPATT)
 }
