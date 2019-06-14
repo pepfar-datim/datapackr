@@ -1,18 +1,16 @@
-#' @importFrom magrittr %>% %<>%
-#' @title unPackSheet(d)
+#' @export
+#' @title Unpack a Data Pack sheet.
 #'
 #' @description Within a submitted Data Pack or Site Tool (directed to by
 #'    \code{d$keychain$submission_path}), extract data from a single sheet specified
 #'    in \code{d$data$sheet}.
 #'
-#' @param d datapackr list object containing at least
-#'     \code{d$keychain$submission_path},
-#'     \code{d$data$sheet}, & \code{d$info$warningMsg}.
-#' @return A datapackr list object, \code{d}, storing a dataframe of extracted
-#'    data (\code{d$data$extract}) and a warning message
-#'    (\code{d$info$warningMsg}) compiled with errors discovered while
-#'    extracting data from sheet specified in \code{d$data$sheet}.
-unPackSheet <- function(d) {
+#' @param d Datapackr object.
+#' @param sheet Sheet to unpack.
+#' 
+#' @return d
+#' 
+unPackDataPackSheet <- function(d, sheet) {
   addcols <- function(data, cname) {
     add <- cname[!cname %in% names(data)]
     
@@ -24,30 +22,30 @@ unPackSheet <- function(d) {
   d$data$extract <-
     readxl::read_excel(
       path = d$keychain$submission_path,
-      sheet = d$data$sheet,
-      range = readxl::cell_limits(c(5, 1), c(NA, NA))
+      sheet = sheet,
+      range = readxl::cell_limits(c(5, 1), c(NA, NA)),
+      col_types = "text"
     )
   
   # Run structural checks
-  
-  d <- checkColStructure(d)
+  d <- checkColStructure(d, sheet)
   
   # List Target Columns
   targetCols <- datapackr::data_pack_schema %>%
-    dplyr::filter(sheet_name == d$data$sheet,
+    dplyr::filter(sheet_name == sheet,
                   col_type == "Target") %>%
     dplyr::pull(indicator_code)
   
   # Add cols to allow compiling with other sheets
   d$data$extract %<>%
     addcols(c("KeyPop", "Age", "Sex")) %>%
-    # Extract PSNU uid
+  # Extract PSNU uid
     dplyr::mutate(
       psnuid = stringr::str_extract(PSNU, "(?<=\\()([A-Za-z][A-Za-z0-9]{10})(?=\\)$)"),
-      # Tag sheet name
-      sheet_name = d$data$sheet
-    ) %>%
-    # Select only target-related columns
+  # Tag sheet name
+      sheet_name = sheet
+      ) %>%
+  # Select only target-related columns
     dplyr::select(PSNU,
                   psnuid,
                   sheet_name,
@@ -56,17 +54,23 @@ unPackSheet <- function(d) {
                   KeyPop,
                   dplyr::one_of(targetCols))
   
-  
-  if (d$data$sheet == "Prioritization") {
+  if (sheet == "Prioritization") {
     d$data$extract %<>%
-      dplyr::mutate(IMPATT.PRIORITY_SNU.20T = as.numeric(stringr::str_sub(
-        IMPATT.PRIORITY_SNU.20T, start = 1, end = 2
-      )))
+      dplyr::mutate(
+        IMPATT.PRIORITY_SNU.20T =
+          as.numeric(
+            stringr::str_sub(
+              IMPATT.PRIORITY_SNU.20T,
+              start = 1,
+              end = 2
+            )
+          )
+      )
   }
   
-  
+  # Gather all indicators as single column for easier processing
   d$data$extract %<>%
-    tidyr::gather(key = "indicatorCode",
+    tidyr::gather(key = "indicator_code",
                   value = "value",
                   -PSNU,
                   -psnuid,
@@ -74,99 +78,116 @@ unPackSheet <- function(d) {
                   -Sex,
                   -KeyPop,
                   -sheet_name) %>%
-    dplyr::select(PSNU, psnuid, sheet_name, indicatorCode, Age, Sex, KeyPop, value) %>%
-    # Drop zeros & NAs
+    dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value) %>%
+  # Drop zeros & NAs
     tidyr::drop_na(value) %>%
     dplyr::filter(value != 0)
   
-  # TEST for non-numeric entries
-  nonNumeric <- d$data$extract %>%
-    dplyr::filter(!is.numeric(value)) %>%
-    dplyr::select(value)
+  # TEST for non-numeric entries before converting to see how bad
+  non_numeric <- d$data$extract %>%
+    dplyr::mutate(value_numeric = as.numeric(value)) %>%
+    dplyr::filter(is.na(value_numeric)) %>%
+    dplyr::select(value) %>%
+    dplyr::distinct()
   
-  if(NROW(nonNumeric) > 0) {
-    msg <- paste0("In tab ", d$data$sheet, ": NON-NUMERIC VALUES found! -> ",
-                  nonNumeric)
+  if(NROW(non_numeric) > 0) {
+    msg <- paste0("In tab ", sheet, ": NON-NUMERIC VALUES found! -> ",
+                  non_numeric)
     d$info$warningMsg <- append(msg, d$info$warningMsg)
   }
   
+  # Now that non-numeric cases are set aside, convert all to numeric
+  d$data$extract %<>%
+    dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
+    tidyr::drop_na(value)
   
   # TEST for Negative values
   has_negative_numbers <- d$data$extract$value < 0
   
   if (any(has_negative_numbers)) {
-    negCols <- d$data$extract %>%
+    neg_cols <- d$data$extract %>%
       dplyr::filter(value < 0) %>%
-      dplyr::pull(indicatorCode) %>%
+      dplyr::pull(indicator_code) %>%
       unique() %>%
       paste(collapse = ", ")
     
-    msg<-paste0("In tab ", d$data$sheet, ": NEGATIVE VALUES found! -> ", negCols, "")
-    d$info$warningMsg<-append(msg,d$info$warningMsg)
+    msg <- paste0("ERROR! In tab ", sheet,
+                  ": NEGATIVE VALUES found! -> ",
+                  neg_cols,
+                  "")
+    d$info$warning_msg <- append(msg,d$info$warning_msg)
+    d$info$has_error <- TRUE
   }
   
   # TEST for duplicates
   any_dups <- d$data$extract %>%
-    dplyr::select(sheet_name, PSNU, Age, Sex, KeyPop, indicatorCode) %>%
-    dplyr::group_by(sheet_name, PSNU, Age, Sex, KeyPop, indicatorCode) %>%
+    dplyr::select(sheet_name, PSNU, Age, Sex, KeyPop, indicator_code) %>%
+    dplyr::group_by(sheet_name, PSNU, Age, Sex, KeyPop, indicator_code) %>%
     dplyr::summarise(n = (dplyr::n())) %>%
     dplyr::filter(n > 1) %>%
     dplyr::ungroup() %>%
     dplyr::distinct() %>%
-    dplyr::mutate(row_id = paste(PSNU, Age, Sex, KeyPop, indicatorCode, sep = "    ")) %>%
+    dplyr::mutate(row_id = paste(PSNU, Age, Sex, KeyPop, indicator_code, sep = "    ")) %>%
     dplyr::arrange(row_id) %>%
     dplyr::pull(row_id)
   
-  if (NROW(any_dups) > 0) {
-    msg<- paste0("In tab ", d$data$sheet, ": DUPLICATE ROWS -> ", 
+  if (length(any_dups) > 0) {
+    msg <- paste0("In tab ", sheet,
+                  length(any_dups),
+                  ": DUPLICATE ROWS. These will be aggregated! -> ", 
                  paste(any_dups, collapse = ","))
-    d$info$warningMsg<-append(msg,d$info$warningMsg)
+    d$info$warning_msg <- append(msg, d$info$warning_msg)
   }
   
   # TEST for defunct disaggs
   defunct <- defunctDisaggs(d)
   
   if (NROW(defunct) > 0) {
-    defunctMsg <- defunct %>%
-      dplyr::mutate(msg = stringr::str_squish(paste(
-        paste0(indicatorCode, ":"), Age, Sex, KeyPop
-      ))) %>%
-      dplyr::pull(msg)
-    msg <- paste0("In tab ", d$data$sheet, ": DEFUNCT DISAGGS ->",
-                  paste(defunctMsg, collapse = ","))
-    d$info$warningMsg<-append(msg,d$info$warningMsg)
+    defunct_msg <- defunct %>%
+      dplyr::mutate(
+        msg = stringr::str_squish(
+          paste(paste0(indicator_code, ":"), Age, Sex, KeyPop)
+        )
+      ) %>%
+      dplyr::pull(msg) %>%
+      paste(collapse = ",")
+    
+    msg <- paste0("ERROR! In tab ", sheet,
+                  ": INVALID DISAGGS ",
+                  "(Check MER Guidance for correct alternatives) ->",
+                  defunct_msg)
+    
+    d$info$warning_msg<-append(msg, d$info$warning_msg)
+    d$info$has_error <- TRUE
   }
   
   # Aggregate OVC_HIVSTAT
-  if (d$data$sheet == "OVC") {
+  # TODO: Fix this in the Data Pack. Not here...
+  if (sheet == "OVC") {
     d$data$extract %<>%
       dplyr::mutate(
         Age = dplyr::case_when(
-          stringr::str_detect(indicatorCode, "OVC_HIVSTAT") ~ NA_character_,
+          stringr::str_detect(indicator_code, "OVC_HIVSTAT") ~ NA_character_,
           TRUE ~ Age),
         Sex = dplyr::case_when(
-          stringr::str_detect(indicatorCode, "OVC_HIVSTAT") ~ NA_character_,
+          stringr::str_detect(indicator_code, "OVC_HIVSTAT") ~ NA_character_,
           TRUE ~ Sex)) %>%
-      dplyr::group_by(PSNU, psnuid, sheet_name, indicatorCode, Age, Sex, KeyPop) %>%
+      dplyr::group_by(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop) %>%
       dplyr::summarise(value = sum(value)) %>%
       dplyr::ungroup()
   }
   
   # Add ages to PMTCT_EID
-  if (d$data$sheet == "PMTCT_EID") {
+  if (sheet == "PMTCT_EID") {
     d$data$extract %<>%
       dplyr::mutate(
         Age = dplyr::case_when(
-          stringr::str_detect(indicatorCode, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
-          stringr::str_detect(indicatorCode, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
+          stringr::str_detect(indicator_code, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
+          stringr::str_detect(indicator_code, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
           TRUE ~ Age
         )
       )
   }
-  
-  d$data$extract %<>%
-    dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
-    tidyr::drop_na(value)
   
   return(d)
   
