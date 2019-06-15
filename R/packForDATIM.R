@@ -19,7 +19,7 @@ packForDATIM <- function(d, type = NA) {
   
   if (type == "SUBNAT_IMPATT") {
     
-    d <- packSUBNAT_IMPATT(d)
+    d$datim$SUBNAT_IMPATT <- packSUBNAT_IMPATT(d$data$SUBNAT_IMPATT)
     
   }
   
@@ -32,7 +32,7 @@ packForDATIM <- function(d, type = NA) {
       dplyr::left_join(datapackr::PSNUxIM_to_DATIM %>%
                          dplyr::filter(dataset == "MER") %>%
                          dplyr::select(-sheet_name, -typeOptions, -dataset),
-                       by = c("indicatorCode" = "indicatorCode",
+                       by = c("indicator_code" = "indicator_code",
                               "Age" = "validAges",
                               "Sex" = "validSexes",
                               "KeyPop" = "validKPs")) %>%
@@ -62,23 +62,20 @@ packForDATIM <- function(d, type = NA) {
       dplyr::filter(value %% 1 != 0)
     
     d$datim$negative_values <- d$data$targets %>% 
-      dplyr::filter(mech_code != "00000") %>%
-      dplyr::filter(value < 0 )
+      dplyr::filter(mech_code != "00000"
+                    & value < 0 )
     
     importFile <- d$data$targets %>%
-      dplyr::select(site_uid,mech_code,indicatorCode,Type,Age,Sex,KeyPop,value) %>%
+      dplyr::select(site_uid,mech_code,indicator_code,Type,Age,Sex,KeyPop,value) %>%
       dplyr::filter(
         !is.na(suppressWarnings(as.numeric(value)))) %>%
-      dplyr::group_by(site_uid,mech_code,indicatorCode,Type,Age,Sex,KeyPop) %>%
-      dplyr::summarise(value=sum(value)) %>%
-      dplyr::ungroup() %>% 
       dplyr::mutate(
         period = datapackr::periodInfo$iso,
         value = round_trunc(as.numeric(value))) %>%
       dplyr::left_join(datapackr::SiteToDATIM %>%
                          dplyr::filter(dataset == "MER") %>%
                          dplyr::select(-sheet_name, -dataset, -tech_area, -num_den),
-                       by = c("indicatorCode" = "indicator_code",
+                       by = c("indicator_code" = "indicator_code",
                               "Type" = "type_options",
                               "Age" = "valid_ages",
                               "Sex" = "valid_sexes",
