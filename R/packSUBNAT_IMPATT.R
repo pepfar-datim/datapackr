@@ -1,6 +1,6 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
-#' @title packSUBNAT_IMPATT(d)
+#' @title packSUBNAT_IMPATT(data)
 #'
 #' @description Takes the outputs of the \code{\link{unPackSheets}} function and
 #'     recompiles the dataframe containing SUBNAT and IMPATT data,
