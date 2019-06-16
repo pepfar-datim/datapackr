@@ -11,13 +11,6 @@
 #' @return d
 #' 
 unPackDataPackSheet <- function(d, sheet) {
-  addcols <- function(data, cname) {
-    add <- cname[!cname %in% names(data)]
-    
-    if (length(add) != 0)
-      data[add] <- NA_character_
-    return(data)
-  }
   
   d$data$extract <-
     readxl::read_excel(

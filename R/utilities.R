@@ -291,7 +291,9 @@ exportPackr <- function(data, output_path, type, datapack_name) {
 #' 
 #' @return Printed message, \code{x}.
 #' 
-interactive_print <- function(x) if (interactive()) { print(x) }
+interactive_print <- function(x) {
+  if (interactive()) { print(x) }
+}
 
 
 #' @export
@@ -462,10 +464,10 @@ getCountries <- function(datapack_uid = NA) {
                               ~ "West Africa Region",
           TRUE ~ country_name),
         model_uid = dplyr::case_when(
-          data_pack_name == "Asia Region" ~ "Asia_Regional_Data_Pack",
-          data_pack_name == "Caribbean Region" ~ "Caribbean_Data_Pack",
-          data_pack_name == "Central America Region" ~ "Central_America_Data_Pack",
-          data_pack_name == "West Africa Region" ~ "Western_Africa_Data_Pack",
+          data_pack_name == "Asia Region" ~ "ptVxnBssua6",
+          data_pack_name == "Caribbean Region" ~ "nBo9Y4yZubB",
+          data_pack_name == "Central America Region" ~ "vSu0nPMbq7b",
+          data_pack_name == "West Africa Region" ~ "G0BT4KrJouu",
           TRUE ~ country_uid
         ),
         is_region = data_pack_name %in% c("Asia Region",
@@ -498,7 +500,7 @@ getCountries <- function(datapack_uid = NA) {
 #' @description 
 #' Given a file path, will test whether the file can be read.
 #' 
-#' @param path Filepath to test. Default is NA/
+#' @param path Filepath to test. Default is NA.
 #' @param type File type, either \code{standard} or \code{template}.
 #' 
 #' @return Logical. \code{TRUE} if file can be read, \code{FALSE} if not.
@@ -619,4 +621,30 @@ unPackSchema <- function(path) {
     dplyr::arrange(sheet_num, col)
   
   return(schema)
+}
+
+
+#' @export
+#' @title Add list of columns as NULL columns to supplied dataframe.
+#' 
+#' @description
+#' Supplied a character vector of column names, \code{cnames}, \code{addcols}
+#' will add one new, \code{NULL} column to \code{data} for each element of 
+#' \code{cnames} and name it after the corresponding element of \code{cnames}.
+#' 
+#' @param data Dataframe to add columns.
+#' @param cnames Character vector of one or more column names to be added to
+#' \code{data}.
+#' 
+#' @return Dataframe \code{data} with added columns listed in \code{cnames}.
+#'
+addcols <- function(data, cnames) {
+  add <- cnames[!cnames %in% names(data)]
+  
+  if (length(add) != 0) {
+    data[add] <- NA_character_
+  }
+  
+  return(data)
+  
 }
