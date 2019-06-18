@@ -48,7 +48,7 @@ checkStructure <- function(d) {
     msg <- paste0(
       "MISSING SHEETS: Did you delete or rename these tabs?): ",
       paste0(missing_sheets, collapse = ", "), "")
-    d$info$warningMsg<-append(msg,d$info$warningMsg)
+    d$info$warning_msg <- append(msg, d$info$warning_msg)
   }
   
   return(d)
