@@ -34,20 +34,13 @@ unPackTool <- function(submission_path = NA,
     )
   )
   
-  # Check the submission file exists and prompt for user input if not
-  if (d$info$tool %in% c("Data Pack", "Site Tool", "Mechanism Map")) {
-    extension = "xlsx"
-  } else if (d$info$tool == "Site Filter") {
-    extension = "csv"
-  } else {stop("Cannot process that kind of tool.")}
-  
-  d$keychain$submission_path <- handshakeFile(path = d$keychain$submission_path,
-                                              type = "standard",
-                                              extension = extension)
-  
   # Start running log of all warning and information messages
   d$info$warning_msg <- NULL
   d$info$has_error <- FALSE
+  
+  # Check the submission file exists and prompt for user input if not
+  d$keychain$submission_path <- handshakeFile(path = d$keychain$submission_path,
+                                              tool = d$info$tool)
   
   # unPack file based on type
   if (d$info$tool == "Data Pack") {
@@ -58,7 +51,7 @@ unPackTool <- function(submission_path = NA,
     d <- unPackMechanismMap(d)
   } else if (d$info$tool == "Site Filter") {
     d <- unPackSiteFilter(d)
-  } else {stop("Cannot process that kind of tool.")}
+  } else {stop("Please select correct file type: Data Pack, Site Tool, Mechanism Map, or Site Filter.")}
   
   # If warnings, show all grouped by sheet and issue
   if (!is.null(d$info$warning_msg) & interactive()) {
