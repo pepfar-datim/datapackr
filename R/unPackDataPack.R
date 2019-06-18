@@ -33,20 +33,13 @@
 #' The final message in the Console prints all warnings identified in the Data
 #' Pack being processed.
 #'
-
 unPackDataPack <- function(d) {
 
   # Determine country uids
     if (is.na(d$info$country_uids)) {
-      d$info$country_uids <-
-        readxl::read_excel(
-          path = d$keychain$submission_path,
-          sheet = "Home",
-          range = "B23") %>%
-        names() %>%
-        stringr::str_remove_all("\\s") %>%
-        stringr::str_split(",") %>%
-        unlist()
+      d$info$country_uids <- 
+        unPackCountryUIDs(submission_path = d$keychain$submission_path,
+                          tool = d$info$tool)
     }
     
   # Check integrity of Workbook tabs
