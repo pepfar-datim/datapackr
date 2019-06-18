@@ -11,6 +11,13 @@
 #'     
 unPackSiteTool <- function(d) {
   
+  # Determine country uids
+  if (is.na(d$info$country_uids)) {
+    d$info$country_uids <- 
+      unPackCountryUIDs(submission_path = d$keychain$submission_path,
+                        tool = d$info$tool)
+  }
+  
   # Check integrity of tabs
   d <- checkStructure(d)
   
