@@ -5,27 +5,19 @@
 #' Given a file path, will test whether the file can be read.
 #' 
 #' @param path Filepath to test. Default is NA.
-#' @param type File type, either \code{standard} or \code{template}.
 #' 
 #' @return Logical. \code{TRUE} if file can be read, \code{FALSE} if not.
 #'
-canReadFile <- function(path, type = "standard") {
+canReadFile <- function(path) {
   
-  #Check that the file path was supplied.
+  # Check that the file path was supplied.
   if (is.na(path)) {
     return(FALSE)
   }
   
-  #If the file to read is a template file, check for write permissions.
-  else if (type == "template") {
-    file.access(path, 2) == 0
-  }
-  
-  #If the file to read is a standard file, check for at least read permissions.
-  else if (type == "standard") {
+  # Check for at least read permissions.
     file.access(path, 4) == 0
-  }
-  
+    
 }
 
 
@@ -35,38 +27,42 @@ canReadFile <- function(path, type = "standard") {
 #' @title Test an input file for read access and type. Prompt if issues.
 #' 
 #' @description 
-#' Supplied a filepath, will test that this file is readable and is of the
+#' When supplied a filepath, will test that the file is readable and is of the
 #' correct filetype. If either readability or file type is invalid, will prompt
 #' for user selection of correct filepath via computer window.
 #' 
 #' @param path Filepath to test and use.
 #' @param extension File extension to test for. (Do not include leading period.)
-#' @param type File type, whether \code{standard} or \code{template}.
+#' @param tool What type of tool is the submission file? Default is "Data Pack".
+#' Other options include "Site Tool", "Mechanism Map", and "Site Filter".
 #' 
 #' @return Character vector containing valid filepath for further use.
 #' 
-handshakeFile <- function(path = NA, extension, type = "standard") {
+handshakeFile <- function(path = NA,
+                          tool = "Data Pack") {
   
-  #If path has issues or NA, prompt user to select file from window.
-  if (!canReadFile(path, type = type) & interactive()) {
+  if (tool %in% c("Data Pack", "Site Tool", "Mechanism Map")) {
+    extension = "xlsx"
+  } else if (tool == "Site Filter") {
+    extension = "csv"
+  } else {
+    stop("Please select correct file type: Data Pack, Site Tool, Mechanism Map, or Site Filter.")
+    }
+  
+  # If path has issues or NA, prompt user to select file from window.
+  interactive_print("Checking the file exists...")
+  if (!canReadFile(path) & interactive()) {
     interactive_print("Please choose a file.")
     path <- file.choose()
+    
+    if (!canReadFile(path)) {stop("File could not be read!")}
+    
   }
   
-  #Check the file can be read one more time.
-  interactive_print("Checking the file exists...")
-  if (!canReadFile(path, type = type)) {
-    stop("File could not be read!")
-  }
-  
-  #Check the file has correct extension
-  extension = stringr::str_remove(tolower(extension),"\\.")
+  # Check the file has correct extension
   if (file_ext(path) != extension) {
     stop(paste0("File is not the correct format! File must have extension .",
                 extension))
-  } else {
-    
-    return(path)
-  }
+  } else {return(path)}
   
 }
