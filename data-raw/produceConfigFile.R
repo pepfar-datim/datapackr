@@ -430,6 +430,7 @@ getPeriodInfo <- function(FY = NA) {
     save(dataPackMap, file = "./data/dataPackMap.rda")
 
   ## Data Pack Schema ####
+    #TODO: Add all tabs to this schema, even if just in name
     template_path <- "./data-raw/COP19_Data_Pack_Template_vFINAL.xlsx"
     data_pack_schema <- unPackStructure(template_path)
     save(data_pack_schema, file = "./data/data_pack_schema.rda")
