@@ -24,7 +24,7 @@ unPackDataPackSheet <- function(d, sheet) {
   d <- checkColStructure(d, sheet)
   
   # List Target Columns
-  targetCols <- datapackr::data_pack_schema %>%
+  target_cols <- datapackr::data_pack_schema %>%
     dplyr::filter(sheet_name == sheet,
                   col_type == "Target") %>%
     dplyr::pull(indicator_code)
@@ -45,7 +45,7 @@ unPackDataPackSheet <- function(d, sheet) {
                   Age,
                   Sex,
                   KeyPop,
-                  dplyr::one_of(targetCols))
+                  dplyr::one_of(target_cols))
   
   if (sheet == "Prioritization") {
     d$data$extract %<>%
@@ -75,45 +75,52 @@ unPackDataPackSheet <- function(d, sheet) {
   # Drop zeros & NAs
     tidyr::drop_na(value) %>%
     dplyr::filter(value != 0)
+  #TODO: Move Prioritization mutate here?
+  # TODO: Move dropping and filtering values NA and 0 till after convert to numeric?
   
   # TEST for non-numeric entries before converting to see how bad
-  non_numeric <- d$data$extract %>%
+  d$tests$non_numeric <- d$data$extract %>%
     dplyr::mutate(value_numeric = as.numeric(value)) %>%
     dplyr::filter(is.na(value_numeric)) %>%
     dplyr::select(value) %>%
     dplyr::distinct()
   
-  if(NROW(non_numeric) > 0) {
-    msg <- paste0("In tab ", sheet, ": NON-NUMERIC VALUES found! -> ",
-                  non_numeric)
-    d$info$warningMsg <- append(msg, d$info$warningMsg)
+  if(NROW(d$tests$non_numeric) > 0) {
+    warning_msg <-
+      paste0(
+        "In tab ",
+        sheet,
+        ": NON-NUMERIC VALUES found! -> ",
+        d$tests$non_numeric)
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
   
-  # Now that non-numeric cases are set aside, convert all to numeric
+  # Now that non-numeric cases noted, convert all to numeric & drop non-numeric
   d$data$extract %<>%
     dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
     tidyr::drop_na(value)
   
   # TEST for Negative values
-  has_negative_numbers <- d$data$extract$value < 0
-  
-  if (any(has_negative_numbers)) {
-    neg_cols <- d$data$extract %>%
+  if (any(d$data$extract$value < 0)) {
+    d$tests$neg_cols <- d$data$extract %>%
       dplyr::filter(value < 0) %>%
       dplyr::pull(indicator_code) %>%
       unique() %>%
       paste(collapse = ", ")
     
-    msg <- paste0("ERROR! In tab ", sheet,
-                  ": NEGATIVE VALUES found! -> ",
-                  neg_cols,
-                  "")
-    d$info$warning_msg <- append(msg,d$info$warning_msg)
+    warning_msg <- 
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ": NEGATIVE VALUES found! -> ",
+        d$tests$neg_cols,
+        "")
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE
   }
   
   # TEST for duplicates
-  any_dups <- d$data$extract %>%
+  d$tests$duplicates <- d$data$extract %>%
     dplyr::select(sheet_name, PSNU, Age, Sex, KeyPop, indicator_code) %>%
     dplyr::group_by(sheet_name, PSNU, Age, Sex, KeyPop, indicator_code) %>%
     dplyr::summarise(n = (dplyr::n())) %>%
@@ -124,19 +131,22 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::arrange(row_id) %>%
     dplyr::pull(row_id)
   
-  if (length(any_dups) > 0) {
-    msg <- paste0("In tab ", sheet,
-                  length(any_dups),
-                  ": DUPLICATE ROWS. These will be aggregated! -> ", 
-                 paste(any_dups, collapse = ","))
-    d$info$warning_msg <- append(msg, d$info$warning_msg)
+  if (length(d$tests$duplicates) > 0) {
+    warning_msg <-
+      paste0(
+        "In tab ",
+        sheet,
+        length(d$tests$duplicates),
+        ": DUPLICATE ROWS. These will be aggregated! -> ", 
+        paste(d$tests$duplicates, collapse = ","))
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
   
   # TEST for defunct disaggs
-  defunct <- defunctDisaggs(d)
+  d$tests$defunct <- defunctDisaggs(d)
   
-  if (NROW(defunct) > 0) {
-    defunct_msg <- defunct %>%
+  if (NROW(d$tests$defunct) > 0) {
+    defunct_msg <- d$tests$defunct %>%
       dplyr::mutate(
         msg = stringr::str_squish(
           paste(paste0(indicator_code, ":"), Age, Sex, KeyPop)
@@ -145,12 +155,15 @@ unPackDataPackSheet <- function(d, sheet) {
       dplyr::pull(msg) %>%
       paste(collapse = ",")
     
-    msg <- paste0("ERROR! In tab ", sheet,
-                  ": INVALID DISAGGS ",
-                  "(Check MER Guidance for correct alternatives) ->",
-                  defunct_msg)
+    warning_msg <-
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ": INVALID DISAGGS ",
+        "(Check MER Guidance for correct alternatives) ->",
+        defunct_msg)
     
-    d$info$warning_msg<-append(msg, d$info$warning_msg)
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE
   }
   
@@ -171,6 +184,7 @@ unPackDataPackSheet <- function(d, sheet) {
   }
   
   # Add ages to PMTCT_EID
+  # TODO: Fix this in the Data Pack. Not here...
   if (sheet == "PMTCT_EID") {
     d$data$extract %<>%
       dplyr::mutate(
@@ -219,7 +233,7 @@ unPackSiteToolSheet <- function(d, sheet) {
                   col_type == "Target") %>%
     dplyr::pull(indicator_code)
   
-  # Handle empty tabs
+  # Handle empty tabs ####
   d$data$extract %<>%
     dplyr::select(-Status) %>%
     dplyr::filter_all(., dplyr::any_cars(!is.na(.)))
@@ -263,84 +277,103 @@ unPackSiteToolSheet <- function(d, sheet) {
                   -sheet_name) %>%
     dplyr::select(Site, site_uid,mech_code,Type, sheet_name, indicator_code,
                   Age, Sex, KeyPop, value) %>%
-  # Drop where value is zero, NA, dash, or space-only entry
+  # Drop where value is zero, NA, dash, or space-only entry ####
+    #TODO Add non-numeric test
     tidyr::drop_na(value) %>%
     dplyr::filter(
       !is.na(suppressWarnings(as.numeric(value)))) %>% 
     dplyr::mutate(value = as.numeric(value))
   
-  # Check for non-sites
-  has_unallocated <- greply("NOT YET DISTRIBUTED", d$data$extract$Site)
+  # Check for non-sites ####
+  d$tests$unallocated_data <- greply("NOT YET DISTRIBUTED", d$data$extract$Site)
   
-  if (any(has_unallocated)) {
-    msg <- paste0("ERROR! In tab ", sheet, ": Values not allocated to Site level!")
-    d$info$warning_msg <- append(msg, d$info$warning_msg)
+  if (any(d$tests$unallocated_data)) {
+    warning_msg <-
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ": Values not allocated to Site level!")
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE
   }
   
-  # Proceed by removing unallocated rows
+  # Proceed by removing unallocated rows ####
   d$data$extract %<>%
     dplyr::filter(stringr::str_detect(Site, "NOT YET DISTRIBUTED", negate = TRUE))
   
-  # Filter taregt zeros, allowing for zero-value dedupes
+  # Filter target zeros, allowing for zero-value dedupes ####
   d$data$extract %<>%
     dplyr::filter(value != 0 | stringr::str_detect("00000", mech_code))
   
-  # TEST for Negative values in non-dedupe mechanisms
-  has_negative_numbers <-
+  # TEST for Negative values in non-dedupe mechanisms ####
+  d$tests$has_negative_nondedupes <-
     ( d$data$extract$value < 0 ) &
     stringr::str_detect("00000", d$data$extract$mech_code, negate = TRUE)
   
-  if (any(has_negative_numbers)) {
-    negCols <- d$data$extract %>%
-      dplyr::filter( has_negative_numbers) %>% 
+  if (any(d$tests$has_negative_nondedupes)) {
+    d$tests$neg_cols <- d$data$extract %>%
+      dplyr::filter( d$tests$has_negative_nondedupes) %>% 
       dplyr::pull(indicator_code) %>%
       unique() %>%
       paste(collapse = ", ")
     
-    msg <- paste0("ERROR! In tab ", sheet,
-                  ": NEGATIVE VALUES found! -> ",
-                  negCols,
-                  "")
-    d$info$warning_msg <- append(msg, d$info$warning_msg)
+    warning_msg <-
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ": NEGATIVE VALUES found! -> ",
+        d$tests$neg_cols,
+        "")
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE
   }
   
-  # TEST for positive values in dedupe mechanisms
-  has_positive_dedupe <-
+  # TEST for positive values in dedupe mechanisms ####
+  d$tests$has_positive_dedupes <-
     (d$data$extract$value > 0) &
     stringr::str_detect("00000", d$data$extract$mech_code)
   
-  if ( any( has_positive_dedupe ) ) {
-    
-    posCols <- d$data$extract %>%
-      dplyr::filter(has_positive_dedupe) %>% 
+  if ( any( d$tests$has_positive_dedupes ) ) {
+    d$tests$pos_cols <- d$data$extract %>%
+      dplyr::filter(d$tests$has_positive_dedupes) %>% 
       dplyr::pull(indicator_code) %>%
       unique() %>%
       paste(collapse = ", ")
     
-    msg <- paste0("ERROR! In tab ", d$data$sheet,
+    warning_msg <- paste0("ERROR! In tab ", d$data$sheet,
                   ": POSITIVE DEDUPE VALUES found! -> ",
-                  posCols,
+                  d$tests$pos_cols,
                   "")
-    d$info$warning_msg <-append(msg, d$info$warning_msg)
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE
   }
   
-  #Test for decimals
-  has_decimals <- d$data$extract$value %% 1 != 0
+  # TEST for decimals ####
+  d$tests$has_decimals <- d$data$extract$value %% 1 != 0
   
-  if (any(has_decimals)){
-    msg <- paste0("ERROR! In tab ", sheet, ": " ,
-                  sum(has_decimals),
-                  " DECIMAL VALUES found!")
-    d$info$warning_msg <- append(msg, d$info$warning_msg)
+  if (any(d$tests$has_decimals)){
+    d$tests$decimals_found <- d$data$extract %>%
+      dplyr::select(value) %>%
+      dplyr::filter(value %% 1 != 0) %>%
+      dplyr::distinct %>%
+      dplyr::pull(value) %>%
+      paste(collapse = ", ")
+    
+    warning_msg <-
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ": " ,
+        sum(d$tests$has_decimals),
+        " DECIMAL VALUES found!: ",
+        d$tests$decimals_found)
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE
   }
   
   
-  # TEST for duplicates
-  any_dups <- d$data$extract %>%
+  # TEST for duplicates ####
+  d$tests$duplicates <- d$data$extract %>%
     dplyr::select(sheet_name, site_uid, mech_code, Age, Sex, KeyPop, Type, indicator_code) %>%
     dplyr::group_by(sheet_name, site_uid, mech_code, Age, Sex, KeyPop, Type, indicator_code) %>%
     dplyr::summarise(n = (dplyr::n())) %>%
@@ -351,18 +384,22 @@ unPackSiteToolSheet <- function(d, sheet) {
     dplyr::arrange(row_id) %>%
     dplyr::pull(row_id)
   
-  if (length(any_dups) > 0) {
-    msg <- paste0("In tab ", sheet, ":" ,
-                  length(any_dups),
-                  " DUPLICATE ROWS. These will be aggregated!" ) 
-    d$info$warning_msg <- append(msg,d$info$warning_msg)
+  if (length(d$tests$duplicates) > 0) {
+    warning_msg <- 
+      paste0(
+        "In tab ",
+        sheet,
+        ":" ,
+        length(d$tests$duplicates),
+        " DUPLICATE ROWS. These will be aggregated!" ) 
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
   
-  # TEST for defunct disaggs
-  defunct <- defunctDisaggs(d)
+  # TEST for defunct disaggs ####
+  d$tests$defunct <- defunctDisaggs(d)
   
   if (NROW(defunct) > 0) {
-    defunctMsg <- defunct %>%
+    defunct_msg <- d$tests$defunct %>%
       dplyr::mutate(
         msg = stringr::str_squish(
           paste(paste0(indicator_code, ":"), Age, Sex, KeyPop)
@@ -371,26 +408,51 @@ unPackSiteToolSheet <- function(d, sheet) {
       dplyr::pull(msg) %>%
       paste(collapse = ",")
     
-    msg <- paste0("ERROR! In tab ", sheet,
-                  ": INVALID DISAGGS ",
-                  "(Check MER Guidance for correct alternatives) ->",
-                  defunctMsg)
+    warning_msg <-
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ": INVALID DISAGGS ",
+        "(Check MER Guidance for correct alternatives) ->",
+        defunct_msg)
     
-    d$info$warning_msg<-append(msg, d$info$warning_msg)
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE
   }
   
-  #Test for any missing mechanisms
+  # TEST for any missing mechanisms ####
+  d$tests$missing_mechs <- d$data$extract %>%
+    dplyr::select(sheet_name, PSNU, Age, Sex, KeyPop, indicator_code) %>%
+    dplyr::group_by(sheet_name, PSNU, Age, Sex, KeyPop, indicator_code) %>%
+    dplyr::summarise(n = (dplyr::n())) %>%
+    dplyr::filter(n > 1) %>%
+    dplyr::ungroup() %>%
+    dplyr::distinct() %>%
+    dplyr::mutate(row_id = paste(PSNU, Age, Sex, KeyPop, indicator_code, sep = "    ")) %>%
+    dplyr::arrange(row_id) %>%
+    dplyr::pull(row_id)
+    
+    dplyr::filter(is.na(mech_code)) %>%
+    
+  
   if (any(is.na(d$data$extract$mech_code)) ) {
-    msg <- paste0("ERROR! In tab ", sheet, ": BLANK MECHANISMS found!")
+    warning_msg <-
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ": BLANK MECHANISMS found!")
     
-    d$info$warning_msg <- append(msg, d$info$warning_msg)
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE
   }
   
-  #Test for any missing Types
+  #TEST for any missing Types ####
   if (any(is.na(d$data$extract$Type)) ) {
-    msg <- paste0("ERROR! In tab ", sheet, ": MISSING DSD/TA ATTRIBUTION found!")
+    msg <-
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ": MISSING DSD/TA ATTRIBUTION found!")
     
     d$info$warning_msg <- append(msg,d$info$warning_msg)
     d$info$has_error <- TRUE

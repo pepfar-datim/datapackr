@@ -11,8 +11,6 @@
 #' @return d
 #' 
 checkColStructure <- function(d, sheet) {
-  msg <- NULL
-  
   if (sheet == "SNU x IM") {
     data = d$data$SNUxIM
   } else {
@@ -30,7 +28,7 @@ checkColStructure <- function(d, sheet) {
     schema <- datapackr::site_tool_schema
   } else {stop("Cannot process that kind of tool.")}
   
-  col_check <- schema %>%
+  d$tests$col_check <- schema %>%
     dplyr::filter(sheet_name == sheet
                   & !(sheet == "SNU x IM" & indictaor_code == "Mechanism1")) %>%
     dplyr::select(indicator_code, template_order = col) %>%
@@ -38,15 +36,18 @@ checkColStructure <- function(d, sheet) {
     dplyr::mutate(order_check = template_order == submission_order)
   
   ## Alert to missing cols
-  if (any(is.na(col_check$submission_order))) {
-    missing_cols <- col_check %>%
+  if (any(is.na(d$tests$col_check$submission_order))) {
+    
+    d$tests$missing_cols <- d$tests$col_check %>%
       dplyr::filter(is.na(submission_order)) %>%
       dplyr::pull(indicator_code)
-    msg <- paste0("In tab", sheet, 
+    
+    warning_msg <- paste0("In tab", sheet, 
                   " MISSING COLUMNS: Note that this may be due to missing/renamed sheets,
        or added or renamed columns.:  ",
-                  paste(missing_cols, collapse = ", "),"")
-    d$info$warningMsg <- append(msg, d$info$warningMsg)
+                  paste(d$tests$missing_cols, collapse = ", "),"")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
   
   return(d)

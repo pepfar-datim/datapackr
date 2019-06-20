@@ -41,6 +41,9 @@ unPackDataPack <- function(d) {
         unPackCountryUIDs(submission_path = d$keychain$submission_path,
                           tool = d$info$tool)
     }
+  
+  # Store schema
+    d$info$schema <- datapackr::data_pack_schema
     
   # Check integrity of Workbook tabs
     d <- checkStructure(d)
