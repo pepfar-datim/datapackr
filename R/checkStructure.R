@@ -23,7 +23,7 @@ checkStructure <- function(d) {
     dplyr::left_join(submission_sheets, by = c("sheet_name")) %>%
     dplyr::mutate(order_check = template_order == submission_order)
   
-  #TODO: Decide whether to add all sheets into schema to check against
+  # TODO: Decide whether to add all sheets into schema to check against
   
   # TEST for missing Sheets ####
   info_msg <- "Checking for any missing tabs..."

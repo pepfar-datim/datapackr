@@ -20,16 +20,16 @@ unPackDataPackSheet <- function(d, sheet) {
       col_types = "text"
     )
   
-  # Run structural checks
+  # Run structural checks ####
   d <- checkColStructure(d, sheet)
   
   # List Target Columns
-  target_cols <- datapackr::data_pack_schema %>%
+  target_cols <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet,
                   col_type == "Target") %>%
     dplyr::pull(indicator_code)
   
-  # Add cols to allow compiling with other sheets
+  # Add cols to allow compiling with other sheets ####
   d$data$extract %<>%
     addcols(c("KeyPop", "Age", "Sex")) %>%
   # Extract PSNU uid
@@ -72,54 +72,62 @@ unPackDataPackSheet <- function(d, sheet) {
                   -KeyPop,
                   -sheet_name) %>%
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value) %>%
-  # Drop zeros & NAs
-    tidyr::drop_na(value) %>%
-    dplyr::filter(value != 0)
-  #TODO: Move Prioritization mutate here?
-  # TODO: Move dropping and filtering values NA and 0 till after convert to numeric?
+  # Drop NAs ####
+    tidyr::drop_na(value)
+
+  # TODO: Move Prioritization mutate here?
   
-  # TEST for non-numeric entries before converting to see how bad
+  # TEST for non-numeric values ####
   d$tests$non_numeric <- d$data$extract %>%
     dplyr::mutate(value_numeric = as.numeric(value)) %>%
     dplyr::filter(is.na(value_numeric)) %>%
-    dplyr::select(value) %>%
-    dplyr::distinct()
+    dplyr::select(indicator_code, value) %>%
+    dplyr::distinct() %>%
+    dplyr::group_by(indicator_code) %>%
+    dplyr::arrange(value) %>%
+    dplyr::summarise(values = paste(value, collapse = ", ")) %>%
+    dplyr::mutate(row_id = paste(indicator_code, values, sep = ":    ")) %>%
+    dplyr::arrange(row_id) %>%
+    dplyr::pull(row_id)
   
-  if(NROW(d$tests$non_numeric) > 0) {
+  if(length(d$tests$non_numeric) > 0) {
     warning_msg <-
       paste0(
         "In tab ",
         sheet,
-        ": NON-NUMERIC VALUES found! -> ",
-        d$tests$non_numeric)
+        ": NON-NUMERIC VALUES found! ->  \n", 
+        paste(d$tests$non_numeric, collapse = "\n"))
+    
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
   
-  # Now that non-numeric cases noted, convert all to numeric & drop non-numeric
+  # Now that non-numeric cases noted, convert all to numeric & drop non-numeric ####
   d$data$extract %<>%
     dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
-    tidyr::drop_na(value)
+    tidyr::drop_na(value) %>%
+  # Filter out zeros ####
+    dplyr::filter(value != 0)
   
-  # TEST for Negative values
+  # TEST for Negative values ####
   if (any(d$data$extract$value < 0)) {
     d$tests$neg_cols <- d$data$extract %>%
       dplyr::filter(value < 0) %>%
       dplyr::pull(indicator_code) %>%
-      unique() %>%
-      paste(collapse = ", ")
+      unique()
     
     warning_msg <- 
       paste0(
         "ERROR! In tab ",
         sheet,
-        ": NEGATIVE VALUES found! -> ",
-        d$tests$neg_cols,
+        ": NEGATIVE VALUES found in the following columns! -> \n",
+        paste(d$tests$neg_cols, collapse = "\n"),
         "")
+    
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE
   }
   
-  # TEST for duplicates
+  # TEST for duplicates ####
   d$tests$duplicates <- d$data$extract %>%
     dplyr::select(sheet_name, PSNU, Age, Sex, KeyPop, indicator_code) %>%
     dplyr::group_by(sheet_name, PSNU, Age, Sex, KeyPop, indicator_code) %>%
@@ -136,13 +144,12 @@ unPackDataPackSheet <- function(d, sheet) {
       paste0(
         "In tab ",
         sheet,
-        length(d$tests$duplicates),
-        ": DUPLICATE ROWS. These will be aggregated! -> ", 
-        paste(d$tests$duplicates, collapse = ","))
+        ": DUPLICATE ROWS. These will be aggregated! -> \n", 
+        paste(d$tests$duplicates, collapse = "\n"))
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
   
-  # TEST for defunct disaggs
+  # TEST for defunct disaggs ####
   d$tests$defunct <- defunctDisaggs(d)
   
   if (NROW(d$tests$defunct) > 0) {

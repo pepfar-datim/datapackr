@@ -4,13 +4,19 @@
 \alias{api_filter}
 \title{Filter a DATIM API query.}
 \usage{
-api_filter(api_call, filter)
+api_filter(api_call, field, operation, match)
 }
 \arguments{
 \item{api_call}{Base DATIM API query, specifying API table and setting paging
 as false.}
 
-\item{filter}{Filter parameters. No need to include \code{&filter=}.}
+\item{field}{Endpoint field aginst which to filter.}
+
+\item{operation}{Operation to apply as filter. See
+\href{https://docs.dhis2.org/2.22/en/developer/html/ch01s08.html}{DHIS2 Web API documentation}
+for valid operators.}
+
+\item{match}{Text to match using \code{operator}.}
 }
 \value{
 Web-encoded URL for DATIM API query.

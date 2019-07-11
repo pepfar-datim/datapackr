@@ -11,6 +11,9 @@
 #' @return d
 #' 
 checkColStructure <- function(d, sheet) {
+  info_msg <- "Checking column order..."
+  interactive_print(info_msg)
+  
   if (sheet == "SNU x IM") {
     data = d$data$SNUxIM
   } else {
@@ -22,17 +25,11 @@ checkColStructure <- function(d, sheet) {
     dplyr::select(indicator_code = value) %>%
     dplyr::mutate(submission_order = as.integer(1:(dplyr::n())))
   
-  if (d$info$tool == "Data Pack") {
-    schema <- datapackr::data_pack_schema
-  } else if (d$info$tool == "Site Tool") {
-    schema <- datapackr::site_tool_schema
-  } else {stop("Cannot process that kind of tool.")}
-  
-  d$tests$col_check <- schema %>%
+  d$tests$col_check <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet
-                  & !(sheet == "SNU x IM" & indictaor_code == "Mechanism1")) %>%
+                  & !(sheet == "SNU x IM" & indicator_code == "Mechanism1")) %>%
     dplyr::select(indicator_code, template_order = col) %>%
-    dplyr::full_join(submission_cols, by = c("indicator_code" = "indicator_code")) %>%
+    dplyr::left_join(submission_cols, by = c("indicator_code" = "indicator_code")) %>%
     dplyr::mutate(order_check = template_order == submission_order)
   
   ## Alert to missing cols
@@ -42,10 +39,14 @@ checkColStructure <- function(d, sheet) {
       dplyr::filter(is.na(submission_order)) %>%
       dplyr::pull(indicator_code)
     
-    warning_msg <- paste0("In tab", sheet, 
-                  " MISSING COLUMNS: Note that this may be due to missing/renamed sheets,
-       or added or renamed columns.:  ",
-                  paste(d$tests$missing_cols, collapse = ", "),"")
+    warning_msg <-
+      paste0(
+        "In tab ",
+        sheet,
+        ", MISSING COLUMNS: Note that this may be due to missing/renamed sheets,
+        or added or renamed columns. ->  ",
+        paste(d$tests$missing_cols, collapse = ", "),
+        "")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }

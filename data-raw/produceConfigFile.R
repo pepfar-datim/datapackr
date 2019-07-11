@@ -189,22 +189,11 @@ produceConfig <- function() {
     configFile <- getCountries()
     
   # Add levels & prioritization details
-    impattLevels <- datapackr::getIMPATTLevels()
+    impattLevels <- getIMPATTLevels()
     
     configFile %<>%
       dplyr::left_join(impattLevels, by = c("country_name")) %>%
-      dplyr::mutate_if(is.integer,as.double) %>%
-      dplyr::mutate(
-        country = level,
-        prioritization = dplyr::if_else(is.na(operating_unit), level, prioritization),
-        planning = dplyr::if_else(is.na(operating_unit), level, planning),
-        community = dplyr::if_else(is.na(operating_unit), level, community),
-        facility = dplyr::if_else(is.na(operating_unit), level, facility),
-        operating_unit =
-          dplyr::if_else(
-            is.na(operating_unit),
-              level3name,
-              operating_unit))
+      dplyr::mutate_if(is.integer, as.double)
       
   # Add Mil names & UIDs & metadata
     militaryNodes <- datapackr::getMilitaryNodes() %>%

@@ -9,15 +9,9 @@
 #' @return d
 #' 
 unPackSheets <- function(d) {
-  # Get schema
-  if (d$info$tool == "Data Pack") {
-    schema <- datapackr::data_pack_schema
-  } else if (d$info$tool == "Site Tool") {
-    schema <- datapackr::site_tool_schema
-  } else {stop("Cannot process that kind of tool.")}
-  
+
   # Get sheets list
-  sheets <- schema %>%
+  sheets <- d$info$schema %>%
     dplyr::select(sheet_name) %>%
     dplyr::filter(sheet_name != "SNU x IM") %>%
     dplyr::distinct() %>%
@@ -30,7 +24,7 @@ unPackSheets <- function(d) {
   
   for (i in 1:length(sheets_to_read)) {
     sheet = sheets_to_read[i]
-    interactive_print(d$data$sheet)
+    interactive_print(sheet)
     
     if (d$info$tool == "Data Pack") {
       d <- unPackDataPackSheet(d, sheet = sheet)

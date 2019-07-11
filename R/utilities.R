@@ -412,39 +412,22 @@ getPSNUs <- function(country_uids = NA,
 #' @return Data frame of Countries
 #' 
 getCountries <- function(datapack_uid = NA) {
-  # Manually add new countries if not already grouped under Country orgunitgroupset
-  # Remove upon resolution of https://github.com/pepfar-datim/Global/issues/4655
-    newCountryUIDs <- c("joGQFpKiHl9", #Brazil
-                        "YlSE5fOVJMa", #Nepal
-                        "ODOymOOWyl0", #Sierra Leone
-                        "N3xTKNKu5KM", #Mali
-                        "ZeB2eGmDfGw", #Burkina Faso
-                        "EIUtrKbw8PQ", #Togo
-                        "kH29I939rDQ", #Liberia
-                        "N5GhQWVpVFs") %>% #Senegal
-      paste(collapse = ",")
   
   # Pull Country List
     countries <-
-      paste0(
-        getOption("baseurl"),"api/",datapackr::api_version(),
-        "/organisationUnits.json?paging=false",
-        ## Filter to just countries
-        "&filter=organisationUnitGroups.id:eq:cNzfcPWEGSH",
-        "&filter=id:in:[",newCountryUIDs,"]",
-        "&rootJunction=OR",
-        "&fields=id,name,level,ancestors[id,name]") %>%
-      utils::URLencode() %>%
-      httr::GET() %>%
-      httr::content(., "text") %>%
-      jsonlite::fromJSON(., flatten = TRUE) %>%
-      do.call(rbind.data.frame, .) %>%
+      datapackr::api_call("organisationUnits") %>%
+      datapackr::api_filter(field = "organisationUnitGroups.id",
+                            operation = "eq",
+                            match = "cNzfcPWEGSH") %>%
+      datapackr::api_fields(fields = "id,name,level,ancestors[id,name]") %>%
+      datapackr::api_get() %>%
     
   # Remove countries no longer supported
-      dplyr::filter(!name %in% 
-                      c("Antigua & Barbuda","Bahamas","Belize","China","Dominica","Grenada",
-                        "Saint Kitts & Nevis","Saint Lucia","Saint Vincent & the Grenadines",
-                        "Turkmenistan","Uzbekistan")) %>%
+      dplyr::filter(
+        !name %in% 
+          c("Antigua & Barbuda","Bahamas","Belize","China","Dominica","Grenada",
+            "Saint Kitts & Nevis","Saint Lucia","Saint Vincent & the Grenadines",
+            "Turkmenistan","Uzbekistan")) %>%
       dplyr::select(country_name = name, country_uid = id, dplyr::everything()) %>%
   
   # Add metadata

@@ -4,16 +4,16 @@
 #' @description
 #' Constructs URL for DATIM API query against specified table without paging.
 #' 
-#' @param table Character. DATIM API table to query.
+#' @param endpoint Character. DATIM API endpoint to query.
 #' 
 #' @return Web-encoded URL for DATIM API query.
 #' 
-api_call <- function(table) {
+api_call <- function(endpoint) {
   
   URL <- paste0(
     getOption("baseurl"),"api/",datapackr::api_version(),
     "/",
-    table,
+    endpoint,
     ".json?paging=false") %>%
     utils::URLencode()
   
@@ -28,16 +28,24 @@ api_call <- function(table) {
 #' 
 #' @param api_call Base DATIM API query, specifying API table and setting paging
 #' as false.
-#' @param filter Filter parameters. No need to include \code{&filter=}.
+#' @param field Endpoint field aginst which to filter.
+#' @param operation Operation to apply as filter. See
+#' \href{https://docs.dhis2.org/2.22/en/developer/html/ch01s08.html}{DHIS2 Web API documentation}
+#' for valid operators.
+#' @param match Text to match using \code{operator}.
 #' 
 #' @return Web-encoded URL for DATIM API query.
 #' 
-api_filter <- function(api_call, filter) {
+api_filter <- function(api_call, field, operation, match) {
   
   URL <- paste0(
     api_call,
     "&filter=",
-    filter) %>%
+    field,
+    ":",
+    operation,
+    ":",
+    match) %>%
     utils::URLencode()
   
   return(URL)
