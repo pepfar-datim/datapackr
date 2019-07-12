@@ -78,17 +78,15 @@ unPackDataPackSheet <- function(d, sheet) {
   # TODO: Move Prioritization mutate here?
   
   # TEST for non-numeric values ####
-  d$tests$non_numeric <- d$data$extract %T>%
-    {options(warn=-1)} %>%
-    dplyr::mutate(value_numeric = as.numeric(value)) %T>%
-    {options(warn=0)} %>%
+  d$tests$non_numeric <- d$data$extract %>%
+    dplyr::mutate(value_numeric = suppressWarnings(as.numeric(value))) %>%
     dplyr::filter(is.na(value_numeric)) %>%
     dplyr::select(indicator_code, value) %>%
     dplyr::distinct() %>%
     dplyr::group_by(indicator_code) %>%
     dplyr::arrange(value) %>%
     dplyr::summarise(values = paste(value, collapse = ", ")) %>%
-    dplyr::mutate(row_id = paste(indicator_code, values, sep = ":    ")) %>%
+    dplyr::mutate(row_id = paste(indicator_code, values, sep = ":  ")) %>%
     dplyr::arrange(row_id) %>%
     dplyr::pull(row_id)
   
@@ -97,8 +95,9 @@ unPackDataPackSheet <- function(d, sheet) {
       paste0(
         "In tab ",
         sheet,
-        ": NON-NUMERIC VALUES found! ->  \n", 
-        paste(d$tests$non_numeric, collapse = "\n"))
+        ": NON-NUMERIC VALUES found! ->  \n\t* ", 
+        paste(d$tests$non_numeric, collapse = "\n\t* "),
+        "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
@@ -121,9 +120,9 @@ unPackDataPackSheet <- function(d, sheet) {
       paste0(
         "ERROR! In tab ",
         sheet,
-        ": NEGATIVE VALUES found in the following columns! -> \n",
-        paste(d$tests$neg_cols, collapse = "\n"),
-        "")
+        ": NEGATIVE VALUES found in the following columns! -> \n\t* ",
+        paste(d$tests$neg_cols, collapse = "\n\t* "),
+        "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE
@@ -137,17 +136,18 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::filter(n > 1) %>%
     dplyr::ungroup() %>%
     dplyr::distinct() %>%
-    dplyr::mutate(row_id = paste(PSNU, Age, Sex, KeyPop, indicator_code, sep = "    ")) %>%
-    dplyr::arrange(row_id) %>%
-    dplyr::pull(row_id)
+    dplyr::select(PSNU, Age, Sex, KeyPop, indicator_code)
   
   if (length(d$tests$duplicates) > 0) {
+    dupes_msg <- capture.output(print(as.data.frame(d$tests$duplicates), row.names = FALSE))
+    
     warning_msg <-
       paste0(
         "In tab ",
         sheet,
-        ": DUPLICATE ROWS. These will be aggregated! -> \n", 
-        paste(d$tests$duplicates, collapse = "\n"))
+        ": DUPLICATE ROWS. These will be aggregated! -> \n\t",
+        paste(dupes_msg, collapse = "\n\t"),
+        "\n")
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
   
