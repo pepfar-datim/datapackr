@@ -40,17 +40,16 @@ unPackCountryUIDs <- function(submission_path = NA,
     unlist()
   
   if (length(invalid_uids) > 0) {
-    
     msg <-
       paste0(
         "Cell B25 in the Home tab of your ",
         tool,
-        " contains the following Regional OU uids: ",
-        paste(invalid_uids, collapse = ", ") %>%
-        ". This approach is no longer supported.",
+        " contains the following Regional OU uids: \n\n  * ",
+        paste(invalid_uids, collapse = "\n  * "),
+        "\n\nThis approach is no longer supported.",
         " Please return to your ",
         tool,
-        " and enter a list of DATIM country-level uids, separated by commas, in cell B25 of the Home tab.")
+        " and enter a list of DATIM country-level uids separated by commas in cell B25 of the Home tab.")
     
     stop(msg)
   }
