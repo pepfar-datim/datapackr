@@ -61,8 +61,8 @@ unPackTool <- function(submission_path = NA,
       paste(
         paste(
           seq_along(d$info$warning_msg),
-          ": " ,
-          stringr::str_squish(gsub("\n", "", d$info$warning_msg))
+          ": " , d$info$warning_msg
+          #stringr::str_squish(gsub("\n", "", d$info$warning_msg))
         ),
         sep = "",
         collapse = "\r\n")

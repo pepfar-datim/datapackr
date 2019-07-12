@@ -50,7 +50,7 @@ unPackDataPackSheet <- function(d, sheet) {
   if (sheet == "Prioritization") {
     d$data$extract %<>%
       dplyr::mutate(
-        IMPATT.PRIORITY_SNU.20T =
+        IMPATT.PRIORITY_SNU.20T =  #TODO: Remove references to dated columns
           as.numeric(
             stringr::str_sub(
               IMPATT.PRIORITY_SNU.20T,
@@ -78,8 +78,10 @@ unPackDataPackSheet <- function(d, sheet) {
   # TODO: Move Prioritization mutate here?
   
   # TEST for non-numeric values ####
-  d$tests$non_numeric <- d$data$extract %>%
-    dplyr::mutate(value_numeric = as.numeric(value)) %>%
+  d$tests$non_numeric <- d$data$extract %T>%
+    {options(warn=-1)} %>%
+    dplyr::mutate(value_numeric = as.numeric(value)) %T>%
+    {options(warn=0)} %>%
     dplyr::filter(is.na(value_numeric)) %>%
     dplyr::select(indicator_code, value) %>%
     dplyr::distinct() %>%
