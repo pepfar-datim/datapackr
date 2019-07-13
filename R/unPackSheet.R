@@ -25,8 +25,9 @@ unPackDataPackSheet <- function(d, sheet) {
   
   # List Target Columns
   target_cols <- d$info$schema %>%
-    dplyr::filter(sheet_name == sheet,
-                  col_type == "Target") %>%
+    dplyr::filter(sheet_name == sheet
+                  & col_type == "Target"
+                  & indicator_code %in% colnames(d$data$extract)) %>%
     dplyr::pull(indicator_code)
   
   # Add cols to allow compiling with other sheets ####
@@ -39,13 +40,14 @@ unPackDataPackSheet <- function(d, sheet) {
       sheet_name = sheet
       ) %>%
   # Select only target-related columns
-    dplyr::select(PSNU,
-                  psnuid,
-                  sheet_name,
-                  Age,
-                  Sex,
-                  KeyPop,
-                  dplyr::one_of(target_cols))
+    dplyr::select(
+      PSNU,
+      psnuid,
+      sheet_name,
+      Age,
+      Sex,
+      KeyPop,
+      dplyr::one_of(target_cols))
   
   if (sheet == "Prioritization") {
     d$data$extract %<>%

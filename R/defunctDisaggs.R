@@ -11,7 +11,8 @@
 #' @return d
 #' 
 defunctDisaggs <- function(d) {
-  
+  #TODO: Pull from DATIM instead of manual schema like this
+  #TODO: Allow this to run more modularly (parameterize sheet reference)
   defunct <- d$data$extract %>%
     replace(is.na(.), "") %>%
     dplyr::filter(

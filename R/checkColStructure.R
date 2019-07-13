@@ -11,9 +11,6 @@
 #' @return d
 #' 
 checkColStructure <- function(d, sheet) {
-  info_msg <- "Checking column order..."
-  interactive_print(info_msg)
-  
   if (sheet == "SNU x IM") {
     data = d$data$SNUxIM
   } else {
