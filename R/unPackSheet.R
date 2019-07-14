@@ -80,7 +80,7 @@ unPackDataPackSheet <- function(d, sheet) {
   # TODO: Move Prioritization mutate here?
   
   # TEST for non-numeric values ####
-  d$tests$non_numeric <- d$data$extract %>%
+  non_numeric <- d$data$extract %>%
     dplyr::mutate(value_numeric = suppressWarnings(as.numeric(value))) %>%
     dplyr::filter(is.na(value_numeric)) %>%
     dplyr::select(indicator_code, value) %>%
@@ -92,13 +92,15 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::arrange(row_id) %>%
     dplyr::pull(row_id)
   
-  if(length(d$tests$non_numeric) > 0) {
+  if(length(non_numeric) > 0) {
+    d[["tests"]][["non_numeric"]][[as.character(sheet)]] <- non_numeric
+    
     warning_msg <-
       paste0(
         "In tab ",
         sheet,
         ": NON-NUMERIC VALUES found! ->  \n\t* ", 
-        paste(d$tests$non_numeric, collapse = "\n\t* "),
+        paste(non_numeric, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -113,17 +115,19 @@ unPackDataPackSheet <- function(d, sheet) {
   
   # TEST for Negative values ####
   if (any(d$data$extract$value < 0)) {
-    d$tests$neg_cols <- d$data$extract %>%
+    neg_cols <- d$data$extract %>%
       dplyr::filter(value < 0) %>%
       dplyr::pull(indicator_code) %>%
       unique()
+    
+    d[["tests"]][["neg_cols"]][[as.character(sheet)]] <- neg_cols
     
     warning_msg <- 
       paste0(
         "ERROR! In tab ",
         sheet,
         ": NEGATIVE VALUES found in the following columns! -> \n\t* ",
-        paste(d$tests$neg_cols, collapse = "\n\t* "),
+        paste(neg_cols, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -131,7 +135,7 @@ unPackDataPackSheet <- function(d, sheet) {
   }
   
   # TEST for duplicates ####
-  d$tests$duplicates <- d$data$extract %>%
+  duplicates <- d$data$extract %>%
     dplyr::select(sheet_name, PSNU, Age, Sex, KeyPop, indicator_code) %>%
     dplyr::group_by(sheet_name, PSNU, Age, Sex, KeyPop, indicator_code) %>%
     dplyr::summarise(n = (dplyr::n())) %>%
@@ -140,8 +144,13 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::distinct() %>%
     dplyr::select(PSNU, Age, Sex, KeyPop, indicator_code)
   
-  if (length(d$tests$duplicates) > 0) {
-    dupes_msg <- capture.output(print(as.data.frame(d$tests$duplicates), row.names = FALSE))
+  if (NROW(duplicates) > 0) {
+    d[["tests"]][["duplicates"]][[as.character(sheet)]] <- duplicates
+    
+    dupes_msg <-
+      capture.output(
+        print(as.data.frame(duplicates), row.names = FALSE)
+      )
     
     warning_msg <-
       paste0(
@@ -154,10 +163,12 @@ unPackDataPackSheet <- function(d, sheet) {
   }
   
   # TEST for defunct disaggs ####
-  d$tests$defunct <- defunctDisaggs(d)
+  defunct <- defunctDisaggs(d)
   
-  if (NROW(d$tests$defunct) > 0) {
-    defunct_msg <- d$tests$defunct %>%
+  if (NROW(defunct) > 0) {
+    d[["tests"]][["defunct"]][[as.character(sheet)]] <- defunct
+    
+    defunct_msg <- defunct %>%
       dplyr::mutate(
         msg = stringr::str_squish(
           paste(paste0(indicator_code, ":"), Age, Sex, KeyPop)

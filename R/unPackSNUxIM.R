@@ -13,23 +13,22 @@
 #' @return d
 #' 
 unPackSNUxIM <- function(d) {
-  msg <- NULL
   
   d$data$SNUxIM <-
     readxl::read_excel(
       path = d$keychain$submission_path,
       sheet = "SNU x IM",
-      range = readxl::cell_limits(c(5,1), c(NA, NA)),
+      range = readxl::cell_limits(c(5, 1), c(NA, NA)),
       col_types = "text"
-      )
+    )
   
-  # Run structural checks
+  # Run structural checks ####
   d <- checkColStructure(d, "SNU x IM")
   
   # Keep only columns we need
-  toKeep <- datapackr::data_pack_schema %>%
+  toKeep <- d$info$schema %>%
     dplyr::filter(sheet_name == "SNU x IM"
-                  & !indicator_code %in% c("Mechanism1","ID","sheet_num","Rollup")) %>%
+                  & !indicator_code %in% c("Mechanism1","ID","sheet_num","Rollup")) %>% #TODO: Make less manual
     dplyr::pull(indicator_code)
   
   d$data$SNUxIM %<>%
@@ -43,10 +42,10 @@ unPackSNUxIM <- function(d) {
     
   # TEST where Data Pack targets not fully distributed.
     dplyr::mutate_at(
-      dplyr::vars(dplyr::matches("Data{aclTarget|Rollup|Dedupe|(\\d){4,6}")),
+      dplyr::vars(dplyr::matches("DataPackTarget|Rollup|Dedupe|(\\d){4,6}")),
       as.numeric) %>%
     dplyr::mutate(
-      mechanisms = rowSums(dplyr:select(., dplyr::matches("(\\d){4,6}|Dedupe")),
+      mechanisms = rowSums(dplyr::select(., dplyr::matches("(\\d){4,6}|Dedupe")),
                            na.rm = TRUE),
       DataPackTarget = round_trunc(DataPackTarget),
       mechanisms = round_trunc(mechanisms)

@@ -18,23 +18,27 @@ checkColStructure <- function(d, sheet) {
   }
   
   submission_cols <- names(data) %>%
-    tibble::as_tibble() %>%
+    tibble::enframe(name = NULL) %>%
     dplyr::select(indicator_code = value) %>%
     dplyr::mutate(submission_order = as.integer(1:(dplyr::n())))
   
-  d$tests$col_check <- d$info$schema %>%
+  col_check <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet
                   & !(sheet == "SNU x IM" & indicator_code == "Mechanism1")) %>%
     dplyr::select(indicator_code, template_order = col) %>%
     dplyr::left_join(submission_cols, by = c("indicator_code" = "indicator_code")) %>%
     dplyr::mutate(order_check = template_order == submission_order)
   
-  ## Alert to missing cols
-  if (any(is.na(d$tests$col_check$submission_order))) {
+  d[["tests"]][["col_check"]][[as.character(sheet)]] <- col_check
+  
+  # Alert to missing cols
+  if (any(is.na(col_check$submission_order))) {
     
-    d$tests$missing_cols <- d$tests$col_check %>%
+    missing_cols <- col_check %>%
       dplyr::filter(is.na(submission_order)) %>%
       dplyr::pull(indicator_code)
+    
+    d[["tests"]][["missing_cols"]][[as.character(sheet)]] <- missing_cols
     
     warning_msg <-
       paste0(
@@ -42,7 +46,7 @@ checkColStructure <- function(d, sheet) {
         sheet,
         ", MISSING COLUMNS: Note that this may be due to missing/renamed sheets,
         or added or renamed columns. ->  \n  * ",
-        paste(d$tests$missing_cols, collapse = "\n  * "),
+        paste(missing_cols, collapse = "\n  * "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
