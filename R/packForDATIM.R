@@ -41,13 +41,13 @@ packForDATIM <- function(d, type = NA) {
         period,
         orgUnit = psnuid,
         categoryOptionCombo = categoryoptioncombouid,
-        mechanismCode,
+        mechanism_code,
         value) %>%
       dplyr::group_by(dataElement,
                       period,
                       orgUnit,
                       categoryOptionCombo,
-                      mechanismCode) %>%
+                      mechanism_code) %>% #TODO: Coordinate with Jason on this name change
       dplyr::summarise(value = sum(value)) %>%
       dplyr::ungroup() %>%
       #Remove anything which is NA here, 

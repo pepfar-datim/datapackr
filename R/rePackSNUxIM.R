@@ -130,7 +130,7 @@ rePackPSNUxIM <- function(d) {
                   Sex, KeyPop, mechanism_code, value = newValue) %>%
     dplyr::filter(value != 0) %>%
     tidyr::drop_na(value)
-  #TODO: Decide whether to round_trunc here.
+  #TODO: Current approach is to leave decimals until right before writing to Site Tool. Is this justified?
   
   return(d)
   

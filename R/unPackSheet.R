@@ -146,14 +146,13 @@ unPackDataPackSheet <- function(d, sheet) {
     
     warning_msg <- 
       paste0(
-        "ERROR! In tab ",
+        "WARNING! In tab ",
         sheet,
         ": DECIMAL VALUES found in the following columns! -> \n\t* ",
         paste(decimal_cols, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
-    d$info$has_error <- TRUE
   }
   
   # TEST for duplicates ####
