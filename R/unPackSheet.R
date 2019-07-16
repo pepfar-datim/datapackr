@@ -176,12 +176,15 @@ unPackDataPackSheet <- function(d, sheet) {
     
     warning_msg <-
       paste0(
-        "In tab ",
+        "ERROR! In tab ",
         sheet,
-        ": DUPLICATE ROWS. These will be aggregated! -> \n\t",
+        ": DUPLICATE ROWS. Duplicates are not permitted. -> \n\t",
         paste(dupes_msg, collapse = "\n\t"),
         "\n")
+    
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
+    
   }
   
   # TEST for defunct disaggs ####
