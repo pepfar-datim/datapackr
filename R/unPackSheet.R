@@ -27,6 +27,7 @@ unPackDataPackSheet <- function(d, sheet) {
   target_cols <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet
                   & col_type == "Target"
+  # Filter by what's in submission to avoid unknown column warning messages
                   & indicator_code %in% colnames(d$data$extract)) %>%
     dplyr::pull(indicator_code)
   
@@ -128,6 +129,27 @@ unPackDataPackSheet <- function(d, sheet) {
         sheet,
         ": NEGATIVE VALUES found in the following columns! -> \n\t* ",
         paste(neg_cols, collapse = "\n\t* "),
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
+  }
+  
+  # TEST for Decimal values ####
+  if (any(d$data$extract$value %% 1 != 0)) {
+    decimal_cols <- d$data$extract %>%
+      dplyr::filter(value %% 1 != 0) %>%
+      dplyr::pull(indicator_code) %>%
+      unique()
+    
+    d[["tests"]][["decimal_cols"]][[as.character(sheet)]] <- decimal_cols
+    
+    warning_msg <- 
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ": DECIMAL VALUES found in the following columns! -> \n\t* ",
+        paste(decimal_cols, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -258,7 +280,7 @@ unPackSiteToolSheet <- function(d, sheet) {
   # Handle empty tabs ####
   d$data$extract %<>%
     dplyr::select(-Status) %>%
-    dplyr::filter_all(., dplyr::any_cars(!is.na(.)))
+    dplyr::filter_all(., dplyr::any_vars(!is.na(.)))
   
   if (NROW(d$data$extract) == 0) {
     d$data$extract <- NULL

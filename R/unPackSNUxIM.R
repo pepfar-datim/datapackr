@@ -28,52 +28,24 @@ unPackSNUxIM <- function(d) {
   # Keep only columns we need
   toKeep <- d$info$schema %>%
     dplyr::filter(sheet_name == "SNU x IM"
-                  & !indicator_code %in% c("Mechanism1","ID","sheet_num","Rollup")) %>% #TODO: Make less manual
+                  & !indicator_code %in% c("Rollup", "sheet_num", "DataPackTarget", "ID")
+  # Filter by what's in submission to avoid unknown column warning messages
+                  & indicator_code %in% colnames(d$data$SNUxIM)) %>%
     dplyr::pull(indicator_code)
   
   d$data$SNUxIM %<>%
     dplyr::select(
-      toKeep,
+      dplyr::one_of(toKeep),
       dplyr::matches("Dedupe|(\\d){4,6}")) %>%
-    dplyr::rename(indicator_code = indicatorCode) %>%
+    dplyr::rename(indicator_code = indicatorCode) %>% #TODO: Fix with other naming issues, preferably inside Data Pack
     
-  # We don't need columns with all NA targets -- Drop them.
+  # We don't need columns or rows with all NA targets -- Drop them.
     dplyr::select_if(~!all(is.na(.))) %>%
-    
-  # TEST where Data Pack targets not fully distributed.
-    dplyr::mutate_at(
-      dplyr::vars(dplyr::matches("DataPackTarget|Rollup|Dedupe|(\\d){4,6}")),
-      as.numeric) %>%
-    dplyr::mutate(
-      mechanisms = rowSums(dplyr::select(., dplyr::matches("(\\d){4,6}|Dedupe")),
-                           na.rm = TRUE),
-      DataPackTarget = round_trunc(DataPackTarget),
-      mechanisms = round_trunc(mechanisms)
-    )
-    
-  d$info$SNUxIM_undistributed <- d$data$SNUxIM %>%
-    dplyr::filter(DataPackTarget != mechanisms) %>%
-    dplyr::select(PSNU,
-                  indicator_code,
-                  CoarseAge,
-                  Sex,
-                  KeyPop,
-                  DataPackTarget,
-                  mechanisms)
-  
-  if (NROW(d$info$SNUxIM_undistributed) > 0) {
-    msg <- paste0(
-      msg,
-      "    ",
-      NROW(d$info$SNUxIM_undistributed),
-      " cases where Data Pack Targets are not correctly distributed among mechanisms. ",
-      "To address this, go to your Data Pack's SNU x IM tab and filter the Rollup column for Pink cells."
-      )
-    d$info$warning_msg <- append(msg, d$info$warning_msg)
-  }
+    dplyr::filter(
+      rowSums(!is.na(dplyr::select(., dplyr::matches("Dedupe|(\\d){4,6}")))) != 0
+      ) %>%
   
   # Align PMTCT_EID Age bands with rest of Data Pack (TODO: Fix in Data Pack, not here)
-  d$data$SNUxIM %<>%
     dplyr::mutate(
       CoarseAge = dplyr::case_when(
         stringr::str_detect(indicator_code, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
@@ -87,21 +59,57 @@ unPackSNUxIM <- function(d) {
         TRUE ~ Sex)) %>%
     tidyr::separate_rows(Sex, sep = "\\|") %>%
   # Create distribution matrix 
-    dplyr::filter(mechanisms != 0) %>%
-    dplyr::select(-DataPackTarget, -mechanisms) %>%
     tidyr::gather(
-      key = "mechanismCode",
+      key = "mechanism_code",
       value = "value",
-      -PSNU, -sheet_name, -indicator_code, -CoarseAge, -Sex, -KeyPop) %>%
-    tidyr::drop_na(value) %>%
+      -PSNU, -sheet_name, -indicator_code, -CoarseAge, -Sex, -KeyPop,
+      na.rm = TRUE) %>%
+    dplyr::mutate(value = as.numeric(value)) %>%
+    dplyr::filter(value != 0) %>%
     dplyr::group_by(PSNU, sheet_name, indicator_code, CoarseAge, Sex, KeyPop) %>%
     dplyr::mutate(distribution = value / sum(value)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(
       psnuid = stringr::str_extract(PSNU, "(?<=\\()([A-Za-z][A-Za-z0-9]{10})(?=\\)$)"),
-      mechanismCode = stringr::str_extract(mechanismCode, "(\\d{4,6})|Dedupe")) %>%
+      mechanism_code = stringr::str_extract(mechanism_code, "(\\d{4,6})|Dedupe")) %>%
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, CoarseAge, Sex,
-                  KeyPop, mechanismCode, distribution)
+                  KeyPop, mechanism_code, distribution, SNUxIM_value = value) %>%
+    dplyr::arrange(PSNU, psnuid, sheet_name, indicator_code, CoarseAge, Sex,
+                   KeyPop, mechanism_code, distribution, SNUxIM_value)
+    
+  # # TEST where Data Pack targets not fully distributed.
+  #   dplyr::mutate_at(
+  #     dplyr::vars(dplyr::matches("DataPackTarget|Rollup|Dedupe|(\\d){4,6}")),
+  #     as.numeric) %>%
+  #   dplyr::mutate(
+  #     mechanisms = rowSums(dplyr::select(., dplyr::matches("(\\d){4,6}|Dedupe")),
+  #                          na.rm = TRUE),
+  #     DataPackTarget = round_trunc(DataPackTarget),
+  #     mechanisms = round_trunc(mechanisms)
+  #   )
+  #   
+  # d$info$SNUxIM_undistributed <- d$data$SNUxIM %>%
+  #   dplyr::filter(DataPackTarget != mechanisms) %>%
+  #   dplyr::select(PSNU,
+  #                 indicator_code,
+  #                 CoarseAge,
+  #                 Sex,
+  #                 KeyPop,
+  #                 DataPackTarget,
+  #                 mechanisms)
+  # 
+  # if (NROW(d$info$SNUxIM_undistributed) > 0) {
+  #   msg <- paste0(
+  #     msg,
+  #     "    ",
+  #     NROW(d$info$SNUxIM_undistributed),
+  #     " cases where Data Pack Targets are not correctly distributed among mechanisms. ",
+  #     "To address this, go to your Data Pack's SNU x IM tab and filter the Rollup column for Pink cells."
+  #     )
+  #   d$info$warning_msg <- append(msg, d$info$warning_msg)
+  # }
+  # 
+  # 
   
   return(d)
 }

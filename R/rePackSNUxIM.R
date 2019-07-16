@@ -10,7 +10,8 @@
 #' @return d
 #' 
 rePackPSNUxIM <- function(d) {
-  d$data$distributedMER <- d$data$MER %>%
+  #d$data$distributedMER
+  distributedMER <- d$data$MER %>%
     dplyr::mutate(
       CoarseAge = dplyr::case_when(
         stringr::str_detect(indicator_code,"OVC_SERV")
@@ -29,7 +30,32 @@ rePackPSNUxIM <- function(d) {
         stringr::str_detect(indicator_code,"KP_MAT") ~ NA_character_, #TODO: Fix in Data Pack, not here.
         TRUE ~ KeyPop)
     ) %>%
-    dplyr::left_join(dplyr::select(d$data$SNUxIM,-PSNU)) %>%
+    dplyr::full_join(dplyr::select(d$data$SNUxIM,-PSNU))
+  
+  # TEST where Data Pack targets not fully distributed.
+  undistributed <- distributedMER %>%
+    dplyr::filter(!is.na(value) & is.na(distribution))
+  
+  # TEST where attempted to distribute where no target set
+  noTargets <- distributedMER %>%
+    dplyr::filter(is.na(value) & !is.na(distribution))
+  
+  # TEST where attempted distribution sum != target
+  imbalancedDistribution <- distributedMER %>%
+    tidyr::drop_na(value, distribution) %>%
+    dplyr::select(-Age, -distribution, -mechanism_code) %>%
+    dplyr::group_by_at(dplyr::vars(dplyr::everything(), -value)) %>%
+    dplyr::summarize(value = round(sum(value), digits = 5)) %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by_at(dplyr::vars(dplyr::everything(), -SNUxIM_value)) %>%
+    dplyr::summarize(SNUxIM_value = round(sum(SNUxIM_value), digits = 5)) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(value != SNUxIM_value)
+  
+  
+  
+  
+    distributedMER %<>%
     dplyr::mutate(newValue = value * distribution) %>%
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, CoarseAge,
                   Sex, KeyPop, mechanismCode, value = newValue) %>%
