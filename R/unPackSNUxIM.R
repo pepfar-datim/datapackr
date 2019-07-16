@@ -77,39 +77,5 @@ unPackSNUxIM <- function(d) {
     dplyr::arrange(PSNU, psnuid, sheet_name, indicator_code, CoarseAge, Sex,
                    KeyPop, mechanism_code, distribution, SNUxIM_value)
     
-  # # TEST where Data Pack targets not fully distributed.
-  #   dplyr::mutate_at(
-  #     dplyr::vars(dplyr::matches("DataPackTarget|Rollup|Dedupe|(\\d){4,6}")),
-  #     as.numeric) %>%
-  #   dplyr::mutate(
-  #     mechanisms = rowSums(dplyr::select(., dplyr::matches("(\\d){4,6}|Dedupe")),
-  #                          na.rm = TRUE),
-  #     DataPackTarget = round_trunc(DataPackTarget),
-  #     mechanisms = round_trunc(mechanisms)
-  #   )
-  #   
-  # d$info$SNUxIM_undistributed <- d$data$SNUxIM %>%
-  #   dplyr::filter(DataPackTarget != mechanisms) %>%
-  #   dplyr::select(PSNU,
-  #                 indicator_code,
-  #                 CoarseAge,
-  #                 Sex,
-  #                 KeyPop,
-  #                 DataPackTarget,
-  #                 mechanisms)
-  # 
-  # if (NROW(d$info$SNUxIM_undistributed) > 0) {
-  #   msg <- paste0(
-  #     msg,
-  #     "    ",
-  #     NROW(d$info$SNUxIM_undistributed),
-  #     " cases where Data Pack Targets are not correctly distributed among mechanisms. ",
-  #     "To address this, go to your Data Pack's SNU x IM tab and filter the Rollup column for Pink cells."
-  #     )
-  #   d$info$warning_msg <- append(msg, d$info$warning_msg)
-  # }
-  # 
-  # 
-  
   return(d)
 }

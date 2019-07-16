@@ -10,8 +10,8 @@
 #' @return d
 #' 
 rePackPSNUxIM <- function(d) {
-  #d$data$distributedMER
-  distributedMER <- d$data$MER %>%
+  
+  d$data$distributedMER <- d$data$MER %>%
     dplyr::mutate(
       CoarseAge = dplyr::case_when(
         stringr::str_detect(indicator_code,"OVC_SERV")
@@ -33,15 +33,63 @@ rePackPSNUxIM <- function(d) {
     dplyr::full_join(dplyr::select(d$data$SNUxIM,-PSNU))
   
   # TEST where Data Pack targets not fully distributed.
-  undistributed <- distributedMER %>%
+  undistributed <- d$data$distributedMER %>%
     dplyr::filter(!is.na(value) & is.na(distribution))
   
-  # TEST where attempted to distribute where no target set
-  noTargets <- distributedMER %>%
+  if (NROW(undistributed) > 0) {
+    d$tests$undistributed <- undistributed
+    
+    undistributed_inds <- undistributed %>%
+      dplyr::select(indicator_code) %>%
+      dplyr::distinct() %>%
+      dplyr::arrange(indicator_code) %>%
+      dplyr::pull(indicator_code)
+    
+    warning_msg <-
+      paste0(
+        "ERROR!: ",
+        NROW(undistributed),
+        " cases where no distribution was attempted for Targets.",
+        " To identify these, go to your SNU x IM tab and filter the Rollup column for Pink cells.",
+        " This has affected the following indicators -> \n\t* ",
+        paste(undistributed_inds, collapse = "\n\t* "),
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
+    
+  }
+  
+  # TEST where distribution attempted where no target set
+  noTargets <- d$data$distributedMER %>%
     dplyr::filter(is.na(value) & !is.na(distribution))
   
+  if (NROW(noTargets) > 0) {
+    d$tests$noTargets <- noTargets
+    
+    noTargets_inds <- noTargets %>%
+      dplyr::select(indicator_code) %>%
+      dplyr::distinct() %>%
+      dplyr::arrange(indicator_code) %>%
+      dplyr::pull(indicator_code)
+    
+    warning_msg <-
+      paste0(
+        "ERROR!: ",
+        NROW(noTargets),
+        " cases where distribution attempted where no Target set.",
+        " To identify these, go to your SNU x IM tab and filter the Rollup column for Pink cells.",
+        " This has affected the following indicators -> \n\t* ",
+        paste(noTargets_inds, collapse = "\n\t* "),
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
+    
+  }
+  
   # TEST where attempted distribution sum != target
-  imbalancedDistribution <- distributedMER %>%
+  imbalancedDistribution <- d$data$distributedMER %>%
     tidyr::drop_na(value, distribution) %>%
     dplyr::select(-Age, -distribution, -mechanism_code) %>%
     dplyr::group_by_at(dplyr::vars(dplyr::everything(), -value)) %>%
@@ -52,15 +100,37 @@ rePackPSNUxIM <- function(d) {
     dplyr::ungroup() %>%
     dplyr::filter(value != SNUxIM_value)
   
+  if (NROW(imbalancedDistribution) > 0) {
+    d$tests$imbalancedDistribution <- imbalancedDistribution
+    
+    imbalancedDistribution_inds <- imbalancedDistribution %>%
+      dplyr::select(indicator_code) %>%
+      dplyr::distinct() %>%
+      dplyr::arrange(indicator_code) %>%
+      dplyr::pull(indicator_code)
+    
+    warning_msg <-
+      paste0(
+        "ERROR!: ",
+        NROW(imbalancedDistribution),
+        " cases where distributed total is either more or less than total Target.",
+        " To identify these, go to your SNU x IM tab and filter the Rollup column for Pink cells.",
+        " This has affected the following indicators -> \n\t* ",
+        paste(imbalancedDistribution_inds, collapse = "\n\t* "),
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
+    
+  }
   
-  
-  
-    distributedMER %<>%
+  d$data$distributedMER %<>%
     dplyr::mutate(newValue = value * distribution) %>%
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, CoarseAge,
-                  Sex, KeyPop, mechanismCode, value = newValue) %>%
+                  Sex, KeyPop, mechanism_code, value = newValue) %>%
     dplyr::filter(value != 0) %>%
     tidyr::drop_na(value)
+  #TODO: Decide whether to round_trunc here.
   
   return(d)
   
