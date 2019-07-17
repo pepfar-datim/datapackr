@@ -60,25 +60,25 @@ unPackDataPack <- function(d) {
   # Combine Targets with SNU x IM for PSNU x IM level targets
     d <- rePackPSNUxIM(d)
     
-  # Double check country_uid info
-    site_uids <-
-      datapackr::api_call("organisationUnits") %>%
-      datapackr::api_filter("organisationUnitGroups.name:in:[Military,COP Prioritization SNU]") %>%
-      datapackr::api_filter(
-        paste0(
-          "ancestors.id:in:[",
-          paste0(d$info$country_uids,
-                 collapse = ","),
-          "]")
-      ) %>%
-      datapackr::api_fields("id") %>%
-      datapackr::api_get() %>%
-      dplyr::pull(id)
-    
-    dp_PSNU_uids <- d$data$distributedMER$psnuid %>%
-      unique()
-    
-    country_uid_check <- dp_PSNU_uids[site_uids]
+  # Double check country_uid info # TODO: Replace this with API call against SQL view of sites mapped to Countries.
+    # site_uids <-
+    #   datapackr::api_call("organisationUnits") %>%
+    #   datapackr::api_filter("organisationUnitGroups.name:in:[Military,COP Prioritization SNU]") %>%
+    #   datapackr::api_filter(
+    #     paste0(
+    #       "ancestors.id:in:[",
+    #       paste0(d$info$country_uids,
+    #              collapse = ","),
+    #       "]")
+    #   ) %>%
+    #   datapackr::api_fields("id") %>%
+    #   datapackr::api_get() %>%
+    #   dplyr::pull(id)
+    # 
+    # dp_PSNU_uids <- d$data$distributedMER$psnuid %>%
+    #   unique()
+    # 
+    # country_uid_check <- dp_PSNU_uids[site_uids]
     
     # Where data uids !%in% DATIM list, flag error (Need to provide correct uids in either param or DP home tab)
     

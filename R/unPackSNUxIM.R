@@ -71,7 +71,8 @@ unPackSNUxIM <- function(d) {
     dplyr::ungroup() %>%
     dplyr::mutate(
       psnuid = stringr::str_extract(PSNU, "(?<=\\()([A-Za-z][A-Za-z0-9]{10})(?=\\)$)"),
-      mechanism_code = stringr::str_extract(mechanism_code, "(\\d{4,6})|Dedupe")) %>%
+      mechanism_code = stringr::str_extract(mechanism_code, "(\\d{4,6})|Dedupe"),
+      mechanism_code = stringr::str_replace(mechanism_code, "Dedupe", "00000")) %>%
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, CoarseAge, Sex,
                   KeyPop, mechanism_code, distribution, SNUxIM_value = value) %>%
     dplyr::arrange(PSNU, psnuid, sheet_name, indicator_code, CoarseAge, Sex,

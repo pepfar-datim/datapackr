@@ -1,3 +1,4 @@
+#' @export
 #' @importFrom magrittr %>% %<>%
 #' @title packForDATIM(data)
 #' 
@@ -25,34 +26,7 @@ packForDATIM <- function(d, type = NA) {
   
   if (type == "PSNUxIM") {
     
-    d$datim$PSNUxIM <- d$data$distributedMER %>%
-      dplyr::mutate(
-        period = datapackr::periodInfo$iso,
-        mechanismCode = stringr::str_replace(mechanism_code,"Dedupe","00000")) %>% 
-      dplyr::left_join(datapackr::PSNUxIM_to_DATIM %>%
-                         dplyr::filter(dataset == "MER") %>%
-                         dplyr::select(-sheet_name, -typeOptions, -dataset),
-                       by = c("indicator_code" = "indicator_code",
-                              "Age" = "validAges",
-                              "Sex" = "validSexes",
-                              "KeyPop" = "validKPs")) %>%
-      dplyr::select(
-        dataElement = dataelementuid,
-        period,
-        orgUnit = psnuid,
-        categoryOptionCombo = categoryoptioncombouid,
-        mechanism_code,
-        value) %>%
-      dplyr::group_by(dataElement,
-                      period,
-                      orgUnit,
-                      categoryOptionCombo,
-                      mechanism_code) %>% #TODO: Coordinate with Jason on this name change
-      dplyr::summarise(value = sum(value)) %>%
-      dplyr::ungroup() %>%
-      #Remove anything which is NA here, 
-      #like TX_PVLS.N.Age/Sex/Indication/HIVStatus.20T.Routine
-      dplyr::filter(complete.cases(.))
+    d$datim$PSNUxIM <- packSNUxIM(d$data$distributedMER)
     
   }
   

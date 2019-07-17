@@ -41,44 +41,25 @@ unPackDataPackSheet <- function(d, sheet) {
       sheet_name = sheet
       ) %>%
   # Select only target-related columns
-    dplyr::select(
-      PSNU,
-      psnuid,
-      sheet_name,
-      Age,
-      Sex,
-      KeyPop,
-      dplyr::one_of(target_cols))
-  
-  if (sheet == "Prioritization") {
-    d$data$extract %<>%
-      dplyr::mutate(
-        IMPATT.PRIORITY_SNU.20T =  #TODO: Remove references to dated columns
-          as.numeric(
-            stringr::str_sub(
-              IMPATT.PRIORITY_SNU.20T,
-              start = 1,
-              end = 2
-            )
-          )
-      )
-  }
+    dplyr::select(PSNU, psnuid, sheet_name, Age, Sex, KeyPop,
+                  dplyr::one_of(target_cols))
   
   # Gather all indicators as single column for easier processing
   d$data$extract %<>%
     tidyr::gather(key = "indicator_code",
                   value = "value",
-                  -PSNU,
-                  -psnuid,
-                  -Age,
-                  -Sex,
-                  -KeyPop,
-                  -sheet_name) %>%
+                  -PSNU, -psnuid, -Age, -Sex, -KeyPop, -sheet_name) %>%
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value) %>%
   # Drop NAs ####
-    tidyr::drop_na(value)
-
-  # TODO: Move Prioritization mutate here?
+    tidyr::drop_na(value) %>%
+  # Convert Prioritization from text to short-number.
+    dplyr::mutate(
+      value = dplyr::case_when(
+        stringr::str_detect(indicator_code,"IMPATT.PRIORITY_SNU")
+          ~ stringr::str_sub(value, start = 1, end = 2),
+        TRUE ~ value
+        )
+      )
   
   # TEST for non-numeric values ####
   non_numeric <- d$data$extract %>%
@@ -136,11 +117,13 @@ unPackDataPackSheet <- function(d, sheet) {
   }
   
   # TEST for Decimal values ####
-  if (any(d$data$extract$value %% 1 != 0)) {
-    decimal_cols <- d$data$extract %>%
-      dplyr::filter(value %% 1 != 0) %>%
-      dplyr::pull(indicator_code) %>%
-      unique()
+  decimal_cols <- d$data$extract %>%
+    dplyr::filter(value %% 1 != 0,
+                  indicator_code != c("HIV_PREV.N.Age/Sex/HIVStatus.20T")) %>% # Embed something about type allowance into schema to automate this
+    dplyr::pull(indicator_code) %>%
+    unique()
+  
+  if (NROW(decimal_cols) > 0) {
     
     d[["tests"]][["decimal_cols"]][[as.character(sheet)]] <- decimal_cols
     
