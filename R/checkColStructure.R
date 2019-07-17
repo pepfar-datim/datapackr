@@ -42,7 +42,7 @@ checkColStructure <- function(d, sheet) {
     
     warning_msg <-
       paste0(
-        "In tab ",
+        "WARNING! In tab ",
         sheet,
         ", MISSING COLUMNS: Note that this may be due to missing/renamed sheets,
         or added or renamed columns. ->  \n  * ",

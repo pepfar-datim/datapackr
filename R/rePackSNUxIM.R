@@ -111,7 +111,7 @@ rePackPSNUxIM <- function(d) {
     
     warning_msg <-
       paste0(
-        "ERROR!: ",
+        "WARNING!: ",
         NROW(imbalancedDistribution),
         " cases where distributed total is either more or less than total Target.",
         " To identify these, go to your SNU x IM tab and filter the Rollup column for Pink cells.",
@@ -120,7 +120,6 @@ rePackPSNUxIM <- function(d) {
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
-    d$info$has_error <- TRUE
     
   }
   

@@ -79,7 +79,7 @@ unPackDataPackSheet <- function(d, sheet) {
     
     warning_msg <-
       paste0(
-        "In tab ",
+        "WARNING! In tab ",
         sheet,
         ": NON-NUMERIC VALUES found! ->  \n\t* ", 
         paste(non_numeric, collapse = "\n\t* "),
@@ -118,8 +118,8 @@ unPackDataPackSheet <- function(d, sheet) {
   
   # TEST for Decimal values ####
   decimal_cols <- d$data$extract %>%
-    dplyr::filter(value %% 1 != 0,
-                  indicator_code != c("HIV_PREV.N.Age/Sex/HIVStatus.20T")) %>% # Embed something about type allowance into schema to automate this
+    dplyr::filter(value %% 1 != 0
+                  & indicator_code != c("HIV_PREV.NA.Age/Sex/HIVStatus.20T")) %>% # Embed something about type allowance into schema to automate this
     dplyr::pull(indicator_code) %>%
     unique()
   
@@ -160,7 +160,7 @@ unPackDataPackSheet <- function(d, sheet) {
       paste0(
         "ERROR! In tab ",
         sheet,
-        ": DUPLICATE ROWS. Duplicates are not permitted. -> \n\t",
+        ": DUPLICATE ROWS found. Duplicates are not permitted. -> \n\t",
         paste(dupes_msg, collapse = "\n\t"),
         "\n")
     
