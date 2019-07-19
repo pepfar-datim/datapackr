@@ -80,7 +80,7 @@ selectOU <- function() {
 getIMPATTLevels <- function(){
   impatt_levels <-
     paste0(getOption("baseurl"),"api/",datapackr::api_version(),
-           "/dataStore/dataSetAssignments/ous") %>%
+           "/dataStore/dataSetAssignments/orgUnitLevels") %>%
     httr::GET() %>%
     httr::content(., "text") %>%
     jsonlite::fromJSON(., flatten = TRUE) %>%
