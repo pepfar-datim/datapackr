@@ -4,8 +4,8 @@
 \alias{packDataPack}
 \title{Pack a Data Pack}
 \usage{
-packDataPack(datapack_uid, country_uids, template_path = NA,
-  output_folder = getwd())
+packDataPack(datapack_uid = NA, country_uids = NA,
+  template_path = NA, output_folder = getwd())
 }
 \arguments{
 \item{datapack_uid}{Unique ID to assign Data Pack. Usually the same as

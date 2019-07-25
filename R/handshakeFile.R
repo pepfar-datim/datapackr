@@ -33,20 +33,24 @@ canReadFile <- function(path) {
 #' 
 #' @param path Filepath to test and use.
 #' @param extension File extension to test for. (Do not include leading period.)
-#' @param tool What type of tool is the submission file? Default is "Data Pack".
-#' Other options include "Site Tool", "Mechanism Map", and "Site Filter".
+#' @param tool What type of tool is the submission file? Options include 
+#' "Data Pack", "Data Pack Template", Site Tool", "Site Tool Template",
+#' "Mechanism Map", and "Site Filter".
 #' 
 #' @return Character vector containing valid filepath for further use.
 #' 
 handshakeFile <- function(path = NA,
-                          tool = "Data Pack") {
+                          tool = NA) {
   
-  if (tool %in% c("Data Pack", "Site Tool", "Mechanism Map")) {
+  if (tool %in% c("Data Pack", "Data Pack Template", "Site Tool",
+                  "Site Tool Template", "Mechanism Map")) {
     extension = "xlsx"
   } else if (tool == "Site Filter") {
     extension = "csv"
   } else {
-    stop("Please select correct file type: Data Pack, Site Tool, Mechanism Map, or Site Filter.")
+    stop(
+      "Please specify correct file type: Data Pack, Data Pack Template, Site Tool,
+      Site Tool Template, Mechanism Map, Data Pack Template, or Site Filter.")
     }
   
   # If path has issues or NA, prompt user to select file from window.

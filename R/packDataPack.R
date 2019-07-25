@@ -1,8 +1,3 @@
-
-
-
-
-
 #' @export
 #' @importFrom magrittr %>% %<>%
 #' @title Pack a Data Pack
@@ -26,8 +21,8 @@
 #' @return Exports a Data Pack to Excel within \code{output_folder}.
 #'
 
-packDataPack <- function(datapack_uid,
-                         country_uids,
+packDataPack <- function(datapack_uid = NA, #TODO: Do we need datapack_uid anymore?
+                         country_uids = NA,
                          template_path = NA,
                          output_folder = getwd()) {
   
@@ -45,8 +40,8 @@ packDataPack <- function(datapack_uid,
   )
   
   # Open template ####
-  d$keychain$template_path <- handshake_file(d$keychain$template_path,
-                                             extension = "xlsx")
+  d$keychain$template_path <- handshakeFile(path = d$keychain$template_path,
+                                             tool = "Data Pack Template")
   
   wb <- openxlsx::loadWorkbook(d$keychain$template_path)
   

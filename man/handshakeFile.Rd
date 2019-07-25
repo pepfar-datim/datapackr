@@ -4,13 +4,14 @@
 \alias{handshakeFile}
 \title{Test an input file for read access and type. Prompt if issues.}
 \usage{
-handshakeFile(path = NA, tool = "Data Pack")
+handshakeFile(path = NA, tool = NA)
 }
 \arguments{
 \item{path}{Filepath to test and use.}
 
-\item{tool}{What type of tool is the submission file? Default is "Data Pack".
-Other options include "Site Tool", "Mechanism Map", and "Site Filter".}
+\item{tool}{What type of tool is the submission file? Options include 
+"Data Pack", "Data Pack Template", Site Tool", "Site Tool Template",
+"Mechanism Map", and "Site Filter".}
 
 \item{extension}{File extension to test for. (Do not include leading period.)}
 }
