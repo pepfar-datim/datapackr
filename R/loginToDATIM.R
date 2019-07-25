@@ -34,7 +34,7 @@ LoadConfigFile <- function(config_path = NA) {
 #'
 #' @return Version of the API
 #' 
-api_version <- function() { "29" }
+api_version <- function() { "30" }
 
 
 #' @title Check login credentials
