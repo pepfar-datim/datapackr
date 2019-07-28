@@ -93,3 +93,38 @@ api_get <- function(api_call) {
     
   return(r)
 }
+
+
+#' @export
+#' @title Query DATIM SQL View.
+#' 
+#' @description
+#' Queries a DATIM SQL View and returns data object.
+#' 
+#' @param sqlView uid of sqlView table to query.
+#' @param var Variable to substitute into SQL query. Only supply if SQL view is
+#' of type query.
+#' 
+#' @return Web-encoded URL for DATIM API query.
+#' 
+api_sql_call <- function(sqlView, var = NA) {
+  
+  URL <-   
+    paste0(
+      getOption("baseurl"),"api/",datapackr::api_version(),
+      "/sqlViews/",
+      sqlView,
+      "/data.csv?",
+      ifelse(!is.na(var),paste0("var=dataSets:",var,"&"),""),
+      "paging=false") %>%
+    utils::URLencode()
+    
+  r <- 
+    URL %>%
+    httr::GET() %>%
+    httr::content(., "text") %>%
+    readr::read_csv()
+    
+  return(r)
+  
+}

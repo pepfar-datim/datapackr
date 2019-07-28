@@ -4,7 +4,7 @@
 \alias{unPackSchema_datapack}
 \title{Extract and save schema from Data Pack template.}
 \usage{
-unPackSchema_datapack(filepath, skip = NA)
+unPackSchema_datapack(filepath = NA, skip = NA)
 }
 \arguments{
 \item{skip}{Character vector of Sheet Names to label for skipping in schema.}
