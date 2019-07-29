@@ -82,13 +82,38 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
       fullCodeList, by = c("dataelement_dsd" = "dataelementuid")
     )
   
-  schema[schema == "NULL"] <- NA_character_
+  # Add skipped sheets
+  skipped_schema <- matrix(nrow = 0, ncol = NCOL(schema)) %>%
+    as.data.frame() %>%
+    setNames(names(schema)) %>%
+    tibble::add_row(sheet_name = skip, sheet_num = 1:4)
+  
+  skipped_schema[] <- mapply(FUN = as, skipped_schema, sapply(schema, class), SIMPLIFY = FALSE)
+  
+  
+  schema %<>%
+    dplyr::bind_rows(skipped_schema, .) %>%
+    dplyr::mutate(
+      data_structure =
+        dplyr::case_when(sheet_name %in% skip ~ "skip",
+                         TRUE ~ "normal")) %>%
+    dplyr::select(sheet_num, sheet_name, data_structure, dplyr::everything())
+  
+  schema[schema == "NULL" | schema == "NA"] <- NA_character_
   
   
   
   # TEST schema is valid
   tests <- schema %>%
+    dplyr::left_join(
+      data.frame(
+        "sheet_name" = sheets,
+        "sheet_num.test" = 1:length(sheets),
+        stringsAsFactors = FALSE),
+      by = "sheet_name") %>%
     dplyr::mutate(
+      sheet_num.test = sheet_num != sheet_num.test,
+      sheet_name.test = !sheet_name %in% sheets,
       dataelement_dsd.test = 
         !stringr::str_detect(dataelement_dsd, "^([A-Za-z][A-Za-z0-9]{10})$"),
       dataelement_ta.test = 
@@ -98,25 +123,29 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
           categoryoption_specified,
           "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$"),
       dataset.test = 
-        (col_type %in% c("reference","assumption","calculation","row_header", "allocation") 
-         & !dataset %in% c("datapack"))
-      | (col_type %in% c("target","past") 
-         & !dataset %in% c("mer","impatt","subnat"))
-      | (!dataset %in% c("impatt","subnat","mer","datapack")),
+        dplyr::case_when(
+          col_type %in% c("reference","assumption","calculation","row_header","allocation") 
+            ~ !dataset %in% c("datapack"),
+          col_type %in% c("target","past") ~ !dataset %in% c("mer","impatt","subnat"),
+          sheet_num %in% 1:4 ~ !is.na(dataset),
+          TRUE ~ TRUE),
       col_type.test = 
-        !col_type %in% c("target","reference","assumption","calculation", "past",
-                        "row_header","allocation"),
+        (!col_type %in% c("target","reference","assumption","calculation", "past",
+                        "row_header","allocation"))
+        & (sheet_num %in% 1:4 & !is.na(col_type)),
       value_type.test =
-        !value_type %in% c("integer","percentage","string")
+        (!value_type %in% c("integer","percentage","string"))
+        & (sheet_num %in% 1:4 & !is.na(value_type))
     ) %>%
     dplyr::select(sheet_name,indicator_code,dplyr::matches("test")) %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("test")), dplyr::any_vars(. == TRUE))
   
-  tests[is.na(tests)] <- ""
-  tests[tests == FALSE] <- ""
-  tests[tests == TRUE] <- "ERROR!"
-  
   if (NROW(tests) > 0) {
+    
+    tests[is.na(tests)] <- ""
+    tests[tests == FALSE] <- ""
+    tests[tests == TRUE] <- "ERROR!"
+    
     stop_msg <-
       capture.output(
         print(as.data.frame(tests), row.names = FALSE)
