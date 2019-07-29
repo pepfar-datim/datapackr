@@ -1,4 +1,3 @@
-#' @export
 #' @importFrom magrittr %>% %<>%
 #' @importFrom utils URLencode
 #' @title Compile valid categoryOptions for a given dataset

@@ -12,26 +12,25 @@
 #'
 unPackSchema_datapack <- function(filepath = NA, skip = NA) {
   
+  # Check the filepath is valid. If NA, request via window.
   filepath <- handshakeFile(path = filepath,
                             tool = "Data Pack Template")
-  
-  sheets <- tidyxl::xlsx_sheet_names(filepath)
-  verbose_sheets <- sheets[!sheets %in% skip]
   
   schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = FALSE) %>%
     dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
   
+  # Add sheet number based on order of occurrence in workbook, rather than A-Z
   data.table::setDT(schema)[,sheet_num:=.GRP, by = c("sheet_name")]
+  
+  # Skip detail on listed sheets.
+  sheets <- tidyxl::xlsx_sheet_names(filepath)
+  verbose_sheets <- sheets[!sheets %in% skip]
   
   schema %<>%
     dplyr::filter(sheet_name %in% verbose_sheets,
                   row %in% c(5:12)) %>%
-    dplyr::mutate(
-      character =
-        stringr::str_replace(
-          character,
-          "dataset|col_type|value_type|dataelement_dsd|dataelement_ta|categoryoption",
-          NA_character_)) %>%
+    
+  # Gather and Spread to get formula, value, and indicator_code in separate cols
     tidyr::gather(key,value,-sheet_num,-sheet_name,-col,-row) %>%
     tidyr::unite(new.col, c(key,row)) %>%
     tidyr::spread(new.col,value) %>%
@@ -41,38 +40,51 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
                   value_type = character_7,
                   dataelement_dsd = character_8,
                   dataelement_ta = character_9,
-                  categoryoption = character_10,
+                  categoryoption_specified = character_10,
                   indicator_code = character_11,
                   formula = formula_12,
                   value = numeric_12) %>%
-    dplyr::mutate(
-      formula = dplyr::case_when(is.na(formula) ~ value,
-                                 TRUE ~ formula),
-      col_type =
-        dplyr::case_when(
-          indicator_code %in% c("PSNU","Age","Sex","ID","AgeCoarse","IDAgeCoarse",
-                                "PSNUCheck","KeyPop","sheet_name","indicatorCode",
-                                "CoarseAge","sheet_num")
-            ~ "row_header",
-          TRUE ~ col_type),
-      value_type =
-        dplyr::case_when(
-          indicator_code %in% c("PSNU","Age","Sex","ID","AgeCoarse","IDAgeCoarse",
-                                "PSNUCheck","KeyPop","sheet_name","indicatorCode",
-                                "CoarseAge","sheet_num")
-          ~ "string",
-          TRUE ~ value_type),
-      dataset =
-        dplyr::case_when(
-          indicator_code %in% c("PSNU","Age","Sex","ID","AgeCoarse","IDAgeCoarse",
-                                "PSNUCheck","KeyPop","sheet_name","indicatorCode",
-                                "CoarseAge","sheet_num")
-          ~ "datapack",
-          TRUE ~ dataset)) %>%
+    dplyr::mutate(formula = dplyr::if_else(is.na(formula), value, formula)) %>%
     dplyr::select(sheet_num, sheet_name, col, indicator_code, dataset, col_type,
-                  value_type, dataelement_dsd, dataelement_ta, categoryoption,
+                  value_type, dataelement_dsd, dataelement_ta, categoryoption_specified,
                   formula) %>%
     dplyr::arrange(sheet_num, col)
+  
+  # Pull list of valid disaggs
+  codeList <- DEs_COCs_COs_Cs()
+    
+  fullCodeList <- codeList %>%
+  # Rename Key Population to match Data Pack namecon
+    dplyr::select(dataelement, dataelementuid,
+                  categoryoptioncombo, categoryoptioncombouid,
+                  Age, Sex, KeyPop = `Key Population`) %>%
+      
+  # Drop other COs to only summarize Age, Sex, KP
+    dplyr::distinct() %>%
+    
+  # Group Age, Sex, KP into single list col, and categoryoption name and id
+    # into another col
+    dplyr::group_by(dataelement, dataelementuid)
+  
+  match <- list("categoryoptioncombo", "Age|Sex|KeyPop")
+  key <- list("valid_cocs", "valid_cos")
+  
+  fullCodeList <- purrr::map2(.x = match, .y = key, 
+                     ~ fullCodeList %>%
+                       dplyr::select("dataelement","dataelementuid",dplyr::matches(.x)) %>%
+                       tidyr::nest(.key = !! rlang::sym(.y))) %>%
+    dplyr::bind_cols() %>%
+    dplyr::select(-dataelement1,-dataelementuid1, -dataelement)
+    
+  # Add valid disaggs to schema
+  schema %<>%
+    dplyr::left_join(
+      fullCodeList, by = c("dataelement_dsd" = "dataelementuid")
+    )
+  
+  schema[schema == "NULL"] <- NA_character_
+  
+  
   
   # TEST schema is valid
   tests <- schema %>%
@@ -82,7 +94,9 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
       dataelement_ta.test = 
         !stringr::str_detect(dataelement_ta, "^([A-Za-z][A-Za-z0-9]{10})$"),
       categoryoption.test = 
-        !stringr::str_detect(categoryoption, "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$"),
+        !stringr::str_detect(
+          categoryoption_specified,
+          "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$"),
       dataset.test = 
         (col_type %in% c("reference","assumption","calculation","row_header", "allocation") 
          & !dataset %in% c("datapack"))

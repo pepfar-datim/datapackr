@@ -10,7 +10,7 @@ pullDATIMCodeList(dataset)
 \item{dataset}{Dataset uid to query.}
 }
 \value{
-Combined code list as dataframe.
+Code list as dataframe.
 }
 \description{
 Pulls the DATIM code list for specified datasets.

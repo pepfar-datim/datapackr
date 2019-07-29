@@ -6,7 +6,7 @@
 #' 
 #' @param dataset Dataset uid to query.
 #' 
-#' @return Combined code list as dataframe.
+#' @return Code list as dataframe.
 #'
 pullDATIMCodeList <- function(dataset) {
   
