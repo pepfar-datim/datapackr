@@ -11,12 +11,13 @@
 #' @return d
 #' 
 unPackDataPackSheet <- function(d, sheet) {
+  start_row <- startRow("Data Pack")
   
   d$data$extract <-
     readxl::read_excel(
       path = d$keychain$submission_path,
       sheet = sheet,
-      range = readxl::cell_limits(c(5, 1), c(NA, NA)),
+      range = readxl::cell_limits(c(start_row, 1), c(NA, NA)),
       col_types = "text"
     )
   
@@ -26,7 +27,7 @@ unPackDataPackSheet <- function(d, sheet) {
   # List Target Columns
   target_cols <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet
-                  & col_type == "Target"
+                  & col_type == "target"
   # Filter by what's in submission to avoid unknown column warning messages
                   & indicator_code %in% colnames(d$data$extract)) %>%
     dplyr::pull(indicator_code)
@@ -117,9 +118,17 @@ unPackDataPackSheet <- function(d, sheet) {
   }
   
   # TEST for Decimal values ####
+  decimals_allowed <- d$info$schema %>%
+    dplyr::filter(sheet_name == sheet
+                  & col_type == "target"
+                  # Filter by what's in submission to avoid unknown column warning messages
+                  & indicator_code %in% colnames(d$data$extract)
+                  & value_type == "percentage") %>%
+    dplyr::pull(indicator_code)
+    
   decimal_cols <- d$data$extract %>%
     dplyr::filter(value %% 1 != 0
-                  & indicator_code != c("HIV_PREV.NA.Age/Sex/HIVStatus.20T")) %>% # Embed something about type allowance into schema to automate this
+                  & !indicator_code %in% decimals_allowed) %>%
     dplyr::pull(indicator_code) %>%
     unique()
   

@@ -6,15 +6,6 @@
 default_catOptCombo <- function() { "HllvX50cXC0" }
 
 
-#' @export
-#' @title Returns current COP Year
-#'
-#' @return Current COP Year. (e.g., for COP19, returns 2019)
-#' 
-cop_year <- function() { 2019 }
-
-
-
 #' @title Round at 0.5 toward integer with highest absolute value
 #'
 #' @description
@@ -499,4 +490,23 @@ addcols <- function(data, cnames) {
   
   return(data)
   
+}
+
+#' @export
+#' @title Return current FY based on system date.
+#' 
+#' @return Current FY as numeric.
+#'
+currentFY <- function() {
+  current_year <- Sys.Date() %>%
+    format("%Y") %>%
+    as.numeric()
+  
+  current_month <- Sys.Date() %>%
+    format("%m") %>%
+    as.numeric()
+  
+  current_FY <- ifelse(current_month > 9, current_year + 1, current_year)
+  
+  return(current_FY)
 }

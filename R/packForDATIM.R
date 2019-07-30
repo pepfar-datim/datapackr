@@ -16,22 +16,11 @@ packForDATIM <- function(d, type = NA) {
   
   if (is.na(type)) {
     stop("Please specify data type in parameters: 'PSNUxIM', 'SUBNAT_IMPATT', or 'Site'")
-  }
-  
-  if (type == "SUBNAT_IMPATT") {
-    
+  } else if (type == "SUBNAT_IMPATT") {
     d$datim$SUBNAT_IMPATT <- packSUBNAT_IMPATT(d$data$SUBNAT_IMPATT)
-    
-  }
-  
-  if (type == "PSNUxIM") {
-    
+  } else if (type == "PSNUxIM") {
     d$datim$PSNUxIM <- packSNUxIM(d$data$distributedMER)
-    
-  }
-  
-  if (type == "Site") {
-    
+  } else if (type == "Site") {
     d$datim$decimal_values <- d$data$targets %>% 
       dplyr::filter(value %% 1 != 0)
     
@@ -70,7 +59,7 @@ packForDATIM <- function(d, type = NA) {
       
       msg <- paste0("ERROR! Empty values found in DATIM export. These will
                      be filtered.")
-      d$info$warningMsg <- append(msg,d$info$warningMsg)
+      d$info$warningMsg <- append(msg, d$info$warningMsg)
       d$info$has_error <- TRUE
     }
     

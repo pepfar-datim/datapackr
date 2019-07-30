@@ -16,8 +16,8 @@ separateDataSets <- function(d) {
     dplyr::filter(
       indicator_code %in% (
         d$info$schema %>%
-          dplyr::filter(col_type == "Target",
-                        dataset == "MER") %>%
+          dplyr::filter(col_type == "target",
+                        dataset == "mer") %>%
           dplyr::pull(indicator_code)
       )
     )
@@ -26,8 +26,8 @@ separateDataSets <- function(d) {
     dplyr::filter(
       indicator_code %in% (
         d$info$schema %>%
-          dplyr::filter(col_type == "Target",
-                        dataset %in% c("SUBNAT", "IMPATT")) %>%
+          dplyr::filter(col_type == "target",
+                        dataset %in% c("subnat", "impatt")) %>%
           dplyr::pull(indicator_code)
       )
     )

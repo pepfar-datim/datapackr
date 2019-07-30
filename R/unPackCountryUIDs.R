@@ -21,7 +21,7 @@ unPackCountryUIDs <- function(submission_path = NA,
     readxl::read_excel(
       path = submission_path,
       sheet = "Home",
-      range = "B25") %>%
+      range = countryUIDs_homeCell()) %>%
     names() %>%
     stringr::str_remove_all("\\s") %>%
     stringr::str_split(",") %>%
@@ -42,14 +42,16 @@ unPackCountryUIDs <- function(submission_path = NA,
   if (length(invalid_uids) > 0) {
     msg <-
       paste0(
-        "Cell B25 in the Home tab of your ",
+        "Cell ",countryUIDs_homeCell()," in the Home tab of your ",
         tool,
         " contains the following Regional OU uids: \n\n  * ",
         paste(invalid_uids, collapse = "\n  * "),
         "\n\nThis approach is no longer supported.",
         " Please return to your ",
         tool,
-        " and enter a list of DATIM country-level uids separated by commas in cell B25 of the Home tab.")
+        " and enter a list of DATIM country-level uids separated by commas in cell",
+        countryUIDs_homeCell(),
+        " of the Home tab.")
     
     stop(msg)
   }

@@ -13,8 +13,9 @@ unPackSheets <- function(d) {
   # Get sheets list
   sheets <- d$info$schema %>%
     dplyr::select(sheet_name) %>%
-    dplyr::filter(sheet_name != "SNU x IM") %>%
     dplyr::distinct() %>%
+    dplyr::filter(!sheet_name %in% skip_tabs(tool = d$info$tool)
+                  & sheet_name != "SNU x IM") %>%
     dplyr::pull(sheet_name)
   
   actual_sheets <- readxl::excel_sheets(d$keychain$submission_path)

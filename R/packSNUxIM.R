@@ -17,7 +17,6 @@ packSNUxIM <- function(data) {
   
   if (any(names(data) != SNUxIM.schema.names)) {
     error_msg <- "ERROR occurred while preparing SNUxIM data for DATIM. Columns not as expected."
-    
     stop(error_msg)
   }
 
@@ -41,7 +40,7 @@ packSNUxIM <- function(data) {
       mechanism_code,
       value) %>%
     dplyr::group_by(dataElement, period, orgUnit,categoryOptionCombo,
-                    mechanism_code) %>% #TODO: Coordinate with Jason on this name change
+                    mechanism_code) %>% #TODO: Coordinate with self-service on this name change
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup() %>%
   # Coerce decimals to integers now

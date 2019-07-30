@@ -1,4 +1,5 @@
 #' @export
+#' @importFrom data.table :=
 #' @title Extract and save schema from Data Pack template.
 #' 
 #' @description
@@ -28,14 +29,14 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
   
   schema %<>%
     dplyr::filter(sheet_name %in% verbose_sheets,
-                  row %in% c(5:12)) %>%
+                  row %in% c(5:(startRow("Data Pack Template")+1))) %>%
     
   # Gather and Spread to get formula, value, and indicator_code in separate cols
     tidyr::gather(key,value,-sheet_num,-sheet_name,-col,-row) %>%
     tidyr::unite(new.col, c(key,row)) %>%
     tidyr::spread(new.col,value) %>%
     dplyr::select(sheet_num, sheet_name, col,
-                  dataset = character_5,
+                  dataset = character_5, # TODO: Find a way to not have to alter this manually in case template changes
                   col_type = character_6,
                   value_type = character_7,
                   dataelement_dsd = character_8,
@@ -86,10 +87,9 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
   skipped_schema <- matrix(nrow = 0, ncol = NCOL(schema)) %>%
     as.data.frame() %>%
     setNames(names(schema)) %>%
-    tibble::add_row(sheet_name = skip, sheet_num = 1:4)
+    tibble::add_row(sheet_name = skip, sheet_num = 1:length(skip))
   
   skipped_schema[] <- mapply(FUN = as, skipped_schema, sapply(schema, class), SIMPLIFY = FALSE)
-  
   
   schema %<>%
     dplyr::bind_rows(skipped_schema, .) %>%
@@ -104,6 +104,12 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
   
   
   # TEST schema is valid
+  skip_sheets_num <- schema %>%
+    dplyr::filter(sheet_name %in% skip) %>%
+    dplyr::select(sheet_num) %>%
+    dplyr::distinct() %>%
+    dplyr::pull()
+  
   tests <- schema %>%
     dplyr::left_join(
       data.frame(
@@ -127,15 +133,15 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
           col_type %in% c("reference","assumption","calculation","row_header","allocation") 
             ~ !dataset %in% c("datapack"),
           col_type %in% c("target","past") ~ !dataset %in% c("mer","impatt","subnat"),
-          sheet_num %in% 1:4 ~ !is.na(dataset),
+          sheet_num %in% skip_sheets_num ~ !is.na(dataset),
           TRUE ~ TRUE),
       col_type.test = 
         (!col_type %in% c("target","reference","assumption","calculation", "past",
                         "row_header","allocation"))
-        & (sheet_num %in% 1:4 & !is.na(col_type)),
+        & (sheet_num %in% skip_sheets_num & !is.na(col_type)),
       value_type.test =
         (!value_type %in% c("integer","percentage","string"))
-        & (sheet_num %in% 1:4 & !is.na(value_type))
+        & (sheet_num %in% skip_sheets_num & !is.na(value_type))
     ) %>%
     dplyr::select(sheet_name,indicator_code,dplyr::matches("test")) %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("test")), dplyr::any_vars(. == TRUE))

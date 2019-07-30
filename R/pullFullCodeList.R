@@ -11,17 +11,8 @@
 #' @return Combined code list as dataframe.
 #'
 pullFullCodeList <- function(FY = NA, datastream = NA) {
-  current_year <- Sys.Date() %>%
-    format("%Y") %>%
-    as.numeric()
   
-  current_month <- Sys.Date() %>%
-    format("%m") %>%
-    as.numeric()
-  
-  current_FY <- ifelse(current_month > 9, current_year + 1, current_year)
-  
-  if (is.na(FY)) {FY = current_FY}
+  if (is.na(FY)) {FY = currentFY()}
   
   if (is.na(datastream)) {datastream = c("MER", "SUBNAT", "IMPATT")}
   
@@ -35,10 +26,10 @@ pullFullCodeList <- function(FY = NA, datastream = NA) {
       ) %>%
     dplyr::mutate(
       fiscal_year = dplyr::case_when(
-        stringr::str_detect(displayName, "FY", negate = TRUE) ~ current_FY+1,
+        !stringr::str_detect(displayName, "FY") ~ currentFY()+1,
         TRUE ~ as.numeric(stringr::str_extract(displayName,"(?<=FY)\\d{4}$"))
       ),
-      data_stream =dplyr::case_when(
+      data_stream = dplyr::case_when(
         stringr::str_detect(displayName, "^MER ") ~ "MER",
         stringr::str_detect(displayName, "^Host Country Targets") ~ "SUBNAT",
         stringr::str_detect(displayName, "^Planning Attributes") ~ "IMPATT",
