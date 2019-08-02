@@ -13,17 +13,17 @@
 #'
 unPackSchema_datapack <- function(filepath = NA, skip = NA) {
   
-  # Check the filepath is valid. If NA, request via window.
+  # Check the filepath is valid. If NA, request via window. ####
   filepath <- handshakeFile(path = filepath,
                             tool = "Data Pack Template")
   
   schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = FALSE) %>%
     dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
   
-  # Add sheet number based on order of occurrence in workbook, rather than A-Z
+  # Add sheet number based on order of occurrence in workbook, rather than A-Z ####
   data.table::setDT(schema)[,sheet_num:=.GRP, by = c("sheet_name")]
   
-  # Skip detail on listed sheets.
+  # Skip detail on listed sheets. ####
   sheets <- tidyxl::xlsx_sheet_names(filepath)
   verbose_sheets <- sheets[!sheets %in% skip]
   
@@ -31,12 +31,12 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
     dplyr::filter(sheet_name %in% verbose_sheets,
                   row %in% c(5:(headerRow("Data Pack Template")+1))) %>%
     
-  # Gather and Spread to get formula, value, and indicator_code in separate cols
+  # Gather and Spread to get formula, value, and indicator_code in separate cols ####
     tidyr::gather(key,value,-sheet_num,-sheet_name,-col,-row) %>%
     tidyr::unite(new.col, c(key,row)) %>%
     tidyr::spread(new.col,value) %>%
     dplyr::select(sheet_num, sheet_name, col,
-                  dataset = character_5, # TODO: Find a way to automate these suffixes
+                  dataset = character_5, # TODO: Find a way to automate these suffixes ####
                   col_type = character_6,
                   value_type = character_7,
                   dataelement_dsd = character_8,
@@ -49,12 +49,19 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
                   formula = formula_15,
                   value = numeric_15) %>%
     
-  # When formula is empty, pull from value (Assumed value)
+  # When formula is empty, pull from value (Assumed value) ####
     dplyr::mutate(formula = dplyr::if_else(is.na(formula), value, formula))
   
-  # Translate valid disaggs
+  # Translate valid disaggs ####
   five_yr_ages <- c("<01","01-04","05-09","10-14","15-19","20-24","25-29",
                     "30-34","35-39","40-44","45-49","50+")
+  five_year_ages.25_49 <- five_yr_ages[7:11]
+  five_yr_ages.1plus <- five_yr_ages[2:12]
+  five_yr_ages.15plus <- five_yr_ages[5:12]
+  five_yr_ages.10plus <- five_yr_ages[4:12]
+  ovc_ages <- c(five_yr_ages[1:4],"15-17","18+")
+  coarse_ages <- c("<15","15+")
+  
   coarse_kps <- c("FSW","MSM","PWID","TG",
                   "People in prisons and other enclosed settings")
   finer_kps <- c("Female PWID","Male PWID","MSM not SW",
@@ -66,12 +73,12 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
     dplyr::mutate(
       valid_ages = dplyr::case_when(
         valid_ages == "5 yr" ~ list(five_yr_ages),
-        valid_ages == "5 yr, 25-49" ~ list(five_yr_ages[7:11]),
-        valid_ages == "15s" ~ list(c("<15","15+")),
-        valid_ages == "5 yr, 1+" ~ list(five_yr_ages[2:12]),
-        valid_ages == "5 yr, 15+" ~ list(five_yr_ages[5:12]),
-        valid_ages == "5 yr, 10+" ~ list(five_yr_ages[4:12]),
-        valid_ages == "5 yr, <01-18+" ~ list(c(five_yr_ages[1:4],"15-17","18+"))),
+        valid_ages == "5 yr, 25-49" ~ list(five_year_ages.25_49),
+        valid_ages == "15s" ~ list(coarse_ages),
+        valid_ages == "5 yr, 1+" ~ list(five_yr_ages.1plus),
+        valid_ages == "5 yr, 15+" ~ list(five_yr_ages.15plus),
+        valid_ages == "5 yr, 10+" ~ list(five_yr_ages.10plus),
+        valid_ages == "5 yr, <01-18+" ~ list(ovc_ages)),
       valid_sexes = dplyr::case_when(
         valid_sexes == "M/F" ~ list(c("Male", "Female")),
         valid_sexes == "M" ~ list(c("Male")),
@@ -137,7 +144,7 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
   #     fullCodeList, by = c("dataelement_dsd" = "dataelementuid")
   #   )
   
-  # Add skipped sheets
+  # Add skipped sheets ####
   skipped_schema <- matrix(nrow = 0, ncol = NCOL(schema)) %>%
     as.data.frame() %>%
     setNames(names(schema)) %>%
@@ -156,7 +163,7 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
   schema[schema == "NULL" | schema == "NA"] <- NA_character_
   
   
-  # TEST schema is valid
+  # TEST schema is valid ####
   skip_sheets_num <- schema %>%
     dplyr::filter(sheet_name %in% skip) %>%
     dplyr::select(sheet_num) %>%
@@ -196,10 +203,10 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
         (!value_type %in% c("integer","percentage","string"))
         & (sheet_num %in% skip_sheets_num & !is.na(value_type)),
       valid_ages.test =
-        !valid_ages %in% c(list(five_yr_ages),list(five_yr_ages[7:11]),
-                           list(five_yr_ages[2:12]),list(five_yr_ages[5:12]),
-                           list(five_yr_ages[4:12]),list(c("<15","15+")),
-                           list(c(five_yr_ages[1:4],"15-18","18+")),NA_character_),
+        !valid_ages %in% c(list(five_yr_ages),list(five_year_ages.25_49),
+                           list(five_yr_ages.1plus),list(five_yr_ages.15plus),
+                           list(five_yr_ages.10plus),list(coarse_ages),
+                           list(ovc_ages),NA_character_),
       valid_sexes.test =
         !valid_sexes %in% c(list(c("Male","Female")),list(c("Male")),list(c("Female")),NA_character_),
       valid_kps.test =

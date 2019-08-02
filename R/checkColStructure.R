@@ -45,8 +45,8 @@ checkColStructure <- function(d, sheet) {
         "WARNING! In tab ",
         sheet,
         ", MISSING COLUMNS: Note that this may be due to missing/renamed sheets,
-        or added or renamed columns. ->  \n  * ",
-        paste(missing_cols, collapse = "\n  * "),
+        or added or renamed columns. ->  \n\t* ",
+        paste(missing_cols, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)

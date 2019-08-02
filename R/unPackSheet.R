@@ -124,7 +124,7 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::filter(sheet_name == sheet
                   & col_type == "target"
                   # Filter by what's in submission to avoid unknown column warning messages
-                  & indicator_code %in% colnames(d$data$extract)
+                  & indicator_code %in% unique(d$data$extract$indicator_code)
                   & value_type == "percentage") %>%
     dplyr::pull(indicator_code)
     
