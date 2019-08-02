@@ -18,7 +18,7 @@ unPackSNUxIM <- function(d) {
     readxl::read_excel(
       path = d$keychain$submission_path,
       sheet = "SNU x IM",
-      range = readxl::cell_limits(c(startRow(d$info$tool), 1), c(NA, NA)),
+      range = readxl::cell_limits(c(headerRow(d$info$tool), 1), c(NA, NA)),
       col_types = "text"
     )
   

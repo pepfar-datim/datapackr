@@ -7,71 +7,51 @@
 #'    been used.
 #'
 #' @param d Datapackr object.
+#' @param sheet Sheet name.
 #'     
 #' @return d
 #' 
-defunctDisaggs <- function(d) {
-  #TODO: Pull from DATIM instead of manual schema like this
-  #TODO: Allow this to run more modularly (parameterize sheet reference)
-  defunct <- d$data$extract %>%
-    replace(is.na(.), "") %>%
-    dplyr::filter(
-      (stringr::str_detect(indicator_code, "Malnutrition|Pediatric")
-        & Age != "01-04")
-    | (stringr::str_detect(indicator_code, "HTS_RECENT|PrEP")
-        & Age %in% c("01-04", "05-09", "10-14"))
-    | (stringr::str_detect(indicator_code,"HTS_TST_PMTCTPostANC1|PMTCT_STAT|PMTCT_ART")
-        & (Age %in% c("<01", "01-04", "05-09") | Sex == "Male"))
-    | (stringr::str_detect(indicator_code, "HTS_SELF|PP_PREV")
-        & Age %in% c("01-04", "05-09"))
-    | (stringr::str_detect(indicator_code,"(HTS_TST|KP_ESTIMATES|PrEP|TX_NEW)(.)+KeyPop")
-        & !KeyPop %in% c("FSW",
-                         "MSM",
-                         "People in prisons and other enclosed settings",
-                         "PWID",
-                         "TG"))
-    | (stringr::str_detect(indicator_code, "KP_MAT")
-        & !KeyPop %in% c("Female PWID", "Male PWID"))
-    | (stringr::str_detect(indicator_code, "KP_PREV")
-        & !KeyPop %in% c("Female PWID",
-                         "Male PWID",
-                         "FSW",
-                         "MSM not SW",
-                         "MSM SW",
-                         "People in prisons and other enclosed settings",
-                         "TG not SW",
-                         "TG SW"))
-    | (stringr::str_detect(indicator_code, "OVC_SERV")
-        & !Age %in% c("<01", "01-04", "05-09", "10-14", "15-17", "18+"))
-    | (stringr::str_detect(indicator_code, "PRIORITY_SNU")
-        & !value %in% (datapackr::prioritizations %>%
-                         dplyr::pull(value)))
-    | (stringr::str_detect(indicator_code, "VMMC")
-        & (Age %in% c("<01", "01-04", "05-09") | Sex == "Female")))
+defunctDisaggs <- function(d, sheet) {
   
-  # Add in specific cases for OVC_HIVSTAT
-  if (d$info$tool == "Data Pack") {
-    defunct <- d$data$extract %>%
-      replace(is.na(.), "") %>%
-      dplyr::filter(
-        stringr::str_detect(indicator_code, "OVC_HIVSTAT")
-          & !Age %in% c("<01", "01-04", "05-09", "10-14", "15-17", "18+")) %>%
-      dplyr::bind_rows(defunct)
+  if (sheet == "SNU x IM") {
+    stop("Sorry! Can't check the SNU x IM tab with this function.")
+  } else {
+    data = d$data$extract
   }
   
-  if (d$info$tool == "Site Tool") {
-    defunct <- d$data$extract %>%
-      replace(is.na(.), "") %>%
-      dplyr::filter(
-        stringr::str_detect(indicatorCode, "OVC_HIVSTAT")
-          & !Age %in% c("")) %>%
-      dplyr::bind_rows(defunct)
-  }
+  valid_disaggs <- d$info$schema %>%
+    dplyr::filter(sheet_name == sheet,
+                  col_type == "target") %>%
+    dplyr::select(indicator_code, valid_ages, valid_sexes, valid_kps)
   
-  defunct %<>%
+  defunct <- data %>%
+    dplyr::left_join(valid_disaggs, by = c("indicator_code" = "indicator_code")) %>%
+    dplyr::filter(!Age %in% unlist(valid_ages)
+                  | !Sex %in% unlist(valid_sexes)
+                  | !KeyPop %in% unlist(valid_kps)) %>%
     dplyr::select(indicator_code, Age, Sex, KeyPop) %>%
     dplyr::distinct()
   
-  return(defunct)
+  if (NROW(defunct) > 0) {
+    d[["tests"]][["defunct"]][[as.character(sheet)]] <- defunct
+    
+    defunct_msg <- 
+      capture.output(
+        print(as.data.frame(defunct), row.names = FALSE)
+      )
+    
+    warning_msg <-
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ": INVALID DISAGGS ",
+        "(Check MER Guidance for correct alternatives) -> \n\t",
+        paste(defunct_msg, collapse = "\n\t"))
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
+  }
+  
+  return(d)
   
 }

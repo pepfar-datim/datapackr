@@ -4,10 +4,12 @@
 \alias{defunctDisaggs}
 \title{defunctDisaggs(d)}
 \usage{
-defunctDisaggs(d)
+defunctDisaggs(d, sheet)
 }
 \arguments{
 \item{d}{Datapackr object.}
+
+\item{sheet}{Sheet name.}
 }
 \value{
 d

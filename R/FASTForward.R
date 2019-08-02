@@ -66,8 +66,7 @@ FASTforward <- function(d) {
     ) %>%
     dplyr::select(mechanismid = mechanism_code, indicator, disag, value) %>%
     dplyr::group_by(mechanismid, indicator, disag) %>%
-    dplyr::summarise(fy2020_targets = round_trunc(sum(value))) %>%
-    #dplyr::summarise(!!varname := paste0("fy",datapackr::periodInfo,"_targets") = round_trunc(sum(value))) %>%
+    dplyr::summarise(targets = round_trunc(sum(value))) %>%
     dplyr::ungroup() %>%
     tidyr::drop_na(mechanismid) %>%
     dplyr::arrange(mechanismid, indicator, disag)

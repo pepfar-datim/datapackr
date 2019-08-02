@@ -31,24 +31,24 @@ skip_tabs <- function(tool = "Data Pack") {
 }
 
 #' @export
-#' @title Tool start rows
+#' @title Tool header rows
 #' 
 #' @param tool "Data Pack", "Data Pack Template", "Site Tool", "Site Tool Template",
 #' "Mechanism Map", or "Site Filter".
 #' 
-#' @return Start row
+#' @return Header row
 #' 
-startRow <- function(tool) {
+headerRow <- function(tool) {
   if (tool %in% c("Data Pack", "Site Tool")) {
-    start_row <- 5
+    header_row <- 5
   } else if (tool %in% c("Data Pack Template", "Site Tool Template")) {
-    start_row <- 11
+    header_row <- 14
   } else if (tool %in% c("Site Filter")) {
-    start_row <- 1
+    header_row <- 1
   } else if (tool %in% c("Mechanism Map")) {
-    start_row <- 3
+    header_row <- 3
   }
     
-  return(start_row)
+  return(header_row)
     
 }

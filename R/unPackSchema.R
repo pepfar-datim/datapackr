@@ -29,59 +29,113 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
   
   schema %<>%
     dplyr::filter(sheet_name %in% verbose_sheets,
-                  row %in% c(5:(startRow("Data Pack Template")+1))) %>%
+                  row %in% c(5:(headerRow("Data Pack Template")+1))) %>%
     
   # Gather and Spread to get formula, value, and indicator_code in separate cols
     tidyr::gather(key,value,-sheet_num,-sheet_name,-col,-row) %>%
     tidyr::unite(new.col, c(key,row)) %>%
     tidyr::spread(new.col,value) %>%
     dplyr::select(sheet_num, sheet_name, col,
-                  dataset = character_5, # TODO: Find a way to not have to alter this manually in case template changes
+                  dataset = character_5, # TODO: Find a way to automate these suffixes
                   col_type = character_6,
                   value_type = character_7,
                   dataelement_dsd = character_8,
                   dataelement_ta = character_9,
                   categoryoption_specified = character_10,
-                  indicator_code = character_11,
-                  formula = formula_12,
-                  value = numeric_12) %>%
-    dplyr::mutate(formula = dplyr::if_else(is.na(formula), value, formula)) %>%
-    dplyr::select(sheet_num, sheet_name, col, indicator_code, dataset, col_type,
-                  value_type, dataelement_dsd, dataelement_ta, categoryoption_specified,
+                  valid_ages = character_11,
+                  valid_sexes = character_12,
+                  valid_kps = character_13,
+                  indicator_code = character_14,
+                  formula = formula_15,
+                  value = numeric_15) %>%
+    
+  # When formula is empty, pull from value (Assumed value)
+    dplyr::mutate(formula = dplyr::if_else(is.na(formula), value, formula))
+  
+  # Translate valid disaggs
+  five_yr_ages <- c("<01","01-04","05-09","10-14","15-19","20-24","25-29",
+                    "30-34","35-39","40-44","45-49","50+")
+  coarse_kps <- c("FSW","MSM","PWID","TG",
+                  "People in prisons and other enclosed settings")
+  finer_kps <- c("Female PWID","Male PWID","MSM not SW",
+                 "MSM SW","TG not SW","TG SW",
+                 "People in prisons and other enclosed settings")
+  pwid_kps <- finer_kps[1:2]
+  
+  schema %<>%
+    dplyr::mutate(
+      valid_ages = dplyr::case_when(
+        valid_ages == "5 yr" ~ list(five_yr_ages),
+        valid_ages == "5 yr, 25-49" ~ list(five_yr_ages[7:11]),
+        valid_ages == "15s" ~ list(c("<15","15+")),
+        valid_ages == "5 yr, 1+" ~ list(five_yr_ages[2:12]),
+        valid_ages == "5 yr, 15+" ~ list(five_yr_ages[5:12]),
+        valid_ages == "5 yr, 10+" ~ list(five_yr_ages[4:12]),
+        valid_ages == "5 yr, <01-18+" ~ list(c(five_yr_ages[1:4],"15-17","18+"))),
+      valid_sexes = dplyr::case_when(
+        valid_sexes == "M/F" ~ list(c("Male", "Female")),
+        valid_sexes == "M" ~ list(c("Male")),
+        valid_sexes == "F" ~ list(c("Female"))
+      ),
+      valid_kps = dplyr::case_when(
+        valid_kps == "Coarse KP" ~ list(coarse_kps),
+        valid_kps == "Finer KP" ~ list(finer_kps),
+        valid_kps == "M/F PWID" ~ list(pwid_kps)
+      )) %>%
+    dplyr::select(sheet_num, sheet_name, col, indicator_code,
+                  dataset, col_type, value_type,
+                  dataelement_dsd, dataelement_ta, categoryoption_specified,
+                  valid_ages, valid_sexes, valid_kps,
                   formula) %>%
     dplyr::arrange(sheet_num, col)
   
   # Pull list of valid disaggs
-  codeList <- DEs_COCs_COs_Cs()
-    
-  fullCodeList <- codeList %>%
-  # Rename Key Population to match Data Pack namecon
-    dplyr::select(dataelement, dataelementuid,
-                  categoryoptioncombo, categoryoptioncombouid,
-                  Age, Sex, KeyPop = `Key Population`) %>%
-      
-  # Drop other COs to only summarize Age, Sex, KP
-    dplyr::distinct() %>%
-    
-  # Group Age, Sex, KP into single list col, and categoryoption name and id
-    # into another col
-    dplyr::group_by(dataelement, dataelementuid)
-  
-  match <- list("categoryoptioncombo", "Age|Sex|KeyPop")
-  key <- list("valid_cocs", "valid_cos")
-  
-  fullCodeList <- purrr::map2(.x = match, .y = key, 
-                     ~ fullCodeList %>%
-                       dplyr::select("dataelement","dataelementuid",dplyr::matches(.x)) %>%
-                       tidyr::nest(.key = !! rlang::sym(.y))) %>%
-    dplyr::bind_cols() %>%
-    dplyr::select(-dataelement1,-dataelementuid1, -dataelement)
-    
-  # Add valid disaggs to schema
-  schema %<>%
-    dplyr::left_join(
-      fullCodeList, by = c("dataelement_dsd" = "dataelementuid")
-    )
+  # codeList <- DEs_COCs_COs_Cs()
+  #   
+  # fullCodeList <- codeList %>%
+  # # Rename Key Population to match Data Pack namecon
+  #   dplyr::select(dataelement, dataelementuid,
+  #                 Age, Sex, KeyPop = `Key Population`) %>%
+  #     
+  # # Drop other COs to only summarize Age, Sex, KP
+  #   dplyr::distinct() %>%
+  #   
+  # # Map to only those indicator_codes used in Data Pack
+  #   dplyr::left_join(
+  #     (schema %>%
+  #        dplyr::filter(col_type == "target") %>%
+  #        dplyr::select(indicator_code, dataelement_dsd, dataelement_ta) %>%
+  #        tidyr::gather(key = "support_type", value = "dataelementuid",
+  #                      dataelement_dsd, dataelement_ta, na.rm = TRUE) %>%
+  #        dplyr::select(-support_type) %>%
+  #        dplyr::distinct()),
+  #     y = .,
+  #     by = "dataelementuid"
+  #   ) %>%
+  #   dplyr::mutate(
+  #     support_type = stringr::str_extract(dataelement, "(?<=(, ))(DSD|TA)(?=(, |\\)))"),
+  #     support_type = dplyr::case_when(is.na(support_type) ~ "dsd",
+  #                                     TRUE ~ tolower(support_type)))
+  #   
+  # # Group Age, Sex, KP into single list col, and categoryoption name and id
+  #   # into another col
+  #   dplyr::group_by(dataelement, dataelementuid)
+  # 
+  # match <- list("categoryoptioncombo", "Age|Sex|KeyPop")
+  # key <- list("valid_cocs", "valid_cos")
+  # 
+  # fullCodeList <- purrr::map2(.x = match, .y = key, 
+  #                    ~ fullCodeList %>%
+  #                      dplyr::select("dataelement","dataelementuid",dplyr::matches(.x)) %>%
+  #                      tidyr::nest(.key = !! rlang::sym(.y))) %>%
+  #   dplyr::bind_cols() %>%
+  #   dplyr::select(-dataelement1,-dataelementuid1, -dataelement)
+  #   
+  # # Add valid disaggs to schema
+  # schema %<>%
+  #   dplyr::left_join(
+  #     fullCodeList, by = c("dataelement_dsd" = "dataelementuid")
+  #   )
   
   # Add skipped sheets
   skipped_schema <- matrix(nrow = 0, ncol = NCOL(schema)) %>%
@@ -100,7 +154,6 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
     dplyr::select(sheet_num, sheet_name, data_structure, dplyr::everything())
   
   schema[schema == "NULL" | schema == "NA"] <- NA_character_
-  
   
   
   # TEST schema is valid
@@ -141,7 +194,16 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
         & (sheet_num %in% skip_sheets_num & !is.na(col_type)),
       value_type.test =
         (!value_type %in% c("integer","percentage","string"))
-        & (sheet_num %in% skip_sheets_num & !is.na(value_type))
+        & (sheet_num %in% skip_sheets_num & !is.na(value_type)),
+      valid_ages.test =
+        !valid_ages %in% c(list(five_yr_ages),list(five_yr_ages[7:11]),
+                           list(five_yr_ages[2:12]),list(five_yr_ages[5:12]),
+                           list(five_yr_ages[4:12]),list(c("<15","15+")),
+                           list(c(five_yr_ages[1:4],"15-18","18+")),NA_character_),
+      valid_sexes.test =
+        !valid_sexes %in% c(list(c("Male","Female")),list(c("Male")),list(c("Female")),NA_character_),
+      valid_kps.test =
+        !valid_kps %in% c(list(finer_kps),list(coarse_kps),list(pwid_kps),NA_character_)
     ) %>%
     dplyr::select(sheet_name,indicator_code,dplyr::matches("test")) %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("test")), dplyr::any_vars(. == TRUE))

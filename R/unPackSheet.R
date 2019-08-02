@@ -11,13 +11,13 @@
 #' @return d
 #' 
 unPackDataPackSheet <- function(d, sheet) {
-  start_row <- startRow("Data Pack")
+  header_row <- headerRow("Data Pack")
   
   d$data$extract <-
     readxl::read_excel(
       path = d$keychain$submission_path,
       sheet = sheet,
-      range = readxl::cell_limits(c(start_row, 1), c(NA, NA)),
+      range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
       col_types = "text"
     )
   
@@ -52,8 +52,10 @@ unPackDataPackSheet <- function(d, sheet) {
                   -PSNU, -psnuid, -Age, -Sex, -KeyPop, -sheet_name) %>%
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value) %>%
   # Drop NAs ####
-    tidyr::drop_na(value) %>%
+    tidyr::drop_na(value)
+  
   # Convert Prioritization from text to short-number.
+  d$data$extract %<>%
     dplyr::mutate(
       value = dplyr::case_when(
         stringr::str_detect(indicator_code,"IMPATT.PRIORITY_SNU")
@@ -179,31 +181,8 @@ unPackDataPackSheet <- function(d, sheet) {
   }
   
   # TEST for defunct disaggs ####
-  defunct <- defunctDisaggs(d)
+  d <- defunctDisaggs(d, sheet)
   
-  if (NROW(defunct) > 0) {
-    d[["tests"]][["defunct"]][[as.character(sheet)]] <- defunct
-    
-    defunct_msg <- defunct %>%
-      dplyr::mutate(
-        msg = stringr::str_squish(
-          paste(paste0(indicator_code, ":"), Age, Sex, KeyPop)
-        )
-      ) %>%
-      dplyr::pull(msg) %>%
-      paste(collapse = ",")
-    
-    warning_msg <-
-      paste0(
-        "ERROR! In tab ",
-        sheet,
-        ": INVALID DISAGGS ",
-        "(Check MER Guidance for correct alternatives) ->",
-        defunct_msg)
-    
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
-    d$info$has_error <- TRUE
-  }
   
   # Aggregate OVC_HIVSTAT
   # TODO: Fix this in the Data Pack. Not here...
