@@ -44,7 +44,7 @@ unPackDataPack <- function(d) {
   
   # Store schema
     d$info$schema <- datapackr::data_pack_schema
-    #d$info$schema <- datapackr::unPackSchema_datapack(skip = skip_tabs(tool = d$info$tool))
+    
   # Check integrity of Workbook tabs
     d <- checkStructure(d)
 

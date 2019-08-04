@@ -74,7 +74,7 @@ unPackTool <- function(submission_path = NA,
       "- ERROR!: You MUST address these issues and resubmit your tool.\r\n",
       "*********************\r\n\r\n")
     
-    cat(crayon::red("VALIDATION ISSUES: \r\n\r\n"))
+    cat(crayon::red(crayon::bold("VALIDATION ISSUES: \r\n\r\n")))
     cat(crayon::red(key))
     cat(crayon::red(messages))
   }
