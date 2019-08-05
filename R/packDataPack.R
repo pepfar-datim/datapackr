@@ -9,6 +9,8 @@
 #' @param datapack_uid Unique ID to assign Data Pack. Usually the same as
 #' Operating Unit ID (level 3 ID). For full list of these IDs, see
 #' \code{datapackr::dataPackMap}.
+#' @param datapack_name Name you would like associated with this Data Pack.
+#' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
 #' @param country_uids Unique IDs for countries to include in the Data Pack.
 #' For full list of these IDs, see \code{datapackr::dataPackMap}.
 #' @param template_path Local filepath to Data Pack template Excel (XLSX) file.
@@ -21,11 +23,13 @@
 #' @return Exports a Data Pack to Excel within \code{output_folder}.
 #'
 
-packDataPack <- function(datapack_uid = NA, #TODO: Do we need datapack_uid anymore?
-                         country_uids = NA,
+packDataPack <- function(datapack_uid, #TODO: Do we need datapack_uid anymore?
+                         datapack_name,
+                         country_uids,
                          template_path = NA,
                          output_folder = getwd()) {
   
+  #TODO: Combine with packSiteTool? Or merge both into packTool?
   
   # Create data train for use across remainder of program
   d <- list(
@@ -35,6 +39,7 @@ packDataPack <- function(datapack_uid = NA, #TODO: Do we need datapack_uid anymo
     ),
     info = list(
       datapack_uid = datapack_uid,
+      datapack_name = datapack_name,
       country_uids = country_uids
     )
   )
@@ -45,12 +50,10 @@ packDataPack <- function(datapack_uid = NA, #TODO: Do we need datapack_uid anymo
   
   wb <- openxlsx::loadWorkbook(d$keychain$template_path)
   
-  # Derive schema from template####
-  
-  
   # Write Home Sheet info ####
   wb <- writeHomeTab(wb = wb,
-                     datapack_uid = d$info$datapack_uid,
+                     datapack_name = d$info$datapack_name,
+                     country_uids = d$info$country_uids,
                      type = "Data Pack")
   
   # Get PSNU List####

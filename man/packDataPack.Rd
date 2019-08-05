@@ -4,13 +4,16 @@
 \alias{packDataPack}
 \title{Pack a Data Pack}
 \usage{
-packDataPack(datapack_uid = NA, country_uids = NA,
+packDataPack(datapack_uid, datapack_name, country_uids,
   template_path = NA, output_folder = getwd())
 }
 \arguments{
 \item{datapack_uid}{Unique ID to assign Data Pack. Usually the same as
 Operating Unit ID (level 3 ID). For full list of these IDs, see
 \code{datapackr::dataPackMap}.}
+
+\item{datapack_name}{Name you would like associated with this Data Pack.
+(Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
 
 \item{country_uids}{Unique IDs for countries to include in the Data Pack.
 For full list of these IDs, see \code{datapackr::dataPackMap}.}

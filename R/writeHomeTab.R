@@ -10,8 +10,8 @@
 #' @param wb Openxlsx workbook object.
 #' @param datapack_name Name you would like associated with this Data Pack.
 #' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
-#' @param country_uids List of 11 digit alphanumeric DATIM codes representing
-#' countries.
+#' @param country_uids Character vector of 11 digit alphanumeric DATIM codes
+#' representing countries.
 #' @param type Either "Data Pack" or "Site Tool". Defaults to "Data Pack".
 #' 
 #' @return Openxlsx workbook object with added, styled Home tab.

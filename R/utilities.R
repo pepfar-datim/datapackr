@@ -71,16 +71,31 @@ selectOU <- function() {
 getIMPATTLevels <- function(){
   impatt_levels <-
     paste0(getOption("baseurl"),"api/",datapackr::api_version(),
-           "/dataStore/dataSetAssignments/ous") %>%
+           "/dataStore/dataSetAssignments/orgUnitLevels") %>%
     httr::GET() %>%
     httr::content(., "text") %>%
     jsonlite::fromJSON(., flatten = TRUE) %>%
     do.call(rbind.data.frame, .) %>%
-    dplyr::select(operating_unit = name3, country_name = name4, dplyr::everything()) %>%
+    dplyr::rename(operating_unit = name3, country_name = name4) %>%
     dplyr::mutate_if(is.factor, as.character) %>%
     dplyr::mutate(country_name =
                     dplyr::case_when(country == 3 ~ operating_unit,
                                      country == 4 ~ country_name))
+  
+  # Add country_uids ####
+  countries <-
+    datapackr::api_call("organisationUnits") %>%
+    datapackr::api_filter(field = "organisationUnitGroups.id",
+                          operation = "eq",
+                          match = "cNzfcPWEGSH") %>%
+    datapackr::api_fields(fields = "id,name,level,ancestors[id,name]") %>%
+    datapackr::api_get()
+  
+  impatt_levels %<>%
+    dplyr::left_join(countries, by = c("country_name" = "name")) %>%
+    dplyr::rename(country_uid = id) %>%
+    dplyr::select(operating_unit, country_name, country_uid,
+                  dplyr::everything(), -ancestors, -level)
   
   return(impatt_levels)
   
@@ -286,107 +301,6 @@ interactive_print <- function(x) {
   if (interactive()) { print(x) }
 }
 
-
-#' @export
-#' @title Pull list of PSNUs from DATIM and format based on datapackr structure.
-#' 
-#' @description
-#' Queries DATIM to extract list of PSNUs for specified Data Pack UID and adds
-#' additional PSNUs not currently in DATIM as needed.
-#' 
-#' @param country_uids Character vector of DATIM country IDs. This can only
-#' include countries. Regional Operating Unit uids will not be accepted
-#' @param include_mil Logical. If \code{TRUE}, will also include _Military nodes
-#' related to \code{country_uids}. Default is \code{FALSE}.
-#' 
-#' @return Data frame of PSNUs
-#' 
-getPSNUs <- function(country_uids = NA,
-                     include_mil = FALSE) {
-  
-  countries <- datapackr::api_call("organisationUnits") %>%
-    datapackr::api_filter("organisationUnitGroups.id:eq:cNzfcPWEGSH") %>%
-    datapackr::api_fields("id,name,level") %>%
-    datapackr::api_get()
-  
-  PSNUs <- datapackr::api_call("organisationUnits") %>%
-    datapackr::api_filter(paste0("organisationUnitGroups.id:in:[AVy8gJXym2D",
-                                 dplyr::if_else(include_mil, ",nwQbMeALRjL", ""),
-                                 "]")) %>%
-    datapackr::api_fields("id,name,level,ancestors[id,name],organisationUnitGroups[id,name]") %>%
-    datapackr::api_get() %>%
-    dplyr::mutate(
-      operating_unit = purrr::map_chr(ancestors,list("name",3)),
-      operating_unit_id = purrr::map_chr(ancestors,list("id",3)),
-      psnu_type =
-        dplyr::case_when(
-          stringr::str_detect(as.character(organisationUnitGroups), "nwQbMeALRjL") ~ "Military",
-          stringr::str_detect(as.character(organisationUnitGroups), "AVy8gJXym2D") ~ "PSNU"),
-      in_region = operating_unit_id %in% 
-        (datapackr::dataPackMap %>%
-           dplyr::filter(is_region) %>%
-           dplyr::pull(uidlevel3) %>%
-           unique()),
-      country_uid = dplyr::case_when(
-        operating_unit_id %in% countries$id ~ operating_unit_id,
-        id %in% countries$id ~ id,
-        TRUE ~ purrr::map_chr(ancestors, list("id",4), .default = NA)),
-      country_name = dplyr::case_when(
-        operating_unit_id %in% countries$id ~ operating_unit,
-        id %in% countries$id ~ name,
-        TRUE ~ purrr::map_chr(ancestors, list("name",4), .default = NA))
-    ) %>%
-    dplyr::select(operating_unit, operating_unit_id, country_name, country_uid,
-                  psnu = name, psnu_uid = id, psnu_type, in_region)
-  
-  if (!all(is.na(country_uids))) {
-    PSNUs %<>%
-      dplyr::filter(country_uid %in% country_uids)
-  }
-    
-  # Patch for Suriname and Jamaica
-    # REMOVE THIS dependent upon https://github.com/pepfar-datim/Global/issues/4655
-  # if(datapack_uid == "Caribbean_Data_Pack") {
-  #   patchList <- c("Suriname","Jamaica")
-  #   
-  #   JamaicaSuriname = NULL
-  #   
-  #   for (i in 1:length(patchList)) {
-  #     URL <- paste0(getOption("baseurl"),
-  #                   "api/sqlViews/kEtZ2bSQCu2/data.json?fields=level4name,organisationunituid,name&filter=level4name:eq:",
-  #                   patchList[i],
-  #                   dplyr::case_when(patchList[i] == "Jamaica" ~ "&filter=level:eq:6",
-  #                                    patchList[i] == "Suriname" ~ "&filter=level:eq:5"))
-  #     Export <- URL %>%
-  #       URLencode() %>%
-  #       httr::GET() %>%
-  #       httr::content(., "text") %>%
-  #       jsonlite::fromJSON(., flatten = TRUE)
-  #     JamaicaSuriname <- as.data.frame(Export$rows,stringsAsFactors = FALSE) %>%
-  #       setNames(.,Export$headers$name) %>%
-  #       dplyr::select(country = level4name, uid = organisationunituid, name) %>%
-  #       dplyr::distinct() %>%
-  #       dplyr::bind_rows(JamaicaSuriname,.)
-  #   }
-  #   
-  #   PSNUs <- PSNUs %>%
-  #     dplyr::filter(!country %in% c("Jamaica", "Suriname")) %>%
-  #     dplyr::bind_rows(JamaicaSuriname)
-  # }
-  
-  # Create Data Pack PSNU ID & tag with country name breadcrumb where country != PSNU
-    PSNUs %<>%
-      dplyr::mutate(
-        dp_psnu = paste0(
-          dplyr::case_when(
-            in_region & is.na(country_uid) ~ paste0(operating_unit, " > "),
-            in_region & psnu_uid != country_uid ~ paste0(country_name, " > "),
-            TRUE ~ ""),
-          psnu, " (", psnu_uid,")")
-      )
-  
-  return(PSNUs)
-}
 
 
 #' @export
