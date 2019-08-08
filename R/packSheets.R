@@ -6,7 +6,6 @@
 #' Loops through all normally structured sheets in a submitted Data Pack
 #' and writes data.
 #'
-#' @param wb Openxlsx workbook object built from template.
 #' @param d datapackr list object.
 #' 
 #' @return wb with all sheets written except SNU x IM

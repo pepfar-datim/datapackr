@@ -15,14 +15,15 @@ outputs to be saved. If not supplied, will output to working directory.}
 
 \item{type}{File prefix to be applied in output filename, as follows:
   \describe{
-    \item{\code{\emph{Site Tool}}}{Openxlsx Workbook object containing Site Tool.}
-    \item{\code{\emph{Data Pack}}}{Openxlsx Workbook object containing Data Pack.}
-    \item{\code{\emph{FAST Export}}}{Data frame containing FAST export data.}
-    \item{\code{\emph{SUBNAT IMPATT}}}{Data frame containing SUBNAT/IMPATT data.}
-    \item{\code{\emph{Results Archive}}}{List object containing results archive.}
+    \item{\code{Site Tool}}{Openxlsx Workbook object containing Site Tool.}
+    \item{\code{Data Pack}}{Openxlsx Workbook object containing Data Pack.}
+    \item{\code{FAST Export}}{Data frame containing FAST export data.}
+    \item{\code{SUBNAT IMPATT}}{Data frame containing SUBNAT/IMPATT data.}
+    \item{\code{Results Archive}}{List object containing results archive.}
 }}
 
-\item{datapack_name}{Country name or OU name to be listed in output filename.}
+\item{datapack_name}{Name you would like associated with this Data Pack.
+(Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
 }
 \description{
 Exports a datapackr output to specified filepath.

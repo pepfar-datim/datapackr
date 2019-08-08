@@ -20,9 +20,10 @@ frameMechMap <- function(datapack_uid) {
     openxlsx::modifyBaseFont(wb, fontName = "Calibri", fontSize = 11)
     
   # Add Home tab ####
-    wb <- writeHomeTab(wb = wb,
-                        datapack_uid = datapack_uid,
-                        type = "Mechanism Map")
+    # wb <- writeHomeTab(wb = wb,
+    #                     datapack_uid = datapack_uid,
+    #                     type = "Mechanism Map")
+    #TODO: Update parameters
     
   # Add other tabs ####
     sheet_names <- c("Old Mechs", "New Mechs", "Validations", "Mechanism Map")

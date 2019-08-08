@@ -10,11 +10,11 @@
 #' outputs to be saved. If not supplied, will output to working directory.
 #' @param type File prefix to be applied in output filename, as follows:
 #'   \describe{
-#'     \item{\code{\emph{Site Tool}}}{Openxlsx Workbook object containing Site Tool.}
-#'     \item{\code{\emph{Data Pack}}}{Openxlsx Workbook object containing Data Pack.}
-#'     \item{\code{\emph{FAST Export}}}{Data frame containing FAST export data.}
-#'     \item{\code{\emph{SUBNAT IMPATT}}}{Data frame containing SUBNAT/IMPATT data.}
-#'     \item{\code{\emph{Results Archive}}}{List object containing results archive.}
+#'     \item{\code{Site Tool}}{Openxlsx Workbook object containing Site Tool.}
+#'     \item{\code{Data Pack}}{Openxlsx Workbook object containing Data Pack.}
+#'     \item{\code{FAST Export}}{Data frame containing FAST export data.}
+#'     \item{\code{SUBNAT IMPATT}}{Data frame containing SUBNAT/IMPATT data.}
+#'     \item{\code{Results Archive}}{List object containing results archive.}
 #' }
 #' @param datapack_name Name you would like associated with this Data Pack.
 #' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)

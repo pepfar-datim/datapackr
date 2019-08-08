@@ -12,9 +12,11 @@
 #' 
 comparePacks <- function(datapack_path, sitetool_path) {
   
-  dp <- unPackData(submission_path = datapack_path)
+  #dp <- unPackData(submission_path = datapack_path)
+  #TODO: Update formula reference
   
-  st <- unPackSiteToolData(submission_path = sitetool_path)
+  #st <- unPackSiteToolData(submission_path = sitetool_path) 
+  #TODO: Update formula reference
   
   # Check these are for the same Countries
   if(dp$info$datapack_uid != st$info$datapack_uid) {
@@ -147,7 +149,7 @@ comparePacks <- function(datapack_path, sitetool_path) {
 #' 
 #' 
 #' @param d List of data frames from comparePacks
-#' @param output_path Local folder where you want output written.
+#' @param filename Filename where you want Comparison workbooks written.
 #' 
 
 writeComparisonWorkbook <- function(d, filename) {

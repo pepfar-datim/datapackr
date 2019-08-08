@@ -9,7 +9,7 @@ writeComparisonWorkbook(d, filename)
 \arguments{
 \item{d}{List of data frames from comparePacks}
 
-\item{output_path}{Local folder where you want output written.}
+\item{filename}{Filename where you want Comparison workbooks written.}
 }
 \description{
 Writes an XLSX workbook from a object from comparePacks

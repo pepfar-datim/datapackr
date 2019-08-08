@@ -1,4 +1,5 @@
 #' @export
+#' @importFrom utils capture.output
 #' @title Unpack a Data Pack sheet.
 #'
 #' @description Within a submitted Data Pack or Site Tool (directed to by
@@ -302,7 +303,7 @@ unPackSiteToolSheet <- function(d, sheet) {
     dplyr::mutate(value = as.numeric(value))
   
   # Check for non-sites ####
-  d$tests$unallocated_data <- greply("NOT YET DISTRIBUTED", d$data$extract$Site)
+  d$tests$unallocated_data <- grepl("NOT YET DISTRIBUTED", d$data$extract$Site)
   
   if (any(d$tests$unallocated_data)) {
     warning_msg <-

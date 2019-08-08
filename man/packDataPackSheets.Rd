@@ -8,8 +8,6 @@ packDataPackSheets(d)
 }
 \arguments{
 \item{d}{datapackr list object.}
-
-\item{wb}{Openxlsx workbook object built from template.}
 }
 \value{
 wb with all sheets written except SNU x IM

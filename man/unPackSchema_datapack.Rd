@@ -7,9 +7,9 @@
 unPackSchema_datapack(filepath = NA, skip = NA)
 }
 \arguments{
-\item{skip}{Character vector of Sheet Names to label for skipping in schema.}
+\item{filepath}{Local filepath for a Data Pack template (XLSX).}
 
-\item{path}{Local filepath for a Data Pack template (XLSX).}
+\item{skip}{Character vector of Sheet Names to label for skipping in schema.}
 }
 \value{
 Data Pack schema.

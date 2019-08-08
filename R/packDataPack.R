@@ -6,6 +6,7 @@
 #' Takes a Data Pack template, combines it with data pulled from DATIM API, and
 #' produces a Data Pack ready for distribution.
 #'
+#' @param model_data Data from DATIM needed to pack into Data Pack
 #' @param datapack_name Name you would like associated with this Data Pack.
 #' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
 #' @param country_uids Unique IDs for countries to include in the Data Pack.
@@ -20,10 +21,10 @@
 #' @return Exports a Data Pack to Excel within \code{output_folder}.
 #'
 
-packDataPack <- function(datapack_name,
+packDataPack <- function(model_data,
+                         datapack_name,
                          country_uids,
                          template_path = NA,
-                         model_data,
                          output_folder = getwd()) {
   
   #TODO: Combine with packSiteTool? Or merge both into packTool?

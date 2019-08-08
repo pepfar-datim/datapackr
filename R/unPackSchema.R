@@ -1,12 +1,13 @@
 #' @export
 #' @importFrom data.table :=
+#' @importFrom utils capture.output
 #' @title Extract and save schema from Data Pack template.
 #' 
 #' @description
 #' Supplied a filepath to a Data Pack template (XLSX), will extract and save a
 #' schema based on the template.
 #' 
-#' @param path Local filepath for a Data Pack template (XLSX).
+#' @param filepath Local filepath for a Data Pack template (XLSX).
 #' @param skip Character vector of Sheet Names to label for skipping in schema.
 #' 
 #' @return Data Pack schema.

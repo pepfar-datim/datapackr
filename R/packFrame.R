@@ -214,7 +214,7 @@ packFrame <- function(datapack_uid, type = "Data Pack") {
     options("openxlsx.numFmt" = "#,##0")
     
 # Write Home Page ####
-    wb <- writeHomeTab(wb = wb, datapack_uid = datapack_uid, type = type)
+   # wb <- writeHomeTab(wb = wb, datapack_uid = datapack_uid, type = type) #TODO: Update parameters
   
 # Add Tool specific tabs ####
   if (type == "Site Tool") {

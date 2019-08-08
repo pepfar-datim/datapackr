@@ -1,5 +1,6 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
+#' @importFrom utils capture.output
 #' @title defunctDisaggs(d)
 #'
 #' @description Checks data extracted from a sheet in a submitted Data Pack or

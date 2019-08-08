@@ -9,7 +9,7 @@ pullFullCodeList(FY = NA, datastream = NA)
 \arguments{
 \item{FY}{Reporting FY for which to filter active code lists.}
 
-\item{data_stream}{Specify MER, SUBNAT, or IMPATT, or omit to specify all.}
+\item{datastream}{Specify MER, SUBNAT, or IMPATT, or omit to specify all.}
 }
 \value{
 Combined code list as dataframe.

@@ -6,7 +6,7 @@
 #' combines these into a unique list.
 #' 
 #' @param FY Reporting FY for which to filter active code lists.
-#' @param data_stream Specify MER, SUBNAT, or IMPATT, or omit to specify all.
+#' @param datastream Specify MER, SUBNAT, or IMPATT, or omit to specify all.
 #' 
 #' @return Combined code list as dataframe.
 #'

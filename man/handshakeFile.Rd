@@ -12,8 +12,6 @@ handshakeFile(path = NA, tool = NA)
 \item{tool}{What type of tool is the submission file? Options include 
 "Data Pack", "Data Pack Template", Site Tool", "Site Tool Template",
 "Mechanism Map", and "Site Filter".}
-
-\item{extension}{File extension to test for. (Do not include leading period.)}
 }
 \value{
 Character vector containing valid filepath for further use.

@@ -32,7 +32,6 @@ canReadFile <- function(path) {
 #' for user selection of correct filepath via computer window.
 #' 
 #' @param path Filepath to test and use.
-#' @param extension File extension to test for. (Do not include leading period.)
 #' @param tool What type of tool is the submission file? Options include 
 #' "Data Pack", "Data Pack Template", Site Tool", "Site Tool Template",
 #' "Mechanism Map", and "Site Filter".
