@@ -6,9 +6,9 @@
 #' the results hierarchy 
 #' 
 #' @param data list object with COP 19 model data
-#' @param country_uids string vector listing country uids at the top level of the input hierarchy.
+#' @param country_uids string vector listing country uids at the top level of the list hierarchy.
 #' 
-#' @return list object with one result set for each country named with the country uid
+#' @return list object with one result set for each country named by country uid
 #' 
 flattenDataPackModel_19 <- function(data, country_uids = NULL) {
   
