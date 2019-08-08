@@ -46,7 +46,7 @@ getPSNUs <- function(country_uids = NA,
                   & country == prioritization) %>%
     dplyr::pull(country_uid)
   
-  if (length(country_as_psnu) > 1) {
+  if (length(country_as_psnu) > 0) {
     countries_as_PSNUs <-
       api_call("organisationUnits") %>%
       api_filter("id","in",paste(country_as_psnu,collapse=",")) %>%
