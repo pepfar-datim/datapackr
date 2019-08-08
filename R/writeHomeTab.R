@@ -20,7 +20,7 @@ writeHomeTab <- function(wb, datapack_name, country_uids, type = "Data Pack") {
   #TODO: Setup for default to run PEPFARLANDIA version.
   
   # Add Tab ####
-  if(!stringr::str_detect(names(wb), "Home")) {
+  if(!any(stringr::str_detect(names(wb), "Home"))) {
     openxlsx::addWorksheet(wb,
                            sheetName = "Home",
                            gridLines = FALSE)
@@ -72,11 +72,6 @@ writeHomeTab <- function(wb, datapack_name, country_uids, type = "Data Pack") {
                       paste("Package version:",
                             as.character(utils::packageVersion("datapackr"))),
                       xy = c(2, row+4))
-  
-  # COP Year ####
-  openxlsx::writeData(wb, "Home",
-                      cop_year(),
-                      xy = c(2, row+6))
   
   return(wb)
 }
