@@ -4,14 +4,10 @@
 \alias{packDataPack}
 \title{Pack a Data Pack}
 \usage{
-packDataPack(datapack_uid, datapack_name, country_uids,
-  template_path = NA, output_folder = getwd())
+packDataPack(datapack_name, country_uids, template_path = NA,
+  model_data_path, output_folder = getwd())
 }
 \arguments{
-\item{datapack_uid}{Unique ID to assign Data Pack. Usually the same as
-Operating Unit ID (level 3 ID). For full list of these IDs, see
-\code{datapackr::dataPackMap}.}
-
 \item{datapack_name}{Name you would like associated with this Data Pack.
 (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
 
@@ -25,6 +21,10 @@ This file MUST NOT have any data validation formats present. If left
 \item{output_folder}{Local folder where you would like your Data Pack to be
 saved upon export. If left as \code{NA}, will output to
 \code{Working Directory}.}
+
+\item{datapack_uid}{Unique ID to assign Data Pack. Usually the same as
+Operating Unit ID (level 3 ID). For full list of these IDs, see
+\code{datapackr::dataPackMap}.}
 }
 \value{
 Exports a Data Pack to Excel within \code{output_folder}.

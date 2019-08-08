@@ -14,5 +14,5 @@ d
 }
 \description{
 Loops through all critical sheets in a submitted Data Pack or
-    Site Tool and extracts data, then compukes into single flat dataframe.
+Site Tool and extracts data, then compiles into single flat dataframe.
 }
