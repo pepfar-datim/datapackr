@@ -6,9 +6,6 @@
 #' Takes a Data Pack template, combines it with data pulled from DATIM API, and
 #' produces a Data Pack ready for distribution.
 #'
-#' @param datapack_uid Unique ID to assign Data Pack. Usually the same as
-#' Operating Unit ID (level 3 ID). For full list of these IDs, see
-#' \code{datapackr::dataPackMap}.
 #' @param datapack_name Name you would like associated with this Data Pack.
 #' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
 #' @param country_uids Unique IDs for countries to include in the Data Pack.
@@ -23,10 +20,10 @@
 #' @return Exports a Data Pack to Excel within \code{output_folder}.
 #'
 
-packDataPack <- function(datapack_uid, #TODO: Do we need datapack_uid anymore?
-                         datapack_name,
+packDataPack <- function(datapack_name,
                          country_uids,
                          template_path = NA,
+                         model_data,
                          output_folder = getwd()) {
   
   #TODO: Combine with packSiteTool? Or merge both into packTool?
@@ -38,31 +35,60 @@ packDataPack <- function(datapack_uid, #TODO: Do we need datapack_uid anymore?
       output_folder = output_folder
     ),
     info = list(
-      datapack_uid = datapack_uid,
       datapack_name = datapack_name,
-      country_uids = country_uids
+      country_uids = country_uids,
+      type = "Data Pack"
+    ),
+    data = list(
+      model_data = model_data
     )
   )
+  
+  # Open schema ####
+  d$info$schema <- datapackr::data_pack_schema
   
   # Open template ####
   d$keychain$template_path <- handshakeFile(path = d$keychain$template_path,
                                              tool = "Data Pack Template")
   
-  wb <- openxlsx::loadWorkbook(d$keychain$template_path)
+  # Test template against schema ####
+  schema <- unPackSchema_datapack(filepath = d$keychain$template,
+                        skip = skip_tabs("Data Pack Template"))
+  
+  if (!identical(d$info$schema, schema)) {
+    stop("Ruh roh. Template provided does not match archived schema.")
+  }
+  
+  # Place Workbook into play
+  d$tool$wb <- openxlsx::loadWorkbook(d$keychain$template_path)
   
   # Write Home Sheet info ####
-  wb <- writeHomeTab(wb = wb,
-                     datapack_name = d$info$datapack_name,
-                     country_uids = d$info$country_uids,
-                     type = "Data Pack")
+  d$tool$wb <- writeHomeTab(wb = d$tool$wb,
+                            datapack_name = d$info$datapack_name,
+                            country_uids = d$info$country_uids,
+                            type = "Data Pack")
   
   # Get PSNU List####
   d$data$PSNUs <- getPSNUs(country_uids = d$info$country_uids,
-                           include_mil = TRUE)
+                           include_mil = TRUE) %>%
+    dplyr::arrange(dp_psnu)
+  
+  # Prepare data
+  if (!all(d$info$country_uids %in% names(d$data$model_data))) {
+    missing <- d$info$country_uids[!d$info$country_uids %in% names(d$data$model_data)]
+    stop(
+      paste0(
+        "Model data file does not have data for the following country_uids: \r\n\t- ",
+        paste(missing, collapse = "\r\n\t- ")
+        )
+      )
+  }
+  
+  sj <- d$data$model_data %>%
+    rlist::list.match(paste(d$info$country_uids, collapse = "|"))
   
   # Write Main Sheets ####
-  sheets <- readxl::excel_sheets(d$keychain$template_path)
-  sheets_to_loop <- sheets[which(!stringr::str_detect(sheets, "Home|Quotes|Summary|Spectrum|SNU x IM|Visualizations|Validations"))]
+  
   
   
   
@@ -75,7 +101,16 @@ packDataPack <- function(datapack_uid, #TODO: Do we need datapack_uid anymore?
   # Add validations
   
   
-  # Save & Export
+  # Save & Export Workbook
+  exportPackr(data = d$tool$wb,
+              output_path = d$keychain$output_folder,
+              type = d$info$type,
+              datapack_name = d$info$datapack_name)
   
+  # Save & Export Archive
+  exportPackr(data = d,
+              output_path = d$keychain$output_folder,
+              type = "Results Archive",
+              datapack_name = d$info$datapack_name)
   
 }
