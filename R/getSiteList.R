@@ -14,10 +14,10 @@
 #' @param include_mil When TRUE, will append _Military organisation nodes to
 #' site list.
 #'
-getSiteList <- function(country_uids,
+getSiteList <- function(org_unit_uids,
                         include_mil = TRUE) {
-#TODO change the paramter name from country_uids to org_unit_uids
-  country_uids <- purrr::map(country_uids, CountriesContained) %>% 
+
+  country_uids <- purrr::map(org_unit_uids, CountriesContained) %>% 
     purrr::reduce(c)  %>% 
     unique()
   
