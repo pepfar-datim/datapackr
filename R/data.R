@@ -337,3 +337,12 @@
 #' }
 #' 
 "SiteToDATIM"
+
+#' @docType data
+#' @title flattenDataPackModel_19_fake_data
+#' 
+#' @description 
+#' Stripped down anonymized version of COP 19 model data file list object 
+#' for unit testing and examples flattenDataPackModel_19_fake_data
+#' 
+"flattenDataPackModel_19_fake_data"
