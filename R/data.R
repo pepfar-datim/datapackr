@@ -339,10 +339,10 @@
 "SiteToDATIM"
 
 #' @docType data
-#' @title flattenDataPackModel_19_fake_data
+#' @title fake_data_flattenDataPackModel_19
 #' 
 #' @description 
 #' Stripped down anonymized version of COP 19 model data file list object 
-#' for unit testing and examples flattenDataPackModel_19_fake_data
+#' for unit testing and examples for function flattenDataPackModel_19
 #' 
-"flattenDataPackModel_19_fake_data"
+"fake_data_flattenDataPackModel_19"

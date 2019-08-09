@@ -20,7 +20,7 @@ the results hierarchy
 }
 \examples{
         
-        str(flattenDataPackModel_19_fake_data)
-        flattenDataPackModel_19(flattenDataPackModel_19_fake_data)
+        str(fake_data_flattenDataPackModel_19)
+        flattenDataPackModel_19(fake_data_flattenDataPackModel_19)
 
 }

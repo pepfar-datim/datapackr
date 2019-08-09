@@ -11,8 +11,8 @@
 #' @return list object with one result set for each country named by country uid
 #' @examples 
 #'         
-#'         str(flattenDataPackModel_19_fake_data)
-#'         flattenDataPackModel_19(flattenDataPackModel_19_fake_data)
+#'         str(fake_data_flattenDataPackModel_19)
+#'         flattenDataPackModel_19(fake_data_flattenDataPackModel_19)
 #' 
 flattenDataPackModel_19 <- function(data, country_uids = NULL) {
   

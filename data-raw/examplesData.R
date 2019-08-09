@@ -1,7 +1,7 @@
 setwd("/Users/sam/Documents/GitHub/datapackr/")
 
 
-flattenDataPackModel_19_fake_data <- list(AAAAAAAAAAA = list(
+fake_data_flattenDataPackModel_19 <- list(AAAAAAAAAAA = list(
   ou_name = "Country",
   ou_psnu_level = 4L,
   TX = list(
@@ -138,4 +138,4 @@ flattenDataPackModel_19_fake_data <- list(AAAAAAAAAAA = list(
     )
   )
 ))
-usethis::use_data(flattenDataPackModel_19_fake_data, overwrite = TRUE, compress = "gzip")
+usethis::use_data(fake_data_flattenDataPackModel_19, overwrite = TRUE, compress = "gzip")
