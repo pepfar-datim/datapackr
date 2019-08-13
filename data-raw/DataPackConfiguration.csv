@@ -1,37 +1,36 @@
 DataPack_name,model_uid,countryName,countryUID,milPSNU,milPSNUuid,level3name,uidlevel3,level4name,uidlevel4,Currently_in_DATIM,Military_nested_underneath,milPSNU_in_DATIM,Current_Prioritization_Level,Prioritizing_at_Natl_or_SNU,isRegion,isMil
-Asia Region,Asia_Regional_Data_Pack,Burma,wChmwjpXOw2,_Military Burma,Q6SLJ0iou4u,Burma,wChmwjpXOw2,,,Y,Y,Y,6,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Cambodia,XWZK2nop7pM,_Military Cambodia,pcib7Ubi755,Cambodia,XWZK2nop7pM,,,Y,Y,Y,4,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,India,skj3e4YSiJY,_Military India,bIYjUuqf1sf,India,skj3e4YSiJY,,,Y,Y,Y,5,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Indonesia,W73PRZcjFIU,_Military Indonesia,P9Plp51eAEF,Indonesia,W73PRZcjFIU,,,Y,Y,Y,5,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Kazakhstan,xVvOdyoS7wi,_Military Kazakhstan,TBD00000010,Central Asia Region,t25400wXrNB,Kazakhstan,xVvOdyoS7wi,Y,Y,N,5,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Kyrgyzstan,vm58KTm9wvy,_Military Kyrgyzstan,TBD00000011,Central Asia Region,t25400wXrNB,Kyrgyzstan,vm58KTm9wvy,Y,Y,N,5,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Laos,PcXTNoVUrUc,_Military Laos,TBD00000012,Asia Regional Program,iD2i0aynOGm,Laos,PcXTNoVUrUc,Y,Y,N,5,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Nepal,TBD00000001,_Military Nepal,TBD00000013,,,,,N,Y,N,,Natl,1,0
-Asia Region,Asia_Regional_Data_Pack,Papua New Guinea,cl7jVQOW3Ks,_Military Papua New Guinea,taJjLW2MrND,Papua New Guinea,cl7jVQOW3Ks,,,Y,Y,Y,4,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Tajikistan,ZtoVYbNCnsj,_Military Tajikistan,TBD00000014,Central Asia Region,t25400wXrNB,Tajikistan,ZtoVYbNCnsj,Y,Y,N,5,SNU,1,0
-Asia Region,Asia_Regional_Data_Pack,Thailand,Gv5ApcpDrIB,_Military Thailand,TBD00000015,Asia Regional Program,iD2i0aynOGm,Thailand,Gv5ApcpDrIB,Y,Y,N,5,SNU,1,0
-Caribbean Region,Caribbean_Data_Pack,Barbados,RKoVudgb05Y,,,Caribbean Region,nBo9Y4yZubB,Barbados,RKoVudgb05Y,Y,N,,4,Natl,1,0
-Caribbean Region,Caribbean_Data_Pack,_Military Caribbean Region,utFDiGSMhJh,_Military Caribbean Region,utFDiGSMhJh,Caribbean Region,nBo9Y4yZubB,_Military Caribbean Region,utFDiGSMhJh,Y,N,Y,4,Regional,1,1
-Caribbean Region,Caribbean_Data_Pack,Guyana,PeOHqAwdtez,,,Caribbean Region,nBo9Y4yZubB,Guyana,PeOHqAwdtez,Y,N,,5,SNU,1,0
-Caribbean Region,Caribbean_Data_Pack,Jamaica,WuxG6jzaypt,,,Caribbean Region,nBo9Y4yZubB,Jamaica,WuxG6jzaypt,Y,N,,6,SNU,1,0
-Caribbean Region,Caribbean_Data_Pack,Suriname,zhJINyURZ5Y,,,Caribbean Region,nBo9Y4yZubB,Suriname,zhJINyURZ5Y,Y,N,,5,SNU,1,0
-Caribbean Region,Caribbean_Data_Pack,Trinidad & Tobago,WSl5y9jxCpC,,,Caribbean Region,nBo9Y4yZubB,Trinidad & Tobago,WSl5y9jxCpC,Y,N,,4,Natl,1,0
-Central America Region,Central_America_Data_Pack,Brazil,TBD00000002,,,,,,,N,N,,,Natl,1,0
-Central America Region,Central_America_Data_Pack,_Military Central America Region,jAW4qOepbSh,_Military Central America Region,jAW4qOepbSh,Central America Region,vSu0nPMbq7b,_Military Central America Region,jAW4qOepbSh,Y,N,Y,4,Regional,1,1
-Central America Region,Central_America_Data_Pack,Costa Rica,QKD4CzBG2GM,,,Central America Region,vSu0nPMbq7b,Costa Rica,QKD4CzBG2GM,Y,N,,5,SNU,1,0
-Central America Region,Central_America_Data_Pack,El Salvador,N7QAPGSaODP,,,Central America Region,vSu0nPMbq7b,El Salvador,N7QAPGSaODP,Y,N,,5,SNU,1,0
-Central America Region,Central_America_Data_Pack,Guatemala,EXVC4bNtv84,,,Central America Region,vSu0nPMbq7b,Guatemala,EXVC4bNtv84,Y,N,,5,SNU,1,0
-Central America Region,Central_America_Data_Pack,Honduras,w5NMe34EjPN,,,Central America Region,vSu0nPMbq7b,Honduras,w5NMe34EjPN,Y,N,,5,SNU,1,0
-Central America Region,Central_America_Data_Pack,Nicaragua,aUTsSmqqu9O,,,Central America Region,vSu0nPMbq7b,Nicaragua,aUTsSmqqu9O,Y,N,,5,SNU,1,0
-Central America Region,Central_America_Data_Pack,Panama,oK0gC85xx2f,,,Central America Region,vSu0nPMbq7b,Panama,oK0gC85xx2f,Y,N,,5,SNU,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,Burkina Faso,TBD00000003,,,,,,,N,N,,,Natl,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,Ghana,y3zhsvdXlhN,,,Ghana,y3zhsvdXlhN,,,Y,N,,4,SNU,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,Liberia,TBD00000004,,,,,,,N,N,,,Natl,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,Mali,TBD00000005,,,,,,,N,N,,,Natl,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,Senegal,TBD00000006,,,,,,,N,N,,,Natl,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,Sierra Leone,TBD00000007,,,,,,,N,N,,,Natl,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,Togo,TBD00000008,,,,,,,N,N,,,Natl,1,0
-West-Central Africa Region,Western_Africa_Data_Pack,_Military West-Central Africa Region,TBD00000009,_Military West-Central Africa Region,TBD00000009,,,,,N,N,N,,Regional,1,1
+Asia Region,ptVxnBssua6,Burma,wChmwjpXOw2,_Military Burma,Q6SLJ0iou4u,Asia Region,ptVxnBssua6,Burma,wChmwjpXOw2,Y,Y,Y,6,SNU,1,0
+Asia Region,ptVxnBssua6,Cambodia,XWZK2nop7pM,_Military Cambodia,pcib7Ubi755,Asia Region,ptVxnBssua6,Cambodia,XWZK2nop7pM,Y,Y,Y,4,SNU,1,0
+Asia Region,ptVxnBssua6,India,skj3e4YSiJY,_Military India,bIYjUuqf1sf,Asia Region,ptVxnBssua6,India,skj3e4YSiJY,Y,Y,Y,5,SNU,1,0
+Asia Region,ptVxnBssua6,Indonesia,W73PRZcjFIU,_Military Indonesia,P9Plp51eAEF,Asia Region,ptVxnBssua6,Indonesia,W73PRZcjFIU,Y,Y,Y,5,SNU,1,0
+Asia Region,ptVxnBssua6,Kazakhstan,xVvOdyoS7wi,_Military Kazakhstan,mt5d3w7GEah,Asia Region,ptVxnBssua6,Kazakhstan,xVvOdyoS7wi,Y,Y,N,5,SNU,1,0
+Asia Region,ptVxnBssua6,Kyrgyzstan,vm58KTm9wvy,_Military Kyrgyzstan,GzUZeQXOAuN,Asia Region,ptVxnBssua6,Kyrgyzstan,vm58KTm9wvy,Y,Y,N,5,SNU,1,0
+Asia Region,ptVxnBssua6,Laos,PcXTNoVUrUc,_Military Laos,QyshCnaj7tY,Asia Region,ptVxnBssua6,Laos,PcXTNoVUrUc,Y,Y,N,5,SNU,1,0
+Asia Region,ptVxnBssua6,Nepal,YlSE5fOVJMa,_Military Nepal,rdCXVfj3zze,Asia Region,ptVxnBssua6,Nepal,YlSE5fOVJMa,N,Y,N,,Natl,1,0
+Asia Region,ptVxnBssua6,Papua New Guinea,cl7jVQOW3Ks,_Military Papua New Guinea,taJjLW2MrND,Asia Region,ptVxnBssua6,Papua New Guinea,cl7jVQOW3Ks,Y,Y,Y,4,SNU,1,0
+Asia Region,ptVxnBssua6,Tajikistan,ZtoVYbNCnsj,_Military Tajikistan,k0ZIWufl2En,Asia Region,ptVxnBssua6,Tajikistan,ZtoVYbNCnsj,Y,Y,N,5,SNU,1,0
+Asia Region,ptVxnBssua6,Thailand,Gv5ApcpDrIB,_Military Thailand,jaoX6p4NUZY,Asia Region,ptVxnBssua6,Thailand,Gv5ApcpDrIB,Y,Y,N,5,SNU,1,0
+Caribbean Region,nBo9Y4yZubB,Barbados,RKoVudgb05Y,,,Caribbean Region,nBo9Y4yZubB,Barbados,RKoVudgb05Y,Y,N,,4,Natl,1,0
+Caribbean Region,nBo9Y4yZubB,_Military Caribbean Region,utFDiGSMhJh,_Military Caribbean Region,utFDiGSMhJh,Caribbean Region,nBo9Y4yZubB,_Military Caribbean Region,utFDiGSMhJh,Y,N,Y,4,Regional,1,1
+Caribbean Region,nBo9Y4yZubB,Guyana,PeOHqAwdtez,,,Caribbean Region,nBo9Y4yZubB,Guyana,PeOHqAwdtez,Y,N,,5,SNU,1,0
+Caribbean Region,nBo9Y4yZubB,Jamaica,WuxG6jzaypt,,,Caribbean Region,nBo9Y4yZubB,Jamaica,WuxG6jzaypt,Y,N,,6,SNU,1,0
+Caribbean Region,nBo9Y4yZubB,Suriname,zhJINyURZ5Y,,,Caribbean Region,nBo9Y4yZubB,Suriname,zhJINyURZ5Y,Y,N,,5,SNU,1,0
+Caribbean Region,nBo9Y4yZubB,Trinidad & Tobago,WSl5y9jxCpC,,,Caribbean Region,nBo9Y4yZubB,Trinidad & Tobago,WSl5y9jxCpC,Y,N,,4,Natl,1,0
+Central America Region,vSu0nPMbq7b,Brazil,TBD00000002,,,,,,,N,N,,,Natl,1,0
+Central America Region,vSu0nPMbq7b,_Military Central America Region,jAW4qOepbSh,_Military Central America Region,jAW4qOepbSh,Central America Region,vSu0nPMbq7b,_Military Central America Region,jAW4qOepbSh,Y,N,Y,4,Regional,1,1
+Central America Region,vSu0nPMbq7b,Costa Rica,QKD4CzBG2GM,,,Central America Region,vSu0nPMbq7b,Costa Rica,QKD4CzBG2GM,Y,N,,5,SNU,1,0
+Central America Region,vSu0nPMbq7b,El Salvador,N7QAPGSaODP,,,Central America Region,vSu0nPMbq7b,El Salvador,N7QAPGSaODP,Y,N,,5,SNU,1,0
+Central America Region,vSu0nPMbq7b,Guatemala,EXVC4bNtv84,,,Central America Region,vSu0nPMbq7b,Guatemala,EXVC4bNtv84,Y,N,,5,SNU,1,0
+Central America Region,vSu0nPMbq7b,Honduras,w5NMe34EjPN,,,Central America Region,vSu0nPMbq7b,Honduras,w5NMe34EjPN,Y,N,,5,SNU,1,0
+Central America Region,vSu0nPMbq7b,Nicaragua,aUTsSmqqu9O,,,Central America Region,vSu0nPMbq7b,Nicaragua,aUTsSmqqu9O,Y,N,,5,SNU,1,0
+Central America Region,vSu0nPMbq7b,Panama,oK0gC85xx2f,,,Central America Region,vSu0nPMbq7b,Panama,oK0gC85xx2f,Y,N,,5,SNU,1,0
+West Africa Region,G0BT4KrJouu,Burkina Faso,ZeB2eGmDfGw,_Military Burkina Faso,Xk0IltY3lVw,West Africa Region,,,,N,N,,,Natl,1,0
+West Africa Region,G0BT4KrJouu,Ghana,y3zhsvdXlhN,_Military Ghana,p1yWt0WB6GZ,West Africa Region,y3zhsvdXlhN,,,Y,N,,4,SNU,1,0
+West Africa Region,G0BT4KrJouu,Liberia,kH29I939rDQ,_Military Liberia,gvogyUXDIX0,West Africa Region,,,,N,N,,,Natl,1,0
+West Africa Region,G0BT4KrJouu,Mali,N3xTKNKu5KM,_Military Mali,j4Kicn2MJcT,West Africa Region,,,,N,N,,,Natl,1,0
+West Africa Region,G0BT4KrJouu,Senegal,N5GhQWVpVFs,_Military Senegal,fba5B7HBAPX,West Africa Region,,,,N,N,,,Natl,1,0
+West Africa Region,G0BT4KrJouu,Sierra Leone,ODOymOOWyl0,_Military Sierra Leone,fs5wnlQJVsD,West Africa Region,,,,N,N,,,Natl,1,0
+West Africa Region,G0BT4KrJouu,Togo,EIUtrKbw8PQ,_Military Togo,VCCFz7EEZcC,West Africa Region,,,,N,N,,,Natl,1,0
 Angola,XOivy2uDpMF,Angola,XOivy2uDpMF,_Military Angola,bSwiBL5Y4SW,Angola,XOivy2uDpMF,,,Y,Y,Y,4,SNU,0,0
 Botswana,l1KFEXKI4Dg,Botswana,l1KFEXKI4Dg,_Military Botswana,YUdVS82TqXZ,Botswana,l1KFEXKI4Dg,,,Y,Y,Y,5,SNU,0,0
 Burundi,Qh4XMQJhbk8,Burundi,Qh4XMQJhbk8,_Military Burundi,yDmdrNI3wNW,Burundi,Qh4XMQJhbk8,,,Y,Y,Y,4,SNU,0,0

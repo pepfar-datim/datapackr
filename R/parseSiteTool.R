@@ -1,63 +1,3 @@
-#' @title checkSiteToolOUinfo(d)
-#'
-#' @description Cross-checks and updates PEPFAR Operating Unit name and id as
-#'  read from Data Pack or Site Tool submission file.
-#'
-#' @param d datapackr list object containing at least d$keychain$submission_path.
-#' @return A datapackr list object, \code{d}, storing a unique UID and Name for
-#'    the PEPFAR Operating Unit related to the submitted Data Pack or Site Tool.
-checkSiteToolOUinfo <- function(d) {
-  # Get OU name and uid
-  d$info$datapack_uid <-
-    names(readxl::read_excel(
-      d$keychain$submission_path,
-      sheet = "Home",
-      range = "B25"
-    ))
-  d$info$datapack_name <-
-    names(readxl::read_excel(
-      d$keychain$submission_path,
-      sheet = "Home",
-      range = "B20"
-    ))
-  
-  # Check ou_name and ou_uid match
-  datapack_name <- datapackr::configFile %>%
-    dplyr::filter(model_uid == d$info$datapack_uid) %>%
-    dplyr::select(DataPack_name) %>%
-    unique() %>%
-    dplyr::pull(DataPack_name)
-  
-  datapack_uid <- datapackr::configFile %>%
-    dplyr::filter(DataPack_name == d$info$datapack_name) %>%
-    dplyr::select(model_uid) %>%
-    unique() %>%
-    dplyr::pull(model_uid)
-  
-  # If OU name and UID do not match, force identification via user prompt in Console
-  if (d$info$datapack_name != datapack_name |
-      d$info$datapack_uid != datapack_uid) {
-    msg <-
-      "The OU UID and OU name used in this submission don't match up!"
-    interactive_print(msg)
-    d$info$warningMsg <- append(msg, d$info$warningMsg)
-    
-    if (interactive()) {
-      d$info$datapack_name <- selectOU()
-    } else {
-      stop(msg)
-    }
-    
-    d$info$datapack_uid <- datapackr::configFile %>%
-      dplyr::filter(DataPack_name == d$info$datapack_name) %>%
-      dplyr::select(model_uid) %>%
-      unique() %>%
-      dplyr::pull(model_uid)
-  }
-  
-  return(d)
-}
-
 #' @title checkSiteToolStructure(d)
 #'
 #' @description Checks structural integrity of tabs for SiteTool
@@ -144,7 +84,6 @@ checkSiteToolStructure <- function(d) {
   return(d)
   
 }
-
 
 #' @title unPackSiteToolSheets(d)
 #'
@@ -315,7 +254,7 @@ unPackSiteToolSheet <- function(d) {
   #Proceed by removing unallocated rows
   d$data$extract%<>% 
     #TODO Ugly hack for NOT A SITE ROWS which have no site
-    dplyr::filter(Status != "NOT A SITE") 
+    dplyr::filter(!(Status == "NOT A SITE" & is.na(Site)))
   
   #No rows
   if (NROW(d$data$extract) ==  0) {
@@ -323,11 +262,23 @@ unPackSiteToolSheet <- function(d) {
     return(d)
   }
   
+  #We should only have "Active" sites now
+  
+  only_active_sites <- d$data$extract$Status == "Active" & !is.na(d$data$extract$Site)
+  
+  if (!(all(only_active_sites) & all(!is.na(only_active_sites)))) {
+    msg<-paste0("ERROR! In tab ", d$data$sheet, ": Inactive sites found! These will be filtered!")
+    d$info$warningMsg<-append(msg,d$info$warningMsg)
+    d$info$has_error<-TRUE
+  }
+  
+  #Proceed by filtering rows which have site but no "Active" status
+  d$data$extract%<>% 
+    dplyr::filter(only_active_sites)
+  
   #Only empty rows
   is_empty_row <- function(x) {
-    
   purrr::reduce(purrr::map(x, is.na), `+`) == NCOL(x)
-    
   }
   
   empty_rows<-is_empty_row(d$data$extract)
@@ -455,8 +406,8 @@ if (any(has_negative_numbers)) {
   
   # TEST for duplicates
   any_dups <- d$data$extract %>%
-    dplyr::select(sheet_name, Site, mech_code, Age, Sex, KeyPop, Type, indicatorCode) %>%
-    dplyr::group_by(sheet_name, Site, mech_code, Age, Sex, KeyPop, Type, indicatorCode) %>%
+    dplyr::select( Site, mech_code, Age, Sex, KeyPop, Type, indicatorCode) %>%
+    dplyr::group_by( Site, mech_code, Age, Sex, KeyPop, Type, indicatorCode) %>%
     dplyr::summarise(n = (dplyr::n())) %>%
     dplyr::filter(n > 1) %>%
     dplyr::ungroup() %>%
