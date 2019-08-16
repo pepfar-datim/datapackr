@@ -1,3 +1,29 @@
+# Retry API is part of data pack commons but I don't currently export it.
+#' @title RetryAPI(api_url, content_type, max_attempts)
+#' 
+#' @description Submits specified api request up to specified maximum times
+#' stopping when expected content type is returned with 200 response
+#' @param api_url string - full url for web request
+#' @param content_type string - expected type of content in reposne e.d 'application/json'
+#' @param max_attempts integer - maximum number of retries for succesful request
+#' @return  full api response
+#'
+RetryAPI <- function(api_url, content_type, max_attempts = 10){
+  for(i in 1:max_attempts){
+    try({
+      response <- httr::GET(api_url, httr::timeout(180))
+      if (response$status_code == 200L && 
+          response$url == api_url && 
+          httr::http_type(response) == content_type){
+        return(response)
+      }
+    })
+    Sys.sleep(i/2 + 1)
+  }
+  # if i am here all my attempts failed
+  stop(paste("Failed to obtain valid response in RetryAPI for:", api_url))
+}
+
 SiteVsDatim <- function(d, org_unit_uid = NULL, period, base_url = getOption("baseurl")){
   
   if (is.null(org_unit_uid)) {
