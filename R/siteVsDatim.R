@@ -1,17 +1,21 @@
-compareSiteVsDatim <- function(site_tool_location, org_unit_uid = NULL, period, base_url = getOption("baseurl")){
+SiteVsDatim <- function(d, org_unit_uid = NULL, period, base_url = getOption("baseurl")){
   
-  d <- datapackr::unPackSiteToolData(site_tool_location)
-  if (is.null(org_unit_uid)) org_unit_uid <- d$info$datapack_uid
+  if (is.null(org_unit_uid)) {
+    org_unit_uid <- d$info$datapack_uid
+  }
+  
   if(period == "2019Oct"){
     print("put data sets here")
   }
   
-  site_data <- d$datim$site_data %>% dplyr::rename( "tool_value" = "value")
-  # site_data_dedups <- dplyr::filter(site_data, attributeOptionCombo == "00000" || attributeOptionCombo == "00001")
-  # site_data <- dplyr::filter(site_data, attributeOptionCombo != "00000" && attributeOptionCombo != "00001")
-  # 
+  site_data <- d$datim$site_data %>% 
+    dplyr::group_by(dataElement,period,orgUnit,categoryOptionCombo,attributeOptionCombo) %>% 
+    dplyr::summarise(value=round(sum(as.numeric(value)))) %>% 
+    dplyr::rename( "tool_value" = "value")
+
+  api_call <- "https://triage.datim.org/api/30/dataValueSets.csv?dataSet=nIHNMxuPUORX&dataSet=sBv1dj90IX6&dataSet=C2G7IyPPrvD&dataSet=HiJieecLXxNX&period=2019Oct&orgUnit=XtxUYCsDWrR&children=true&categoryOptionComboIdScheme=code&includeDeleted=false"
   
-  api_call <- "https://triage.datim.org/api/30/dataValueSets.csv?dataSet=nIHNMxuPUORX&dataSet=sBv1dj90IX6&dataSet=C2G7IyPPrvD&dataSet=HiJieecLXxNX&period=2019Oct&orgUnit=Qh4XMQJhbk8&children=true&categoryOptionComboIdScheme=code&includeDeleted=false"
+  
   
 # note the deleted column comes back empty (missing a comma in fact) which results in a warning
 # we can disregard that warning
@@ -29,6 +33,12 @@ compareSiteVsDatim <- function(site_tool_location, org_unit_uid = NULL, period, 
                     attributeOptionCombo = attributeoptioncombo,
                     datim_value = value)
     
-temp=dplyr::full_join(site_data,datim_data)
-      
+    data=dplyr::full_join(site_data,datim_data)
+    data_dedups <- dplyr::filter(data, attributeOptionCombo == "00000" | attributeOptionCombo == "00001")
+    data <- dplyr::filter(data, attributeOptionCombo != "00000" & attributeOptionCombo != "00001")
+    data_different_value <- dplyr::filter(data, tool_value != datim_value)
+    data_datim_only <- dplyr::filter(data, is.na(tool_value))
+    data_site_tool_only <- dplyr::filter(data, is.na(datim_value))
+    
+
 }
