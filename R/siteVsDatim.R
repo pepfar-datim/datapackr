@@ -1,7 +1,17 @@
-SiteVsDatim <- function(site_data, 
-                        org_unit_uid, 
-                        period, 
-                        base_url = getOption("baseurl")){
+#' @export
+#' @title CompareData_SiteVsDatim
+#' 
+#' @description Compares the import file from a parsed site tool with target date in DATIM.
+#' @param site_data data frame - d$datim$site_data object as of COP 19
+#' @param org_unit_uid string - the org unit uid of the site tool (d$info$datapack_uid for COP 19)
+#' @param period string - ISO format for fiscal year of the site tool e.g. 2019Oct for COP 19 
+#' @param base_url string - base address of instance (text before api/ in URL)
+#' @return  list object of differences $data_different_value, $data_datim_only and $data_site_tool_only
+
+CompareData_SiteVsDatim <- function(site_data, 
+                                    org_unit_uid, 
+                                    period, 
+                                    base_url = getOption("baseurl")){
   
   if(period == "2019Oct"){
     parameters <- tibble::tribble(~key, ~value,
@@ -37,7 +47,7 @@ SiteVsDatim <- function(site_data,
 
   data <- dplyr::full_join(site_data, datim_data)
     
-# pull dedups into their own object
+# pull dedups into their own object - we do not currently return this 
   data_dedups <- dplyr::filter(data, 
                                  attribute_option_combo_code == "00000" | 
                                    attribute_option_combo_code == "00001")
@@ -50,8 +60,7 @@ SiteVsDatim <- function(site_data,
   data_datim_only <- dplyr::filter(data, is.na(tool_value))
   data_site_tool_only <- dplyr::filter(data, is.na(datim_value))
     
-  list(data_dedups = data_dedups,
-       data_different_value = data_different_value,
+  list(data_different_value = data_different_value,
        data_datim_only = data_datim_only,
        data_site_tool_only = data_site_tool_only
        )
