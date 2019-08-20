@@ -1,38 +1,3 @@
-DHISLogin("/users/sam/.secrets/triage.json")
-base_url <- getOption("baseurl")
-d <- datapackr::unPackSiteToolData("/Users/sam/Documents/cop_19_data/final_site_tool/17_JHHSiteTool_Rwanda_20190407_submission.xlsx")
-
-
-
-
-# Retry API is part of data pack commons but I don't currently export it.
-#' @title RetryAPI(api_url, content_type, max_attempts)
-#' 
-#' @description Submits specified api request up to specified maximum times
-#' stopping when expected content type is returned with 200 response
-#' @param api_url string - full url for web request
-#' @param content_type string - expected type of content in reposne e.d 'application/json'
-#' @param max_attempts integer - maximum number of retries for succesful request
-#' @return  full api response
-#'
-RetryAPI <- function(api_url, content_type, max_attempts = 10){
-  for(i in 1:max_attempts){
-    try({
-      response <- httr::GET(api_url, httr::timeout(180))
-      if (response$status_code == 200L && 
-          response$url == api_url && 
-          httr::http_type(response) == content_type){
-        return(response)
-      }
-    })
-    Sys.sleep(i/2 + 1)
-  }
-  # if i am here all my attempts failed
-  stop(paste("Failed to obtain valid response in RetryAPI for:", api_url))
-}
-
-
-
 #' @export
 #' @title GetDataValueSet
 #' 
@@ -58,7 +23,7 @@ GetDataValueSet <- function(keys, values,
   #  row col   expected     actual         file
   #  1  -- 11 columns 10 columns literal data
   
-  RetryAPI(api_call, "application/csv") %>%   
+  datapackcommons::RetryAPI(api_call, "application/csv") %>%   
     httr::content(., "text") %>% 
     {suppressWarnings(readr::read_csv(., 
                                       col_names = TRUE, 
@@ -133,5 +98,3 @@ SiteVsDatim <- function(site_data,
        data_site_tool_only = data_site_tool_only
        )
   }
-
-temp <- SiteVsDatim(d$datim$site_data, d$info$datapack_uid, "2019Oct")
