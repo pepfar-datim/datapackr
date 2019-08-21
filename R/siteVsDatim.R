@@ -12,7 +12,9 @@ CompareData_SiteVsDatim <- function(site_data,
                                     org_unit_uid, 
                                     period, 
                                     base_url = getOption("baseurl")){
-  
+
+# this is a very specific and self contained function, so the details of each year's 
+# site tool are are hard coded here
   if(period == "2019Oct"){
     parameters <- tibble::tribble(~key, ~value,
                                   "dataSet", "nIHNMxuPUORX",
@@ -24,7 +26,9 @@ CompareData_SiteVsDatim <- function(site_data,
                                   "children", "true",
                                   "categoryOptionComboIdScheme", "code",
                                   "includeDeleted", "false")
-    }
+  } else if{
+    stop("You are trying to compare a site tool for an unsupported period.")
+  }
   
 # rename columns to fit standards
 # aggregate duplicate rows from site tool data

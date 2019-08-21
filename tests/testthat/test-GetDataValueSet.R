@@ -21,8 +21,4 @@ test_that("GetDataSetValue", {
                                          c("25"), 
                                          "https://play.dhis2.org/2.30/", 
                                          max_attempts = 1))
-  
-  
-  
-})
-names(data)
+  })
