@@ -4,14 +4,15 @@
 #' @description Used to read DHIS 2 data using the data value set endpoint
 #' @param keys character vector - data value set parameter keys (e.g. "dataSet", "period")
 #' @param values character vector - values marching the key from keys (e.g. "Abcde123456", "2019Q1"
+#' @param base_url string - base address of instance (text before api/ in URL)
+#' @param api_version - api version to use when calling DHIS2
+#' @param max_attempts - number of times to try for a valid response
 #' @return  tibble with the data requested
 #'
 GetDataValueSet <- function(keys, values, 
                             base_url = getOption("baseurl"), 
                             api_version = "30",
                             max_attempts = 3){
-  
-  #  api_call <- "https://triage.datim.org/api/30/dataValueSets.csv?dataSet=nIHNMxuPUORX&dataSet=sBv1dj90IX6&dataSet=C2G7IyPPrvD&dataSet=HiJieecLXxNX&period=2019Oct&orgUnit=XtxUYCsDWrR&children=true&categoryOptionComboIdScheme=code&includeDeleted=false"
   
   # concatenate and format the keys and values provided for the api call 
   parameters <- stringr::str_c(keys, 

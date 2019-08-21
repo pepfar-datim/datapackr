@@ -3,35 +3,47 @@
 #' 
 #' @description Compares the import file from a parsed site tool with target date in DATIM.
 #' @param site_data data frame - d$datim$site_data object as of COP 19
-#' @param org_unit_uid string - the org unit uid of the site tool (d$info$datapack_uid for COP 19)
-#' @param period string - ISO format for fiscal year of the site tool e.g. 2019Oct for COP 19 
+#' @param org_unit_uids character vector - the org unit uids of the site tool (d$info$datapack_uid for COP 19)
+#' @param iso_fy string - ISO format for fiscal year of the site tool e.g. 2019Oct for COP 19 
 #' @param base_url string - base address of instance (text before api/ in URL)
 #' @return  list object of differences $data_different_value, $data_datim_only and $data_site_tool_only
 
 CompareData_SiteVsDatim <- function(site_data, 
-                                    org_unit_uid, 
-                                    period, 
+                                    org_unit_uids, 
+                                    iso_fy, 
                                     base_url = getOption("baseurl")){
 
-# this is a very specific and self contained function, so the details of each year's 
+# ensure site_data has the expected columns
+  if(!identical(names(site_data), 
+                c("dataElement", "period",
+                  "orgUnit", "categoryOptionCombo",
+                  "attributeOptionCombo", "value"))){
+    stop("The column names of your site data aren't as expected.")
+  }
+  
+# This is a specific and self contained function, so the data sets of each year's 
 # site tool are are hard coded here
-  if(period == "2019Oct"){
+  
+  if(iso_fy == "2019Oct"){
     parameters <- tibble::tribble(~key, ~value,
                                   "dataSet", "nIHNMxuPUORX",
                                   "dataSet", "sBv1dj90IX6",
                                   "dataSet", "C2G7IyPPrvD",
                                   "dataSet", "HiJieecLXxNX",
-                                  "period", "2019Oct",
-                                  "orgUnit", org_unit_uid,
-                                  "children", "true",
-                                  "categoryOptionComboIdScheme", "code",
-                                  "includeDeleted", "false")
+                                  "period", "2019Oct")
   } else {
     stop("You are trying to compare a site tool for an unsupported period.")
   }
   
-# rename columns to fit standards
-# aggregate duplicate rows from site tool data
+  parameters <- tibble::tribble(~key, ~value,
+                                "children", "true",
+                                "categoryOptionComboIdScheme", "code",
+                                "includeDeleted", "false") %>%
+    dplyr::bind_rows(tibble::tibble(key = "orgUnit", value = org_unit_uids)) %>% 
+    dplyr::bind_rows(parameters)
+  
+# rename site_data columns to fit standards
+# aggregate duplicate rows from site tool data as would be done before import
   site_data <- site_data %>%
     dplyr::rename(tool_value = value, data_element_uid = dataElement, 
                   org_unit_uid = orgUnit,

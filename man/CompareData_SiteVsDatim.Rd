@@ -4,15 +4,15 @@
 \alias{CompareData_SiteVsDatim}
 \title{CompareData_SiteVsDatim}
 \usage{
-CompareData_SiteVsDatim(site_data, org_unit_uid, period,
+CompareData_SiteVsDatim(site_data, org_unit_uids, iso_fy,
   base_url = getOption("baseurl"))
 }
 \arguments{
 \item{site_data}{data frame - d$datim$site_data object as of COP 19}
 
-\item{org_unit_uid}{string - the org unit uid of the site tool (d$info$datapack_uid for COP 19)}
+\item{org_unit_uids}{character vector - the org unit uids of the site tool (d$info$datapack_uid for COP 19)}
 
-\item{period}{string - ISO format for fiscal year of the site tool e.g. 2019Oct for COP 19}
+\item{iso_fy}{string - ISO format for fiscal year of the site tool e.g. 2019Oct for COP 19}
 
 \item{base_url}{string - base address of instance (text before api/ in URL)}
 }
