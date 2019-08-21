@@ -43,7 +43,7 @@ Imports:
     scales (>= 1.0.0)
 Suggests:
     devtools (>= 2.0.1),
-    testthat
+    testthat (>= 2.1.0)
 Remotes: jason-p-pickering/openxlsx
 License: GPL-2
 Encoding: UTF-8

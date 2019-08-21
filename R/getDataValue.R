@@ -8,7 +8,8 @@
 #'
 GetDataValueSet <- function(keys, values, 
                             base_url = getOption("baseurl"), 
-                            api_version = "30"){
+                            api_version = "30",
+                            max_attempts = 3){
   
   #  api_call <- "https://triage.datim.org/api/30/dataValueSets.csv?dataSet=nIHNMxuPUORX&dataSet=sBv1dj90IX6&dataSet=C2G7IyPPrvD&dataSet=HiJieecLXxNX&period=2019Oct&orgUnit=XtxUYCsDWrR&children=true&categoryOptionComboIdScheme=code&includeDeleted=false"
   
@@ -22,8 +23,7 @@ GetDataValueSet <- function(keys, values,
   # we can disregard that warning
   #  row col   expected     actual         file
   #  1  -- 11 columns 10 columns literal data
-  
-  datapackcommons::RetryAPI(api_call, "application/csv") %>%   
+  datapackcommons::RetryAPI(api_call, "application/csv", max_attempts = max_attempts) %>%   
     httr::content(., "text") %>% 
     {suppressWarnings(readr::read_csv(., 
                                       col_names = TRUE, 
