@@ -3,7 +3,10 @@
 #' 
 #' @description Compares the import file from a parsed site tool with target date in DATIM.
 #' @param site_data data frame - d$datim$site_data object as of COP 19
-#' @param org_unit_uids character vector - the org unit uids of the site tool (d$info$datapack_uid for COP 19)
+#' @param org_unit_uids character vector - the org unit uids of the site tool 
+#' - d$info$datapack_uid for COP 19 standard countries
+#' - if regional and not all contries from the region are in the site tool data, 
+#'   list the countries individually
 #' @param iso_fy string - ISO format for fiscal year of the site tool e.g. 2019Oct for COP 19 
 #' @param base_url string - base address of instance (text before api/ in URL)
 #' @return  list object of differences $data_different_value, $data_datim_only and $data_site_tool_only
