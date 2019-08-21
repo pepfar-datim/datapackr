@@ -26,7 +26,7 @@ CompareData_SiteVsDatim <- function(site_data,
                                   "children", "true",
                                   "categoryOptionComboIdScheme", "code",
                                   "includeDeleted", "false")
-  } else if{
+  } else {
     stop("You are trying to compare a site tool for an unsupported period.")
   }
   
