@@ -1,5 +1,5 @@
 #' @export
-#' @title CompareData_SiteVsDatim
+#' @title compareData_SiteVsDatim
 #' 
 #' @description Compares the import file from a parsed site tool with target date in DATIM.
 #' @param site_data data frame - d$datim$site_data object as of COP 19
@@ -11,7 +11,7 @@
 #' @param base_url string - base address of instance (text before api/ in URL)
 #' @return  list object of differences $data_different_value, $data_datim_only and $data_site_tool_only
 
-CompareData_SiteVsDatim <- function(site_data, 
+compareData_SiteVsDatim <- function(site_data, 
                                     org_unit_uids, 
                                     iso_fy, 
                                     base_url = getOption("baseurl")){
@@ -58,7 +58,7 @@ CompareData_SiteVsDatim <- function(site_data,
     
 # get data from datim
 # rename to standard names
-  datim_data <- GetDataValueSet(parameters$key, parameters$value) %>% 
+  datim_data <- getDataValueSets(parameters$key, parameters$value) %>% 
     dplyr::rename(datim_value = value, data_element_uid = data_element, 
                   org_unit_uid = org_unit,
                   category_option_combo_uid = category_option_combo,

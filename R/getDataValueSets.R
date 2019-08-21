@@ -1,5 +1,5 @@
 #' @export
-#' @title GetDataValueSet
+#' @title getDataValueSets
 #' 
 #' @description Used to read DHIS 2 data using the data value set endpoint
 #' @param keys character vector - data value set parameter keys (e.g. "dataSet", "period")
@@ -9,7 +9,7 @@
 #' @param max_attempts - number of times to try for a valid response
 #' @return  tibble with the data requested
 #'
-GetDataValueSet <- function(keys, values, 
+getDataValueSets <- function(keys, values, 
                             base_url = getOption("baseurl"), 
                             api_version = "30",
                             max_attempts = 3){
