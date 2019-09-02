@@ -116,7 +116,8 @@ compareData_SiteVsDatim <- function(site_data,
       org_unit_uid = org_unit,
       category_option_combo_uid = category_option_combo,
       attribute_option_combo_code = attribute_option_combo
-    )
+    ) %>% 
+    dplyr::filter(datim_value != 0)
   
   data <- dplyr::full_join(site_data, datim_data)
   
