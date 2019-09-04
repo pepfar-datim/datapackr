@@ -142,9 +142,10 @@ compareData_SiteVsDatim <- function(site_data,
   data_site_tool_only <- dplyr::filter(data, is.na(datim_value))
   
   list(
-    data_matched_value = data_matched_value,
-    data_different_value = data_different_value,
-    data_datim_only = data_datim_only,
-    data_site_tool_only = data_site_tool_only
+    dedup = data_dedups, 
+    matched = data_matched_value,
+    different = data_different_value,
+    datim_only = data_datim_only,
+    site_tool_only = data_site_tool_only
   )
 }
