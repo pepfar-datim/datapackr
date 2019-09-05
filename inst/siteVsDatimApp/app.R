@@ -4,12 +4,15 @@ require(magrittr)
 require(purrr)
 require(dplyr)
 require(datimvalidation)
-require(ggplot2)
-library(datapackimporter)
+require(datapackimporter)
+library(shiny)
 
-DHISLogin <- function(baseurl, username, password) {
+options("baseurl" = "https://www.datim.org/")
+addResourcePath("www", system.file("siteVsDatimApp/www", package = "datapackr"))
+DHISLogin <- function(username, password, 
+                      base_url = getOption("baseurl")) {
   httr::set_config(httr::config(http_version = 0))
-  url <- URLencode(URL = paste0(getOption("baseurl"), "api/me"))
+  url <- URLencode(URL = paste0(base_url, "api/me"))
   #Logging in here will give us a cookie to reuse
   r <- httr::GET(url,
                  httr::authenticate(username, password),
@@ -23,104 +26,113 @@ DHISLogin <- function(baseurl, username, password) {
   }
 }
 
-# datapackcommons::DHISLogin("/users/sam/.secrets/prod.json")
-# base_url <- getOption("baseurl")
-
-#base_url <- "https://www.datim.org/"
-# d <- datapackr::unPackSiteToolData("/Users/sam/Documents/cop_19_data/final_site_tool/17_JHHSiteTool_Rwanda_20190407_submission.xlsx")
-# 
-# temp <- datapackr::compareData_SiteVsDatim(d$datim$site_data, d$info$datapack_uid, "2019Oct")
-# 
-# 
-# site_normal <- "/Users/sam/Downloads/SiteLevelReview_NORMAL_SITE_Eswatini_20190903083520.xlsx"
-# site_hts <- "/Users/sam/Downloads/SiteLevelReview_HTS_SITE_Eswatini_20190903083527.xlsx"
-# support_files <- "/Users/sam/Desktop/SupportingFiles_COP18_OPU/"
-# 
-# data <- dplyr::bind_rows(datapackimporter::DataPackR(site_normal,
-#                                              "",
-#                                              "/Users/sam/Desktop/SupportingFiles_COP18_OPU/")$data,
-#                          datapackimporter::DataPackR(site_hts,
-#                                                      "",
-#                                                      "/Users/sam/Desktop/SupportingFiles_COP18_OPU/")$data)
-# 
-# temp3 <- datapackr::compareData_SiteVsDatim(data, "V0qMZH29CtN", "2018Oct")
-
-
-library(shiny)
+ping <- function(){
+  if (httr::GET(paste0(getOption("baseurl"),"api/system/ping")) %>% 
+      httr::content() == "pong"){
+    TRUE
+  } else{
+    FALSE
+  }
+}
 
 ui <- fluidPage(
-  shiny::textInput(inputId = "user", 
-                   label = "DATIM User Name:",
-                   value = "sgarman@baosystems.com"),
-  shiny::passwordInput(inputId = "pw", 
-                       label = "DATIM Password:"),
-  shiny::radioButtons(inputId = "server", 
-                      label = "Server", 
-                      choiceNames =  c("Production", 
-                                       "Triage",
-                                       "Jason"), 
-                      choiceValues = c("https://www.datim.org/", 
-                                       "https://triage.datim.org/",
-                                       "https://jason.datim.org/")),
-  shiny::actionButton(inputId = "log_me_in", 
-                      label = "Log In"),
-  shiny::textInput(inputId = "support_files", 
-                   label = "Support Files:", 
-                   value = "/Users/sam/Desktop/SupportingFiles_COP18_OPU/"),
-  shiny::radioButtons(inputId = "cop_year", 
-                      label = "COP Year", 
-                      choiceNames =  c("COP19", "COP18"), 
-                      choiceValues = c("2019Oct", "2018Oct")),
-  shiny::radioButtons(inputId = "org_unit", 
-                      label = "Countries/Region", 
-                      choiceNames =  c("Rwanda", "Eswatini"), 
-                      choiceValues = c("XtxUYCsDWrR", "V0qMZH29CtN")),
-  shiny::conditionalPanel(condition = "input.cop_year != '2018Oct'",
-                          shiny::fileInput("site_in", "Site Tool")
-                          ),
-  shiny::conditionalPanel(condition = "input.cop_year == '2018Oct'",
-    shiny::fileInput("hts_in", "HTS"),
-    shiny::fileInput("normal_in", "Normal")
+  
+
+  
+  sidebarLayout(
+  sidebarPanel(
+    
+    # shiny::radioButtons(
+    #   inputId = "server",
+    #   label = "Server",
+    #   choiceNames =  c("Production",
+    #                    "Triage",
+    #                    "Jason"),
+    #   choiceValues = c(
+    #     "https://www.datim.org/",
+    #     "https://triage.datim.org/",
+    #     "https://jason.datim.org/"
+    #   )
+    # ),
+    shiny::textInput(
+      inputId = "support_files",
+      label = "Support Files:",
+      value = "/Users/sam/Desktop/SupportingFiles_COP18_OPU/"
+    ),
+    shiny::radioButtons(
+      inputId = "cop_year",
+      label = "COP Year",
+      choiceNames =  c("COP19", "COP18"),
+      choiceValues = c("2019Oct", "2018Oct")
+    ),
+    shiny::selectInput(
+      inputId = "org_unit",
+      label = "Countries/Region",
+      choices = c("Eswatini" = "V0qMZH29CtN",
+                  "Rwanda" = "XtxUYCsDWrR"),
+      multiple = TRUE,
+      selectize = TRUE
+    ),
+    shiny::conditionalPanel(condition = "input.cop_year != '2018Oct'",
+                            shiny::fileInput("site_in", "Site Tool")),
+    shiny::conditionalPanel(
+      condition = "input.cop_year == '2018Oct'",
+      shiny::fileInput("hts_in", "HTS"),
+      shiny::fileInput("normal_in", "Normal")
+    ),
+    shiny::actionButton("compare", "Compare")
   ),
-  shiny::actionButton("compare", "Compare"),
-  shiny::dataTableOutput(outputId = "data_matched")
-)
+  
+  mainPanel(  shiny::conditionalPanel(condition = "!output.logged_in", 
+                                      shiny::img(src='www/pepfar.png', align = "center"),
+                                      "Please log in.",
+                                      shiny::textInput(
+                                        inputId = "user",
+                                        label = "DATIM User Name:",
+                                        value = "sgarman@baosystems.com"
+                                      ),
+                                      shiny::passwordInput(inputId = "pw",
+                                                           label = "DATIM Password:"),
+                                      shiny::actionButton(inputId = "log_me_in",
+                                                          label = "Log In")
+                                      
+  ),
+  shiny::dataTableOutput(outputId = "data_matched"))
+))
 
 server <- function(input, output, session) {
+
+  output$logged_in <- shiny::reactive(FALSE)
+  outputOptions(output, "logged_in", suspendWhenHidden = FALSE)
   shiny::observeEvent(input$log_me_in, {
-    x = DHISLogin(input$server, 
-                  input$user, 
+    x = DHISLogin(input$user,
                   input$pw)
-#    d <- datapackr::unPackSiteToolData("/Users/sam/Documents/cop_19_data/final_site_tool/17_JHHSiteTool_Rwanda_20190407_submission.xlsx")
-#    temp <- datapackr::compareData_SiteVsDatim(d$datim$site_data, d$info$datapack_uid, "2019Oct")
-#    output$data_matched <- shiny::renderDataTable({temp$data_matched_value})
     })
   shiny::observeEvent(input$compare, {
-    if (input$cop_year == "2018Oct"){
+    if (input$cop_year == "2018Oct") {
       data <-
-        dplyr::bind_rows(datapackimporter::DataPackR(input$hts_in$datapath,
-                                                     "",
-                                                     input$support_files)$data,
-                         datapackimporter::DataPackR(input$normal_in$datapath,
-                                                     "",
-                                                     input$support_files)$data)
+        dplyr::bind_rows(
+          datapackimporter::DataPackR(input$hts_in$datapath,
+                                      "",
+                                      input$support_files)$data,
+          datapackimporter::DataPackR(input$normal_in$datapath,
+                                      "",
+                                      input$support_files)$data
+        )
     } else if (input$cop_year == "2019Oct") {
-      # data <-
-      #   datapackimporter::DataPackR(input$site_in$datapath,
-      #                               "",
-      #                               input$support_files)#$data
-      data <- datapackr::unPackSiteToolData(input$site_in$datapath)$datim$site_data
-      #   temp <- datapackr::compareData_SiteVsDatim(d$datim$site_data, d$info$datapack_uid, "2019Oct")      
+      data <-
+        datapackr::unPackSiteToolData(input$site_in$datapath)$datim$site_data
     } else {
       stop("Unsupported COP year")
     }
-    compare_out <- datapackr::compareData_SiteVsDatim(data, input$org_unit, input$cop_year)
-
-    output$data_matched <- shiny::renderDataTable({compare_out$matched})
+    compare_out <- datapackr::compareData_SiteVsDatim(data,
+                                                      input$org_unit,
+                                                      input$cop_year)
+    output$data_matched <-
+      shiny::renderDataTable({
+        compare_out$matched
+      })
   })
-  }
+}
 
-
-  
 shinyApp(ui, server)
-

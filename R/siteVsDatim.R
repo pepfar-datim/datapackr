@@ -109,7 +109,9 @@ compareData_SiteVsDatim <- function(site_data,
   # get data from datim
   # rename to standard names
   datim_data <-
-    getDataValueSets(parameters$key, parameters$value) %>%
+    getDataValueSets(parameters$key, 
+                     parameters$value, 
+                     base_url = base_url) %>%
     dplyr::rename(
       datim_value = value,
       data_element_uid = data_element,
