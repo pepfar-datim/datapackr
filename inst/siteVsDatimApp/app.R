@@ -42,18 +42,6 @@ ui <- fluidPage(
   sidebarLayout(
   sidebarPanel(
     
-    # shiny::radioButtons(
-    #   inputId = "server",
-    #   label = "Server",
-    #   choiceNames =  c("Production",
-    #                    "Triage",
-    #                    "Jason"),
-    #   choiceValues = c(
-    #     "https://www.datim.org/",
-    #     "https://triage.datim.org/",
-    #     "https://jason.datim.org/"
-    #   )
-    # ),
     shiny::textInput(
       inputId = "support_files",
       label = "Support Files:",
@@ -83,10 +71,22 @@ ui <- fluidPage(
     shiny::actionButton("compare", "Compare")
   ),
   
-  mainPanel(  shiny::conditionalPanel(condition = "!output.logged_in", 
+  mainPanel(shiny::conditionalPanel(condition = "!output.logged_in", 
                                       shiny::img(src='www/pepfar.png', align = "center"),
                                       "Please log in.",
-                                      shiny::textInput(
+                                      # shiny::radioButtons(
+                                      #   inputId = "server",
+                                      #   label = "Server",
+                                      #   choiceNames =  c("Production",
+                                      #                    "Triage",
+                                      #                    "Jason"),
+                                      #   choiceValues = c(
+                                      #     "https://www.datim.org/",
+                                      #     "https://triage.datim.org/",
+                                      #     "https://jason.datim.org/"
+                                      #   )
+                                      # ),
+                                        shiny::textInput(
                                         inputId = "user",
                                         label = "DATIM User Name:",
                                         value = "sgarman@baosystems.com"
@@ -105,10 +105,11 @@ server <- function(input, output, session) {
   output$logged_in <- shiny::reactive(FALSE)
   outputOptions(output, "logged_in", suspendWhenHidden = FALSE)
   shiny::observeEvent(input$log_me_in, {
-    x = DHISLogin(input$user,
-                  input$pw)
+    output$logged_in <-  shiny::reactive(DHISLogin(input$user,
+                                                   input$pw))
     })
   shiny::observeEvent(input$compare, {
+    #output$logged_in <- ping()
     if (input$cop_year == "2018Oct") {
       data <-
         dplyr::bind_rows(
