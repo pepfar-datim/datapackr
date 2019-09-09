@@ -44,7 +44,8 @@ Imports:
 Suggests:
     devtools (>= 2.0.1),
     testthat
-Remotes: jason-p-pickering/openxlsx
+Remotes: jason-p-pickering/openxlsx,
+          pepfar-datim/data-pack-commons
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
