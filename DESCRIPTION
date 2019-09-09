@@ -40,7 +40,8 @@ Imports:
     stats,
     lubridate,
     data.table,
-    scales (>= 1.0.0)
+    scales (>= 1.0.0),
+    datapackcommons
 Suggests:
     devtools (>= 2.0.1),
     testthat
