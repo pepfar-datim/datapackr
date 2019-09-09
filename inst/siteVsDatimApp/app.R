@@ -36,12 +36,11 @@ ping <- function(){
 }
 
 ui <- fluidPage(
-  
-
-  
+  useShinyjs(),
   sidebarLayout(
   sidebarPanel(
-    
+    shiny::tags$div(id = "controls",
+    shinyjs::disabled(
     shiny::textInput(
       inputId = "support_files",
       label = "Support Files:",
@@ -55,7 +54,7 @@ ui <- fluidPage(
     ),
     shiny::selectInput(
       inputId = "org_unit",
-      label = "Countries/Region",
+      label = "Countries in the site tool",
       choices = c("Eswatini" = "V0qMZH29CtN",
                   "Rwanda" = "XtxUYCsDWrR"),
       multiple = TRUE,
@@ -69,45 +68,44 @@ ui <- fluidPage(
       shiny::fileInput("normal_in", "Normal")
     ),
     shiny::actionButton("compare", "Compare")
-  ),
+  ))),
   
-  mainPanel(shiny::conditionalPanel(condition = "!output.logged_in", 
-                                      shiny::img(src='www/pepfar.png', align = "center"),
-                                      "Please log in.",
-                                      # shiny::radioButtons(
-                                      #   inputId = "server",
-                                      #   label = "Server",
-                                      #   choiceNames =  c("Production",
-                                      #                    "Triage",
-                                      #                    "Jason"),
-                                      #   choiceValues = c(
-                                      #     "https://www.datim.org/",
-                                      #     "https://triage.datim.org/",
-                                      #     "https://jason.datim.org/"
-                                      #   )
-                                      # ),
-                                        shiny::textInput(
-                                        inputId = "user",
-                                        label = "DATIM User Name:",
-                                        value = "sgarman@baosystems.com"
-                                      ),
-                                      shiny::passwordInput(inputId = "pw",
-                                                           label = "DATIM Password:"),
-                                      shiny::actionButton(inputId = "log_me_in",
-                                                          label = "Log In")
-                                      
-  ),
-  shiny::dataTableOutput(outputId = "data_matched"))
-))
+  mainPanel(
+    shiny::tags$div(id = "log_in_ui",
+                    shiny::img(src = 'www/pepfar.png', align = "center"),
+                    shiny::tags$br(),shiny::tags$br(),
+                    shiny::tags$b("Analyze differences between a COP site tool and DATIM target data"),
+                    shiny::tags$br(),shiny::tags$br(),
+                    "Please log in.",
+                    shiny::tags$br(),shiny::tags$br(),
+                    shiny::textInput(inputId = "user",
+                                     label = "DATIM User Name:",
+                                     value = "sgarman@baosystems.com"),
+                    shiny::passwordInput(inputId = "pw",
+                                         label = "DATIM Password:"),
+                    shiny::actionButton(inputId = "log_me_in",
+                                        label = "Log In")
+                    ),
+    shinyjs::hidden(shiny::downloadButton("downloadFlatPack", label = "Download XLSX"))
+      # shiny::dataTableOutput(outputId = "data_matched")
+  )
+  ))
+
 
 server <- function(input, output, session) {
-
-  output$logged_in <- shiny::reactive(FALSE)
-  outputOptions(output, "logged_in", suspendWhenHidden = FALSE)
   shiny::observeEvent(input$log_me_in, {
-    output$logged_in <-  shiny::reactive(DHISLogin(input$user,
-                                                   input$pw))
-    })
+    success <- DHISLogin(input$user,
+                         input$pw)
+    if (success) {
+      shinyjs::enable("controls")
+      shinyjs::hide("log_in_ui")
+    } else{
+      shinyjs::alert("Log in unsuccesful.")
+    }
+    print(success)
+    # output$logged_in <-  shiny::reactive(DHISLogin(input$user,
+    # input$pw))
+  })
   shiny::observeEvent(input$compare, {
     #output$logged_in <- ping()
     if (input$cop_year == "2018Oct") {
@@ -129,10 +127,23 @@ server <- function(input, output, session) {
     compare_out <- datapackr::compareData_SiteVsDatim(data,
                                                       input$org_unit,
                                                       input$cop_year)
-    output$data_matched <-
-      shiny::renderDataTable({
-        compare_out$matched
-      })
+    
+  output$downloadFlatPack <- downloadHandler(
+    
+    filename = function() {
+      
+      prefix <- "target_site_to_datim_compare_flatpack"
+      
+      date<-format(Sys.time(),"%Y%m%d_%H%M%S")
+      
+      paste0(paste(prefix,date,sep="_"),".xlsx")
+    },
+    content = function(file) {
+      
+      openxlsx::write.xlsx(compare_out, file = file)
+      
+    })
+  shinyjs::show("downloadFlatPack")
   })
 }
 
