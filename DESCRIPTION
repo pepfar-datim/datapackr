@@ -41,6 +41,7 @@ Imports:
     lubridate,
     data.table,
     scales (>= 1.0.0),
+    datimvalidation,
     datapackcommons
 Suggests:
     devtools (>= 2.0.1),
