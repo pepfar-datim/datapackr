@@ -41,12 +41,15 @@ Imports:
     lubridate,
     data.table,
     scales (>= 1.0.0),
+    datimvalidation,
     datapackcommons,
     glue
 Suggests:
     devtools (>= 2.0.1),
-    testthat (>= 2.1.0)
-Remotes: jason-p-pickering/openxlsx
+    testthat
+Remotes: jason-p-pickering/datim-validation,
+          jason-p-pickering/openxlsx,
+          pepfar-datim/data-pack-commons
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
