@@ -51,6 +51,7 @@ packDataPack <- function(model_data,
   # Open template ####
   d$keychain$template_path <- handshakeFile(path = d$keychain$template_path,
                                              tool = "Data Pack Template")
+  # TODO: Restrict to only allow use of schema saved in package, or at least as default in param
   
   # Test template against schema ####
   schema <- unPackSchema_datapack(filepath = d$keychain$template,
@@ -70,23 +71,11 @@ packDataPack <- function(model_data,
                             type = "Data Pack")
   
   # Get PSNU List####
-  d$data$PSNUs <- getPSNUs(country_uids = d$info$country_uids,
+  PSNUs <- getPSNUs(country_uids = d$info$country_uids,
                            include_mil = TRUE) %>%
     dplyr::arrange(dp_psnu)
-  
-  # Prepare data
-  if (!all(d$info$country_uids %in% names(d$data$model_data))) {
-    missing <- d$info$country_uids[!d$info$country_uids %in% names(d$data$model_data)]
-    stop(
-      paste0(
-        "Model data file does not have data for the following country_uids: \r\n\t- ",
-        paste(missing, collapse = "\r\n\t- ")
-        )
-      )
-  }
-  
-  sj <- d$data$model_data %>%
-    rlist::list.match(paste(d$info$country_uids, collapse = "|"))
+  # TODO: Separate PSNUs as parameter for this function, allowing you to include
+  # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
   
   # Write Main Sheets ####
   
