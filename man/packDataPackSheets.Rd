@@ -2,12 +2,16 @@
 % Please edit documentation in R/packSheets.R
 \name{packDataPackSheets}
 \alias{packDataPackSheets}
-\title{Pack data into a Data Pack sheet}
+\title{Loop through and populate normal Data Pack sheets}
 \usage{
-packDataPackSheets(d)
+packDataPackSheets(wb, country_uids, model_data)
 }
 \arguments{
-\item{d}{datapackr list object.}
+\item{wb}{datapackr list object.}
+
+\item{country_uids}{datapackr list object.}
+
+\item{model_data}{}
 }
 \value{
 wb with all sheets written except SNU x IM

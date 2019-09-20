@@ -37,21 +37,24 @@ combined <- left %>%
            "valid_kps.id" = "kp_option_uid"))
 
 
-dataStructure <- d$info$schema %>%
-  dplyr::filter(sheet_name == sheet) %>%
-  dplyr::arrange(col) %>%
-  `row.names<-`(.[, "indicator_code"]) %>%
-  dplyr::select(formula) %>%
-  t() %>%
-  tibble::as_tibble() %>%
-  # Setup formulas
-  dplyr::slice(rep(1:dplyr::n(), times = NROW(left))) %>%
-  dplyr::mutate_if(
-    is.character,
-    stringr::str_replace_all,
-    pattern = paste0("(?<=[:upper:])",headerRow(tool = "Data Pack Template")+1),
-    replacement = as.character(1:NROW(left) + headerRow(tool = "Data Pack Template")))
+ dataStructure <- d$info$schema %>%
+   dplyr::filter(sheet_name == sheet) %>%
+   dplyr::arrange(col) %>%
+   `row.names<-`(.[, "indicator_code"]) %>%
+   dplyr::select(formula) %>%
+   t() %>%
+   tibble::as_tibble() %>%
+   # Setup formulas
+   dplyr::slice(rep(1:dplyr::n(), times = NROW(left))) %>%
+   dplyr::mutate_if(
+     is.character,
+     stringr::str_replace_all,
+     pattern = paste0("(?<=[:upper:])",headerRow(tool = "Data Pack Template")+1),
+     replacement = as.character(1:NROW(left) + headerRow(tool = "Data Pack Template")))
 
 dataStructure <- dataStructure %>%
-  swapColumns(., combined) %>%
-  as.data.frame(.)
+   swapColumns(., combined) %>%
+   as.data.frame(.)
+
+}
+

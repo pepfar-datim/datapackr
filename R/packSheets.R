@@ -6,7 +6,9 @@
 #' Loops through all normally structured sheets in a submitted Data Pack
 #' and writes data.
 #'
-#' @param d datapackr list object.
+#' @param wb datapackr list object.
+#' @param country_uids datapackr list object.
+#' @param model_data
 #' 
 #' @return wb with all sheets written except SNU x IM
 #'
