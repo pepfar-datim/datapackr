@@ -36,10 +36,8 @@ pullFullCodeList <- function(FY = NA, datastream = NA) {
       )
     ) %>%
     dplyr::filter(fiscal_year == FY,
-                  data_stream %in% datastream
-    )
-    
-  datasets_list %<>% dplyr::pull(id)
+                  data_stream %in% datastream) %>%
+    dplyr::pull(id)
   
   ds <- data.frame()
   
