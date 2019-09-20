@@ -54,46 +54,48 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
     dplyr::mutate(formula = dplyr::if_else(is.na(formula), value, formula))
   
   # Translate valid disaggs ####
-  five_yr_ages <- c("<01","01-04","05-09","10-14","15-19","20-24","25-29",
-                    "30-34","35-39","40-44","45-49","50+")
-  five_year_ages.25_49 <- five_yr_ages[7:11]
-  five_yr_ages.1plus <- five_yr_ages[2:12]
-  five_yr_ages.15plus <- five_yr_ages[5:12]
-  five_yr_ages.10plus <- five_yr_ages[4:12]
-  ovc_ages <- c(five_yr_ages[1:4],"15-17","18+")
-  coarse_ages <- c("<15","15+")
+  disaggs <- datapackr::valid_COs %>%
+    dplyr::select(name = datapack_disagg, id, group = datapack_schema_group) %>%
+    dplyr::filter(group != "") %>%
+    tidyr::separate_rows(group, sep = ",") %>%
+    dplyr::arrange(group, name) %>%
+    dplyr::group_by(group) %>%
+    tidyr::nest(.key = options) %>%
+    tibble::deframe()
   
-  coarse_kps <- c("FSW","MSM","PWID","TG",
-                  "People in prisons and other enclosed settings")
-  finer_kps <- c("Female PWID","Male PWID","MSM not SW",
-                 "MSM SW","TG not SW","TG SW",
-                 "People in prisons and other enclosed settings")
-  pwid_kps <- finer_kps[1:2]
+  empty <- list(tibble::tribble(
+    ~name, ~id,
+    NA_character_, NA_character_))
   
   schema %<>%
     dplyr::mutate(
-      valid_ages = dplyr::case_when(
-        valid_ages == "5 yr" ~ list(five_yr_ages),
-        valid_ages == "5 yr, 25-49" ~ list(five_year_ages.25_49),
-        valid_ages == "15s" ~ list(coarse_ages),
-        valid_ages == "5 yr, 1+" ~ list(five_yr_ages.1plus),
-        valid_ages == "5 yr, 15+" ~ list(five_yr_ages.15plus),
-        valid_ages == "5 yr, 10+" ~ list(five_yr_ages.10plus),
-        valid_ages == "5 yr, <01-18+" ~ list(ovc_ages)),
-      valid_sexes = dplyr::case_when(
-        valid_sexes == "M/F" ~ list(c("Male", "Female")),
-        valid_sexes == "M" ~ list(c("Male")),
-        valid_sexes == "F" ~ list(c("Female"))
-      ),
-      valid_kps = dplyr::case_when(
-        valid_kps == "Coarse KP" ~ list(coarse_kps),
-        valid_kps == "Finer KP" ~ list(finer_kps),
-        valid_kps == "M/F PWID" ~ list(pwid_kps)
-      )) %>%
+      valid_ages.options = dplyr::case_when(
+        valid_ages == "5 yr" ~ list(disaggs$`5yr`),
+        valid_ages == "5 yr, 25-49" ~ list(disaggs$`25-49`),
+        valid_ages == "15s" ~ list(disaggs$coarse),
+        valid_ages == "5 yr, 1+" ~ list(disaggs$`01+`),
+        valid_ages == "5 yr, 15+" ~ list(disaggs$`15+`),
+        valid_ages == "5 yr, 10+" ~ list(disaggs$`10+`),
+        valid_ages == "5 yr, <01-18+" ~ list(disaggs$ovc),
+        valid_ages == "01-04" ~ list(disaggs$`01+`[disaggs$`01+`$name == "01-04",]),
+        TRUE ~ empty),
+      valid_sexes.options = dplyr::case_when(
+        valid_sexes == "M/F" ~ list(disaggs$`M/F`),
+        valid_sexes == "M" ~ list(disaggs$`M/F`[disaggs$`M/F`$name == "Male",]),
+        valid_sexes == "F" ~ list(disaggs$`M/F`[disaggs$`M/F`$name == "Female",]),
+        TRUE ~ empty),
+      valid_kps.options = dplyr::case_when(
+        valid_kps == "Coarse KP" ~ list(disaggs$coarseKPs),
+        valid_kps == "Finer KP" ~ list(disaggs$fineKPs),
+        valid_kps == "M/F PWID" ~ list(disaggs$pwidKPs),
+        TRUE ~ empty)
+      ) %>%
     dplyr::select(sheet_num, sheet_name, col, indicator_code,
                   dataset, col_type, value_type,
                   dataelement_dsd, dataelement_ta, categoryoption_specified,
-                  valid_ages, valid_sexes, valid_kps,
+                  valid_ages = valid_ages.options,
+                  valid_sexes = valid_sexes.options,
+                  valid_kps = valid_kps.options,
                   formula) %>%
     dplyr::arrange(sheet_num, col)
   
@@ -153,6 +155,9 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
   
   skipped_schema[] <- mapply(FUN = as, skipped_schema, sapply(schema, class), SIMPLIFY = FALSE)
   
+  skipped_schema %<>%
+    dplyr::mutate(valid_ages = empty, valid_sexes = empty, valid_kps = empty)
+  
   schema %<>%
     dplyr::bind_rows(skipped_schema, .) %>%
     dplyr::mutate(
@@ -160,8 +165,6 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
         dplyr::case_when(sheet_name %in% skip ~ "skip",
                          TRUE ~ "normal")) %>%
     dplyr::select(sheet_num, sheet_name, data_structure, dplyr::everything())
-  
-  schema[schema == "NULL" | schema == "NA"] <- NA_character_
   
   
   # TEST schema is valid ####
@@ -204,14 +207,19 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
         (!value_type %in% c("integer","percentage","string"))
         & (sheet_num %in% skip_sheets_num & !is.na(value_type)),
       valid_ages.test =
-        !valid_ages %in% c(list(five_yr_ages),list(five_year_ages.25_49),
-                           list(five_yr_ages.1plus),list(five_yr_ages.15plus),
-                           list(five_yr_ages.10plus),list(coarse_ages),
-                           list(ovc_ages),NA_character_),
+        !valid_ages %in% c(list(disaggs$`5yr`),list(disaggs$`25-49`),
+                           list(disaggs$`01+`),list(disaggs$`15+`),
+                           list(disaggs$`10+`),list(disaggs$coarse),
+                           list(disaggs$ovc),empty,
+                           list(disaggs$`01+`[disaggs$`01+`$name == "01-04",])),
       valid_sexes.test =
-        !valid_sexes %in% c(list(c("Male","Female")),list(c("Male")),list(c("Female")),NA_character_),
+        !valid_sexes %in% c(list(disaggs$`M/F`),
+                            list(disaggs$`M/F`[disaggs$`M/F`$name == "Male",]),
+                            list(disaggs$`M/F`[disaggs$`M/F`$name == "Female",]),
+                            empty),
       valid_kps.test =
-        !valid_kps %in% c(list(finer_kps),list(coarse_kps),list(pwid_kps),NA_character_)
+        !valid_kps %in% c(list(disaggs$fineKPs),list(disaggs$coarseKPs),
+                          list(disaggs$pwidKPs),empty)
     ) %>%
     dplyr::select(sheet_name,indicator_code,dplyr::matches("test")) %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("test")), dplyr::any_vars(. == TRUE))
