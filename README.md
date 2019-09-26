@@ -1,5 +1,8 @@
 # datapackr: A package for packing and unpacking Data Packs.
 
+**Repo Owner:** Jason Pickering [@jason-p-pickering](https://github.com/jason-p-pickering)
+
+
 ### Installation
 
 1. Download R from http://cran.us.r-project.org/

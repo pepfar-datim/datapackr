@@ -354,7 +354,8 @@ packSiteTool <- function(d,
   
 # Write site list (TODO: SPEED THIS UP) ####
     country_uids <- datapackr::dataPackMap %>%
-      dplyr::filter(data_pack_name == d$info$datapack_name) %>%
+      dplyr::filter(data_pack_name == dplyr::if_else(d$info$datapack_name == "West-Central Africa Region", 
+                                                     "West Africa Region", d$info$datapack_name)) %>%
       dplyr::pull(country_uid)
     
     sites <- getSiteList(country_uids,

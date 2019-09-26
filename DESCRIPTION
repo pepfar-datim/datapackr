@@ -40,11 +40,15 @@ Imports:
     stats,
     lubridate,
     data.table,
-    scales (>= 1.0.0)
+    scales (>= 1.0.0),
+    datimvalidation,
+    datapackcommons
 Suggests:
     devtools (>= 2.0.1),
     testthat
-Remotes: jason-p-pickering/openxlsx
+Remotes: jason-p-pickering/datim-validation,
+          jason-p-pickering/openxlsx,
+          pepfar-datim/data-pack-commons
 License: GPL-2
 Encoding: UTF-8
 LazyData: true

@@ -23,13 +23,15 @@ comparePacks <- function(datapack_path, sitetool_path) {
     stop("These Countries are apples and oranges. Recheck your fruit.")
   }
   
-  # Aggregate Site Tool data
-    country_uids <- datapackr::dataPackMap %>%
-      dplyr::filter(model_uid == st$info$datapack_uid) %>%
-      dplyr::pull(country_uid) %>%
-      unique()
+  #JPP Note: Removing this, as the info$datapack_uid should contain 
+  # The correct UID when parsed.
+  # # Aggregate Site Tool data
+  #   country_uids <- datapackr::dataPackMap %>%
+  #     dplyr::filter(model_uid == st$info$datapack_uid) %>%
+  #     dplyr::pull(country_uid) %>%
+  #     unique()
     
-    siteList <- getSiteList(country_uids, include_mil = TRUE)
+    siteList <- getSiteList(st$info$datapack_uid, include_mil = TRUE)
     
     sitetool_data_raw <- st$data$targets %>%
       dplyr::filter(indicatorCode != "VMMC_CIRC.N.Age/Sex.20T") %>%

@@ -24,6 +24,10 @@ LoadConfigFile <- function(config_path = NA) {
       stop(paste("Cannot read configuration located at",config_path))
     }
     dhis_config <- jsonlite::fromJSON(config_path)
+    #Mangle the config to be sure it always ends with a single forward slash. 
+    #All other URIs should thus NOT begin with a /
+    dhis_config$dhis$baseurl <-
+      stringi::stri_reverse(gsub("^/+", "/", paste0("/",stringi::stri_reverse(dhis_config$dhis$baseurl))))
     return(dhis_config)
   } else {
     stop("You must specify a credentials file!") }
