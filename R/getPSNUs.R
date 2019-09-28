@@ -32,33 +32,24 @@ getPSNUs <- function(country_uids = NA,
       psnu_type =
         dplyr::case_when(
           stringr::str_detect(as.character(organisationUnitGroups), "nwQbMeALRjL") ~ "Military",
-          stringr::str_detect(as.character(organisationUnitGroups), "AVy8gJXym2D") ~ "PSNU")
+          stringr::str_detect(as.character(organisationUnitGroups), "cNzfcPWEGSH") ~ "Country",
+          stringr::str_detect(as.character(organisationUnitGroups), "AVy8gJXym2D") ~ "PSNU"),
+      level_4_type = purrr::map(ancestors, list("organisationUnitGroups",4), .default = NA),
+      country_name = dplyr::case_when(
+        psnu_type == "Country" ~ name,
+        stringr::str_detect(as.character(level_4_type), "cNzfcPWEGSH") ~ 
+          purrr::map_chr(ancestors, list("name", 4), .default = NA),
+        TRUE ~ purrr::map_chr(ancestors, list("name", 3), .default = NA)
+      ),
+      country_uid = dplyr::case_when(
+        psnu_type == "Country" ~ id,
+        stringr::str_detect(as.character(level_4_type), "cNzfcPWEGSH") ~ 
+          purrr::map_chr(ancestors, list("id", 4), .default = NA),
+        TRUE ~ purrr::map_chr(ancestors, list("id", 3), .default = NA)
+      )
     ) %>%
-    tidyr::unnest(ancestors, .drop = FALSE, .sep = ".") %>%
-    tidyr::unnest(ancestors.organisationUnitGroups, .drop = FALSE, .sep = ".") %>%
-    dplyr::filter(ancestors.organisationUnitGroups.name == "Country") %>%
     dplyr::select(psnu = name, psnu_uid = id, psnu_type,
-                  country_name = ancestors.name, country_uid = ancestors.id)
-  
-  # Add countries that double as PSNUs ####
-  country_as_psnu <- getIMPATTLevels() %>%
-    dplyr::filter(country_uid %in% country_uids
-                  & country == prioritization) %>%
-    dplyr::pull(country_uid)
-  
-  if (length(country_as_psnu) > 0) {
-    countries_as_PSNUs <-
-      api_call("organisationUnits") %>%
-      api_filter("id","in",paste(country_as_psnu,collapse=",")) %>%
-      datapackr::api_fields("id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]") %>%
-      datapackr::api_get() %>%
-      dplyr::mutate(country_name = name, country_uid = id,
-                    psnu_type = "PSNU") %>%
-      dplyr::select(psnu = name, psnu_uid = id, psnu_type,
-                    country_name, country_uid)
-    
-    PSNUs %<>% dplyr::bind_rows(countries_as_PSNUs)
-  }
+                  country_name, country_uid)
   
   return(PSNUs)
 }
