@@ -2,21 +2,33 @@
 % Please edit documentation in R/getPSNUs.R
 \name{getPSNUs}
 \alias{getPSNUs}
-\title{Pull list of PSNUs from DATIM and format based on datapackr structure.}
+\title{Pull list of PSNUs from DATIM based on provided country UIDs.}
 \usage{
-getPSNUs(country_uids = NA, include_mil = TRUE)
+getPSNUs(PSNUs, country_uids)
+
+getPSNUs(PSNUs, country_uids)
 }
 \arguments{
+\item{PSNUs}{Data frame of PSNUs produced by \code{\link{getPSNUs}}.}
+
 \item{country_uids}{Character vector of DATIM country IDs. This can only
-include countries. Regional Operating Unit uids will not be accepted}
+include countries. Regional Operating Unit UIDs will not be accepted}
 
 \item{include_mil}{Logical. If \code{TRUE}, will also include _Military nodes
 related to \code{country_uids}. Default is \code{TRUE}.}
+
+\item{country_uids}{Character vector of DATIM country IDs. This can only
+include countries. Regional Operating Unit UIDs will not be accepted}
 }
 \value{
 Data frame of PSNUs
+
+Data frame of PSNUs
 }
 \description{
-Queries DATIM to extract list of PSNUs for specified Data Pack UID and adds
-additional PSNUs not currently in DATIM as needed.
+Queries DATIM to extract list of PSNUs and adds additional PSNUs not
+currently in DATIM as needed.
+
+Queries DATIM to extract list of PSNUs and adds additional PSNUs not
+currently in DATIM as needed.
 }

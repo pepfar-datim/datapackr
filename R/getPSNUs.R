@@ -1,12 +1,12 @@
 #' @export
-#' @title Pull list of PSNUs from DATIM and format based on datapackr structure.
+#' @title Pull list of PSNUs from DATIM based on provided country UIDs.
 #' 
 #' @description
-#' Queries DATIM to extract list of PSNUs for specified Data Pack UID and adds
-#' additional PSNUs not currently in DATIM as needed.
+#' Queries DATIM to extract list of PSNUs and adds additional PSNUs not
+#' currently in DATIM as needed.
 #' 
 #' @param country_uids Character vector of DATIM country IDs. This can only
-#' include countries. Regional Operating Unit uids will not be accepted
+#' include countries. Regional Operating Unit UIDs will not be accepted
 #' @param include_mil Logical. If \code{TRUE}, will also include _Military nodes
 #' related to \code{country_uids}. Default is \code{TRUE}.
 #' 
@@ -60,16 +60,35 @@ getPSNUs <- function(country_uids = NA,
     PSNUs %<>% dplyr::bind_rows(countries_as_PSNUs)
   }
   
-  # Create Data Pack PSNU ID & tag with country name breadcrumb where country != PSNU
-  PSNUs %<>%
-    dplyr::mutate(
-      dp_psnu = paste0(
-        dplyr::if_else(
-          length(country_uids) > 1 & country_uid != psnu_uid,
-          paste0(country_name, " > "),
-          ""),
-        psnu, " [", psnu_uid,"]")
-    )
+  return(PSNUs)
+}
+
+
+#' @export
+#' @title Modify PSNU list to add datapackr IDs.
+#' 
+#' @description
+#' Queries DATIM to extract list of PSNUs and adds additional PSNUs not
+#' currently in DATIM as needed.
+#'
+#' @param PSNUs Data frame of PSNUs produced by \code{\link{getPSNUs}}.
+#' @param country_uids Character vector of DATIM country IDs. This can only
+#' include countries. Regional Operating Unit UIDs will not be accepted
+#' 
+#' @return Data frame of PSNUs
+#' 
+getPSNUs <- function(PSNUs, country_uids) {
+
+# Create Data Pack PSNU ID & tag with country name breadcrumb where country != PSNU
+PSNUs %<>%
+  dplyr::mutate(
+    dp_psnu = paste0(
+      dplyr::if_else(
+        length(country_uids) > 1 & country_uid != psnu_uid,
+        paste0(country_name, " > "),
+        ""),
+      psnu, " [", psnu_uid,"]")
+  )
   
   return(PSNUs)
 }

@@ -566,3 +566,9 @@ getPeriodInfo <- function(FY = NA) {
   ## All valid age COs
     
     
+
+    
+# Load PSNUs into package from DATIM
+    valid_PSNUs <- getPSNUs() %>%
+      dplyr::arrange(dp_psnu)
+    save(valid_PSNUs, file = ".data/valid_PSNUs.rda")
