@@ -3,6 +3,7 @@
 export(DEs_COCs_COs_Cs)
 export(FASTforward)
 export(addValidationsSite)
+export(add_dp_psnu)
 export(addcols)
 export(api_call)
 export(api_fields)

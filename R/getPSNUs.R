@@ -68,7 +68,7 @@ getPSNUs <- function(country_uids = NA,
 #' 
 #' @return Data frame of PSNUs
 #' 
-getPSNUs <- function(PSNUs, country_uids) {
+add_dp_psnu <- function(PSNUs, country_uids) {
 
 # Create Data Pack PSNU ID & tag with country name breadcrumb where country != PSNU
 PSNUs %<>%

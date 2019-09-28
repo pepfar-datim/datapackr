@@ -569,6 +569,5 @@ getPeriodInfo <- function(FY = NA) {
 
     
 # Load PSNUs into package from DATIM
-    valid_PSNUs <- getPSNUs() %>%
-      dplyr::arrange(dp_psnu)
-    save(valid_PSNUs, file = ".data/valid_PSNUs.rda")
+    valid_PSNUs <- getPSNUs()
+    save(valid_PSNUs, file = "./data/valid_PSNUs.rda")
