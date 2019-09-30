@@ -569,5 +569,7 @@ getPeriodInfo <- function(FY = NA) {
 
     
 # Load PSNUs into package from DATIM
-    valid_PSNUs <- getPSNUs()
+    valid_PSNUs <- getPSNUs() %>%
+      dplyr::select(-organisationUnitGroups, -ancestors)
     save(valid_PSNUs, file = "./data/valid_PSNUs.rda")
+    
