@@ -4,18 +4,14 @@
 \alias{add_dp_psnu}
 \title{Modify PSNU list to add datapackr IDs.}
 \usage{
-add_dp_psnu(PSNUs, country_uids)
+add_dp_psnu(PSNUs)
 }
 \arguments{
 \item{PSNUs}{Data frame of PSNUs produced by \code{\link{getPSNUs}}.}
-
-\item{country_uids}{Character vector of DATIM country IDs. This can only
-include countries. Regional Operating Unit UIDs will not be accepted}
 }
 \value{
-Data frame of PSNUs
+Data frame of PSNUs with added Data Pack label, \code{dp_psnu}.
 }
 \description{
-Queries DATIM to extract list of PSNUs and adds additional PSNUs not
-currently in DATIM as needed.
+Adds PSNU label used in Data Packs.
 }

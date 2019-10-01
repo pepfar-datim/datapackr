@@ -4,7 +4,8 @@
 \alias{getPSNUs}
 \title{Pull list of PSNUs from DATIM based on provided country UIDs.}
 \usage{
-getPSNUs(country_uids = NA, include_mil = TRUE)
+getPSNUs(country_uids = NULL, include_mil = TRUE,
+  additional_fields = NULL)
 }
 \arguments{
 \item{country_uids}{Character vector of DATIM country IDs. This can only
@@ -12,6 +13,10 @@ include countries. Regional Operating Unit UIDs will not be accepted}
 
 \item{include_mil}{Logical. If \code{TRUE}, will also include _Military nodes
 related to \code{country_uids}. Default is \code{TRUE}.}
+
+\item{additional_fields}{Character string of any fields to return from DATIM
+API other than those returned by default: \code{name}, \code{id}, \code{ancestors},
+& \code{organisationUnitGroups}.}
 }
 \value{
 Data frame of PSNUs
