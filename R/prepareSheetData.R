@@ -65,25 +65,45 @@ prepareSheetData <- function(sheet,
     dplyr::mutate_if(
       is.character,
       stringr::str_replace_all,
-      pattern = paste0("(?<=[:upper:])",headerRow(tool = "Data Pack Template")+1),
+      pattern = paste0("(?<=[:upper:])", headerRow(tool = "Data Pack Template")+1),
       replacement = as.character(1:NROW(row_headers) + headerRow(tool = "Data Pack Template")))
   
-  # Swap in model data ####
-  sheet_data %<>%
-    tidyr::spread(key = indicator_code,
-                  value = value)
+  # Classify formul columns as formulas
+  ## TODO: Improve approach
+  for (i in 1:length(dataStructure)) {
+    if (!all(any(is.na(dataStructure[[i]])))) {
+      class(dataStructure[[i]]) <- c(class(dataStructure[[i]]), "formula")
+    }
+  }
   
-  combined <- row_headers %>%
-    dplyr::left_join(
-      sheet_data,
-      by = c("psnu_uid" = "psnu_uid",
-             "valid_ages.id" = "age_option_uid",
-             "valid_sexes.id" = "sex_option_uid",
-             "valid_kps.id" = "kp_option_uid"))
+  # Swap in model data ####
+  if (!is.null(sheet_data)) {
+    sheet_data %<>%
+      tidyr::spread(key = indicator_code,
+                    value = value)
+    
+    combined <- row_headers %>%
+      dplyr::left_join(
+        sheet_data,
+        by = c("psnu_uid" = "psnu_uid",
+               "valid_ages.id" = "age_option_uid",
+               "valid_sexes.id" = "sex_option_uid",
+               "valid_kps.id" = "kp_option_uid"))
+  } else {combined = row_headers}
   
   dataStructure <- dataStructure %>%
     swapColumns(., combined) %>%
     as.data.frame(.)
+  
+  # Translate Prioritizations
+  if(sheet == "Prioritization") {
+    dataStructure %<>%
+      dplyr::left_join(
+       datapackr::prioritizations, by = c("IMPATT.PRIORITY_SNU.19T" = "value")
+      ) %>%
+    dplyr::mutate(IMPATT.PRIORITY_SNU.19T = Prioritization) %>%
+    dplyr::select(-Prioritization)
+  }
   
   return(dataStructure)
 

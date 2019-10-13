@@ -4,14 +4,29 @@
 \alias{packDataPackSheets}
 \title{Loop through and populate normal Data Pack sheets}
 \usage{
-packDataPackSheets(wb, country_uids, model_data)
+packDataPackSheets(wb, country_uids = NULL,
+  ou_level = "Prioritization", org_units = NULL, model_data = NULL,
+  schema = datapackr::data_pack_schema, sheets = NULL)
 }
 \arguments{
 \item{wb}{datapackr list object.}
 
 \item{country_uids}{datapackr list object.}
 
-\item{model_data}{}
+\item{ou_level}{Level in DATIM hierarchy to pull orgUnits from. Choose from:
+"Prioritization", "Community", "Facility", or the numbers 4 through 7.}
+
+\item{org_units}{Allows for specification of custom list of orgUnits to include
+in Data Pack sheets. To use, country_uids and ou_level must be left NULL.}
+
+\item{model_data}{Dataset to use as input for packing Data Pack. If left NULL,
+will produce a Data Pack with orgUnits and disagg specifications, but no data.}
+
+\item{schema}{Defaults to standard Data Pack schema, but allows for provision
+of custom schema if needed.}
+
+\item{sheets}{Sheets to pack. Defaults to all those available in \code{wb},
+minus the first few front-matter/summary tabs.}
 }
 \value{
 wb with all sheets written except SNU x IM

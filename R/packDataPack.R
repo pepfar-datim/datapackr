@@ -71,17 +71,19 @@ packDataPack <- function(model_data,
                             type = "Data Pack")
   
   # Get PSNU List####
-  PSNUs <- getPSNUs(country_uids = d$info$country_uids,
-                           include_mil = TRUE) %>%
+  PSNUs <- datapackr::valid_PSNUs %>%
+    dplyr::filter(country_uid %in% country_uids) %>%
+    add_dp_psnu(.) %>%
     dplyr::arrange(dp_psnu)
   # TODO: Separate PSNUs as parameter for this function, allowing you to include
   # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
-  # TODO: Store PSNUs within package to allow this to move faster? That level of detail is public anyway
   
   # Write Main Sheets ####
-  
-  
-  
+  wb <- packDataPackSheets(wb = d$tool$wb,
+                           country_uids = country_uids,
+                           ou_level = "Prioritization",
+                           model_data = model_data,
+                           schema = d$info$schema)
   
   # Write SNU x IM tab ####
   
