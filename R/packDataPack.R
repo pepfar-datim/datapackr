@@ -79,11 +79,11 @@ packDataPack <- function(model_data,
   # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
   
   # Write Main Sheets ####
-  wb <- packDataPackSheets(wb = d$tool$wb,
-                           country_uids = country_uids,
-                           ou_level = "Prioritization",
-                           model_data = model_data,
-                           schema = d$info$schema)
+  d$tool$wb <- packDataPackSheets(wb = d$tool$wb,
+                                  country_uids = country_uids,
+                                  ou_level = "Prioritization",
+                                  model_data = model_data,
+                                  schema = d$info$schema)
   
   # Write SNU x IM tab ####
   

@@ -34,5 +34,25 @@ packDataPackSheet <- function(wb,
                       xy = c(1, headerRow(tool = "Data Pack Template")),
                       colNames = T, rowNames = F, withFilter = TRUE)
   
+  # Format percentages
+  percentCols <- schema %>%
+    dplyr::filter(sheet_name == sheet,
+                  value_type == "percentage") %>%
+    dplyr::pull(col)
+  
+  percentStyle = openxlsx::createStyle(numFmt = "0%")
+  
+  if (length(percentCols) > 0) {
+    openxlsx::addStyle(wb,
+                       sheet = sheet,
+                       percentStyle,
+                       rows = (1:NROW(sheet_data)) + headerRow(tool = "Data Pack Template"),
+                       cols = percentCols,
+                       gridExpand = TRUE,
+                       stack = TRUE)
+  }
+  
+  
+  
   return(wb) 
 }

@@ -68,7 +68,7 @@ prepareSheetData <- function(sheet,
       pattern = paste0("(?<=[:upper:])", headerRow(tool = "Data Pack Template")+1),
       replacement = as.character(1:NROW(row_headers) + headerRow(tool = "Data Pack Template")))
   
-  # Classify formul columns as formulas
+  # Classify formula columns as formulas
   ## TODO: Improve approach
   for (i in 1:length(dataStructure)) {
     if (!all(any(is.na(dataStructure[[i]])))) {
