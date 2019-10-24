@@ -135,19 +135,49 @@ compareData_SiteVsDatim <- function(site_data,
       attribute_option_combo_code != "00001"
   )
   
-  # Find the cases with different values
+  # Find the cases with different values. These should be  imported into DATIM
   data_different_value <-
-    dplyr::filter(data, tool_value != datim_value)
-  data_matched_value <-
-    dplyr::filter(data, tool_value == datim_value)
-  data_datim_only <- dplyr::filter(data, is.na(tool_value))
-  data_site_tool_only <- dplyr::filter(data, is.na(datim_value))
+    dplyr::filter(data, tool_value != datim_value | is.na(datim_value)) %>%
+  dplyr::select(data_element_uid,period,org_unit_uid,category_option_combo_uid,attribute_option_combo_code,tool_value)
   
-  list(
+  
+  #Find cases which only exist in  DATIM. These need to be deleted. 
+  data_datim_only <- dplyr::filter(data, is.na(tool_value)) %>% 
+    select(data_element_uid,period,org_unit_uid,category_option_combo_uid,attribute_option_combo_code,datim_value)
+
+  #Make the data prettier
+  data$data_element <-datimvalidation::remapDEs(data$data_element_uid,mode_in="id",mode_out = "shortName")
+  data$site_name <- datimvalidation::remapOUs(data$org_unit_uid,mode_in = "id", mode_out = "shortName", organisationUnit = org_unit_uids)
+  data$disagg <- datimvalidation::remapCategoryOptionCombos(data$category_option_combo_uid,mode_in = "id",mode_out = "name")
+  
+  data_pretty <-
+    data %>% dplyr::ungroup() %>%  dplyr::select(data_element,
+                                                 site_name,
+                                                 period,
+                                                 disagg,
+                                                 mechanism = attribute_option_combo_code,
+                                                 tool_value,
+                                                 datim_value) %>%
+  tidyr::gather(source,value,tool_value:datim_value) %>% 
+    mutate(source = plyr::mapvalues(source,c("tool_value","datim_value"),c("Site Tool","DATIM")))
+   
+  changed_data <-
+    data_pretty %>% select(-source)  %>% 
+    dplyr::arrange(data_element, site_name, period, disagg, mechanism, value) %>% 
+    group_by_all() %>% 
+    mutate(recs =n()) %>% 
+    filter(recs != 2) %>% 
+    ungroup() %>% 
+    select(-c(value, recs)) %>%  
+    dplyr::distinct() %>% 
+    inner_join(data_pretty,.)
+  
+  #Data which needs to be deleted 
+  
+   list(
     dedup = data_dedups, 
-    matched = data_matched_value,
-    different = data_different_value,
-    datim_only = data_datim_only,
-    site_tool_only = data_site_tool_only
+    updates= data_different_value,
+    deletes = data_datim_only,
+    data_pretty = data_pretty
   )
 }
