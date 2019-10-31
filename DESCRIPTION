@@ -45,7 +45,8 @@ Imports:
     datapackcommons,
     glue,
     rlang,
-    assertthat
+    assertthat,
+    shiny
 Suggests:
     devtools (>= 2.0.1),
     testthat
