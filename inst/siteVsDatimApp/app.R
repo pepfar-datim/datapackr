@@ -52,16 +52,6 @@ ui <- fluidPage(
       choiceNames =  c("COP19", "COP18"),
       choiceValues = c("2019Oct", "2018Oct")
     ),
-    shiny::selectInput(
-      inputId = "org_unit",
-      label = "Countries in the site tool",
-      choices = c("Eswatini" = "V0qMZH29CtN",
-                  "Rwanda" = "XtxUYCsDWrR",
-                  "South Africa" = "cDGPF739ZZr",
-                  "Vietnam" = "YM6xn5QxNpY"),
-      multiple = TRUE,
-      selectize = TRUE
-    ),
     shiny::conditionalPanel(condition = "input.cop_year != '2018Oct'",
                             shiny::fileInput("site_in", "Site Tool")),
     shiny::conditionalPanel(
@@ -95,6 +85,7 @@ ui <- fluidPage(
 
 
 server <- function(input, output, session) {
+  
   shiny::observeEvent(input$log_me_in, {
     success <- DHISLogin(input$user,
                          input$pw)
@@ -105,29 +96,35 @@ server <- function(input, output, session) {
       shinyjs::alert("Log in unsuccesful.")
     }
     print(success)
-    # output$logged_in <-  shiny::reactive(DHISLogin(input$user,
-    # input$pw))
   })
+  
   shiny::observeEvent(input$compare, {
-    #output$logged_in <- ping()
+    
     if (input$cop_year == "2018Oct") {
-      data <-
-        dplyr::bind_rows(
-          datapackimporter::DataPackR(input$hts_in$datapath,
+   
+          hts<-datapackimporter::DataPackR(input$hts_in$datapath,
                                       "",
-                                      input$support_files)$data,
-          datapackimporter::DataPackR(input$normal_in$datapath,
+                                      input$support_files)
+          
+          normal<-datapackimporter::DataPackR(input$normal_in$datapath,
                                       "",
-                                      input$support_files)$data
-        )
+                                      input$support_files)
+          
+          orgunit<-hts$wb_info$ou_uid
+          data <- dplyr::bind_rows(hts$data,normal$data)
+          
+
+        
     } else if (input$cop_year == "2019Oct") {
-      data <-
-        datapackr::unPackSiteToolData(input$site_in$datapath)$datim$site_data
+      site_tool <- datapackr::unPackSiteToolData(input$site_in$datapath)
+      data  <- site_tool$datim$site_data
+      orgunit <- site_tool$info$datapack_uid
     } else {
       stop("Unsupported COP year")
     }
+    
     compare_out <- datapackr::compareData_SiteVsDatim(data,
-                                                      input$org_unit,
+                                                      orgunit,
                                                       input$cop_year)
     
   output$downloadFlatPack <- downloadHandler(

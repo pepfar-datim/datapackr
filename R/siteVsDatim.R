@@ -58,22 +58,26 @@ compareData_SiteVsDatim <- function(site_data,
       "period", "2018Oct"
     )
 
-# go from mech id to code for COP 18 data    
-    site_data <-
-      purrr::map(org_unit_uids, datimvalidation::getMechanismsMap) %>%
-      dplyr::bind_rows() %>% 
-      dplyr::select(id, code) %>% 
-      dplyr::distinct() %>% 
-      dplyr::right_join(site_data, by = c("id" = "attributeoptioncombo")) %>% 
-      dplyr::mutate(attributeoptioncombo = code) %>% 
-      dplyr::select(-id, -code) %>% 
-      dplyr::select(dataelement,
-                     period,
-                     orgunit,
-                     categoryoptioncombo,
-                     attributeoptioncombo,
-                     value
-                     )
+# go from mech id to code for COP 18 data
+    site_data$attributeoptioncombo<-datimvalidation::remapMechs(site_data$attributeoptioncombo,
+                                                                organisationUnit = org_unit_uids,
+                                                                mode_in = "id",
+                                                                mode_out = "code")
+    # site_data <-
+    #   purrr::map(org_unit_uids, datimvalidation::getMechanismsMap) %>%
+    #   dplyr::bind_rows() %>% 
+    #   dplyr::select(id, code) %>% 
+    #   dplyr::distinct() %>% 
+    #   dplyr::right_join(site_data, by = c("id" = "attributeoptioncombo")) %>% 
+    #   dplyr::mutate(attributeoptioncombo = code) %>% 
+    #   dplyr::select(-id, -code) %>% 
+    #   dplyr::select(dataelement,
+    #                  period,
+    #                  orgunit,
+    #                  categoryoptioncombo,
+    #                  attributeoptioncombo,
+    #                  value
+    #                 )
     } else {
       stop("You are trying to compare a site tool for an unsupported period.")
       }
@@ -99,6 +103,7 @@ compareData_SiteVsDatim <- function(site_data,
       category_option_combo_uid = categoryoptioncombo,
       attribute_option_combo_code = attributeoptioncombo
     ) %>%
+    dplyr::filter(!stringr::str_detect(attribute_option_combo_code, "00000|00001")) %>%  #Filter out dedupes 
     dplyr::group_by(
       data_element_uid,
       period,
@@ -122,21 +127,11 @@ compareData_SiteVsDatim <- function(site_data,
       category_option_combo_uid = category_option_combo,
       attribute_option_combo_code = attribute_option_combo
     ) %>% 
-    dplyr::filter(datim_value != 0)
+    dplyr::filter(datim_value != 0) %>% 
+    dplyr::filter(datim_value != "") %>% 
+    dplyr::filter(!stringr::str_detect(attribute_option_combo_code, "00000|00001")) #Filter out dedupes
   
   data <- dplyr::full_join(site_data, datim_data)
-  
-  # pull dedups into their own object - we do not currently return this
-  data_dedups <- dplyr::filter(
-    data,
-    attribute_option_combo_code == "00000" |
-      attribute_option_combo_code == "00001"
-  )
-  data <- dplyr::filter(
-    data,
-    attribute_option_combo_code != "00000" &
-      attribute_option_combo_code != "00001"
-  )
   
   # Find the cases with different values. These should be  imported into DATIM
   data_different_value <-
@@ -149,7 +144,6 @@ compareData_SiteVsDatim <- function(site_data,
                 tool_value)
   
   
-  #Find cases which only exist in  DATIM. These need to be deleted. 
   data_datim_only <- dplyr::filter(data, is.na(tool_value)) %>% 
     select(data_element_uid,period,org_unit_uid,category_option_combo_uid,attribute_option_combo_code,datim_value)
 
@@ -172,7 +166,6 @@ compareData_SiteVsDatim <- function(site_data,
                                     c("Site Tool","DATIM")))
    
    list(
-    dedup = data_dedups, 
     updates= data_different_value,
     deletes = data_datim_only,
     data_pretty = data_pretty
