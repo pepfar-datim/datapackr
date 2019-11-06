@@ -96,6 +96,8 @@ unPackDataPackSheet <- function(d, sheet) {
   d$data$extract %<>%
     dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
     tidyr::drop_na(value) %>%
+  # Remove any small floating point error coming from Excel  
+    dplyr::mutate(value = round(value, 10)) %>% 
   # Filter out zeros ####
     dplyr::filter(value != 0)
   
