@@ -79,6 +79,7 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::pull(row_id)
   
   if(length(non_numeric) > 0) {
+    d[["tests"]][["non_numeric"]][[as.character(sheet)]] <- character()
     d[["tests"]][["non_numeric"]][[as.character(sheet)]] <- non_numeric
     
     warning_msg <-
@@ -105,7 +106,7 @@ unPackDataPackSheet <- function(d, sheet) {
       dplyr::filter(value < 0) %>%
       dplyr::pull(indicator_code) %>%
       unique()
-    
+    d[["tests"]][["neg_cols"]][[as.character(sheet)]] <- character()
     d[["tests"]][["neg_cols"]][[as.character(sheet)]] <- neg_cols
     
     warning_msg <- 
@@ -137,6 +138,7 @@ unPackDataPackSheet <- function(d, sheet) {
   
   if (NROW(decimal_cols) > 0) {
     
+    d[["tests"]][["decimal_cols"]][[as.character(sheet)]] <- character()
     d[["tests"]][["decimal_cols"]][[as.character(sheet)]] <- decimal_cols
     
     warning_msg <- 
@@ -161,6 +163,7 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::select(PSNU, Age, Sex, KeyPop, indicator_code)
   
   if (NROW(duplicates) > 0) {
+    d[["tests"]][["duplicates"]][[as.character(sheet)]] <- character()
     d[["tests"]][["duplicates"]][[as.character(sheet)]] <- duplicates
     
     dupes_msg <-
