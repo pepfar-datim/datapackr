@@ -63,21 +63,7 @@ compareData_SiteVsDatim <- function(site_data,
                                                                 organisationUnit = org_unit_uids,
                                                                 mode_in = "id",
                                                                 mode_out = "code")
-    # site_data <-
-    #   purrr::map(org_unit_uids, datimvalidation::getMechanismsMap) %>%
-    #   dplyr::bind_rows() %>% 
-    #   dplyr::select(id, code) %>% 
-    #   dplyr::distinct() %>% 
-    #   dplyr::right_join(site_data, by = c("id" = "attributeoptioncombo")) %>% 
-    #   dplyr::mutate(attributeoptioncombo = code) %>% 
-    #   dplyr::select(-id, -code) %>% 
-    #   dplyr::select(dataelement,
-    #                  period,
-    #                  orgunit,
-    #                  categoryoptioncombo,
-    #                  attributeoptioncombo,
-    #                  value
-    #                 )
+
     } else {
       stop("You are trying to compare a site tool for an unsupported period.")
       }
@@ -149,12 +135,14 @@ compareData_SiteVsDatim <- function(site_data,
 
   #Make the data prettier
   data$data_element <-datimvalidation::remapDEs(data$data_element_uid,mode_in="id",mode_out = "shortName")
-  data$site_name <- datimvalidation::remapOUs(data$org_unit_uid,mode_in = "id", mode_out = "shortName", organisationUnit = org_unit_uids)
   data$disagg <- datimvalidation::remapCategoryOptionCombos(data$category_option_combo_uid,mode_in = "id",mode_out = "name")
+  
+  
+
   
   data_pretty <-
     data %>%  dplyr::select(data_element,
-                            site_name,
+                            org_unit_uid,
                             period,
                             disagg,
                             mechanism = attribute_option_combo_code,
@@ -164,6 +152,19 @@ compareData_SiteVsDatim <- function(site_data,
     mutate(source = plyr::mapvalues(source,
                                     c("tool_value","datim_value"),
                                     c("Site Tool","DATIM")))
+  
+  #Adorn the sites
+  site_list <- getSiteList(org_unit_uids) %>%
+    dplyr::select(psnu,
+                  org_unit_uid=id)
+  
+  data_pretty %<>% 
+    dplyr::left_join(site_list, by="org_unit_uid") %>%
+    dplyr::select(-org_unit_uid) %>% 
+    dplyr::group_by(data_element,period,disagg,mechanism,source,psnu) %>% 
+    dplyr::summarise(value=sum(as.numeric(value),na.rm = TRUE)) %>% 
+    dplyr::ungroup()
+  
    
    list(
     updates= data_different_value,
