@@ -34,7 +34,9 @@ rePackPSNUxIM <- function(d) {
   
   # TEST where Data Pack targets not fully distributed.
   undistributed <- d$data$distributedMER %>%
-    dplyr::filter(!is.na(value) & is.na(distribution))
+    dplyr::filter(!is.na(value) & 
+                    value >= .5 & 
+                    is.na(distribution))
   
   if (NROW(undistributed) > 0) {
     d$tests$undistributed <- undistributed
