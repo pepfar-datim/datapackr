@@ -8,6 +8,7 @@ require(datapackimporter)
 library(shiny)
 
 options("baseurl" = "https://www.datim.org/")
+options(shiny.maxRequestSize=30*1024^2)
 addResourcePath("www", system.file("siteVsDatimApp/www", package = "datapackr"))
 DHISLogin <- function(username, password, 
                       base_url = getOption("baseurl")) {
@@ -58,6 +59,7 @@ ui <- fluidPage(
       choices = c("Eswatini" = "V0qMZH29CtN",
                   "Rwanda" = "XtxUYCsDWrR",
                   "South Africa" = "cDGPF739ZZr",
+                  "Tanzania"= "mdXu6iCbn2G",
                   "Vietnam" = "YM6xn5QxNpY"),
       multiple = TRUE,
       selectize = TRUE
