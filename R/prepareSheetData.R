@@ -78,31 +78,29 @@ prepareSheetData <- function(sheet,
   
   # Swap in model data ####
   if (!is.null(sheet_data)) {
-    sheet_data %<>%
+    sheet_data_spread <- sheet_data %>%
       tidyr::spread(key = indicator_code,
                     value = value)
     
     combined <- row_headers %>%
       dplyr::left_join(
-        sheet_data,
+        sheet_data_spread,
         by = c("psnu_uid" = "psnu_uid",
                "valid_ages.id" = "age_option_uid",
                "valid_sexes.id" = "sex_option_uid",
                "valid_kps.id" = "kp_option_uid"))
   } else {combined = row_headers}
   
-  dataStructure <- dataStructure %>%
+  dataStructure %<>%
     swapColumns(., combined) %>%
     as.data.frame(.)
   
   # Translate Prioritizations
-  if(sheet == "Prioritization") {
-    dataStructure %<>%
-      dplyr::left_join(
-       datapackr::prioritizations, by = c("IMPATT.PRIORITY_SNU.19T" = "value")
-      ) %>%
-    dplyr::mutate(IMPATT.PRIORITY_SNU.19T = Prioritization) %>%
-    dplyr::select(-Prioritization)
+  if (sheet == "Prioritization") {
+    pznDict <- with(prioritizations, setNames(Prioritization, value))
+    
+    dataStructure$IMPATT.PRIORITY_SNU.19T <- 
+      dplyr::recode(dataStructure$IMPATT.PRIORITY_SNU.19T, !!!pznDict)
   }
   
   return(dataStructure)

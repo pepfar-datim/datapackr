@@ -61,8 +61,11 @@ packDataPack <- function(model_data,
     stop("Ruh roh. Template provided does not match archived schema.")
   }
   
-  # Place Workbook into play
+  # Place Workbook into play ####
   d$tool$wb <- openxlsx::loadWorkbook(d$keychain$template_path)
+  
+  # Set global numeric format ####
+  options("openxlsx.numFmt" = "#,##0")
   
   # Write Home Sheet info ####
   d$tool$wb <- writeHomeTab(wb = d$tool$wb,
@@ -86,15 +89,28 @@ packDataPack <- function(model_data,
                                   schema = d$info$schema)
   
   # Write SNU x IM tab ####
+  print("Writing SNU x IM tab. This can sometimes take a few minutes...")
   
   
   # Add Styles ####
+  print("Cleaning up Styles...")
+  ## TODO: Address this in Data Pack?
+    ## Add styles to Summary tab
+  summaryStyle = openxlsx::createStyle(fgFill = "#404040")
+  openxlsx::addStyle(d$tool$wb, sheet = "Summary", summaryStyle, cols = 1:2, rows = 1:62, gridExpand = TRUE, stack = TRUE)
   
+    ## Add styles to Spectrum tab
+  spectrumStyle1 = openxlsx::createStyle(fgFill = "#9CBEBD")
+  spectrumStyle2 = openxlsx::createStyle(fgFill = "#FFEB84")
+  openxlsx::addStyle(d$tool$wb, sheet = "Spectrum", spectrumStyle1, cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
+  openxlsx::addStyle(d$tool$wb, sheet = "Spectrum", spectrumStyle2, cols = 2, rows = 2, gridExpand = TRUE, stack = TRUE)
   
   # Add validations
+  print("Adding Validations...")
   
   
   # Save & Export Workbook
+  print("Saving...")
   exportPackr(data = d$tool$wb,
               output_path = d$keychain$output_folder,
               type = d$info$type,
