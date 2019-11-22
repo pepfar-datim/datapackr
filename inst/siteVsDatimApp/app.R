@@ -57,10 +57,12 @@ ui <- fluidPage(
       inputId = "org_unit",
       label = "Countries in the site tool",
       choices = c("Eswatini" = "V0qMZH29CtN",
+                  "Ghana" = "y3zhsvdXlhN",
                   "Rwanda" = "XtxUYCsDWrR",
                   "South Africa" = "cDGPF739ZZr",
                   "Tanzania"= "mdXu6iCbn2G",
-                  "Vietnam" = "YM6xn5QxNpY"),
+                  "Vietnam" = "YM6xn5QxNpY",
+                  "West Africa" = "G0BT4KrJouu"),
       multiple = TRUE,
       selectize = TRUE
     ),
