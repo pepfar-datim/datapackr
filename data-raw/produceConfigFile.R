@@ -424,12 +424,19 @@ getPeriodInfo <- function(FY = NA) {
     # data_pack_schema <- unPackStructure(template_path)
     # save(data_pack_schema, file = "./data/data_pack_schema.rda")
     
-  ## Updated Data Pack Schema ####
+  ## Updated COP19 Data Pack Schema ####
     datapack_template_filepath <- "./data-raw/COP19_Data_Pack_Template_vFinal.xlsx"
     data_pack_schema <- unPackSchema_datapack(
       filepath = datapack_template_filepath,
       skip = skip_tabs(tool = "Data Pack Template"))
     save(data_pack_schema, file = "./data/data_pack_schema.rda")
+    
+  ## Updated COP20 Data Pack Schema ####
+    datapack_template_filepath <- "./data-raw/COP20_Data_Pack_Template_vFINAL.xlsx"
+    cop20_data_pack_schema <- unPackSchema_datapack(
+      filepath = datapack_template_filepath,
+      skip = skip_tabs(tool = "Data Pack Template"))
+    save(cop20_data_pack_schema, file = "./data/cop20_data_pack_schema.rda")
       
   ## Site Tool Schema ####
     site_tool_schema <- getSiteToolSchema(data_pack_schema)

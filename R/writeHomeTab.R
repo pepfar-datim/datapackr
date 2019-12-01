@@ -12,6 +12,7 @@
 #' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
 #' @param country_uids Character vector of 11 digit alphanumeric DATIM codes
 #' representing countries.
+#' @param cop_year COP Year in format YYYY.
 #' @param type Either "Data Pack" or "Site Tool". Defaults to "Data Pack".
 #' 
 #' @return Openxlsx workbook object with added, styled Home tab.
@@ -19,6 +20,7 @@
 writeHomeTab <- function(wb,
                          datapack_name,
                          country_uids,
+                         cop_year = cop_year(),
                          type = "Data Pack") {
   #TODO: Setup for default to run PEPFARLANDIA version.
   
@@ -38,7 +40,7 @@ writeHomeTab <- function(wb,
   # Title ####
   openxlsx::writeData(wb, "Home",
                       x = paste0("COP",
-                                 stringr::str_sub(cop_year(), -2,-1),
+                                 stringr::str_sub(cop_year, -2,-1),
                                  " ",
                                  type),
                       xy = c(2,10),

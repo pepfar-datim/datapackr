@@ -14,6 +14,8 @@
 #' @param template_path Local filepath to Data Pack template Excel (XLSX) file.
 #' This file MUST NOT have any data validation formats present. If left
 #' \code{NA}, will prompt for file selection via window.
+#' @param  cop_year Specifies COP year for dating as well as selection of
+#' templates.
 #' @param output_folder Local folder where you would like your Data Pack to be
 #' saved upon export. If left as \code{NA}, will output to
 #' \code{Working Directory}.
@@ -25,6 +27,7 @@ packDataPack <- function(model_data,
                          datapack_name,
                          country_uids,
                          template_path = NA,
+                         cop_year = cop_year(),
                          output_folder = getwd()) {
   
   #TODO: Combine with packSiteTool? Or merge both into packTool?
@@ -38,7 +41,8 @@ packDataPack <- function(model_data,
     info = list(
       datapack_name = datapack_name,
       country_uids = country_uids,
-      type = "Data Pack"
+      type = "Data Pack",
+      cop_year =  cop_year
     ),
     data = list(
       model_data = model_data
@@ -46,7 +50,9 @@ packDataPack <- function(model_data,
   )
   
   # Open schema ####
-  d$info$schema <- datapackr::data_pack_schema
+  if (cop_year == 2020) {
+   d$info$schema <-  datapackr::cop20_data_pack_schema
+  } else {d$info$schema <- datapackr::data_pack_schema}
   
   # Open template ####
   d$keychain$template_path <- handshakeFile(path = d$keychain$template_path,
@@ -71,6 +77,7 @@ packDataPack <- function(model_data,
   d$tool$wb <- writeHomeTab(wb = d$tool$wb,
                             datapack_name = d$info$datapack_name,
                             country_uids = d$info$country_uids,
+                            cop_year = cop_year,
                             type = "Data Pack")
   
   # Get PSNU List####
