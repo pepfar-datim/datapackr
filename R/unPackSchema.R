@@ -59,8 +59,7 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
     dplyr::filter(group != "") %>%
     tidyr::separate_rows(group, sep = ",") %>%
     dplyr::arrange(group, name) %>%
-    dplyr::group_by(group) %>%
-    tidyr::nest(.key = options) %>%
+    tidyr::nest(options = c(name, id)) %>%
     tibble::deframe()
   
   empty <- list(tibble::tribble(
