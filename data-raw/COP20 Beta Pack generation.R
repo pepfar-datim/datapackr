@@ -31,8 +31,8 @@ batch <- tibble::tribble(
 
 for (i in 1:NROW(batch)) {
   packDataPack(model_data = model_data,
-               datapack_name = batch[i,1],
-               country_uids = batch[i,2],
+               datapack_name = batch[[i,1]],
+               country_uids = batch[[i,2]],
                template_path = template_path,
                cop_year = cop_year,
                output_folder = output_folder)
