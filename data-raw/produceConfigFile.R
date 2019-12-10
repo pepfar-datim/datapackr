@@ -525,7 +525,8 @@ getPeriodInfo <- function(FY = NA) {
         ## 25-49
         datapack_schema_group = ifelse(
           test = stringr::str_detect(datapack_schema_group,"5yr")
-            & (stringr::str_extract(datapack_disagg,"\\d\\d") %>% as.numeric) >= 25,
+            & (stringr::str_extract(datapack_disagg,"\\d\\d") %>% as.numeric) >= 25
+            & datapack_disagg != "50+",
           yes = paste(datapack_schema_group,"25-49",sep = ","),
           no =  datapack_schema_group),
         ##ovcAges
