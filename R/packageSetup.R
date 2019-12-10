@@ -19,12 +19,18 @@ countryUIDs_homeCell <- function() { "B25" }
 #' 
 #' @param tool "Data Pack", "Data Pack Template", "Site Tool", "Site Tool Template",
 #' "Mechanism Map", or "Site Filter".
+#' @param cop_year
 #' 
 #' @return Character vector of tab names to skip.
 #' 
-skip_tabs <- function(tool = "Data Pack") {
+skip_tabs <- function(tool = "Data Pack", cop_year = cop_year()) {
   if (tool %in% c("Data Pack", "Data Pack Template")) {
-    skip = c("Home", "Quotes", "Summary", "Spectrum")
+    if (cop_year == 2019) {
+      skip = c("Home", "Quotes", "Summary", "Spectrum")
+    }
+    else if (cop_year == 2020) {
+      skip = c("Home", "Summary", "Spectrum")
+    }
   } else {skip = c(NA_character_)}
   
   return(skip)

@@ -435,7 +435,7 @@ getPeriodInfo <- function(FY = NA) {
     datapack_template_filepath <- "./data-raw/COP20_Data_Pack_Template_vFINAL.xlsx"
     cop20_data_pack_schema <- unPackSchema_datapack(
       filepath = datapack_template_filepath,
-      skip = skip_tabs(tool = "Data Pack Template"))
+      skip = skip_tabs(tool = "Data Pack Template", cop_year = 2020))
     save(cop20_data_pack_schema, file = "./data/cop20_data_pack_schema.rda")
       
   ## Site Tool Schema ####

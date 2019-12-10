@@ -61,7 +61,8 @@ packDataPack <- function(model_data,
   
   # Test template against schema ####
   schema <- unPackSchema_datapack(filepath = d$keychain$template,
-                        skip = skip_tabs("Data Pack Template"))
+                        skip = skip_tabs(tool = "Data Pack Template",
+                                         cop_year = cop_year))
   
   if (!identical(d$info$schema, schema)) {
     stop("Ruh roh. Template provided does not match archived schema.")

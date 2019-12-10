@@ -18,15 +18,9 @@ model_data <- readRDS(model_data_path) %>%
 
 batch <- tibble::tribble(
   ~datapack_name, ~country_uids,
-  "India", "skj3e4YSiJY",
-  "Thailand", "Gv5ApcpDrIB",
-  "Nigeria", "PqlFzhuPcF1",
-  "South Africa", "cDGPF739ZZr",
-  "Zimbabwe", "a71G4Gtcttv",
-  "Tanzania", "mdXu6iCbn2G",
-  "Uganda", "FETQ6OmnsKB",
-  "Mozambique", "h11OyvlPxpJ",
-  "Ethiopia", "IH1kchw86uA"
+  "Kenya","HfVjCurKxh2",
+  "Cote d'Ivoire","ds0ADyc9UCU",
+  "Mozambique", "h11OyvlPxpJ"
 )
 
 for (i in 1:NROW(batch)) {
