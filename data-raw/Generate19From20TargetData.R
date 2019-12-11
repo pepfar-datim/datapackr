@@ -147,11 +147,11 @@ dataSets = dplyr::filter(dataSets, !is.na(indicator_code) & !is.na(psnu)) %>%
                 Sex          = valid_sexes,
                 KeyPop       = valid_kps,
                 mechanismCode= attribute_option_combo,
-                value        = value, #(if we pulled directly from a data pack this would be different than siteValue, but for OPUs should equal siteValue) 
+                value, #(if we pulled directly from a data pack this would be different than siteValue, but for OPUs should equal siteValue) 
                 org_unit     = org_unit,
-                type         = type_options, #{DSD, TA} -   (NA not valid in our case)
-                siteValue    = value
-                )
+                type         = type_options #{DSD, TA} -   (NA not valid in our case)
+                ) %>% 
+  dplyr::mutate(PSNU = glue::glue("{PSNU} ({psnuid})"), siteValue = value)
 
 
 # Initialize empty result list for performance reasons
