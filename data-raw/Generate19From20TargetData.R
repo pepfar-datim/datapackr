@@ -87,6 +87,7 @@ getCOP19DataFromAPI<-function(country_uid) {
     "dataSet", "HiJieecLXxN",
     "period",  "2019Oct",
     "children", "true",
+    "categoryOptionComboIdScheme", "code",
     "includeDeleted", "false",
     "orgUnit", country_uid) 
   
@@ -102,12 +103,57 @@ getCOP19DataFromAPI<-function(country_uid) {
 
 datimvalidation::loadSecrets(secrets)
 
+# get a table to map the DATIM columns data site tool columns 
+# handling the special cases of HTS_SELF.N.HIVSelfTest.20T.Unassisted and 
+# 
+ site_to_datim <- dplyr::filter(datapackr::SiteToDATIM,
+                       indicator_code != "HTS_SELF.N.HIVSelfTest.20T.Unassisted" |
+                         (indicator_code == "HTS_SELF.N.HIVSelfTest.20T.Unassisted" &
+                            valid_ages == "50+" & valid_sexes == "Male")
+                       ) %>% 
+   dplyr::filter(indicator_code != "TB_ART.N.Age/Sex/NewExistingART/HIVStatus.20T.Already")
+   
+
 # Cache the PSNUs for this country
-psnus = datapackr::getPSNUs(parent_uid, TRUE)
+# psnus = datapackr::getPSNUs(parent_uid, TRUE)
+sites  <-  datapackr::getSiteList(parent_uid)
 # Store the country OU name
 parent_name <- getOUNameFromUID(parent_uid)
 # Get the main dataset for looping through
 dataSets <- getCOP19DataFromAPI(parent_uid)
+
+#join with site to datim table to back out columns for site tool 
+dataSets  <-  dplyr::left_join(dataSets, site_to_datim, 
+                 by = c("data_element" = "dataelementuid",
+                        "category_option_combo" = "categoryoptioncombouid"))
+
+# join with sites table to get PSNU details
+
+dataSets  <-  dplyr::left_join(dataSets, sites, 
+                                by = c("org_unit" = "id"))
+
+# store these for investigation - Why is there FY20 target data in DATIM 
+# that we cannot map to the site tool? Usually this is because the data collection form included
+# entry points that were not on the data pack and someone manually eneterd the target
+
+incomplete_records = dplyr::filter(dataSets, is.na(indicator_code) | is.na(psnu))
+
+dataSets = dplyr::filter(dataSets, !is.na(indicator_code) & !is.na(psnu)) %>% 
+  dplyr::select(PSNU = psnu,
+                psnuid = psnu_uid,
+                sheet_name   = sheet_name,
+                indicatorCode = indicator_code,
+                Age          = valid_ages,
+                Sex          = valid_sexes,
+                KeyPop       = valid_kps,
+                mechanismCode= attribute_option_combo,
+                value        = value, #(if we pulled directly from a data pack this would be different than siteValue, but for OPUs should equal siteValue) 
+                org_unit     = org_unit,
+                type         = type_options, #{DSD, TA} -   (NA not valid in our case)
+                siteValue    = value
+                )
+
+
 # Initialize empty result list for performance reasons
 resultSet <- vector("list", nrow(dataSets))
 
