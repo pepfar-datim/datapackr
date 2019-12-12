@@ -174,6 +174,8 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA) {
     dplyr::distinct() %>%
     dplyr::pull()
   
+  #TODO: Add check to make sure T, T_1, and R map correctly to rows 5-13
+  
   tests <- schema %>%
     dplyr::left_join(
       data.frame(
