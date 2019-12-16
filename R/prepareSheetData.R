@@ -99,8 +99,8 @@ prepareSheetData <- function(sheet,
   if (sheet == "Prioritization") {
     pznDict <- with(prioritizations, setNames(Prioritization, value))
     
-    dataStructure$IMPATT.PRIORITY_SNU.19T <- 
-      dplyr::recode(dataStructure$IMPATT.PRIORITY_SNU.19T, !!!pznDict)
+    dataStructure$IMPATT.PRIORITY_SNU.T_1 <- 
+      dplyr::recode(dataStructure$IMPATT.PRIORITY_SNU.T_1, !!!pznDict)
   }
   
   return(dataStructure)
