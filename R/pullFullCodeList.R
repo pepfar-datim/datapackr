@@ -16,12 +16,12 @@ pullFullCodeList <- function(FY = NA, datastream = NA) {
   
   if (is.na(datastream)) {datastream = c("MER", "SUBNAT", "IMPATT")}
   
-  datasets_list <- api_call("dataSets") %>%
+  datasets <- api_call("dataSets") %>%
     api_get() %>%
     dplyr::filter(
       stringr::str_detect(
         displayName,
-        "^MER Targets: (Community|Facility)|^(Host Country Targets|Planning Attributes): COP Prioritization SNU"
+        "^MER Targets: (Community|Facility)|MER Target Setting: PSNU|^(Host Country Targets|Planning Attributes): COP Prioritization SNU"
         )
       ) %>%
     dplyr::mutate(
@@ -34,10 +34,39 @@ pullFullCodeList <- function(FY = NA, datastream = NA) {
         stringr::str_detect(displayName, "^Host Country Targets") ~ "SUBNAT",
         stringr::str_detect(displayName, "^Planning Attributes") ~ "IMPATT",
       )
-    ) %>%
-    dplyr::filter(fiscal_year == FY,
-                  data_stream %in% datastream) %>%
-    dplyr::pull(id)
+    )
+  
+  if ("MER" %in% datastream) {
+    MER <- datasets %>%
+      dplyr::filter(fiscal_year == FY & data_stream == "MER") %>%
+      dplyr::pull(id)
+  }
+  if ("SUBNAT" %in% datastream) {
+    SUBNAT <- datasets %>%
+      dplyr::filter(fiscal_year == FY & data_stream == "SUBNAT") %>%
+      dplyr::pull(id)
+    
+    if (length(SUBNAT) == 0) {
+      SUBNAT <- datasets %>%
+        dplyr::filter(fiscal_year < FY & data_stream == "SUBNAT") %>%
+        dplyr::slice(which.max(fiscal_year)) %>%
+        dplyr::pull(id)
+    }
+  }
+  if ("IMPATT" %in% datastream) {
+    IMPATT <- datasets %>%
+      dplyr::filter(fiscal_year == FY & data_stream == "IMPATT") %>%
+      dplyr::pull(id)
+    
+    if (length(IMPATT) == 0) {
+      IMPATT <- datasets %>%
+        dplyr::filter(fiscal_year < FY & data_stream == "IMPATT") %>%
+        dplyr::slice(which.max(fiscal_year)) %>%
+        dplyr::pull(id)
+    }
+  }
+  
+  datasets_list <- c(MER, SUBNAT, IMPATT)
   
   ds <- data.frame()
   
