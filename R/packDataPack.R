@@ -31,6 +31,16 @@ packDataPack <- function(model_data,
                          output_folder = getwd()) {
   
   #TODO: Combine with packSiteTool? Or merge both into packTool?
+  # Grab correct schema
+  if (is.na(template_path)) {
+    template_path <- system.file("extdata",
+                                 "COP20_Data_Pack_Template_vFINAL.xlsx",
+                                 package = "datapackr",
+                                 mustWork = TRUE)
+  }
+  
+  
+  
   
   # Create data train for use across remainder of program
   d <- list(
@@ -60,9 +70,11 @@ packDataPack <- function(model_data,
   # TODO: Restrict to only allow use of schema saved in package, or at least as default in param
   
   # Test template against schema ####
-  schema <- unPackSchema_datapack(filepath = d$keychain$template,
-                        skip = skip_tabs(tool = "Data Pack Template",
-                                         cop_year = cop_year))
+  schema <-
+    unPackSchema_datapack(
+      filepath = d$keychain$template,
+      skip = skip_tabs(tool = "Data Pack Template", cop_year = cop_year),
+      cop_year = cop_year)
   
   if (!identical(d$info$schema, schema)) {
     stop("Ruh roh. Template provided does not match archived schema.")
