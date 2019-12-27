@@ -1,11 +1,11 @@
 library(datapackr)
 library(magrittr)
 
-secrets <- "/Users/scott/.secrets/test-mer2.json"
+secrets <- "/Users/scott/.secrets/reg-test.json"
 
 loginToDATIM(secrets)
 
-template_path <- "./data-raw/COP20_Data_Pack_Template_vFINAL.xlsx"
+#template_path <- "./data-raw/COP20_Data_Pack_Template_vTEST.xlsx"
 
 output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/Beta Packs/Testing"
 

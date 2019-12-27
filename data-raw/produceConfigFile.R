@@ -403,7 +403,6 @@ getPeriodInfo <- function(FY = NA) {
     # save(valid_COs, file = "./data/valid_COs.rda")
     
 # Load PSNUs into package from DATIM ####
-    valid_PSNUs <- getPSNUs() %>%
-      dplyr::select(-organisationUnitGroups, -ancestors)
+    valid_PSNUs <- getPSNUs(additional_fields = "lastUpdated")
     save(valid_PSNUs, file = "./data/valid_PSNUs.rda")
     
