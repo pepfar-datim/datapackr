@@ -10,13 +10,15 @@
 #' @param schema Defaults to standard Data Pack schema, but allows for provision
 #' of custom schema if needed.
 #' @param sheet_data 
+#' @param cop_year
 #' 
 #' @return dataframe of data prepared for Data Pack
 #'
 prepareSheetData <- function(sheet,
                              org_units,
                              schema = datapackr::data_pack_schema,
-                             sheet_data) {
+                             sheet_data,
+                             cop_year = cop_year()) {
 
   # Get valid disaggs ####
   valid_disaggs <- schema %>%
@@ -65,8 +67,12 @@ prepareSheetData <- function(sheet,
     dplyr::mutate_if(
       is.character,
       stringr::str_replace_all,
-      pattern = paste0("(?<=[:upper:])", headerRow(tool = "Data Pack Template")+1),
-      replacement = as.character(1:NROW(row_headers) + headerRow(tool = "Data Pack Template")))
+      pattern = paste0("(?<=[:upper:])", headerRow(tool = "Data Pack Template",
+                                                   cop_year = cop_year)
+                                        +1),
+      replacement = as.character(1:NROW(row_headers)
+                                 + headerRow(tool = "Data Pack Template",
+                                             cop_year = cop_year)))
   
   # Classify formula columns as formulas
   ## TODO: Improve approach

@@ -5,7 +5,8 @@
 \title{Pack data into a Data Pack sheet}
 \usage{
 packDataPackSheet(wb, sheet, org_units,
-  schema = datapackr::data_pack_schema, sheet_data)
+  schema = datapackr::data_pack_schema, sheet_data,
+  cop_year = cop_year())
 }
 \arguments{
 \item{wb}{datapackr list object.}
@@ -19,6 +20,8 @@ of custom schema if needed.}
 
 \item{sheet_data}{Dataset to use as input for packing Data Pack. If left NULL,
 will produce a Data Pack with orgUnits and disagg specifications, but no data.}
+
+\item{cop_year}{}
 }
 \value{
 wb with specified sheet packed with data

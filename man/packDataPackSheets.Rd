@@ -4,9 +4,10 @@
 \alias{packDataPackSheets}
 \title{Loop through and populate normal Data Pack sheets}
 \usage{
-packDataPackSheets(wb, country_uids = NULL,
-  ou_level = "Prioritization", org_units = NULL, model_data = NULL,
-  schema = datapackr::data_pack_schema, sheets = NULL)
+packDataPackSheets(wb, country_uids, ou_level = "Prioritization",
+  org_units = NULL, model_data = NULL,
+  schema = datapackr::data_pack_schema, sheets = NULL,
+  cop_year = cop_year())
 }
 \arguments{
 \item{wb}{datapackr list object.}
@@ -17,7 +18,7 @@ packDataPackSheets(wb, country_uids = NULL,
 "Prioritization", "Community", "Facility", or the numbers 4 through 7.}
 
 \item{org_units}{Allows for specification of custom list of orgUnits to include
-in Data Pack sheets. To use, country_uids and ou_level must be left NULL.}
+in Data Pack sheets.}
 
 \item{model_data}{Dataset to use as input for packing Data Pack. If left NULL,
 will produce a Data Pack with orgUnits and disagg specifications, but no data.}
@@ -27,6 +28,8 @@ of custom schema if needed.}
 
 \item{sheets}{Sheets to pack. Defaults to all those available in \code{wb},
 minus the first few front-matter/summary tabs.}
+
+\item{cop_year}{}
 }
 \value{
 wb with all sheets written except SNU x IM

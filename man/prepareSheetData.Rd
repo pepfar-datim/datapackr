@@ -5,7 +5,7 @@
 \title{Prepare sheet-specific dataset for writing into a Data Pack sheet.}
 \usage{
 prepareSheetData(sheet, org_units, schema = datapackr::data_pack_schema,
-  sheet_data)
+  sheet_data, cop_year = cop_year())
 }
 \arguments{
 \item{sheet}{Specified sheet within wb.}
@@ -16,6 +16,8 @@ prepareSheetData(sheet, org_units, schema = datapackr::data_pack_schema,
 of custom schema if needed.}
 
 \item{sheet_data}{}
+
+\item{cop_year}{}
 }
 \value{
 dataframe of data prepared for Data Pack

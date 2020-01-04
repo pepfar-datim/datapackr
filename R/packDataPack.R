@@ -26,21 +26,18 @@
 packDataPack <- function(model_data,
                          datapack_name,
                          country_uids,
-                         template_path = NA,
+                         template_path = NULL,
                          cop_year = cop_year(),
                          output_folder = getwd()) {
   
   #TODO: Combine with packSiteTool? Or merge both into packTool?
   # Grab correct schema
-  if (is.na(template_path)) {
+  if (is.null(template_path)) {
     template_path <- system.file("extdata",
                                  "COP20_Data_Pack_Template_vFINAL.xlsx",
                                  package = "datapackr",
                                  mustWork = TRUE)
   }
-  
-  
-  
   
   # Create data train for use across remainder of program
   d <- list(
@@ -97,36 +94,47 @@ packDataPack <- function(model_data,
   PSNUs <- datapackr::valid_PSNUs %>%
     dplyr::filter(country_uid %in% country_uids) %>%
     add_dp_psnu(.) %>%
-    dplyr::arrange(dp_psnu)
+    dplyr::arrange(dp_psnu) %>%
+    dplyr::select(PSNU = dp_psnu, psnu_uid)
   # TODO: Separate PSNUs as parameter for this function, allowing you to include
   # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
+  
+  # TODO: AFTER regionalization is deployed to DATIM, add lastUpdated lookup to
+  # check whether PSNUs have been updated at all since valid_PSNUs was last run.
   
   # Write Main Sheets ####
   d$tool$wb <- packDataPackSheets(wb = d$tool$wb,
                                   country_uids = country_uids,
                                   ou_level = "Prioritization",
+                                  org_units = PSNUs,
                                   model_data = model_data,
-                                  schema = d$info$schema)
+                                  schema = d$info$schema,
+                                  sheets = NULL,
+                                  cop_year = cop_year)
   
   # Write SNU x IM tab ####
-  print("Writing SNU x IM tab. This can sometimes take a few minutes...")
-  
+  # print("Writing SNU x IM tab. This can sometimes take a few minutes...")
+  # TODO: Move this to separate function for use in shiny app
   
   # Add Styles ####
   print("Cleaning up Styles...")
   ## TODO: Address this in Data Pack?
-    ## Add styles to Summary tab
-  summaryStyle = openxlsx::createStyle(fgFill = "#404040")
-  openxlsx::addStyle(d$tool$wb, sheet = "Summary", summaryStyle, cols = 1:2, rows = 1:62, gridExpand = TRUE, stack = TRUE)
+  #   ## Add styles to Summary tab
+  # summaryStyle = openxlsx::createStyle(fgFill = "#404040")
+  # openxlsx::addStyle(d$tool$wb, sheet = "Summary", summaryStyle, cols = 1:2, rows = 1:62, gridExpand = TRUE, stack = TRUE)
   
     ## Add styles to Spectrum tab
+  #TODO: See if new openxlsx release addresses this issue
   spectrumStyle1 = openxlsx::createStyle(fgFill = "#9CBEBD")
   spectrumStyle2 = openxlsx::createStyle(fgFill = "#FFEB84")
   openxlsx::addStyle(d$tool$wb, sheet = "Spectrum", spectrumStyle1, cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
   openxlsx::addStyle(d$tool$wb, sheet = "Spectrum", spectrumStyle2, cols = 2, rows = 2, gridExpand = TRUE, stack = TRUE)
+  openxlsx::addStyle(d$tool$wb, sheet = "Spectrum IDs", spectrumStyle1, cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
+  openxlsx::addStyle(d$tool$wb, sheet = "Spectrum IDs", spectrumStyle2, cols = 2, rows = 2, gridExpand = TRUE, stack = TRUE)
   
   # Add validations
   print("Adding Validations...")
+  #TODO: Adding validations prevents use of openxlsx to add SNU x IM tab
   
   
   # Save & Export Workbook

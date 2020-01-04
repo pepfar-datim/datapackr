@@ -4,8 +4,9 @@
 \alias{packDataPack}
 \title{Pack a Data Pack}
 \usage{
-packDataPack(model_data, datapack_name, country_uids, template_path = NA,
-  cop_year = cop_year(), output_folder = getwd())
+packDataPack(model_data, datapack_name, country_uids,
+  template_path = NULL, cop_year = cop_year(),
+  output_folder = getwd())
 }
 \arguments{
 \item{model_data}{Data from DATIM needed to pack into Data Pack}
