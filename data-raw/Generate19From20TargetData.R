@@ -164,65 +164,65 @@ d$data$distributedMER <- dataSets
 datapackr::packSiteTool(d,
                         output_path = "/Users/sam" )
 
-# Initialize empty result list for performance reasons
-resultSet <- vector("list", nrow(dataSets))
-
-# loop over dataSets
-#for ( i in 1:nrow(dataSets)) {
-for ( i in 1:6 ) {
-#look up the PSNU for this dataSets$org_unit
-    thisPsnu <- getPsnuForSite(dataSets$org_unit[i],psnus)
-    
-    if (length(thisPsnu) < 1) {
-        cat(sprintf("Error Obtaining Site %s",dataSets$org_unit[i]))
-        next
-    }
-    
-    distributed = list(
-        PSNU = thisPsnu$psnu,
-        psnuid = thisPsnu$psnu_uid,
-        sheet_name   = datapackr::SiteToDATIM$sheet_name %>% unique(),
-        indicatorCode= datapackr::SiteToDATIM$indicator_code %>% unique(),
-        Age          = datapackr::SiteToDATIM$valid_ages %>% unique(),
-        Sex          = datapackr::SiteToDATIM$valid_sexes %>% unique(),
-        KeyPop       = datapackr::SiteToDATIM$valid_kps %>% unique(),
-        mechanismCode= dataSets$attribute_option_combo[i],
-        value        = dataSets$value[i], #(if we pulled directly from a data pack this would be different than siteValue, but for OPUs should equal siteValue) 
-        org_unit     = dataSets$org_unit[i],
-        type         = datapackr::SiteToDATIM$type_options %>% unique(), #{DSD, TA} -   (NA not valid in our case)
-        siteValue    = dataSets$value[i]
-    )
-    
-    record <- list(
-            # create $distributed
-            site = list(
-                distributed = distributed
-            ),
-            distributedMER = list(
-                PSNU = thisPsnu$psnu,
-                psnuid = thisPsnu$psnu_uid,
-                sheet_name   = datapackr::SiteToDATIM$sheet_name %>% unique(),
-                indicatorCode= datapackr::SiteToDATIM$indicator_code %>% unique(),
-                Age          = datapackr::SiteToDATIM$valid_ages %>% unique(),
-                Sex          = datapackr::SiteToDATIM$valid_sexes %>% unique(),
-                KeyPop       = datapackr::SiteToDATIM$valid_kps %>% unique(),
-                mechanismCode= dataSets$attribute_option_combo[i],
-                value        = dataSets$value[i]
-            )
-        )
-
-    # insert into "d"
-    d <-list(
-        info = list(
-            datapack_uid = parent_uid,
-            datapack_name = parent_name
-        ),
-        data = record
-    )
-    
-    if (length(d) > 0) {
-        # datapackr::packSiteTool(d, output_path)
-    }
-}
-
-
+# # Initialize empty result list for performance reasons
+# resultSet <- vector("list", nrow(dataSets))
+# 
+# # loop over dataSets
+# #for ( i in 1:nrow(dataSets)) {
+# for ( i in 1:6 ) {
+# #look up the PSNU for this dataSets$org_unit
+#     thisPsnu <- getPsnuForSite(dataSets$org_unit[i],psnus)
+#     
+#     if (length(thisPsnu) < 1) {
+#         cat(sprintf("Error Obtaining Site %s",dataSets$org_unit[i]))
+#         next
+#     }
+#     
+#     distributed = list(
+#         PSNU = thisPsnu$psnu,
+#         psnuid = thisPsnu$psnu_uid,
+#         sheet_name   = datapackr::SiteToDATIM$sheet_name %>% unique(),
+#         indicatorCode= datapackr::SiteToDATIM$indicator_code %>% unique(),
+#         Age          = datapackr::SiteToDATIM$valid_ages %>% unique(),
+#         Sex          = datapackr::SiteToDATIM$valid_sexes %>% unique(),
+#         KeyPop       = datapackr::SiteToDATIM$valid_kps %>% unique(),
+#         mechanismCode= dataSets$attribute_option_combo[i],
+#         value        = dataSets$value[i], #(if we pulled directly from a data pack this would be different than siteValue, but for OPUs should equal siteValue) 
+#         org_unit     = dataSets$org_unit[i],
+#         type         = datapackr::SiteToDATIM$type_options %>% unique(), #{DSD, TA} -   (NA not valid in our case)
+#         siteValue    = dataSets$value[i]
+#     )
+#     
+#     record <- list(
+#             # create $distributed
+#             site = list(
+#                 distributed = distributed
+#             ),
+#             distributedMER = list(
+#                 PSNU = thisPsnu$psnu,
+#                 psnuid = thisPsnu$psnu_uid,
+#                 sheet_name   = datapackr::SiteToDATIM$sheet_name %>% unique(),
+#                 indicatorCode= datapackr::SiteToDATIM$indicator_code %>% unique(),
+#                 Age          = datapackr::SiteToDATIM$valid_ages %>% unique(),
+#                 Sex          = datapackr::SiteToDATIM$valid_sexes %>% unique(),
+#                 KeyPop       = datapackr::SiteToDATIM$valid_kps %>% unique(),
+#                 mechanismCode= dataSets$attribute_option_combo[i],
+#                 value        = dataSets$value[i]
+#             )
+#         )
+# 
+#     # insert into "d"
+#     d <-list(
+#         info = list(
+#             datapack_uid = parent_uid,
+#             datapack_name = parent_name
+#         ),
+#         data = record
+#     )
+#     
+#     if (length(d) > 0) {
+#         # datapackr::packSiteTool(d, output_path)
+#     }
+# }
+# 
+# 
