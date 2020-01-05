@@ -1,7 +1,6 @@
-devtools::install(pkg = "/Users/sam/Documents/GitHub/openxlsx",
-                  build = TRUE,
-                  upgrade = FALSE)
 
+# THIS SPECIFIC VERSION OF OPENXLSX IS REQUIRED
+devtools::install_github("https://github.com/jason-p-pickering/openxlsx")
 
 require(jsonlite)
 require(assertthat)
