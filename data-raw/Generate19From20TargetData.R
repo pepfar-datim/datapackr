@@ -1,3 +1,8 @@
+devtools::install(pkg = "/Users/sam/Documents/GitHub/openxlsx",
+                  build = TRUE,
+                  upgrade = FALSE)
+
+
 require(jsonlite)
 require(assertthat)
 require(glue)
@@ -9,70 +14,72 @@ require(dplyr)
 require(stringr)
 
 # Main config options
-secrets <- "~/.secrets/datim.json"
+secrets <- "~/.secrets/triage.json"
 output_path<-"~/output"
-parent_uid <- "XtxUYCsDWrR"
+d=NULL
+d$info$datapack_uid = "bQQJe0cC1eD"
+d$info$datapack_name = "Cameroon"
 
 # Set up a site -> PSNU cache
-sitePsnuCache <- new.env()
+# sitePsnuCache <- new.env()
 
 #' Get the name of an OU from its UID
 #' 
 #'  @param uid A valid OU UID
 #'  @return The OU's name 
-getOUNameFromUID<-function(uid) {
-  paste0(getOption("baseurl"),"api/29/organisationUnits/",uid,"?fields=name") %>% 
-    httr::GET() %>% 
-    httr::content(as = "text") %>% 
-    jsonlite::fromJSON(.) %>% 
-    purrr::pluck("name")
-}
+# getOUNameFromUID<-function(uid) {
+#   paste0(getOption("baseurl"),"api/29/organisationUnits/",uid,"?fields=name") %>% 
+#     httr::GET() %>% 
+#     httr::content(as = "text") %>% 
+#     jsonlite::fromJSON(.) %>% 
+#     purrr::pluck("name")
+# }
 
 #' Get the OU path string
 #' 
 #' @param uid A valid OU UID
 #' @return '/' delimited list of parent OUs
-getOUPathFromUID<-function(uid) {
-    paste0(getOption("baseurl"),"api/29/organisationUnits/",uid,"?fields=path") %>% 
-        httr::GET() %>% 
-        httr::content(as = "text") %>% 
-        jsonlite::fromJSON(.) %>% 
-        purrr::pluck("path")
-}
+# getOUPathFromUID<-function(uid) {
+#     paste0(getOption("baseurl"),"api/29/organisationUnits/",uid,"?fields=path") %>% 
+#         httr::GET() %>% 
+#         httr::content(as = "text") %>% 
+#         jsonlite::fromJSON(.) %>% 
+#         purrr::pluck("path")
+# }
 
 #' Get the PSNU record set for a given site
 #' 
 #' @param siteUID OU UID
 #' @param psnus Existing list of PSNUs for this country
 #' @return row record or FALSE
-getPsnuForSite<-function(siteUID,psnus) {
-    # see if it is cached already
-    if (exists(siteUID, envir = sitePsnuCache)) {
-        return(sitePsnuCache[[siteUID]])
-    } else {
-        # pull it, shove it
-        sitePath <- getOUPathFromUID(siteUID)
-        if (length(sitePath) == 0) {
-            # @TODO:: return exception
-            return(FALSE)
-        }
-        sitePathList <- unlist(strsplit(sitePath,"/"))
-        # compare this site to the PSNU list for the country
-        for (s in sitePathList) {
-            # skip this site and any leading blanks
-            if (s == "" || s == siteUID) {
-                next
-            }
-            candidatePSNU <- psnus %>% filter(psnu_uid == s)
-            if (length(candidatePSNU$psnu) == 0) {
-                next
-            }
-            sitePsnuCache[[siteUID]] <- candidatePSNU
-            return(sitePsnuCache[[siteUID]])
-        }
-    }
-    return(FALSE)
-}
+# getPsnuForSite<-function(siteUID,psnus) {
+#     # see if it is cached already
+#     if (exists(siteUID, envir = sitePsnuCache)) {
+#         return(sitePsnuCache[[siteUID]])
+#     } else {
+#         # pull it, shove it
+#         sitePath <- getOUPathFromUID(siteUID)
+#         if (length(sitePath) == 0) {
+#             # @TODO:: return exception
+#             return(FALSE)
+#         }
+#         sitePathList <- unlist(strsplit(sitePath,"/"))
+#         # compare this site to the PSNU list for the country
+#         for (s in sitePathList) {
+#             # skip this site and any leading blanks
+#             if (s == "" || s == siteUID) {
+#                 next
+#             }
+#             candidatePSNU <- psnus %>% filter(psnu_uid == s)
+#             if (length(candidatePSNU$psnu) == 0) {
+#                 next
+#             }
+#             sitePsnuCache[[siteUID]] <- candidatePSNU
+#             return(sitePsnuCache[[siteUID]])
+#         }
+#     }
+#     return(FALSE)
+# }
 
 #' Pull data for the relevant data sets from DATIM for FY20, excluding dedups and deleted values.
 #' 
@@ -91,7 +98,7 @@ getCOP19DataFromAPI<-function(country_uid) {
     "includeDeleted", "false",
     "orgUnit", country_uid) 
   
-  datapackr::getDataValueSets(parameters$key,parameters$value) %>%
+  datapackr::getDataValueSets(parameters$key, parameters$value) %>%
     dplyr::filter(value != 0) %>%  # don't need 0s
     dplyr::filter(attribute_option_combo != '00000') %>% # dedup
     dplyr::filter(attribute_option_combo != '00001') %>% # dedup
@@ -100,12 +107,11 @@ getCOP19DataFromAPI<-function(country_uid) {
 
 
 # Main Data Processing Routine --------------------------------
-
-datimvalidation::loadSecrets(secrets)
+datapackr::loginToDATIM(secrets)
 
 # get a table to map the DATIM columns data site tool columns 
 # handling the special cases of HTS_SELF.N.HIVSelfTest.20T.Unassisted and 
-# 
+# TB_ART.N
  site_to_datim <- dplyr::filter(datapackr::SiteToDATIM,
                        indicator_code != "HTS_SELF.N.HIVSelfTest.20T.Unassisted" |
                          (indicator_code == "HTS_SELF.N.HIVSelfTest.20T.Unassisted" &
@@ -116,11 +122,11 @@ datimvalidation::loadSecrets(secrets)
 
 # Cache the PSNUs for this country
 # psnus = datapackr::getPSNUs(parent_uid, TRUE)
-sites  <-  datapackr::getSiteList(parent_uid)
+sites  <-  datapackr::getSiteList(d$info$datapack_uid)
 # Store the country OU name
-parent_name <- getOUNameFromUID(parent_uid)
+# parent_name <- getOUNameFromUID(parent_uid)
 # Get the main dataset for looping through
-dataSets <- getCOP19DataFromAPI(parent_uid)
+dataSets <- getCOP19DataFromAPI(d$info$datapack_uid)
 
 #join with site to datim table to back out columns for site tool 
 dataSets  <-  dplyr::left_join(dataSets, site_to_datim, 
@@ -153,6 +159,11 @@ dataSets = dplyr::filter(dataSets, !is.na(indicator_code) & !is.na(psnu)) %>%
                 ) %>% 
   dplyr::mutate(PSNU = glue::glue("{PSNU} ({psnuid})"), siteValue = value)
 
+
+d$data$site$distributed <- dataSets
+d$data$distributedMER <- dataSets
+datapackr::packSiteTool(d,
+                        output_path = "/Users/sam" )
 
 # Initialize empty result list for performance reasons
 resultSet <- vector("list", nrow(dataSets))
