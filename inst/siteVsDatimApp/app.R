@@ -56,7 +56,8 @@ ui <- fluidPage(
     shiny::selectInput(
       inputId = "org_unit",
       label = "Countries in the site tool",
-      choices = c("Eswatini" = "V0qMZH29CtN",
+      choices = c("Cameroon" = "bQQJe0cC1eD",
+        "Eswatini" = "V0qMZH29CtN",
                   "Ghana" = "y3zhsvdXlhN",
                   "Mozambique" = "h11OyvlPxpJ",
                   "Rwanda" = "XtxUYCsDWrR",
