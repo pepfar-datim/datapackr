@@ -1,44 +1,38 @@
 #' @importFrom magrittr %>% %<>%
 #' @importFrom utils URLencode
-#' @title Compile valid categoryOptions for a given dataset
+#' @title Compile valid categoryOptions for a given data element group
 #' 
 #' @description
 #' Queries DATIM API against the dataElementGroups endpoint and returns list of
-#' all dataElements associated with a provided dataSet, as well as all valid 
-#' categoryOptions associated with that dataElement.
+#' all dataElements associated with a provided data element group, as well as all valid 
+#' categoryOptions associated with that dataElement. Should be noted that this does
+#' not guarentee that the category option will actually be in use in the data entry form. 
+#' 
 #'
-#' @param data_element_group.id DATIM dataElementGroup id to filter against.
+#' @param deg_id DATIM dataElementGroup id to filter against.
 #' 
 #' @return validCategoryOptions
 #'
-getValidCOs <- function(data_element_group.id) {
+getValidCOs <- function(deg_id = "XUA8pDYjPsw") {
   
+
   # Query dataElementGroups end point ####
-  dataElementGroup <- 
+
     datapackr::api_call("dataElementGroups") %>%
-  # Filter to include only the dataElementGroup specified
-    datapackr::api_filter(field = "id", operation = "eq", match = "XUA8pDYjPsw") %>%
-      # TODO generate match automatically based on current FY...
-    datapackr::api_fields("dataElements[id,name,categoryCombo[categories[id,name,categoryOptions[id,name]]]]") %>%
+    # Filter to include only the dataElementGroup specified
+    datapackr::api_filter(field = "id", operation = "eq", match = deg_id ) %>%
+    # TODO generate match automatically based on current FY...
+    datapackr::api_fields("dataElements[id~rename(de_id),name~rename(de_name),categoryCombo[categories[id~rename(categoryid),name~rename(categoryname),categoryOptions[id~rename(coid),name~rename(coname)]]]]") %>%
     datapackr::api_get() %>%
-    tidyr::unnest() %>%
-    tidyr::unnest() %>%
-    tidyr::unnest() %>%
+    tidyr::unnest(dataElements)  %>% 
+    tidyr::unnest(cols = categoryCombo.categories) %>% 
+    tidyr::unnest(categoryOptions) %>%
     dplyr::mutate(
-      grp = dplyr::case_when(stringr::str_detect(name1, "Age") ~ "Age",
-                             stringr::str_detect(name1, "Sex") ~ "Sex",
-                             stringr::str_detect(name1, "Key Pop") ~ "KP")
+      grp = dplyr::case_when(stringr::str_detect(categoryname, "Age") ~ "Age",
+                             stringr::str_detect(categoryname, "Sex") ~ "Sex",
+                             stringr::str_detect(categoryname, "Key Pop") ~ "KP")
       ) %>%
   # Keep only Age, Sex, KP categoryOptions
-    tidyr::drop_na(grp) %>%
-    dplyr::select(
-      data_element.name = name,
-      data_element.id = id,
-      category_combo.name = name1,
-      category_combo.id = id1,
-      grp,
-      category_option.name = name2,
-      category_combo.id = id2)
+    tidyr::drop_na(grp) 
   
-   
 }
