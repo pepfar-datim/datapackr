@@ -10,7 +10,8 @@ skip_tabs(tool = "Data Pack", cop_year = cop_year())
 \item{tool}{"Data Pack", "Data Pack Template", "Site Tool", "Site Tool Template",
 "Mechanism Map", or "Site Filter".}
 
-\item{cop_year}{}
+\item{cop_year}{COP year for dating as well as selection of
+templates.}
 }
 \value{
 Character vector of tab names to skip.

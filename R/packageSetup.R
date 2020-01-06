@@ -19,7 +19,8 @@ countryUIDs_homeCell <- function() { "B25" }
 #' 
 #' @param tool "Data Pack", "Data Pack Template", "Site Tool", "Site Tool Template",
 #' "Mechanism Map", or "Site Filter".
-#' @param cop_year
+#' @param cop_year COP year for dating as well as selection of
+#' templates.
 #' 
 #' @return Character vector of tab names to skip.
 #' 

@@ -13,7 +13,7 @@ packDataPackSheet(wb, sheet, org_units,
 
 \item{sheet}{Specified sheet within wb}
 
-\item{org_units}{}
+\item{org_units}{Org Units to write in.}
 
 \item{schema}{Defaults to standard Data Pack schema, but allows for provision
 of custom schema if needed.}
@@ -21,7 +21,8 @@ of custom schema if needed.}
 \item{sheet_data}{Dataset to use as input for packing Data Pack. If left NULL,
 will produce a Data Pack with orgUnits and disagg specifications, but no data.}
 
-\item{cop_year}{}
+\item{cop_year}{COP year for dating as well as selection of
+templates.}
 }
 \value{
 wb with specified sheet packed with data

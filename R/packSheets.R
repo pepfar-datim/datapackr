@@ -7,7 +7,7 @@
 #' and writes data.
 #'
 #' @param wb datapackr list object.
-#' @param country_uids datapackr list object.
+#' @param country_uids Character vector of Country UIDs from DATIM.
 #' @param ou_level Level in DATIM hierarchy to pull orgUnits from. Choose from:
 #' "Prioritization", "Community", "Facility", or the numbers 4 through 7.
 #' @param org_units Allows for specification of custom list of orgUnits to include
@@ -18,7 +18,8 @@
 #' of custom schema if needed.
 #' @param sheets Sheets to pack. Defaults to all those available in \code{wb},
 #' minus the first few front-matter/summary tabs.
-#' @param cop_year
+#' @param cop_year COP year for dating as well as selection of
+#' templates.
 #' 
 #' @return wb with all sheets written except SNU x IM
 #'

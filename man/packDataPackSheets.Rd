@@ -12,7 +12,7 @@ packDataPackSheets(wb, country_uids, ou_level = "Prioritization",
 \arguments{
 \item{wb}{datapackr list object.}
 
-\item{country_uids}{datapackr list object.}
+\item{country_uids}{Character vector of Country UIDs from DATIM.}
 
 \item{ou_level}{Level in DATIM hierarchy to pull orgUnits from. Choose from:
 "Prioritization", "Community", "Facility", or the numbers 4 through 7.}
@@ -29,7 +29,8 @@ of custom schema if needed.}
 \item{sheets}{Sheets to pack. Defaults to all those available in \code{wb},
 minus the first few front-matter/summary tabs.}
 
-\item{cop_year}{}
+\item{cop_year}{COP year for dating as well as selection of
+templates.}
 }
 \value{
 wb with all sheets written except SNU x IM

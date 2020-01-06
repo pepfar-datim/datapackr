@@ -8,6 +8,8 @@ CountriesContained(org_unit_uid, base_url = getOption("baseurl"))
 }
 \arguments{
 \item{org_unit_uid}{single org unit uid as a character string}
+
+\item{base_url}{DHIS2 URL to use as base query.}
 }
 \value{
 character vector of country uids, length of 0 if no countries at or below

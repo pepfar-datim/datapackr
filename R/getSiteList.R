@@ -8,7 +8,7 @@
 #' specified, and compiles these into the list as needed for use in the PEPFAR
 #' Site Tool.
 #'
-#' @param country_uids Character vector of DATIM country IDs. This can only
+#' @param org_unit_uids Character vector of DATIM country IDs. This can only
 #' include countries. Regional Operating Unit uids will be converted to a list of 
 #' descendant country uids
 #' @param include_mil When TRUE, will append _Military organisation nodes to
@@ -109,6 +109,8 @@ getSiteList <- function(org_unit_uids,
 #' countries in a region
 #'
 #' @param org_unit_uid single org unit uid as a character string
+#' @param base_url DHIS2 URL to use as base query.
+#' 
 #' @return character vector of country uids, length of 0 if no countries at or below
 #' the org unit
 #'
