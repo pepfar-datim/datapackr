@@ -40,7 +40,11 @@ Imports:
     data.table,
     scales (>= 1.0.0),
     datimvalidation,
-    datapackcommons
+    datapackcommons,
+    tidyselect,
+    glue,
+    rlang,
+    assertthat
 Suggests:
     devtools (>= 2.0.1),
     testthat

@@ -366,7 +366,9 @@ getPeriodInfo <- function(FY = NA) {
         filepath = datapack_template_filepath,
         skip = skip_tabs(tool = "Data Pack Template", cop_year = 2020),
         cop_year = 2020)
-    save(cop20_data_pack_schema, file = "./data/cop20_data_pack_schema.rda")
+    save(cop20_data_pack_schema,
+         file = "./data/cop20_data_pack_schema.rda",
+         compress = "xz")
       
   ## Site Tool Schema ####
     site_tool_schema <- getSiteToolSchema(data_pack_schema)
@@ -386,7 +388,7 @@ getPeriodInfo <- function(FY = NA) {
       
   ## Load Openxlsx Style Guide ####
     styleGuide <- loadStyleGuide()
-    save(styleGuide, file = "./data/styleGuide.rda")
+    save(styleGuide, file = "./data/styleGuide.rda", compress = "xz")
 
   ## Load PSNUxIM to DATIM map ####
     PSNUxIM_to_DATIM <- readr::read_csv("./data-raw/PSNUxIM_to_DATIM.csv")
@@ -404,9 +406,9 @@ getPeriodInfo <- function(FY = NA) {
     
   ## Save Valid COs ####
     # valid_COs <- validCOs(cop_year = cop_year())
-    # save(valid_COs, file = "./data/valid_COs.rda")
+    # save(valid_COs, file = "./data/valid_COs.rda", compress = "xz")
     
 # Load PSNUs into package from DATIM ####
     valid_PSNUs <- getPSNUs(additional_fields = "lastUpdated")
-    save(valid_PSNUs, file = "./data/valid_PSNUs.rda")
+    save(valid_PSNUs, file = "./data/valid_PSNUs.rda", compress = "xz")
     
