@@ -55,6 +55,42 @@ packDataPackSheet <- function(wb,
                        stack = TRUE)
   }
   
+  # Format integers
+  integerCols <- schema %>%
+    dplyr::filter(sheet_name == sheet,
+                  value_type == "integer") %>%
+    dplyr::pull(col)
+  
+  integerStyle = openxlsx::createStyle(numFmt = "#,##0")
+  
+  if (length(integerCols) > 0) {
+    openxlsx::addStyle(wb,
+                       sheet = sheet,
+                       integerStyle,
+                       rows = (1:NROW(sheet_data)) + headerRow("Data Pack Template", cop_year),
+                       cols = integerCols,
+                       gridExpand = TRUE,
+                       stack = TRUE)
+  }
+  
+  # Format targets
+  targetCols <- schema %>%
+    dplyr::filter(sheet_name == sheet,
+                  col_type == "target") %>%
+    dplyr::pull(col)
+  
+  targetStyle = openxlsx::createStyle(textDecoration = "bold")
+  
+  if (length(targetCols) > 0) {
+    openxlsx::addStyle(wb,
+                       sheet = sheet,
+                       targetStyle,
+                       rows = (1:NROW(sheet_data)) + headerRow("Data Pack Template", cop_year),
+                       cols = targetCols,
+                       gridExpand = TRUE,
+                       stack = TRUE)
+  }
+  
   # Hide rows 5-13
   openxlsx::setRowHeights(wb,
                           sheet = sheet,

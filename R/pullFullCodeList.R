@@ -10,11 +10,11 @@
 #' 
 #' @return Combined code list as dataframe.
 #'
-pullFullCodeList <- function(FY = NA, datastream = NA) {
+pullFullCodeList <- function(FY = NULL, datastream = NULL) {
   
-  if (is.na(FY)) {FY = currentFY()}
+  if (is.null(FY)) {FY = currentFY()}
   
-  if (is.na(datastream)) {datastream = c("MER", "SUBNAT", "IMPATT")}
+  if (is.null(datastream)) {datastream = c("MER", "SUBNAT", "IMPATT")}
   
   datasets <- api_call("dataSets") %>%
     api_get() %>%

@@ -31,14 +31,7 @@ packDataPack <- function(model_data,
                          output_folder = getwd()) {
   
   #TODO: Combine with packSiteTool? Or merge both into packTool?
-  # Grab correct schema
-  if (is.null(template_path)) {
-    template_path <- system.file("extdata",
-                                 "COP20_Data_Pack_Template_vFINAL.xlsx",
-                                 package = "datapackr",
-                                 mustWork = TRUE)
-  }
-  
+
   # Create data train for use across remainder of program
   d <- list(
     keychain = list(
@@ -62,11 +55,19 @@ packDataPack <- function(model_data,
   } else {d$info$schema <- datapackr::data_pack_schema}
   
   # Open template ####
+  # Grab correct schema
+  if (is.null(d$keychain$template_path)) {
+    d$keychain$template_path <- system.file("extdata",
+                                 "COP20_Data_Pack_Template_vFINAL.xlsx",
+                                 package = "datapackr",
+                                 mustWork = TRUE)
+  }
+  
   d$keychain$template_path <- handshakeFile(path = d$keychain$template_path,
                                              tool = "Data Pack Template")
-  # TODO: Restrict to only allow use of schema saved in package, or at least as default in param
   
   # Test template against schema ####
+  print("Checking template against schema and DATIM...")
   schema <-
     unPackSchema_datapack(
       filepath = d$keychain$template,

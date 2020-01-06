@@ -29,7 +29,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = cop_year()) {
       skip = c("Home", "Quotes", "Summary", "Spectrum")
     }
     else if (cop_year == 2020) {
-      skip = c("Home", "Summary", "Spectrum", "Spectrum IDs")
+      skip = c("Home", "Instructions", "Summary", "Spectrum", "Spectrum IDs")
     }
   } else {skip = c(NA_character_)}
   
