@@ -9,11 +9,11 @@ require(dplyr)
 require(stringr)
 
 # Main config options
-secrets <- "~/.secrets/triage.json"
-output_path<-"~/output"
+secrets <- "~/.secrets/datim.json"
+output_path<-"/Users/sam/Documents/cop_19_data/opus"
 d=NULL
-d$info$datapack_uid = "bQQJe0cC1eD"
-d$info$datapack_name = "Cameroon"
+d$info$datapack_uid = "mdXu6iCbn2G"
+d$info$datapack_name = "Tanzania"
 
 # Set up a site -> PSNU cache
 # sitePsnuCache <- new.env()
@@ -158,7 +158,7 @@ dataSets = dplyr::filter(dataSets, !is.na(indicator_code) & !is.na(psnu)) %>%
 d$data$site$distributed <- dataSets
 d$data$distributedMER <- dataSets
 datapackr::packSiteTool(d,
-                        output_path = "/Users/sam" )
+                        output_path = output_path )
 
 # # Initialize empty result list for performance reasons
 # resultSet <- vector("list", nrow(dataSets))
