@@ -12,8 +12,8 @@ require(stringr)
 secrets <- "~/.secrets/datim.json"
 output_path<-"/Users/sam/Documents/cop_19_data/opus"
 d=NULL
-d$info$datapack_uid = "mdXu6iCbn2G"
-d$info$datapack_name = "Tanzania"
+d$info$datapack_uid = "G0BT4KrJouu"
+d$info$datapack_name = "West Africa Region"
 
 # Set up a site -> PSNU cache
 # sitePsnuCache <- new.env()
