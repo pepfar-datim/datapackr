@@ -67,5 +67,6 @@ for (i in 1:NROW(batch)) {
                country_uids = batch[[i,2]],
                template_path = NULL,
                cop_year = 2020,
-               output_folder = output_folder)
+               output_folder = output_folder,
+               results_archive = FALSE)
 }
