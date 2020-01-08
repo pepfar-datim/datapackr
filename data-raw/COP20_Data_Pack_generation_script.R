@@ -5,7 +5,7 @@ secrets <- "/Users/scott/.secrets/datim.json"
 
 loginToDATIM(secrets)
 
-output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/Beta Packs/Testing"
+output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/Data Packs/Testing"
 
 model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/model_data_pack_input_20_20200107_1_flat.rds"
 
@@ -13,52 +13,52 @@ model_data <- readRDS(model_data_path)
 
 batch <- tibble::tribble(
   ~datapack_name, ~country_uids,
-  "Angola","XOivy2uDpMF",
-  "Botswana","l1KFEXKI4Dg",
-  #"Burundi","Qh4XMQJhbk8",
-  "Cameroon","bQQJe0cC1eD",
-  "Cote d'Ivoire","ds0ADyc9UCU",
-  #"Democratic Republic of the Congo","ANN4YCOufcP",
-  "Dominican Republic","NzelIFhEv3C",
-  "Eswatini","V0qMZH29CtN",
-  #"Ethiopia","IH1kchw86uA",
-  "Haiti","JTypsdEUNPw",
-  "Kenya","HfVjCurKxh2",
-  "Lesotho","qllxzIjjurr",
-  "Malawi","lZsCb6y0KDX",
-  "Mozambique", "h11OyvlPxpJ",
-  "Namibia","FFVkaV9Zk1S",
-  #"Nigeria","PqlFzhuPcF1",
-  "Rwanda","XtxUYCsDWrR",
-  "South Africa", "cDGPF739ZZr",
-  "South Sudan","WLG0z5NxQs8",
-  #"Tanzania","mdXu6iCbn2G",
-  "Uganda","FETQ6OmnsKB",
-  "Ukraine","ligZVIYs2rL",
-  "Vietnam","YM6xn5QxNpY",
-  "Zambia","f5RoebaDLMx",
-  "Zimbabwe","a71G4Gtcttv",
-  "Burma","wChmwjpXOw2",
-  "Cambodia","XWZK2nop7pM",
-  "India","skj3e4YSiJY",
-  "Indonesia","W73PRZcjFIU",
-  "Laos","PcXTNoVUrUc",
-  "Papua New Guinea","cl7jVQOW3Ks",
-  "Thailand","Gv5ApcpDrIB",
-  "Kazakhstan","xVvOdyoS7wi",
-  "Kyrgyzstan","vm58KTm9wvy",
-  "Nepal","YlSE5fOVJMa",
-  "Tajikistan","ZtoVYbNCnsj",
-  #"Philippines","p1E1K4MWGpa",
-  "Caribbean Region",c("RKoVudgb05Y","PeOHqAwdtez","WuxG6jzaypt","zhJINyURZ5Y","WSl5y9jxCpC"),
-  "Latin America Region",c("joGQFpKiHl9","QKD4CzBG2GM","N7QAPGSaODP","EXVC4bNtv84","w5NMe34EjPN","aUTsSmqqu9O","oK0gC85xx2f"),
-  #"Burkina Faso","ZeB2eGmDfGw",
-  "Ghana","y3zhsvdXlhN",
-  #"Liberia","kH29I939rDQ",
-  #"Mali","N3xTKNKu5KM",
-  #"Senegal","N5GhQWVpVFs",
-  #"Sierra Leone","ODOymOOWyl0",
-  #"Togo","EIUtrKbw8PQ"
+  "Angola","XOivy2uDpMF",                                               #1
+  "Botswana","l1KFEXKI4Dg",                                             #2
+  "Burundi","Qh4XMQJhbk8",                                             #3
+  "Cameroon","bQQJe0cC1eD",                                             #4
+  "Cote d'Ivoire","ds0ADyc9UCU",                                        #5
+  "Democratic Republic of the Congo","ANN4YCOufcP",                    #6
+  "Dominican Republic","NzelIFhEv3C",                                   #7
+  "Eswatini","V0qMZH29CtN",                                             #8
+  "Ethiopia","IH1kchw86uA",                                            #9
+  "Haiti","JTypsdEUNPw",                                                #10
+  "Kenya","HfVjCurKxh2",                                                #11
+  "Lesotho","qllxzIjjurr",                                              #12
+  "Malawi","lZsCb6y0KDX",                                               #13
+  "Mozambique", "h11OyvlPxpJ",                                          #14
+  "Namibia","FFVkaV9Zk1S",                                              #15
+  "Nigeria","PqlFzhuPcF1",                                             #16
+  "Rwanda","XtxUYCsDWrR",                                               #17
+  "South Africa", "cDGPF739ZZr",                                        #18
+  "South Sudan","WLG0z5NxQs8",                                          #19
+  "Tanzania","mdXu6iCbn2G",                                            #20
+  "Uganda","FETQ6OmnsKB",                                               #21
+  "Ukraine","ligZVIYs2rL",                                              #22
+  "Vietnam","YM6xn5QxNpY",                                              #23
+  "Zambia","f5RoebaDLMx",                                               #24
+  "Zimbabwe","a71G4Gtcttv",                                             #25
+  "Burma","wChmwjpXOw2",                                                #26
+  "Cambodia","XWZK2nop7pM",                                             #27
+  "India","skj3e4YSiJY",                                                #28
+  "Indonesia","W73PRZcjFIU",                                            #29
+  "Laos","PcXTNoVUrUc",                                                 #30
+  "Papua New Guinea","cl7jVQOW3Ks",                                     #31
+  "Thailand","Gv5ApcpDrIB",                                             #32
+  "Kazakhstan","xVvOdyoS7wi",                                           #33
+  "Kyrgyzstan","vm58KTm9wvy",                                           #34
+  "Nepal","YlSE5fOVJMa",                                                #35
+  "Tajikistan","ZtoVYbNCnsj",                                           #36
+  "Philippines","p1E1K4MWGpa",                                         #37
+  "Caribbean Region",c("RKoVudgb05Y","PeOHqAwdtez","WuxG6jzaypt","zhJINyURZ5Y","WSl5y9jxCpC"), #38
+  "Latin America Region",c("joGQFpKiHl9","QKD4CzBG2GM","N7QAPGSaODP","EXVC4bNtv84","w5NMe34EjPN","aUTsSmqqu9O","oK0gC85xx2f"), #39
+  "Burkina Faso","ZeB2eGmDfGw",                                        #40
+  "Ghana","y3zhsvdXlhN",                                                #41
+  "Liberia","kH29I939rDQ",                                             #42
+  "Mali","N3xTKNKu5KM",                                                #43
+  "Senegal","N5GhQWVpVFs",                                             #44
+  "Sierra Leone","ODOymOOWyl0",                                        #45
+  "Togo","EIUtrKbw8PQ"                                                 #46
 )
 
 for (i in 1:NROW(batch)) {

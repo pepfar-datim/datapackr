@@ -19,6 +19,8 @@
 #' @param output_folder Local folder where you would like your Data Pack to be
 #' saved upon export. If left as \code{NA}, will output to
 #' \code{Working Directory}.
+#' @param results_archive If TRUE, will export compiled results of all tests and
+#' processes to output_folder.
 #' 
 #' @return Exports a Data Pack to Excel within \code{output_folder}.
 #'
@@ -28,9 +30,12 @@ packDataPack <- function(model_data,
                          country_uids,
                          template_path = NULL,
                          cop_year = cop_year(),
-                         output_folder = getwd()) {
+                         output_folder = getwd(),
+                         results_archive = TRUE) {
   
   #TODO: Combine with packSiteTool? Or merge both into packTool?
+  print(datapack_name)
+  print(country_uids)
 
   # Create data train for use across remainder of program
   d <- list(
@@ -146,9 +151,10 @@ packDataPack <- function(model_data,
               datapack_name = d$info$datapack_name)
   
   # Save & Export Archive
-  exportPackr(data = d,
-              output_path = d$keychain$output_folder,
-              type = "Results Archive",
-              datapack_name = d$info$datapack_name)
-  
+  if (results_archive) {
+    exportPackr(data = d,
+                output_path = d$keychain$output_folder,
+                type = "Results Archive",
+                datapack_name = d$info$datapack_name)
+  }
 }
