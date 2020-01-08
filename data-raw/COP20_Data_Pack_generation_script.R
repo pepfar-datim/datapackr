@@ -1,15 +1,13 @@
 library(datapackr)
 library(magrittr)
 
-secrets <- "/Users/scott/.secrets/test-mer2.json"
+secrets <- "/Users/scott/.secrets/datim.json"
 
 loginToDATIM(secrets)
 
-#template_path <- "./data-raw/COP20_Data_Pack_Template_vTEST.xlsx"
-
 output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/Beta Packs/Testing"
 
-model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/SAMPLE_model_data_pack_input_jason_20_20200203_1_flat.rds"
+model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/model_data_pack_input_20_20200107_1_flat.rds"
 
 model_data <- readRDS(model_data_path)
 
@@ -18,7 +16,8 @@ batch <- tibble::tribble(
   "Kenya","HfVjCurKxh2",
   "Cote d'Ivoire","ds0ADyc9UCU",
   "Mozambique", "h11OyvlPxpJ",
-  "South Africa", "cDGPF739ZZr"
+  "South Africa", "cDGPF739ZZr",
+  "Malawi","lZsCb6y0KDX"
 )
 
 for (i in 1:NROW(batch)) {
@@ -29,4 +28,3 @@ for (i in 1:NROW(batch)) {
                cop_year = 2020,
                output_folder = output_folder)
 }
-

@@ -14,7 +14,7 @@
 #' 
 #' @return Data Pack schema.
 #'
-unPackSchema_datapack <- function(filepath = NA, skip = NA, cop_year = cop_year()) {
+unPackSchema_datapack <- function(filepath = NULL, skip = NULL, cop_year = cop_year()) {
   
   # Check the filepath is valid. If NA, request via window. ####
   filepath <- handshakeFile(path = filepath,
@@ -27,7 +27,7 @@ unPackSchema_datapack <- function(filepath = NA, skip = NA, cop_year = cop_year(
   data.table::setDT(schema)[,sheet_num:=.GRP, by = c("sheet_name")]
   
   # Skip detail on listed sheets. ####
-  if (is.na(skip)) {skip = skip_tabs(tool = "Data Pack", cop_year = cop_year)}
+  if (is.null(skip)) {skip = skip_tabs(tool = "Data Pack", cop_year = cop_year)}
   sheets <- tidyxl::xlsx_sheet_names(filepath)
   verbose_sheets <- sheets[!sheets %in% skip]
   

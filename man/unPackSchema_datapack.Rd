@@ -4,7 +4,7 @@
 \alias{unPackSchema_datapack}
 \title{Extract and save schema from Data Pack template.}
 \usage{
-unPackSchema_datapack(filepath = NA, skip = NA,
+unPackSchema_datapack(filepath = NULL, skip = NULL,
   cop_year = cop_year())
 }
 \arguments{

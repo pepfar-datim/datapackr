@@ -102,13 +102,13 @@ prepareSheetData <- function(sheet,
     swapColumns(., combined) %>%
     as.data.frame(.)
   
-  # Translate Prioritizations
-  if (sheet == "Prioritization") {
-    pznDict <- with(prioritizations, setNames(Prioritization, value))
-    
-    dataStructure$IMPATT.PRIORITY_SNU.T_1 <- 
-      dplyr::recode(dataStructure$IMPATT.PRIORITY_SNU.T_1, !!!pznDict)
-  }
+  # # Translate Prioritizations
+  # if (sheet == "Prioritization") {
+  #   pznDict <- with(prioritizations, setNames(Prioritization, value))
+  #   
+  #   dataStructure$IMPATT.PRIORITY_SNU.T_1 <- 
+  #     dplyr::recode(dataStructure$IMPATT.PRIORITY_SNU.T_1, !!!pznDict)
+  # }
   
   return(dataStructure)
 
