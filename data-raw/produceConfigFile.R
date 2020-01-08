@@ -408,7 +408,5 @@ getPeriodInfo <- function(FY = NA) {
     # valid_COs <- validCOs(cop_year = cop_year())
     # save(valid_COs, file = "./data/valid_COs.rda", compress = "xz")
     
-# Load PSNUs into package from DATIM ####
-    valid_PSNUs <- getPSNUs(additional_fields = "lastUpdated")
-    save(valid_PSNUs, file = "./data/valid_PSNUs.rda", compress = "xz")
+
     
