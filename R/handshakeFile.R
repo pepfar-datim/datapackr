@@ -59,6 +59,8 @@ handshakeFile <- function(path = NULL,
     
     if (!canReadFile(path)) {stop("File could not be read!")}
     
+  } else {
+    stop("File cannot be read.")
   }
   
   # Check the file has correct extension
