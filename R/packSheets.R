@@ -82,7 +82,7 @@ packDataPackSheets <- function(wb,
     wb_sheets = names(wb)
     schema_sheets = schema %>%
       dplyr::filter(data_structure == "normal"
-                    & sheet_name != "SNU x IM"
+                    & !(sheet_name %in% c("SNU x IM","PSNUxIM"))
                     & sheet_name %in% names(wb)) %>%
       dplyr::pull(sheet_name) %>%
       unique()

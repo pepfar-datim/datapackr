@@ -61,10 +61,12 @@ batch <- tibble::tribble(
   "Togo","EIUtrKbw8PQ"                                                 #46
 )
 
-for (i in 1:NROW(batch)) {
+pick <- batch[c(5,11,14,18),]
+
+for (i in 1:NROW(pick)) {
   packDataPack(model_data = model_data,
-               datapack_name = batch[[i,1]],
-               country_uids = batch[[i,2]],
+               datapack_name = pick[[i,1]],
+               country_uids = pick[[i,2]],
                template_path = NULL,
                cop_year = 2020,
                output_folder = output_folder,
