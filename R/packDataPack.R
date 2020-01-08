@@ -97,7 +97,7 @@ packDataPack <- function(model_data,
                             type = "Data Pack")
   
   # Get PSNU List####
-  PSNUs <- datapackr::valid_PSNUs %>%
+  d$data$PSNUs <- datapackr::valid_PSNUs %>%
     dplyr::filter(country_uid %in% country_uids) %>%
     add_dp_psnu(.) %>%
     dplyr::arrange(dp_psnu) %>%
@@ -110,13 +110,13 @@ packDataPack <- function(model_data,
   
   # Write Main Sheets ####
   d$tool$wb <- packDataPackSheets(wb = d$tool$wb,
-                                  country_uids = country_uids,
+                                  country_uids = d$info$country_uids,
                                   ou_level = "Prioritization",
-                                  org_units = PSNUs,
-                                  model_data = model_data,
+                                  org_units = d$data$PSNUs,
+                                  model_data = d$data$model_data,
                                   schema = d$info$schema,
                                   sheets = NULL,
-                                  cop_year = cop_year)
+                                  cop_year = d$info$cop_year)
   
   # Write SNU x IM tab ####
   # print("Writing SNU x IM tab. This can sometimes take a few minutes...")

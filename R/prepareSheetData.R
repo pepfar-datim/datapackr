@@ -83,6 +83,20 @@ prepareSheetData <- function(sheet,
     }
   }
   
+  # Adjust KP_MAT data to fit inside KP tab ####
+  if (sheet == "KP") {
+   sheet_data <- sheet_data %>%
+     dplyr::mutate(
+       kp_option_uid = 
+         dplyr::case_when(
+           sex_option_uid == "Qn0I5FbKQOA" ~ "wyeCT63FkXB", #Male -> Male PWID
+           sex_option_uid == "Z1EnpTPaUfq" ~ "G6OYSzplF5a", #Female -> Female PWID
+           TRUE                 ~ kp_option_uid
+         ),
+       sex_option_uid = NA_character_
+     )
+  }
+  
   # Swap in model data ####
   if (!is.null(sheet_data)) {
     sheet_data_spread <- sheet_data %>%
