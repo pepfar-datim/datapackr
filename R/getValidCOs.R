@@ -24,9 +24,9 @@ getValidCOs <- function(deg_id = "XUA8pDYjPsw") {
     # TODO generate match automatically based on current FY...
     datapackr::api_fields("dataElements[id~rename(de_id),name~rename(de_name),categoryCombo[categories[id~rename(categoryid),name~rename(categoryname),categoryOptions[id~rename(coid),name~rename(coname)]]]]") %>%
     datapackr::api_get() %>%
-    tidyr::unnest(dataElements)  %>% 
+    tidyr::unnest(cols = dataElements)  %>% 
     tidyr::unnest(cols = categoryCombo.categories) %>% 
-    tidyr::unnest(categoryOptions) %>%
+    tidyr::unnest(cols = categoryOptions) %>%
     dplyr::mutate(
       grp = dplyr::case_when(stringr::str_detect(categoryname, "Age") ~ "Age",
                              stringr::str_detect(categoryname, "Sex") ~ "Sex",
