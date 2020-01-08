@@ -53,14 +53,19 @@ handshakeFile <- function(path = NA,
     }
   
   # If path has issues or NA, prompt user to select file from window.
-  if (!canReadFile(path) & interactive()) {
-    interactive_print("Please choose a file.")
-    path <- file.choose()
+  if ( !canReadFile(path) ) {
+    if ( interactive() ) {
+      interactive_print("Please choose a file.")
+      path <- file.choose()
+      
+      if (!canReadFile(path)) {
+        stop("File could not be read!")
+      }
+      
+    } else {
+      stop("File could not be read!")
+    }
     
-    if (!canReadFile(path)) {stop("File could not be read!")}
-    
-  } else {
-    stop("File cannot be read.")
   }
   
   # Check the file has correct extension
