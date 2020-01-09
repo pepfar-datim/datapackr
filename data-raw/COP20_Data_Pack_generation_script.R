@@ -61,7 +61,7 @@ batch <- tibble::tribble(
   "Togo","EIUtrKbw8PQ"                                                 #46
 )
 
-pick <- batch[c(5,11,14,18),]
+pick <- batch[c(13),]
 
 for (i in 1:NROW(pick)) {
   packDataPack(model_data = model_data,
