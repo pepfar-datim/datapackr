@@ -121,6 +121,8 @@ packDataPack <- function(model_data,
   # Write SNU x IM tab ####
   # print("Writing SNU x IM tab. This can sometimes take a few minutes...")
   # TODO: Move this to separate function for use in shiny app
+  psnu_sheet_num <- grep("PSNUxIM",names(d$tool$wb))
+  openxlsx::sheetVisibility(d$tool$wb)[psnu_sheet_num] <- "hidden"
   
   # Add Styles ####
   print("Cleaning up Styles...")

@@ -5,7 +5,7 @@ secrets <- "/Users/scott/.secrets/datim.json"
 
 loginToDATIM(secrets)
 
-output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/Data Packs/Testing"
+output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/Data Packs"
 
 model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/model_data_pack_input_20_20200107_1_flat.rds"
 
@@ -61,9 +61,11 @@ batch <- tibble::tribble(
   "Togo","EIUtrKbw8PQ"                                                 #46
 )
 
-pick <- batch[c(13),]
+pick <- batch[c(1,2,4,5,7,8,10,11,12,13,14,15),]
 
 for (i in 1:NROW(pick)) {
+  print(paste0(i," of ",NROW(pick)))
+  
   packDataPack(model_data = model_data,
                datapack_name = pick[[i,1]],
                country_uids = pick[[i,2]],
