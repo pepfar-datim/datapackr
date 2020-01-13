@@ -8,6 +8,7 @@ require(datapackimporter)
 library(shiny)
 
 options("baseurl" = "https://www.datim.org/")
+options(shiny.maxRequestSize=30*1024^2)
 addResourcePath("www", system.file("siteVsDatimApp/www", package = "datapackr"))
 DHISLogin <- function(username, password, 
                       base_url = getOption("baseurl")) {
