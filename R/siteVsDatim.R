@@ -118,7 +118,7 @@ compareData_SiteVsDatim <- function(site_data,
     dplyr::filter(!stringr::str_detect(attribute_option_combo_code, "00000|00001")) #Filter out dedupes
   
   data <- dplyr::full_join(site_data, datim_data)
-  
+
   # Find the cases with different values. These should be  imported into DATIM
   data_different_value <-
     dplyr::filter(data, tool_value != datim_value | is.na(datim_value)) %>%
@@ -137,7 +137,6 @@ compareData_SiteVsDatim <- function(site_data,
   data$data_element <-datimvalidation::remapDEs(data$data_element_uid,mode_in="id",mode_out = "shortName")
   data$disagg <- datimvalidation::remapCategoryOptionCombos(data$category_option_combo_uid,mode_in = "id",mode_out = "name")
   
-  
 
   
   data_pretty <-
@@ -147,28 +146,38 @@ compareData_SiteVsDatim <- function(site_data,
                             disagg,
                             mechanism = attribute_option_combo_code,
                             tool_value,
-                            datim_value) %>%
-    tidyr::gather(source,value,tool_value:datim_value) %>% 
-    mutate(source = plyr::mapvalues(source,
-                                    c("tool_value","datim_value"),
-                                    c("Site Tool","DATIM")))
+                            datim_value) #%>%
+    #tidyr::gather(source,value,tool_value:datim_value) %>% 
+    #mutate(source = plyr::mapvalues(source,
+                #                    c("tool_value","datim_value"),
+                 #                   c("Site Tool","DATIM")))
   
-  #Adorn the sites
+    #Adorn the sites
   site_list <- getSiteList(org_unit_uids) %>%
     dplyr::select(psnu,
                   org_unit_uid=id)
   
   data_pretty %<>% 
     dplyr::left_join(site_list, by="org_unit_uid") %>%
-    dplyr::select(-org_unit_uid) %>% 
-    dplyr::group_by(data_element,period,disagg,mechanism,source,psnu) %>% 
-    dplyr::summarise(value=sum(as.numeric(value),na.rm = TRUE)) %>% 
-    dplyr::ungroup()
-  
-   
+    dplyr::select(psnu, 
+                  data_element,
+                  disagg,
+                  mechanism,
+                  tool_value,
+                  datim_value) %>% 
+    dplyr::mutate(difference = tool_value - datim_value) %>% 
+    dplyr::mutate(effect = dplyr::case_when(is.na(difference) & is.na(tool_value) ~ "Delete",
+                                            is.na(difference) & is.na(datim_value) ~ "Create",
+                                            !is.na(difference) & difference != 0 ~ "Update",
+                                            difference == 0 ~ "No Change"))# %>%
+    # dplyr::group_by(data_element,period,disagg,mechanism,source,psnu) %>% 
+    # dplyr::summarise(value=sum(as.numeric(value),na.rm = TRUE)) %>% 
+    # dplyr::ungroup()
+    # 
+  data_temp<<-data_pretty 
    list(
-    updates= data_different_value,
-    deletes = data_datim_only,
-    data_pretty = data_pretty
+    data_pretty = data_pretty,
+    updates = data_different_value,
+    deletes = data_datim_only
   )
 }
