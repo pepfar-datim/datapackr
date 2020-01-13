@@ -174,7 +174,7 @@ compareData_SiteVsDatim <- function(site_data,
     # dplyr::summarise(value=sum(as.numeric(value),na.rm = TRUE)) %>% 
     # dplyr::ungroup()
     # 
-  data_temp<<-data_pretty 
+ 
    list(
     data_pretty = data_pretty,
     updates = data_different_value,
