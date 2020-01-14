@@ -154,12 +154,12 @@ compareData_SiteVsDatim <- function(site_data,
   
     #Adorn the sites
   site_list <- getSiteList(org_unit_uids) %>%
-    dplyr::select(psnu,
+    dplyr::select(psnu, site = name, 
                   org_unit_uid=id)
   
   data_pretty %<>% 
     dplyr::left_join(site_list, by="org_unit_uid") %>%
-    dplyr::select(psnu, 
+    dplyr::select(psnu, site,
                   data_element,
                   disagg,
                   mechanism,
