@@ -14,7 +14,7 @@
 #' 
 defunctDisaggs <- function(d, sheet) {
   
-  if (sheet == "SNU x IM") {
+  if (sheet %in% c("SNU x IM","PSNUxIM")) {
     stop("Sorry! Can't check the SNU x IM tab with this function.")
   } else {
     data = d$data$extract

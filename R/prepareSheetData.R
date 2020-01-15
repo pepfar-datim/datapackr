@@ -6,17 +6,20 @@
 #' Prepares provided dataset for writing into specified Data Pack sheet.
 #'
 #' @param sheet Specified sheet within wb.
-#' @param org_units 
+#' @param org_units Dataset of org units to include.
 #' @param schema Defaults to standard Data Pack schema, but allows for provision
 #' of custom schema if needed.
-#' @param sheet_data 
+#' @param sheet_data Data to prepare.
+#' @param cop_year COP year for dating as well as selection of
+#' templates.
 #' 
 #' @return dataframe of data prepared for Data Pack
 #'
 prepareSheetData <- function(sheet,
                              org_units,
                              schema = datapackr::data_pack_schema,
-                             sheet_data) {
+                             sheet_data,
+                             cop_year = getCurrentCOPYear()) {
 
   # Get valid disaggs ####
   valid_disaggs <- schema %>%
@@ -65,8 +68,12 @@ prepareSheetData <- function(sheet,
     dplyr::mutate_if(
       is.character,
       stringr::str_replace_all,
-      pattern = paste0("(?<=[:upper:])", headerRow(tool = "Data Pack Template")+1),
-      replacement = as.character(1:NROW(row_headers) + headerRow(tool = "Data Pack Template")))
+      pattern = paste0("(?<=[:upper:])", headerRow(tool = "Data Pack Template",
+                                                   cop_year = cop_year)
+                                        +1),
+      replacement = as.character(1:NROW(row_headers)
+                                 + headerRow(tool = "Data Pack Template",
+                                             cop_year = cop_year)))
   
   # Classify formula columns as formulas
   ## TODO: Improve approach
@@ -74,6 +81,20 @@ prepareSheetData <- function(sheet,
     if (!all(any(is.na(dataStructure[[i]])))) {
       class(dataStructure[[i]]) <- c(class(dataStructure[[i]]), "formula")
     }
+  }
+  
+  # Adjust KP_MAT data to fit inside KP tab ####
+  if (sheet == "KP") {
+   sheet_data <- sheet_data %>%
+     dplyr::mutate(
+       kp_option_uid = 
+         dplyr::case_when(
+           sex_option_uid == "Qn0I5FbKQOA" ~ "wyeCT63FkXB", #Male -> Male PWID
+           sex_option_uid == "Z1EnpTPaUfq" ~ "G6OYSzplF5a", #Female -> Female PWID
+           TRUE                 ~ kp_option_uid
+         ),
+       sex_option_uid = NA_character_
+     )
   }
   
   # Swap in model data ####
@@ -95,13 +116,13 @@ prepareSheetData <- function(sheet,
     swapColumns(., combined) %>%
     as.data.frame(.)
   
-  # Translate Prioritizations
-  if (sheet == "Prioritization") {
-    pznDict <- with(prioritizations, setNames(Prioritization, value))
-    
-    dataStructure$IMPATT.PRIORITY_SNU.19T <- 
-      dplyr::recode(dataStructure$IMPATT.PRIORITY_SNU.19T, !!!pznDict)
-  }
+  # # Translate Prioritizations
+  # if (sheet == "Prioritization") {
+  #   pznDict <- with(prioritizations, setNames(Prioritization, value))
+  #   
+  #   dataStructure$IMPATT.PRIORITY_SNU.T_1 <- 
+  #     dplyr::recode(dataStructure$IMPATT.PRIORITY_SNU.T_1, !!!pznDict)
+  # }
   
   return(dataStructure)
 

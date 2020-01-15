@@ -7,27 +7,30 @@
 #' and writes data.
 #'
 #' @param wb datapackr list object.
-#' @param country_uids datapackr list object.
+#' @param country_uids Character vector of Country UIDs from DATIM.
 #' @param ou_level Level in DATIM hierarchy to pull orgUnits from. Choose from:
 #' "Prioritization", "Community", "Facility", or the numbers 4 through 7.
 #' @param org_units Allows for specification of custom list of orgUnits to include
-#' in Data Pack sheets. To use, country_uids and ou_level must be left NULL.
+#' in Data Pack sheets.
 #' @param model_data Dataset to use as input for packing Data Pack. If left NULL,
 #' will produce a Data Pack with orgUnits and disagg specifications, but no data.
 #' @param schema Defaults to standard Data Pack schema, but allows for provision
 #' of custom schema if needed.
 #' @param sheets Sheets to pack. Defaults to all those available in \code{wb},
 #' minus the first few front-matter/summary tabs.
+#' @param cop_year COP year for dating as well as selection of
+#' templates.
 #' 
 #' @return wb with all sheets written except SNU x IM
 #'
 packDataPackSheets <- function(wb,
-                               country_uids = NULL,
+                               country_uids,
                                ou_level = "Prioritization",
                                org_units = NULL, #TODO: Any way we could use PEPFARlandia here?
                                model_data = NULL, #TODO: Could we load a play dataset here?
                                schema = datapackr::data_pack_schema,
-                               sheets = NULL) {
+                               sheets = NULL,
+                               cop_year = getCurrentCOPYear()) {
   
   # Resolve parameter issues. ####
   if (is.null(model_data)) {
@@ -35,13 +38,8 @@ packDataPackSheets <- function(wb,
     #TODO: Feature to allow production of blank data pack (with just org_units and disaggs)
   }
   
-  if (is.null(country_uids) & is.null(org_units)) {
-    stop("Must provide either country_uids or org_units. Leaving both blank
-         is not an option at this time.")
-  }
-  
   # Get org_units to write into Data Pack based on provided parameters. ####
-  if (!is.null(country_uids)) {
+  if (is.null(org_units)) {
     if (ou_level == "Prioritization") {
       org_units <- datapackr::valid_PSNUs %>%
         dplyr::filter(country_uid %in% country_uids) %>%
@@ -61,10 +59,6 @@ packDataPackSheets <- function(wb,
            to. Please choose from: 'Prioritization', 'Community', 'Facility', 4,
            5, 6, or 7.")
     }
-  } else {
-      stop("Sorry! I'm learning how to pack a Data Pack based on a custom list of
-           org_units, but I'm not quite there yet.")
-    #TODO: Add feature
   }
   
   # Prepare data ####
@@ -81,22 +75,14 @@ packDataPackSheets <- function(wb,
   data <- model_data[country_uids] %>%
     dplyr::bind_rows() %>%
     tidyr::drop_na(value) %>%
-    dplyr::select(-period) %>%
-    ## Fix issue with GEND_GBV name length
-    dplyr::mutate(
-      indicator_code = stringr::str_replace(
-        string = indicator_code,
-        pattern = "GEND_GBV.N.ViolenceServiceType.19T.Sexual_Violence__Post_Rape_Care",
-        replacement = "GEND_GBV.N.ViolenceServiceType.19T.Sexual")) %>%
-    ## Drop Other PITC data to prevent overwriting new catch-all formula in Data Pack
-    dplyr::filter(indicator_code != "HTS_TST.N.otherShare")
+    dplyr::select(-period)
   
   # Get sheets to loop if not provided as parameter. ####
   if (is.null(sheets)) {
     wb_sheets = names(wb)
     schema_sheets = schema %>%
       dplyr::filter(data_structure == "normal"
-                    & sheet_name != "SNU x IM"
+                    & !(sheet_name %in% c("SNU x IM","PSNUxIM"))
                     & sheet_name %in% names(wb)) %>%
       dplyr::pull(sheet_name) %>%
       unique()
@@ -126,7 +112,8 @@ packDataPackSheets <- function(wb,
                             sheet = sheet,
                             org_units = org_units,
                             schema = schema,
-                            sheet_data = sheet_data)
+                            sheet_data = sheet_data,
+                            cop_year = cop_year)
   }
   
   

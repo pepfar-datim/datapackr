@@ -107,7 +107,7 @@ api_get <- function(api_call) {
 #' 
 #' @return Web-encoded URL for DATIM API query.
 #' 
-api_sql_call <- function(sqlView, var = NA) {
+api_sql_call <- function(sqlView, var = NULL) {
   
   URL <-   
     paste0(
@@ -115,7 +115,7 @@ api_sql_call <- function(sqlView, var = NA) {
       "/sqlViews/",
       sqlView,
       "/data.csv?",
-      ifelse(!is.na(var),paste0("var=dataSets:",var,"&"),""),
+      ifelse(!is.null(var),paste0("var=dataSets:",var,"&"),""),
       "paging=false") %>%
     utils::URLencode()
     

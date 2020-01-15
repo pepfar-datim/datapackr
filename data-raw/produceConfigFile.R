@@ -45,82 +45,6 @@ unPackStructure <- function(filepath) {
   return(schema)
 }
 
-validDPDisaggs <- function() {
-
-    validDisaggs <- list(
-        "Epi Cascade I" = list(
-            validAges = c("<01","01-04","05-09","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "Epi Cascade II" = list(
-            validAges = c("<15","15+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "Epi PMTCT" = list(
-            validAges = NA_character_,
-            validSexes = NA_character_,
-            validKPs = NA_character_),
-        "Prioritization" = list(
-            validAges = NA_character_,
-            validSexes = NA_character_,
-            validKPs = NA_character_),
-        "PMTCT_STAT_ART" = list(
-            validAges = c("10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Female"),
-            validKPs = NA_character_),
-        "PMTCT_EID" = list(
-            validAges = NA_character_,
-            validSexes = NA_character_,
-            validKPs = NA_character_),
-        "TB_STAT_ART" = list(
-            validAges = c("<01","01-04","05-09","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "VMMC" = list(
-            validAges = c("10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Male"),
-            validKPs = NA_character_),
-        "TX" = list(
-            validAges = c("<01","01-04","05-09","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "CXCA" = list(
-            validAges = c("25-29","30-34","35-39","40-44","45-49"),
-            validSexes = c("Female"),
-            validKPs = NA_character_),
-        "HTS" = list(
-            validAges = c("01-04","05-09","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "TB_TX_PREV" = list(
-            validAges = c("<15","15+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "OVC" = list(
-            validAges = c("<01","01-04","05-09","10-14","15-17","18+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "KP" = list(
-            validAges = NA_character_,
-            validSexes = NA_character_,
-            validKPs = c("Female PWID","Male PWID","PWID","FSW","MSM not SW","MSM SW","MSM","People in prisons and other enclosed settings","TG SW","TG not SW","TG")),
-        "PP" = list(
-            validAges = c("10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "PrEP" = list(
-            validAges = c("15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "GEND" = list(
-            validAges = NA_character_,
-            validSexes = NA_character_,
-            validKPs = NA_character_)
-    )
-
-    return(validDisaggs)
-}
-
 prioritizationDict <- function() {
     dict <- tibble::tribble(
         ~value, ~Prioritization,
@@ -428,15 +352,23 @@ getPeriodInfo <- function(FY = NA) {
     datapack_template_filepath <- "./data-raw/COP19_Data_Pack_Template_vFinal.xlsx"
     data_pack_schema <- unPackSchema_datapack(
       filepath = datapack_template_filepath,
-      skip = skip_tabs(tool = "Data Pack Template"))
+      skip = skip_tabs(tool = "Data Pack Template"),
+      cop_year = 2019)
     save(data_pack_schema, file = "./data/data_pack_schema.rda")
     
   ## Updated COP20 Data Pack Schema ####
-    datapack_template_filepath <- "./data-raw/COP20_Data_Pack_Template_vFINAL.xlsx"
-    cop20_data_pack_schema <- unPackSchema_datapack(
-      filepath = datapack_template_filepath,
-      skip = skip_tabs(tool = "Data Pack Template"))
-    save(cop20_data_pack_schema, file = "./data/cop20_data_pack_schema.rda")
+    datapack_template_filepath <- system.file("extdata",
+                                              "COP20_Data_Pack_Template_vFINAL.xlsx",
+                                              package = "datapackr",
+                                              mustWork = TRUE)
+    cop20_data_pack_schema <-
+      unPackSchema_datapack(
+        filepath = datapack_template_filepath,
+        skip = skip_tabs(tool = "Data Pack Template", cop_year = 2020),
+        cop_year = 2020)
+    save(cop20_data_pack_schema,
+         file = "./data/cop20_data_pack_schema.rda",
+         compress = "xz")
       
   ## Site Tool Schema ####
     site_tool_schema <- getSiteToolSchema(data_pack_schema)
@@ -456,7 +388,7 @@ getPeriodInfo <- function(FY = NA) {
       
   ## Load Openxlsx Style Guide ####
     styleGuide <- loadStyleGuide()
-    save(styleGuide, file = "./data/styleGuide.rda")
+    save(styleGuide, file = "./data/styleGuide.rda", compress = "xz")
 
   ## Load PSNUxIM to DATIM map ####
     PSNUxIM_to_DATIM <- readr::read_csv("./data-raw/PSNUxIM_to_DATIM.csv")
@@ -469,114 +401,12 @@ getPeriodInfo <- function(FY = NA) {
     save(SiteToDATIM, file = "./data/SiteToDATIM.rda")
       
   ## Load Period Info ####
-    periodInfo <- getPeriodInfo(datapackr::cop_year())
+    periodInfo <- getPeriodInfo(datapackr::getCurrentCOPYear())
     save(periodInfo, file = "./data/periodInfo.rda")
     
-  ## Load Code List into package data file ####
-    fullCodeList <- pullFullCodeList(FY = cop_year()+1)
-    save(fullCodeList, file = "./data/fullCodeList.rda")
-    
-  ## Map of all valid COCs and COs for COP FY ####
-    valid_COCs_COs <- map_COCs_to_COs() %>%
-      dplyr::filter(id %in% unique(fullCodeList$categoryoptioncombouid))
-    save(valid_COCs_COs, file = "./data/valid_COCs_COs.rda")
-    
-  ## All valid COs for COP FY grouped by category ####
-    pad <- function(digit) {padded <- paste0("0", digit)}
-    five_year_age_names <- c("<01","01-04","05-09","10-14","15-19","20-24",
-                             "25-29","30-34","35-39","40-44","45-49","50+")
-    valid_COs <- valid_COCs_COs %>%
-      dplyr::select(categoryOptions) %>%
-      tidyr::unnest() %>%
-      dplyr::distinct() %>%
-      dplyr::arrange(name) %>%
-      dplyr::left_join(
-        map_Cs_to_COs() %>% dplyr::select(-categoryoption),
-        by = c("id" = "categoryoptionuid")) %>%
-      dplyr::mutate(
-        datapack_disagg = dplyr::case_when(
-          categoryoptiongroup == "Age"
-            ~ stringr::str_replace_all(name, "(?<!\\d)\\d(?!\\d)", pad),
-          TRUE ~ name),
-        ## five_year_ages
-        datapack_schema_group = ifelse(
-          test = categoryoptiongroup == "Age"
-            & datapack_disagg %in% five_year_age_names,
-          yes = "5yr",
-          no =  ""),
-        ##1plus
-        datapack_schema_group = ifelse(
-          test = stringr::str_detect(datapack_schema_group,"5yr")
-            & datapack_disagg != "<01",
-          yes = paste(datapack_schema_group,"01+",sep = ","),
-          no =  datapack_schema_group),
-        ##10plus
-        datapack_schema_group = ifelse(
-          test = stringr::str_detect(datapack_schema_group,"5yr")
-            & (stringr::str_extract(datapack_disagg,"\\d\\d") %>% as.numeric()) >= 10,
-          yes = paste(datapack_schema_group,"10+",sep = ","),
-          no =  datapack_schema_group),
-        ##15plus
-        datapack_schema_group = ifelse(
-          test = stringr::str_detect(datapack_schema_group,"5yr")
-            & (stringr::str_extract(datapack_disagg,"\\d\\d") %>% as.numeric()) >= 15,
-          yes = paste(datapack_schema_group,"15+",sep = ","),
-          no =  datapack_schema_group),
-        ## 25-49
-        datapack_schema_group = ifelse(
-          test = stringr::str_detect(datapack_schema_group,"5yr")
-            & (stringr::str_extract(datapack_disagg,"\\d\\d") %>% as.numeric) >= 25,
-          yes = paste(datapack_schema_group,"25-49",sep = ","),
-          no =  datapack_schema_group),
-        ##ovcAges
-        datapack_schema_group = ifelse(
-          test = categoryoptiongroup == "Age"
-            & datapack_disagg %in% c(five_year_age_names[1:4],"15-17","18+"),
-          yes = paste(datapack_schema_group,"ovc",sep = ","),
-          no =  datapack_schema_group),
-        ##coarseAges
-        datapack_schema_group = ifelse(
-          test = categoryoptiongroup == "Age" & datapack_disagg %in% c("<15","15+"),
-          yes = paste(datapack_schema_group,"coarse",sep = ","),
-          no = datapack_schema_group),
-        ##coarseKPs
-        datapack_schema_group = ifelse(
-          test = categoryoptiongroup == "Key Population"
-            & datapack_disagg %in% c("FSW","MSM","PWID","TG",
-                                     "People in prisons and other enclosed settings"),
-          yes = paste(datapack_schema_group,"coarseKPs",sep = ","),
-          no = datapack_schema_group),
-        ##fineKPs
-        datapack_schema_group = ifelse(
-          test = categoryoptiongroup == "Key Population"
-          & datapack_disagg %in% c("Female PWID","Male PWID","MSM not SW",
-                                   "MSM SW","TG not SW","TG SW",
-                                   "People in prisons and other enclosed settings"),
-          yes = paste(datapack_schema_group,"fineKPs",sep = ","),
-          no = datapack_schema_group),
-        ##pwidKPs
-        datapack_schema_group = ifelse(
-          test = categoryoptiongroup == "Key Population"
-          & datapack_disagg %in% c("Female PWID","Male PWID"),
-          yes = paste(datapack_schema_group,"pwidKPs",sep = ","),
-          no = datapack_schema_group),
-        ##M/F
-        datapack_schema_group = ifelse(
-          test = categoryoptiongroup == "Sex"
-          & datapack_disagg %in% c("Female","Male"),
-          yes = paste(datapack_schema_group,"M/F",sep = ","),
-          no = datapack_schema_group),
-        datapack_schema_group = stringr::str_replace(datapack_schema_group, "^,","")
-      )
-    save(valid_COs, file = "./data/valid_COs.rda")
-    
-  ## All valid age COs
-    
+  ## Save Valid COs ####
+    # valid_COs <- validCOs(cop_year = getCurrentCOPYear())
+    # save(valid_COs, file = "./data/valid_COs.rda", compress = "xz")
     
 
-    
-# Load PSNUs into package from DATIM
-    valid_PSNUs <- getPSNUs() %>%
-      dplyr::select(-organisationUnitGroups, -ancestors)
-    save(valid_PSNUs, file = "./data/valid_PSNUs.rda")
     
