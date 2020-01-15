@@ -4,7 +4,7 @@
 \alias{pullHTSModality}
 \title{pullHTSModality}
 \usage{
-pullHTSModality(cop_year = cop_year(), dataElements = NULL)
+pullHTSModality(cop_year = getCurrentCOPYear(), dataElements = NULL)
 }
 \arguments{
 \item{cop_year}{Specifies COP year for selection of correct modalities.}

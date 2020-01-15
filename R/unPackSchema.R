@@ -65,7 +65,7 @@ unPackSchema_datapack <- function(filepath = NULL, skip = NULL, cop_year = getCu
     tidyr::separate_rows(group, sep = ",") %>%
     dplyr::arrange(group, name) %>%
     dplyr::group_by(group) %>%
-    tidyr::nest(.key = options) %>%
+    tidyr::nest(options = c(name,id)) %>%
     tibble::deframe()
   
   empty <- list(tibble::tribble(
@@ -232,7 +232,7 @@ unPackSchema_datapack <- function(filepath = NULL, skip = NULL, cop_year = getCu
   
   ## Test valid_ages ####
       valid_ages.test =
-        !valid_ages %in% c(disaggs, empty),
+       !(valid_ages %in% disaggs | valid_ages %in% empty),
   
   ## Test valid_sexes ####
       valid_sexes.test =
