@@ -72,7 +72,7 @@ DEs_COCs_COs_Cs <- function() {
   
   # Pull from code list instead of dataElementGroups to make sure constrains
     # list of categoryOptionCombos to only those actually allowable in forms.
-  codeList <- pullFullCodeList(FY = cop_year() + 1)
+  codeList <- pullFullCodeList(FY = getCurrentCOPYear() + 1)
   
   fullCodeList <- codeList %>%
   

@@ -7,7 +7,7 @@
 packDataPackSheets(wb, country_uids, ou_level = "Prioritization",
   org_units = NULL, model_data = NULL,
   schema = datapackr::data_pack_schema, sheets = NULL,
-  cop_year = cop_year())
+  cop_year = getCurrentCOPYear())
 }
 \arguments{
 \item{wb}{datapackr list object.}

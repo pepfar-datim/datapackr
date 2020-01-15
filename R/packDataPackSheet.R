@@ -22,7 +22,7 @@ packDataPackSheet <- function(wb,
                               org_units,
                               schema = datapackr::data_pack_schema,
                               sheet_data,
-                              cop_year = cop_year()){ #TODO: Could we load a play dataset here?
+                              cop_year = getCurrentCOPYear()){ #TODO: Could we load a play dataset here?
   
   # Prepare data for writing to sheet
   sheet_data <- prepareSheetData(sheet = sheet,

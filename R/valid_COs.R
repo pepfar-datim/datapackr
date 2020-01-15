@@ -9,7 +9,7 @@
 #'
 #' @return Dataframe of all valid categoryOptions for specified FY
 #' 
-validCOs <- function(cop_year = cop_year()) {
+validCOs <- function(cop_year = getCurrentCOPYear()) {
   ## Pull full Code List from DATIM ####
   fullCodeList <- pullFullCodeList(FY = cop_year +1)
   

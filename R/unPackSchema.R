@@ -14,7 +14,7 @@
 #' 
 #' @return Data Pack schema.
 #'
-unPackSchema_datapack <- function(filepath = NULL, skip = NULL, cop_year = cop_year()) {
+unPackSchema_datapack <- function(filepath = NULL, skip = NULL, cop_year = getCurrentCOPYear()) {
   
   # Check the filepath is valid. If NA, request via window. ####
   filepath <- handshakeFile(path = filepath,

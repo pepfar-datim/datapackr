@@ -3,7 +3,7 @@
 #'
 #' @return Current COP Year. (e.g., for COP19, returns 2019)
 #' 
-cop_year <- function() { 2020 }
+getCurrentCOPYear <- function() { 2020 }
 
 
 #' @export
@@ -24,7 +24,7 @@ countryUIDs_homeCell <- function() { "B25" }
 #' 
 #' @return Character vector of tab names to skip.
 #' 
-skip_tabs <- function(tool = "Data Pack", cop_year = cop_year()) {
+skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
   if (tool %in% c("Data Pack", "Data Pack Template")) {
     if (cop_year == 2019) {
       skip = c("Home", "Quotes", "Summary", "Spectrum")
@@ -47,7 +47,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = cop_year()) {
 #' 
 #' @return Header row
 #' 
-headerRow <- function(tool, cop_year = cop_year()) {
+headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
   if (cop_year == 2019) {
     if (tool %in% c("Data Pack","Site Tool")) {header_row <- 5}
     else if (tool %in% c("Data Pack Template","Site Tool Template")) {header_row <- 14}
