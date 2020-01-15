@@ -5,7 +5,7 @@
 \title{Unpack a submitted tool}
 \usage{
 unPackTool(submission_path = NA, tool = "Data Pack",
-  country_uids = NA, cop_year = cop_year())
+  country_uids = NA, cop_year = getCurrentCopYear())
 }
 \arguments{
 \item{submission_path}{Local path to the file to import.}

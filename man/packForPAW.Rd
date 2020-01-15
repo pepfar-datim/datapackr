@@ -2,9 +2,9 @@
 % Please edit documentation in R/packForPAW.R
 \name{packForPAW}
 \alias{packForPAW}
-\title{packForPAW(data)}
+\title{packForPAW}
 \usage{
-packForPAW(d, type = NA)
+packForPAW(d, type)
 }
 \arguments{
 \item{d}{Datapackr object.}
