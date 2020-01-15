@@ -1,7 +1,7 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
-#' @title packForPAW(data)
-#' 
+#' @title packForPAW
+#'  
 #' @description 
 #' Prepare dataset for use in PAW.
 #' 
