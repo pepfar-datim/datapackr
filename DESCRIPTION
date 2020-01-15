@@ -1,16 +1,14 @@
 Package: datapackr
 Type: Package
 Title: A Package that Packs and Unpacks all Data Packs
-Version: 2.0.0
-Date: 2019-08-03
+Version: 3.0.0
+Date: 2020-01-03
 Authors@R: c(
     person("Scott", "Jackson", email = "sjackson@baosystems.com",
         role = c("aut", "cre")),
     person("Jason", "Pickering", email = "jason.p.pickering@gmail.com",
         role = c("aut")),
     person("Sam", "Garman", email = "sgarman@baosystems.com",
-        role = c("aut")),
-    person("Sid", "Dixit", , "sdixit@baosystems.com",
         role = c("aut")),
     person("William", "Shiflett", , "wshiflett@guidehouse.com",
         role = c("ctb"))
@@ -42,7 +40,11 @@ Imports:
     data.table,
     scales (>= 1.0.0),
     datimvalidation,
-    datapackcommons
+    datapackcommons,
+    tidyselect,
+    glue,
+    rlang,
+    assertthat
 Suggests:
     devtools (>= 2.0.1),
     testthat

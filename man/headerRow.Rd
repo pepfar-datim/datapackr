@@ -4,11 +4,14 @@
 \alias{headerRow}
 \title{Tool header rows}
 \usage{
-headerRow(tool)
+headerRow(tool, cop_year = cop_year())
 }
 \arguments{
 \item{tool}{"Data Pack", "Data Pack Template", "Site Tool", "Site Tool Template",
 "Mechanism Map", or "Site Filter".}
+
+\item{cop_year}{Specifies COP year for dating as well as selection of
+templates.}
 }
 \value{
 Header row

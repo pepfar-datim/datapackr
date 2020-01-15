@@ -38,8 +38,8 @@ canReadFile <- function(path) {
 #' 
 #' @return Character vector containing valid filepath for further use.
 #' 
-handshakeFile <- function(path = NA,
-                          tool = NA) {
+handshakeFile <- function(path = NULL,
+                          tool = NULL) {
   
   if (tool %in% c("Data Pack", "Data Pack Template", "Site Tool",
                   "Site Tool Template", "Mechanism Map")) {

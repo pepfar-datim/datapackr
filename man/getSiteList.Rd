@@ -7,12 +7,12 @@
 getSiteList(org_unit_uids, include_mil = TRUE)
 }
 \arguments{
-\item{include_mil}{When TRUE, will append _Military organisation nodes to
-site list.}
-
-\item{country_uids}{Character vector of DATIM country IDs. This can only
+\item{org_unit_uids}{Character vector of DATIM country IDs. This can only
 include countries. Regional Operating Unit uids will be converted to a list of 
 descendant country uids}
+
+\item{include_mil}{When TRUE, will append _Military organisation nodes to
+site list.}
 }
 \description{
 Extracts full list of sites from DATIM, including _Military nodes where

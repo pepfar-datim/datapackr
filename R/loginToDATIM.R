@@ -17,9 +17,9 @@ GetCredentialsFromConsole <- function() {
 #' @param config_path Path to the DHIS2 credentials file
 #' @return A list of baseurl, username and password
 #'
-LoadConfigFile <- function(config_path = NA) {
+LoadConfigFile <- function(config_path = NULL) {
   #Load from a file
-  if (!is.na(config_path)) {
+  if (!is.null(config_path)) {
     if (file.access(config_path, mode = 4) == -1) {
       stop(paste("Cannot read configuration located at",config_path))
     }
@@ -127,7 +127,7 @@ DHISLogin<-function(dhis_config) {
 #'    }
 #'  }
 #' }
-loginToDATIM <- function(secrets = NA) {
+loginToDATIM <- function(secrets = NULL) {
   #Load from a file
   if (is.null(secrets)) {
     s <- GetCredentialsFromConsole()
