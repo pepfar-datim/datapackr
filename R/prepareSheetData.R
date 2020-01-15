@@ -19,7 +19,7 @@ prepareSheetData <- function(sheet,
                              org_units,
                              schema = datapackr::data_pack_schema,
                              sheet_data,
-                             cop_year = cop_year()) {
+                             cop_year = getCurrentCOPYear()) {
 
   # Get valid disaggs ####
   valid_disaggs <- schema %>%

@@ -9,7 +9,7 @@ secrets <- "/Users/scott/.secrets/datim.json"
 datapackr::loginToDATIM(secrets)
 
 mapply(function(x) datapackr::packMechMap(datapack_name = x,
-                                          FY = datapackr::cop_year(),
+                                          FY = datapackr::getCurrentCOPYear(),
                                           output_path = output_path),
        datapack_names)
 

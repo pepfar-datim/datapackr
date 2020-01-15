@@ -401,11 +401,11 @@ getPeriodInfo <- function(FY = NA) {
     save(SiteToDATIM, file = "./data/SiteToDATIM.rda")
       
   ## Load Period Info ####
-    periodInfo <- getPeriodInfo(datapackr::cop_year())
+    periodInfo <- getPeriodInfo(datapackr::getCurrentCOPYear())
     save(periodInfo, file = "./data/periodInfo.rda")
     
   ## Save Valid COs ####
-    # valid_COs <- validCOs(cop_year = cop_year())
+    # valid_COs <- validCOs(cop_year = getCurrentCOPYear())
     # save(valid_COs, file = "./data/valid_COs.rda", compress = "xz")
     
 

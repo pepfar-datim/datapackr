@@ -9,7 +9,7 @@
 #' 
 #' @return Dataframe of COP indicators retrieved from DATIM
 #'
-pull_COPindicators <- function(cop_year = datapackr::cop_year()) {
+pull_COPindicators <- function(cop_year = datapackr::getCurrentCOPYear()) {
   indicators <- datapackr::api_call("indicators") %>%
     datapackr::api_filter(field = "indicatorGroups.name",
                           operation = "eq",
