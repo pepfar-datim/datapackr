@@ -4,7 +4,7 @@
 \alias{api_sql_call}
 \title{Query DATIM SQL View.}
 \usage{
-api_sql_call(sqlView, var = NA)
+api_sql_call(sqlView, var = NULL)
 }
 \arguments{
 \item{sqlView}{uid of sqlView table to query.}
