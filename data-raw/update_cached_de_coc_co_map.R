@@ -61,3 +61,7 @@ map <- datapackr::cop20_data_pack_schema %>%
   dplyr::left_join(fullCodeList,
                    by = c("dataelement" = "dataelementuid",
                           "categoryOptions.ids" = "categoryOptions"))
+
+save(map, file = "./data/valid_PSNUs.rda", compress = "xz")
+
+
