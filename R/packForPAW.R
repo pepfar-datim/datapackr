@@ -25,7 +25,10 @@ packForPAW <- function(d, type) {
   schema <- d$info$schema %>%
     dplyr::filter(col_type == "target") %>%
     dplyr::select(indicator_code, dataelement_dsd, dataelement_ta,
-                  categoryoption_specified)
+                  categoryoption_specified) %>%
+    tidyr::pivot_longer(tidyselect::vars_select(names(dataelement_dsd, dataelement_ta))) %>%
+    dplyr::left_join(pullHTSModality(cop_year = d$info$cop_year),
+                     by = c("dataelement" = "dataElement"))
   
   #TODO: Map to dataelements and categoryoptioncombos
   
