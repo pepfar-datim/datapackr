@@ -26,5 +26,10 @@ pullHTSModality <- function(cop_year = cop_year(), dataElements = NULL) {
                   hts_modality = name ) %>%
     dplyr::mutate(hts_modality = stringr::str_remove(hts_modality,"FY\\d{2}R/FY\\d{2}T"))
   
+  if (!is.null(dataElements)) {
+    modality_map %<>%
+      dplyr::filter(dataElement %in% dataElements)
+  }
+  
   return(modality_map)   
 }
