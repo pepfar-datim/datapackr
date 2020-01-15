@@ -24,12 +24,12 @@
 #' 
 #' @return Exports a Data Pack to Excel within \code{output_folder}.
 #'
-
+#TODO Remove use of getwd()!!
 packDataPack <- function(model_data,
                          datapack_name,
                          country_uids,
                          template_path = NULL,
-                         cop_year = cop_year(),
+                         cop_year = getCurrentCOPYear(),
                          output_folder = getwd(),
                          results_archive = TRUE) {
   

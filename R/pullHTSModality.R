@@ -9,7 +9,7 @@
 #' 
 #' @return Dataframe of HTS modalities mapped to dataElements
 #' 
-pullHTSModality <- function(cop_year = cop_year(), dataElements = NULL) {
+pullHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL) {
   if (cop_year == 2020) {
     groupSet = "ra9ZqrTtSQn"
   } else if (cop_year == 2019) {

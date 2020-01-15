@@ -24,7 +24,7 @@
 unPackTool <- function(submission_path = NA,
                        tool = "Data Pack",
                        country_uids = NA,
-                       cop_year = cop_year()) {
+                       cop_year = getCurrentCOPYear()) {
   
   # Create data train for use across remainder of program
   d <- list(

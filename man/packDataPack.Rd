@@ -5,7 +5,7 @@
 \title{Pack a Data Pack}
 \usage{
 packDataPack(model_data, datapack_name, country_uids,
-  template_path = NULL, cop_year = cop_year(),
+  template_path = NULL, cop_year = getCurrentCOPYear(),
   output_folder = getwd(), results_archive = TRUE)
 }
 \arguments{

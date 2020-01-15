@@ -402,7 +402,7 @@ packSiteTool <- function(d,
 # Write mech list ####
     mechList <- getMechList(country_uids,
                             include_dedupe = TRUE,
-                            COP_FY = datapackr::cop_year()) %>%
+                            COP_FY = datapackr::getCurrentCOPYear()) %>%
       dplyr::select(mechanism, code) %>%
       dplyr::arrange(code)
     

@@ -4,7 +4,7 @@
 \alias{pull_COPindicators}
 \title{Extract COP indicators list from DATIM}
 \usage{
-pull_COPindicators(cop_year = datapackr::cop_year())
+pull_COPindicators(cop_year = datapackr::getCurrentCOPYear())
 }
 \arguments{
 \item{cop_year}{Year of COP for which to return indicator list. (e.g., for 

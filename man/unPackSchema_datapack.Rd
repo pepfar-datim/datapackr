@@ -5,7 +5,7 @@
 \title{Extract and save schema from Data Pack template.}
 \usage{
 unPackSchema_datapack(filepath = NULL, skip = NULL,
-  cop_year = cop_year())
+  cop_year = getCurrentCOPYear())
 }
 \arguments{
 \item{filepath}{Local filepath for a Data Pack template (XLSX).}

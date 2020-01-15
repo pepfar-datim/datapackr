@@ -20,7 +20,7 @@
 writeHomeTab <- function(wb,
                          datapack_name,
                          country_uids,
-                         cop_year = cop_year(),
+                         cop_year = getCurrentCOPYear(),
                          type = "Data Pack") {
   #TODO: Setup for default to run PEPFARLANDIA version.
   

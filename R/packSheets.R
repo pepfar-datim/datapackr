@@ -30,7 +30,7 @@ packDataPackSheets <- function(wb,
                                model_data = NULL, #TODO: Could we load a play dataset here?
                                schema = datapackr::data_pack_schema,
                                sheets = NULL,
-                               cop_year = cop_year()) {
+                               cop_year = getCurrentCOPYear()) {
   
   # Resolve parameter issues. ####
   if (is.null(model_data)) {
