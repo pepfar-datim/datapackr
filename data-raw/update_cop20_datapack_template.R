@@ -1,7 +1,7 @@
 ## If you've made any edits to the Excel template, rebuild package first to
 ## capture these, then run the below.
 
-secrets <- "/Users/scott/.secrets/datim.json"
+secrets <- "/Users/scott/.secrets/test-mer2.json"
 
 loginToDATIM(secrets)
 

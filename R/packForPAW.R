@@ -78,7 +78,7 @@ packForPAW <- function(d, type) {
         categoryoptioncombo_id, categoryoptioncombo_name,
         result_value, target_value = value)
     
-    readr::write_csv(sj, path = "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/DataPackTEST.csv")
+    
                     
       
   } else if (type == "PSNU x IM") {
