@@ -14,13 +14,22 @@
 #' 
 unPackSNUxIM <- function(d) {
   
+  if (d$info$cop_year == 2020) {sheet = "PSNUxIM"} else {sheet = "SNU x IM"}
+  
   d$data$SNUxIM <-
     readxl::read_excel(
       path = d$keychain$submission_path,
-      sheet = "SNU x IM",
-      range = readxl::cell_limits(c(headerRow(d$info$tool), 1), c(NA, NA)),
+      sheet = sheet,
+      range =
+        readxl::cell_limits(
+          c(headerRow(tool = d$info$tool, cop_year = d$info$cop_year),
+            1),
+          c(NA, NA)),
       col_types = "text"
-    )
+    ) %>%
+    tidyr::drop_na()
+  
+  if (NROW(d$data$SNUxIM) == 0) {return(d)}
   
   # Run structural checks ####
   d <- checkColStructure(d, "SNU x IM")

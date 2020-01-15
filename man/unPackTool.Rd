@@ -5,7 +5,7 @@
 \title{Unpack a submitted tool}
 \usage{
 unPackTool(submission_path = NA, tool = "Data Pack",
-  country_uids = NA)
+  country_uids = NA, cop_year = cop_year())
 }
 \arguments{
 \item{submission_path}{Local path to the file to import.}
@@ -16,6 +16,9 @@ Other options include "Site Tool", "Mechanism Map", and "Site Filter".}
 \item{country_uids}{List of 11 digit alphanumeric DATIM codes representing
 countries. If not provided, will check file for these codes. If not in file,
 will flag error.}
+
+\item{cop_year}{Specifies COP year for dating as well as selection of
+templates.}
 }
 \description{
 Processes a submitted Data Pack, Site Tool, Mechanism Map, or Site Filter by

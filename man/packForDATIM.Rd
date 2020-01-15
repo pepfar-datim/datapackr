@@ -7,7 +7,7 @@
 packForDATIM(d, type = NA)
 }
 \arguments{
-\item{d}{Data packr object.}
+\item{d}{Datapackr object.}
 
 \item{type}{Type of dataset to prep for DATIM. Choose from \code{PSNUxIM},
 \code{SUBNAT_IMPATT}, or \code{Site}.}
