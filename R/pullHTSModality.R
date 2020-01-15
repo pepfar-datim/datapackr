@@ -1,5 +1,5 @@
 #' @export
-#' @title pullHTSModality
+#' @title getHTSModality
 #' 
 #' @description 
 #' Map HTS modality to dataElement id
@@ -9,7 +9,7 @@
 #' 
 #' @return Dataframe of HTS modalities mapped to dataElements
 #' 
-pullHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL) {
+getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL) {
   if (cop_year == 2020) {
     groupSet = "ra9ZqrTtSQn"
   } else if (cop_year == 2019) {
@@ -20,7 +20,7 @@ pullHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL)
   modality_map <- api_call(paste0("dataElementGroupSets/",groupSet)) %>%
     api_fields("dataElementGroups[name,dataElements[id]]") %>%
     api_get() %>%
-    tidyr::unnest() %>%
+    tidyr::unnest(cols = dataElements) %>%
     dplyr::distinct() %>%
     dplyr::select(dataElement = id,
                   hts_modality = name ) %>%

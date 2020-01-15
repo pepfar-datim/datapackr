@@ -25,7 +25,7 @@ validCOs <- function(cop_year = getCurrentCOPYear()) {
   
   valid_COs <- valid_COCs_COs %>%
     dplyr::select(categoryOptions) %>%
-    tidyr::unnest() %>%
+    tidyr::unnest(cols = categoryOptions) %>%
     dplyr::distinct() %>%
     dplyr::arrange(name) %>%
     dplyr::left_join(
