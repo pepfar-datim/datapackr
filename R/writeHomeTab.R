@@ -12,11 +12,16 @@
 #' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
 #' @param country_uids Character vector of 11 digit alphanumeric DATIM codes
 #' representing countries.
+#' @param cop_year COP Year in format YYYY.
 #' @param type Either "Data Pack" or "Site Tool". Defaults to "Data Pack".
 #' 
 #' @return Openxlsx workbook object with added, styled Home tab.
 #' 
-writeHomeTab <- function(wb, datapack_name, country_uids, type = "Data Pack") {
+writeHomeTab <- function(wb,
+                         datapack_name,
+                         country_uids,
+                         cop_year = cop_year(),
+                         type = "Data Pack") {
   #TODO: Setup for default to run PEPFARLANDIA version.
   
   # Add Tab ####
@@ -27,7 +32,6 @@ writeHomeTab <- function(wb, datapack_name, country_uids, type = "Data Pack") {
   }
   
   # PEPFAR banner #### 
-  # TODO: Decide whether to keep features for writing styles, given we'll be creating Site Tool from template now too
   openxlsx::writeData(wb, "Home", "PEPFAR", xy = c(2,2), colNames = F)
   openxlsx::addStyle(wb, "Home",
                      styleGuide$home$pepfar,
@@ -36,7 +40,7 @@ writeHomeTab <- function(wb, datapack_name, country_uids, type = "Data Pack") {
   # Title ####
   openxlsx::writeData(wb, "Home",
                       x = paste0("COP",
-                                 stringr::str_sub(cop_year(), -2,-1),
+                                 stringr::str_sub(cop_year, -2,-1),
                                  " ",
                                  type),
                       xy = c(2,10),
@@ -52,6 +56,7 @@ writeHomeTab <- function(wb, datapack_name, country_uids, type = "Data Pack") {
                      rows = 20, cols = 2)
   
   # country_uids ####
+  #TODO: Can we just explicitly state row, col here?
   col <- countryUIDs_homeCell() %>%
     openxlsx::convertFromExcelRef() %>%
     as.numeric()
@@ -59,7 +64,11 @@ writeHomeTab <- function(wb, datapack_name, country_uids, type = "Data Pack") {
     stringr::str_sub(2,3) %>%
     as.numeric()
   
-  openxlsx::writeData(wb, "Home", country_uids, xy = c(col, row), colNames = F)
+  countries <- paste(country_uids, collapse = ", ")
+  
+  openxlsx::writeData(wb, "Home", countries, xy = c(col, row), colNames = F)
+  
+  #TODO: Add feature to list country names in addition to country_uids right below
   
   # Generated: ####
   openxlsx::writeData(wb, "Home",

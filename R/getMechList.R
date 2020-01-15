@@ -20,9 +20,9 @@
 #' @return A dataframe of mechanisms, including start and end dates, mechanism
 #' code, partner name, funding agency, and related OU.
 #'
-getMechList <- function(country_uids = NA,
+getMechList <- function(country_uids = NULL,
                         include_dedupe = FALSE,
-                        COP_FY = NA) {
+                        COP_FY = NULL) {
   
   # Pull Mechs ####
     mechList <- 
@@ -34,7 +34,7 @@ getMechList <- function(country_uids = NA,
       readr::read_csv()
     
   # Filter OU ####
-    if (!all(is.na(country_uids))) {
+    if (!all(is.null(country_uids))) {
       ous <- datapackr::dataPackMap %>%
         dplyr::filter(country_uid %in% country_uids) %>%
         dplyr::pull(level3name) %>%
@@ -46,7 +46,7 @@ getMechList <- function(country_uids = NA,
     }
     
   # Filter by Fiscal Year ####
-    if (!is.na(COP_FY)) {
+    if (!is.null(COP_FY)) {
       mechList %<>%
         dplyr::filter((startdate < paste0(COP_FY+1,"-10-01") &
                          enddate > paste0(COP_FY,"-09-30"))
