@@ -6,7 +6,7 @@
 #' Flexible function that allows packaging of a variety of datapackr outputs as
 #' DATIM import files.
 #' 
-#' @param d Data packr object.
+#' @param d Datapackr object.
 #' @param type Type of dataset to prep for DATIM. Choose from \code{PSNUxIM},
 #' \code{SUBNAT_IMPATT}, or \code{Site}.
 #' 
