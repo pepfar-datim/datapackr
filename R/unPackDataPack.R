@@ -36,7 +36,7 @@
 unPackDataPack <- function(d) {
   
   # Determine country uids ####
-    if (is.na(d$info$country_uids)) {
+    if (is.null(d$info$country_uids)) {
       d$info$country_uids <- 
         unPackCountryUIDs(submission_path = d$keychain$submission_path,
                           tool = d$info$tool)
@@ -72,8 +72,12 @@ unPackDataPack <- function(d) {
   # Pack for PAW ####  
       # d <- packForPAW(d, type = "PSNUxIM")
       
+  # Package SUBNAT/IMPATT export ####
+      d <- packForDATIM(d, type = "SUBNAT_IMPATT")
+      
     } else {
       # d <- packForPAW(d, type = "PSNU")
+      # d <- addSNUxIM(d)
     }
     
   # Double check country_uid info # TODO: Replace this with API call against SQL view of sites mapped to Countries.
@@ -97,9 +101,6 @@ unPackDataPack <- function(d) {
     # country_uid_check <- dp_PSNU_uids[site_uids]
     
     # Where data uids !%in% DATIM list, flag error (Need to provide correct uids in either param or DP home tab)
-    
-  # Package SUBNAT/IMPATT export ####
-    d <- packForDATIM(d, type = "SUBNAT_IMPATT")
     
   return(d)
 

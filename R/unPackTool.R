@@ -21,9 +21,9 @@
 #'     \item Performs integrity checks on file structure;
 #' }
 #'     
-unPackTool <- function(submission_path = NA,
+unPackTool <- function(submission_path = NULL,
                        tool = "Data Pack",
-                       country_uids = NA,
+                       country_uids = NULL,
                        cop_year = getCurrentCOPYear()) {
   
   # Create data train for use across remainder of program

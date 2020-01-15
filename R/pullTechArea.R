@@ -1,5 +1,5 @@
 #' @export
-#' @title pullTechArea
+#' @title getTechArea
 #' 
 #' @description 
 #' Map Tech Area to dataElement id
@@ -8,14 +8,14 @@
 #' 
 #' @return Dataframe of Tech Areas mapped to dataElements
 #' 
-pullTechArea <- function(dataElements = NULL) {
+getTechArea <- function(dataElements = NULL) {
   
   groupSet = "LxhLO68FcXm"
   
   tech_areas <- api_call(paste0("dataElementGroupSets/",groupSet)) %>%
     api_fields("dataElementGroups[name,dataElements[id]]") %>%
     api_get() %>%
-    tidyr::unnest() %>%
+    tidyr::unnest(cols = dataElements) %>%
     dplyr::distinct() %>%
     dplyr::select(dataElement = id,
                   tech_area = name )
