@@ -4,8 +4,7 @@
 \alias{getMechList}
 \title{Compile Mechanism List for Site Tool}
 \usage{
-getMechList(country_uids = NULL, include_dedupe = FALSE,
-  COP_FY = NULL)
+getMechList(country_uids = NA, include_dedupe = FALSE, COP_FY = NA)
 }
 \arguments{
 \item{country_uids}{Character vector of DATIM country IDs. This can only

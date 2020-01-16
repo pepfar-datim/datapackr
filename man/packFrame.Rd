@@ -7,7 +7,7 @@
 packFrame(datapack_uid, type = "Data Pack")
 }
 \arguments{
-\item{datapack_uid}{A unique ID specifying the PEPFAR Operating Unit
+\item{datapack_uid}{A unique ID specifying the PEPFAR Operating Unit 
 the Site Tool belongs to.}
 
 \item{type}{Either "Data Pack" or "Site Tool". Defaults to "Site Tool".}

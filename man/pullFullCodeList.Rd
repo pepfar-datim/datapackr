@@ -4,7 +4,7 @@
 \alias{pullFullCodeList}
 \title{Pull & combine all MER, SUBNAT, IMPATT code lists for specified FY.}
 \usage{
-pullFullCodeList(FY = NULL, datastream = NULL)
+pullFullCodeList(FY = NA, datastream = NA)
 }
 \arguments{
 \item{FY}{Reporting FY for which to filter active code lists.}

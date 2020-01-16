@@ -4,16 +4,12 @@
 \alias{unPackSchema_datapack}
 \title{Extract and save schema from Data Pack template.}
 \usage{
-unPackSchema_datapack(filepath = NULL, skip = NULL,
-  cop_year = cop_year())
+unPackSchema_datapack(filepath = NA, skip = NA)
 }
 \arguments{
 \item{filepath}{Local filepath for a Data Pack template (XLSX).}
 
 \item{skip}{Character vector of Sheet Names to label for skipping in schema.}
-
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
 }
 \value{
 Data Pack schema.

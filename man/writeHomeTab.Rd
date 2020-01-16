@@ -4,8 +4,7 @@
 \alias{writeHomeTab}
 \title{writeHomeTab(wb, datapack_uid, type = "Data Pack")}
 \usage{
-writeHomeTab(wb, datapack_name, country_uids, cop_year = cop_year(),
-  type = "Data Pack")
+writeHomeTab(wb, datapack_name, country_uids, type = "Data Pack")
 }
 \arguments{
 \item{wb}{Openxlsx workbook object.}
@@ -15,8 +14,6 @@ writeHomeTab(wb, datapack_name, country_uids, cop_year = cop_year(),
 
 \item{country_uids}{Character vector of 11 digit alphanumeric DATIM codes
 representing countries.}
-
-\item{cop_year}{COP Year in format YYYY.}
 
 \item{type}{Either "Data Pack" or "Site Tool". Defaults to "Data Pack".}
 }

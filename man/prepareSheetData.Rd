@@ -2,27 +2,21 @@
 % Please edit documentation in R/prepareSheetData.R
 \name{prepareSheetData}
 \alias{prepareSheetData}
-\title{Prepare sheet-specific dataset for writing into a Data Pack sheet.}
+\title{Loop through and populate normal Data Pack sheets}
 \usage{
-prepareSheetData(sheet, org_units, schema = datapackr::data_pack_schema,
-  sheet_data, cop_year = cop_year())
+prepareSheetData(sheet, row_headers, data)
 }
 \arguments{
-\item{sheet}{Specified sheet within wb.}
+\item{sheet}{Specified sheet within wb}
 
-\item{org_units}{Dataset of org units to include.}
+\item{row_headers}{Structure to use in row_headers}
 
-\item{schema}{Defaults to standard Data Pack schema, but allows for provision
-of custom schema if needed.}
-
-\item{sheet_data}{Data to prepare.}
-
-\item{cop_year}{COP year for dating as well as selection of
-templates.}
+\item{data}{Data from DATIM}
 }
 \value{
 dataframe of data prepared for Data Pack
 }
 \description{
-Prepares provided dataset for writing into specified Data Pack sheet.
+Loops through all normally structured sheets in a submitted Data Pack
+and writes data.
 }

@@ -3,7 +3,7 @@
 #'
 #' @return Current COP Year. (e.g., for COP19, returns 2019)
 #' 
-cop_year <- function() { 2020 }
+cop_year <- function() { 2019 }
 
 
 #' @export
@@ -19,19 +19,12 @@ countryUIDs_homeCell <- function() { "B25" }
 #' 
 #' @param tool "Data Pack", "Data Pack Template", "Site Tool", "Site Tool Template",
 #' "Mechanism Map", or "Site Filter".
-#' @param cop_year COP year for dating as well as selection of
-#' templates.
 #' 
 #' @return Character vector of tab names to skip.
 #' 
-skip_tabs <- function(tool = "Data Pack", cop_year = cop_year()) {
+skip_tabs <- function(tool = "Data Pack") {
   if (tool %in% c("Data Pack", "Data Pack Template")) {
-    if (cop_year == 2019) {
-      skip = c("Home", "Quotes", "Summary", "Spectrum")
-    }
-    else if (cop_year == 2020) {
-      skip = c("Home", "Instructions", "Summary", "Spectrum", "Spectrum IDs")
-    }
+    skip = c("Home", "Quotes", "Summary", "Spectrum")
   } else {skip = c(NA_character_)}
   
   return(skip)
@@ -42,22 +35,19 @@ skip_tabs <- function(tool = "Data Pack", cop_year = cop_year()) {
 #' 
 #' @param tool "Data Pack", "Data Pack Template", "Site Tool", "Site Tool Template",
 #' "Mechanism Map", or "Site Filter".
-#' @param cop_year Specifies COP year for dating as well as selection of
-#' templates.
 #' 
 #' @return Header row
 #' 
-headerRow <- function(tool, cop_year = cop_year()) {
-  if (cop_year == 2019) {
-    if (tool %in% c("Data Pack","Site Tool")) {header_row <- 5}
-    else if (tool %in% c("Data Pack Template","Site Tool Template")) {header_row <- 14}
-    else if (tool %in% c("Site Filter")) {header_row <- 1}
-    else if (tool %in% c("Mechanism Map")) {header_row <- 3}
-    else stop("That tool type is not supported for that cop_year.")
-  } else if (cop_year == 2020) {
-    if (tool %in% c("Data Pack", "Data Pack Template")) {header_row <- 14}
-    else stop("That tool type is not supported for that cop_year.")
-  } else stop("That cop_year is not currently supported.")
+headerRow <- function(tool) {
+  if (tool %in% c("Data Pack", "Site Tool")) {
+    header_row <- 5
+  } else if (tool %in% c("Data Pack Template", "Site Tool Template")) {
+    header_row <- 14
+  } else if (tool %in% c("Site Filter")) {
+    header_row <- 1
+  } else if (tool %in% c("Mechanism Map")) {
+    header_row <- 3
+  }
     
   return(header_row)
     

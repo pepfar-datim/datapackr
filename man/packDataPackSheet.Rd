@@ -4,25 +4,16 @@
 \alias{packDataPackSheet}
 \title{Pack data into a Data Pack sheet}
 \usage{
-packDataPackSheet(wb, sheet, org_units,
-  schema = datapackr::data_pack_schema, sheet_data,
-  cop_year = cop_year())
+packDataPackSheet(wb, sheet, row_headers, data)
 }
 \arguments{
 \item{wb}{datapackr list object.}
 
 \item{sheet}{Specified sheet within wb}
 
-\item{org_units}{Org Units to write in.}
+\item{row_headers}{Structure to use in row_headers}
 
-\item{schema}{Defaults to standard Data Pack schema, but allows for provision
-of custom schema if needed.}
-
-\item{sheet_data}{Dataset to use as input for packing Data Pack. If left NULL,
-will produce a Data Pack with orgUnits and disagg specifications, but no data.}
-
-\item{cop_year}{COP year for dating as well as selection of
-templates.}
+\item{data}{Data to write}
 }
 \value{
 wb with specified sheet packed with data

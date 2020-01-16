@@ -9,12 +9,10 @@
 #' 
 #' @param filepath Local filepath for a Data Pack template (XLSX).
 #' @param skip Character vector of Sheet Names to label for skipping in schema.
-#' @param cop_year Specifies COP year for dating as well as selection of
-#' templates.
 #' 
 #' @return Data Pack schema.
 #'
-unPackSchema_datapack <- function(filepath = NULL, skip = NULL, cop_year = cop_year()) {
+unPackSchema_datapack <- function(filepath = NA, skip = NA) {
   
   # Check the filepath is valid. If NA, request via window. ####
   filepath <- handshakeFile(path = filepath,
@@ -27,20 +25,19 @@ unPackSchema_datapack <- function(filepath = NULL, skip = NULL, cop_year = cop_y
   data.table::setDT(schema)[,sheet_num:=.GRP, by = c("sheet_name")]
   
   # Skip detail on listed sheets. ####
-  if (is.null(skip)) {skip = skip_tabs(tool = "Data Pack", cop_year = cop_year)}
   sheets <- tidyxl::xlsx_sheet_names(filepath)
   verbose_sheets <- sheets[!sheets %in% skip]
   
   schema %<>%
     dplyr::filter(sheet_name %in% verbose_sheets,
-                  row %in% c(5:(headerRow("Data Pack Template", cop_year)+1))) %>%
+                  row %in% c(5:(headerRow("Data Pack Template")+1))) %>%
     
   # Gather and Spread to get formula, value, and indicator_code in separate cols ####
     tidyr::gather(key,value,-sheet_num,-sheet_name,-col,-row) %>%
     tidyr::unite(new.col, c(key,row)) %>%
     tidyr::spread(new.col,value) %>%
     dplyr::select(sheet_num, sheet_name, col,
-                  dataset = character_5,
+                  dataset = character_5, # TODO: Find a way to automate these suffixes ####
                   col_type = character_6,
                   value_type = character_7,
                   dataelement_dsd = character_8,
@@ -57,9 +54,7 @@ unPackSchema_datapack <- function(filepath = NULL, skip = NULL, cop_year = cop_y
     dplyr::mutate(formula = dplyr::if_else(is.na(formula), value, formula))
   
   # Translate valid disaggs ####
-  valid_COs <- validCOs(cop_year = cop_year)
-  
-  disaggs <- valid_COs %>%
+  disaggs <- datapackr::valid_COs %>%
     dplyr::select(name = datapack_disagg, id, group = datapack_schema_group) %>%
     dplyr::filter(group != "") %>%
     tidyr::separate_rows(group, sep = ",") %>%
@@ -81,10 +76,8 @@ unPackSchema_datapack <- function(filepath = NULL, skip = NULL, cop_year = cop_y
         valid_ages == "5 yr, 1+" ~ list(disaggs$`01+`),
         valid_ages == "5 yr, 15+" ~ list(disaggs$`15+`),
         valid_ages == "5 yr, 10+" ~ list(disaggs$`10+`),
-        valid_ages == "5 yr, <01-18+" ~ list(disaggs$ovc_serv),
-        valid_ages == "5 yr, <01-17" ~ list(disaggs$ovc_hiv_stat),
-        valid_ages == "01-04" ~ list(disaggs$`01-04`),
-        valid_ages == "<01" ~ list(disaggs$`<01`),
+        valid_ages == "5 yr, <01-18+" ~ list(disaggs$ovc),
+        valid_ages == "01-04" ~ list(disaggs$`01+`[disaggs$`01+`$name == "01-04",]),
         TRUE ~ empty),
       valid_sexes.options = dplyr::case_when(
         valid_sexes == "M/F" ~ list(disaggs$`M/F`),
@@ -92,9 +85,9 @@ unPackSchema_datapack <- function(filepath = NULL, skip = NULL, cop_year = cop_y
         valid_sexes == "F" ~ list(disaggs$`M/F`[disaggs$`M/F`$name == "Female",]),
         TRUE ~ empty),
       valid_kps.options = dplyr::case_when(
-        valid_kps == "coarseKPs" ~ list(disaggs$coarseKPs),
-        valid_kps == "fineKPs" ~ list(disaggs$fineKPs),
-        valid_kps == "pwidKPs" ~ list(disaggs$pwidKPs),
+        valid_kps == "Coarse KP" ~ list(disaggs$coarseKPs),
+        valid_kps == "Finer KP" ~ list(disaggs$fineKPs),
+        valid_kps == "M/F PWID" ~ list(disaggs$pwidKPs),
         TRUE ~ empty)
       ) %>%
     dplyr::select(sheet_num, sheet_name, col, indicator_code,
@@ -174,74 +167,56 @@ unPackSchema_datapack <- function(filepath = NULL, skip = NULL, cop_year = cop_y
     dplyr::select(sheet_num, sheet_name, data_structure, dplyr::everything())
   
   
-  # TEST schema is valid (TRUE = Test fail) ####
+  # TEST schema is valid ####
   skip_sheets_num <- schema %>%
     dplyr::filter(sheet_name %in% skip) %>%
     dplyr::select(sheet_num) %>%
     dplyr::distinct() %>%
     dplyr::pull()
   
-  #TODO: Add check to make sure T, T_1, and R map correctly to rows 5-13
-  
   tests <- schema %>%
-    
-  ## Test Sheet Numbers ####
     dplyr::left_join(
       data.frame(
-        "sheet_name" = tidyxl::xlsx_sheet_names(filepath),
-        "sheet_num.test" = 1:length(tidyxl::xlsx_sheet_names(filepath)),
+        "sheet_name" = sheets,
+        "sheet_num.test" = 1:length(sheets),
         stringsAsFactors = FALSE),
       by = "sheet_name") %>%
     dplyr::mutate(
       sheet_num.test = sheet_num != sheet_num.test,
-  
-  ## Test Sheet Names ####
       sheet_name.test = !sheet_name %in% sheets,
-  
-  ## Test Data Elements ####
       dataelement_dsd.test = 
         !stringr::str_detect(dataelement_dsd, "^([A-Za-z][A-Za-z0-9]{10})$"),
       dataelement_ta.test = 
         !stringr::str_detect(dataelement_ta, "^([A-Za-z][A-Za-z0-9]{10})$"),
-  
-  ## Test categoryOptions
       categoryoption.test = 
         !stringr::str_detect(
           categoryoption_specified,
           "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$"),
-  
-  ## Test datasets ####
       dataset.test = 
         dplyr::case_when(
           col_type %in% c("reference","assumption","calculation","row_header","allocation") 
-            ~ !dataset == c("datapack"),
+            ~ !dataset %in% c("datapack"),
           col_type %in% c("target","past") ~ !dataset %in% c("mer","impatt","subnat"),
           sheet_num %in% skip_sheets_num ~ !is.na(dataset),
           TRUE ~ TRUE),
-  
-  ## Test col_type ####
       col_type.test = 
         (!col_type %in% c("target","reference","assumption","calculation", "past",
                         "row_header","allocation"))
         & (sheet_num %in% skip_sheets_num & !is.na(col_type)),
-  
-  ## Test value_type ####
       value_type.test =
         (!value_type %in% c("integer","percentage","string"))
         & (sheet_num %in% skip_sheets_num & !is.na(value_type)),
-  
-  ## Test valid_ages ####
       valid_ages.test =
-        !valid_ages %in% c(disaggs, empty),
-  
-  ## Test valid_sexes ####
+        !valid_ages %in% c(list(disaggs$`5yr`),list(disaggs$`25-49`),
+                           list(disaggs$`01+`),list(disaggs$`15+`),
+                           list(disaggs$`10+`),list(disaggs$coarse),
+                           list(disaggs$ovc),empty,
+                           list(disaggs$`01+`[disaggs$`01+`$name == "01-04",])),
       valid_sexes.test =
         !valid_sexes %in% c(list(disaggs$`M/F`),
                             list(disaggs$`M/F`[disaggs$`M/F`$name == "Male",]),
                             list(disaggs$`M/F`[disaggs$`M/F`$name == "Female",]),
                             empty),
-  
-  ## Test valid_kps
       valid_kps.test =
         !valid_kps %in% c(list(disaggs$fineKPs),list(disaggs$coarseKPs),
                           list(disaggs$pwidKPs),empty)

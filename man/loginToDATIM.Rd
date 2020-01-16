@@ -4,7 +4,7 @@
 \alias{loginToDATIM}
 \title{Log into DATIM using DATIM credentials}
 \usage{
-loginToDATIM(secrets = NULL)
+loginToDATIM(secrets = NA)
 }
 \arguments{
 \item{secrets}{A local path directing to a file containing DATIM login

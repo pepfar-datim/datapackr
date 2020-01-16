@@ -4,14 +4,11 @@
 \alias{skip_tabs}
 \title{List of tabs to skip for given tool.}
 \usage{
-skip_tabs(tool = "Data Pack", cop_year = cop_year())
+skip_tabs(tool = "Data Pack")
 }
 \arguments{
 \item{tool}{"Data Pack", "Data Pack Template", "Site Tool", "Site Tool Template",
 "Mechanism Map", or "Site Filter".}
-
-\item{cop_year}{COP year for dating as well as selection of
-templates.}
 }
 \value{
 Character vector of tab names to skip.

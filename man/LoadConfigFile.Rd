@@ -4,7 +4,7 @@
 \alias{LoadConfigFile}
 \title{LoadConfig(config_path)}
 \usage{
-LoadConfigFile(config_path = NULL)
+LoadConfigFile(config_path = NA)
 }
 \arguments{
 \item{config_path}{Path to the DHIS2 credentials file}
