@@ -186,7 +186,6 @@ unPackDataPackSheet <- function(d, sheet) {
   
   
   # Aggregate OVC_HIVSTAT
-  # TODO: Fix this in the Data Pack. Not here...
   if (sheet == "OVC") {
     d$data$extract %<>%
       dplyr::mutate(
@@ -202,7 +201,6 @@ unPackDataPackSheet <- function(d, sheet) {
   }
   
   # Add ages to PMTCT_EID
-  # TODO: Fix this in the Data Pack. Not here...
   if (sheet == "PMTCT_EID") {
     d$data$extract %<>%
       dplyr::mutate(

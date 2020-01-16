@@ -1,7 +1,7 @@
 library(datapackr)
 library(magrittr)
 
-secrets <- "/Users/scott/.secrets/datim.json"
+secrets <- "/Users/scott/.secrets/test-mer2.json"
 
 loginToDATIM(secrets)
 

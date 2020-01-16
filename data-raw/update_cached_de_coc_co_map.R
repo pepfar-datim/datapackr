@@ -10,13 +10,18 @@ fullCodeList <- pullFullCodeList(FY = cop_year +1) %>%
   dplyr::mutate(categoryOptions = purrr::map_chr(categoryOptions,~.x[["id"]] %>% 
                                                    sort() %>% paste(collapse = ".")))
 
-map <- datapackr::cop20_data_pack_schema %>%
+map_DataPack_DATIM_DEs_COCs <- datapackr::cop20_data_pack_schema %>%
   dplyr::filter(col_type == "target") %>%
   dplyr::select(indicator_code, dataelement_dsd, dataelement_ta,
                 categoryoption_specified, valid_ages, valid_sexes, valid_kps) %>%
   tidyr::unnest(cols = valid_ages, names_sep  = ".") %>%
   tidyr::unnest(cols = valid_sexes, names_sep  = ".") %>%
   tidyr::unnest(cols = valid_kps, names_sep  = ".") %>%
+  dplyr::mutate_at(c("valid_sexes.name","valid_ages.name","valid_ages.id","valid_sexes.id"),
+                   ~dplyr::case_when(indicator_code == "OVC_HIVSTAT.N.total.T"
+                                     ~ NA_character_,
+                                     TRUE ~ .)) %>%
+  dplyr::distinct() %>%
   dplyr::mutate(categoryoption_specified = stringr::str_split(categoryoption_specified, "[.]")) %>%
   dplyr::mutate(
     valid_kps.id =
@@ -26,14 +31,6 @@ map <- datapackr::cop20_data_pack_schema %>%
         (indicator_code %in% c("KP_MAT_SUBNAT.N.Sex.T", "KP_MAT.N.Sex.T") 
          & valid_kps.id == "wyeCT63FkXB") ~ "Qn0I5FbKQOA",
         TRUE ~ valid_kps.id),
-    valid_ages.id =
-      dplyr::case_when(
-        indicator_code == "OVC_HIVSTAT.N.total.T" ~ NA_character_,
-        TRUE ~ valid_ages.id),
-    valid_sexes.id =
-      dplyr::case_when(
-        indicator_code == "OVC_HIVSTAT.N.total.T" ~ NA_character_,
-        TRUE ~ valid_sexes.id),
     categoryOptions.ids =
       purrr::pmap(list(valid_ages.id,
                        valid_sexes.id,
@@ -57,11 +54,13 @@ map <- datapackr::cop20_data_pack_schema %>%
                    by = c("dataelement" = "dataElement")) %>%
   dplyr::left_join(getTechArea(),
                    by = c("dataelement" = "dataElement")) %>%
+  dplyr::left_join(getNumeratorDenominator(),
+                   by = c("dataelement" = "dataElement")) %>%
   dplyr::mutate(support_type = toupper(support_type)) %>%
   dplyr::left_join(fullCodeList,
                    by = c("dataelement" = "dataelementuid",
                           "categoryOptions.ids" = "categoryOptions"))
 
-save(map, file = "./data/valid_PSNUs.rda", compress = "xz")
+save(map_DataPack_DATIM_DEs_COCs, file = "./data/map_DataPack_DATIM_DEs_COCs.rda", compress = "xz")
 
 

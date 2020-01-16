@@ -12,51 +12,33 @@
 #' @return Data frame ready for use in PAW
 #' 
 packForPAW <- function(d, type) {
+  
   PSNUs <- datapackr::valid_PSNUs %>%
     dplyr::mutate(
       ou_id = purrr::map_chr(ancestors, list("id", 3), .default = NA),
+      ou = purrr::map_chr(ancestors, list("name", 3), .default = NA),
       snu1_id = dplyr::if_else(
         condition = is.na(purrr::map_chr(ancestors, list("id",4), .default = NA)),
         true = psnu_uid,
-        false = purrr::map_chr(ancestors, list("id",4), .default = NA))
+        false = purrr::map_chr(ancestors, list("id",4), .default = NA)),
+      snu1 = dplyr::if_else(
+        condition = is.na(purrr::map_chr(ancestors, list("name",4), .default = NA)),
+        true = psnu,
+        false = purrr::map_chr(ancestors, list("name",4), .default = NA))
     ) %>%
-    dplyr::select(psnu_uid, ou_id, snu1_id)
-  
-  fullCodeList <- pullFullCodeList(FY = cop_year +1) %>%
-    dplyr::left_join(datapackr::valid_COCs_COs, by = c("categoryoptioncombouid" = "id")) %>%
-    dplyr::mutate(categoryOptions = purrr::map_chr(categoryOptions,~.x[["id"]] %>% 
-                                                     sort() %>% paste(collapse = ".")))
-  
-  schema <- d$info$schema %>%
-    dplyr::filter(col_type == "target") %>%
-    dplyr::select(indicator_code, dataelement_dsd, dataelement_ta,
-                  categoryoption_specified, valid_ages, valid_sexes, valid_kps) %>%
-    tidyr::unnest(cols = valid_ages, names_sep  = ".") %>%
-    tidyr::unnest(cols = valid_sexes, names_sep  = ".") %>%
-    tidyr::unnest(cols = valid_kps, names_sep  = ".") %>%
-    dplyr::mutate(categoryOptions.ids = purrr::pmap(list(valid_ages.id, valid_sexes.id, valid_kps.id, categoryoption_specified ), cbind)) %>% 
-    dplyr::mutate(categoryOptions.ids = purrr::map(categoryOptions.ids, sort)) %>%
-    dplyr::mutate(categoryOptions.ids = purrr::map(categoryOptions.ids, na.omit)) %>% 
-    dplyr::mutate(categoryOptions.ids = purrr::map_chr(categoryOptions.ids, paste, collapse = ".")) %>%
-    tidyr::pivot_longer(cols = dataelement_dsd:dataelement_ta,
-                        names_to = "support_type",
-                        values_to = "dataelement",
-                        names_prefix = "dataelement_",
-                        values_drop_na = TRUE) %>%
-    dplyr::left_join(getHTSModality(cop_year = d$info$cop_year),
-                     by = c("dataelement" = "dataElement")) %>%
-    dplyr::left_join(getTechArea(),
-                     by = c("dataelement" = "dataElement")) %>%
-    dplyr::mutate(support_type = toupper(support_type)) %>%
-    dplyr::left_join(fullCodeList,
-                     by = c("dataelement" = "dataelementuid",
-                            "categoryOptions.ids" = "categoryOptions"))
+    dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id, psnu, psnu_uid)
   
   if (type == "PSNU") {
     sj <- d$data$MER %>%
       dplyr::bind_rows(d$data$SUBNAT_IMPATT) %>%
       dplyr::left_join(PSNUs, by = c("psnuid" = "psnu_uid")) %>%
-      dplyr::left_join(schema,
+      dplyr::mutate(
+        Age =
+          dplyr::case_when(
+            indicator_code %in% c("PMTCT_EID.N.Age.T.2mo","PMTCT_EID.N.Age.T.2to12mo") ~ NA_character_,
+            TRUE ~ Age
+          )) %>%
+      dplyr::left_join(datapackr::map_DataPack_DATIM_DEs_COCs,
                        by = c("indicator_code" = "indicator_code",
                               "Age" = "valid_ages.name",
                               "Sex" = "valid_sexes.name",
@@ -71,13 +53,15 @@ packForPAW <- function(d, type) {
                     categoryoptioncombo_name = categoryoptioncombo,
                     result_value = NA_character_) %>%
       dplyr::select(
-        ou_id, snu1_id, psnuid,
+        ou, ou_id, country_name, country_uid, snu1, snu1_id, psnu, psnuid,
         mechanism_code, mechanism_desc, partner_id, partner_desc, funding_agency,
         fiscal_year,
-        sex = Sex, indicator = tech_area, support_type, hts_modality,
-        categoryoptioncombo_id, categoryoptioncombo_name,
+        dataelement_id = dataelement, dataelement_name = dataelement.y,
+        indicator = tech_area, numerator_denominator, support_type, hts_modality,
+        categoryoptioncombo_id, categoryoptioncombo_name, sex = Sex,
         result_value, target_value = value)
     
+    readr::write_csv(x = sj, path = "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/DataPackTEST.csv")
     
                     
       
