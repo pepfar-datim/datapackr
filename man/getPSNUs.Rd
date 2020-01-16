@@ -4,8 +4,7 @@
 \alias{getPSNUs}
 \title{Pull list of PSNUs from DATIM based on provided country UIDs.}
 \usage{
-getPSNUs(country_uids = NULL, include_mil = TRUE,
-  additional_fields = NULL)
+getPSNUs(country_uids = NULL, include_mil = TRUE, additional_fields = NULL)
 }
 \arguments{
 \item{country_uids}{Character vector of DATIM country IDs. This can only

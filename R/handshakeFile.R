@@ -11,7 +11,7 @@
 canReadFile <- function(path) {
   
   # Check that the file path was supplied.
-  if (is.na(path)) {
+  if (is.null(path)) {
     return(FALSE)
   }
   
@@ -62,7 +62,7 @@ handshakeFile <- function(path = NULL,
   }
   
   # Check the file has correct extension
-  if (file_ext(path) != extension) {
+  if (tools::file_ext(path) != extension) {
     stop(paste0("File is not the correct format! File must have extension .",
                 extension))
   } else {return(path)}

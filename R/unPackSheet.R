@@ -12,7 +12,7 @@
 #' @return d
 #' 
 unPackDataPackSheet <- function(d, sheet) {
-  header_row <- headerRow("Data Pack")
+  header_row <- headerRow(tool = "Data Pack", cop_year = d$info$cop_year)
   
   d$data$extract <-
     readxl::read_excel(
@@ -38,7 +38,7 @@ unPackDataPackSheet <- function(d, sheet) {
     addcols(c("KeyPop", "Age", "Sex")) %>%
   # Extract PSNU uid
     dplyr::mutate(
-      psnuid = stringr::str_extract(PSNU, "(?<=\\()([A-Za-z][A-Za-z0-9]{10})(?=\\)$)"),
+      psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)"),
   # Tag sheet name
       sheet_name = sheet
       ) %>%
@@ -56,14 +56,14 @@ unPackDataPackSheet <- function(d, sheet) {
     tidyr::drop_na(value)
   
   # Convert Prioritization from text to short-number.
-  d$data$extract %<>%
-    dplyr::mutate(
-      value = dplyr::case_when(
-        stringr::str_detect(indicator_code,"IMPATT.PRIORITY_SNU")
-          ~ stringr::str_sub(value, start = 1, end = 2),
-        TRUE ~ value
-        )
-      )
+  # d$data$extract %<>%
+  #   dplyr::mutate(
+  #     value = dplyr::case_when(
+  #       stringr::str_detect(indicator_code,"IMPATT.PRIORITY_SNU")
+  #         ~ stringr::str_sub(value, start = 1, end = 2),
+  #       TRUE ~ value
+  #       )
+  #     )
   
   # TEST for non-numeric values ####
   non_numeric <- d$data$extract %>%
@@ -186,7 +186,6 @@ unPackDataPackSheet <- function(d, sheet) {
   
   
   # Aggregate OVC_HIVSTAT
-  # TODO: Fix this in the Data Pack. Not here...
   if (sheet == "OVC") {
     d$data$extract %<>%
       dplyr::mutate(
@@ -202,7 +201,6 @@ unPackDataPackSheet <- function(d, sheet) {
   }
   
   # Add ages to PMTCT_EID
-  # TODO: Fix this in the Data Pack. Not here...
   if (sheet == "PMTCT_EID") {
     d$data$extract %<>%
       dplyr::mutate(

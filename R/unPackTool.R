@@ -12,6 +12,8 @@
 #' @param country_uids List of 11 digit alphanumeric DATIM codes representing
 #' countries. If not provided, will check file for these codes. If not in file,
 #' will flag error.
+#' @param cop_year Specifies COP year for dating as well as selection of
+#' templates.
 #' 
 #' @details
 #' Executes the following operations in relation to a submitted Site Tool
@@ -19,9 +21,10 @@
 #'     \item Performs integrity checks on file structure;
 #' }
 #'     
-unPackTool <- function(submission_path = NA,
+unPackTool <- function(submission_path = NULL,
                        tool = "Data Pack",
-                       country_uids = NA) {
+                       country_uids = NULL,
+                       cop_year = getCurrentCOPYear()) {
   
   # Create data train for use across remainder of program
   d <- list(
@@ -30,7 +33,8 @@ unPackTool <- function(submission_path = NA,
     ),
     info = list(
       tool = tool,
-      country_uids = country_uids
+      country_uids = country_uids,
+      cop_year = cop_year
     )
   )
   

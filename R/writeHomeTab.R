@@ -2,11 +2,11 @@
 #' @importFrom magrittr %>% %<>%
 #' @importFrom utils packageVersion
 #' @title writeHomeTab(wb, datapack_uid, type = "Data Pack")
-#' 
+#'
 #' @description
 #' Function to write Home tab details into either Data Pack or Site Tool, as
 #' specified.
-#' 
+#'
 #' @param wb Openxlsx workbook object.
 #' @param datapack_name Name you would like associated with this Data Pack.
 #' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
@@ -14,29 +14,29 @@
 #' representing countries.
 #' @param cop_year COP Year in format YYYY.
 #' @param type Either "Data Pack" or "Site Tool". Defaults to "Data Pack".
-#' 
+#'
 #' @return Openxlsx workbook object with added, styled Home tab.
-#' 
+#'
 writeHomeTab <- function(wb,
                          datapack_name,
                          country_uids,
-                         cop_year = cop_year(),
+                         cop_year = getCurrentCOPYear(),
                          type = "Data Pack") {
   #TODO: Setup for default to run PEPFARLANDIA version.
-  
+
   # Add Tab ####
   if(!any(stringr::str_detect(names(wb), "Home"))) {
     openxlsx::addWorksheet(wb,
                            sheetName = "Home",
                            gridLines = FALSE)
   }
-  
-  # PEPFAR banner #### 
+
+  # PEPFAR banner ####
   openxlsx::writeData(wb, "Home", "PEPFAR", xy = c(2,2), colNames = F)
   openxlsx::addStyle(wb, "Home",
                      styleGuide$home$pepfar,
                      rows = 2, cols = 2)
-  
+
   # Title ####
   openxlsx::writeData(wb, "Home",
                       x = paste0("COP",
@@ -48,13 +48,13 @@ writeHomeTab <- function(wb,
   openxlsx::addStyle(wb, "Home",
                      styleGuide$home$title,
                      rows = 10, cols = 2)
-  
+
   # datapack_name ####
   openxlsx::writeData(wb, "Home", datapack_name, xy = c(2,20), colNames = F)
   openxlsx::addStyle(wb, "Home",
                      styleGuide$home$datapack_name,
                      rows = 20, cols = 2)
-  
+
   # country_uids ####
   #TODO: Can we just explicitly state row, col here?
   col <- countryUIDs_homeCell() %>%
@@ -63,24 +63,24 @@ writeHomeTab <- function(wb,
   row <- countryUIDs_homeCell() %>%
     stringr::str_sub(2,3) %>%
     as.numeric()
-  
+
   countries <- paste(country_uids, collapse = ", ")
-  
+
   openxlsx::writeData(wb, "Home", countries, xy = c(col, row), colNames = F)
-  
+
   #TODO: Add feature to list country names in addition to country_uids right below
-  
+
   # Generated: ####
   openxlsx::writeData(wb, "Home",
                       paste("Generated on:", Sys.time()),
                       xy = c(2, row+2),
                       colNames = F)
-  
+
   # Package version ####
   openxlsx::writeData(wb, "Home",
                       paste("Package version:",
                             as.character(utils::packageVersion("datapackr"))),
                       xy = c(2, row+4))
-  
+
   return(wb)
 }
