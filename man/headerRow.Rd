@@ -5,6 +5,7 @@
 \title{Tool header rows}
 \usage{
 headerRow(tool, cop_year = getCurrentCOPYear())
+
 }
 \arguments{
 \item{tool}{"Data Pack", "Data Pack Template", "Site Tool", "Site Tool Template",

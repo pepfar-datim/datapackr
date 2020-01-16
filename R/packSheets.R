@@ -1,8 +1,8 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
 #' @title Loop through and populate normal Data Pack sheets
-#' 
-#' @description 
+#'
+#' @description
 #' Loops through all normally structured sheets in a submitted Data Pack
 #' and writes data.
 #'
@@ -20,7 +20,7 @@
 #' minus the first few front-matter/summary tabs.
 #' @param cop_year COP year for dating as well as selection of
 #' templates.
-#' 
+#'
 #' @return wb with all sheets written except SNU x IM
 #'
 packDataPackSheets <- function(wb,
@@ -31,13 +31,13 @@ packDataPackSheets <- function(wb,
                                schema = datapackr::data_pack_schema,
                                sheets = NULL,
                                cop_year = getCurrentCOPYear()) {
-  
+
   # Resolve parameter issues. ####
   if (is.null(model_data)) {
     stop("Must provide model_data. Leaving this blank is not an option at this time.")
     #TODO: Feature to allow production of blank data pack (with just org_units and disaggs)
   }
-  
+
   # Get org_units to write into Data Pack based on provided parameters. ####
   if (is.null(org_units)) {
     if (ou_level == "Prioritization") {
@@ -48,19 +48,19 @@ packDataPackSheets <- function(wb,
         dplyr::select(PSNU = dp_psnu, psnu_uid)
       #TODO: Update Data Pack and here to use `OrgUnit as column header instead
       # of PSNU to allow custom org unit list.
-      
+
     } else if (ou_level %in% c(4:7, "Facility", "Community")) {
       stop("Sorry! I'm learning how to pack a Data Pack at a non-Prioritization
            level, but I'm not quite there yet.")
       #TODO: Add feature
-      
+
     } else {
       stop("Hmmm... The ou_level you've provided doesn't look like what I'm used
            to. Please choose from: 'Prioritization', 'Community', 'Facility', 4,
            5, 6, or 7.")
     }
   }
-  
+
   # Prepare data ####
   if (!all(country_uids %in% names(model_data))) {
     missing <- country_uids[!country_uids %in% names(model_data)]
@@ -71,12 +71,12 @@ packDataPackSheets <- function(wb,
       )
     )
   }
-  
+
   data <- model_data[country_uids] %>%
     dplyr::bind_rows() %>%
     tidyr::drop_na(value) %>%
     dplyr::select(-period)
-  
+
   # Get sheets to loop if not provided as parameter. ####
   if (is.null(sheets)) {
     wb_sheets = names(wb)
@@ -86,28 +86,28 @@ packDataPackSheets <- function(wb,
                     & sheet_name %in% names(wb)) %>%
       dplyr::pull(sheet_name) %>%
       unique()
-    
+
     sheets = wb_sheets[wb_sheets %in% schema_sheets]
-    
+
     if (length(sheets) == 0) {stop("This template file does not appear to be normal.")}
   }
-  
+
   # Loop through sheets ####
   print("Writing Sheets...")
-  
+
   for (sheet in sheets) {
     print(sheet)
     sheet_codes <- schema %>%
       dplyr::filter(sheet_name == sheet
                     & col_type %in% c("past","calculation")) %>%
       dplyr::pull(indicator_code)
-    
+
     ## If no model data needed for a sheet, forward a NULL dataset to prevent errors
     if (length(sheet_codes) != 0) {
       sheet_data <- data %>%
         dplyr::filter(indicator_code %in% sheet_codes)
     } else {sheet_data = NULL}
-    
+
     wb <- packDataPackSheet(wb = wb,
                             sheet = sheet,
                             org_units = org_units,
@@ -115,8 +115,7 @@ packDataPackSheets <- function(wb,
                             sheet_data = sheet_data,
                             cop_year = cop_year)
   }
-  
-  
+
+
   return(wb)
 }
-  

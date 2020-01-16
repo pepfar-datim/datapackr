@@ -1,4 +1,6 @@
 # Load PSNUs into package from DATIM ####
+library(magrittr)
+library(datapackr)
 
 secrets <- "/Users/scott/.secrets/datim.json"
 

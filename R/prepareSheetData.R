@@ -1,8 +1,8 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
 #' @title Prepare sheet-specific dataset for writing into a Data Pack sheet.
-#' 
-#' @description 
+#'
+#' @description
 #' Prepares provided dataset for writing into specified Data Pack sheet.
 #'
 #' @param sheet Specified sheet within wb.
@@ -12,7 +12,7 @@
 #' @param sheet_data Data to prepare.
 #' @param cop_year COP year for dating as well as selection of
 #' templates.
-#' 
+#'
 #' @return dataframe of data prepared for Data Pack
 #'
 prepareSheetData <- function(sheet,
@@ -36,7 +36,7 @@ prepareSheetData <- function(sheet,
                   Sex = valid_sexes.name,
                   KeyPop = valid_kps.name) %>%
     dplyr::arrange(Age, Sex, KeyPop)
-  
+
   # Cross PSNUs and disaggs ####
   row_headers <- org_units %>%
     tidyr::crossing(valid_disaggs) %>%
@@ -54,7 +54,7 @@ prepareSheetData <- function(sheet,
       PSNU, Age, Sex, KeyPop, AgeCoarse,
       psnu_uid, valid_ages.id, valid_sexes.id, valid_kps.id) %>%
     dplyr::arrange_at(dplyr::vars(dplyr::everything()))
-  
+
   # Setup data structure ####
   dataStructure <- schema %>%
     dplyr::filter(sheet_name == sheet) %>%
@@ -74,7 +74,7 @@ prepareSheetData <- function(sheet,
       replacement = as.character(1:NROW(row_headers)
                                  + headerRow(tool = "Data Pack Template",
                                              cop_year = cop_year)))
-  
+
   # Classify formula columns as formulas
   ## TODO: Improve approach
   for (i in 1:length(dataStructure)) {
@@ -82,12 +82,12 @@ prepareSheetData <- function(sheet,
       class(dataStructure[[i]]) <- c(class(dataStructure[[i]]), "formula")
     }
   }
-  
+
   # Adjust KP_MAT data to fit inside KP tab ####
   if (sheet == "KP") {
    sheet_data <- sheet_data %>%
      dplyr::mutate(
-       kp_option_uid = 
+       kp_option_uid =
          dplyr::case_when(
            sex_option_uid == "Qn0I5FbKQOA" ~ "wyeCT63FkXB", #Male -> Male PWID
            sex_option_uid == "Z1EnpTPaUfq" ~ "G6OYSzplF5a", #Female -> Female PWID
@@ -96,13 +96,13 @@ prepareSheetData <- function(sheet,
        sex_option_uid = NA_character_
      )
   }
-  
+
   # Swap in model data ####
   if (!is.null(sheet_data)) {
     sheet_data_spread <- sheet_data %>%
       tidyr::spread(key = indicator_code,
                     value = value)
-    
+
     combined <- row_headers %>%
       dplyr::left_join(
         sheet_data_spread,
@@ -111,19 +111,19 @@ prepareSheetData <- function(sheet,
                "valid_sexes.id" = "sex_option_uid",
                "valid_kps.id" = "kp_option_uid"))
   } else {combined = row_headers}
-  
+
   dataStructure %<>%
     swapColumns(., combined) %>%
     as.data.frame(.)
-  
+
   # # Translate Prioritizations
   # if (sheet == "Prioritization") {
   #   pznDict <- with(prioritizations, setNames(Prioritization, value))
-  #   
-  #   dataStructure$IMPATT.PRIORITY_SNU.T_1 <- 
+  #
+  #   dataStructure$IMPATT.PRIORITY_SNU.T_1 <-
   #     dplyr::recode(dataStructure$IMPATT.PRIORITY_SNU.T_1, !!!pznDict)
   # }
-  
+
   return(dataStructure)
 
 }

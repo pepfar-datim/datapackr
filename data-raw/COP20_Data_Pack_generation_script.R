@@ -9,6 +9,7 @@ output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing
 
 model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/model_data_pack_input_20_20200114_1_flat.rds"
 
+
 model_data <- readRDS(model_data_path)
 
 batch <- tibble::tribble(
@@ -63,9 +64,10 @@ batch <- tibble::tribble(
 
 pick <- batch[c(37),]
 
+
 for (i in 1:NROW(pick)) {
   print(paste0(i," of ",NROW(pick)))
-  
+
   packDataPack(model_data = model_data,
                datapack_name = pick[[i,1]],
                country_uids = pick[[i,2]],

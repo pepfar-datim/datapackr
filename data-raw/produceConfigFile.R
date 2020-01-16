@@ -111,19 +111,19 @@ mapIndicators <- function() {
 produceConfig <- function() {
   # Load Country List
     configFile <- getCountries()
-    
+
   # Add levels & prioritization details
     impattLevels <- getIMPATTLevels()
-    
+
     configFile %<>%
       dplyr::left_join(impattLevels, by = c("country_name")) %>%
       dplyr::mutate_if(is.integer, as.double)
-      
+
   # Add Mil names & UIDs & metadata
     militaryNodes <- datapackr::getMilitaryNodes() %>%
       dplyr::mutate(mil_in_datim = TRUE) %>%
       dplyr::select(-country_name, mil_level = level)
-    
+
     configFile %<>%
     ## Building based on future state of all military nodes nested under country
       dplyr::left_join(militaryNodes, by= c("country_uid")) %>%
@@ -141,7 +141,7 @@ produceConfig <- function() {
           mil_psnu),
         mil_psnu_uid =
           dplyr::if_else(
-            is.na(mil_psnu_uid), 
+            is.na(mil_psnu_uid),
             paste0(
               "MIL",
               stringr::str_sub(
@@ -158,13 +158,13 @@ produceConfig <- function() {
           pad = 0)
         ) %>%
       tidyr::replace_na(list(mil_in_datim = FALSE, mil_level = 5))
-    
+
     return(configFile)
-    
+
 }
 
 loadStyleGuide <- function() {
-  
+
   # Home Tab Styles ####
   home <- list(
     ## Home Tab Title
@@ -185,7 +185,7 @@ loadStyleGuide <- function() {
                                    halign = "left",
                                    valign = "center")
   )
-  
+
   # Site Lists ####
   siteList <- list(
     community = openxlsx::createStyle(fontColour = "#000000",
@@ -199,7 +199,7 @@ loadStyleGuide <- function() {
     military = openxlsx::createStyle(fontColour = "#000000",
                                      bgFill = "#C4BD97")
   )
-  
+
   # Data Tabs ####
   data <- list(
     title = openxlsx::createStyle(fontSize = 18,
@@ -225,12 +225,12 @@ loadStyleGuide <- function() {
     invalidDisagg = openxlsx::createStyle(fontColour = "#C00000",
                                           bgFill = "#000000")
   )
-  
+
   # Compile ####
   styleGuide <- list(home = home,
                      siteList = siteList,
                      data = data)
-  
+
   return(styleGuide)
 }
 
@@ -241,13 +241,13 @@ getSiteToolSchema <- function(data_pack_schema) {
                                     "KP","PP","PrEP","GEND")) %>%
     dplyr::pull(sheet_name) %>%
     unique()
-  
+
   site_row_headers <- c("PSNU","Age","Sex","KeyPop")
-    
+
   site_schema <- data_pack_schema %>%
   # Select only FY20 MER target columns
     dplyr::filter((col_type == "Target" & dataset == "MER")
-                  | (col_type == "Row Header" 
+                  | (col_type == "Row Header"
                      & sheet_name %in% site_sheets
                      & indicator_code %in% site_row_headers)) %>%
     dplyr::arrange(sheet_num) %>%
@@ -260,7 +260,7 @@ getSiteToolSchema <- function(data_pack_schema) {
                   tech_area =
                     dplyr::case_when(
                       col_type == "Target" ~ stringr::str_extract(indicator_code,"^(.)+\\.(N|D)(?=\\.)")),
-                  tech_area = 
+                  tech_area =
                     dplyr::case_when(
                       !is.na(tech_area) ~ paste0(stringr::str_replace(tech_area,"\\."," ("),")"))) %>%
     dplyr::group_by(sheet_name,tech_area) %>%
@@ -268,7 +268,7 @@ getSiteToolSchema <- function(data_pack_schema) {
     dplyr::ungroup() %>%
     dplyr::mutate(tech_area = dplyr::case_when(header == 1 ~ tech_area),
                   split = dplyr::case_when(indicator_code == "Site" ~ 4, TRUE ~ 1))
-  
+
   # Add Mechanism and type columns to every sheet
   site_schema <- site_schema[rep(seq_len(dim(site_schema)[1]),site_schema$split),] %>%
     dplyr::select(-split,-header) %>%
@@ -292,20 +292,20 @@ getSiteToolSchema <- function(data_pack_schema) {
       )
     ) %>%
     dplyr::select(sheet_num,sheet_name,col = column,col_type,tech_area,label,indicator_code)
-  
+
   return(site_schema)
 }
 
 getPeriodInfo <- function(FY = NA) {
   periodISO <- paste0(FY, "Oct")
-  
+
   url <- paste0(getOption("baseurl"),
                 "api/",
                 datapackr::api_version(),
                 "/sqlViews/TTM90ytCCdY/data.json?filter=iso:eq:",
                 periodISO) %>%
     utils::URLencode()
-  
+
     r <- httr::GET(url , httr::timeout(60))
     if (r$status == 200L) {
       r <- httr::content(r, "text")
@@ -317,15 +317,15 @@ getPeriodInfo <- function(FY = NA) {
         p$startdate <- as.Date(p$startdate,"%Y-%m-%d")
       } else {
         stop(paste0("Period with ISO identifier", ISO, "not found"))
-      } 
+      }
     } else {stop("Could not retrieve period information")}
-  
+
   if (!is.na(FY)) {
     assertthat::assert_that(length(FY) == 1)
     p <- p[p$iso == periodISO,] }
-  
+
   return(p)
-  
+
 }
 
 
@@ -337,7 +337,7 @@ getPeriodInfo <- function(FY = NA) {
     config_path = "./data-raw/DataPackConfiguration.csv"
     configFile <- readr::read_csv(config_path)
     save(configFile, file = "./data/configFile.rda")
-      
+
   ## Data Pack Map (i.e., Updated Config File) ####
     dataPackMap <- produceConfig()
     save(dataPackMap, file = "./data/dataPackMap.rda")
@@ -347,7 +347,7 @@ getPeriodInfo <- function(FY = NA) {
     # template_path <- "./data-raw/COP19_Data_Pack_Template_vFINAL.xlsx"
     # data_pack_schema <- unPackStructure(template_path)
     # save(data_pack_schema, file = "./data/data_pack_schema.rda")
-    
+
   ## Updated COP19 Data Pack Schema ####
     datapack_template_filepath <- "./data-raw/COP19_Data_Pack_Template_vFinal.xlsx"
     data_pack_schema <- unPackSchema_datapack(
@@ -355,7 +355,7 @@ getPeriodInfo <- function(FY = NA) {
       skip = skip_tabs(tool = "Data Pack Template"),
       cop_year = 2019)
     save(data_pack_schema, file = "./data/data_pack_schema.rda")
-    
+
   ## Updated COP20 Data Pack Schema ####
     datapack_template_filepath <- system.file("extdata",
                                               "COP20_Data_Pack_Template_vFINAL.xlsx",
@@ -369,7 +369,7 @@ getPeriodInfo <- function(FY = NA) {
     save(cop20_data_pack_schema,
          file = "./data/cop20_data_pack_schema.rda",
          compress = "xz")
-      
+
   ## Site Tool Schema ####
     site_tool_schema <- getSiteToolSchema(data_pack_schema)
     save(site_tool_schema, file = "./data/site_tool_schema.rda")
@@ -385,7 +385,7 @@ getPeriodInfo <- function(FY = NA) {
   ## Data Pack to DATIM Indicator Map ####
     indicatorMap <- readr::read_csv("./data-raw/DataPack to DATIM indicator map.csv")
     save(indicatorMap, file = "./data/indicatorMap.rda")
-      
+
   ## Load Openxlsx Style Guide ####
     styleGuide <- loadStyleGuide()
     save(styleGuide, file = "./data/styleGuide.rda", compress = "xz")
@@ -399,14 +399,12 @@ getPeriodInfo <- function(FY = NA) {
       sheet = "Site Tool",
       col_types = "text")
     save(SiteToDATIM, file = "./data/SiteToDATIM.rda")
-      
+
   ## Load Period Info ####
     periodInfo <- getPeriodInfo(datapackr::getCurrentCOPYear())
     save(periodInfo, file = "./data/periodInfo.rda")
-    
+
   ## Save Valid COs ####
+
     # valid_COs <- validCOs(cop_year = getCurrentCOPYear())
     # save(valid_COs, file = "./data/valid_COs.rda", compress = "xz")
-    
-
-    
