@@ -18,7 +18,7 @@ URL: https://github.com/pepfar-datim/datapackr
 BugReports: https://github.com/pepfar-datim/datapackr
 Depends: R (>= 3.6.2)
 Imports:
-    dplyr (>= 0.7.8),
+    dplyr (>= 0.8.3),
     tidyr (>= 1.0.0),
     tidyxl (>= 1.0.4),
     readxl (>= 1.2.0),
