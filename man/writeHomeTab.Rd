@@ -4,8 +4,13 @@
 \alias{writeHomeTab}
 \title{writeHomeTab(wb, datapack_uid, type = "Data Pack")}
 \usage{
-writeHomeTab(wb, datapack_name, country_uids,
-  cop_year = getCurrentCOPYear(), type = "Data Pack")
+writeHomeTab(
+  wb,
+  datapack_name,
+  country_uids,
+  cop_year = getCurrentCOPYear(),
+  type = "Data Pack"
+)
 }
 \arguments{
 \item{wb}{Openxlsx workbook object.}

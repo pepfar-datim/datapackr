@@ -4,12 +4,10 @@
 \alias{packSUBNAT_IMPATT}
 \title{packSUBNAT_IMPATT(data)}
 \usage{
-packSUBNAT_IMPATT(data, cop_year = getCurrentCOPYear())
+packSUBNAT_IMPATT(data)
 }
 \arguments{
 \item{data}{SUBNAT/IMPATT dataframe to pack for DATIM.}
-
-\item{cop_year}{COP Year}
 }
 \value{
 Dataframe of SUBNAT & IMPATT data ready for DATIM ingestion.

@@ -4,9 +4,14 @@
 \alias{packDataPackSheet}
 \title{Pack data into a Data Pack sheet}
 \usage{
-packDataPackSheet(wb, sheet, org_units,
-  schema = datapackr::data_pack_schema, sheet_data,
-  cop_year = getCurrentCOPYear())
+packDataPackSheet(
+  wb,
+  sheet,
+  org_units,
+  schema = datapackr::data_pack_schema,
+  sheet_data,
+  cop_year = getCurrentCOPYear()
+)
 }
 \arguments{
 \item{wb}{datapackr list object.}
