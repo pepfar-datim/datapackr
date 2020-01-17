@@ -7,16 +7,11 @@
 #'     \code{d$data$SUBNAT_IMPATT} into a standard DATIM import file.
 #'
 #' @param data SUBNAT/IMPATT dataframe to pack for DATIM.
-#' @param cop_year COP Year
 #' 
 #' @return Dataframe of SUBNAT & IMPATT data ready for DATIM ingestion.
 #' 
-packSUBNAT_IMPATT <- function(data, cop_year = getCurrentCOPYear()) {
+packSUBNAT_IMPATT <- function(data) {
   
-  if (cop_year == 2020) {
-    SUBNAT_IMPATT <- data %>%
-      dplyr::left_join()
-  } else {
     SUBNAT_IMPATT <- data %>%
       dplyr::left_join((
         datapackr::indicatorMap %>%
@@ -52,7 +47,6 @@ packSUBNAT_IMPATT <- function(data, cop_year = getCurrentCOPYear()) {
       dplyr::summarise(value = sum(value)) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(value = as.character(round_trunc(value)))
-  }
   
   return(SUBNAT_IMPATT)
 }
