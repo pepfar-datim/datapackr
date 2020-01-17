@@ -58,7 +58,7 @@ packForPAW <- function(d, type) {
         fiscal_year,
         dataelement_id = dataelement, dataelement_name = dataelement.y,
         indicator = tech_area, numerator_denominator, support_type, hts_modality,
-        categoryoptioncombo_id, categoryoptioncombo_name, sex = Sex,
+        categoryoptioncombo_id, categoryoptioncombo_name, age = Age, sex = Sex,
         result_value, target_value = value)
     
     readr::write_csv(x = sj, path = "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/DataPackTEST.csv")
