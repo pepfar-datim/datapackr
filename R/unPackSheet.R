@@ -132,7 +132,7 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::pull(indicator_code)
     
   decimal_cols <- d$data$extract %>%
-    dplyr::filter(round(value, 5) %% 1 != 0
+    dplyr::filter(value %% 1 != 0
                   & !indicator_code %in% decimals_allowed) %>%
     dplyr::pull(indicator_code) %>%
     unique()
