@@ -132,7 +132,7 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::pull(indicator_code)
     
   decimal_cols <- d$data$extract %>%
-    dplyr::filter(value %% 1 != 0
+    dplyr::filter(round(value, 5) %% 1 != 0
                   & !indicator_code %in% decimals_allowed) %>%
     dplyr::pull(indicator_code) %>%
     unique()
@@ -369,12 +369,12 @@ unPackSiteToolSheet <- function(d, sheet) {
   }
   
   # TEST for decimals ####
-  d$tests$has_decimals <- d$data$extract$value %% 1 != 0
+  d$tests$has_decimals <- round(d$data$extract$value, 5) %% 1 != 0
   
   if (any(d$tests$has_decimals)){
     d$tests$decimals_found <- d$data$extract %>%
       dplyr::select(value) %>%
-      dplyr::filter(value %% 1 != 0) %>%
+      dplyr::filter(round(value, 5) %% 1 != 0) %>%
       dplyr::distinct %>%
       dplyr::pull(value) %>%
       paste(collapse = ", ")
