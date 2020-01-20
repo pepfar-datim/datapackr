@@ -844,7 +844,7 @@ packForDATIM <- function(d, type = NA) {
   if (type == "Site") {
     
     d$datim$decimal_values <- d$data$targets %>% 
-      dplyr::filter(value %% 1 != 0)
+      dplyr::filter(round(value, 5) %% 1 != 0)
     
     d$datim$negative_values <- d$data$targets %>% 
       dplyr::filter(mech_code != "00000") %>%
