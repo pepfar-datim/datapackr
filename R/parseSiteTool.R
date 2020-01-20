@@ -389,7 +389,7 @@ if (any(has_negative_numbers)) {
   }
   
   #Test for decimals
-  has_decimals <- round(d$data$extract$value, 10) %% 1 != 0
+  has_decimals <- round(d$data$extract$value, 5) %% 1 != 0
   
   if (any(has_decimals)){
     msg <-
