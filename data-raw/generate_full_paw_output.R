@@ -63,7 +63,7 @@ PAW %<>%
     indicator, numerator_denominator, support_type, hts_modality,
     categoryoptioncombo_id,
     categoryoptioncombo_name,
-    age, sex,
+    age, sex, key_population,
     result_value, target_value
   )
 
