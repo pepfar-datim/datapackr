@@ -55,6 +55,24 @@ packDataPackSheet <- function(wb,
                        gridExpand = TRUE,
                        stack = TRUE)
   }
+  
+  # Format HIV_PREV
+  if (sheet == "Epi Cascade I") {
+    percentDecimalCols <- schema %>%
+      dplyr::filter(sheet_name == sheet,
+                    indicator_code == "HIV_PREV.NA.Age/Sex/HIVStatus.T") %>%
+      dplyr::pull(col)
+    
+    percentDecimalStyle = openxlsx::createStyle(numFmt = "0.00%")
+    
+    openxlsx::addStyle(wb,
+                       sheet = sheet,
+                       percentDecimalStyle,
+                       rows = (1:NROW(sheet_data)) + headerRow("Data Pack Template", cop_year),
+                       cols = percentDecimalCols,
+                       gridExpand = TRUE,
+                       stack = TRUE)
+  }
 
   # Format integers
   integerCols <- schema %>%
