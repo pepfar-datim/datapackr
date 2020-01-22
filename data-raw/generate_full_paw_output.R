@@ -19,7 +19,7 @@ PAW <- datapackr::map_DataPack_DATIM_DEs_COCs %>%
     indicator = tech_area, numerator_denominator, support_type, hts_modality,
     categoryoptioncombo_id = categoryoptioncombouid,
     categoryoptioncombo_name = categoryoptioncombo,
-    age = valid_ages.name, sex = valid_sexes.name,
+    age = valid_ages.name, sex = valid_sexes.name, key_population = valid_kps.name,
     result_value
   ) %>%
   dplyr::bind_rows(
@@ -34,6 +34,7 @@ PAW <- datapackr::map_DataPack_DATIM_DEs_COCs %>%
 
 
 PSNUs <- datapackr::valid_PSNUs %>%
+  dplyr::filter(country_name %in% c("Malawi","Eswatini","Lesotho")) %>%
   dplyr::mutate(
     ou_id = purrr::map_chr(ancestors, list("id", 3), .default = NA),
     ou = purrr::map_chr(ancestors, list("name", 3), .default = NA),
@@ -44,16 +45,18 @@ PSNUs <- datapackr::valid_PSNUs %>%
     snu1 = dplyr::if_else(
       condition = is.na(purrr::map_chr(ancestors, list("name",4), .default = NA)),
       true = psnu,
-      false = purrr::map_chr(ancestors, list("name",4), .default = NA))
+      false = purrr::map_chr(ancestors, list("name",4), .default = NA)),
+    prioritization = sample(prioritizations$Prioritization, size = NROW(.), replace = TRUE)
   ) %>%
-  dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id, psnu, psnu_uid) %>%
-  dplyr::filter(country_name %in% c("Malawi","Eswatini","Lesotho"))
+  dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id,
+                psnu, psnu_uid, prioritization)
 
 
 PAW %<>%
   tidyr::crossing(PSNUs) %>%
   dplyr::select(
     ou, ou_id, country_name, country_uid, snu1, snu1_id, psnu, psnuid = psnu_uid,
+    prioritization,
     mechanism_code, mechanism_desc, partner_id, partner_desc, funding_agency,
     fiscal_year,
     dataelement_id, dataelement_name,
@@ -61,7 +64,7 @@ PAW %<>%
     categoryoptioncombo_id,
     categoryoptioncombo_name,
     age, sex,
-    result_value
+    result_value, target_value
   )
 
 readr::write_csv(

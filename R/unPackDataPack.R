@@ -77,7 +77,8 @@ unPackDataPack <- function(d) {
       
     } else {
       # d <- packForPAW(d, type = "PSNU")
-      # d <- addSNUxIM(d)
+      # shipToPAW(d$data$paw)
+      # d <- packSNUxIM(d)
     }
     
   # Double check country_uid info # TODO: Replace this with API call against SQL view of sites mapped to Countries.
