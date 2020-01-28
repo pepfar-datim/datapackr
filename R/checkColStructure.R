@@ -11,7 +11,7 @@
 #' @return d
 #' 
 checkColStructure <- function(d, sheet) {
-  if (sheet == "SNU x IM") {
+  if (sheet %in% c("SNU x IM","PSNUxIM")) {
     data = d$data$SNUxIM
   } else {
     data = d$data$extract
@@ -24,7 +24,8 @@ checkColStructure <- function(d, sheet) {
   
   col_check <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet
-                  & !(sheet == "SNU x IM" & indicator_code == "Mechanism1")) %>%
+                  & !(sheet %in% c("SNU x IM","PSNUxIM")
+                        & indicator_code == "Mechanism1")) %>%
     dplyr::select(indicator_code, template_order = col) %>%
     dplyr::left_join(submission_cols, by = c("indicator_code" = "indicator_code")) %>%
     dplyr::mutate(order_check = template_order == submission_order)

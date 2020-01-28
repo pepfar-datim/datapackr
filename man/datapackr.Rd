@@ -3,7 +3,6 @@
 \docType{package}
 \name{datapackr}
 \alias{datapackr}
-\alias{datapackr-package}
 \title{Data Pack on R
 
 datapackr: a grammar of Data Pack manipulation

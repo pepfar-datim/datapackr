@@ -9,13 +9,9 @@ unPackSiteToolSheet(d, sheet)
 unPackSiteToolSheet(d, sheet)
 }
 \arguments{
-\item{d}{datapackr list object containing at least
-\code{d$keychain$submission_path},
-\code{d$data$sheet}, & \code{d$info$warningMsg}.}
+\item{d}{Datapackr object.}
 
 \item{sheet}{Sheet to unpack.}
-
-\item{d}{Datapackr object.}
 }
 \value{
 A datapackr list object, \code{d}, storing a dataframe of extracted

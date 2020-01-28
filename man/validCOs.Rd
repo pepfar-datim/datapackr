@@ -4,7 +4,7 @@
 \alias{validCOs}
 \title{validCOs}
 \usage{
-validCOs(cop_year = cop_year())
+validCOs(cop_year = getCurrentCOPYear())
 }
 \arguments{
 \item{cop_year}{Specifies COP year for dating as well as selection of

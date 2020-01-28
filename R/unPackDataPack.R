@@ -34,31 +34,52 @@
 #' Pack being processed.
 #'
 unPackDataPack <- function(d) {
-
-  # Determine country uids
-    if (is.na(d$info$country_uids)) {
+  
+  # Determine country uids ####
+    if (is.null(d$info$country_uids)) {
       d$info$country_uids <- 
         unPackCountryUIDs(submission_path = d$keychain$submission_path,
                           tool = d$info$tool)
     }
   
-  # Store schema
-    d$info$schema <- datapackr::data_pack_schema
+  # Store schema ####
+  if (d$info$cop_year == 2020) {
+    d$info$schema <-  datapackr::cop20_data_pack_schema
+  } else {d$info$schema <- datapackr::data_pack_schema}
     
-  # Check integrity of Workbook tabs
+  # Check integrity of Workbook tabs ####
     d <- checkStructure(d)
 
-  # Unpack the Targets
+  # Unpack the Targets ####
     d <- unPackSheets(d)
     
-  # Separate Data Sets
+  # Separate Data Sets ####
     d <- separateDataSets(d)
 
-  # Unpack the SNU x IM sheet
+  # Unpack the SNU x IM sheet ####
     d <- unPackSNUxIM(d)
 
-  # Combine Targets with SNU x IM for PSNU x IM level targets
-    d <- rePackPSNUxIM(d)
+  # Combine Targets with SNU x IM for PSNU x IM level targets ####
+    if (NROW(d$data$SNUxIM) > 0) {
+      d <- rePackPSNUxIM(d)
+      
+  # Prepare SNU x IM dataset for DATIM validation checks ####
+      d <- packForDATIM(d, type = "PSNUxIM")
+      
+  # Package FAST export ####
+      if (d$info$cop_year != 2020) {d <- FASTforward(d)}
+      
+  # Pack for PAW ####  
+      # d <- packForPAW(d, type = "PSNUxIM")
+      
+  # Package SUBNAT/IMPATT export ####
+      d <- packForDATIM(d, type = "SUBNAT_IMPATT")
+      
+    } else {
+      # d <- packForPAW(d, type = "PSNU")
+      # shipToPAW(d$data$paw)
+      # d <- packSNUxIM(d)
+    }
     
   # Double check country_uid info # TODO: Replace this with API call against SQL view of sites mapped to Countries.
     # site_uids <-
@@ -81,15 +102,6 @@ unPackDataPack <- function(d) {
     # country_uid_check <- dp_PSNU_uids[site_uids]
     
     # Where data uids !%in% DATIM list, flag error (Need to provide correct uids in either param or DP home tab)
-    
-  # Prepare SNU x IM dataset for DATIM validation checks
-    d <- packForDATIM(d, type = "PSNUxIM")
-
-  # Package FAST export
-    d <- FASTforward(d)
-    
-  # Package SUBNAT/IMPATT export
-    d <- packForDATIM(d, type = "SUBNAT_IMPATT")
     
   return(d)
 

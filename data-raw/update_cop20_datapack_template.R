@@ -1,9 +1,8 @@
 ## If you've made any edits to the Excel template, rebuild package first to
 ## capture these, then run the below.
-library(magrittr)
-library(datapackr)
 
-secrets <- "/Users/scott/.secrets/datim.json"
+secrets <- "/Users/scott/.secrets/test-mer2.json"
+
 
 loginToDATIM(secrets)
 
