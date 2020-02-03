@@ -32,6 +32,7 @@ unPackTool <- function(submission_path = NULL,
       submission_path = submission_path
     ),
     info = list(
+      datapack_name = NULL,
       tool = tool,
       country_uids = country_uids,
       cop_year = cop_year

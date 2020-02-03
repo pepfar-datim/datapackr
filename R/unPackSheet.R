@@ -55,6 +55,11 @@ unPackDataPackSheet <- function(d, sheet) {
   # Drop NAs ####
     tidyr::drop_na(value)
   
+  # Remove _Military district from Prioritization extract as this can't be assigned a prioritization
+  if (sheet == "Prioritization") {
+    d$data$extract %<>%
+      dplyr::filter(!stringr::str_detect(PSNU, "_Military"))
+  }
   # Convert Prioritization from text to short-number.
   # d$data$extract %<>%
   #   dplyr::mutate(

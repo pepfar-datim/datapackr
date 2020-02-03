@@ -4,13 +4,15 @@
 \alias{packSNUxIM}
 \title{packSNUxIM(data)}
 \usage{
-packSNUxIM(data)
+packSNUxIM(d, snuxim_model_data_path)
 }
 \arguments{
-\item{data}{SNUxIM dataframe to pack for DATIM.}
+\item{d}{Datapackr object}
+
+\item{snuxim_model_data_path}{Filepath where SNU x IM distribution model is stored.}
 }
 \value{
-Dataframe of SNUxIM data ready for DATIM import.
+d
 }
 \description{
 Packs SNUxIM data prepared from unPackSNUxIM for import to DATIM.

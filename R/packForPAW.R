@@ -6,12 +6,10 @@
 #' Prepare dataset for use in PAW.
 #' 
 #' @param d Datapackr object.
-#' @param type Type of dataset to prep for PAW. Choose from \code{PSNUxIM} or
-#' \code{PSNU}.
 #' 
 #' @return Data frame ready for use in PAW
 #' 
-packForPAW <- function(d, type) {
+packForPAW <- function(d) {
   
   PSNUs <- datapackr::valid_PSNUs %>%
     dplyr::mutate(
@@ -28,8 +26,7 @@ packForPAW <- function(d, type) {
     ) %>%
     dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id, psnu, psnu_uid)
   
-  if (type == "PSNU") {
-    sj <- d$data$MER %>%
+    d$data$PAW <- d$data$SNUxIM %>%
       dplyr::bind_rows(d$data$SUBNAT_IMPATT) %>%
       dplyr::left_join(PSNUs, by = c("psnuid" = "psnu_uid")) %>%
       dplyr::mutate(
@@ -60,16 +57,6 @@ packForPAW <- function(d, type) {
         indicator = tech_area, numerator_denominator, support_type, hts_modality,
         categoryoptioncombo_id, categoryoptioncombo_name, age = Age, sex = Sex,
         result_value, target_value = value)
-    
-    readr::write_csv(x = sj, path = "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/DataPackTEST.csv")
-    
-                    
-      
-  } else if (type == "PSNU x IM") {
-    d$data$paw <- d$data$SNUxIM %>%
-      dplyr::bind_rows(d$data$SUBNAT_IMPATT)
-    
-  } else {stop("Can't send that to PAW.")}
   
   return (d)
 }

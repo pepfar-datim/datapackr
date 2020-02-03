@@ -5,23 +5,146 @@
 #'
 #' @description Packs SNUxIM data prepared from unPackSNUxIM for import to DATIM.
 #'
-#' @param data SNUxIM dataframe to pack for DATIM.
+#' @param d Datapackr object
+#' @param snuxim_model_data_path Filepath where SNU x IM distribution model is stored.
+#' @param output_folder Local folder where you would like your Data Pack to be
+#' saved upon export.
 #' 
-#' @return Dataframe of SNUxIM data ready for DATIM import.
+#' @return d
 #' 
-packSNUxIM <- function(data) {
-  
-  # Confirm data structure is as expected.
-  SNUxIM.schema.names <-
-    c("PSNU","psnuid","sheet_name","indicator_code","Age","CoarseAge",
-      "Sex","KeyPop","mechanism_code","value")
-  
-  if (any(names(data) != SNUxIM.schema.names)) {
-    error_msg <- "ERROR occurred while preparing SNUxIM data for DATIM. Columns not as expected."
-    stop(error_msg)
-  }
+packSNUxIM <- function(d, snuxim_model_data_path, output_folder) {
 
-  SNUxIM <- data %>%
+  # Check if SNUxIM data already exists ####
+  if (NROW(d$data$SNUxIM) > 0) {
+  
+  # If does exist, check what combos are missing and write these in ####
+    
+  
+  # If doesn't exist, write all combos in ####
+  } else {
+    # Prepare SNU x IM model dataset ####
+      snuxim_model_data <- readRDS(snuxim_model_data_path) %>%
+        dplyr::select(-value, -age_option_uid, -sex_option_uid, -kp_option_uid)
+    
+    # Combine with MER data ####
+      dsd_ta <- tibble::tribble(
+        ~type,
+        "DSD",
+        "TA"
+      )
+      
+      d$data$SNUxIM_combined <- d$data$MER %>%
+        tidyr::crossing(dsd_ta) %>%
+        dplyr::left_join(
+          snuxim_model_data,
+          by = c("psnuid" = "psnu_uid",
+                 "indicator_code" = "indicator_code",
+                 "Age" = "age_option_name",
+                 "Sex" = "sex_option_name",
+                 "KeyPop" = "kp_option_name",
+                 "type" = "type")) %>%
+        dplyr::arrange(mechanism_code, type) %>%
+        dplyr::filter(!mechanism_code %in% c('00000','00001')) %>%
+        tidyr::pivot_wider(names_from = c(mechanism_code, type),
+                           values_from = percent) %>%
+        dplyr::select_at(dplyr::vars(-tidyselect::one_of("NA_TA","NA_DSD"),
+                                     -psnuid, -sheet_name))
+
+    # Add ID & sheet_num formulas ####
+      colCount <- NCOL(d$data$SNUxIM_combined)
+      
+      d$data$SNUxIM_combined %<>%
+        dplyr::left_join(
+          datapackr::cop20_data_pack_schema %>%
+            dplyr::filter(dataset == "mer", col_type == "target") %>%
+            dplyr::select(indicator_code, sheet_num, col),
+          by = "indicator_code") %>%
+        dplyr::arrange(PSNU, sheet_num, col, Age, Sex, KeyPop) %>%
+        dplyr::mutate(
+          row = (1:dplyr::n()) + headerRow("Data Pack Template", cop_year),
+          ID = paste0('$A',row,'&IF($C',row,'<>"","|"&$C',row,',"")&IF($D',row,
+                      '<>"","|"&$D',row,',"")&IF($E',row,'<>"","|"&$E',row,',"")'),
+          sheet_num = dplyr::case_when(
+            indicator_code == "OVC_HIVSTAT.N.total.T" ~ 15,
+            TRUE ~ sheet_num - 8),
+        
+    # Add Data Pack total formula ####
+          # DataPackTarget = paste0(
+          #   'ROUND(SUMIF(CHOOSE($G',row,
+          #   ',TX!$D:$D,HTS!$D:$D,TB_STAT_ART!$D:$D,PMTCT_STAT_ART!$D:$D,PMTCT_EID!$A:$A,VMMC!$D:$D,CXCA!$D:$D,HTS_RECENT!$D:$D,TX_TB_PREV!$D:$D,KP!$C:$C,PP!$D:$D,OVC!$D:$D,PrEP!$D:$D,GEND!$A:$A,OVC!$A:$A),$F',row,
+          #   ',INDIRECT($B',row,')),0)'),
+    
+    # Add Rollup check formula ####
+          Rollup = paste0('SUM($K',row,':$',openxlsx::int2col(colCount),row,')'),
+    
+    # Add Dedupe formula ####
+          Dedupe = paste0('IF($I',row,'>100%,1-$I',row,',0)')
+        ) %>%
+        dplyr::select(
+          PSNU, indicator_code, Age, Sex, KeyPop, ID, sheet_num, #DataPackTarget,
+          Rollup, Dedupe, dplyr::everything(), -row, -value, -col)
+      
+    # Format formula columns
+      formulaCols <- grep("ID|DataPackTarget|Rollup|Dedupe",
+                          colnames(d$data$SNUxIM_combined))
+      
+      for (i in formulaCols) {
+          class(d$data$SNUxIM_combined[[i]]) <- c(class(d$data$SNUxIM_combined[[i]]), "formula")
+      }
+      
+    # Write data to sheet
+      d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
+      
+      openxlsx::writeData(wb = d$tool$wb,
+                          sheet = "PSNUxIM",
+                          x = d$data$SNUxIM_combined,
+                          xy = c(1, headerRow("Data Pack", cop_year)),
+                          colNames = T, rowNames = F, withFilter = TRUE)
+      
+    # Format percent columns
+      percentCols <- grep("Rollup|Dedupe|_(DSD|TA)$",
+                          colnames(d$data$SNUxIM_combined))
+      
+      percentStyle = openxlsx::createStyle(numFmt = "0%")
+      
+      openxlsx::addStyle(
+        wb = d$tool$wb,
+        sheet = "PSNUxIM",
+        percentStyle,
+        rows = (1:NROW(d$data$SNUxIM_combined)) + headerRow("Data Pack", cop_year),
+        cols = percentCols,
+        gridExpand = TRUE,
+        stack = TRUE)
+    
+    # Format integers
+      integerCols <- grep("DataPackTarget", colnames(d$data$SNUxIM_combined))
+      
+      integerStyle = openxlsx::createStyle(numFmt = "#,##0")
+
+      openxlsx::addStyle(
+        wb = d$tool$wb,
+        sheet = "PSNUxIM",
+        integerStyle,
+        rows = (1:NROW(d$data$SNUxIM_combined)) + headerRow("Data Pack", cop_year),
+        cols = integerCols,
+        gridExpand = TRUE,
+        stack = TRUE)
+      
+    # Hide rows 5-13
+      openxlsx::setRowHeights(wb = d$tool$wb,
+                              sheet = "PSNUxIM",
+                              rows = 5:13,
+                              heights = 0)
+      
+      exportPackr(data = d$tool$wb,
+                  output_path = output_folder,
+                  type = "Data Pack",
+                  datapack_name = d$info$datapack_name)
+      
+  }
+  
+  
+  data <- data %>%
     dplyr::mutate(
       period = datapackr::periodInfo$iso) %>% 
     dplyr::left_join(datapackr::PSNUxIM_to_DATIM %>% #TODO: Build PSNUxIM_to_DATIM from API call.
@@ -49,6 +172,6 @@ packSNUxIM <- function(data) {
   # Remove anything which is NA here. Under COP19 guidance, this will include only TX_PVLS.N.Age/Sex/Indication/HIVStatus.20T.Routine
     dplyr::filter(complete.cases(.))
   
-  return(SNUxIM)
+  return(d)
 
 }

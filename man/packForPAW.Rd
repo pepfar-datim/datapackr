@@ -4,13 +4,10 @@
 \alias{packForPAW}
 \title{packForPAW}
 \usage{
-packForPAW(d, type)
+packForPAW(d)
 }
 \arguments{
 \item{d}{Datapackr object.}
-
-\item{type}{Type of dataset to prep for PAW. Choose from \code{PSNUxIM} or
-\code{PSNU}.}
 }
 \value{
 Data frame ready for use in PAW
