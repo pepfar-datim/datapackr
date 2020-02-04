@@ -217,6 +217,17 @@ unPackDataPackSheet <- function(d, sheet) {
       )
   }
   
+  if (sheet == "KP") {
+    d$data$extract %<>%
+      dplyr::mutate(
+        Sex = dplyr::case_when(indicator_code == "KP_MAT.N.Sex.T"
+            ~ stringr::str_replace(KeyPop, " PWID", ""),
+          TRUE ~ Sex),
+        KeyPop = dplyr::case_when(indicator_code == "KP_MAT.N.Sex.T" ~ NA_character_,
+          TRUE ~ KeyPop)
+      )
+  }
+  
   return(d)
   
 }
