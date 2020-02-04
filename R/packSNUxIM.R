@@ -51,8 +51,6 @@ packSNUxIM <- function(d, snuxim_model_data_path, output_folder) {
                                      -psnuid, -sheet_name))
 
     # Add ID & sheet_num formulas ####
-      colCount <- NCOL(d$data$SNUxIM_combined)
-      
       d$data$SNUxIM_combined %<>%
         dplyr::left_join(
           datapackr::cop20_data_pack_schema %>%
@@ -69,22 +67,26 @@ packSNUxIM <- function(d, snuxim_model_data_path, output_folder) {
             TRUE ~ sheet_num - 8),
         
     # Add Data Pack total formula ####
-          # DataPackTarget = paste0(
-          #   'ROUND(SUMIF(CHOOSE($G',row,
-          #   ',TX!$D:$D,HTS!$D:$D,TB_STAT_ART!$D:$D,PMTCT_STAT_ART!$D:$D,PMTCT_EID!$A:$A,VMMC!$D:$D,CXCA!$D:$D,HTS_RECENT!$D:$D,TX_TB_PREV!$D:$D,KP!$C:$C,PP!$D:$D,OVC!$D:$D,PrEP!$D:$D,GEND!$A:$A,OVC!$A:$A),$F',row,
-          #   ',INDIRECT($B',row,')),0)'),
-    
-    # Add Rollup check formula ####
-          Rollup = paste0('SUM($K',row,':$',openxlsx::int2col(colCount),row,')'),
+          DataPackTarget = paste0(
+           'ROUND(SUMIF(CHOOSE($G',row,
+           ',TX!$D:$D,HTS!$D:$D,TB_STAT_ART!$D:$D,PMTCT_STAT_ART!$D:$D,PMTCT_EID!$A:$A,VMMC!$D:$D,CXCA!$D:$D,HTS_RECENT!$D:$D,TX_TB_PREV!$D:$D,KP!$C:$C,PP!$D:$D,OVC!$D:$D,PrEP!$D:$D,GEND!$A:$A,OVC!$A:$A),$F',row,
+           ',INDIRECT($B',row,')),0)'),
     
     # Add Dedupe formula ####
           Dedupe = paste0('IF($I',row,'>100%,1-$I',row,',0)')
-        ) %>%
+        )
+      
+      # Add Rollup check formula ####
+      colCount <- NCOL(d$data$SNUxIM_combined)
+      
+      d$data$SNUxIM_combined %<>%
+        dplyr::mutate(
+          Rollup = paste0('SUM($K',row,':$',openxlsx::int2col(colCount),row,')')) %>%
         dplyr::select(
-          PSNU, indicator_code, Age, Sex, KeyPop, ID, sheet_num, #DataPackTarget,
+          PSNU, indicator_code, Age, Sex, KeyPop, ID, sheet_num, DataPackTarget,
           Rollup, Dedupe, dplyr::everything(), -row, -value, -col)
       
-    # Format formula columns
+    # Format formula columns ####
       formulaCols <- grep("ID|DataPackTarget|Rollup|Dedupe",
                           colnames(d$data$SNUxIM_combined))
       
@@ -92,16 +94,23 @@ packSNUxIM <- function(d, snuxim_model_data_path, output_folder) {
           class(d$data$SNUxIM_combined[[i]]) <- c(class(d$data$SNUxIM_combined[[i]]), "formula")
       }
       
-    # Write data to sheet
+    # Write data to sheet ####
       d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
+      
+      sheets_with_filters <- cop20_data_pack_schema %>%
+        dplyr::filter(data_structure == "normal") %>%
+        dplyr::pull(sheet_num) %>%
+        unique()
+      
+      openxlsx::removeFilter(d$tool$wb, sheets_with_filters)
       
       openxlsx::writeData(wb = d$tool$wb,
                           sheet = "PSNUxIM",
                           x = d$data$SNUxIM_combined,
                           xy = c(1, headerRow("Data Pack", cop_year)),
-                          colNames = T, rowNames = F, withFilter = TRUE)
+                          colNames = T, rowNames = F, withFilter = FALSE)
       
-    # Format percent columns
+    # Format percent columns ####
       percentCols <- grep("Rollup|Dedupe|_(DSD|TA)$",
                           colnames(d$data$SNUxIM_combined))
       
@@ -116,7 +125,7 @@ packSNUxIM <- function(d, snuxim_model_data_path, output_folder) {
         gridExpand = TRUE,
         stack = TRUE)
     
-    # Format integers
+    # Format integers ####
       integerCols <- grep("DataPackTarget", colnames(d$data$SNUxIM_combined))
       
       integerStyle = openxlsx::createStyle(numFmt = "#,##0")
@@ -130,12 +139,35 @@ packSNUxIM <- function(d, snuxim_model_data_path, output_folder) {
         gridExpand = TRUE,
         stack = TRUE)
       
-    # Hide rows 5-13
+    # Hide rows 5-13 ####
       openxlsx::setRowHeights(wb = d$tool$wb,
                               sheet = "PSNUxIM",
                               rows = 5:13,
                               heights = 0)
       
+    # Hide ID and sheet_num columns ####
+      hiddenCols <- grep("ID|sheet_num",
+                          colnames(d$data$SNUxIM_combined))
+      
+      openxlsx::setColWidths(wb = d$tool$wb,
+                             sheet = "PSNUxIM",
+                             cols = hiddenCols,
+                             hidden = TRUE)
+      
+    # Tab generation date ####
+      openxlsx::writeData(d$tool$wb, "PSNUxIM",
+                          paste("Generated on:", Sys.time()),
+                          xy = c(1,2),
+                          colNames = F)
+      
+    # Package Version ####
+      openxlsx::writeData(d$tool$wb, "PSNUxIM",
+                          paste("Package version:",
+                                as.character(utils::packageVersion("datapackr"))),
+                          xy = c(2,2),
+                          colNames = F)
+      
+    # Export SNU x IM Data Pack ####
       exportPackr(data = d$tool$wb,
                   output_path = output_folder,
                   type = "Data Pack",
