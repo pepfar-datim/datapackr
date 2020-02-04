@@ -113,7 +113,6 @@ packSNUxIM <- function(d, snuxim_model_data_path, output_folder) {
     # Format percent columns ####
       percentCols <- grep("Rollup|Dedupe|_(DSD|TA)$",
                           colnames(d$data$SNUxIM_combined))
-      
       percentStyle = openxlsx::createStyle(numFmt = "0%")
       
       openxlsx::addStyle(
@@ -123,11 +122,10 @@ packSNUxIM <- function(d, snuxim_model_data_path, output_folder) {
         rows = (1:NROW(d$data$SNUxIM_combined)) + headerRow("Data Pack", cop_year),
         cols = percentCols,
         gridExpand = TRUE,
-        stack = TRUE)
+        stack = FALSE)
     
     # Format integers ####
       integerCols <- grep("DataPackTarget", colnames(d$data$SNUxIM_combined))
-      
       integerStyle = openxlsx::createStyle(numFmt = "#,##0")
 
       openxlsx::addStyle(
@@ -138,6 +136,35 @@ packSNUxIM <- function(d, snuxim_model_data_path, output_folder) {
         cols = integerCols,
         gridExpand = TRUE,
         stack = TRUE)
+      
+    # Add Conditional Formatting for Ages and Sexes ####
+      errorStyle <- openxlsx::createStyle(fontColour = "#9C0006", bgFill = "#FFC7CE")
+      warningStyle <- openxlsx::createStyle(fontColour = "#9C5700", bgFill = "#FFEB9C")
+      normalStyle <- openxlsx::createStyle(fontColour = "#000000", bgFill = "#FFFFFF")
+      
+      # Consider adding errorStyling here to emphasize where incorrect disaggs entered.
+      
+    # Alter conditional formatting for Rollup and Dedupe ####
+      openxlsx::conditionalFormatting(wb = d$tool$wb,
+                                      sheet = "PSNUxIM",
+                                      cols = 9,
+                                      rows = (1:NROW(d$data$SNUxIM_combined) + 14),
+                                      rule = "AND(ISNUMBER($I15),ROUND($I15,2)<>1)",
+                                      style = errorStyle)
+      
+      openxlsx::conditionalFormatting(wb = d$tool$wb,
+                                      sheet = "PSNUxIM",
+                                      cols = 10,
+                                      rows = (1:NROW(d$data$SNUxIM_combined) + 14),
+                                      rule = "AND(ISNUMBER($J15),ROUND($J15,2)<>0)",
+                                      style = warningStyle)
+      
+      openxlsx::conditionalFormatting(wb = d$tool$wb,
+                                      sheet = "PSNUxIM",
+                                      cols = 10,
+                                      rows = (1:NROW(d$data$SNUxIM_combined) + 14),
+                                      rule = "AND(ISNUMBER($J15),ROUND($J15,2)=0)",
+                                      style = normalStyle)
       
     # Hide rows 5-13 ####
       openxlsx::setRowHeights(wb = d$tool$wb,
