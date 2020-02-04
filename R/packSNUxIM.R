@@ -76,7 +76,7 @@ packSNUxIM <- function(d, snuxim_model_data_path, output_folder) {
           Dedupe = paste0('IF($I',row,'>100%,1-$I',row,',0)')
         )
       
-      # Add Rollup check formula ####
+    # Add Rollup check formula ####
       colCount <- NCOL(d$data$SNUxIM_combined)
       
       d$data$SNUxIM_combined %<>%
@@ -172,6 +172,23 @@ packSNUxIM <- function(d, snuxim_model_data_path, output_folder) {
                                       rows = (1:NROW(d$data$SNUxIM_combined) + 14),
                                       rule = "AND(ISNUMBER($J15),ROUND($J15,2)=0)",
                                       style = normalStyle)
+      
+    # Format mechanism columns ####
+      colCount <- NCOL(d$data$SNUxIM_combined)
+      
+      mechColHeaders <- openxlsx::createStyle(halign = "center",
+                                              valign = "center",
+                                              textRotation = 90,
+                                              fgFill = "#9CBEBD",
+                                              textDecoration = "bold")
+      
+      openxlsx::addStyle(d$tool$wb,
+                         sheet = "PSNUxIM",
+                         style = mechColHeaders,
+                         rows = headerRow(tool = "Data Pack", cop_year = d$info$cop_year),
+                         cols = 9:colCount,
+                         gridExpand = TRUE,
+                         stack = TRUE)
       
     # Hide rows 5-13 ####
       openxlsx::setRowHeights(wb = d$tool$wb,
