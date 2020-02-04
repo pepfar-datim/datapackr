@@ -6,13 +6,10 @@
 #' @description Packs SNUxIM data prepared from unPackSNUxIM for import to DATIM.
 #'
 #' @param d Datapackr object
-#' @param snuxim_model_data_path Filepath where SNU x IM distribution model is stored.
-#' @param output_folder Local folder where you would like your Data Pack to be
-#' saved upon export.
 #' 
 #' @return d
 #' 
-packSNUxIM <- function(d, snuxim_model_data_path, output_folder) {
+packSNUxIM <- function(d) {
   if (d$info$cop_year == 2020) {
   # Check if SNUxIM data already exists ####
     if (NROW(d$data$SNUxIM) > 0) {
@@ -23,7 +20,7 @@ packSNUxIM <- function(d, snuxim_model_data_path, output_folder) {
     # If doesn't exist, write all combos in ####
     } else {
       # Prepare SNU x IM model dataset ####
-        snuxim_model_data <- readRDS(snuxim_model_data_path) %>%
+        snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path) %>%
           dplyr::select(-value, -age_option_uid, -sex_option_uid, -kp_option_uid)
       
       # Combine with MER data ####
@@ -229,7 +226,7 @@ packSNUxIM <- function(d, snuxim_model_data_path, output_folder) {
         
       # Export SNU x IM Data Pack ####
         exportPackr(data = d$tool$wb,
-                    output_path = output_folder,
+                    output_path = d$keychain$output_folder,
                     type = "Data Pack",
                     datapack_name = d$info$datapack_name)
         

@@ -90,8 +90,7 @@ unPackDataPack <- function(d,
     }
       
   # Check whether to write anything into SNU x IM tab and write if needed
-      #d <- packSNUxIM(d, snuxim_model_data_path, output_folder)
-    ##### Replace snuxim_model_data_path and output_folder with S3 details when available and connected
+      d <- packSNUxIM(d)
     
   # If new information added to SNU x IM tab, reexport Data Pack for user
       #if (d$info$newSNUxIM) {exportPackr()}
