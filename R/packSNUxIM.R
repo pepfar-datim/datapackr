@@ -84,7 +84,14 @@ packSNUxIM <- function(d, snuxim_model_data_path, output_folder) {
           Rollup = paste0('SUM($K',row,':$',openxlsx::int2col(colCount),row,')')) %>%
         dplyr::select(
           PSNU, indicator_code, Age, Sex, KeyPop, ID, sheet_num, DataPackTarget,
-          Rollup, Dedupe, dplyr::everything(), -row, -value, -col)
+          Rollup, Dedupe, dplyr::everything(), -row, -value, -col) %>%
+        
+    # Alter Ages and Sexes as needed
+        dplyr::mutate(
+          Age = dplyr::case_when(
+            indicator_code %in% c("PMTCT_EID.N.Age.T.2mo","PMTCT_EID.N.Age.T.2to12mo") ~ NA_character_,
+            TRUE ~ Age)
+        )
       
     # Format formula columns ####
       formulaCols <- grep("ID|DataPackTarget|Rollup|Dedupe",
