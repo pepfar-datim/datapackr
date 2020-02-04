@@ -1,7 +1,7 @@
 Package: datapackr
 Type: Package
 Title: A Package that Packs and Unpacks all Data Packs
-Version: 3.0.1
+Version: 3.0.2
 Date: 2020-01-03
 Authors@R: c(
     person("Scott", "Jackson", email = "sjackson@baosystems.com",
