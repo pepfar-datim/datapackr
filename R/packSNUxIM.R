@@ -65,7 +65,7 @@ packSNUxIM <- function(d) {
             by = "indicator_code") %>%
           dplyr::arrange(PSNU, sheet_num, col, Age, Sex, KeyPop) %>%
           dplyr::mutate(
-            row = (1:dplyr::n()) + headerRow("Data Pack Template", cop_year),
+            row = (1:dplyr::n()) + headerRow("Data Pack Template", cop_year = d$info$cop_year),
             ID = paste0('$A',row,'&IF($C',row,'<>"","|"&$C',row,',"")&IF($D',row,
                         '<>"","|"&$D',row,',"")&IF($E',row,'<>"","|"&$E',row,',"")'),
             sheet_num = dplyr::case_when(
@@ -120,7 +120,7 @@ packSNUxIM <- function(d) {
         openxlsx::writeData(wb = d$tool$wb,
                             sheet = "PSNUxIM",
                             x = d$data$SNUxIM_combined,
-                            xy = c(1, headerRow("Data Pack", cop_year)),
+                            xy = c(1, headerRow("Data Pack", cop_year = d$info$cop_year)),
                             colNames = T, rowNames = F, withFilter = FALSE)
         
       # Format percent columns ####
@@ -132,7 +132,7 @@ packSNUxIM <- function(d) {
           wb = d$tool$wb,
           sheet = "PSNUxIM",
           percentStyle,
-          rows = (1:NROW(d$data$SNUxIM_combined)) + headerRow("Data Pack", cop_year),
+          rows = (1:NROW(d$data$SNUxIM_combined)) + headerRow("Data Pack", cop_year = d$info$cop_year),
           cols = percentCols,
           gridExpand = TRUE,
           stack = FALSE)
@@ -145,7 +145,7 @@ packSNUxIM <- function(d) {
           wb = d$tool$wb,
           sheet = "PSNUxIM",
           integerStyle,
-          rows = (1:NROW(d$data$SNUxIM_combined)) + headerRow("Data Pack", cop_year),
+          rows = (1:NROW(d$data$SNUxIM_combined)) + headerRow("Data Pack", cop_year = d$info$cop_year),
           cols = integerCols,
           gridExpand = TRUE,
           stack = TRUE)

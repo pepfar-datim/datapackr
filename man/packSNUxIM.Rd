@@ -4,15 +4,10 @@
 \alias{packSNUxIM}
 \title{packSNUxIM(data)}
 \usage{
-packSNUxIM(d, snuxim_model_data_path, output_folder)
+packSNUxIM(d)
 }
 \arguments{
 \item{d}{Datapackr object}
-
-\item{snuxim_model_data_path}{Filepath where SNU x IM distribution model is stored.}
-
-\item{output_folder}{Local folder where you would like your Data Pack to be
-saved upon export.}
 }
 \value{
 d

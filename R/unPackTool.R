@@ -28,7 +28,7 @@ unPackTool <- function(submission_path = NULL,
                        tool = "Data Pack",
                        country_uids = NULL,
                        cop_year = getCurrentCOPYear(),
-                       snuxim_model_data_path = NULL,
+                       snuxim_model_data_path,
                        output_folder = getwd()) {
   
   # Create data train for use across remainder of program
@@ -90,8 +90,5 @@ unPackTool <- function(submission_path = NULL,
     cat(crayon::red(key))
     cat(crayon::red(messages))
   }
-    
-  
-  return(d)
-  
+
 }
