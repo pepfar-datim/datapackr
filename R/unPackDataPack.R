@@ -42,6 +42,9 @@ unPackDataPack <- function(d) {
                           tool = d$info$tool)
     }
   
+  #Get the name of the datapack
+  d$info$datapack_name<-unPackDataPackName(submission_path = d$keychain$submission_path)
+  
   # Store schema ####
   if (d$info$cop_year == 2020) {
     d$info$schema <-  datapackr::cop20_data_pack_schema

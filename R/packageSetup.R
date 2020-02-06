@@ -1,3 +1,5 @@
+#:TODO Move these next three methods of this into the schema and make a function of the COP Year.
+#This should NOT be hard coded here as it may and will change. 
 #' @export
 #' @title Returns current COP Year
 #'
@@ -9,9 +11,17 @@ getCurrentCOPYear <- function() { 2020 }
 #' @export
 #' @title Location of Country UIDs on Home tab.
 #'
-#' @return Cell reference where Country UIDs should be on Home tab.
+#' @return Cell reference where the name of the DataPack is located.
 #'
 countryUIDs_homeCell <- function() { "B25" }
+
+
+#' @export
+#' @title Location of Name of the DataPack on the Home tab
+#'
+#' @return Cell reference where the name of the datapack can be found.
+#'
+dataPackName_homeCell <- function() { "B20" }
 
 
 #' @export
