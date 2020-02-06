@@ -16,7 +16,7 @@ Authors@R: c(
 Description: Generates and processes PEPFAR Data Packs and Site Tools.
 URL: https://github.com/pepfar-datim/datapackr
 BugReports: https://github.com/pepfar-datim/datapackr
-Depends: R (>= 3.6.2)
+Depends: R (>= 3.6.0)
 Imports:
     dplyr (>= 0.8.3),
     tidyr (>= 1.0.0),
