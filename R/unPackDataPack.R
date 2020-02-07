@@ -64,7 +64,7 @@ unPackDataPack <- function(d) {
       d <- rePackPSNUxIM(d)
       
   # Prepare SNU x IM dataset for DATIM validation checks ####
-      d <- packForDATIM(d, type = "PSNUxIM")
+      #d <- packForDATIM(d, type = "PSNUxIM")
       
   # Package FAST export ####
       if (d$info$cop_year != 2020) {d <- FASTforward(d)}
@@ -74,33 +74,11 @@ unPackDataPack <- function(d) {
       
   # Package SUBNAT/IMPATT export ####
       d <- packForDATIM(d, type = "SUBNAT_IMPATT")
-      
+      d <- exportDistributedDataToDATIM(d)
     } else {
       # d <- packForPAW(d, type = "PSNU")
       # d <- addSNUxIM(d)
     }
-    
-  # Double check country_uid info # TODO: Replace this with API call against SQL view of sites mapped to Countries.
-    # site_uids <-
-    #   datapackr::api_call("organisationUnits") %>%
-    #   datapackr::api_filter("organisationUnitGroups.name:in:[Military,COP Prioritization SNU]") %>%
-    #   datapackr::api_filter(
-    #     paste0(
-    #       "ancestors.id:in:[",
-    #       paste0(d$info$country_uids,
-    #              collapse = ","),
-    #       "]")
-    #   ) %>%
-    #   datapackr::api_fields("id") %>%
-    #   datapackr::api_get() %>%
-    #   dplyr::pull(id)
-    # 
-    # dp_PSNU_uids <- d$data$distributedMER$psnuid %>%
-    #   unique()
-    # 
-    # country_uid_check <- dp_PSNU_uids[site_uids]
-    
-    # Where data uids !%in% DATIM list, flag error (Need to provide correct uids in either param or DP home tab)
     
   return(d)
 

@@ -13,37 +13,27 @@
 packSUBNAT_IMPATT <- function(data) {
   
   # Confirm data structure is as expected.
+  #TODO: Why is this hardcoded here and not present in the schema?
   SUBNAT_IMPATT.schema.names <-
     c("PSNU", "psnuid", "sheet_name", "indicator_code", "Age", "Sex",
       "KeyPop", "value")
   
   if (any(names(data) != SUBNAT_IMPATT.schema.names)) {
     error_msg <- "ERROR occurred while preparing SUBNAT/IMPATT data for DATIM. Columns not as expected."
-    
     stop(error_msg)
   }
   
   SUBNAT_IMPATT <- data %>%
-    dplyr::left_join((
-      datapackr::indicatorMap %>%
-        dplyr::filter(dataset %in% c("SUBNAT", "IMPATT")) %>%
-        dplyr::rename(indicator_code = indicatorCode) %>%
-        dplyr::select(
-          sheet_name,
-          indicator_code,
-          Age = validAges,
-          Sex = validSexes,
-          KeyPop = validKPs,
-          dataelementuid,
-          categoryoptioncombouid)
-      )) %>%
-    #tidyr::drop_na(dataelementuid, categoryoptioncombouid, value) %>%
+    dplyr::left_join(., ( datapackr::map_DataPack_DATIM_DEs_COCs %>% 
+                        dplyr::rename(Age = valid_ages.name,
+                                      Sex = valid_sexes.name,
+                                      KeyPop = valid_kps.name) )) %>% 
     dplyr::mutate(
-      period = datapackr::periodInfo$iso,
+      period = paste0( d$info$cop_year ,"Oct" ),
       attributeOptionCombo = datapackr::default_catOptCombo()
     ) %>%
     dplyr::select(
-      dataElement = dataelementuid,
+      dataElement = dataelement,
       period,
       orgUnit = psnuid,
       categoryOptionCombo = categoryoptioncombouid,
@@ -54,10 +44,12 @@ packSUBNAT_IMPATT <- function(data) {
                     period,
                     orgUnit,
                     categoryOptionCombo,
-                    attributeOptionCombo) %>%
-    dplyr::summarise(value = sum(value)) %>%
+                    attributeOptionCombo ) %>%
+    dplyr::summarise(value = sum(value,na.rm=TRUE)) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(value = as.character(round_trunc(value)))
+    dplyr::mutate(value = as.character(datapackr::round_trunc(value))) %>% 
+    #TODO: Not sure where the NAs are coming from here...
+    tidyr::drop_na()
   
   
   # TEST: Whether any NAs in any columns
