@@ -109,13 +109,7 @@ packSNUxIM <- function(d) {
         
       # Write data to sheet ####
         d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
-        
-        sheets_with_filters <- cop20_data_pack_schema %>%
-          dplyr::filter(data_structure == "normal") %>%
-          dplyr::pull(sheet_num) %>%
-          unique()
-        
-        openxlsx::removeFilter(d$tool$wb, sheets_with_filters)
+        openxlsx::removeFilter(d$tool$wb, names(d$tool$wb))
         
         openxlsx::writeData(wb = d$tool$wb,
                             sheet = "PSNUxIM",
