@@ -20,8 +20,8 @@ packSNUxIM <- function(d) {
     # If doesn't exist, write all combos in ####
     } else {
       # Prepare SNU x IM model dataset ####
-        snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path) %>%
-          dplyr::select(-value, -age_option_uid, -sex_option_uid, -kp_option_uid)
+      snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path)[[d$info$country_uids]] %>%
+        dplyr::select(-value, -age_option_uid, -sex_option_uid, -kp_option_uid)
       
       # Combine with MER data ####
         dsd_ta <- tibble::tribble(
