@@ -45,82 +45,6 @@ unPackStructure <- function(filepath) {
   return(schema)
 }
 
-validDPDisaggs <- function() {
-
-    validDisaggs <- list(
-        "Epi Cascade I" = list(
-            validAges = c("<01","01-04","05-09","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "Epi Cascade II" = list(
-            validAges = c("<15","15+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "Epi PMTCT" = list(
-            validAges = NA_character_,
-            validSexes = NA_character_,
-            validKPs = NA_character_),
-        "Prioritization" = list(
-            validAges = NA_character_,
-            validSexes = NA_character_,
-            validKPs = NA_character_),
-        "PMTCT_STAT_ART" = list(
-            validAges = c("10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Female"),
-            validKPs = NA_character_),
-        "PMTCT_EID" = list(
-            validAges = NA_character_,
-            validSexes = NA_character_,
-            validKPs = NA_character_),
-        "TB_STAT_ART" = list(
-            validAges = c("<01","01-04","05-09","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "VMMC" = list(
-            validAges = c("10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Male"),
-            validKPs = NA_character_),
-        "TX" = list(
-            validAges = c("<01","01-04","05-09","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "CXCA" = list(
-            validAges = c("25-29","30-34","35-39","40-44","45-49"),
-            validSexes = c("Female"),
-            validKPs = NA_character_),
-        "HTS" = list(
-            validAges = c("01-04","05-09","10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "TB_TX_PREV" = list(
-            validAges = c("<15","15+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "OVC" = list(
-            validAges = c("<01","01-04","05-09","10-14","15-17","18+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "KP" = list(
-            validAges = NA_character_,
-            validSexes = NA_character_,
-            validKPs = c("Female PWID","Male PWID","PWID","FSW","MSM not SW","MSM SW","MSM","People in prisons and other enclosed settings","TG SW","TG not SW","TG")),
-        "PP" = list(
-            validAges = c("10-14","15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "PrEP" = list(
-            validAges = c("15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+"),
-            validSexes = c("Female","Male"),
-            validKPs = NA_character_),
-        "GEND" = list(
-            validAges = NA_character_,
-            validSexes = NA_character_,
-            validKPs = NA_character_)
-    )
-
-    return(validDisaggs)
-}
-
 prioritizationDict <- function() {
     dict <- tibble::tribble(
         ~value, ~Prioritization,
@@ -187,30 +111,19 @@ mapIndicators <- function() {
 produceConfig <- function() {
   # Load Country List
     configFile <- getCountries()
-    
+
   # Add levels & prioritization details
-    impattLevels <- datapackr::getIMPATTLevels()
-    
+    impattLevels <- getIMPATTLevels()
+
     configFile %<>%
       dplyr::left_join(impattLevels, by = c("country_name")) %>%
-      dplyr::mutate_if(is.integer,as.double) %>%
-      dplyr::mutate(
-        country = level,
-        prioritization = dplyr::if_else(is.na(operating_unit), level, prioritization),
-        planning = dplyr::if_else(is.na(operating_unit), level, planning),
-        community = dplyr::if_else(is.na(operating_unit), level, community),
-        facility = dplyr::if_else(is.na(operating_unit), level, facility),
-        operating_unit =
-          dplyr::if_else(
-            is.na(operating_unit),
-              level3name,
-              operating_unit))
-      
+      dplyr::mutate_if(is.integer, as.double)
+
   # Add Mil names & UIDs & metadata
     militaryNodes <- datapackr::getMilitaryNodes() %>%
       dplyr::mutate(mil_in_datim = TRUE) %>%
       dplyr::select(-country_name, mil_level = level)
-    
+
     configFile %<>%
     ## Building based on future state of all military nodes nested under country
       dplyr::left_join(militaryNodes, by= c("country_uid")) %>%
@@ -228,7 +141,7 @@ produceConfig <- function() {
           mil_psnu),
         mil_psnu_uid =
           dplyr::if_else(
-            is.na(mil_psnu_uid), 
+            is.na(mil_psnu_uid),
             paste0(
               "MIL",
               stringr::str_sub(
@@ -245,13 +158,13 @@ produceConfig <- function() {
           pad = 0)
         ) %>%
       tidyr::replace_na(list(mil_in_datim = FALSE, mil_level = 5))
-    
+
     return(configFile)
-    
+
 }
 
 loadStyleGuide <- function() {
-  
+
   # Home Tab Styles ####
   home <- list(
     ## Home Tab Title
@@ -272,7 +185,7 @@ loadStyleGuide <- function() {
                                    halign = "left",
                                    valign = "center")
   )
-  
+
   # Site Lists ####
   siteList <- list(
     community = openxlsx::createStyle(fontColour = "#000000",
@@ -286,7 +199,7 @@ loadStyleGuide <- function() {
     military = openxlsx::createStyle(fontColour = "#000000",
                                      bgFill = "#C4BD97")
   )
-  
+
   # Data Tabs ####
   data <- list(
     title = openxlsx::createStyle(fontSize = 18,
@@ -312,12 +225,12 @@ loadStyleGuide <- function() {
     invalidDisagg = openxlsx::createStyle(fontColour = "#C00000",
                                           bgFill = "#000000")
   )
-  
+
   # Compile ####
   styleGuide <- list(home = home,
                      siteList = siteList,
                      data = data)
-  
+
   return(styleGuide)
 }
 
@@ -328,13 +241,13 @@ getSiteToolSchema <- function(data_pack_schema) {
                                     "KP","PP","PrEP","GEND")) %>%
     dplyr::pull(sheet_name) %>%
     unique()
-  
+
   site_row_headers <- c("PSNU","Age","Sex","KeyPop")
-    
+
   site_schema <- data_pack_schema %>%
   # Select only FY20 MER target columns
     dplyr::filter((col_type == "Target" & dataset == "MER")
-                  | (col_type == "Row Header" 
+                  | (col_type == "Row Header"
                      & sheet_name %in% site_sheets
                      & indicator_code %in% site_row_headers)) %>%
     dplyr::arrange(sheet_num) %>%
@@ -347,7 +260,7 @@ getSiteToolSchema <- function(data_pack_schema) {
                   tech_area =
                     dplyr::case_when(
                       col_type == "Target" ~ stringr::str_extract(indicator_code,"^(.)+\\.(N|D)(?=\\.)")),
-                  tech_area = 
+                  tech_area =
                     dplyr::case_when(
                       !is.na(tech_area) ~ paste0(stringr::str_replace(tech_area,"\\."," ("),")"))) %>%
     dplyr::group_by(sheet_name,tech_area) %>%
@@ -355,7 +268,7 @@ getSiteToolSchema <- function(data_pack_schema) {
     dplyr::ungroup() %>%
     dplyr::mutate(tech_area = dplyr::case_when(header == 1 ~ tech_area),
                   split = dplyr::case_when(indicator_code == "Site" ~ 4, TRUE ~ 1))
-  
+
   # Add Mechanism and type columns to every sheet
   site_schema <- site_schema[rep(seq_len(dim(site_schema)[1]),site_schema$split),] %>%
     dplyr::select(-split,-header) %>%
@@ -379,20 +292,20 @@ getSiteToolSchema <- function(data_pack_schema) {
       )
     ) %>%
     dplyr::select(sheet_num,sheet_name,col = column,col_type,tech_area,label,indicator_code)
-  
+
   return(site_schema)
 }
 
 getPeriodInfo <- function(FY = NA) {
   periodISO <- paste0(FY, "Oct")
-  
+
   url <- paste0(getOption("baseurl"),
                 "api/",
                 datapackr::api_version(),
                 "/sqlViews/TTM90ytCCdY/data.json?filter=iso:eq:",
                 periodISO) %>%
     utils::URLencode()
-  
+
     r <- httr::GET(url , httr::timeout(60))
     if (r$status == 200L) {
       r <- httr::content(r, "text")
@@ -404,15 +317,15 @@ getPeriodInfo <- function(FY = NA) {
         p$startdate <- as.Date(p$startdate,"%Y-%m-%d")
       } else {
         stop(paste0("Period with ISO identifier", ISO, "not found"))
-      } 
+      }
     } else {stop("Could not retrieve period information")}
-  
+
   if (!is.na(FY)) {
     assertthat::assert_that(length(FY) == 1)
     p <- p[p$iso == periodISO,] }
-  
+
   return(p)
-  
+
 }
 
 
@@ -424,16 +337,39 @@ getPeriodInfo <- function(FY = NA) {
     config_path = "./data-raw/DataPackConfiguration.csv"
     configFile <- readr::read_csv(config_path)
     save(configFile, file = "./data/configFile.rda")
-      
+
   ## Data Pack Map (i.e., Updated Config File) ####
     dataPackMap <- produceConfig()
     save(dataPackMap, file = "./data/dataPackMap.rda")
 
   ## Data Pack Schema ####
-    template_path <- "./data-raw/COP19_Data_Pack_Template_vFINAL.xlsx"
-    data_pack_schema <- unPackStructure(template_path)
+    # TODO: Completely deprecate this schema
+    # template_path <- "./data-raw/COP19_Data_Pack_Template_vFINAL.xlsx"
+    # data_pack_schema <- unPackStructure(template_path)
+    # save(data_pack_schema, file = "./data/data_pack_schema.rda")
+
+  ## Updated COP19 Data Pack Schema ####
+    datapack_template_filepath <- "./data-raw/COP19_Data_Pack_Template_vFinal.xlsx"
+    data_pack_schema <- unPackSchema_datapack(
+      filepath = datapack_template_filepath,
+      skip = skip_tabs(tool = "Data Pack Template"),
+      cop_year = 2019)
     save(data_pack_schema, file = "./data/data_pack_schema.rda")
-      
+
+  ## Updated COP20 Data Pack Schema ####
+    datapack_template_filepath <- system.file("extdata",
+                                              "COP20_Data_Pack_Template_vFINAL.xlsx",
+                                              package = "datapackr",
+                                              mustWork = TRUE)
+    cop20_data_pack_schema <-
+      unPackSchema_datapack(
+        filepath = datapack_template_filepath,
+        skip = skip_tabs(tool = "Data Pack Template", cop_year = 2020),
+        cop_year = 2020)
+    save(cop20_data_pack_schema,
+         file = "./data/cop20_data_pack_schema.rda",
+         compress = "xz")
+
   ## Site Tool Schema ####
     site_tool_schema <- getSiteToolSchema(data_pack_schema)
     save(site_tool_schema, file = "./data/site_tool_schema.rda")
@@ -449,10 +385,10 @@ getPeriodInfo <- function(FY = NA) {
   ## Data Pack to DATIM Indicator Map ####
     indicatorMap <- readr::read_csv("./data-raw/DataPack to DATIM indicator map.csv")
     save(indicatorMap, file = "./data/indicatorMap.rda")
-      
+
   ## Load Openxlsx Style Guide ####
     styleGuide <- loadStyleGuide()
-    save(styleGuide, file = "./data/styleGuide.rda")
+    save(styleGuide, file = "./data/styleGuide.rda", compress = "xz")
 
   ## Load PSNUxIM to DATIM map ####
     PSNUxIM_to_DATIM <- readr::read_csv("./data-raw/PSNUxIM_to_DATIM.csv")
@@ -463,9 +399,12 @@ getPeriodInfo <- function(FY = NA) {
       sheet = "Site Tool",
       col_types = "text")
     save(SiteToDATIM, file = "./data/SiteToDATIM.rda")
-      
+
   ## Load Period Info ####
-    periodInfo <- getPeriodInfo(datapackr::cop_year())
+    periodInfo <- getPeriodInfo(datapackr::getCurrentCOPYear())
     save(periodInfo, file = "./data/periodInfo.rda")
-    
-      
+
+  ## Save Valid COs ####
+
+    # valid_COs <- validCOs(cop_year = getCurrentCOPYear())
+    # save(valid_COs, file = "./data/valid_COs.rda", compress = "xz")

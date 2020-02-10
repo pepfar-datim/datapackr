@@ -19,7 +19,7 @@ A datapackr list object, \code{d}, storing at least 2 dataframes of
 }
 \description{
 Loops through all critical sheets in a submitted 
-    Site Tool and executes \code{\link{unPackSheet}} to extract data, then
+    Site Tool and executes unPackSheet to extract data, then
     compiles data into single flat dataframe. Also executes
     \code{\link{separateDataSets}} to separate single dataframe into at least
     two for \code{MER} and \code{SUBNAT/IMPATT}.

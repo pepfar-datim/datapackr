@@ -15,61 +15,61 @@ checkOUinfo <- function(d) {
       sheet = "Home",
       range = "B25"
     ))
-  
+
   datapack_region_name <-
     names(readxl::read_excel(
       d$keychain$submission_path,
       sheet = "Home",
       range = "B20"
     ))
-  
-  regional_country_name <- 
+
+  regional_country_name <-
     names(readxl::read_excel(
       d$keychain$submission_path,
       sheet = "Home",
       range = "B21"
     ))
-  
+
   is_regional_country_pack<-length(regional_country_name) != 0
-  
+
   d$info$datapack_name<-ifelse( is_regional_country_pack,regional_country_name,datapack_region_name )
-  
-  regional_country <-ifelse( is_regional_country_pack, "countryName","DataPack_name") 
-  
+
+  regional_country <-ifelse( is_regional_country_pack, "countryName","DataPack_name")
+
   regional_country_uid<-ifelse(is_regional_country_pack, "countryUID", "model_uid")
-  
+
   # Check ou_name and ou_uid match
-  
+
   verifyDataPackNameWithUID<-function(d,regional_country_uid,regional_country ) {
-    
+
     regional_country_uid <- rlang::sym(regional_country_uid)
     regional_country <- rlang::sym(regional_country)
-    
+
     datapack_name <- datapackr::configFile %>%
       dplyr::filter(!!regional_country_uid == d$info$datapack_uid) %>%
       dplyr::select(!!regional_country) %>%
-      dplyr::pull(!!regional_country) %>% 
+      dplyr::pull(!!regional_country) %>%
       unique()
-    
+
     #If we get nothing here (like the UID does not exist, we need to bail early)
     if ( length(datapack_name) == 0  ) {
       stop("Unknown DataPack Name. Please contact the DataPack Support Team!")
     }
-    
-    
-    
+
+
+
     datapack_uid <- datapackr::configFile %>%
       dplyr::filter(!!regional_country == d$info$datapack_name) %>%
       dplyr::select(!!regional_country_uid) %>%
-      dplyr::pull(!!regional_country_uid) %>% 
+      dplyr::pull(!!regional_country_uid) %>%
       unique()
-    
+
     #If we get nothing here (like the UID does not exist, we need to bail early)
     if ( length(datapack_uid) == 0 ) {
       stop("Unknown DataPack UID. Please contact the DataPack Support Team!")
     }
-    
-    
+
+
     # If OU name and UID do not match, force identification via user prompt in Console
     if (d$info$datapack_name != datapack_name |
         d$info$datapack_uid != datapack_uid) {
@@ -83,11 +83,11 @@ checkOUinfo <- function(d) {
         stop(msg)
       }
     }
-    
+
     d
-    
+
   }
-  
+
   verifyDataPackNameWithUID(d,regional_country_uid,regional_country)
-  
+
 }

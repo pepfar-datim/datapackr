@@ -4,10 +4,10 @@
 \alias{api_call}
 \title{Start DATIM API query and specify table}
 \usage{
-api_call(table)
+api_call(endpoint)
 }
 \arguments{
-\item{table}{Character. DATIM API table to query.}
+\item{endpoint}{Character. DATIM API endpoint to query.}
 }
 \value{
 Web-encoded URL for DATIM API query.

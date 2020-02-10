@@ -4,8 +4,13 @@
 \alias{getDataValueSets}
 \title{getDataValueSets}
 \usage{
-getDataValueSets(keys, values, base_url = getOption("baseurl"),
-  api_version = "30", max_attempts = 3)
+getDataValueSets(
+  keys,
+  values,
+  base_url = getOption("baseurl"),
+  api_version = "30",
+  max_attempts = 3
+)
 }
 \arguments{
 \item{keys}{character vector - data value set parameter keys (e.g. "dataSet", "period")}
