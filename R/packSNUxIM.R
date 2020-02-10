@@ -13,9 +13,9 @@ packSNUxIM <- function(d) {
   if (d$info$cop_year == 2020) {
   # Check if SNUxIM data already exists ####
     if (NROW(d$data$SNUxIM) > 0) {
+    print("SNU x IM tab appending not yet supported...")
     
     # If does exist, check what combos are missing and write these in ####
-      
     
     # If doesn't exist, write all combos in ####
     } else {
@@ -231,7 +231,8 @@ packSNUxIM <- function(d) {
                     datapack_name = d$info$datapack_name)
         
     }
-  } # else if (d$info$cop_year == 2019) {
+  } else if (d$info$cop_year == 2019) {
+    stop("Packing SNU x IM tabs is no longer supported for FY2019 Data Packs.")
   #   data <- data %>%
   #     dplyr::mutate(
   #       period = datapackr::periodInfo$iso) %>% 
@@ -259,7 +260,7 @@ packSNUxIM <- function(d) {
   #     dplyr::mutate(value = round_trunc(value)) %>%
   #   # Remove anything which is NA here. Under COP19 guidance, this will include only TX_PVLS.N.Age/Sex/Indication/HIVStatus.20T.Routine
   #     dplyr::filter(complete.cases(.))
-  # }
+  }
   
   return(d)
 
