@@ -6,6 +6,8 @@
 #'     issues, checking data against DATIM validations, and extracting data.
 #'
 #' @param d Datapackr object
+#' @param export_to_PAW TRUE or FALSE indicating whether to write to S3 bucket
+#' for use by PAW.
 #'
 #' @details
 #' Executes the following operations in relation to a submitted Data Pack:
@@ -33,7 +35,16 @@
 #' The final message in the Console prints all warnings identified in the Data
 #' Pack being processed.
 #'
-unPackDataPack <- function(d) {
+unPackDataPack <- function(d,
+                           export_to_PAW = FALSE) {
+  
+  # Grab datapack_name from Home Page
+    d$info$datapack_name <- 
+      readxl::read_excel(
+        path = d$keychain$submission_path,
+        sheet = "Home",
+        range = "B20") %>%
+      names()
   
   # Determine country uids ####
     if (is.null(d$info$country_uids)) {
@@ -66,23 +77,26 @@ unPackDataPack <- function(d) {
     if (NROW(d$data$SNUxIM) > 0) {
       d <- rePackPSNUxIM(d)
       
-  # Prepare SNU x IM dataset for DATIM validation checks ####
+    # Prepare SNU x IM dataset for DATIM import & validation ####
       d <- packForDATIM(d, type = "PSNUxIM")
       
-  # Package FAST export ####
-      if (d$info$cop_year != 2020) {d <- FASTforward(d)}
-      
-  # Pack for PAW ####  
-      # d <- packForPAW(d, type = "PSNUxIM")
-      
-  # Package SUBNAT/IMPATT export ####
+    # Package SUBNAT/IMPATT DATIM import file ####
       d <- packForDATIM(d, type = "SUBNAT_IMPATT")
       
-    } else {
-      # d <- packForPAW(d, type = "PSNU")
-      # shipToPAW(d$data$paw)
-      # d <- packSNUxIM(d)
+    # Package FAST export ####
+      if (d$info$cop_year != 2020) {d <- FASTforward(d)}
+      
+    # Pack for PAW ####  
+      #d <- packForPAW(d)
+      #if (export_to_PAW) {shipToPAW(d$data$PAW)}
+      
     }
+      
+  # Check whether to write anything into SNU x IM tab and write if needed
+      d <- packSNUxIM(d)
+    
+  # If new information added to SNU x IM tab, reexport Data Pack for user
+      #if (d$info$newSNUxIM) {exportPackr()}
     
   # Double check country_uid info # TODO: Replace this with API call against SQL view of sites mapped to Countries.
     # site_uids <-

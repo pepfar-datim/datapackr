@@ -14,6 +14,9 @@
 #' will flag error.
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
+#' @param snuxim_model_data_path Filepath where SNU x IM distribution model is stored.
+#' @param output_folder Local folder where you would like your Data Pack to be
+#' saved upon export.
 #' 
 #' @details
 #' Executes the following operations in relation to a submitted Site Tool
@@ -24,14 +27,19 @@
 unPackTool <- function(submission_path = NULL,
                        tool = "Data Pack",
                        country_uids = NULL,
-                       cop_year = getCurrentCOPYear()) {
+                       cop_year = getCurrentCOPYear(),
+                       snuxim_model_data_path,
+                       output_folder = getwd()) {
   
   # Create data train for use across remainder of program
   d <- list(
     keychain = list(
-      submission_path = submission_path
+      submission_path = submission_path,
+      snuxim_model_data_path = snuxim_model_data_path,
+      output_folder = output_folder
     ),
     info = list(
+      datapack_name = NULL,
       tool = tool,
       country_uids = country_uids,
       cop_year = cop_year
@@ -82,8 +90,5 @@ unPackTool <- function(submission_path = NULL,
     cat(crayon::red(key))
     cat(crayon::red(messages))
   }
-    
-  
-  return(d)
-  
+
 }

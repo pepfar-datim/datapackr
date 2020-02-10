@@ -30,7 +30,14 @@ PAW <- datapackr::map_DataPack_DATIM_DEs_COCs %>%
     )) %>%
   dplyr::mutate(
     target_value = sample(1000, size = NROW(.), replace = TRUE)
-  )
+  ) # %>%
+  # dplyr::group_by_at(
+  #   dplyr::vars(
+  #     -target_value, -result_value, -key_population,-age, -sex,
+  #     -categoryoptioncombo_name, -categoryoptioncombo_id)) %>%
+  # dplyr::summarise(
+  #   target_value = sum(target_value[indicator == "OVC_HIVSTAT"])
+  # )
 
 
 PSNUs <- datapackr::valid_PSNUs %>%

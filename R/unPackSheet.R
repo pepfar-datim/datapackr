@@ -55,6 +55,11 @@ unPackDataPackSheet <- function(d, sheet) {
   # Drop NAs ####
     tidyr::drop_na(value)
   
+  # Remove _Military district from Prioritization extract as this can't be assigned a prioritization
+  if (sheet == "Prioritization") {
+    d$data$extract %<>%
+      dplyr::filter(!stringr::str_detect(PSNU, "_Military"))
+  }
   # Convert Prioritization from text to short-number.
   # d$data$extract %<>%
   #   dplyr::mutate(
@@ -212,6 +217,17 @@ unPackDataPackSheet <- function(d, sheet) {
           stringr::str_detect(indicator_code, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
           TRUE ~ Age
         )
+      )
+  }
+  
+  if (sheet == "KP") {
+    d$data$extract %<>%
+      dplyr::mutate(
+        Sex = dplyr::case_when(indicator_code == "KP_MAT.N.Sex.T"
+            ~ stringr::str_replace(KeyPop, " PWID", ""),
+          TRUE ~ Sex),
+        KeyPop = dplyr::case_when(indicator_code == "KP_MAT.N.Sex.T" ~ NA_character_,
+          TRUE ~ KeyPop)
       )
   }
   
