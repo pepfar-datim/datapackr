@@ -20,8 +20,8 @@ packSNUxIM <- function(d) {
     # If doesn't exist, write all combos in ####
     } else {
       # Prepare SNU x IM model dataset ####
-        snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path) %>%
-          dplyr::select(-value, -age_option_uid, -sex_option_uid, -kp_option_uid)
+      snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path)[[d$info$country_uids]] %>%
+        dplyr::select(-value, -age_option_uid, -sex_option_uid, -kp_option_uid)
       
       # Combine with MER data ####
         dsd_ta <- tibble::tribble(
@@ -109,13 +109,7 @@ packSNUxIM <- function(d) {
         
       # Write data to sheet ####
         d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
-        
-        sheets_with_filters <- cop20_data_pack_schema %>%
-          dplyr::filter(data_structure == "normal") %>%
-          dplyr::pull(sheet_num) %>%
-          unique()
-        
-        openxlsx::removeFilter(d$tool$wb, sheets_with_filters)
+        openxlsx::removeFilter(d$tool$wb, names(d$tool$wb))
         
         openxlsx::writeData(wb = d$tool$wb,
                             sheet = "PSNUxIM",
