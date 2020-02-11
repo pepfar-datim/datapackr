@@ -39,12 +39,8 @@ unPackDataPack <- function(d,
                            export_to_PAW = FALSE) {
   
   # Grab datapack_name from Home Page
-    d$info$datapack_name <- 
-      readxl::read_excel(
-        path = d$keychain$submission_path,
-        sheet = "Home",
-        range = "B20") %>%
-      names()
+    d$info$datapack_name <- unPackDataPackName(
+      submission_path = d$keychain$submission_path)  
   
   # Determine country uids ####
     if (is.null(d$info$country_uids)) {
@@ -52,9 +48,6 @@ unPackDataPack <- function(d,
         unPackCountryUIDs(submission_path = d$keychain$submission_path,
                           tool = d$info$tool)
     }
-  
-  #Get the name of the datapack
-  d$info$datapack_name<-unPackDataPackName(submission_path = d$keychain$submission_path)
   
   # Store schema ####
   if (d$info$cop_year == 2020) {
