@@ -53,14 +53,6 @@ unPackSNUxIM <- function(d) {
     dplyr::filter(
       rowSums(!is.na(dplyr::select(., dplyr::matches("Dedupe|(\\d){4,6}")))) != 0
       ) %>%
-  # Recalculate Dedupe
-    dplyr::mutate_at(dplyr::vars(dplyr::matches("Dedupe|(\\d){4,6}")), as.numeric) %>%
-    dplyr::mutate(
-      mechanisms = rowSums(dplyr::select(., dplyr::matches("(\\d){4,6}")), na.rm = TRUE),
-      Dedupe = dplyr::if_else(mechanisms > 1, 1 - mechanisms, 0)
-    ) %>%
-    dplyr::filter(mechanisms != 0) %>%
-    dplyr::select(-mechanisms) %>%
   # # Align PMTCT_EID Age bands with rest of Data Pack (TODO: Fix in Data Pack, not here)
   #  dplyr::mutate(
   #    Age = dplyr::case_when(
@@ -80,10 +72,8 @@ unPackSNUxIM <- function(d) {
       value = "value",
       -PSNU, -indicator_code, -Age, -Sex, -KeyPop,
       na.rm = TRUE) %>%
-    dplyr::group_by(PSNU, indicator_code, Age, Sex, KeyPop) %>%
-    dplyr::mutate(
-      distribution = value / sum(value)) %>%
-    dplyr::ungroup() %>%
+    dplyr::mutate(value = as.numeric(value)) %>%
+    dplyr::filter(value != 0) %>%
     tidyr::separate(mechanism_code, into=c("mechanism_code","support_type"), sep = "_") %>% 
     dplyr::mutate(
       psnuid = stringr::str_extract(PSNU, "(?<=\\[)([A-Za-z][A-Za-z0-9]{10})(?<!\\])"),
