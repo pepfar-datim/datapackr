@@ -13,11 +13,11 @@
 #' For full list of these IDs, see \code{datapackr::dataPackMap}.
 #' @param template_path Local filepath to Data Pack template Excel (XLSX) file.
 #' This file MUST NOT have any data validation formats present. If left
-#' \code{NA}, will prompt for file selection via window.
+#' \code{NULL}, will prompt for file selection via window.
 #' @param  cop_year Specifies COP year for dating as well as selection of
 #' templates.
 #' @param output_folder Local folder where you would like your Data Pack to be
-#' saved upon export. If left as \code{NA}, will output to
+#' saved upon export. If left as \code{NULL}, will output to
 #' \code{Working Directory}.
 #' @param results_archive If TRUE, will export compiled results of all tests and
 #' processes to output_folder.

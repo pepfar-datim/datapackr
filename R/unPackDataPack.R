@@ -6,6 +6,8 @@
 #'     issues, checking data against DATIM validations, and extracting data.
 #'
 #' @param d Datapackr object
+#' @param export_to_PAW TRUE or FALSE indicating whether to write to S3 bucket
+#' for use by PAW.
 #'
 #' @details
 #' Executes the following operations in relation to a submitted Data Pack:
@@ -33,7 +35,16 @@
 #' The final message in the Console prints all warnings identified in the Data
 #' Pack being processed.
 #'
-unPackDataPack <- function(d) {
+unPackDataPack <- function(d,
+                           export_to_PAW = FALSE) {
+  
+  # Grab datapack_name from Home Page
+    d$info$datapack_name <- 
+      readxl::read_excel(
+        path = d$keychain$submission_path,
+        sheet = "Home",
+        range = "B20") %>%
+      names()
   
   # Determine country uids ####
     if (is.null(d$info$country_uids)) {
@@ -41,6 +52,9 @@ unPackDataPack <- function(d) {
         unPackCountryUIDs(submission_path = d$keychain$submission_path,
                           tool = d$info$tool)
     }
+  
+  #Get the name of the datapack
+  d$info$datapack_name<-unPackDataPackName(submission_path = d$keychain$submission_path)
   
   # Store schema ####
   if (d$info$cop_year == 2020) {
@@ -63,22 +77,30 @@ unPackDataPack <- function(d) {
     if (NROW(d$data$SNUxIM) > 0) {
       d <- rePackPSNUxIM(d)
       
-  # Prepare SNU x IM dataset for DATIM validation checks ####
-      #d <- packForDATIM(d, type = "PSNUxIM")
+    # Prepare SNU x IM dataset for DATIM import & validation ####
+      d <- packForDATIM(d, type = "PSNUxIM")
       
-  # Package FAST export ####
+    # Package SUBNAT/IMPATT DATIM import file ####
+      d <- packForDATIM(d, type = "SUBNAT_IMPATT")
+      
+    # Package FAST export ####
       if (d$info$cop_year != 2020) {d <- FASTforward(d)}
       
-  # Pack for PAW ####  
-      # d <- packForPAW(d, type = "PSNUxIM")
-      
-  # Package SUBNAT/IMPATT export ####
-      d <- packForDATIM(d, type = "SUBNAT_IMPATT")
+
       d <- exportDistributedDataToDATIM(d)
+
     } else {
-      # d <- packForPAW(d, type = "PSNU")
-      # d <- addSNUxIM(d)
+      
+    # Pack for PAW ####  
+      #d <- packForPAW(d)
+      #if (export_to_PAW) {shipToPAW(d$data$PAW)}
     }
+      
+  # Check whether to write anything into SNU x IM tab and write if needed
+      d <- packSNUxIM(d)
+    
+  # If new information added to SNU x IM tab, reexport Data Pack for user
+      #if (d$info$newSNUxIM) {exportPackr()}
     
   return(d)
 

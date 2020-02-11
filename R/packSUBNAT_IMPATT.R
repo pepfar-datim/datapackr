@@ -14,15 +14,6 @@ packSUBNAT_IMPATT <- function(data) {
   
   # Confirm data structure is as expected.
   #TODO: Why is this hardcoded here and not present in the schema?
-  SUBNAT_IMPATT.schema.names <-
-    c("PSNU", "psnuid", "sheet_name", "indicator_code", "Age", "Sex",
-      "KeyPop", "value")
-  
-  if (any(names(data) != SUBNAT_IMPATT.schema.names)) {
-    error_msg <- "ERROR occurred while preparing SUBNAT/IMPATT data for DATIM. Columns not as expected."
-    stop(error_msg)
-  }
-  
   SUBNAT_IMPATT <- data %>%
     dplyr::left_join(., ( datapackr::map_DataPack_DATIM_DEs_COCs %>% 
                         dplyr::rename(Age = valid_ages.name,

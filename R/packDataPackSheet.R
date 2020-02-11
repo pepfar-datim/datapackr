@@ -24,21 +24,21 @@ packDataPackSheet <- function(wb,
                               sheet_data,
                               cop_year = getCurrentCOPYear()){ #TODO: Could we load a play dataset here?
   
-  # Prepare data for writing to sheet
+  # Prepare data for writing to sheet ####
   sheet_data <- prepareSheetData(sheet = sheet,
                                  org_units = org_units,
                                  schema = schema,
                                  sheet_data = sheet_data,
                                  cop_year = cop_year)
 
-  # Write data to sheet
+  # Write data to sheet ####
   openxlsx::writeData(wb = wb,
                       sheet = sheet,
                       x = sheet_data,
                       xy = c(1, headerRow("Data Pack Template", cop_year)),
-                      colNames = T, rowNames = F, withFilter = TRUE)
+                      colNames = T, rowNames = F, withFilter = FALSE)
 
-  # Format percentages
+  # Format percentages ####
   percentCols <- schema %>%
     dplyr::filter(sheet_name == sheet,
                   value_type == "percentage") %>%
@@ -55,8 +55,26 @@ packDataPackSheet <- function(wb,
                        gridExpand = TRUE,
                        stack = TRUE)
   }
+  
+  # Format HIV_PREV ####
+  if (sheet == "Epi Cascade I") {
+    percentDecimalCols <- schema %>%
+      dplyr::filter(sheet_name == sheet,
+                    indicator_code == "HIV_PREV.NA.Age/Sex/HIVStatus.T") %>%
+      dplyr::pull(col)
+    
+    percentDecimalStyle = openxlsx::createStyle(numFmt = "0.00%")
+    
+    openxlsx::addStyle(wb,
+                       sheet = sheet,
+                       percentDecimalStyle,
+                       rows = (1:NROW(sheet_data)) + headerRow("Data Pack Template", cop_year),
+                       cols = percentDecimalCols,
+                       gridExpand = TRUE,
+                       stack = TRUE)
+  }
 
-  # Format integers
+  # Format integers ####
   integerCols <- schema %>%
     dplyr::filter(sheet_name == sheet,
                   value_type == "integer") %>%
@@ -74,7 +92,7 @@ packDataPackSheet <- function(wb,
                        stack = TRUE)
   }
 
-  # Format targets
+  # Format targets ####
   targetCols <- schema %>%
     dplyr::filter(sheet_name == sheet,
                   col_type == "target") %>%
@@ -92,7 +110,7 @@ packDataPackSheet <- function(wb,
                        stack = TRUE)
   }
 
-  # Hide rows 5-13
+  # Hide rows 5-13 ####
   openxlsx::setRowHeights(wb,
                           sheet = sheet,
                           rows = 5:13,

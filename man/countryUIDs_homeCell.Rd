@@ -7,7 +7,7 @@
 countryUIDs_homeCell()
 }
 \value{
-Cell reference where Country UIDs should be on Home tab.
+Cell reference where the name of the DataPack is located.
 }
 \description{
 Location of Country UIDs on Home tab.
