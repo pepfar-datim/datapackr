@@ -186,7 +186,7 @@ packSNUxIM <- function(d) {
                            sheet = "PSNUxIM",
                            style = mechColHeaders,
                            rows = headerRow(tool = "Data Pack", cop_year = d$info$cop_year),
-                           cols = 9:colCount,
+                           cols = 11:colCount,
                            gridExpand = TRUE,
                            stack = TRUE)
         
