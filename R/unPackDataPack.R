@@ -78,9 +78,6 @@ unPackDataPack <- function(d,
       
     # Package FAST export ####
       if (d$info$cop_year != 2020) {d <- FASTforward(d)}
-      
-
-      d <- exportDistributedDataToDATIM(d)
 
     } else {
       
@@ -88,12 +85,7 @@ unPackDataPack <- function(d,
       #d <- packForPAW(d)
       #if (export_to_PAW) {shipToPAW(d$data$PAW)}
     }
-      
-  # Check whether to write anything into SNU x IM tab and write if needed
-      d <- packSNUxIM(d)
     
-  # If new information added to SNU x IM tab, reexport Data Pack for user
-      #if (d$info$newSNUxIM) {exportPackr()}
     
   return(d)
 

@@ -117,7 +117,7 @@ unPackSNUxIM <- function(d) {
   # Get other metadata needed for joining with other targets data
       psnuid = stringr::str_extract(PSNU, "(?<=\\[)([A-Za-z][A-Za-z0-9]{10})(?<!\\])")) %>%
     dplyr::select(PSNU, psnuid,  indicator_code, Age, Sex,
-                  KeyPop, mechanism_code, support_type, SNUxIM_value = value)
+                  KeyPop, mechanism_code, support_type, distribution = value)
     
   return(d)
 }

@@ -9,7 +9,7 @@ unPackTool(
   tool = "Data Pack",
   country_uids = NULL,
   cop_year = getCurrentCOPYear(),
-  snuxim_model_data_path,
+  snuxim_model_data_path = NULL,
   output_folder = getwd()
 )
 }
