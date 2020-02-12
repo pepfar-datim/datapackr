@@ -29,9 +29,13 @@ unPackSNUxIM <- function(d) {
     ) %>% 
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
   
-  if (NROW(d$data$SNUxIM) == 0) {return(d)}
+  if (NROW(d$data$SNUxIM) == 0) {
+    d$info$has_psnuxim <- FALSE
+    return(d)
+  }
   
   # Run structural checks ####
+  d$info$has_psnuxim<-TRUE
   d <- checkColStructure(d, "PSNUxIM")
   
   # Keep only columns we need ####
