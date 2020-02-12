@@ -64,14 +64,28 @@ unPackSNUxIM <- function(d) {
       Age = dplyr::case_when(
         stringr::str_detect(indicator_code, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
         stringr::str_detect(indicator_code, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
-        TRUE ~ Age)) %>%
+        TRUE ~ Age),
+      
+  # Accommodate cases where user accidentally deletes Dedupe formula. This allows
+  # rePackSNUxIM function to know the data is there somewhere.
+      Dedupe = dplyr::case_when(is.na(Dedupe) ~ "0", TRUE ~ Dedupe),
+  
+  # Get other metadata needed for joining with other targets data
+      psnuid = stringr::str_extract(PSNU, "(?<=\\[)([A-Za-z][A-Za-z0-9]{10})(?<!\\])"))
+  
+  # Prior to gathering, document all combos used in submitted PSNUxIM tab.
+  # This ensures tests for new combinations are correctly matched
+  d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
+    dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
+    dplyr::distinct()
   
   # Gather for joining ####
+  d$data$SNUxIM %<>%
     tidyr::gather(
       key = "mechCode_supportType",
       value = "distribution",
       -PSNU, -indicator_code, -Age, -Sex, -KeyPop,
-      na.rm = TRUE) %>%
+      na.rm = FALSE) %>%
   
   # Drop zeros ####
     dplyr::mutate(distribution = as.numeric(distribution)) # %>%
@@ -108,10 +122,7 @@ unPackSNUxIM <- function(d) {
     dplyr::mutate(
       mechanism_code = stringr::str_extract(mechCode_supportType, "(\\d{4,6})|Dedupe"),
       mechanism_code = stringr::str_replace(mechanism_code, "Dedupe", "99999"),
-      support_type = stringr::str_extract(mechCode_supportType, "(?<=_)DSD|TA"),
-    
-  # Get other metadata needed for joining with other targets data
-      psnuid = stringr::str_extract(PSNU, "(?<=\\[)([A-Za-z][A-Za-z0-9]{10})(?<!\\])")) %>%
+      support_type = stringr::str_extract(mechCode_supportType, "(?<=_)DSD|TA")) %>%
     dplyr::select(PSNU, psnuid,  indicator_code, Age, Sex,
                   KeyPop, mechanism_code, support_type, distribution)
     
