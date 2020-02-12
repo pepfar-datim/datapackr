@@ -12,16 +12,16 @@
 rePackPSNUxIM <- function(d) {
   
   d$data$distributedMER <- d$data$MER %>%
-    dplyr::full_join(dplyr::select(d$data$SNUxIM, -PSNU))
+    dplyr::full_join(d$data$SNUxIM)
   
   # TEST where Data Pack targets not fully distributed.
-  undistributed <- d$data$distributedMER %>%
+  missing_combs <- d$data$distributedMER %>%
     dplyr::filter(!is.na(value) & is.na(distribution))
   
-  if (NROW(undistributed) > 0) {
-    d$tests$undistributed <- undistributed
+  if (NROW(missing_combs) > 0) {
+    d$tests$missing_combs <- missing_combs
     
-    undistributed_inds <- undistributed %>%
+    missing_combs_inds <- missing_combs %>%
       dplyr::select(indicator_code) %>%
       dplyr::distinct() %>%
       dplyr::arrange(indicator_code) %>%
@@ -30,21 +30,24 @@ rePackPSNUxIM <- function(d) {
     warning_msg <-
       paste0(
         "ERROR!: ",
-        NROW(undistributed),
+        NROW(missing_combs),
         " cases where no distribution was attempted for Targets.",
         " To identify these, go to your SNU x IM tab and filter the Rollup column for Pink cells.",
         " This has affected the following indicators -> \n\t* ",
-        paste(undistributed_inds, collapse = "\n\t* "),
+        paste(missing_combs_inds, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE
+    d$info$missing_combs <- TRUE
     
   }
   
   # TEST where distribution attempted where no target set
   noTargets <- d$data$distributedMER %>%
-    dplyr::filter(is.na(value) & !is.na(distribution))
+    dplyr::filter((is.na(value) | value == 0)
+                  & !is.na(distribution)
+                  & distribution != 0)
   
   if (NROW(noTargets) > 0) {
     d$tests$noTargets <- noTargets
