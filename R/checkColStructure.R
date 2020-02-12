@@ -52,6 +52,23 @@ checkColStructure <- function(d, sheet) {
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
+  # Alert to columns which may be out of order
   
+  
+  columns_out_of_order <- col_check[which(col_check$template_order != col_check$submission_order),"indicator_code"]
+  d[["tests"]][["columns_out_of_order"]][[as.character(sheet)]] <- columns_out_of_order
+  
+  if ( length(columns_out_of_order) > 0 ) {
+    warning_msg <-
+      paste0(
+        "WARNING! In tab ",
+        sheet,
+        ", OUT OF ORDER COLUMNS: DO NOT add columns on the left or remove any columns. ->  \n\t* ",
+        paste(columns_out_of_order, collapse = "\n\t* "),
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  }
+ 
   return(d)
 }
