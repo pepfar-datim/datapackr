@@ -84,8 +84,8 @@ unPackSNUxIM <- function(d) {
     tidyr::gather(
       key = "mechCode_supportType",
       value = "distribution",
-      -PSNU, -indicator_code, -Age, -Sex, -KeyPop,
-      na.rm = FALSE) %>%
+      -PSNU, -indicator_code, -Age, -Sex, -KeyPop, -psnuid,
+      na.rm = TRUE) %>%
   
   # Drop zeros ####
     dplyr::mutate(distribution = as.numeric(distribution)) # %>%

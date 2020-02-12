@@ -11,12 +11,8 @@
 #' 
 rePackPSNUxIM <- function(d) {
   
-  SNUxIM <- d$data$SNUxIM %>%
-    dplyr::mutate(in_PSNUxIM_tab = 1) %>%
-    dplyr::select(-PSNU)
-  
   d$data$distributedMER <- d$data$MER %>%
-    dplyr::full_join(SNUxIM)
+    dplyr::full_join(dplyr::select(d$data$SNUxIM, -PSNU))
   
   # TEST where Data Pack targets not fully distributed.
   undistributed <- d$data$distributedMER %>%
