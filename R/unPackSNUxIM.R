@@ -56,8 +56,8 @@ unPackSNUxIM <- function(d) {
       paste0(
         "WARNING! In tab ",
         sheet,
-        ", INVALID COLUMN HEADERS: The following column headers are invalid.
-          Please use only the form 12345_DSD. ->  \n\t* ",
+        ", INVALID COLUMN HEADERS: The following column headers are invalid and
+        will be dropped in processing. Please use only the form 12345_DSD. ->  \n\t* ",
         paste(invalid_mech_headers, collapse = "\n\t* "),
         "\n")
     
@@ -78,7 +78,7 @@ unPackSNUxIM <- function(d) {
       PSNU,
       indicator_code,
       dplyr::one_of(toKeep),
-      dplyr::matches("Dedupe|(\\d){4,6}")) %>%
+      dplyr::matches("Dedupe|(\\d){4,6}_(DSD|TA)")) %>%
   
   # We don't need columns or rows with all NA targets -- Drop them. ####
     #dplyr::select_if(~!all(is.na(.))) %>%
