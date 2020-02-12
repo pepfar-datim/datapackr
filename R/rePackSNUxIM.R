@@ -31,10 +31,10 @@ rePackPSNUxIM <- function(d) {
     
     warning_msg <-
       paste0(
-        "ERROR!: ",
+        "WARNING!: ",
         NROW(noTargets),
         " cases where distribution attempted where no Target set.",
-        " To identify these, go to your SNU x IM tab and filter the Rollup column for Pink cells.",
+        "NOTE that these will be ignored and won't prevent further processing.",
         " This has affected the following indicators -> \n\t* ",
         paste(noTargets_inds, collapse = "\n\t* "),
         "\n")
