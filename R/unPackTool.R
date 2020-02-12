@@ -28,7 +28,7 @@ unPackTool <- function(submission_path = NULL,
                        tool = "Data Pack",
                        country_uids = NULL,
                        cop_year = getCurrentCOPYear(),
-                       snuxim_model_data_path,
+                       snuxim_model_data_path=NULL,
                        output_folder = getwd()) {
   
   # Create data train for use across remainder of program
@@ -57,6 +57,15 @@ unPackTool <- function(submission_path = NULL,
   # unPack file based on type
   if (d$info$tool == "Data Pack") {
     d <- unPackDataPack(d)
+    
+    # if ( !is.na(snuxim_model_data_path ) ) {
+    #   # Check whether to write anything into SNU x IM tab and write if needed
+    #   d <- packSNUxIM(d)
+    # }
+    # 
+    # # If new information added to SNU x IM tab, reexport Data Pack for user
+    # #if (d$info$newSNUxIM) {exportPackr()}
+    
   } else if (d$info$tool == "Site Tool") {
     d <- unPackSiteTool(d)
   } else if (d$info$tool == "Mechanism Map") {
@@ -91,4 +100,5 @@ unPackTool <- function(submission_path = NULL,
     cat(crayon::red(messages))
   }
 
+  return(d)
 }

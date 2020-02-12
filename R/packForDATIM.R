@@ -17,9 +17,9 @@ packForDATIM <- function(d, type = NA) {
   if (is.na(type)) {
     stop("Please specify data type in parameters: 'PSNUxIM', 'SUBNAT_IMPATT', or 'Site'")
   } else if (type == "SUBNAT_IMPATT") {
-    d$datim$SUBNAT_IMPATT <- packSUBNAT_IMPATT(d$data$SUBNAT_IMPATT)
+    d <- exportSubnatToDATIM(d)
   } else if (type == "PSNUxIM") {
-    d$datim$PSNUxIM <- packSNUxIM(d$data$distributedMER)
+    d <- exportDistributedDataToDATIM(d)
   } else if (type == "Site") {
     d$datim$decimal_values <- d$data$targets %>% 
       dplyr::filter(value %% 1 != 0)

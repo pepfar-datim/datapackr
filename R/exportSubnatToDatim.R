@@ -1,20 +1,19 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
-#' @title packSUBNAT_IMPATT(data)
+#' @title exportSubnatToDATIM(d)
 #'
 #' @description Takes the outputs of the \code{\link{unPackSheets}} function and
-#'     recompiles the dataframe containing SUBNAT and IMPATT data,
+#'     adds  a dataframe containing SUBNAT and IMPATT data,
 #'     \code{d$data$SUBNAT_IMPATT} into a standard DATIM import file.
 #'
 #' @param data SUBNAT/IMPATT dataframe to pack for DATIM.
 #' 
-#' @return Dataframe of SUBNAT & IMPATT data ready for DATIM ingestion.
+#' @return Datapackr d object
 #' 
-packSUBNAT_IMPATT <- function(data) {
+exportSubnatToDATIM <- function(d) {
   
-  # Confirm data structure is as expected.
-  #TODO: Why is this hardcoded here and not present in the schema?
-  SUBNAT_IMPATT <- data %>%
+  
+  d$datim$subnat_impatt <- d$data$SUBNAT_IMPATT %>%
     dplyr::left_join(., ( datapackr::map_DataPack_DATIM_DEs_COCs %>% 
                         dplyr::rename(Age = valid_ages.name,
                                       Sex = valid_sexes.name,
@@ -43,15 +42,17 @@ packSUBNAT_IMPATT <- function(data) {
     tidyr::drop_na()
   
   
+  #@Scott: TODO. DO NOT throw an error here. This needs to be handled with a message. 
+  
   # TEST: Whether any NAs in any columns
-  if (any(is.na(SUBNAT_IMPATT))) {
-    stop("ERROR occurred. NAs remained when preparing SUBNAT/IMPATT data for DATIM import.")
+  if (any(is.na(d$datim$subnat_impatt))) {
+     warning("ERROR occurred. NAs remained when preparing SUBNAT/IMPATT data for DATIM import.")
   }
   
   # TEST: Any Negative values? (not allowed for SUBNAT/IMPATT dataset)
-  if (any(SUBNAT_IMPATT$value < 0)) {
-    stop("ERROR occurred. Negative values present in SUBNAT/IMPATT data.")
+  if (any(d$datim$subnat_impatt < 0)) {
+    warning("ERROR occurred. Negative values present in SUBNAT/IMPATT data.")
   }
   
-  return(SUBNAT_IMPATT)
+  return(d)
 }

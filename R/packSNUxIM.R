@@ -10,9 +10,10 @@
 #' @return d
 #' 
 packSNUxIM <- function(d) {
-  if (d$info$cop_year == 2020) {
+  if ( d$info$cop_year == 2020 ) {
   # Check if SNUxIM data already exists ####
     if (NROW(d$data$SNUxIM) > 0) {
+    #TODO: DO NOT USE PRINT. 
     print("SNU x IM tab appending not yet supported...")
     
     # If does exist, check what combos are missing and write these in ####
@@ -186,7 +187,7 @@ packSNUxIM <- function(d) {
                            sheet = "PSNUxIM",
                            style = mechColHeaders,
                            rows = headerRow(tool = "Data Pack", cop_year = d$info$cop_year),
-                           cols = 9:colCount,
+                           cols = 11:colCount,
                            gridExpand = TRUE,
                            stack = TRUE)
         
@@ -217,13 +218,14 @@ packSNUxIM <- function(d) {
                                   as.character(utils::packageVersion("datapackr"))),
                             xy = c(2,2),
                             colNames = F)
-        
-      # Export SNU x IM Data Pack ####
-        exportPackr(data = d$tool$wb,
-                    output_path = d$keychain$output_folder,
-                    type = "Data Pack",
-                    datapack_name = d$info$datapack_name)
-        
+      
+      #TODO: Create a seperate wrapper function for this.
+      # # Export SNU x IM Data Pack ####
+      #   exportPackr(data = d$tool$wb,
+      #               output_path = d$keychain$output_folder,
+      #               type = "Data Pack",
+      #               datapack_name = d$info$datapack_name)
+      #   
     }
   } else if (d$info$cop_year == 2019) {
     stop("Packing SNU x IM tabs is no longer supported for FY2019 Data Packs.")
