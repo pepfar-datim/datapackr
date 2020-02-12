@@ -37,9 +37,36 @@ unPackSNUxIM <- function(d) {
   d$info$has_psnuxim <- TRUE
   d <- checkColStructure(d, "PSNUxIM")
   
+  # TEST Column headers for appropriate structure ####
+  expected_cols <- d$info$schema %>%
+    dplyr::filter(sheet_name == sheet,
+                  indicator_code != "Mechanism1") %>%
+    dplyr::pull(indicator_code) %>% 
+    unique(.)
+  
+  invalid_mech_headers <- d$data$SNUxIM %>%
+    dplyr::select(-dplyr::one_of(expected_cols)) %>%
+    dplyr::select(-dplyr::matches("(\\d){4,6}_(DSD|TA)")) %>%
+    names()
+  
+  d[["tests"]][["invalid_mech_headers"]][[as.character(sheet)]] <- invalid_mech_headers
+  
+  if (length(invalid_mech_headers) > 0) {
+    warning_msg <-
+      paste0(
+        "WARNING! In tab ",
+        sheet,
+        ", INVALID COLUMN HEADERS: The following column headers are invalid.
+          Please use only the form 12345_DSD. ->  \n\t* ",
+        paste(invalid_mech_headers, collapse = "\n\t* "),
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  }
+  
   # Keep only columns we need ####
   toKeep <- d$info$schema %>%
-    dplyr::filter(sheet_name == sheet_name
+    dplyr::filter(sheet_name == sheet
                   & !indicator_code %in% c("Rollup", "sheet_num", "DataPackTarget", "ID")
   # Filter by what's in submission to avoid unknown column warning messages ####
                   & indicator_code %in% colnames(d$data$SNUxIM)) %>%
@@ -90,32 +117,6 @@ unPackSNUxIM <- function(d) {
   # Drop zeros ####
     dplyr::mutate(distribution = as.numeric(distribution)) # %>%
     #dplyr::filter(distribution != 0)
-    
-  # TEST Column headers for appropriate structure ####
-    mech_headers_check <- d$data$SNUxIM %>%
-      dplyr::filter(!stringr::str_detect(mechCode_supportType, "Dedupe|(\\d{4,6})_(DSD|TA)"))
-    
-    d[["tests"]][["mech_headers_check"]][[as.character(sheet)]] <- mech_headers_check
-    
-    if (NROW(mech_headers_check) > 0) {
-      invalid_mech_headers <- mech_headers_check %>%
-        dplyr::pull(mechCode_supportType) %>%
-        unique()
-      
-      d[["tests"]][["invalid_mech_headers"]][[as.character(sheet)]] <- invalid_mech_headers
-      
-      warning_msg <-
-        paste0(
-          "WARNING! In tab ",
-          sheet,
-          ", INVALID COLUMN HEADERS: The following column headers are invalid.
-          Please use only the form 12345_DSD. ->  \n\t* ",
-          paste(invalid_mech_headers, collapse = "\n\t* "),
-          "\n")
-      
-      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
-      
-    }
   
   # Get mech codes and support types ####
   d$data$SNUxIM %<>%
