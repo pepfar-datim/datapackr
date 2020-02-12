@@ -52,9 +52,8 @@ checkColStructure <- function(d, sheet) {
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
+  
   # Alert to columns which may be out of order
-  
-  
   columns_out_of_order <- col_check[which(col_check$template_order != col_check$submission_order),"indicator_code"]
   d[["tests"]][["columns_out_of_order"]][[as.character(sheet)]] <- columns_out_of_order
   
