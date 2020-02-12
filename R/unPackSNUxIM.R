@@ -35,7 +35,7 @@ unPackSNUxIM <- function(d) {
   }
   
   # Run structural checks ####
-  d$info$has_psnuxim<-TRUE
+  d$info$has_psnuxim <- TRUE
   d <- checkColStructure(d, "PSNUxIM")
   
   # Keep only columns we need ####
@@ -56,35 +56,27 @@ unPackSNUxIM <- function(d) {
   
   # We don't need columns or rows with all NA targets -- Drop them. ####
     #dplyr::select_if(~!all(is.na(.))) %>%
-    dplyr::filter(
-      rowSums(!is.na(dplyr::select(., dplyr::matches("Dedupe|(\\d){4,6}")))) != 0
-      ) %>%
-  
+    # dplyr::filter(
+    #   rowSums(!is.na(dplyr::select(., dplyr::matches("Dedupe|(\\d){4,6}")))) != 0
+    #   ) %>%
     
-    # # Align PMTCT_EID Age bands with rest of Data Pack (TODO: Fix in Data Pack, not here)
-  #  dplyr::mutate(
-  #    Age = dplyr::case_when(
-  #      stringr::str_detect(indicator_code, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
-  #      stringr::str_detect(indicator_code, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
-  #      TRUE ~ Age),
-  #    Sex = dplyr::case_when(
-  # # Drop Unknown Sex from PMTCT_EID (TODO: Fix in Data Pack, not here)
-  #      stringr::str_detect(indicator_code, "PMTCT_EID") ~ NA_character_,
-  # # Fix issues with HTS_SELF (duplicate and split by Male/Female) (TODO: Fix in Data Pack, not here)
-  #      stringr::str_detect(indicator_code, "HTS_SELF(.)+Unassisted") ~ "Male|Female",
-  #      TRUE ~ Sex)) %>%
-  # tidyr::separate_rows(Sex, sep = "\\|") %>%
+  # Align PMTCT_EID Age bands with rest of Data Pack (TODO: Fix in Data Pack, not here)
+    dplyr::mutate(
+      Age = dplyr::case_when(
+        stringr::str_detect(indicator_code, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
+        stringr::str_detect(indicator_code, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
+        TRUE ~ Age)) %>%
   
   # Gather for joining ####
     tidyr::gather(
       key = "mechCode_supportType",
-      value = "value",
+      value = "distribution",
       -PSNU, -indicator_code, -Age, -Sex, -KeyPop,
       na.rm = TRUE) %>%
   
   # Drop zeros ####
-    dplyr::mutate(value = as.numeric(value)) %>%
-    dplyr::filter(value != 0)
+    dplyr::mutate(distribution = as.numeric(distribution)) # %>%
+    #dplyr::filter(distribution != 0)
     
   # TEST Column headers for appropriate structure ####
     mech_headers_check <- d$data$SNUxIM %>%
@@ -122,7 +114,7 @@ unPackSNUxIM <- function(d) {
   # Get other metadata needed for joining with other targets data
       psnuid = stringr::str_extract(PSNU, "(?<=\\[)([A-Za-z][A-Za-z0-9]{10})(?<!\\])")) %>%
     dplyr::select(PSNU, psnuid,  indicator_code, Age, Sex,
-                  KeyPop, mechanism_code, support_type, distribution = value)
+                  KeyPop, mechanism_code, support_type, distribution)
     
   return(d)
 }
