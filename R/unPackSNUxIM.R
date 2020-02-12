@@ -26,7 +26,8 @@ unPackSNUxIM <- function(d) {
             1),
           c(NA, NA)),
       col_types = "text"
-    )
+    ) %>% 
+    dplyr::filter_all(dplyr::any_vars(!is.na(.)))
   
   if (NROW(d$data$SNUxIM) == 0) {return(d)}
   
