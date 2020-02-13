@@ -21,7 +21,7 @@ unPackDataPackSheet <- function(d, sheet) {
       range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
       col_types = "text"
     ) %>% 
-  # remove rows
+  # remove rows that are all NAs
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
 
   # if tab has no target related content, send d back
