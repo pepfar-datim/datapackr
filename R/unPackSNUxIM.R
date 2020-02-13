@@ -100,7 +100,7 @@ unPackSNUxIM <- function(d) {
   # Get other metadata needed for joining with other targets data
       psnuid = stringr::str_extract(PSNU, "(?<=\\[)([A-Za-z][A-Za-z0-9]{10})(?<!\\])"))
   
-  # Prior to gathering, document all combos used in submitted PSNUxIM tab.
+  # Prior to gathering, document all combos used in submitted PSNUxIM tab. ####
   # This ensures tests for new combinations are correctly matched
   d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
