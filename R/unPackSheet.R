@@ -20,7 +20,15 @@ unPackDataPackSheet <- function(d, sheet) {
       sheet = sheet,
       range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
       col_types = "text"
-    )
+    ) %>% 
+  # remove rows that are all NAs
+    dplyr::filter_all(dplyr::any_vars(!is.na(.)))
+
+  # if tab has no target related content, send d back
+  if (NROW(d$data$extract) == 0) {
+    d$data$extract <- NULL
+    return(d)
+    }
   
   # Run structural checks ####
   d <- checkColStructure(d, sheet)
