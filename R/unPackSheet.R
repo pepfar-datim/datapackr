@@ -21,6 +21,12 @@ unPackDataPackSheet <- function(d, sheet) {
       range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
       col_types = "text"
     )
+
+  # if tab has no target related content, send d back
+  if (NROW(d$data$extract) == 0) {
+    d$data$extract <- NULL
+    return(d)
+    }
   
   # Run structural checks ####
   d <- checkColStructure(d, sheet)
