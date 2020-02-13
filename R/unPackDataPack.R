@@ -77,7 +77,7 @@ unPackDataPack <- function(d,
       d <- packForDATIM(d, type = "SUBNAT_IMPATT")
       
     # Package FAST export ####
-      if (d$info$cop_year != 2020) {d <- FASTforward(d)}
+      if (d$info$cop_year == 2019) {d <- FASTforward(d)}
 
     } else {
       
