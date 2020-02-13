@@ -21,9 +21,16 @@ modified_data <- purrr::map(original_sheets,~readxl::read_xlsx(modified,.x, col_
                               dplyr::mutate(modified=TRUE))%>% 
   setNames(original_sheets)
 
-comparison_join <- purrr::map(original_sheets[1:22],~(dplyr::full_join(original_data[[.x]],
-                                                                modified_data[[.x]]) %>% 
+# comparison_join <- purrr::map(original_sheets[1:22],~(dplyr::full_join(original_data[[.x]],
+#                                                                 modified_data[[.x]]) %>% 
+#                                                         dplyr::filter(is.na(original) |
+#                                                                         is.na(modified))) %>% 
+#                                  dplyr::arrange_all()) %>% 
+#                            setNames(original_sheets[1:22])
+
+comparison_join <- purrr::map(original_sheets,~(dplyr::full_join(original_data[[.x]],
+                                                                       modified_data[[.x]]) %>%
                                                         dplyr::filter(is.na(original) |
-                                                                        is.na(modified))) %>% 
-                                 dplyr::arrange_all()) %>% 
-                           setNames(original_sheets[1:22])
+                                                                        is.na(modified))) %>%
+                                dplyr::arrange_all()) %>%
+  setNames(original_sheets)
