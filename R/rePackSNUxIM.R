@@ -44,49 +44,56 @@ rePackPSNUxIM <- function(d) {
     
   }
 
-  # @Scott TODO: This test is broken. Please fix. 
-  # # TEST where attempted distribution sum != target
-  # imbalancedDistribution <- d$data$distributedMER %>%
-  #   tidyr::drop_na(value, distribution) %>%
-  #   dplyr::select(-Age, -distribution, -mechanism_code) %>%
-  #   dplyr::group_by_at(dplyr::vars(dplyr::everything(), -value)) %>%
-  #   dplyr::summarize(value = round(sum(value), digits = 5)) %>%
-  #   dplyr::ungroup() %>%
-  #   dplyr::group_by_at(dplyr::vars(dplyr::everything(), -distribution)) %>%
-  #   dplyr::summarize(SNUxIM_value = round(sum(distribution), digits = 5)) %>%
-  #   dplyr::ungroup() %>%
-  #   dplyr::filter(value != SNUxIM_value)
-  # 
-  # if (NROW(imbalancedDistribution) > 0) {
-  #   d$tests$imbalancedDistribution <- imbalancedDistribution
-  # 
-  #   imbalancedDistribution_inds <- imbalancedDistribution %>%
-  #     dplyr::select(indicator_code) %>%
-  #     dplyr::distinct() %>%
-  #     dplyr::arrange(indicator_code) %>%
-  #     dplyr::pull(indicator_code)
-  # 
-  #   warning_msg <-
-  #     paste0(
-  #       "WARNING!: ",
-  #       NROW(imbalancedDistribution),
-  #       " cases where distributed total is either more or less than total Target.",
-  #       " To identify these, go to your SNU x IM tab and filter the Rollup column for Pink cells.",
-  #       " This has affected the following indicators -> \n\t* ",
-  #       paste(imbalancedDistribution_inds, collapse = "\n\t* "),
-  #       "\n")
-  # 
-  #   d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
-  # 
-  # }
-  
   #Do not round at this point. Only just prior to some output step. 
   d$data$distributedMER %<>%
-    dplyr::mutate(newValue = value * distribution) %>%
+    tidyr::drop_na(value, distribution) %>%
+    dplyr::mutate(distributed_value = round_trunc(value * distribution))
+  
+  # TEST where attempted distribution sum != target
+  imbalancedDistribution <- d$data$distributedMER %>%
+    dplyr::group_by_at(
+      dplyr::vars(
+        dplyr::everything(),
+        -mechanism_code, -support_type,
+        -value, -distributed_value, -distribution)) %>%
+    dplyr::mutate(distributed_value_total = sum(distributed_value)) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(value != distributed_value_total)
+
+  if (NROW(imbalancedDistribution) > 0) {
+    d$tests$imbalancedDistribution <- imbalancedDistribution
+    
+    imbalancedDistribution_inds <- imbalancedDistribution %>%
+      dplyr::select(indicator_code) %>%
+      dplyr::distinct() %>%
+      dplyr::arrange(indicator_code) %>%
+      dplyr::pull(indicator_code)
+   
+    warning_msg <-
+      paste0(
+        "WARNING!: ",
+        NROW(imbalancedDistribution),
+        " cases where distributed total across all mechanisms and Dedupe is",
+        " either more or less than PSNU-level Target.",
+        " To identify these, go to your PSNUxIM tab and filter the Rollup column ",
+        "to find cases where this is not equal to 100%.",
+        " NOTE that this may be due to any invalid mechanism names in row 14 of your PSNUxIM tab.",
+        " For reference, this has affected the following indicators -> \n\t* ",
+        paste(imbalancedDistribution_inds, collapse = "\n\t* "),
+      "\n")
+  
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  }
+  
+  d$data$distributedMER %<>%
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age,
-                  Sex, KeyPop, mechanism_code, value = newValue) %>%
+                  Sex, KeyPop, mechanism_code, support_type,
+                  value = distributed_value) %>%
     dplyr::filter(value != 0) %>%
     tidyr::drop_na(value)
+  
+  # TEST for negatives against non-dedupes
+  # TEST for invalid DSD TA
   
   return(d)
   
