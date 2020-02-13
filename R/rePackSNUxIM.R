@@ -85,6 +85,39 @@ rePackPSNUxIM <- function(d) {
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
   
+  # TEST for positives against dedupes
+  d$tests$invalid_dedupes <- d$data$distributedMER %>%
+    dplyr::filter(mechanism_code == "99999" & distribution > 0)
+  
+  if (NROW(d$tests$invalid_dedupes) > 0) {
+    warning_msg <- 
+      paste0(
+        "WARNING!: ",
+        NROW(d$tests$invalid_dedupes),
+        " cases where positive numbers are being used for Dedupe allocations.",
+        " You can find these by filtering on the Dedupe column in the PSNUxIM tab.")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  }
+  
+  # TEST for negatives against non-dedupes
+  d$tests$negative_distributed_targets <- d$data$distributedMER %>%
+    dplyr::filter(mechanism_code != "99999" & distribution < 0)
+  
+  if (NROW(d$tests$negative_distributed_targets) > 0) {
+    warning_msg <- 
+      paste0(
+        "WARNING!: ",
+        NROW(d$tests$negative_distributed_targets),
+        " cases where negative numbers are being used for mechanism allocations.",
+        " The following mechanisms have been affected. -> \n\t* ",
+        paste(unique(d$tests$negative_distributed_targets$mechanism_code), collapse = "\n\t* "),
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  }
+  
+  # Prepare for Export
   d$data$distributedMER %<>%
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age,
                   Sex, KeyPop, mechanism_code, support_type,
@@ -92,8 +125,21 @@ rePackPSNUxIM <- function(d) {
     dplyr::filter(value != 0) %>%
     tidyr::drop_na(value)
   
-  # TEST for negatives against non-dedupes
   # TEST for invalid DSD TA
+  d$tests$invalid_DSDTA <- d$data$distributedMER %>%
+    dplyr::filter(mechanism_code != "99999" & is.na(support_type))
+  
+  if (NROW(d$tests$invalid_DSDTA) > 0) {
+    warning_msg <- 
+      paste0(
+        "WARNING!: ",
+        NROW(d$tests$invalid_DSDTA),
+        " cases where column headers in row 14 of your PSNUxIM tab have prevented",
+        " us from determining whether you intended data to be distributed to DSD or TA.",
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  }
   
   return(d)
   
