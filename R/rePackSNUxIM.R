@@ -1,5 +1,5 @@
 #' @export
-#' @title rePackSNUxIM(d)
+#' @title combineMER_SNUxIM(d)
 #'
 #' @description Takes the output of the \code{\link{unPackSNUxIM}} and
 #'     \code{\link{unPackSheets}} functions and delicatety combines these to create
@@ -9,7 +9,7 @@
 #' 
 #' @return d
 #' 
-rePackPSNUxIM <- function(d) {
+combineMER_SNUxIM <- function(d) {
   
   d$data$distributedMER <- d$data$MER %>%
     dplyr::full_join(d$data$SNUxIM)
