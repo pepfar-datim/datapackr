@@ -123,7 +123,8 @@ packSNUxIM <- function(d) {
                         DataPackTarget, Rollup, Dedupe, dplyr::everything(), -value, -col)
         
       # Add Rollup check formula ####
-        new_mech_cols <- names(d$data$SNUxIM_combined)[!names(d$data$SNUxIM_combined) %in% c(header_cols, "row")]
+        new_mech_cols <- names(d$data$SNUxIM_combined)[!names(d$data$SNUxIM_combined) %in% c(names(SNUxIM_tab), "row")]
+        non_appended_mech_cols <- names(SNUxIM_tab)[!names(SNUxIM_tab) %in% names(d$data$SNUxIM_combined)]
         
         d$data$SNUxIM_combined %<>%
           dplyr::mutate(
@@ -137,7 +138,9 @@ packSNUxIM <- function(d) {
             Age = dplyr::case_when(
               indicator_code %in% c("PMTCT_EID.N.Age.T.2mo","PMTCT_EID.N.Age.T.2to12mo") ~ NA_character_,
               TRUE ~ Age)
-          )
+          ) %>%
+          addcols(non_appended_mech_cols) %>%
+          dplyr::select(names(SNUxIM_tab), new_mech_cols)
         
       # Format formula columns ####
         formulaCols <- grep("ID|DataPackTarget|Rollup|Dedupe",
@@ -152,34 +155,40 @@ packSNUxIM <- function(d) {
         openxlsx::removeFilter(d$tool$wb, names(d$tool$wb))
         
         if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
-          header_data <- d$data$SNUxIM_combined %>%
-            dplyr::select(header_cols)
-          
-          mech_data <- d$data$SNUxIM_combined %>%
-            dplyr::select(-header_cols)
-          
-          mech_names <- names(mech_data) %>%
-            as.data.frame() %>%
-            `row.names<-`(.[, 1]) %>%
-            t() %>%
-            tibble::as_tibble()
+          # header_data <- d$data$SNUxIM_combined %>%
+          #   dplyr::select(header_cols)
+          # 
+          # mech_data <- d$data$SNUxIM_combined %>%
+          #   dplyr::select(-header_cols)
+          # 
+          # mech_names <- names(mech_data) %>%
+          #   as.data.frame() %>%
+          #   `row.names<-`(.[, 1]) %>%
+          #   t() %>%
+          #   tibble::as_tibble()
+          # 
+          # openxlsx::writeData(wb = d$tool$wb,
+          #                     sheet = "PSNUxIM",
+          #                     x = header_data,
+          #                     xy = c(1, existing_rows + 1),
+          #                     colNames = F, rowNames = F, withFilter = FALSE)
+          # 
+          # openxlsx::writeData(wb = d$tool$wb,
+          #                     sheet = "PSNUxIM",
+          #                     x = mech_data,
+          #                     xy = c(first_new_mech_col, existing_rows + 1),
+          #                     colNames = F, rowNames = F, withFilter = FALSE)
+          # 
+          # openxlsx::writeData(wb = d$tool$wb,
+          #                     sheet = "PSNUxIM",
+          #                     x = mech_names,
+          #                     xy = c(first_new_mech_col, top_rows),
+          #                     colNames = F, rowNames = F, withFilter = FALSE)
           
           openxlsx::writeData(wb = d$tool$wb,
                               sheet = "PSNUxIM",
-                              x = header_data,
+                              x = d$data$SNUxIM_combined,
                               xy = c(1, existing_rows + 1),
-                              colNames = F, rowNames = F, withFilter = FALSE)
-          
-          openxlsx::writeData(wb = d$tool$wb,
-                              sheet = "PSNUxIM",
-                              x = mech_data,
-                              xy = c(first_new_mech_col, existing_rows + 1),
-                              colNames = F, rowNames = F, withFilter = FALSE)
-          
-          openxlsx::writeData(wb = d$tool$wb,
-                              sheet = "PSNUxIM",
-                              x = mech_names,
-                              xy = c(first_new_mech_col, top_rows),
                               colNames = F, rowNames = F, withFilter = FALSE)
           
       # Add green highlights to appended rows, if any ####
