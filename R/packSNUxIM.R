@@ -182,6 +182,18 @@ packSNUxIM <- function(d) {
                               xy = c(first_new_mech_col, top_rows),
                               colNames = F, rowNames = F, withFilter = FALSE)
           
+      # Add green highlights to appended rows, if any ####
+          newRowStyle <- openxlsx::createStyle(fontColour = "#006100", fgFill = "#C6EFCE")
+          
+          openxlsx::addStyle(
+            wb = d$tool$wb,
+            sheet = "PSNUxIM",
+            newRowStyle,
+            rows = (existing_rows + 1):(existing_rows + NROW(d$data$SNUxIM_combined)),
+            cols = 1:2,
+            gridExpand = TRUE,
+            stack = FALSE)
+          
         } else {
           openxlsx::writeData(wb = d$tool$wb,
                               sheet = "PSNUxIM",
