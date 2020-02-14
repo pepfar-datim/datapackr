@@ -58,11 +58,11 @@ unPackTool <- function(submission_path = NULL,
   if (d$info$tool == "Data Pack") {
     d <- unPackDataPack(d)
     
-    # if ( !is.na(snuxim_model_data_path ) ) {
-    #   # Check whether to write anything into SNU x IM tab and write if needed
-    #   d <- packSNUxIM(d)
-    # }
-    # 
+  # Check whether to write anything into SNU x IM tab and write if needed  
+    if ( !is.null(snuxim_model_data_path ) ) {
+     d <- packSNUxIM(d)
+    } else {stop("Cannot update PSNUxIM tab without model data.")}
+    
     # # If new information added to SNU x IM tab, reexport Data Pack for user
     # #if (d$info$newSNUxIM) {exportPackr()}
     
