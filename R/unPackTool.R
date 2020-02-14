@@ -65,6 +65,8 @@ unPackTool <- function(submission_path = NULL,
     
     # If new information added to SNU x IM tab, reexport Data Pack for user
     if (d$info$newSNUxIM) {
+      d <- strip_wb_NAs(d)
+      
       exportPackr(
         data = d$tool$wb,
         output_path = d$keychain$output_folder,
