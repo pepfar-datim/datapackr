@@ -63,8 +63,14 @@ unPackTool <- function(submission_path = NULL,
      d <- packSNUxIM(d)
     } else {stop("Cannot update PSNUxIM tab without model data.")}
     
-    # # If new information added to SNU x IM tab, reexport Data Pack for user
-    # #if (d$info$newSNUxIM) {exportPackr()}
+    # If new information added to SNU x IM tab, reexport Data Pack for user
+    if (d$info$newSNUxIM) {
+      exportPackr(
+        data = d$tool$wb,
+        output_path = d$keychain$output_folder,
+        type = "Data Pack",
+        datapack_name = d$info$datapack_name)
+    }
     
   } else if (d$info$tool == "Site Tool") {
     d <- unPackSiteTool(d)

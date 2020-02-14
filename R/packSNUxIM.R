@@ -191,28 +191,35 @@ packSNUxIM <- function(d) {
         }
         
       # Format percent columns ####
-        percentCols <- grep("Rollup|Dedupe|_(DSD|TA)$",
-                            colnames(d$data$SNUxIM_combined))
+        final_snuxim_cols <- 
+          openxlsx::readWorkbook(
+            xlsxFile = d$tool$wb,
+            sheet = "PSNUxIM",
+            rows = top_rows
+          ) %>%
+          names()
+        
+        percentCols <- c(grep("Rollup", final_snuxim_cols):length(final_snuxim_cols))
         percentStyle = openxlsx::createStyle(numFmt = "0%")
         
         openxlsx::addStyle(
           wb = d$tool$wb,
           sheet = "PSNUxIM",
           percentStyle,
-          rows = (1:(existing_rows + NROW(d$data$SNUxIM_combined))),
+          rows = (top_rows + 1):(existing_rows + NROW(d$data$SNUxIM_combined)),
           cols = percentCols,
           gridExpand = TRUE,
           stack = FALSE)
       
       # Format integers ####
-        integerCols <- grep("DataPackTarget", colnames(d$data$SNUxIM_combined))
+        integerCols <- grep("DataPackTarget", final_snuxim_cols)
         integerStyle = openxlsx::createStyle(numFmt = "#,##0")
   
         openxlsx::addStyle(
           wb = d$tool$wb,
           sheet = "PSNUxIM",
           integerStyle,
-          rows = (1:NROW(d$data$SNUxIM_combined)) + headerRow("Data Pack", cop_year = d$info$cop_year),
+          rows = (top_rows + 1):(existing_rows + NROW(d$data$SNUxIM_combined)),
           cols = integerCols,
           gridExpand = TRUE,
           stack = TRUE)
@@ -227,27 +234,27 @@ packSNUxIM <- function(d) {
       # Alter conditional formatting for Rollup and Dedupe ####
         openxlsx::conditionalFormatting(wb = d$tool$wb,
                                         sheet = "PSNUxIM",
-                                        cols = 9,
-                                        rows = (1:NROW(d$data$SNUxIM_combined) + 14),
+                                        cols = grep("Rollup", final_snuxim_cols),
+                                        rows = (top_rows+1):(existing_rows + NROW(d$data$SNUxIM_combined)),
                                         rule = "AND(ISNUMBER($I15),ROUND($I15,2)<>1)",
                                         style = errorStyle)
         
         openxlsx::conditionalFormatting(wb = d$tool$wb,
                                         sheet = "PSNUxIM",
-                                        cols = 10,
-                                        rows = (1:NROW(d$data$SNUxIM_combined) + 14),
+                                        cols = grep("Dedupe", final_snuxim_cols),
+                                        rows = (top_rows+1):(existing_rows + NROW(d$data$SNUxIM_combined)),
                                         rule = "AND(ISNUMBER($J15),ROUND($J15,2)<>0)",
                                         style = warningStyle)
         
         openxlsx::conditionalFormatting(wb = d$tool$wb,
                                         sheet = "PSNUxIM",
-                                        cols = 10,
-                                        rows = (1:NROW(d$data$SNUxIM_combined) + 14),
+                                        cols = grep("Dedupe", final_snuxim_cols),
+                                        rows = (top_rows+1):(existing_rows + NROW(d$data$SNUxIM_combined)),
                                         rule = "AND(ISNUMBER($J15),ROUND($J15,2)=0)",
                                         style = normalStyle)
         
       # Format mechanism columns ####
-        colCount <- NCOL(d$data$SNUxIM_combined)
+        colCount <- length(final_snuxim_cols)
         
         mechColHeaders <- openxlsx::createStyle(halign = "center",
                                                 valign = "center",
@@ -258,20 +265,19 @@ packSNUxIM <- function(d) {
         openxlsx::addStyle(d$tool$wb,
                            sheet = "PSNUxIM",
                            style = mechColHeaders,
-                           rows = headerRow(tool = "Data Pack", cop_year = d$info$cop_year),
-                           cols = 11:colCount,
+                           rows = top_rows,
+                           cols = (length(header_cols)+1):colCount,
                            gridExpand = TRUE,
                            stack = TRUE)
         
       # Hide rows 5-13 ####
         openxlsx::setRowHeights(wb = d$tool$wb,
                                 sheet = "PSNUxIM",
-                                rows = 5:13,
+                                rows = 5:(top_rows-1),
                                 heights = 0)
         
       # Hide ID and sheet_num columns ####
-        hiddenCols <- grep("ID|sheet_num",
-                            colnames(d$data$SNUxIM_combined))
+        hiddenCols <- grep("ID|sheet_num", final_snuxim_cols)
         
         openxlsx::setColWidths(wb = d$tool$wb,
                                sheet = "PSNUxIM",
@@ -290,6 +296,8 @@ packSNUxIM <- function(d) {
                                   as.character(utils::packageVersion("datapackr"))),
                             xy = c(2,2),
                             colNames = F)
+        
+        d$info$newSNUxIM <- TRUE
       
       #TODO: Create a seperate wrapper function for this.
       # # Export SNU x IM Data Pack ####
