@@ -319,6 +319,34 @@ packSNUxIM <- function(d) {
                             colNames = F)
         
         d$info$newSNUxIM <- TRUE
+        
+        warning_msg <- 
+          paste0(
+            "NOTE: Based on your submission, we have ",
+            ifelse(d$info$has_psnuxim,
+                   paste0("added ", NROW(d$data$SNUxIM_combined), " rows to your PSNUxIM tab.",
+                           " These have been highlighted green for your reference."),
+                   "populated your PSNUxIM tab for the first time."),
+            " An updated copy of your Data Pack is available for download from this app.",
+            " Please review your PSNUxIM tab and note the following:\n",
+            "\t1) To add new mechanisms to your PSNUxIM tab, either type over an
+            existing mechanism name, or add a new column to the right of your existing
+            mechanism columns. All mechanism names must be of the format 12345_DSD
+            or 12345_TA, and every mechanism must also be entered and up to date
+            in FACTS Info. Finally, ensure the formula in the Rollup column
+            extends to include all mechanism columns that you add.
+            
+        2) It is critical that no manual modifications are made to the PSNUxIM
+            tab other than:
+            
+              a. adding additional mechanism columns,
+              b. modifying the Rollup column to include additional mechanism columns, and
+              c. adding/updating the percent allocations to mechanisms.
+            
+If you have any questions, please submit a Help Desk ticket at DATIM.Zendesk.com.",
+            "\n")
+        
+        d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
       
       #TODO: Create a seperate wrapper function for this.
       # # Export SNU x IM Data Pack ####
