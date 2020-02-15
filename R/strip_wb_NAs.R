@@ -12,7 +12,7 @@
 #'     
 strip_wb_NAs <- function(d) {
   
-  d$tool$wb$sharedStrings[wb$sharedStrings == "<si><t>NA</t></si>"] <- "<si><t></t></si>"
+  d$tool$wb$sharedStrings[d$tool$wb$sharedStrings == "<si><t>NA</t></si>"] <- "<si><t></t></si>"
   
   # NA_sharedString <- grep("<si><t>NA</t></si>", d$tool$wb$sharedStrings)-1
   # 

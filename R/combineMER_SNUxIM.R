@@ -34,7 +34,7 @@ combineMER_SNUxIM <- function(d) {
         "WARNING!: ",
         NROW(noTargets),
         " cases where distribution attempted where no Target set.",
-        "NOTE that these will be ignored and won't prevent further processing.",
+        " NOTE that these will be ignored and won't prevent further processing.",
         " This has affected the following indicators -> \n\t* ",
         paste(noTargets_inds, collapse = "\n\t* "),
         "\n")
