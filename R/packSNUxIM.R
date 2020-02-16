@@ -328,7 +328,7 @@ packSNUxIM <- function(d) {
                            " These have been highlighted green for your reference."),
                    "populated your PSNUxIM tab for the first time."),
             " An updated copy of your Data Pack is available for download from this app.",
-            " Please review your PSNUxIM tab and note the following:\n",
+            " Please review your PSNUxIM tab and note the following:\n\n",
             "\t1) To add new mechanisms to your PSNUxIM tab, either type over an
             existing mechanism name, or add a new column to the right of your existing
             mechanism columns. All mechanism names must be of the format 12345_DSD
