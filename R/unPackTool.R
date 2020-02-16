@@ -50,6 +50,7 @@ unPackTool <- function(submission_path = NULL,
   d$info$warning_msg <- NULL
   d$info$has_error <- FALSE
   d$info$newSNUxIM <- FALSE
+  d$info$has_psnuxim <- FALSE
   
   # Check the submission file exists and prompt for user input if not
   d$keychain$submission_path <- handshakeFile(path = d$keychain$submission_path,
