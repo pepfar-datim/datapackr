@@ -6,8 +6,6 @@
 #'     issues, checking data against DATIM validations, and extracting data.
 #'
 #' @param d Datapackr object
-#' @param export_to_PAW TRUE or FALSE indicating whether to write to S3 bucket
-#' for use by PAW.
 #'
 #' @details
 #' Executes the following operations in relation to a submitted Data Pack:
@@ -35,8 +33,7 @@
 #' The final message in the Console prints all warnings identified in the Data
 #' Pack being processed.
 #'
-unPackDataPack <- function(d,
-                           export_to_PAW = FALSE) {
+unPackDataPack <- function(d) {
   
   # Grab datapack_name from Home Page
     d$info$datapack_name <- unPackDataPackName(
@@ -79,13 +76,7 @@ unPackDataPack <- function(d,
     # Package FAST export ####
       if (d$info$cop_year == 2019) {d <- FASTforward(d)}
 
-    } else {
-      
-    # Pack for PAW ####  
-      #d <- packForPAW(d)
-      #if (export_to_PAW) {shipToPAW(d$data$PAW)}
     }
-    
     
   return(d)
 
