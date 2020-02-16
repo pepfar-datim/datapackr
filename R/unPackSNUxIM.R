@@ -94,6 +94,13 @@ unPackSNUxIM <- function(d) {
         stringr::str_detect(indicator_code, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
         TRUE ~ Age),
       
+  # Align KP_MAT disaggs
+      Sex = dplyr::case_when(indicator_code == "KP_MAT.N.Sex.T"
+                             ~ stringr::str_replace(KeyPop, " PWID", ""),
+                             TRUE ~ Sex),
+      KeyPop = dplyr::case_when(indicator_code == "KP_MAT.N.Sex.T" ~ NA_character_,
+                                TRUE ~ KeyPop),
+      
   # Accommodate cases where user accidentally deletes Dedupe formula. This allows
   # rePackSNUxIM function to know the data is there somewhere.
       Dedupe = dplyr::case_when(is.na(Dedupe) ~ "0", TRUE ~ Dedupe),

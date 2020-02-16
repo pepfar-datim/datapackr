@@ -49,6 +49,8 @@ unPackTool <- function(submission_path = NULL,
   # Start running log of all warning and information messages
   d$info$warning_msg <- NULL
   d$info$has_error <- FALSE
+  d$info$newSNUxIM <- FALSE
+  d$info$has_psnuxim <- FALSE
   
   # Check the submission file exists and prompt for user input if not
   d$keychain$submission_path <- handshakeFile(path = d$keychain$submission_path,
@@ -58,13 +60,21 @@ unPackTool <- function(submission_path = NULL,
   if (d$info$tool == "Data Pack") {
     d <- unPackDataPack(d)
     
-    # if ( !is.na(snuxim_model_data_path ) ) {
-    #   # Check whether to write anything into SNU x IM tab and write if needed
-    #   d <- packSNUxIM(d)
-    # }
-    # 
-    # # If new information added to SNU x IM tab, reexport Data Pack for user
-    # #if (d$info$newSNUxIM) {exportPackr()}
+  # Check whether to write anything into SNU x IM tab and write if needed  
+    if ( !is.null(snuxim_model_data_path ) ) {
+     d <- packSNUxIM(d)
+    } else {stop("Cannot update PSNUxIM tab without model data.")}
+    
+    # If new information added to SNU x IM tab, reexport Data Pack for user
+    if (d$info$newSNUxIM) {
+      d <- strip_wb_NAs(d)
+      
+      exportPackr(
+        data = d$tool$wb,
+        output_path = d$keychain$output_folder,
+        type = "Data Pack",
+        datapack_name = d$info$datapack_name)
+    }
     
   } else if (d$info$tool == "Site Tool") {
     d <- unPackSiteTool(d)

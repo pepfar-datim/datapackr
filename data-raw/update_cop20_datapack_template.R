@@ -3,7 +3,6 @@
 
 secrets <- "/Users/scott/.secrets/test-mer2.json"
 
-
 loginToDATIM(secrets)
 
 datapack_template_filepath <- system.file("extdata",

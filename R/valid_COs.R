@@ -122,7 +122,7 @@ validCOs <- function(cop_year = getCurrentCOPYear()) {
     ## fineKPs ####
       datapack_schema_group = ifelse(
         test = categoryoptiongroup == "Key Population"
-          & datapack_disagg %in% c("Female PWID","Male PWID","MSM not SW",
+          & datapack_disagg %in% c("Female PWID","FSW","Male PWID","MSM not SW",
                                   "MSM SW","TG not SW","TG SW",
                                   "People in prisons and other enclosed settings"),
         yes = paste(datapack_schema_group,"fineKPs",sep = ","),

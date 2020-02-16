@@ -28,7 +28,7 @@ unPackDataPackSheet <- function(d, sheet) {
   if (NROW(d$data$extract) == 0) {
     d$data$extract <- NULL
     return(d)
-    }
+  }
   
   # Run structural checks ####
   d <- checkColStructure(d, sheet)
@@ -126,7 +126,7 @@ unPackDataPackSheet <- function(d, sheet) {
       paste0(
         "ERROR! In tab ",
         sheet,
-        ": NEGATIVE VALUES found in the following columns! -> \n\t* ",
+        ": NEGATIVE VALUES found in the following columns! These will be removed. -> \n\t* ",
         paste(neg_cols, collapse = "\n\t* "),
         "\n")
     
@@ -158,7 +158,7 @@ unPackDataPackSheet <- function(d, sheet) {
       paste0(
         "WARNING! In tab ",
         sheet,
-        ": DECIMAL VALUES found in the following columns! -> \n\t* ",
+        ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
         paste(decimal_cols, collapse = "\n\t* "),
         "\n")
     
