@@ -191,6 +191,8 @@ packSNUxIM <- function(d) {
                               xy = c(1, existing_rows + 1),
                               colNames = F, rowNames = F, withFilter = FALSE)
           
+          d$info$newSNUxIM <- TRUE
+          
       # Add green highlights to appended rows, if any ####
           newRowStyle <- openxlsx::createStyle(fontColour = "#006100", fgFill = "#C6EFCE")
           
@@ -317,8 +319,6 @@ packSNUxIM <- function(d) {
                                   as.character(utils::packageVersion("datapackr"))),
                             xy = c(2,2),
                             colNames = F)
-        
-        d$info$newSNUxIM <- TRUE
         
         warning_msg <- 
           paste0(

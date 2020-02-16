@@ -28,7 +28,7 @@ unPackDataPackSheet <- function(d, sheet) {
   if (NROW(d$data$extract) == 0) {
     d$data$extract <- NULL
     return(d)
-    }
+  }
   
   # Run structural checks ####
   d <- checkColStructure(d, sheet)

@@ -4,13 +4,10 @@
 \alias{unPackDataPack}
 \title{Unpack a submitted Data Pack}
 \usage{
-unPackDataPack(d, export_to_PAW = FALSE)
+unPackDataPack(d)
 }
 \arguments{
 \item{d}{Datapackr object}
-
-\item{export_to_PAW}{TRUE or FALSE indicating whether to write to S3 bucket
-for use by PAW.}
 }
 \description{
 Processes a submitted Data Pack (in .xlsx format) by identifying integrity
