@@ -39,6 +39,7 @@ unPackSchema_datapack <- function(filepath = NULL, skip = NULL, cop_year = getCu
     tidyr::gather(key,value,-sheet_num,-sheet_name,-col,-row) %>%
     tidyr::unite(new.col, c(key,row)) %>%
     tidyr::spread(new.col,value) %>%
+    #TODO: How to avoid hardcoding these numbers??
     dplyr::select(sheet_num, sheet_name, col,
                   dataset = character_5,
                   col_type = character_6,
