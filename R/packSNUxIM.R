@@ -114,12 +114,49 @@ packSNUxIM <- function(d) {
                         '<>"","|"&$D',row,',"")&IF($E',row,'<>"","|"&$E',row,',"")'),
             sheet_num = dplyr::case_when(
               indicator_code == "OVC_HIVSTAT.N.total.T" ~ 15,
-              TRUE ~ sheet_num - 8),
+              TRUE ~ sheet_num - 8))
           
       # Add Data Pack total formula ####
+        get_ID_col <- function(data) {
+          col_letter <- data %>%
+            dplyr::filter(indicator_code == "ID") %>%
+            dplyr::pull(submission_order) %>%
+            openxlsx::int2col()
+          
+          if (length(col_letter) == 0) {
+            col_letter <- data %>%
+              dplyr::filter(indicator_code == "PSNU") %>%
+              dplyr::pull(submission_order) %>%
+              openxlsx::int2col()
+          }
+          
+          return(col_letter)
+        }
+        
+        col_letters <- lapply(d$tests$col_check, get_ID_col)
+        
+        compile_formula_ref <- function(sheet_name) {
+          if (!sheet_name %in% c("Epi Cascade I", "Epi PMTCT", "Prioritization")) {
+          paste0(sheet_name, "!$", col_letters[[sheet_name]],
+                 ":$", col_letters[[sheet_name]], ",")
+          }
+        }
+        
+        OVC_HIVSTAT_col_letter <- d$tests$col_check$OVC %>%
+          dplyr::filter(indicator_code == "PSNU") %>%
+          dplyr::pull(submission_order) %>%
+          openxlsx::int2col()
+        
+        formula_refs_compiled <- lapply(names(d$tests$col_check), compile_formula_ref) %>%
+          unlist() %>%
+          paste(collapse = "") %>%
+          paste0(., "OVC!$",OVC_HIVSTAT_col_letter,":$",OVC_HIVSTAT_col_letter)
+        
+        d$data$SNUxIM_combined %<>%
+          dplyr::mutate(
             DataPackTarget = paste0(
              'ROUND(SUMIF(CHOOSE($G',row,
-             ',TX!$D:$D,HTS!$D:$D,TB_STAT_ART!$D:$D,PMTCT_STAT_ART!$D:$D,PMTCT_EID!$A:$A,VMMC!$D:$D,CXCA!$D:$D,HTS_RECENT!$D:$D,TX_TB_PREV!$D:$D,KP!$C:$C,PP!$D:$D,OVC!$D:$D,PrEP!$D:$D,GEND!$A:$A,OVC!$A:$A),$F',row,
+             ',',formula_refs_compiled,'),$F',row,
              ',INDIRECT($B',row,')),0)'),
       
       # Add Dedupe formula ####
