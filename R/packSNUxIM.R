@@ -26,7 +26,8 @@ packSNUxIM <- function(d) {
     if (!d$info$has_psnuxim | d$info$missing_psnuxim_combos) {
   
       # Prepare SNU x IM model dataset ####
-      snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path)[[d$info$country_uids]] %>%
+      snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path)[d$info$country_uids] %>%
+        dplyr::bind_rows() %>%
         dplyr::select(-value, -age_option_uid, -sex_option_uid, -kp_option_uid)
       
       # Combine with MER data ####
@@ -88,6 +89,14 @@ packSNUxIM <- function(d) {
         first_new_mech_col <- NCOL(SNUxIM_tab) + 1
           
       } else {
+        SNUxIM_tab <- d$info$schema %>%
+          dplyr::filter(sheet_name == "PSNUxIM",
+                        indicator_code != "Mechanism1") %>%
+          dplyr::select(indicator_code) %>%
+          `row.names<-`(.[, 1]) %>%
+          t() %>%
+          tibble::as_tibble()
+          
         existing_rows <- top_rows
         first_new_mech_col <- length(header_cols) + 1
       }
@@ -139,7 +148,9 @@ packSNUxIM <- function(d) {
               indicator_code %in% c("PMTCT_EID.N.Age.T.2mo","PMTCT_EID.N.Age.T.2to12mo") ~ NA_character_,
               TRUE ~ Age)
           ) %>%
-          addcols(non_appended_mech_cols) %>%
+          {if (length(non_appended_mech_cols) > 0) {
+            (.) %>% addcols(non_appended_mech_cols)
+            } else {.}} %>%
           dplyr::select(names(SNUxIM_tab), new_mech_cols)
         
       # Format formula columns ####
@@ -211,6 +222,9 @@ packSNUxIM <- function(d) {
                               x = d$data$SNUxIM_combined,
                               xy = c(1, top_rows),
                               colNames = T, rowNames = F, withFilter = FALSE)
+          
+          d$info$newSNUxIM <- TRUE
+          
         }
         
       # Format percent columns ####
