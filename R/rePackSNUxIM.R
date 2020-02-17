@@ -110,7 +110,7 @@ rePackPSNUxIM <- function(d) {
   d$data$distributedMER %<>%
     dplyr::mutate(newValue = value * distribution) %>%
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age,
-                  Sex, KeyPop, mechanism_code, value = newValue) %>%
+                  Sex, KeyPop, mechanism_code, support_type, value = newValue) %>%
     dplyr::filter(value != 0) %>%
     tidyr::drop_na(value)
   
