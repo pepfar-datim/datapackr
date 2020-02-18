@@ -12,7 +12,7 @@
 #'     
 strip_wb_NAs <- function(d) {
   
-  d$tool$wb$sharedStrings[d$tool$wb$sharedStrings == "<si><t>NA</t></si>"] <- "<si><t></t></si>"
+  d$tool$wb$sharedStrings[d$tool$wb$sharedStrings == "<si><t>NA</t></si>"] <- "<si><t>0</t></si>"
   
   # NA_sharedString <- grep("<si><t>NA</t></si>", d$tool$wb$sharedStrings)-1
   # 
@@ -23,10 +23,6 @@ strip_wb_NAs <- function(d) {
   #     d$tool$wb$worksheets[[i]]$sheet_data$v[d$tool$wb$worksheets[[i]]$sheet_data$v == NA_sharedString] <- ""
   #     
   #     grep("1316", d$tool$wb$worksheets[[9]]$sheet_data$v)
-  #     
-  #     stringr::str_
-  #     
-  #     
   #   }
   #   
   # }
