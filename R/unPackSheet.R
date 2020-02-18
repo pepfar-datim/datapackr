@@ -33,6 +33,31 @@ unPackDataPackSheet <- function(d, sheet) {
   # Run structural checks ####
   d <- checkColStructure(d, sheet)
   
+  # TEST TX_NEW <1 from somewhere other than EID ####
+  if (sheet == "TX") {
+    d$tests$tx_new_invalid_lt1_sources <- d$data$extract %>%
+      dplyr::select(PSNU, Age, Sex, TX_NEW.N.Age_Sex_HIVStatus.T,
+        TX_NEW.N.IndexRate, TX_NEW.N.TBRate, TX_NEW.N.PMTCTRate,
+        TX_NEW.N.PostANC1Rate, TX_NEW.N.EIDRate, TX_NEW.N.VMMCRateNew,
+        TX_NEW.N.prevDiagnosedRate) %>%
+      dplyr::filter(Age == "<01",
+                    TX_NEW.N.Age_Sex_HIVStatus.T > 0) %>%
+      dplyr::filter_at(dplyr::vars(-PSNU,-Age,-Sex, -TX_NEW.N.EIDRate,
+                                   -TX_NEW.N.Age_Sex_HIVStatus.T),
+                       dplyr::any_vars(.>0))
+    
+    if (NROW(d$tests$tx_new_invalid_lt1_sources) > 0) {
+      warning_msg <- 
+        paste0(
+          "WARNING! In tab TX",
+          ": TX_NEW for <01 year olds being targeted through method other than EID.",
+          "MER Guidance recommends all testing for <01 year olds be performed through EID rather than HTS",
+          "\n")
+      
+      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    }
+  }
+  
   # List Target Columns
   target_cols <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet
