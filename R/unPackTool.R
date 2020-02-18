@@ -14,9 +14,6 @@
 #' will flag error.
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
-#' @param snuxim_model_data_path Filepath where SNU x IM distribution model is stored.
-#' @param output_folder Local folder where you would like your Data Pack to be
-#' saved upon export.
 #' 
 #' @details
 #' Executes the following operations in relation to a submitted Site Tool
@@ -27,16 +24,12 @@
 unPackTool <- function(submission_path = NULL,
                        tool = "Data Pack",
                        country_uids = NULL,
-                       cop_year = getCurrentCOPYear(),
-                       snuxim_model_data_path = NULL,
-                       output_folder = getwd()) {
+                       cop_year = getCurrentCOPYear()) {
   
   # Create data train for use across remainder of program
   d <- list(
     keychain = list(
-      submission_path = submission_path,
-      snuxim_model_data_path = snuxim_model_data_path,
-      output_folder = output_folder
+      submission_path = submission_path
     ),
     info = list(
       datapack_name = NULL,
@@ -60,23 +53,6 @@ unPackTool <- function(submission_path = NULL,
   # unPack file based on type
   if (d$info$tool == "Data Pack") {
     d <- unPackDataPack(d)
-    
-  # Check whether to write anything into SNU x IM tab and write if needed  
-    if ( !is.null(snuxim_model_data_path ) ) {
-     d <- packSNUxIM(d)
-    } else {stop("Cannot update PSNUxIM tab without model data.")}
-    
-    # If new information added to SNU x IM tab, reexport Data Pack for user
-    if (d$info$newSNUxIM) {
-      d <- strip_wb_NAs(d)
-      
-      exportPackr(
-        data = d$tool$wb,
-        output_path = d$keychain$output_folder,
-        type = "Data Pack",
-        datapack_name = d$info$datapack_name)
-    }
-    
   } else if (d$info$tool == "Site Tool") {
     d <- unPackSiteTool(d)
   } else if (d$info$tool == "Mechanism Map") {

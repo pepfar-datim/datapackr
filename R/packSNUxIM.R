@@ -399,13 +399,6 @@ If you have any questions, please submit a Help Desk ticket at DATIM.Zendesk.com
         
         d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
       
-      #TODO: Create a seperate wrapper function for this.
-      # # Export SNU x IM Data Pack ####
-      #   exportPackr(data = d$tool$wb,
-      #               output_path = d$keychain$output_folder,
-      #               type = "Data Pack",
-      #               datapack_name = d$info$datapack_name)
-      #   
     }
   } else if (d$info$cop_year == 2019) {
     stop("Packing SNU x IM tabs is no longer supported for FY2019 Data Packs.")
