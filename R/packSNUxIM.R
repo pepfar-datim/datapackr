@@ -109,7 +109,7 @@ packSNUxIM <- function(d) {
       } else {
         SNUxIM_tab <- d$info$schema %>%
           dplyr::filter(sheet_name == "PSNUxIM",
-                        indicator_code != "Mechanism1") %>%
+                        !indicator_code %in% c("12345_DSD","12345_TA")) %>%
           dplyr::select(indicator_code) %>%
           `row.names<-`(.[, 1]) %>%
           t() %>%

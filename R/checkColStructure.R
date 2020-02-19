@@ -25,7 +25,7 @@ checkColStructure <- function(d, sheet) {
   col_check <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet
                   & !(sheet %in% c("SNU x IM","PSNUxIM")
-                        & indicator_code == "Mechanism1")) %>%
+                        & indicator_code %in% c("12345_DSD","12345_TA"))) %>%
     dplyr::select(indicator_code, template_order = col) %>%
     dplyr::left_join(submission_cols, by = c("indicator_code" = "indicator_code")) %>%
     dplyr::mutate(order_check = template_order == submission_order)

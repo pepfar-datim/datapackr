@@ -41,7 +41,7 @@ unPackSNUxIM <- function(d) {
   # TEST Column headers for appropriate structure ####
   expected_cols <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet,
-                  indicator_code != "Mechanism1") %>%
+                  !indicator_code %in% c("12345_DSD","12345_TA")) %>%
     dplyr::pull(indicator_code) %>% 
     unique(.)
   
