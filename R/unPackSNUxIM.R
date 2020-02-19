@@ -26,10 +26,8 @@ unPackSNUxIM <- function(d) {
             1),
           c(NA, NA)),
       col_types = "text"
-    )
-  
-  # TEST for missing metadata (PSNU, indicator_code, ID) ####
-  d <- checkMissingMetadata(d, sheet)
+    ) %>%
+    dplyr::rename_at(dplyr::vars(dplyr::matches("indicatorCode")), ~"indicator_code")
   
   d$data$SNUxIM %<>%
     dplyr::filter_at(dplyr::vars(PSNU, indicator_code, ID), dplyr::any_vars(!is.na(.)))
@@ -42,6 +40,9 @@ unPackSNUxIM <- function(d) {
   # Run structural checks ####
   d$info$has_psnuxim <- TRUE
   d <- checkColStructure(d, "PSNUxIM")
+  
+  # TEST for missing metadata (PSNU, indicator_code, ID) ####
+  d <- checkMissingMetadata(d, sheet)
   
   # TEST Column headers for appropriate structure ####
   expected_cols <- d$info$schema %>%

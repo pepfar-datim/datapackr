@@ -33,6 +33,9 @@ unPackDataPackSheet <- function(d, sheet) {
   # Run structural checks ####
   d <- checkColStructure(d, sheet)
   
+  # TEST: No missing metadata ####
+  d <- checkMissingMetadata(d, sheet)
+  
   # TEST TX_NEW <1 from somewhere other than EID ####
   if (sheet == "TX") {
     d$tests$tx_new_invalid_lt1_sources <- d$data$extract %>%
@@ -137,6 +140,9 @@ unPackDataPackSheet <- function(d, sheet) {
     tidyr::drop_na(value) %>%
   # Filter out zeros ####
     dplyr::filter(value != 0)
+  
+  # TEST: No invalid org units ####
+  d <- checkInvalidOrgUnits(d, sheet)
   
   # TEST for Negative values ####
   if (any(d$data$extract$value < 0)) {
