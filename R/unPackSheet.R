@@ -87,15 +87,35 @@ unPackDataPackSheet <- function(d, sheet) {
     tidyr::gather(key = "indicator_code",
                   value = "value",
                   -PSNU, -psnuid, -Age, -Sex, -KeyPop, -sheet_name) %>%
-    dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value) %>%
-  # Drop NAs ####
-    tidyr::drop_na(value)
+    dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value)
   
-  # Remove _Military district from Prioritization extract as this can't be assigned a prioritization
+  # TEST that all Prioritizations completed ####
   if (sheet == "Prioritization") {
+    blank_prioritizations <- d$data$extract %>%
+      dplyr::filter(is.na(value)) %>%
+      dplyr::pull(PSNU)
+    
+    if (length(blank_prioritizations) > 0) {
+      d$tests$blank_prioritizations <- blank_prioritizations
+      
+      warning_msg <-
+        paste0(
+          "ERROR! In tab ",
+          sheet,
+          ": MISSING PRIORITIZATIONS. You must enter a prioritization value for",
+          " the following PSNUs -> \n\t* ",
+          paste(blank_prioritizations, collapse = "\n\t* "),
+          "\n")
+      
+      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+      d$info$has_error <- TRUE
+      
+    }
+  # Remove _Military district from Prioritization extract as this can't be assigned a prioritization ####
     d$data$extract %<>%
       dplyr::filter(!stringr::str_detect(PSNU, "_Military"))
   }
+  
   # Convert Prioritization from text to short-number.
   # d$data$extract %<>%
   #   dplyr::mutate(
@@ -105,6 +125,10 @@ unPackDataPackSheet <- function(d, sheet) {
   #       TRUE ~ value
   #       )
   #     )
+  
+  # Drop NAs ####
+  d$data$extract %<>%
+    tidyr::drop_na(value)
   
   # TEST for non-numeric values ####
   non_numeric <- d$data$extract %>%
