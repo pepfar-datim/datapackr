@@ -196,7 +196,7 @@ packSNUxIM <- function(d) {
               'SUM($', openxlsx::int2col(length(header_cols) + 1), row,
               ':$',
               openxlsx::int2col(
-                max(11,
+                max(12,
                     first_new_mech_col - 1 + length(new_mech_cols)
                     )
                 ),
