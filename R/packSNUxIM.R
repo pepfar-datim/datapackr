@@ -46,7 +46,6 @@ packSNUxIM <- function(d) {
           tidyr::crossing(dsd_ta)
       
       # Combine MER data with SNUxIM model data ####
-        
         if (NROW(d$data$snuxim_model_data) > 0) {
           d$data$snuxim_model_data %<>%
             dplyr::select(-value, -age_option_uid, -sex_option_uid, -kp_option_uid)
@@ -76,7 +75,7 @@ packSNUxIM <- function(d) {
           dplyr::select_at(dplyr::vars(-tidyselect::one_of("NA_TA","NA_DSD"),
                                        -psnuid, -sheet_name)) %>%
           
-      # Allow DataPackTarget formula to lookup KP_MAT correctly
+      # Allow DataPackTarget formula to lookup KP_MAT correctly ####
           dplyr::mutate(
             KeyPop = dplyr::case_when(
               indicator_code == "KP_MAT.N.Sex.T" ~ paste0(Sex, " PWID"),
@@ -84,8 +83,6 @@ packSNUxIM <- function(d) {
             Sex = dplyr::case_when(indicator_code == "KP_MAT.N.Sex.T" ~ NA_character_,
                                    TRUE ~ Sex)
           )
-        
-        
   
       # Add ID & sheet_num formulas ####
       top_rows <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
@@ -96,18 +93,28 @@ packSNUxIM <- function(d) {
         dplyr::pull(indicator_code)
       
       if (d$info$has_psnuxim) {
-        SNUxIM_tab <- readxl::read_excel(
-          path = d$keychain$submission_path,
-          sheet = "PSNUxIM",
-          range = readxl::cell_limits(c(top_rows, 1), c(NA, NA)),
-          col_types = "text"
+        # Don't count blank rows at bottom or blank columns to left
+        SNUxIM_cols <- 
+          readxl::read_excel(
+            path = d$keychain$submission_path,
+            sheet = "PSNUxIM",
+            range = readxl::cell_limits(c(top_rows, 1), c(top_rows, NA))
           )
+
+        SNUxIM_rows <-
+          readxl::read_excel(
+            path = d$keychain$submission_path,
+            sheet = "PSNUxIM",
+            range = readxl::cell_limits(c(1,1), c(NA,1)),
+            col_names = F
+          ) %>%
+          NROW()
         
-        existing_rows <- NROW(SNUxIM_tab) + top_rows
-        first_new_mech_col <- NCOL(SNUxIM_tab) + 1
+        existing_rows <- SNUxIM_rows
+        first_new_mech_col <- NCOL(SNUxIM_cols) + 1
           
       } else {
-        SNUxIM_tab <- d$info$schema %>%
+        SNUxIM_cols <- d$info$schema %>%
           dplyr::filter(sheet_name == "PSNUxIM",
                         !indicator_code %in% c("12345_DSD","12345_TA")) %>%
           dplyr::select(indicator_code) %>%
@@ -187,8 +194,8 @@ packSNUxIM <- function(d) {
                         DataPackTarget, Rollup, Dedupe, dplyr::everything(), -value, -col)
         
       # Add Rollup check formula ####
-        new_mech_cols <- names(d$data$SNUxIM_combined)[!names(d$data$SNUxIM_combined) %in% c(names(SNUxIM_tab), "row")]
-        non_appended_mech_cols <- names(SNUxIM_tab)[!names(SNUxIM_tab) %in% names(d$data$SNUxIM_combined)]
+        new_mech_cols <- names(d$data$SNUxIM_combined)[!names(d$data$SNUxIM_combined) %in% c(names(SNUxIM_cols), "row")]
+        non_appended_mech_cols <- names(SNUxIM_cols)[!names(SNUxIM_cols) %in% names(d$data$SNUxIM_combined)]
         
         d$data$SNUxIM_combined %<>%
           dplyr::mutate(
@@ -212,7 +219,7 @@ packSNUxIM <- function(d) {
           {if (length(non_appended_mech_cols) > 0) {
             (.) %>% addcols(non_appended_mech_cols)
             } else {.}} %>%
-          dplyr::select(names(SNUxIM_tab), new_mech_cols)
+          dplyr::select(names(SNUxIM_cols), new_mech_cols)
         
       # Format formula columns ####
         formulaCols <- grep("ID|DataPackTarget|Rollup|Dedupe",
@@ -264,6 +271,13 @@ packSNUxIM <- function(d) {
                               colNames = F, rowNames = F, withFilter = FALSE)
           
           d$info$newSNUxIM <- TRUE
+          
+          # Add additional col_names if any
+          openxlsx::writeData(wb = d$tool$wb,
+                              sheet = "PSNUxIM",
+                              x = new_mech_cols,
+                              xy = c(first_new_mech_col, top_rows),
+                              colNames = F, rowNames = F, withFilter = FALSE)
           
       # Add green highlights to appended rows, if any ####
           newRowStyle <- openxlsx::createStyle(fontColour = "#006100", fgFill = "#C6EFCE")
@@ -354,7 +368,8 @@ packSNUxIM <- function(d) {
       # Format mechanism columns ####
         colCount <- length(final_snuxim_cols)
         
-        mechColHeaders <- openxlsx::createStyle(halign = "center",
+        mechColHeaders <- openxlsx::createStyle(fontSize = 11,
+                                                halign = "center",
                                                 valign = "center",
                                                 textRotation = 90,
                                                 fgFill = "#9CBEBD",
@@ -366,7 +381,7 @@ packSNUxIM <- function(d) {
                            rows = top_rows,
                            cols = (length(header_cols)+1):colCount,
                            gridExpand = TRUE,
-                           stack = TRUE)
+                           stack = FALSE)
         
       # Hide rows 5-13 ####
         openxlsx::setRowHeights(wb = d$tool$wb,

@@ -26,8 +26,13 @@ unPackSNUxIM <- function(d) {
             1),
           c(NA, NA)),
       col_types = "text"
-    ) %>%
-    dplyr::filter_all(dplyr::any_vars(!is.na(.)))
+    )
+  
+  # TEST for missing metadata (PSNU, indicator_code, ID) ####
+  d <- checkMissingMetadata(d, sheet)
+  
+  d$data$SNUxIM %<>%
+    dplyr::filter_at(dplyr::vars(PSNU, indicator_code, ID), dplyr::any_vars(!is.na(.)))
   
   if (NROW(d$data$SNUxIM) == 0) {
     d$info$has_psnuxim <- FALSE
