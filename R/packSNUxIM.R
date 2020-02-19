@@ -26,7 +26,7 @@ packSNUxIM <- function(d) {
     if (!d$info$has_psnuxim | d$info$missing_psnuxim_combos) {
   
       # Prepare SNU x IM model dataset ####
-      snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path)[d$info$country_uids] %>%
+      d$data$snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path)[d$info$country_uids] %>%
         dplyr::bind_rows() %>%
         dplyr::select(-value, -age_option_uid, -sex_option_uid, -kp_option_uid)
       
@@ -46,7 +46,7 @@ packSNUxIM <- function(d) {
         d$data$SNUxIM_combined <- data %>%
           tidyr::crossing(dsd_ta) %>%
           dplyr::left_join(
-            snuxim_model_data,
+            d$data$snuxim_model_data,
             by = c("psnuid" = "psnu_uid",
                    "indicator_code" = "indicator_code",
                    "Age" = "age_option_name",
