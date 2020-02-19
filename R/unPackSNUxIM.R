@@ -120,6 +120,9 @@ unPackSNUxIM <- function(d) {
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
     dplyr::distinct()
   
+  # TEST for duplicate rows ####
+  d <- checkDuplicateRows(d, sheet)
+  
   # Gather for joining ####
   d$data$SNUxIM %<>%
     tidyr::gather(

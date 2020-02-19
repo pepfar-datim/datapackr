@@ -221,40 +221,10 @@ unPackDataPackSheet <- function(d, sheet) {
   }
   
   # TEST for duplicates ####
-  duplicates <- d$data$extract %>%
-    dplyr::select(sheet_name, PSNU, Age, Sex, KeyPop, indicator_code) %>%
-    dplyr::group_by(sheet_name, PSNU, Age, Sex, KeyPop, indicator_code) %>%
-    dplyr::summarise(n = (dplyr::n())) %>%
-    dplyr::filter(n > 1) %>%
-    dplyr::ungroup() %>%
-    dplyr::distinct() %>%
-    dplyr::select(PSNU, Age, Sex, KeyPop, indicator_code)
-  
-  if (NROW(duplicates) > 0) {
-    d[["tests"]][["duplicates"]][[as.character(sheet)]] <- character()
-    d[["tests"]][["duplicates"]][[as.character(sheet)]] <- duplicates
-    
-    dupes_msg <-
-      capture.output(
-        print(as.data.frame(duplicates), row.names = FALSE)
-      )
-    
-    warning_msg <-
-      paste0(
-        "ERROR! In tab ",
-        sheet,
-        ": DUPLICATE ROWS found. Duplicates are not permitted. -> \n\t",
-        paste(dupes_msg, collapse = "\n\t"),
-        "\n")
-    
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
-    d$info$has_error <- TRUE
-    
-  }
+  d <- checkDuplicateRows(d, sheet)
   
   # TEST for defunct disaggs ####
   d <- defunctDisaggs(d, sheet)
-  
   
   # Aggregate OVC_HIVSTAT
   if (sheet == "OVC") {
