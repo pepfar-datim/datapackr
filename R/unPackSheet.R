@@ -19,9 +19,25 @@ unPackDataPackSheet <- function(d, sheet) {
       path = d$keychain$submission_path,
       sheet = sheet,
       range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
-      col_types = "text"
-    ) %>% 
-  # remove rows that are all NAs
+      col_types = "text",
+      .name_repair = "minimal"
+    ) 
+  
+  # Run structural checks ####
+  d <- checkColStructure(d, sheet)
+  
+  # Remove duplicate columns (Take the first example)
+  duplicate_cols <- duplicated(names(d$data$extract))
+  
+  if (any(duplicate_cols)) {
+    d$data$extract <- d$data$extract[,-which(duplicate_cols)]
+  }
+  
+  # Make sure no blank column names
+  d$data$extract %<>%
+    tibble::as_tibble(.name_repair = "unique") %>%
+  
+  # Remove rows that are all NAs
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
 
   # if tab has no target related content, send d back
@@ -29,9 +45,6 @@ unPackDataPackSheet <- function(d, sheet) {
     d$data$extract <- NULL
     return(d)
   }
-  
-  # Run structural checks ####
-  d <- checkColStructure(d, sheet)
   
   # TEST: No missing metadata ####
   d <- checkMissingMetadata(d, sheet)
