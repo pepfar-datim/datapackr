@@ -18,8 +18,9 @@ checkMissingMetadata <- function(d, sheet) {
   }
   
   missing_metadata <- data %>%
-    dplyr::mutate(row = (1:dplyr::n())) %>%
-    dplyr::filter(is.na(PSNU) | is.na(indicator_code) | is.na(ID))
+    dplyr::mutate(row = (1:dplyr::n()) + headerRow("Data Pack")) %>%
+    dplyr::filter_at(dplyr::vars(dplyr::matches("^PSNU$|^ID$|^indicator_code$")),
+                     dplyr::any_vars(is.na(.)))
   
   d[["tests"]][["missing_metadata"]][[as.character(sheet)]] <- missing_metadata
   
@@ -28,17 +29,18 @@ checkMissingMetadata <- function(d, sheet) {
     
     warning_msg <-
       paste0(
-        "WARNING! In tab ",
+        "ERROR! In tab ",
         sheet,
         ", MISSING PSNU, INDICATOR_CODE, OR ID: ",
         NROW(missing_metadata),
         " rows where blank entries exist in the PSNU, indicator_code, or ID columns.",
         " Note that blank entries in these columns will prevent processing of",
-        " data in that row. The following rows are affected:\n\t* ",
-        paste(missing_metadata$row, collapse = "\n\t* "),
+        " data in that row. The following rows are affected: ",
+        paste(missing_metadata$row, collapse = ", "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
   }
   
   return(d)
