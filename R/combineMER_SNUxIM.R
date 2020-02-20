@@ -58,7 +58,7 @@ combineMER_SNUxIM <- function(d) {
     dplyr::mutate(distributed_value_total = sum(distributed_value),
                   diff = value - distributed_value_total) %>%
     dplyr::ungroup() %>%
-    dplyr::filter(value != round_trunc(distributed_value_total))
+    dplyr::filter(round_trunc(value) != round_trunc(distributed_value_total))
 
   if (NROW(d$tests$imbalancedDistribution) > 0) {
     imbalancedDistribution_inds <- d$tests$imbalancedDistribution %>%
