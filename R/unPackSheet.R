@@ -35,10 +35,7 @@ unPackDataPackSheet <- function(d, sheet) {
   
   # Make sure no blank column names
   d$data$extract %<>%
-    tibble::as_tibble(.name_repair = "unique") %>%
-  
-  # Remove rows that are all NAs
-    dplyr::filter_all(dplyr::any_vars(!is.na(.)))
+    tibble::as_tibble(.name_repair = "unique")
 
   # if tab has no target related content, send d back
   if (NROW(d$data$extract) == 0) {
@@ -48,6 +45,10 @@ unPackDataPackSheet <- function(d, sheet) {
   
   # TEST: No missing metadata ####
   d <- checkMissingMetadata(d, sheet)
+  
+  # If PSNU has been deleted, drop the row
+  d$data$extract %<>%
+    dplyr::filter(!is.na(PSNU))
   
   # TEST TX_NEW <1 from somewhere other than EID ####
   if (sheet == "TX") {

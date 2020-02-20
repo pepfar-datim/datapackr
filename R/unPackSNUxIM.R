@@ -29,6 +29,11 @@ unPackSNUxIM <- function(d) {
       .name_repair = "minimal"
     )
   
+  if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1,1]])) {
+    d$info$has_psnuxim <- FALSE
+    return(d)
+  } else {d$info$has_psnuxim <- TRUE}
+  
   # Run structural checks ####
   d <- checkColStructure(d, "PSNUxIM")
   
@@ -49,11 +54,6 @@ unPackSNUxIM <- function(d) {
   # Remove rows with NAs in key cols ####
     dplyr::filter_at(dplyr::vars(PSNU, indicator_code, ID), dplyr::any_vars(!is.na(.)))
   
-  if (NROW(d$data$SNUxIM) == 0) {
-    d$info$has_psnuxim <- FALSE
-    return(d)
-  } else {d$info$has_psnuxim <- TRUE}
-  
   # TEST for missing metadata (PSNU, indicator_code, ID) ####
   d <- checkMissingMetadata(d, sheet)
   
@@ -69,6 +69,7 @@ unPackSNUxIM <- function(d) {
     dplyr::select(-dplyr::matches("(\\d){4,6}_(DSD|TA)")) %>%
     names()
   
+  d[["tests"]][["invalid_mech_headers"]][[as.character(sheet)]] <- character()
   d[["tests"]][["invalid_mech_headers"]][[as.character(sheet)]] <- invalid_mech_headers
   
   if (length(invalid_mech_headers) > 0) {

@@ -12,7 +12,9 @@
 packSNUxIM <- function(d) {
   if ( d$info$cop_year == 2020 ) {
   # Check if SNUxIM data already exists ####
-    d$info$has_psnuxim <- (NROW(d$data$SNUxIM) > 0)
+    if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1,1]])) {
+      d$info$has_psnuxim <- FALSE
+    } else {d$info$has_psnuxim <- TRUE}
   
   # If does exist, check what combos are missing ####
     if (d$info$has_psnuxim) {
