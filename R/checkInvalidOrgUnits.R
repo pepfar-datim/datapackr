@@ -31,6 +31,7 @@ checkInvalidOrgUnits <- function(d, sheet) {
   
   if (length(invalid_orgunits) > 0) {
     
+    d[["tests"]][["invalid_orgunits"]][[as.character(sheet)]] <- character()
     d[["tests"]][["invalid_orgunits"]][[as.character(sheet)]] <- invalid_orgunits
     
     warning_msg <-

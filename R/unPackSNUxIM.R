@@ -69,6 +69,7 @@ unPackSNUxIM <- function(d) {
     dplyr::select(-dplyr::matches("(\\d){4,6}_(DSD|TA)")) %>%
     names()
   
+  d[["tests"]][["invalid_mech_headers"]][[as.character(sheet)]] <- character()
   d[["tests"]][["invalid_mech_headers"]][[as.character(sheet)]] <- invalid_mech_headers
   
   if (length(invalid_mech_headers) > 0) {

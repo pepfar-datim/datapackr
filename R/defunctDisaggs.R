@@ -34,6 +34,7 @@ defunctDisaggs <- function(d, sheet) {
     dplyr::distinct()
   
   if (NROW(defunct) > 0) {
+    d[["tests"]][["defunct"]][[as.character(sheet)]] <- character()
     d[["tests"]][["defunct"]][[as.character(sheet)]] <- defunct
     
     defunct_msg <- 
