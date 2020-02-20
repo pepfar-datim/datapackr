@@ -30,6 +30,7 @@ checkColStructure <- function(d, sheet) {
     dplyr::left_join(submission_cols, by = c("indicator_code" = "indicator_code")) %>%
     dplyr::mutate(order_check = template_order == submission_order)
   
+  d[["tests"]][["col_check"]][[as.character(sheet)]] <- character()
   d[["tests"]][["col_check"]][[as.character(sheet)]] <- col_check
   
   # Alert to missing cols ####
@@ -38,7 +39,7 @@ checkColStructure <- function(d, sheet) {
     missing_cols <- col_check %>%
       dplyr::filter(is.na(submission_order)) %>%
       dplyr::pull(indicator_code)
-    
+    d[["tests"]][["missing_cols"]][[as.character(sheet)]]  <- character()
     d[["tests"]][["missing_cols"]][[as.character(sheet)]] <- missing_cols
     
     warning_msg <-
@@ -61,6 +62,7 @@ checkColStructure <- function(d, sheet) {
   duplicate_columns <- submission_cols_no_blanks[duplicated(submission_cols_no_blanks)]
   
   if (length(duplicate_columns) > 0) {
+    d[["tests"]][["duplicate_columns"]][[as.character(sheet)]] <- character()
     d[["tests"]][["duplicate_columns"]][[as.character(sheet)]] <- duplicate_columns
     
     warning_msg <-
@@ -80,6 +82,7 @@ checkColStructure <- function(d, sheet) {
   columns_out_of_order <- col_check[which(col_check$template_order != col_check$submission_order),"indicator_code"]
   
   if ( length(columns_out_of_order) > 0 ) {
+    d[["tests"]][["columns_out_of_order"]][[as.character(sheet)]] <- character()
     d[["tests"]][["columns_out_of_order"]][[as.character(sheet)]] <- columns_out_of_order
     
     warning_msg <-
