@@ -25,14 +25,14 @@ checkColStructure <- function(d, sheet) {
   col_check <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet
                   & !(sheet %in% c("SNU x IM","PSNUxIM")
-                        & indicator_code == "Mechanism1")) %>%
+                        & indicator_code %in% c("12345_DSD","12345_TA"))) %>%
     dplyr::select(indicator_code, template_order = col) %>%
     dplyr::left_join(submission_cols, by = c("indicator_code" = "indicator_code")) %>%
     dplyr::mutate(order_check = template_order == submission_order)
   
   d[["tests"]][["col_check"]][[as.character(sheet)]] <- col_check
   
-  # Alert to missing cols
+  # Alert to missing cols ####
   if (any(is.na(col_check$submission_order))) {
     
     missing_cols <- col_check %>%
@@ -53,11 +53,35 @@ checkColStructure <- function(d, sheet) {
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
   
-  # Alert to columns which may be out of order
+  # Alert to duplicate columns ####
+  submission_cols_no_blanks <- submission_cols %>%
+    dplyr::filter(indicator_code != "") %>%
+    dplyr::pull(indicator_code)
+  
+  duplicate_columns <- submission_cols_no_blanks[duplicated(submission_cols_no_blanks)]
+  
+  if (length(duplicate_columns) > 0) {
+    d[["tests"]][["duplicate_columns"]][[as.character(sheet)]] <- duplicate_columns
+    
+    warning_msg <-
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ", DUPLICATE COLUMNS: The following required columns appear twice. This",
+        " must be resolved in your submission in order for processing to continue  ->  \n\t* ",
+        paste(duplicate_columns, collapse = "\n\t* "),
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
+  }
+  
+  # Alert to columns which may be out of order ####
   columns_out_of_order <- col_check[which(col_check$template_order != col_check$submission_order),"indicator_code"]
-  d[["tests"]][["columns_out_of_order"]][[as.character(sheet)]] <- columns_out_of_order
   
   if ( length(columns_out_of_order) > 0 ) {
+    d[["tests"]][["columns_out_of_order"]][[as.character(sheet)]] <- columns_out_of_order
+    
     warning_msg <-
       paste0(
         "WARNING! In tab ",

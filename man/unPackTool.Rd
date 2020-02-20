@@ -8,9 +8,7 @@ unPackTool(
   submission_path = NULL,
   tool = "Data Pack",
   country_uids = NULL,
-  cop_year = getCurrentCOPYear(),
-  snuxim_model_data_path = NULL,
-  output_folder = getwd()
+  cop_year = getCurrentCOPYear()
 )
 }
 \arguments{
@@ -25,11 +23,6 @@ will flag error.}
 
 \item{cop_year}{Specifies COP year for dating as well as selection of
 templates.}
-
-\item{snuxim_model_data_path}{Filepath where SNU x IM distribution model is stored.}
-
-\item{output_folder}{Local folder where you would like your Data Pack to be
-saved upon export.}
 }
 \description{
 Processes a submitted Data Pack, Site Tool, Mechanism Map, or Site Filter by

@@ -26,11 +26,10 @@ packSNUxIM <- function(d) {
     if (!d$info$has_psnuxim | d$info$missing_psnuxim_combos) {
   
       # Prepare SNU x IM model dataset ####
-      snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path)[d$info$country_uids] %>%
-        dplyr::bind_rows() %>%
-        dplyr::select(-value, -age_option_uid, -sex_option_uid, -kp_option_uid)
+      d$data$snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path)[d$info$country_uids] %>%
+        dplyr::bind_rows()
       
-      # Combine with MER data ####
+      # Cross with DSD/TA ####
         dsd_ta <- tibble::tribble(
           ~type,
           "DSD",
@@ -44,15 +43,31 @@ packSNUxIM <- function(d) {
       }
       
         d$data$SNUxIM_combined <- data %>%
-          tidyr::crossing(dsd_ta) %>%
-          dplyr::left_join(
-            snuxim_model_data,
-            by = c("psnuid" = "psnu_uid",
-                   "indicator_code" = "indicator_code",
-                   "Age" = "age_option_name",
-                   "Sex" = "sex_option_name",
-                   "KeyPop" = "kp_option_name",
-                   "type" = "type")) %>%
+          tidyr::crossing(dsd_ta)
+      
+      # Combine MER data with SNUxIM model data ####
+        if (NROW(d$data$snuxim_model_data) > 0) {
+          d$data$snuxim_model_data %<>%
+            dplyr::select(-value, -age_option_uid, -sex_option_uid, -kp_option_uid)
+          
+          d$data$SNUxIM_combined %<>%
+            dplyr::left_join(
+              d$data$snuxim_model_data,
+              by = c("psnuid" = "psnu_uid",
+                     "indicator_code" = "indicator_code",
+                     "Age" = "age_option_name",
+                     "Sex" = "sex_option_name",
+                     "KeyPop" = "kp_option_name",
+                     "type" = "type"))
+        } else {
+          d$data$SNUxIM_combined %<>%
+            dplyr::mutate(
+              mechanism_code = NA_character_,
+              percent = NA
+            )
+        }
+        
+        d$data$SNUxIM_combined %<>%
           dplyr::arrange(mechanism_code, type) %>%
           dplyr::filter(!mechanism_code %in% c('00000','00001')) %>%
           tidyr::pivot_wider(names_from = c(mechanism_code, type),
@@ -60,7 +75,7 @@ packSNUxIM <- function(d) {
           dplyr::select_at(dplyr::vars(-tidyselect::one_of("NA_TA","NA_DSD"),
                                        -psnuid, -sheet_name)) %>%
           
-      # Allow DataPackTarget formula to lookup KP_MAT correctly
+      # Allow DataPackTarget formula to lookup KP_MAT correctly ####
           dplyr::mutate(
             KeyPop = dplyr::case_when(
               indicator_code == "KP_MAT.N.Sex.T" ~ paste0(Sex, " PWID"),
@@ -78,20 +93,30 @@ packSNUxIM <- function(d) {
         dplyr::pull(indicator_code)
       
       if (d$info$has_psnuxim) {
-        SNUxIM_tab <- readxl::read_excel(
-          path = d$keychain$submission_path,
-          sheet = "PSNUxIM",
-          range = readxl::cell_limits(c(top_rows, 1), c(NA, NA)),
-          col_types = "text"
+        # Don't count blank rows at bottom or blank columns to left
+        SNUxIM_cols <- 
+          readxl::read_excel(
+            path = d$keychain$submission_path,
+            sheet = "PSNUxIM",
+            range = readxl::cell_limits(c(top_rows, 1), c(top_rows, NA))
           )
+
+        SNUxIM_rows <-
+          readxl::read_excel(
+            path = d$keychain$submission_path,
+            sheet = "PSNUxIM",
+            range = readxl::cell_limits(c(1,1), c(NA,1)),
+            col_names = F
+          ) %>%
+          NROW()
         
-        existing_rows <- NROW(SNUxIM_tab) + top_rows
-        first_new_mech_col <- NCOL(SNUxIM_tab) + 1
+        existing_rows <- SNUxIM_rows
+        first_new_mech_col <- NCOL(SNUxIM_cols) + 1
           
       } else {
-        SNUxIM_tab <- d$info$schema %>%
+        SNUxIM_cols <- d$info$schema %>%
           dplyr::filter(sheet_name == "PSNUxIM",
-                        indicator_code != "Mechanism1") %>%
+                        !indicator_code %in% c("12345_DSD","12345_TA")) %>%
           dplyr::select(indicator_code) %>%
           `row.names<-`(.[, 1]) %>%
           t() %>%
@@ -169,14 +194,20 @@ packSNUxIM <- function(d) {
                         DataPackTarget, Rollup, Dedupe, dplyr::everything(), -value, -col)
         
       # Add Rollup check formula ####
-        new_mech_cols <- names(d$data$SNUxIM_combined)[!names(d$data$SNUxIM_combined) %in% c(names(SNUxIM_tab), "row")]
-        non_appended_mech_cols <- names(SNUxIM_tab)[!names(SNUxIM_tab) %in% names(d$data$SNUxIM_combined)]
+        new_mech_cols <- names(d$data$SNUxIM_combined)[!names(d$data$SNUxIM_combined) %in% c(names(SNUxIM_cols), "row")]
+        non_appended_mech_cols <- names(SNUxIM_cols)[!names(SNUxIM_cols) %in% names(d$data$SNUxIM_combined)]
         
         d$data$SNUxIM_combined %<>%
           dplyr::mutate(
             Rollup = paste0(
               'SUM($', openxlsx::int2col(length(header_cols) + 1), row,
-              ':$', openxlsx::int2col(first_new_mech_col - 1 + length(new_mech_cols)), row,')')) %>%
+              ':$',
+              openxlsx::int2col(
+                max(12,
+                    first_new_mech_col - 1 + length(new_mech_cols)
+                    )
+                ),
+              row,')')) %>%
           dplyr::select(-row) %>%
           
       # Alter Ages and Sexes as needed
@@ -188,7 +219,7 @@ packSNUxIM <- function(d) {
           {if (length(non_appended_mech_cols) > 0) {
             (.) %>% addcols(non_appended_mech_cols)
             } else {.}} %>%
-          dplyr::select(names(SNUxIM_tab), new_mech_cols)
+          dplyr::select(names(SNUxIM_cols), new_mech_cols)
         
       # Format formula columns ####
         formulaCols <- grep("ID|DataPackTarget|Rollup|Dedupe",
@@ -240,6 +271,13 @@ packSNUxIM <- function(d) {
                               colNames = F, rowNames = F, withFilter = FALSE)
           
           d$info$newSNUxIM <- TRUE
+          
+          # Add additional col_names if any
+          openxlsx::writeData(wb = d$tool$wb,
+                              sheet = "PSNUxIM",
+                              x = new_mech_cols,
+                              xy = c(first_new_mech_col, top_rows),
+                              colNames = F, rowNames = F, withFilter = FALSE)
           
       # Add green highlights to appended rows, if any ####
           newRowStyle <- openxlsx::createStyle(fontColour = "#006100", fgFill = "#C6EFCE")
@@ -330,7 +368,8 @@ packSNUxIM <- function(d) {
       # Format mechanism columns ####
         colCount <- length(final_snuxim_cols)
         
-        mechColHeaders <- openxlsx::createStyle(halign = "center",
+        mechColHeaders <- openxlsx::createStyle(fontSize = 11,
+                                                halign = "center",
                                                 valign = "center",
                                                 textRotation = 90,
                                                 fgFill = "#9CBEBD",
@@ -342,7 +381,7 @@ packSNUxIM <- function(d) {
                            rows = top_rows,
                            cols = (length(header_cols)+1):colCount,
                            gridExpand = TRUE,
-                           stack = TRUE)
+                           stack = FALSE)
         
       # Hide rows 5-13 ####
         openxlsx::setRowHeights(wb = d$tool$wb,
@@ -399,13 +438,6 @@ If you have any questions, please submit a Help Desk ticket at DATIM.Zendesk.com
         
         d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
       
-      #TODO: Create a seperate wrapper function for this.
-      # # Export SNU x IM Data Pack ####
-      #   exportPackr(data = d$tool$wb,
-      #               output_path = d$keychain$output_folder,
-      #               type = "Data Pack",
-      #               datapack_name = d$info$datapack_name)
-      #   
     }
   } else if (d$info$cop_year == 2019) {
     stop("Packing SNU x IM tabs is no longer supported for FY2019 Data Packs.")

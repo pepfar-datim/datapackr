@@ -25,23 +25,42 @@ unPackSNUxIM <- function(d) {
           c(headerRow(tool = d$info$tool, cop_year = d$info$cop_year),
             1),
           c(NA, NA)),
-      col_types = "text"
-    ) %>%
-    dplyr::filter_all(dplyr::any_vars(!is.na(.)))
+      col_types = "text",
+      .name_repair = "minimal"
+    )
+  
+  # Run structural checks ####
+  d <- checkColStructure(d, "PSNUxIM")
+  
+  # Remove duplicate columns (Take the first example) ####
+  duplicate_cols <- duplicated(names(d$data$SNUxIM))
+  
+  if (any(duplicate_cols)) {
+    d$data$SNUxIM <- d$data$SNUxIM[,-which(duplicate_cols)]
+  }
+  
+  # Make sure no blank column names ####
+  d$data$SNUxIM %<>%
+    tibble::as_tibble(.name_repair = "unique") %>%
+  
+  # Correct indicator_code name ####
+    dplyr::rename_at(dplyr::vars(dplyr::matches("indicatorCode")), ~"indicator_code") %>%
+  
+  # Remove rows with NAs in key cols ####
+    dplyr::filter_at(dplyr::vars(PSNU, indicator_code, ID), dplyr::any_vars(!is.na(.)))
   
   if (NROW(d$data$SNUxIM) == 0) {
     d$info$has_psnuxim <- FALSE
     return(d)
-  }
+  } else {d$info$has_psnuxim <- TRUE}
   
-  # Run structural checks ####
-  d$info$has_psnuxim <- TRUE
-  d <- checkColStructure(d, "PSNUxIM")
+  # TEST for missing metadata (PSNU, indicator_code, ID) ####
+  d <- checkMissingMetadata(d, sheet)
   
   # TEST Column headers for appropriate structure ####
   expected_cols <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet,
-                  indicator_code != "Mechanism1") %>%
+                  !indicator_code %in% c("12345_DSD","12345_TA")) %>%
     dplyr::pull(indicator_code) %>% 
     unique(.)
   
@@ -113,6 +132,9 @@ unPackSNUxIM <- function(d) {
   d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
     dplyr::distinct()
+  
+  # TEST for duplicate rows ####
+  d <- checkDuplicateRows(d, sheet)
   
   # Gather for joining ####
   d$data$SNUxIM %<>%
