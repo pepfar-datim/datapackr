@@ -29,6 +29,11 @@ unPackSNUxIM <- function(d) {
       .name_repair = "minimal"
     )
   
+  if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1,1]])) {
+    d$info$has_psnuxim <- FALSE
+    return(d)
+  } else {d$info$has_psnuxim <- TRUE}
+  
   # Run structural checks ####
   d <- checkColStructure(d, "PSNUxIM")
   
@@ -48,11 +53,6 @@ unPackSNUxIM <- function(d) {
   
   # Remove rows with NAs in key cols ####
     dplyr::filter_at(dplyr::vars(PSNU, indicator_code, ID), dplyr::any_vars(!is.na(.)))
-  
-  if (NROW(d$data$SNUxIM) == 0) {
-    d$info$has_psnuxim <- FALSE
-    return(d)
-  } else {d$info$has_psnuxim <- TRUE}
   
   # TEST for missing metadata (PSNU, indicator_code, ID) ####
   d <- checkMissingMetadata(d, sheet)
