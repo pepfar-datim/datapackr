@@ -130,21 +130,46 @@ unPackDataPackSheet <- function(d, sheet) {
     }
   # Remove _Military district from Prioritization extract as this can't be assigned a prioritization ####
     d$data$extract %<>%
-      dplyr::filter(!stringr::str_detect(PSNU, "_Military"),
+      dplyr::filter(!stringr::str_detect(PSNU, "^_Military"),
   
   # Excuse valid NA Prioritizations
                     value != "NA")
+    
+    # Test that no non-Military district is categorized as "M"
+    invalid_prioritizations <- d$data$extract %>%
+      dplyr::filter(value == "M" & !stringr::str_detect(PSNU, "^_Military"))
+    
+    if (NROW(invalid_prioritizations) > 0) {
+      d$tests$invalid_prioritizations <- invalid_prioritizations
+      
+      invalid_prioritizations_strings <- invalid_prioritizations %>%
+        tidyr::unite(row_id, c(PSNU, value), sep = ":  ") %>%
+        dplyr::arrange(row_id) %>%
+        dplyr::pull(row_id)
+      
+      warning_msg <-
+        paste0(
+          "ERROR! In tab ",
+          sheet,
+          ": INVALID PRIORITIZATIONS. The following Prioritizations are not valid for",
+          " the listed PSNUs -> \n\t* ",
+          paste(invalid_prioritizations_strings, collapse = "\n\t* "),
+          "\n")
+      
+      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+      d$info$has_error <- TRUE
+    }
+    
+    # Convert Prioritization from text to short-number.
+    # d$data$extract %<>%
+    #   dplyr::mutate(
+    #     value = dplyr::case_when(
+    #       stringr::str_detect(indicator_code,"IMPATT.PRIORITY_SNU")
+    #         ~ stringr::str_sub(value, start = 1, end = 2),
+    #       TRUE ~ value
+    #       )
+    #     )
   }
-  
-  # Convert Prioritization from text to short-number.
-  # d$data$extract %<>%
-  #   dplyr::mutate(
-  #     value = dplyr::case_when(
-  #       stringr::str_detect(indicator_code,"IMPATT.PRIORITY_SNU")
-  #         ~ stringr::str_sub(value, start = 1, end = 2),
-  #       TRUE ~ value
-  #       )
-  #     )
   
   # Drop NAs ####
   d$data$extract %<>%
