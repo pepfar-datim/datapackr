@@ -188,7 +188,7 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::arrange(row_id) %>%
     dplyr::pull(row_id)
   
-  if(length(non_numeric) > 0) {
+  if(length(non_numeric) > 0 & sheet != "Prioritization") {
     d[["tests"]][["non_numeric"]][[as.character(sheet)]] <- character()
     d[["tests"]][["non_numeric"]][[as.character(sheet)]] <- non_numeric
     
