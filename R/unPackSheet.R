@@ -26,6 +26,9 @@ unPackDataPackSheet <- function(d, sheet) {
   # Run structural checks ####
   d <- checkColStructure(d, sheet)
   
+  # Check for Formula changes ####
+  d <- checkFormulas(d, sheet)
+  
   # Remove duplicate columns (Take the first example)
   duplicate_cols <- duplicated(names(d$data$extract))
   
@@ -68,7 +71,7 @@ unPackDataPackSheet <- function(d, sheet) {
         paste0(
           "WARNING! In tab TX",
           ": TX_NEW for <01 year olds being targeted through method other than EID.",
-          "MER Guidance recommends all testing for <01 year olds be performed through EID rather than HTS",
+          " MER Guidance recommends all testing for <01 year olds be performed through EID rather than HTS",
           "\n")
       
       d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
