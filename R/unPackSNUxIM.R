@@ -80,10 +80,10 @@ unPackSNUxIM <- function(d) {
     dplyr::select(-dplyr::matches("(\\d){4,6}_(DSD|TA)")) %>%
     names()
   
-  d[["tests"]][["invalid_mech_headers"]][[as.character(sheet)]] <- character()
-  d[["tests"]][["invalid_mech_headers"]][[as.character(sheet)]] <- invalid_mech_headers
-  
   if (length(invalid_mech_headers) > 0) {
+    d[["tests"]][["invalid_mech_headers"]][[as.character(sheet)]] <- character()
+    d[["tests"]][["invalid_mech_headers"]][[as.character(sheet)]] <- invalid_mech_headers
+    
     warning_msg <-
       paste0(
         "WARNING! In tab ",
@@ -172,10 +172,43 @@ unPackSNUxIM <- function(d) {
       key = "mechCode_supportType",
       value = "distribution",
       -PSNU, -indicator_code, -Age, -Sex, -KeyPop, -psnuid,
-      na.rm = TRUE) %>%
+      na.rm = TRUE)
+  
+  # TEST for non-numeric values
+  non_numeric <- d$data$SNUxIM %>%
+    dplyr::mutate(distribution_numeric = suppressWarnings(as.numeric(distribution))) %>%
+    dplyr::filter(is.na(distribution_numeric)) %>%
+    dplyr::select(mechCode_supportType, distribution) %>%
+    dplyr::distinct() %>%
+    dplyr::group_by(mechCode_supportType) %>%
+    dplyr::arrange(distribution) %>%
+    dplyr::summarise(values = paste(distribution, collapse = ", ")) %>%
+    tidyr::unite(row_id, c(mechCode_supportType, values), sep = ":  ") %>%
+    dplyr::ungroup() %>%
+    dplyr::arrange(row_id) %>%
+    dplyr::pull(row_id)
+  
+  if(length(non_numeric) > 0) {
+    d[["tests"]][["non_numeric"]][[as.character(sheet)]] <- character()
+    d[["tests"]][["non_numeric"]][[as.character(sheet)]] <- non_numeric
+    
+    warning_msg <-
+      paste0(
+        "WARNING! In tab ",
+        sheet,
+        ": NON-NUMERIC VALUES found! ->  \n\t* ", 
+        paste(non_numeric, collapse = "\n\t* "),
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  }
+  
+  # Drop non-numeric values
+  d$data$SNUxIM %<>%
+    dplyr::mutate(distribution = suppressWarnings(as.numeric(distribution))) %>%
+    tidyr::drop_na(distribution) #%>%
   
   # Drop zeros ####
-    dplyr::mutate(distribution = as.numeric(distribution)) # %>%
     #dplyr::filter(distribution != 0)
   
   # Get mech codes and support types ####
