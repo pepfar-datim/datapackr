@@ -48,9 +48,6 @@ exportDistributedDataToDATIM <- function(d) {
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup() %>%
     
-  # Coerce decimals to integers now
-    dplyr::mutate(value = round_trunc(value)) %>%
-    
   # Remove anything which is NA here. Under COP19 guidance, this will include only TX_PVLS.N.Age/Sex/Indication/HIVStatus.20T.Routine
     dplyr::filter(complete.cases(.))
   

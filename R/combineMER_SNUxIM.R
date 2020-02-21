@@ -152,6 +152,11 @@ combineMER_SNUxIM <- function(d) {
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age,
                   Sex, KeyPop, mechanism_code, support_type,
                   value = distributed_value) %>%
+    
+  # Coerce decimals to integers now
+    dplyr::mutate(value = round_trunc(value)) %>%
+  
+  # Drop zeros and NAs
     dplyr::filter(value != 0) %>%
     tidyr::drop_na(value)
   
