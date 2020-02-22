@@ -30,14 +30,11 @@ checkStructure <- function(d) {
   if (any(is.na(d$tests$sheets_check$submission_order))) {
    
     missing_sheets <- d$tests$sheets_check %>%
-      dplyr::filter(is.na(submission_order)) %>%
-      dplyr::pull(sheet_name) 
-    missing_sheets<-data.frame("missing_sheets" = missing_sheets)
+      dplyr::filter(is.na(submission_order))
     
     d$tests$missing_sheets<-dplyr::bind_rows(
       d$tests$missing_sheets,missing_sheets
       ) %>% dplyr::filter(!is.na(missing_sheets))
-    
     attr(d$tests$missing_sheets,"test_name")<-"Missing sheets"
     
       paste0(

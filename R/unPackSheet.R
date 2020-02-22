@@ -51,6 +51,7 @@ unPackDataPackSheet <- function(d, sheet) {
   
   # TEST TX_NEW <1 from somewhere other than EID ####
   if (sheet == "TX") {
+    
     d$tests$tx_new_invalid_lt1_sources <- d$data$extract %>%
       dplyr::select(PSNU, Age, Sex, TX_NEW.N.Age_Sex_HIVStatus.T,
         TX_NEW.N.IndexRate, TX_NEW.N.TBRate, TX_NEW.N.PMTCTRate,
@@ -61,6 +62,8 @@ unPackDataPackSheet <- function(d, sheet) {
       dplyr::filter_at(dplyr::vars(-PSNU,-Age,-Sex, -TX_NEW.N.EIDRate,
                                    -TX_NEW.N.Age_Sex_HIVStatus.T),
                        dplyr::any_vars(.>0))
+    attr(d$tests$tx_new_invalid_lt1_sources,"test_name")<-"Invalid TX <01 data source"
+    
     
     if (NROW(d$tests$tx_new_invalid_lt1_sources) > 0) {
       warning_msg <- 
@@ -106,10 +109,12 @@ unPackDataPackSheet <- function(d, sheet) {
   if (sheet == "Prioritization") {
     blank_prioritizations <- d$data$extract %>%
       dplyr::filter(is.na(value)) %>%
-      dplyr::pull(PSNU)
+      dplyr::select(PSNU) 
     
-    if (length(blank_prioritizations) > 0) {
+    if (NROW(blank_prioritizations) > 0) {
+      
       d$tests$blank_prioritizations <- blank_prioritizations
+      attr(d$tests$blank_prioritizations ,"test_name") <- "Blank prioritization levels"
       
       warning_msg <-
         paste0(
@@ -154,11 +159,12 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::summarise(values = paste(value, collapse = ", ")) %>%
     dplyr::mutate(row_id = paste(indicator_code, values, sep = ":  ")) %>%
     dplyr::arrange(row_id) %>%
-    dplyr::pull(row_id)
+    dplyr::select(row_id) %>% 
+    dplyr::mutate(sheet=sheet)
   
-  if(length(non_numeric) > 0) {
-    d[["tests"]][["non_numeric"]][[as.character(sheet)]] <- character()
-    d[["tests"]][["non_numeric"]][[as.character(sheet)]] <- non_numeric
+  if(NROW(non_numeric) > 0) {
+    d$tests$non_numeric<-dplyr::bind_rows(d$tests$non_numeric,non_numeric)
+    attr(d$tests$non_numeric,"test_name")<-"Non-numeric values"
     
     warning_msg <-
       paste0(

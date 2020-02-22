@@ -18,16 +18,18 @@ checkMissingMetadata <- function(d, sheet) {
   }
   
   missing_metadata <- data %>%
-    dplyr::mutate(row = (1:dplyr::n()) + headerRow("Data Pack")) %>%
+    dplyr::mutate(row = (1:dplyr::n()) + headerRow("Data Pack"),
+                  sheet = sheet) %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("^PSNU$|^ID$|^indicator_code$")),
-                     dplyr::any_vars(is.na(.)))
+                     dplyr::any_vars(is.na(.))) %>% 
+    dplyr::select(sheet,row)
   
-  d[["tests"]][["missing_metadata"]][[as.character(sheet)]] <- character()
-  d[["tests"]][["missing_metadata"]][[as.character(sheet)]] <- missing_metadata
-  
+
   # Alert to missing metadata
   if (NROW(missing_metadata) > 0) {
-    
+
+    d$tests$missing_metadata<-dplyr::bind_rows(d$tests$missing_metadata,missing_metadata)
+    attr(d$tests$missing_metadata,"test_name")<-"Missing metadata"
     warning_msg <-
       paste0(
         "ERROR! In tab ",

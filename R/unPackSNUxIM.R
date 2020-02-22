@@ -69,17 +69,20 @@ unPackSNUxIM <- function(d) {
     dplyr::select(-dplyr::matches("(\\d){4,6}_(DSD|TA)")) %>%
     names()
   
-  d[["tests"]][["invalid_mech_headers"]][[as.character(sheet)]] <- character()
-  d[["tests"]][["invalid_mech_headers"]][[as.character(sheet)]] <- invalid_mech_headers
+
   
   if (length(invalid_mech_headers) > 0) {
+    
+    d$tests$invalid_mech_headers<-data.frame(invalid_mech_headers = invalid_mech_headers )
+    attr(d$tests$invalid_mech_headers,"test_name")<-"Invalid mechanism headers"
+    
     warning_msg <-
       paste0(
         "WARNING! In tab ",
         sheet,
         ", INVALID COLUMN HEADERS: The following column headers are invalid and
         will be dropped in processing. Please use only the form 12345_DSD. ->  \n\t* ",
-        paste(invalid_mech_headers, collapse = "\n\t* "),
+        paste(invalid_mech_headers$invalid_mech_headers, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -146,6 +149,7 @@ unPackSNUxIM <- function(d) {
       na.rm = TRUE) %>%
   
   # Drop zeros ####
+  # TODO: Are we not dropping zeros here?
     dplyr::mutate(distribution = as.numeric(distribution)) # %>%
     #dplyr::filter(distribution != 0)
   

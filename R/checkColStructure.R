@@ -31,14 +31,15 @@ checkColStructure <- function(d, sheet) {
     dplyr::left_join(submission_cols, by = c("indicator_code" = "indicator_code")) %>%
     dplyr::mutate(order_check = template_order == submission_order)
   
-  d$tests$col_check<-dplyr::bind_rows(d$tests$col_check,col_check)
-  
   # Alert to missing cols ####
   if (any(is.na(col_check$submission_order))) {
     
     missing_cols <- col_check %>%
       dplyr::filter(is.na(submission_order)) %>%
-      dplyr::pull(indicator_code)
+      dplyr::select(sheet,indicator_code)
+    
+    d$tests$missing_cols<-dplyr::bind_rows(d$tests$missing_cols,missing_cols)
+    attr(d$tests$missing_cols,"test_name")<-"Missing columns"
     
     warning_msg <-
       paste0(
@@ -46,7 +47,7 @@ checkColStructure <- function(d, sheet) {
         sheet,
         ", MISSING COLUMNS: Note that this may be due to missing/renamed sheets,
         or added or renamed columns. ->  \n\t* ",
-        paste(missing_cols, collapse = "\n\t* "),
+        paste(missing_cols$indicator_code, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -55,10 +56,12 @@ checkColStructure <- function(d, sheet) {
   # Alert to duplicate columns ####
   submission_cols_no_blanks <- submission_cols %>%
     dplyr::filter(indicator_code != "") %>%
-    dplyr::pull(indicator_code)
+    dplyr::select(sheet,indicator_code)
   
-  duplicate_columns <- data.frame(sheet=sheet,
-                                  duplicated_cols = submission_cols_no_blanks[duplicated(submission_cols_no_blanks)])
+  duplicate_columns <-submission_cols_no_blanks %>% 
+    dplyr::mutate(duplicated_cols=duplicated(indicator_code)) %>% 
+    dplyr::filter(duplicated_cols)
+    
    
   if (NROW(duplicate_columns) > 0) {
     
@@ -72,7 +75,7 @@ checkColStructure <- function(d, sheet) {
         sheet,
         ", DUPLICATE COLUMNS: The following required columns appear twice. This",
         " must be resolved in your submission in order for processing to continue  ->  \n\t* ",
-        paste(duplicate_columns$duplicated_cols, collapse = "\n\t* "),
+        paste(duplicate_columns$indicator_code, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
