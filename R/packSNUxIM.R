@@ -161,9 +161,9 @@ packSNUxIM <- function(d) {
         col_letters <- lapply(d$tests$col_check, get_ID_col)
         
         compile_formula_ref <- function(sheet_name) {
-          if (!sheet_name %in% c("Epi Cascade I", "Epi PMTCT", "Prioritization")) {
-          paste0(sheet_name, "!$", col_letters[[sheet_name]],
-                 ":$", col_letters[[sheet_name]], ",")
+          if (!sheet_name %in% c("Epi Cascade I", "Epi PMTCT", "Prioritization", "PSNUxIM")) {
+            paste0(sheet_name, "!$", col_letters[[sheet_name]],
+                   ":$", col_letters[[sheet_name]], ",")
           }
         }
         
