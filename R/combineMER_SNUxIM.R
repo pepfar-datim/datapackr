@@ -15,27 +15,29 @@ combineMER_SNUxIM <- function(d) {
     dplyr::full_join(d$data$SNUxIM)
   
   # TEST where distribution attempted where no target set ####
-  d$tests$noTargets <- d$data$distributedMER %>%
+  d$tests$no_targets <- d$data$distributedMER %>%
     dplyr::filter((is.na(value) | value == 0)
                   & !is.na(distribution)
                   & distribution != 0)
+  attr(indicator_code,"test_name")<-"Distribution with no targets"
   
-  if (NROW(d$tests$noTargets) > 0) {
+  
+  if (NROW(d$tests$no_targets) > 0) {
     
-    noTargets_inds <- d$tests$noTargets %>%
+    no_targets_inds <- d$tests$no_targets %>%
       dplyr::select(indicator_code) %>%
       dplyr::distinct() %>%
       dplyr::arrange(indicator_code) %>%
-      dplyr::pull(indicator_code)
+      dplyr::select(sheet_name,indicator_code)
     
     warning_msg <-
       paste0(
         "WARNING!: ",
-        NROW(d$tests$noTargets),
+        NROW(no_targets_inds),
         " cases where distribution attempted where no Target set.",
         " NOTE that these will be ignored and won't prevent further processing.",
         " This has affected the following indicators -> \n\t* ",
-        paste(noTargets_inds, collapse = "\n\t* "),
+        paste(unique(no_targets_inads$indicator_code), collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
