@@ -48,7 +48,8 @@ defunctDisaggs <- function(d, sheet) {
         sheet,
         ": INVALID DISAGGS ",
         "(Check MER Guidance for correct alternatives) -> \n\t",
-        paste(defunct_msg, collapse = "\n\t"))
+        paste(defunct_msg, collapse = "\n\t"),
+        "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE

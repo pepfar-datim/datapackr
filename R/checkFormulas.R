@@ -91,8 +91,8 @@ checkFormulas <- function(d, sheet) {
         " or overwritten, or a manual fix not being applied. See",
         " https://github.com/pepfar-datim/Data-Pack-Feedback/wiki/Manual-Data-Pack-Fixes-for-COP20",
         " for all manual fixes that must be applied to your Data Pack prior to",
-        " submission. Affected columns and their correct formulas include ->  \n\n* ",
-        paste(correct_formulas, collapse = "\n\n* "),
+        " submission. Affected columns and their correct formulas include ->  \n\n\t* ",
+        paste(correct_formulas, collapse = "\n\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
