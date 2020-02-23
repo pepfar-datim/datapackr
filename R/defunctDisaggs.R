@@ -27,9 +27,9 @@ defunctDisaggs <- function(d, sheet) {
   
   defunct <- data %>%
     dplyr::left_join(valid_disaggs, by = c("indicator_code" = "indicator_code")) %>%
-    dplyr::filter(!Age %in% unlist(valid_ages)
-                  | !Sex %in% unlist(valid_sexes)
-                  | !KeyPop %in% unlist(valid_kps)) %>%
+    dplyr::filter(!purrr::map2_lgl(Age, valid_ages, ~.x %in% .y[["name"]])
+                  | !purrr::map2_lgl(Sex, valid_sexes, ~.x %in% .y[["name"]])
+                  | !purrr::map2_lgl(KeyPop, valid_kps, ~.x %in% .y[["name"]])) %>%
     dplyr::select(indicator_code, Age, Sex, KeyPop) %>%
     dplyr::distinct()
   
