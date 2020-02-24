@@ -222,9 +222,7 @@ unPackDataPackSheet <- function(d, sheet) {
 
   # TEST for Negative values ####
   negative_values <- d$data$extract %>%
-    dplyr::filter(value < 0) %>%
-    dplyr::select(indicator_code) %>%
-    dplyr::mutate(sheet=sheet)
+    dplyr::filter(value < 0)
 
   d$tests$negative_values<-dplyr::bind_rows(d$test$negative_values,negative_values)
   attr(d$tests$negative_values,"test_name")<-"Negative values"
@@ -255,8 +253,7 @@ unPackDataPackSheet <- function(d, sheet) {
   decimal_cols <- d$data$extract %>%
     dplyr::filter(value %% 1 != 0
                   & !indicator_code %in% decimals_allowed) %>%
-    dplyr::select(indicator_code,value) %>%
-    dplyr::mutate(sheet=sheet)
+    dplyr::rename(sheet = sheet_name)
 
     d$tests$decimal_values<-dplyr::bind_rows(d$tests$decimal_cols,decimal_cols)
     attr(d$tests$decimal_values,"test_name")<-"Decimal values"
@@ -268,7 +265,7 @@ unPackDataPackSheet <- function(d, sheet) {
         "WARNING! In tab ",
         sheet,
         ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
-        paste(decimal_cols$indicator_code, collapse = "\n\t* "),
+        paste(unique(decimal_cols$indicator_code), collapse = "\n\t* "),
         "\n")
 
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
