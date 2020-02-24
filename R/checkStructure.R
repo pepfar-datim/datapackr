@@ -17,7 +17,7 @@ checkStructure <- function(d) {
     dplyr::mutate(submission_order = as.integer(1:(dplyr::n())))
   
   # Check all sheets present and accounted for ####
-  d$tests$sheets_check <- d$info$schema %>%
+  sheets_check <- d$info$schema %>%
     dplyr::select(sheet_name, template_order = sheet_num) %>%
     dplyr::distinct() %>%
     dplyr::left_join(submission_sheets, by = c("sheet_name")) %>%
@@ -27,15 +27,16 @@ checkStructure <- function(d) {
   info_msg <- "Checking for any missing tabs..."
   interactive_print(info_msg)
   
-  if (any(is.na(d$tests$sheets_check$submission_order))) {
-    d$tests$missing_sheets <- d$tests$sheets_check %>%
-      dplyr::filter(is.na(submission_order)) %>%
-      dplyr::pull(sheet_name)
-    
-    warning_msg <-
+  d$tests$missing_sheets <- sheets_check %>%
+    dplyr::filter(is.na(submission_order))
+  attr(d$tests$missing_sheets,"test_name")<-"Missing sheets"
+  
+  if (any(is.na(sheets_check$submission_order))) {
+   
+    warning_msg <- 
       paste0(
         "MISSING SHEETS: Did you delete or rename these tabs? -> \n  * ",
-        paste0(d$tests$missing_sheets, collapse = "\n  * "),
+        paste0(d$tests$missing_sheets$sheet_name, collapse = "\n  * "),
         "\n")
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }

@@ -25,21 +25,23 @@ defunctDisaggs <- function(d, sheet) {
                   col_type == "target") %>%
     dplyr::select(indicator_code, valid_ages, valid_sexes, valid_kps)
   
-  defunct <- data %>%
+  defunct_disaggs <- data %>%
     dplyr::left_join(valid_disaggs, by = c("indicator_code" = "indicator_code")) %>%
     dplyr::filter(!Age %in% unlist(valid_ages)
                   | !Sex %in% unlist(valid_sexes)
                   | !KeyPop %in% unlist(valid_kps)) %>%
-    dplyr::select(indicator_code, Age, Sex, KeyPop) %>%
+    dplyr::mutate(sheet = sheet) %>%
+    dplyr::select(sheet, indicator_code, Age, Sex, KeyPop) %>%
     dplyr::distinct()
+
+  d$tests$defunct_disaggs<-dplyr::bind_rows(d$tests$defunct_disaggs,defunct_disaggs)
+  attr(d$tests$defunct_disaggs,"test_name")<-"Defunct disaggs"
   
-  if (NROW(defunct) > 0) {
-    d[["tests"]][["defunct"]][[as.character(sheet)]] <- character()
-    d[["tests"]][["defunct"]][[as.character(sheet)]] <- defunct
-    
+  if (NROW(defunct_disaggs) > 0) {
+
     defunct_msg <- 
       capture.output(
-        print(as.data.frame(defunct), row.names = FALSE)
+        print(as.data.frame(defunct_disaggs), row.names = FALSE)
       )
     
     warning_msg <-

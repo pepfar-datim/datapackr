@@ -80,11 +80,12 @@ unPackSNUxIM <- function(d) {
     dplyr::select(-dplyr::matches("(\\d){4,6}_(DSD|TA)")) %>%
     names()
   
+  d$tests$invalid_mech_headers<-data.frame(invalid_mech_headers = invalid_mech_headers )
+  attr(d$tests$invalid_mech_headers,"test_name")<-"Invalid mechanism headers"
+  
   if (length(invalid_mech_headers) > 0) {
-    d[["tests"]][["invalid_mech_headers"]][[as.character(sheet)]] <- character()
-    d[["tests"]][["invalid_mech_headers"]][[as.character(sheet)]] <- invalid_mech_headers
     
-    warning_msg <-
+        warning_msg <-
       paste0(
         "WARNING! In tab ",
         sheet,
@@ -146,9 +147,13 @@ unPackSNUxIM <- function(d) {
     dplyr::distinct()
   
   d$data$missingCombos <- d$data$MER %>%
-    dplyr::anti_join(d$data$PSNUxIM_combos)
+    dplyr::anti_join(d$data$PSNUxIM_combos,
+                     by =  c("PSNU", "psnuid", "indicator_code", "Age", "Sex", "KeyPop"))
   
-  d$info$missing_psnuxim_combos <- (NROW(d$data$missingCombos) > 0)
+  d$tests$missing_combos<-d$data$missingCombos
+  attr(d$tests$missing_combos,"test_name")<-"Missing target combinations"
+
+  d$info$missing_psnuxim_combos <- ( NROW(d$data$missingCombos) > 0 )
   
   if (d$info$missing_psnuxim_combos) {
     warning_msg <- 
@@ -186,18 +191,20 @@ unPackSNUxIM <- function(d) {
     tidyr::unite(row_id, c(mechCode_supportType, values), sep = ":  ") %>%
     dplyr::ungroup() %>%
     dplyr::arrange(row_id) %>%
-    dplyr::pull(row_id)
+    dplyr::select(row_id) %>% 
+    dplyr::mutate(sheet=sheet)
   
-  if(length(non_numeric) > 0) {
-    d[["tests"]][["non_numeric"]][[as.character(sheet)]] <- character()
-    d[["tests"]][["non_numeric"]][[as.character(sheet)]] <- non_numeric
-    
+  d$tests$non_numeric<-dplyr::bind_rows(d$tests$non_numeric, non_numeric)
+  attr(d$tests$non_numeric,"test_name")<-"Non-numeric values"
+  
+  if(NROW(non_numeric) > 0) {
+
     warning_msg <-
       paste0(
         "WARNING! In tab ",
         sheet,
         ": NON-NUMERIC VALUES found! ->  \n\t* ", 
-        paste(non_numeric, collapse = "\n\t* "),
+        paste(non_numeric$row_id, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -207,8 +214,7 @@ unPackSNUxIM <- function(d) {
   d$data$SNUxIM %<>%
     dplyr::mutate(distribution = suppressWarnings(as.numeric(distribution))) %>%
     tidyr::drop_na(distribution) #%>%
-  
-  # Drop zeros ####
+    #dplyr::mutate(distribution = as.numeric(distribution)) # %>%
     #dplyr::filter(distribution != 0)
   
   # Get mech codes and support types ####
