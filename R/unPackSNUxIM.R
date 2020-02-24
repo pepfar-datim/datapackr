@@ -29,6 +29,22 @@ unPackSNUxIM <- function(d) {
       .name_repair = "minimal"
     )
   
+  if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1,1]])) {
+    d$info$has_psnuxim <- FALSE
+    
+    # Alert to need for PSNUxIM tab
+    warning_msg <- 
+      paste0(
+        "WARNING! You must submit your Data Pack to the DATIM Help Desk to receive",
+        " a populated PSNUxIM tab. You can do this at DATIM.ZenDesk.com, or via",
+        " logging in to www.DATIM.org.",
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    
+    return(d)
+  } else {d$info$has_psnuxim <- TRUE}
+  
   # Run structural checks ####
   d <- checkColStructure(d, "PSNUxIM")
   
@@ -49,11 +65,6 @@ unPackSNUxIM <- function(d) {
   # Remove rows with NAs in key cols ####
     dplyr::filter_at(dplyr::vars(PSNU, indicator_code, ID), dplyr::any_vars(!is.na(.)))
   
-  if (NROW(d$data$SNUxIM) == 0) {
-    d$info$has_psnuxim <- FALSE
-    return(d)
-  } else {d$info$has_psnuxim <- TRUE}
-  
   # TEST for missing metadata (PSNU, indicator_code, ID) ####
   d <- checkMissingMetadata(d, sheet)
   
@@ -69,14 +80,12 @@ unPackSNUxIM <- function(d) {
     dplyr::select(-dplyr::matches("(\\d){4,6}_(DSD|TA)")) %>%
     names()
   
-
+  d$tests$invalid_mech_headers<-data.frame(invalid_mech_headers = invalid_mech_headers )
+  attr(d$tests$invalid_mech_headers,"test_name")<-"Invalid mechanism headers"
   
-  if (length(invalid_mech_headers) > 0) {
+  if (NROW(invalid_mech_headers) > 0) {
     
-    d$tests$invalid_mech_headers<-data.frame(invalid_mech_headers = invalid_mech_headers )
-    attr(d$tests$invalid_mech_headers,"test_name")<-"Invalid mechanism headers"
-    
-    warning_msg <-
+        warning_msg <-
       paste0(
         "WARNING! In tab ",
         sheet,
@@ -137,6 +146,24 @@ unPackSNUxIM <- function(d) {
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
     dplyr::distinct()
   
+  d$data$missingCombos <- d$data$MER %>%
+    dplyr::anti_join(d$data$PSNUxIM_combos)
+  
+  d$info$missing_psnuxim_combos <- (NROW(d$data$missingCombos) > 0)
+  
+  if (d$info$missing_psnuxim_combos) {
+    warning_msg <- 
+      paste0(
+        "WARNING! You must submit your Data Pack to the DATIM Help Desk to receive",
+        " an updated PSNUxIM tab that integrates targets set after you last",
+        " received an updated version of this tab. You can do this at",
+        "DATIM.ZenDesk.com, or via logging in to www.DATIM.org.",
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    
+  }
+  
   # TEST for duplicate rows ####
   d <- checkDuplicateRows(d, sheet)
   
@@ -146,10 +173,41 @@ unPackSNUxIM <- function(d) {
       key = "mechCode_supportType",
       value = "distribution",
       -PSNU, -indicator_code, -Age, -Sex, -KeyPop, -psnuid,
-      na.rm = TRUE) %>%
+      na.rm = TRUE)
   
-  # Drop zeros ####
-  # TODO: Are we not dropping zeros here?
+  # TEST for non-numeric values
+  non_numeric <- d$data$SNUxIM %>%
+    dplyr::mutate(distribution_numeric = suppressWarnings(as.numeric(distribution))) %>%
+    dplyr::filter(is.na(distribution_numeric)) %>%
+    dplyr::select(mechCode_supportType, distribution) %>%
+    dplyr::distinct() %>%
+    dplyr::group_by(mechCode_supportType) %>%
+    dplyr::arrange(distribution) %>%
+    dplyr::summarise(values = paste(distribution, collapse = ", ")) %>%
+    tidyr::unite(row_id, c(mechCode_supportType, values), sep = ":  ") %>%
+    dplyr::ungroup() %>%
+    dplyr::arrange(row_id) %>%
+    dplyr::pull(row_id)
+  
+  if(length(non_numeric) > 0) {
+    d[["tests"]][["non_numeric"]][[as.character(sheet)]] <- character()
+    d[["tests"]][["non_numeric"]][[as.character(sheet)]] <- non_numeric
+    
+    warning_msg <-
+      paste0(
+        "WARNING! In tab ",
+        sheet,
+        ": NON-NUMERIC VALUES found! ->  \n\t* ", 
+        paste(non_numeric, collapse = "\n\t* "),
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  }
+  
+  # Drop non-numeric values
+  d$data$SNUxIM %<>%
+    dplyr::mutate(distribution = suppressWarnings(as.numeric(distribution))) %>%
+    tidyr::drop_na(distribution) %>%
     dplyr::mutate(distribution = as.numeric(distribution)) # %>%
     #dplyr::filter(distribution != 0)
   

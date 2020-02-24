@@ -26,6 +26,9 @@ unPackDataPackSheet <- function(d, sheet) {
   # Run structural checks ####
   d <- checkColStructure(d, sheet)
   
+  # Check for Formula changes ####
+  d <- checkFormulas(d, sheet)
+  
   # Remove duplicate columns (Take the first example)
   duplicate_cols <- duplicated(names(d$data$extract))
   
@@ -35,10 +38,7 @@ unPackDataPackSheet <- function(d, sheet) {
   
   # Make sure no blank column names
   d$data$extract %<>%
-    tibble::as_tibble(.name_repair = "unique") %>%
-  
-  # Remove rows that are all NAs
-    dplyr::filter_all(dplyr::any_vars(!is.na(.)))
+    tibble::as_tibble(.name_repair = "unique")
 
   # if tab has no target related content, send d back
   if (NROW(d$data$extract) == 0) {
@@ -48,6 +48,10 @@ unPackDataPackSheet <- function(d, sheet) {
   
   # TEST: No missing metadata ####
   d <- checkMissingMetadata(d, sheet)
+  
+  # If PSNU has been deleted, drop the row
+  d$data$extract %<>%
+    dplyr::filter(!is.na(PSNU))
   
   # TEST TX_NEW <1 from somewhere other than EID ####
   if (sheet == "TX") {
@@ -70,7 +74,7 @@ unPackDataPackSheet <- function(d, sheet) {
         paste0(
           "WARNING! In tab TX",
           ": TX_NEW for <01 year olds being targeted through method other than EID.",
-          "MER Guidance recommends all testing for <01 year olds be performed through EID rather than HTS",
+          " MER Guidance recommends all testing for <01 year olds be performed through EID rather than HTS",
           "\n")
       
       d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -131,18 +135,46 @@ unPackDataPackSheet <- function(d, sheet) {
     }
   # Remove _Military district from Prioritization extract as this can't be assigned a prioritization ####
     d$data$extract %<>%
-      dplyr::filter(!stringr::str_detect(PSNU, "_Military"))
-  }
+      dplyr::filter(!stringr::str_detect(PSNU, "^_Military"),
   
-  # Convert Prioritization from text to short-number.
-  # d$data$extract %<>%
-  #   dplyr::mutate(
-  #     value = dplyr::case_when(
-  #       stringr::str_detect(indicator_code,"IMPATT.PRIORITY_SNU")
-  #         ~ stringr::str_sub(value, start = 1, end = 2),
-  #       TRUE ~ value
-  #       )
-  #     )
+  # Excuse valid NA Prioritizations
+                    value != "NA")
+    
+    # Test that no non-Military district is categorized as "M"
+    invalid_prioritizations <- d$data$extract %>%
+      dplyr::filter(value == "M" & !stringr::str_detect(PSNU, "^_Military"))
+    
+    if (NROW(invalid_prioritizations) > 0) {
+      d$tests$invalid_prioritizations <- invalid_prioritizations
+      
+      invalid_prioritizations_strings <- invalid_prioritizations %>%
+        tidyr::unite(row_id, c(PSNU, value), sep = ":  ") %>%
+        dplyr::arrange(row_id) %>%
+        dplyr::pull(row_id)
+      
+      warning_msg <-
+        paste0(
+          "ERROR! In tab ",
+          sheet,
+          ": INVALID PRIORITIZATIONS. The following Prioritizations are not valid for",
+          " the listed PSNUs -> \n\t* ",
+          paste(invalid_prioritizations_strings, collapse = "\n\t* "),
+          "\n")
+      
+      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+      d$info$has_error <- TRUE
+    }
+    
+    # Convert Prioritization from text to short-number.
+    # d$data$extract %<>%
+    #   dplyr::mutate(
+    #     value = dplyr::case_when(
+    #       stringr::str_detect(indicator_code,"IMPATT.PRIORITY_SNU")
+    #         ~ stringr::str_sub(value, start = 1, end = 2),
+    #       TRUE ~ value
+    #       )
+    #     )
+  }
   
   # Drop NAs ####
   d$data$extract %<>%
@@ -165,13 +197,14 @@ unPackDataPackSheet <- function(d, sheet) {
   if(NROW(non_numeric) > 0) {
     d$tests$non_numeric<-dplyr::bind_rows(d$tests$non_numeric,non_numeric)
     attr(d$tests$non_numeric,"test_name")<-"Non-numeric values"
+
     
     warning_msg <-
       paste0(
         "WARNING! In tab ",
         sheet,
         ": NON-NUMERIC VALUES found! ->  \n\t* ", 
-        paste(non_numeric, collapse = "\n\t* "),
+        paste(non_numeric$row_id, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -189,10 +222,12 @@ unPackDataPackSheet <- function(d, sheet) {
   
   # TEST for Negative values ####
   if (any(d$data$extract$value < 0)) {
+    
     neg_cols <- d$data$extract %>%
       dplyr::filter(value < 0) %>%
       dplyr::pull(indicator_code) %>%
       unique()
+    
     d[["tests"]][["neg_cols"]][[as.character(sheet)]] <- character()
     d[["tests"]][["neg_cols"]][[as.character(sheet)]] <- neg_cols
     

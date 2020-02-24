@@ -13,10 +13,23 @@ exportDistributedDataToDATIM <- function(d) {
   
   d$datim$MER <- d$data$distributedMER %>%
     dplyr::filter(mechanism_code != '99999') %>% 
+    
+  # Readjust for PMTCT_EID
+    dplyr::mutate(
+      Age =
+        dplyr::case_when(
+          indicator_code %in% c("PMTCT_EID.N.Age.T.2mo","PMTCT_EID.N.Age.T.2to12mo")
+            ~ NA_character_,
+          TRUE ~ Age)
+    ) %>%
+    
+  # Pull in all dataElements and categoryOptionCombos
     dplyr::left_join(., ( datapackr::map_DataPack_DATIM_DEs_COCs %>% 
                             dplyr::rename(Age = valid_ages.name,
                                           Sex = valid_sexes.name,
                                           KeyPop = valid_kps.name) )) %>% 
+    
+  # Add period
     dplyr::mutate(
       period = paste0(d$info$cop_year,"Oct") ) %>% 
     # Under COP19 requirements, after this join, TX_PVLS N will remain NA for dataelementuid and categoryoptioncombouid
@@ -28,13 +41,14 @@ exportDistributedDataToDATIM <- function(d) {
       categoryOptionCombo = categoryoptioncombouid,
       attributeOptionCombo = mechanism_code,
       value) %>%
+    
+  # Make sure no duplicates
     dplyr::group_by(dataElement, period, orgUnit,categoryOptionCombo,
                     attributeOptionCombo) %>% #TODO: Coordinate with self-service on this name change
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup() %>%
-    # Coerce decimals to integers now
-    dplyr::mutate(value = round_trunc(value)) %>%
-    # Remove anything which is NA here. Under COP19 guidance, this will include only TX_PVLS.N.Age/Sex/Indication/HIVStatus.20T.Routine
+    
+  # Remove anything which is NA here. Under COP19 guidance, this will include only TX_PVLS.N.Age/Sex/Indication/HIVStatus.20T.Routine
     dplyr::filter(complete.cases(.))
   
   return(d)
