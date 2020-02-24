@@ -38,7 +38,7 @@ combineMER_SNUxIM <- function(d) {
         " cases where distribution attempted where no Target set.",
         " NOTE that these will be ignored and won't prevent further processing.",
         " This has affected the following indicators -> \n\t* ",
-        paste(unique(no_targets_inads$indicator_code), collapse = "\n\t* "),
+        paste(unique(no_targets_inds$indicator_code), collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -66,9 +66,9 @@ combineMER_SNUxIM <- function(d) {
   attr(d$tests$imbalanced_distribution,"test_name")<-"Imbalanced distribution"
   
   
-  if (NROW(d$tests$imbalancedDistribution) > 0) {
+  if (NROW(d$tests$imbalanced_distribution) > 0) {
     
-    imbalancedDistribution_inds <-  d$tests$imbalanced_distribution%>%
+    imbalanced_distribution_inds <-  d$tests$imbalanced_distribution%>%
       dplyr::select(indicator_code) %>%
       dplyr::distinct() %>%
       dplyr::arrange(indicator_code) %>%
@@ -77,14 +77,14 @@ combineMER_SNUxIM <- function(d) {
     warning_msg <-
       paste0(
         "ERROR!: ",
-        NROW(d$tests$imbalancedDistribution),
+        NROW(d$tests$imbalanced_distribution),
         " cases where distributed total across all mechanisms and Dedupe is",
         " either more or less than PSNU-level Target.",
         " To identify these, go to your PSNUxIM tab and filter the Rollup column ",
         "to find cases where this is not equal to 100%.",
         " NOTE that this may be due to any invalid mechanism names in row 14 of your PSNUxIM tab.",
         " For reference, this has affected the following indicators -> \n\t* ",
-        paste(imbalancedDistribution_inds, collapse = "\n\t* "),
+        paste(imbalanced_distribution_inds, collapse = "\n\t* "),
       "\n")
   
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
