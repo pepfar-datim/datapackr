@@ -18,7 +18,8 @@ checkFormulas <- function(d, sheet) {
     tidyxl::xlsx_cells(path = d$keychain$submission_path,
                       sheets = sheet,
                       include_blank_cells = T) %>%
-    dplyr::filter(row >= header_row) %>%
+    dplyr::filter(row >= header_row,
+                  row <= (NROW(d$data$extract) + header_row)) %>%
     dplyr::mutate(
       formula = 
         dplyr::case_when(
@@ -45,7 +46,8 @@ checkFormulas <- function(d, sheet) {
   # Pull in formulas from schema ###
     
   formulas_schema <- datapackr::cop20_data_pack_schema %>%
-    dplyr::filter(sheet_name == sheet) %>%
+    dplyr::filter(sheet_name == sheet,
+                  !is.na(formula)) %>%
     dplyr::select(col, indicator_code, formula) %>%
     tidyr::crossing(row = ((header_row+1):max(formulas_datapack$row))) %>%
     dplyr::select(row, col, indicator_code, formula) %>%
@@ -66,7 +68,8 @@ checkFormulas <- function(d, sheet) {
       by = c("row" = "row", "indicator_code" = "indicator_code")) %>%
     dplyr::mutate(
       formula_diff = formula.x == formula.y) %>%
-    dplyr::filter(formula_diff == FALSE)
+    dplyr::filter(formula_diff == FALSE) %>%
+    dplyr::select(-col.x, -col.y, -formula_diff)
   
   # Compile warning message ####
   if (NROW(formulas_comparison) > 0) {
