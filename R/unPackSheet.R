@@ -224,8 +224,7 @@ unPackDataPackSheet <- function(d, sheet) {
   negative_values <- d$data$extract %>%
     dplyr::filter(value < 0) %>%
     dplyr::select(indicator_code) %>%
-    dplyr::mutate(sheet=sheet) %>%
-    dplyr::distinct()
+    dplyr::mutate(sheet=sheet)
 
   d$tests$negative_values<-dplyr::bind_rows(d$test$negative_values,negative_values)
   attr(d$tests$negative_values,"test_name")<-"Negative values"
