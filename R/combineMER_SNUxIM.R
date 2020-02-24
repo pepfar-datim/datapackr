@@ -12,14 +12,15 @@
 combineMER_SNUxIM <- function(d) {
   
   d$data$distributedMER <- d$data$MER %>%
-    dplyr::full_join(d$data$SNUxIM)
+    dplyr::full_join(d$data$SNUxIM,
+                     by =c("PSNU", "psnuid", "indicator_code", "Age", "Sex", "KeyPop"))
   
   # TEST where distribution attempted where no target set ####
   d$tests$no_targets <- d$data$distributedMER %>%
     dplyr::filter((is.na(value) | value == 0)
                   & !is.na(distribution)
                   & distribution != 0)
-  attr(indicator_code,"test_name")<-"Distribution with no targets"
+  attr(d$tests$no_targets ,"test_name")<-"Distribution with no targets"
   
   
   if (NROW(d$tests$no_targets) > 0) {
@@ -51,7 +52,7 @@ combineMER_SNUxIM <- function(d) {
                   distributed_value_rounded = round_trunc(distributed_value))
   
   # TEST where attempted distribution sum != target ####
-  d$tests$imbalancedDistribution <- d$data$distributedMER %>%
+  d$tests$imbalanced_distribution <- d$data$distributedMER %>%
     dplyr::group_by_at(
       dplyr::vars(
         dplyr::everything(),
@@ -63,7 +64,8 @@ combineMER_SNUxIM <- function(d) {
     dplyr::filter(round_trunc(value) != round_trunc(distributed_value_total))
 
   if (NROW(d$tests$imbalancedDistribution) > 0) {
-    imbalancedDistribution_inds <- d$tests$imbalancedDistribution %>%
+    
+    imbalancedDistribution_inds <-  d$tests$imbalanced_distribution%>%
       dplyr::select(indicator_code) %>%
       dplyr::distinct() %>%
       dplyr::arrange(indicator_code) %>%
