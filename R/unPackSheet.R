@@ -221,15 +221,15 @@ unPackDataPackSheet <- function(d, sheet) {
   d <- checkInvalidOrgUnits(d, sheet)
   
   # TEST for Negative values ####
-  if (any(d$data$extract$value < 0)) {
-    
-    neg_cols <- d$data$extract %>%
-      dplyr::filter(value < 0) %>%
-      dplyr::pull(indicator_code) %>%
-      unique()
-    
-    d[["tests"]][["neg_cols"]][[as.character(sheet)]] <- character()
-    d[["tests"]][["neg_cols"]][[as.character(sheet)]] <- neg_cols
+  negative_values <- d$data$extract %>%
+    dplyr::filter(value < 0) %>%
+    dplyr::select(indicator_code) %>%
+    dplyr::mutate(sheet=sheet)
+
+  d$test$negative_values<-dplyr::bind_rows(d$test$negative_values,negative_values)
+  attr(d$tests$negative_values,"test_name")<-"Negative values"
+  
+  if (NROW(negative_values < 0)) {
     
     warning_msg <- 
       paste0(
@@ -255,13 +255,16 @@ unPackDataPackSheet <- function(d, sheet) {
   decimal_cols <- d$data$extract %>%
     dplyr::filter(value %% 1 != 0
                   & !indicator_code %in% decimals_allowed) %>%
-    dplyr::pull(indicator_code) %>%
-    unique()
+    dplyr::select(indicator_code) %>%
+    dplyr::group_by(indicator_code) %>% 
+    dplyr::summarise(decimal_values = NROW())
+    dplyr::ungroup() %>% 
+    dplyr::mutate(sheet=sheet)
+  
+    d$tests$decimal_values<-dplyr::bind_rows(d$tests$decimal_cols,decimal_cols)
+    attr(d$tests$decimal_values,"test_name")<-"Decimal values"
   
   if (NROW(decimal_cols) > 0) {
-    
-    d[["tests"]][["decimal_cols"]][[as.character(sheet)]] <- character()
-    d[["tests"]][["decimal_cols"]][[as.character(sheet)]] <- decimal_cols
     
     warning_msg <- 
       paste0(

@@ -32,11 +32,12 @@ defunctDisaggs <- function(d, sheet) {
                   | !KeyPop %in% unlist(valid_kps)) %>%
     dplyr::select(indicator_code, Age, Sex, KeyPop) %>%
     dplyr::distinct()
+
+  d$tests$defunct_disaggs<-dplyr::bind_rows(d$tests$defunct_disaggs,defunct_disaggs)
+  attr(d$tests$defunct_disaggs,"test_name")<-"Defunct disaggs"
   
   if (NROW(defunct) > 0) {
-    d[["tests"]][["defunct"]][[as.character(sheet)]] <- character()
-    d[["tests"]][["defunct"]][[as.character(sheet)]] <- defunct
-    
+
     defunct_msg <- 
       capture.output(
         print(as.data.frame(defunct), row.names = FALSE)

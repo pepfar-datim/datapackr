@@ -147,9 +147,13 @@ unPackSNUxIM <- function(d) {
     dplyr::distinct()
   
   d$data$missingCombos <- d$data$MER %>%
-    dplyr::anti_join(d$data$PSNUxIM_combos)
+    dplyr::anti_join(d$data$PSNUxIM_combos,
+                     by =  c("PSNU", "psnuid", "indicator_code", "Age", "Sex", "KeyPop"))
   
-  d$info$missing_psnuxim_combos <- (NROW(d$data$missingCombos) > 0)
+  d$tests$missing_combos<-d$data$missingCombos
+  attr(d$tests$missing_combos,"test_name")<-"Missing target combinations"
+
+  d$info$missing_psnuxim_combos <- ( NROW(d$data$missingCombos) > 0 )
   
   if (d$info$missing_psnuxim_combos) {
     warning_msg <- 
@@ -187,12 +191,14 @@ unPackSNUxIM <- function(d) {
     tidyr::unite(row_id, c(mechCode_supportType, values), sep = ":  ") %>%
     dplyr::ungroup() %>%
     dplyr::arrange(row_id) %>%
-    dplyr::pull(row_id)
+    dplyr::pull(row_id) %>% 
+    dplyr::mutate(sheet=sheet)
   
-  if(length(non_numeric) > 0) {
-    d[["tests"]][["non_numeric"]][[as.character(sheet)]] <- character()
-    d[["tests"]][["non_numeric"]][[as.character(sheet)]] <- non_numeric
-    
+  d$tests$non_numeric<-dplyr::rbind_rows(d$tests$non_numeric)
+  attr(d$tests$non_numeric,"test_name")<-"Non-numeric values"
+  
+  if(NROW(non_numeric) > 0) {
+
     warning_msg <-
       paste0(
         "WARNING! In tab ",

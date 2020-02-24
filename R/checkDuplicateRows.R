@@ -26,11 +26,13 @@ checkDuplicateRows <- function(d, sheet) {
     dplyr::ungroup() %>%
     dplyr::distinct() %>%
     dplyr::select(PSNU, Age, Sex, KeyPop) %>%
-    dplyr::distinct()
+    dplyr::distinct() %>% 
+    dplyr::mutate(sheet=sheet)
   
   if (NROW(duplicates) > 0) {
-    d[["tests"]][["duplicates"]][[as.character(sheet)]] <- character()
-    d[["tests"]][["duplicates"]][[as.character(sheet)]] <- duplicates
+
+    d$tests$duplicate_rows<-dplyr::rbind(d$tests$duplicate_rows,duplicates)
+    attr(d$tests$duplicate_rows,"test_name")<-"Duplicated rows"
     
     dupes_msg <-
       capture.output(
