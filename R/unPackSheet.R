@@ -236,7 +236,7 @@ unPackDataPackSheet <- function(d, sheet) {
         "ERROR! In tab ",
         sheet,
         ": NEGATIVE VALUES found in the following columns! These will be removed. -> \n\t* ",
-        paste(neg_cols, collapse = "\n\t* "),
+        paste(unique(d$tests$negative_values$indicator_code), collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
