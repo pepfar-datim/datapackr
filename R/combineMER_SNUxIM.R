@@ -29,7 +29,7 @@ combineMER_SNUxIM <- function(d) {
       dplyr::select(indicator_code) %>%
       dplyr::distinct() %>%
       dplyr::arrange(indicator_code) %>%
-      dplyr::select(sheet_name,indicator_code)
+      dplyr::select(indicator_code)
     
     warning_msg <-
       paste0(
