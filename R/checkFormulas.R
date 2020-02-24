@@ -87,12 +87,12 @@ checkFormulas <- function(d, sheet) {
       paste0(
         "WARNING! In tab ",
         sheet,
-        ", ALTERED FORMULAS: Note that this may be due to a formula being deleted",
+        ", " ,length(correct_formulas)," ALTERED FORMULAS: Note that this may be due to a formula being deleted",
         " or overwritten, or a manual fix not being applied. See",
         " https://github.com/pepfar-datim/Data-Pack-Feedback/wiki/Manual-Data-Pack-Fixes-for-COP20",
         " for all manual fixes that must be applied to your Data Pack prior to",
         " submission. Affected columns and their correct formulas include ->  \n\n* ",
-        paste(correct_formulas, collapse = "\n\n* "),
+        paste(head(correct_formulas,10), collapse = "\n\n* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
