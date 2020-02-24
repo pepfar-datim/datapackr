@@ -31,8 +31,8 @@ checkDuplicateRows <- function(d, sheet) {
   
   if (NROW(duplicates) > 0) {
 
-    d$tests$duplicate_rows<-dplyr::rbind(d$tests$duplicate_rows,duplicates)
-    attr(d$tests$duplicate_rows,"test_name")<-"Duplicated rows"
+    d$tests$duplicate_rows<-dplyr::bind_rows(d$tests$duplicate_rows,duplicates)
+    attr(d$tests$duplicate_rows,"test_name")<-"Duplicated rows in PSNUxIM"
     
     dupes_msg <-
       capture.output(
