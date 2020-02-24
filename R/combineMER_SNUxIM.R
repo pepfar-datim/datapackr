@@ -62,7 +62,10 @@ combineMER_SNUxIM <- function(d) {
                   diff = value - distributed_value_total) %>%
     dplyr::ungroup() %>%
     dplyr::filter(round_trunc(value) != round_trunc(distributed_value_total))
-
+  
+  attr(d$tests$imbalanced_distribution,"test_name")<-"Imbalanced distribution"
+  
+  
   if (NROW(d$tests$imbalancedDistribution) > 0) {
     
     imbalancedDistribution_inds <-  d$tests$imbalanced_distribution%>%
@@ -104,6 +107,8 @@ combineMER_SNUxIM <- function(d) {
                   distributed_value_rounded_total, diff) %>%
     dplyr::distinct()
   
+  attr(d$tests$PSNUxIM_rounding_diffs,"test_name")<-"PSNUxIM Rounding diffs"
+  
   if (NROW(d$tests$PSNUxIM_rounding_diffs) > 0) {
     warning_msg <-
       paste0(
@@ -122,6 +127,7 @@ combineMER_SNUxIM <- function(d) {
   # TEST for positives against dedupes ####
   d$tests$invalid_dedupes <- d$data$distributedMER %>%
     dplyr::filter(mechanism_code == "99999" & distribution > 0)
+  attr(d$tests$invalid_dedupes,"test_name")<-"Invalid dedupes"
   
   if (NROW(d$tests$invalid_dedupes) > 0) {
     warning_msg <- 
@@ -137,6 +143,7 @@ combineMER_SNUxIM <- function(d) {
   # TEST for negatives against non-dedupes ####
   d$tests$negative_distributed_targets <- d$data$distributedMER %>%
     dplyr::filter(mechanism_code != "99999" & distribution < 0)
+  attr(d$tests$negative_distributed_targets,"test_name")<-"Negative distributed targets"
   
   if (NROW(d$tests$negative_distributed_targets) > 0) {
     warning_msg <- 
@@ -167,6 +174,7 @@ combineMER_SNUxIM <- function(d) {
   # TEST for invalid DSD TA ####
   d$tests$invalid_DSDTA <- d$data$distributedMER %>%
     dplyr::filter(mechanism_code != "99999" & is.na(support_type))
+  attr(d$tests$invalid_DSDTA,"test_name")<-"Invalid DSD/TA"
   
   if (NROW(d$tests$invalid_DSDTA) > 0) {
     warning_msg <- 

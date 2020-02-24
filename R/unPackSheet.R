@@ -193,11 +193,11 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::arrange(row_id) %>%
     dplyr::select(row_id) %>% 
     dplyr::mutate(sheet=sheet)
+
+  d$tests$non_numeric<-dplyr::bind_rows(d$tests$non_numeric,non_numeric)
+  attr(d$tests$non_numeric,"test_name")<-"Non-numeric values"
   
   if(NROW(non_numeric) > 0) {
-    d$tests$non_numeric<-dplyr::bind_rows(d$tests$non_numeric,non_numeric)
-    attr(d$tests$non_numeric,"test_name")<-"Non-numeric values"
-
     
     warning_msg <-
       paste0(
@@ -225,11 +225,11 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::filter(value < 0) %>%
     dplyr::select(indicator_code) %>%
     dplyr::mutate(sheet=sheet)
-
-  d$test$negative_values<-dplyr::bind_rows(d$test$negative_values,negative_values)
-  attr(d$tests$negative_values,"test_name")<-"Negative values"
   
-  if (NROW(negative_values < 0)) {
+  d$tests$negative_values<-dplyr::bind_rows(d$test$negative_values,negative_values)
+  attr(d$tests$negative_values,"test_name")<-"Negative values"
+
+  if ( NROW(negative_values) > 0  ) {
     
     warning_msg <- 
       paste0(
@@ -255,10 +255,7 @@ unPackDataPackSheet <- function(d, sheet) {
   decimal_cols <- d$data$extract %>%
     dplyr::filter(value %% 1 != 0
                   & !indicator_code %in% decimals_allowed) %>%
-    dplyr::select(indicator_code) %>%
-    dplyr::group_by(indicator_code) %>% 
-    dplyr::summarise(decimal_values = NROW())
-    dplyr::ungroup() %>% 
+    dplyr::select(indicator_code,value) %>%  
     dplyr::mutate(sheet=sheet)
   
     d$tests$decimal_values<-dplyr::bind_rows(d$tests$decimal_cols,decimal_cols)

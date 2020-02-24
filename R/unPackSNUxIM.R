@@ -191,10 +191,10 @@ unPackSNUxIM <- function(d) {
     tidyr::unite(row_id, c(mechCode_supportType, values), sep = ":  ") %>%
     dplyr::ungroup() %>%
     dplyr::arrange(row_id) %>%
-    dplyr::pull(row_id) %>% 
+    dplyr::select(row_id) %>% 
     dplyr::mutate(sheet=sheet)
   
-  d$tests$non_numeric<-dplyr::rbind_rows(d$tests$non_numeric)
+  d$tests$non_numeric<-dplyr::bind_rows(d$tests$non_numeric)
   attr(d$tests$non_numeric,"test_name")<-"Non-numeric values"
   
   if(NROW(non_numeric) > 0) {
