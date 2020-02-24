@@ -31,6 +31,9 @@ checkColStructure <- function(d, sheet) {
     dplyr::left_join(submission_cols, by = c("indicator_code" = "indicator_code")) %>%
     dplyr::mutate(order_check = template_order == submission_order)
   
+  d[["info"]][["col_check"]][[as.character(sheet)]] <- character()
+  d[["info"]][["col_check"]][[as.character(sheet)]] <- col_check
+  
   # Alert to missing cols ####
   if (any(is.na(col_check$submission_order))) {
     
