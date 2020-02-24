@@ -474,6 +474,7 @@ unPackSiteToolSheet <- function(d, sheet) {
   d$tests$has_decimals <- d$data$extract$value %% 1 != 0
   
   if (any(d$tests$has_decimals)){
+    
     d$tests$decimals_found <- d$data$extract %>%
       dplyr::select(value) %>%
       dplyr::filter(value %% 1 != 0) %>%
@@ -495,7 +496,7 @@ unPackSiteToolSheet <- function(d, sheet) {
   
   
   # TEST for duplicates ####
-  d$tests$duplicates <- d$data$extract %>%
+  duplicate_target_rows <- d$data$extract %>%
     dplyr::select(sheet_name, site_uid, mech_code, Age, Sex, KeyPop, Type, indicator_code) %>%
     dplyr::group_by(sheet_name, site_uid, mech_code, Age, Sex, KeyPop, Type, indicator_code) %>%
     dplyr::summarise(n = (dplyr::n())) %>%
@@ -504,15 +505,19 @@ unPackSiteToolSheet <- function(d, sheet) {
     dplyr::distinct() %>%
     dplyr::mutate(row_id = paste(site_uid, mech_code, Age, Sex, KeyPop, Type, indicator_code, sep = "    ")) %>%
     dplyr::arrange(row_id) %>%
-    dplyr::pull(row_id)
+    dplyr::select(row_id) %>% 
+    dplyr::mutate(sheet=sheet)
   
-  if (length(d$tests$duplicates) > 0) {
+  d$tests$duplicate_target_rows<-dplyr::bind_rows(d$tests$duplicate_target_rows,duplicate_target_rows)
+  attr(d$tests$duplicate_target_rows)<-"Duplicate target rows"
+  
+  if (NROW(duplicates) > 0) {
     warning_msg <- 
       paste0(
         "In tab ",
         sheet,
         ":" ,
-        length(d$tests$duplicates),
+        NROW(d$tests$duplicates),
         " DUPLICATE ROWS. These will be aggregated!" ) 
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
