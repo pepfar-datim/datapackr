@@ -22,7 +22,6 @@ checkMissingMetadata <- function(d, sheet) {
                   sheet = sheet) %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("^PSNU$|^ID$|^indicator_code$")),
                      dplyr::any_vars(is.na(.)))
-  
 
   # Alert to missing metadata
   if (NROW(missing_metadata) > 0) {

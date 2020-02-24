@@ -46,13 +46,6 @@ unPackDataPackSheet <- function(d, sheet) {
     return(d)
   }
 
-  # TEST: No missing metadata ####
-  d <- checkMissingMetadata(d, sheet)
-
-  # If PSNU has been deleted, drop the row
-  d$data$extract %<>%
-    dplyr::filter(!is.na(PSNU))
-
   # TEST TX_NEW <1 from somewhere other than EID ####
   if (sheet == "TX") {
 
@@ -92,15 +85,26 @@ unPackDataPackSheet <- function(d, sheet) {
   # Add cols to allow compiling with other sheets ####
   d$data$extract %<>%
     addcols(c("KeyPop", "Age", "Sex")) %>%
-  # Extract PSNU uid
+  # Select only target-related columns
+    dplyr::select(PSNU, Age, Sex, KeyPop,
+                  dplyr::one_of(target_cols)) %>%
+  # Drop rows where entire row is NA
+    dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
+    # Extract PSNU uid
     dplyr::mutate(
       psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)"),
-  # Tag sheet name
+      # Tag sheet name
       sheet_name = sheet
-      ) %>%
-  # Select only target-related columns
+    ) %>%
     dplyr::select(PSNU, psnuid, sheet_name, Age, Sex, KeyPop,
-                  dplyr::one_of(target_cols))
+                  dplyr::everything())
+  
+  # TEST: No missing metadata ####
+  d <- checkMissingMetadata(d, sheet)
+  
+  # If PSNU has been deleted, drop the row
+  d$data$extract %<>%
+    dplyr::filter(!is.na(PSNU))
 
   # Gather all indicators as single column for easier processing
   d$data$extract %<>%
