@@ -126,7 +126,7 @@ unPackDataPackSheet <- function(d, sheet) {
           sheet,
           ": MISSING PRIORITIZATIONS. You must enter a prioritization value for",
           " the following PSNUs -> \n\t* ",
-          paste(blank_prioritizations, collapse = "\n\t* "),
+          paste(blank_prioritizations$PSNU, collapse = "\n\t* "),
           "\n")
       
       d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -224,7 +224,8 @@ unPackDataPackSheet <- function(d, sheet) {
   negative_values <- d$data$extract %>%
     dplyr::filter(value < 0) %>%
     dplyr::select(indicator_code) %>%
-    dplyr::mutate(sheet=sheet)
+    dplyr::mutate(sheet=sheet) %>%
+    dplyr::distinct()
   
   d$tests$negative_values<-dplyr::bind_rows(d$test$negative_values,negative_values)
   attr(d$tests$negative_values,"test_name")<-"Negative values"
@@ -236,7 +237,7 @@ unPackDataPackSheet <- function(d, sheet) {
         "ERROR! In tab ",
         sheet,
         ": NEGATIVE VALUES found in the following columns! These will be removed. -> \n\t* ",
-        paste(neg_cols, collapse = "\n\t* "),
+        paste(negative_values$indicator_code, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -268,7 +269,7 @@ unPackDataPackSheet <- function(d, sheet) {
         "WARNING! In tab ",
         sheet,
         ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
-        paste(decimal_cols, collapse = "\n\t* "),
+        paste(decimal_cols$indicator_code, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)

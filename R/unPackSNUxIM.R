@@ -83,7 +83,7 @@ unPackSNUxIM <- function(d) {
   d$tests$invalid_mech_headers<-data.frame(invalid_mech_headers = invalid_mech_headers )
   attr(d$tests$invalid_mech_headers,"test_name")<-"Invalid mechanism headers"
   
-  if (NROW(invalid_mech_headers) > 0) {
+  if (length(invalid_mech_headers) > 0) {
     
         warning_msg <-
       paste0(
@@ -91,7 +91,7 @@ unPackSNUxIM <- function(d) {
         sheet,
         ", INVALID COLUMN HEADERS: The following column headers are invalid and
         will be dropped in processing. Please use only the form 12345_DSD. ->  \n\t* ",
-        paste(invalid_mech_headers$invalid_mech_headers, collapse = "\n\t* "),
+        paste(invalid_mech_headers, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -194,7 +194,7 @@ unPackSNUxIM <- function(d) {
     dplyr::select(row_id) %>% 
     dplyr::mutate(sheet=sheet)
   
-  d$tests$non_numeric<-dplyr::bind_rows(d$tests$non_numeric)
+  d$tests$non_numeric<-dplyr::bind_rows(d$tests$non_numeric, non_numeric)
   attr(d$tests$non_numeric,"test_name")<-"Non-numeric values"
   
   if(NROW(non_numeric) > 0) {
@@ -204,7 +204,7 @@ unPackSNUxIM <- function(d) {
         "WARNING! In tab ",
         sheet,
         ": NON-NUMERIC VALUES found! ->  \n\t* ", 
-        paste(non_numeric, collapse = "\n\t* "),
+        paste(non_numeric$row_id, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -213,8 +213,8 @@ unPackSNUxIM <- function(d) {
   # Drop non-numeric values
   d$data$SNUxIM %<>%
     dplyr::mutate(distribution = suppressWarnings(as.numeric(distribution))) %>%
-    tidyr::drop_na(distribution) %>%
-    dplyr::mutate(distribution = as.numeric(distribution)) # %>%
+    tidyr::drop_na(distribution) #%>%
+    #dplyr::mutate(distribution = as.numeric(distribution)) # %>%
     #dplyr::filter(distribution != 0)
   
   # Get mech codes and support types ####

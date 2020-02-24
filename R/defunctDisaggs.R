@@ -30,7 +30,8 @@ defunctDisaggs <- function(d, sheet) {
     dplyr::filter(!Age %in% unlist(valid_ages)
                   | !Sex %in% unlist(valid_sexes)
                   | !KeyPop %in% unlist(valid_kps)) %>%
-    dplyr::select(indicator_code, Age, Sex, KeyPop) %>%
+    dplyr::mutate(sheet = sheet) %>%
+    dplyr::select(sheet, indicator_code, Age, Sex, KeyPop) %>%
     dplyr::distinct()
 
   d$tests$defunct_disaggs<-dplyr::bind_rows(d$tests$defunct_disaggs,defunct_disaggs)
@@ -40,7 +41,7 @@ defunctDisaggs <- function(d, sheet) {
 
     defunct_msg <- 
       capture.output(
-        print(as.data.frame(defunct), row.names = FALSE)
+        print(as.data.frame(defunct_disaggs), row.names = FALSE)
       )
     
     warning_msg <-

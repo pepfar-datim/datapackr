@@ -41,7 +41,7 @@ checkInvalidOrgUnits <- function(d, sheet) {
         sheet,
         ", INVALID ORG UNITS: The following org units are not valid PSNUs, or do not",
         " contain the required DATIM PSNU UID ->  \n\t* ",
-        paste(invalid_orgunits, collapse = "\n\t* "),
+        paste(invalid_orgunits$PSNU, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
