@@ -27,7 +27,7 @@ unPackDataPackSheet <- function(d, sheet) {
   d <- checkColStructure(d, sheet)
 
   # Check for Formula changes ####
-  d <- checkFormulas(d, sheet)
+  #d <- checkFormulas(d, sheet)
 
   # Remove duplicate columns (Take the first example)
   duplicate_cols <- duplicated(names(d$data$extract))
