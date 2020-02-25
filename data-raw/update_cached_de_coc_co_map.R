@@ -122,9 +122,52 @@ hiv_inclusive<-getCOGSMap("ipBFu42t2sJ") %>% # HIV Test Status (Inclusive)
   dplyr::mutate(resultstatus_inclusive = stringr::str_replace(resultstatus_inclusive,"Status","")) %>%
   dplyr::mutate(resultstatus_inclusive = stringr::str_trim(resultstatus_inclusive))
 
+
+getDEGSMap <- function(uid) {
+  
+  r <- paste0(getOption("baseurl"),"api/dataElementGroupSets/",uid,"?fields=id,name,dataElementGroups[name,dataElements[id]]&paging=false") %>%
+    URLencode(.) %>%
+    httr::GET(.) %>%
+    httr::content(.,"text") %>%
+    jsonlite::fromJSON(.,flatten = TRUE) 
+  
+  r %>%
+    purrr::pluck(.,"dataElementGroups") %>% 
+    dplyr::mutate_if(is.list, purrr::simplify_all) %>% 
+    tidyr::unnest(cols = c(dataElements)) %>%
+    dplyr::distinct() %>%
+    dplyr::mutate(type=make.names(r$name))
+  
+}
+
+#Valid for COP20
+data_element_dims <-
+  c("HWPJnUTMjEq",
+    "LxhLO68FcXm",
+    "gIBfzXabKkt")
+
+degs_map <- purrr::map_dfr(data_element_dims, getDEGSMap) %>%
+  tidyr::spread(type, name, fill = NA)
+#Remapping of column names
+from <- c(
+  "dataElements",
+  "Disaggregation.Type",
+  "Technical.Area",
+  "Top.Level..USE.ONLY.for.FY20.Results.FY21.Targets."
+)
+
+to <- c("dataelement",
+        "disagg_type",
+        "technical_area",
+        "top_level")
+
+names(degs_map) <- plyr::mapvalues(names(degs_map),from,to)
+
 map_DataPack_DATIM_DEs_COCs %<>% 
   dplyr::left_join(hiv_specific,by="categoryoptioncombouid") %>% 
-  dplyr::left_join(hiv_inclusive,by="categoryoptioncombouid")
+  dplyr::left_join(hiv_inclusive,by="categoryoptioncombouid") %>% 
+  dplyr::left_join(degs_map,by="dataelement")
+
 
 
 new <- map_DataPack_DATIM_DEs_COCs %>%
