@@ -224,7 +224,9 @@ unPackSNUxIM <- function(d) {
       mechanism_code = stringr::str_replace(mechanism_code, "Dedupe", "99999"),
       support_type = stringr::str_extract(mechCode_supportType, "(?<=_)DSD|TA")) %>%
     dplyr::select(PSNU, psnuid,  indicator_code, Age, Sex,
-                  KeyPop, mechanism_code, support_type, distribution)
-    
+                  KeyPop, mechanism_code, support_type, distribution) %>% 
+    dplyr::mutate(support_type = dplyr::case_when(mechanism_code == "99999" ~ 'DSD',
+                                                  TRUE ~ support_type))
+  
   return(d)
 }
