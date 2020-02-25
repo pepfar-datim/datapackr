@@ -104,7 +104,7 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::filter(!is.na(PSNU))
   
   # Check for Formula changes ####
-  #d <- checkFormulas(d, sheet)
+  d <- checkFormulas(d, sheet)
 
   # Gather all indicators as single column for easier processing
   d$data$extract %<>%
