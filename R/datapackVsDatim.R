@@ -11,64 +11,34 @@
 #' @param base_url string - base address of instance (text before api/ in URL)
 #' @return  list object of differences $data_different_value, $data_datim_only and $data_site_tool_only
 
-compareData_SiteVsDatim <- function(site_data,
-                                    org_unit_uids,
-                                    iso_fy,
-                                    base_url = getOption("baseurl")) {
+compareData_DatapackVsDatim <- function(d, base_url = getOption("baseurl")) {
   
-#inconsistent capitalization in column names across cop years 18 and 19 so convert to LC
-  names(site_data) <- stringr::str_to_lower(names(site_data))
+  datapack_data <- d$datim$MER
+  org_unit_uids <- d$info$country_uids
   
   # ensure site_data has the expected columns
   if (!identical(
-    names(site_data),
+    names(datapack_data),
     c(
-      "dataelement",
+      "dataElement",
       "period",
-      "orgunit",
-      "categoryoptioncombo",
-      "attributeoptioncombo",
+      "orgUnit",
+      "categoryOptionCombo",
+      "attributeOptionCombo",
       "value"
     )
   )) {
-    stop("The column names of your site data aren't as expected.")
+    stop("The column names of your data aren't as expected by compareData_DatapackVsDatim.")
   }
 
+  dataset_uids <- d$info$cop_year %>% 
+    stringr::str_sub(3,4) %>% 
+    datapackcommons::getDatasetUids("targets")
   
-  # This is a specific and self contained function, so the data sets of each year's
-  # site tool are are hard coded here
-  
-  
-  if (iso_fy == "2019Oct") {
+    parameters <- tibble::tibble(key = "dataSet", value = dataset_uids) %>% 
+      dplyr::bind_rows(c(key = "period",  value = paste0(d$info$cop_year, "Oct")))
+      
     parameters <- tibble::tribble(
-      ~ key, ~ value,
-      "dataSet", "nIHNMxuPUOR",
-      "dataSet", "sBv1dj90IX6",
-      "dataSet", "C2G7IyPPrvD",
-      "dataSet", "HiJieecLXxN",
-      "period",  "2019Oct"
-    )
-  } else if (iso_fy == "2018Oct") {
-    parameters <- tibble::tribble(
-      ~ key, ~ value,
-      "dataSet", "BWBS39fydnX", #MER Targets: Community Based - DoD ONLY FY2019
-      "dataSet", "l796jk9SW7q", #MER Targets: Community Based FY2019
-      "dataSet", "X8sn5HE5inC", #MER Targets: Facility Based - DoD ONLY FY2019
-      "dataSet", "eyI0UOWJnDk", #MER Targets: Facility Based FY2019
-      "period", "2018Oct"
-    )
-
-# go from mech id to code for COP 18 data
-    site_data$attributeoptioncombo<-datimvalidation::remapMechs(site_data$attributeoptioncombo,
-                                                                organisationUnit = org_unit_uids,
-                                                                mode_in = "id",
-                                                                mode_out = "code")
-
-    } else {
-      stop("You are trying to compare a site tool for an unsupported period.")
-      }
-  
-  parameters <- tibble::tribble(
     ~ key, ~ value,
     "children", "true",
     "categoryOptionComboIdScheme", "code",
@@ -81,15 +51,15 @@ compareData_SiteVsDatim <- function(site_data,
   # rename site_data columns to fit standards
   # aggregate duplicate rows from site tool data as would be done before import
   
-  site_data <- site_data %>%
+  datapack_data <- datapack_data %>%
     dplyr::rename(
-      tool_value = value,
-      data_element_uid = dataelement,
-      org_unit_uid = orgunit,
-      category_option_combo_uid = categoryoptioncombo,
-      attribute_option_combo_code = attributeoptioncombo
+      datapack_value = value,
+      data_element_uid = dataElement,
+      org_unit_uid = orgUnit,
+      category_option_combo_uid = categoryOptionCombo,
+      attribute_option_combo_code = attributeOptionCombo
     ) %>%
-    dplyr::filter(!stringr::str_detect(attribute_option_combo_code, "00000|00001")) %>%  #Filter out dedupes 
+#    dplyr::filter(!stringr::str_detect(attribute_option_combo_code, "00000|00001")) %>%  #Filter out dedupes 
     dplyr::group_by(
       data_element_uid,
       period,
@@ -97,7 +67,7 @@ compareData_SiteVsDatim <- function(site_data,
       category_option_combo_uid,
       attribute_option_combo_code
     ) %>%
-    dplyr::summarise(tool_value = round(sum(as.numeric(tool_value)))) %>% 
+    dplyr::summarise(datapack_value = round(sum(as.numeric(datapack_value)))) %>% 
     dplyr::ungroup()
   
   # get data from datim
