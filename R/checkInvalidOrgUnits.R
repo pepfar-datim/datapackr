@@ -27,12 +27,13 @@ checkInvalidOrgUnits <- function(d, sheet) {
     dplyr::left_join(datapackr::valid_PSNUs, by = c("psnuid" = "psnu_uid")) %>%
     dplyr::filter(is.na(psnu)
                   | is.na(psnuid)) %>%
-    dplyr::pull(PSNU)
+    dplyr::select(PSNU) %>% 
+    dplyr::mutate(sheet=sheet)
   
-  if (length(invalid_orgunits) > 0) {
-    
-    d[["tests"]][["invalid_orgunits"]][[as.character(sheet)]] <- character()
-    d[["tests"]][["invalid_orgunits"]][[as.character(sheet)]] <- invalid_orgunits
+  d$tests$invalid_orgunits<-dplyr::bind_rows(d$tests$ivalid_orgunits,invalid_orgunits)
+  attr(d$tests$invalid_orgunits,"test_name")<-"Invalid orgunits"
+  
+  if (NROW(invalid_orgunits) > 0) {
     
     warning_msg <-
       paste0(
@@ -40,7 +41,7 @@ checkInvalidOrgUnits <- function(d, sheet) {
         sheet,
         ", INVALID ORG UNITS: The following org units are not valid PSNUs, or do not",
         " contain the required DATIM PSNU UID ->  \n\t* ",
-        paste(invalid_orgunits, collapse = "\n\t* "),
+        paste(invalid_orgunits$PSNU, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)

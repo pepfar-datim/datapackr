@@ -64,7 +64,7 @@ unPackDataPack <- function(d) {
     d <- unPackSNUxIM(d)
 
   # Combine Targets with SNU x IM for PSNU x IM level targets ####
-    if (NROW(d$data$SNUxIM) > 0) {
+    if (d$info$has_psnuxim) {
       d <- combineMER_SNUxIM(d)
       
     # Prepare SNU x IM dataset for DATIM import & validation ####

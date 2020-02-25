@@ -12,30 +12,33 @@
 combineMER_SNUxIM <- function(d) {
   
   d$data$distributedMER <- d$data$MER %>%
-    dplyr::full_join(d$data$SNUxIM)
+    dplyr::full_join(d$data$SNUxIM,
+                     by =c("PSNU", "psnuid", "indicator_code", "Age", "Sex", "KeyPop"))
   
   # TEST where distribution attempted where no target set ####
-  d$tests$noTargets <- d$data$distributedMER %>%
+  d$tests$no_targets <- d$data$distributedMER %>%
     dplyr::filter((is.na(value) | value == 0)
                   & !is.na(distribution)
                   & distribution != 0)
+  attr(d$tests$no_targets ,"test_name")<-"Distribution with no targets"
   
-  if (NROW(d$tests$noTargets) > 0) {
+  
+  if (NROW(d$tests$no_targets) > 0) {
     
-    noTargets_inds <- d$tests$noTargets %>%
+    no_targets_inds <- d$tests$no_targets %>%
       dplyr::select(indicator_code) %>%
       dplyr::distinct() %>%
       dplyr::arrange(indicator_code) %>%
-      dplyr::pull(indicator_code)
+      dplyr::select(indicator_code)
     
     warning_msg <-
       paste0(
         "WARNING!: ",
-        NROW(d$tests$noTargets),
+        NROW(no_targets_inds),
         " cases where distribution attempted where no Target set.",
         " NOTE that these will be ignored and won't prevent further processing.",
         " This has affected the following indicators -> \n\t* ",
-        paste(noTargets_inds, collapse = "\n\t* "),
+        paste(unique(no_targets_inds$indicator_code), collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -49,7 +52,7 @@ combineMER_SNUxIM <- function(d) {
                   distributed_value_rounded = round_trunc(distributed_value))
   
   # TEST where attempted distribution sum != target ####
-  d$tests$imbalancedDistribution <- d$data$distributedMER %>%
+  d$tests$imbalanced_distribution <- d$data$distributedMER %>%
     dplyr::group_by_at(
       dplyr::vars(
         dplyr::everything(),
@@ -59,9 +62,13 @@ combineMER_SNUxIM <- function(d) {
                   diff = value - distributed_value_total) %>%
     dplyr::ungroup() %>%
     dplyr::filter(round_trunc(value) != round_trunc(distributed_value_total))
-
-  if (NROW(d$tests$imbalancedDistribution) > 0) {
-    imbalancedDistribution_inds <- d$tests$imbalancedDistribution %>%
+  
+  attr(d$tests$imbalanced_distribution,"test_name")<-"Imbalanced distribution"
+  
+  
+  if (NROW(d$tests$imbalanced_distribution) > 0) {
+    
+    imbalanced_distribution_inds <-  d$tests$imbalanced_distribution%>%
       dplyr::select(indicator_code) %>%
       dplyr::distinct() %>%
       dplyr::arrange(indicator_code) %>%
@@ -70,14 +77,14 @@ combineMER_SNUxIM <- function(d) {
     warning_msg <-
       paste0(
         "ERROR!: ",
-        NROW(d$tests$imbalancedDistribution),
+        NROW(d$tests$imbalanced_distribution),
         " cases where distributed total across all mechanisms and Dedupe is",
         " either more or less than PSNU-level Target.",
         " To identify these, go to your PSNUxIM tab and filter the Rollup column ",
         "to find cases where this is not equal to 100%.",
         " NOTE that this may be due to any invalid mechanism names in row 14 of your PSNUxIM tab.",
         " For reference, this has affected the following indicators -> \n\t* ",
-        paste(imbalancedDistribution_inds, collapse = "\n\t* "),
+        paste(imbalanced_distribution_inds, collapse = "\n\t* "),
       "\n")
   
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -100,6 +107,8 @@ combineMER_SNUxIM <- function(d) {
                   distributed_value_rounded_total, diff) %>%
     dplyr::distinct()
   
+  attr(d$tests$PSNUxIM_rounding_diffs,"test_name")<-"PSNUxIM Rounding diffs"
+  
   if (NROW(d$tests$PSNUxIM_rounding_diffs) > 0) {
     warning_msg <-
       paste0(
@@ -118,6 +127,7 @@ combineMER_SNUxIM <- function(d) {
   # TEST for positives against dedupes ####
   d$tests$invalid_dedupes <- d$data$distributedMER %>%
     dplyr::filter(mechanism_code == "99999" & distribution > 0)
+  attr(d$tests$invalid_dedupes,"test_name")<-"Invalid dedupes"
   
   if (NROW(d$tests$invalid_dedupes) > 0) {
     warning_msg <- 
@@ -133,6 +143,7 @@ combineMER_SNUxIM <- function(d) {
   # TEST for negatives against non-dedupes ####
   d$tests$negative_distributed_targets <- d$data$distributedMER %>%
     dplyr::filter(mechanism_code != "99999" & distribution < 0)
+  attr(d$tests$negative_distributed_targets,"test_name")<-"Negative distributed targets"
   
   if (NROW(d$tests$negative_distributed_targets) > 0) {
     warning_msg <- 
@@ -152,12 +163,18 @@ combineMER_SNUxIM <- function(d) {
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age,
                   Sex, KeyPop, mechanism_code, support_type,
                   value = distributed_value) %>%
+    
+  # Coerce decimals to integers now
+    dplyr::mutate(value = round_trunc(value)) %>%
+  
+  # Drop zeros and NAs
     dplyr::filter(value != 0) %>%
     tidyr::drop_na(value)
   
   # TEST for invalid DSD TA ####
   d$tests$invalid_DSDTA <- d$data$distributedMER %>%
     dplyr::filter(mechanism_code != "99999" & is.na(support_type))
+  attr(d$tests$invalid_DSDTA,"test_name")<-"Invalid DSD/TA"
   
   if (NROW(d$tests$invalid_DSDTA) > 0) {
     warning_msg <- 

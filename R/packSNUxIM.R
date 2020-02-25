@@ -12,7 +12,9 @@
 packSNUxIM <- function(d) {
   if ( d$info$cop_year == 2020 ) {
   # Check if SNUxIM data already exists ####
-    d$info$has_psnuxim <- (NROW(d$data$SNUxIM) > 0)
+    if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1,1]])) {
+      d$info$has_psnuxim <- FALSE
+    } else {d$info$has_psnuxim <- TRUE}
   
   # If does exist, check what combos are missing ####
     if (d$info$has_psnuxim) {
@@ -158,7 +160,7 @@ packSNUxIM <- function(d) {
           return(col_letter)
         }
         
-        col_letters <- lapply(d$tests$col_check, get_ID_col)
+        col_letters <- lapply(d$info$col_check, get_ID_col)
         
         compile_formula_ref <- function(sheet_name) {
           if (!sheet_name %in% c("Epi Cascade I", "Epi PMTCT", "Prioritization", "PSNUxIM")) {
@@ -167,12 +169,12 @@ packSNUxIM <- function(d) {
           }
         }
         
-        OVC_HIVSTAT_col_letter <- d$tests$col_check$OVC %>%
+        OVC_HIVSTAT_col_letter <- d$info$col_check$OVC %>%
           dplyr::filter(indicator_code == "PSNU") %>%
           dplyr::pull(submission_order) %>%
           openxlsx::int2col()
         
-        formula_refs_compiled <- lapply(names(d$tests$col_check), compile_formula_ref) %>%
+        formula_refs_compiled <- lapply(names(d$info$col_check), compile_formula_ref) %>%
           unlist() %>%
           paste(collapse = "") %>%
           paste0(., "OVC!$",OVC_HIVSTAT_col_letter,":$",OVC_HIVSTAT_col_letter)
