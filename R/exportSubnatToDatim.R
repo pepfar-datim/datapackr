@@ -12,16 +12,25 @@
 #' 
 exportSubnatToDATIM <- function(d) {
   
+  dataelement_value_types<-datapackr::cop20_data_pack_schema %>% 
+    dplyr::filter(col_type == "target") %>% 
+    dplyr::select(dataelement = dataelement_dsd,value_type) %>% 
+    tidyr::drop_na() %>% 
+    dplyr::distinct()
   
   d$datim$subnat_impatt <- d$data$SUBNAT_IMPATT %>%
     dplyr::left_join(., ( datapackr::map_DataPack_DATIM_DEs_COCs %>% 
                         dplyr::rename(Age = valid_ages.name,
                                       Sex = valid_sexes.name,
-                                      KeyPop = valid_kps.name) )) %>% 
+                                       KeyPop = valid_kps.name) ),
+                     by = c("indicator_code", "Age", "Sex", "KeyPop")) %>% 
+    dplyr::left_join(dataelement_value_types,by="dataelement") %>% 
     dplyr::mutate(
       period = paste0( d$info$cop_year ,"Oct" ),
       attributeOptionCombo = datapackr::default_catOptCombo()
     ) %>%
+    dplyr::mutate( value = dplyr::case_when( value_type == "integer" ~ datapackr::round_trunc(value),
+                                      TRUE ~ value)) %>% 
     dplyr::select(
       dataElement = dataelement,
       period,
@@ -29,29 +38,47 @@ exportSubnatToDATIM <- function(d) {
       categoryOptionCombo = categoryoptioncombouid,
       attributeOptionCombo,
       value
-    ) %>%
-    dplyr::group_by(dataElement,
-                    period,
-                    orgUnit,
-                    categoryOptionCombo,
-                    attributeOptionCombo ) %>%
-    dplyr::summarise(value = sum(value,na.rm=TRUE)) %>%
-    dplyr::ungroup() %>%
-    dplyr::mutate(value = as.character(datapackr::round_trunc(value))) %>% 
-    #TODO: Not sure where the NAs are coming from here...
-    tidyr::drop_na()
+    ) 
   
+  duplicated_rows<-d$datim$subnat_impatt %>% 
+    dplyr::group_by(dataElement,orgUnit,categoryOptionCombo,attributeOptionCombo) %>% 
+    dplyr::tally() %>% 
+    dplyr::filter(n > 1)
+    
+  d$tests$duplicated_subnat_impatt<-duplicated_rows
+  attr(d$tests$duplicated_subnat_impatt,"Duplicated SUBNAT/IMPATT data")
   
-  #@Scott: TODO. DO NOT throw an error here. This needs to be handled with a message. 
   
   # TEST: Whether any NAs in any columns
-  if (any(is.na(d$datim$subnat_impatt))) {
-     warning("ERROR occurred. NAs remained when preparing SUBNAT/IMPATT data for DATIM import.")
+  if ( NROW(duplicated_rows) > 0 ) {
+    warning_msg <-
+      paste0(
+        "ERROR! In tab SUBNATT/IMPATT. Duplicate rows. Contact support.")
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
+  }
+  
+  blank_rows<-d$datim$subnat_impatt %>% 
+    dplyr::select_if(function(x) any(is.na(x)))
+  d$tests$nas_subnat_impatt<-blank_rows
+  attr(d$tests$duplicated_subnat_impatt,"SUBNAT/IMPATT data with blanks")
+    
+  
+  # TEST: Whether any NAs in any columns
+  if ( NROW(blank_rows) > 0 ) {
+    warning_msg <-
+      paste0(
+        "ERROR! In tab SUBNATT/IMPATT. Blank rows. Contact support.")
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
   }
   
   # TEST: Any Negative values? (not allowed for SUBNAT/IMPATT dataset)
   if (any(d$datim$subnat_impatt < 0)) {
-    warning("ERROR occurred. Negative values present in SUBNAT/IMPATT data.")
+    
+    warning_msg <-("ERROR occurred. Negative values present in SUBNAT/IMPATT data.")
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
   }
   
   return(d)
