@@ -13,7 +13,7 @@
 #' @return Modified d object with d$data$analtyics
 #' 
 #'
-getMechanismView<-function() {
+  getMechanismView<-function() {
   
   empty_mechs_view<-tibble::tibble(
     "mechanism_desc" = character() ,
@@ -51,10 +51,10 @@ getMechanismView<-function() {
   if ( is.null(support_files_directory) ) {
     mechs<-getMechanismViewFromDATIM() 
   } else {
-    
+      
     cached_mechs_path <- paste0(support_files_directory,"mechs.rds")
     
-    if ( file.access(cached_mechs_path,4) ) {
+    if ( file.access(cached_mechs_path,4)  == 0) {
       mechs<-readRDS(cached_mechs_path)
     } else {
       mechs<-getMechanismViewFromDATIM() }
