@@ -59,16 +59,15 @@ exportSubnatToDATIM <- function(d) {
   }
   
   blank_rows<-d$datim$subnat_impatt %>% 
-    dplyr::select_if(function(x) any(is.na(x)))
-  d$tests$nas_subnat_impatt<-blank_rows
-  attr(d$tests$duplicated_subnat_impatt,"SUBNAT/IMPATT data with blanks")
-    
+    dplyr::filter_all(dplyr::any_vars(is.na(.)))
   
   # TEST: Whether any NAs in any columns
   if ( NROW(blank_rows) > 0 ) {
+    d$tests$blank_rows_datim_subnat_impatt<-blank_rows
+    attr(d$tests$blank_rows_datim_subnat_impatt, "test_name")<-"SUBNAT/IMPATT data with blanks"
     warning_msg <-
       paste0(
-        "ERROR! In tab SUBNATT/IMPATT. Blank rows. Contact support.")
+        "ERROR! In tab SUBNATT/IMPATT. DATIM Export has blank rows. Contact support.")
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE
   }

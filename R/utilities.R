@@ -360,3 +360,26 @@ currentFY <- function() {
   
   return(current_FY)
 }
+
+
+#' @export
+#' @title Determine whether the user is logged into DATIM or not. 
+#' 
+#' @return TRUE or FALSE
+#'
+isLoggedIn<-function() {
+  baseurl<-getOption("baseurl")
+  if (is.na(baseurl)) {
+    return(FALSE)} else {
+      httr::set_config(httr::config(http_version = 0))
+      url <- URLencode(URL = paste0(baseurl, "api/me"))
+      #Logging in here will give us a cookie to reuse
+      r <- httr::GET(url)
+      if (r$status != 200L) {
+        return(FALSE)
+      } else {
+        
+        return(TRUE)
+      }
+    }
+}
