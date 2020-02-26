@@ -58,7 +58,7 @@ writePSNUxIM <- function(d,
         output_path = d$keychain$output_folder,
         type = "Data Pack",
         datapack_name = d$info$datapack_name)
-    } else {stop("Must supply output_folder path in order to export Data Pack")}
+    }
     
   }
   
