@@ -52,7 +52,7 @@ adornPSNUs<-function(d) {
     dplyr::select(-value)
   
   d$data$analytics %<>% dplyr::left_join(prio,by="psnuid") %>% 
-    dplyr::mutate(prioritization = case_when(is.na(prioritization) ~ "No Prioritization",
+    dplyr::mutate(prioritization = dplyr::case_when(is.na(prioritization) ~ "No Prioritization",
                                              TRUE ~ prioritization ))
   
   d
