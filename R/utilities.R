@@ -369,7 +369,7 @@ currentFY <- function() {
 #'
 isLoggedIn<-function() {
   baseurl<-getOption("baseurl")
-  if (is.na(baseurl)) {
+  if (is.null(baseurl)) {
     return(FALSE)} else {
       httr::set_config(httr::config(http_version = 0))
       url <- URLencode(URL = paste0(baseurl, "api/me"))
