@@ -136,7 +136,7 @@ packSNUxIM <- function(d) {
             by = "indicator_code") %>%
           dplyr::arrange(PSNU, sheet_num, col, Age, Sex, KeyPop) %>%
           dplyr::mutate(
-            row = (1:dplyr::n()) + existing_rows,
+            row = as.integer((1:dplyr::n()) + existing_rows),
             ID = paste0('$A',row,'&IF($C',row,'<>"","|"&$C',row,',"")&IF($D',row,
                         '<>"","|"&$D',row,',"")&IF($E',row,'<>"","|"&$E',row,',"")'),
             sheet_num = dplyr::case_when(
@@ -221,7 +221,7 @@ packSNUxIM <- function(d) {
           {if (length(non_appended_mech_cols) > 0) {
             (.) %>% addcols(non_appended_mech_cols)
             } else {.}} %>%
-          dplyr::select(names(SNUxIM_cols), new_mech_cols)
+          dplyr::select(names(SNUxIM_cols), tidyselect::all_of(new_mech_cols))
         
       # Format formula columns ####
         formulaCols <- grep("ID|DataPackTarget|Rollup|Dedupe",
