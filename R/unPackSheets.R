@@ -21,7 +21,7 @@ unPackSheets <- function(d) {
     dplyr::pull(sheet_name)
   
   actual_sheets <- readxl::excel_sheets(d$keychain$submission_path)
-  sheets_to_read <- actual_sheets[actual_sheets %in% sheets]
+  sheets_to_read <- sheets[sheets %in% actual_sheets]
   
   d$data$targets <- NULL
   
