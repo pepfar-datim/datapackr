@@ -30,7 +30,7 @@ writePSNUxIM <- function(d,
   
   # If new information added to SNU x IM tab, reexport Data Pack for user
   if (d$info$newSNUxIM) {
-    #d <- strip_wb_NAs(d)
+    d <- strip_wb_NAs(d)
     
     if (!is.null(d$keychain$output_folder)) {
       exportPackr(
