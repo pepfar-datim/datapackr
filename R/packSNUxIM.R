@@ -434,6 +434,9 @@ packSNUxIM <- function(d) {
               a. adding additional mechanism columns,
               b. modifying the Rollup column to include additional mechanism columns, and
               c. adding/updating the percent allocations to mechanisms.
+              
+        3) Any external references used in cell formulas will now be corrupt and
+        cause '#N/A' errors. Please review your Data Pack for these cases and correct.
             
 If you have any questions, please submit a Help Desk ticket at DATIM.Zendesk.com.",
             "\n")
