@@ -15,8 +15,9 @@ compareData_DatapackVsDatim <- function(d, base_url = getOption("baseurl")) {
   
   datapack_data <- d$datim$MER
   org_unit_uids <- d$info$country_uids
+  cop_year <- d$info$cop_year
   
-  # ensure site_data has the expected columns
+  # ensure datapack_data has the expected columns
   if (!identical(
     names(datapack_data),
     c(
@@ -31,16 +32,16 @@ compareData_DatapackVsDatim <- function(d, base_url = getOption("baseurl")) {
     stop("The column names of your data aren't as expected by compareData_DatapackVsDatim.")
   }
 
-  dataset_uids <- d$info$cop_year %>% 
-    stringr::str_sub(3,4) %>% 
+  dataset_uids <- cop_year %>% 
+    stringr::str_sub(3,4) %>% #get last two digits of cop year
     datapackcommons::getDatasetUids("targets")
   
     parameters <- tibble::tibble(key = "dataSet", value = dataset_uids) %>% 
-      dplyr::bind_rows(c(key = "period",  value = paste0(d$info$cop_year, "Oct")))
+      dplyr::bind_rows(c(key = "period",  value = paste0(cop_year, "Oct")))
       
     parameters <- tibble::tribble(
     ~ key, ~ value,
-    "children", "true",
+    "children", "true", 
     "categoryOptionComboIdScheme", "code",
     "includeDeleted", "false"
   ) %>%
@@ -58,17 +59,7 @@ compareData_DatapackVsDatim <- function(d, base_url = getOption("baseurl")) {
       org_unit_uid = orgUnit,
       category_option_combo_uid = categoryOptionCombo,
       attribute_option_combo_code = attributeOptionCombo
-    ) %>%
-#    dplyr::filter(!stringr::str_detect(attribute_option_combo_code, "00000|00001")) %>%  #Filter out dedupes 
-    dplyr::group_by(
-      data_element_uid,
-      period,
-      org_unit_uid,
-      category_option_combo_uid,
-      attribute_option_combo_code
-    ) %>%
-    dplyr::summarise(datapack_value = round(sum(as.numeric(datapack_value)))) %>% 
-    dplyr::ungroup()
+    )
   
   # get data from datim
   # rename to standard names
@@ -84,10 +75,9 @@ compareData_DatapackVsDatim <- function(d, base_url = getOption("baseurl")) {
       attribute_option_combo_code = attribute_option_combo
     ) %>% 
     dplyr::filter(datim_value != 0) %>% 
-    dplyr::filter(datim_value != "") %>% 
-    dplyr::filter(!stringr::str_detect(attribute_option_combo_code, "00000|00001")) #Filter out dedupes
+    dplyr::filter(datim_value != "") 
   
-  data <- dplyr::full_join(site_data, datim_data)
+  data <- dplyr::full_join(datapack_data, datim_data)
 
   # Find the cases with different values. These should be  imported into DATIM
   data_different_value <-
