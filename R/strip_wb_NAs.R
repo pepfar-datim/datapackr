@@ -19,8 +19,6 @@ strip_wb_NAs <- function(d) {
   if (length(NA_sharedString) > 0) {
   
    for (i in 1:length(d$tool$wb$worksheets)) {
-     ## Strip only if sheet$data$t == 1 (String) To avoid accidentally replacing a numeric equivalent
-     d$tool$wb$worksheets[[i]]$sheet_data$v[d$tool$wb$worksheets[[i]]$sheet_data$v == NA_sharedString] <- ""
      
      might_be_NA <- d$tool$wb$worksheets[[i]]$sheet_data$v == NA_sharedString
      
