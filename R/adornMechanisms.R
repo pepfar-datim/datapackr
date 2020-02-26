@@ -60,7 +60,7 @@ getMechanismView<-function() {
       mechs<-getMechanismViewFromDATIM() }
   }
   
-  structure_ok<-dplyr::setequal(wanted_columns,names(mechs))
+  structure_ok<-dplyr::setequal(names(empty_mechs_view),names(mechs))
   if (!structure_ok) {warning("Mechanism structure is not correct.")}
   
   mechs
