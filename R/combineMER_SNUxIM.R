@@ -160,6 +160,15 @@ combineMER_SNUxIM <- function(d) {
   
   # Prepare for Export ####
   d$data$distributedMER %<>%
+  
+  # Readjust for PMTCT_EID
+    dplyr::mutate(
+      Age =
+        dplyr::case_when(
+          indicator_code %in% c("PMTCT_EID.N.Age.T.2mo","PMTCT_EID.N.Age.T.2to12mo")
+          ~ NA_character_,
+          TRUE ~ Age)
+    ) %>%
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age,
                   Sex, KeyPop, mechanism_code, support_type,
                   value = distributed_value) %>%

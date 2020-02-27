@@ -13,16 +13,7 @@ exportDistributedDataToDATIM <- function(d) {
   
   #Filter the pseudo-dedupe mechanism data out
   d$datim$MER <- d$data$distributedMER %>%
-    dplyr::filter(mechanism_code != '99999') %>% 
-    
-  # Readjust for PMTCT_EID
-    dplyr::mutate(
-      Age =
-        dplyr::case_when(
-          indicator_code %in% c("PMTCT_EID.N.Age.T.2mo","PMTCT_EID.N.Age.T.2to12mo")
-            ~ NA_character_,
-          TRUE ~ Age)
-    ) %>%
+    dplyr::filter(mechanism_code != '99999') %>%
     
   # Pull in all dataElements and categoryOptionCombos
     dplyr::left_join(., ( datapackr::map_DataPack_DATIM_DEs_COCs %>% 
