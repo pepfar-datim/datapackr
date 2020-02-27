@@ -58,7 +58,7 @@ unPackSchema_datapack <- function(filepath = NULL, skip = NULL, cop_year = getCu
     dplyr::mutate(formula = dplyr::if_else(is.na(formula), value, formula))
 
   # Translate valid disaggs ####
-  valid_COs <- validCOs(cop_year = cop_year)
+  valid_COs <- getValidCategoryOptions(cop_year = cop_year)
 
   disaggs <- valid_COs %>%
     dplyr::select(name = datapack_disagg, id, group = datapack_schema_group) %>%
