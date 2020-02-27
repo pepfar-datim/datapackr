@@ -39,16 +39,16 @@ unPackTool <- function(submission_path = NULL,
     )
   )
   
-  # Start running log of all warning and information messages
-  d$info$warning_msg <- NULL
-  d$info$has_error <- FALSE
-  d$info$newSNUxIM <- FALSE
-  d$info$has_psnuxim <- FALSE
-  d$info$missing_psnuxim_combos <- FALSE
-  
-  # Check the submission file exists and prompt for user input if not
-  d$keychain$submission_path <- handshakeFile(path = d$keychain$submission_path,
-                                              tool = d$info$tool)
+    # Start running log of all warning and information messages
+    d$info$warning_msg <- NULL
+    d$info$has_error <- FALSE
+    d$info$newSNUxIM <- FALSE
+    d$info$has_psnuxim <- FALSE
+    d$info$missing_psnuxim_combos <- FALSE
+    
+    # Check the submission file exists and prompt for user input if not
+    d$keychain$submission_path <- handshakeFile(path = d$keychain$submission_path,
+                                                tool = d$info$tool)
   
   # unPack file based on type
   if (d$info$tool == "Data Pack") {

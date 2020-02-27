@@ -11,6 +11,7 @@
 #' 
 exportDistributedDataToDATIM <- function(d) {
   
+  #Filter the pseudo-dedupe mechanism data out
   d$datim$MER <- d$data$distributedMER %>%
     dplyr::filter(mechanism_code != '99999') %>% 
     

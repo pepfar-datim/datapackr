@@ -26,9 +26,6 @@ unPackDataPackSheet <- function(d, sheet) {
   # Run structural checks ####
   d <- checkColStructure(d, sheet)
 
-  # Check for Formula changes ####
-  #d <- checkFormulas(d, sheet)
-
   # Remove duplicate columns (Take the first example)
   duplicate_cols <- duplicated(names(d$data$extract))
 
@@ -105,6 +102,9 @@ unPackDataPackSheet <- function(d, sheet) {
   # If PSNU has been deleted, drop the row
   d$data$extract %<>%
     dplyr::filter(!is.na(PSNU))
+  
+  # Check for Formula changes ####
+  d <- checkFormulas(d, sheet)
 
   # Gather all indicators as single column for easier processing
   d$data$extract %<>%

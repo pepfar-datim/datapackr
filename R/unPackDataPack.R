@@ -51,6 +51,9 @@ unPackDataPack <- function(d) {
     d$info$schema <-  datapackr::cop20_data_pack_schema
   } else {d$info$schema <- datapackr::data_pack_schema}
     
+  # Check whether there exist any troublesome comments in the file
+    d <- checkComments(d)
+    
   # Check integrity of Workbook tabs ####
     d <- checkStructure(d)
 
@@ -67,7 +70,9 @@ unPackDataPack <- function(d) {
     if (d$info$has_psnuxim) {
       d <- combineMER_SNUxIM(d)
       
-    # Prepare SNU x IM dataset for DATIM import & validation ####
+      d <- createAnalytics(d)
+      
+      # Prepare SNU x IM dataset for DATIM import & validation ####
       d <- packForDATIM(d, type = "PSNUxIM")
       
     # Package SUBNAT/IMPATT DATIM import file ####

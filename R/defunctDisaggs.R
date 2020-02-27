@@ -27,11 +27,10 @@ defunctDisaggs <- function(d, sheet) {
   
   defunct_disaggs <- data %>%
     dplyr::left_join(valid_disaggs, by = c("indicator_code" = "indicator_code")) %>%
-    dplyr::filter(!Age %in% unlist(valid_ages)
-                  | !Sex %in% unlist(valid_sexes)
-                  | !KeyPop %in% unlist(valid_kps)) %>%
-    dplyr::mutate(sheet = sheet) %>%
-    dplyr::select(sheet, indicator_code, Age, Sex, KeyPop) %>%
+    dplyr::filter(!purrr::map2_lgl(Age, valid_ages, ~.x %in% .y[["name"]])
+                  | !purrr::map2_lgl(Sex, valid_sexes, ~.x %in% .y[["name"]])
+                  | !purrr::map2_lgl(KeyPop, valid_kps, ~.x %in% .y[["name"]])) %>%
+    dplyr::select(indicator_code, Age, Sex, KeyPop) %>%
     dplyr::distinct()
 
   d$tests$defunct_disaggs<-dplyr::bind_rows(d$tests$defunct_disaggs,defunct_disaggs)
@@ -50,7 +49,8 @@ defunctDisaggs <- function(d, sheet) {
         sheet,
         ": INVALID DISAGGS ",
         "(Check MER Guidance for correct alternatives) -> \n\t",
-        paste(defunct_msg, collapse = "\n\t"))
+        paste(defunct_msg, collapse = "\n\t"),
+        "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE

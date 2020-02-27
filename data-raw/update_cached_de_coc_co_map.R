@@ -1,4 +1,4 @@
-secrets <- "/Users/scott/.secrets/test-mer2.json"
+secrets <- "/home/jason/.secrets/datim.json"
 loginToDATIM(secrets)
 
 cop_year = getCurrentCOPYear()
@@ -61,6 +61,115 @@ map_DataPack_DATIM_DEs_COCs <- datapackr::cop20_data_pack_schema %>%
                    by = c("dataelement" = "dataelementuid",
                           "categoryOptions.ids" = "categoryOptions"))
 
+
+
+getCOGSMap<-function(uid) {
+  
+  r<-paste0(getOption("baseurl"),"api/categoryOptionGroupSets/",uid,
+            "?fields=id,name,categoryOptionGroups[id,name,categoryOptions[id,name,categoryOptionCombos[id,name]]") %>%
+    URLencode(.) %>%
+    httr::GET(.) %>%
+    httr::content(.,"text") %>%
+    jsonlite::fromJSON(.,flatten = TRUE) 
+  
+  dim_name<- r$name
+  dim_id<- r$id
+  
+  cogs <- r %>% purrr::pluck(.,"categoryOptionGroups") %>% dplyr::select(id,name)
+  
+  cogs_cocs_map<-list()
+  
+  for (i in 1:NROW(cogs) ) {
+    
+    cos_cocs <- r %>%
+      purrr::pluck(.,"categoryOptionGroups") %>% 
+      purrr::pluck(.,"categoryOptions") %>%
+      purrr::pluck(., i) %>% 
+      purrr::pluck(.,"categoryOptionCombos") %>%
+      do.call(rbind.data.frame,.) %>%
+      dplyr::distinct() %>%
+      dplyr::select("category_option_combo"=name,"coc_uid"=id)
+    
+    cos_cocs$category_option_group_name<-cogs[i,"name"]
+    cos_cocs$category_option_group_uid<-cogs[i,"id"]
+    cogs_cocs_map<-rlist::list.append(cogs_cocs_map,cos_cocs)
+  }
+  
+  cogs_cocs_map %<>% do.call(rbind.data.frame,.)
+  
+  return(list(dimension_name=r$name,
+              dimension_id=r$id,
+              dimension_map= cogs_cocs_map))
+  
+}
+
+
+hiv_specific<-getCOGSMap("bDWsPYyXgWP") %>% #HIV Test Status (Specific)
+  purrr::pluck("dimension_map") %>%
+  dplyr::select("categoryoptioncombouid"=coc_uid,
+                "resultstatus"=category_option_group_name) %>%
+  dplyr::mutate(resultstatus = stringr::str_replace(resultstatus,"\\(Specific\\)","")) %>%
+  dplyr::mutate(resultstatus = stringr::str_replace(resultstatus,"HIV","")) %>%
+  dplyr::mutate(resultstatus = stringr::str_trim(resultstatus))
+
+
+hiv_inclusive<-getCOGSMap("ipBFu42t2sJ") %>% # HIV Test Status (Inclusive)
+  purrr::pluck("dimension_map") %>%
+  dplyr::select("categoryoptioncombouid"=coc_uid,
+                "resultstatus_inclusive"=category_option_group_name) %>%
+  dplyr::mutate(resultstatus_inclusive = stringr::str_replace(resultstatus_inclusive,"\\(Inclusive\\)","")) %>%
+  dplyr::mutate(resultstatus_inclusive = stringr::str_replace(resultstatus_inclusive,"HIV","")) %>%
+  dplyr::mutate(resultstatus_inclusive = stringr::str_replace(resultstatus_inclusive,"Status","")) %>%
+  dplyr::mutate(resultstatus_inclusive = stringr::str_trim(resultstatus_inclusive))
+
+
+getDEGSMap <- function(uid) {
+  
+  r <- paste0(getOption("baseurl"),"api/dataElementGroupSets/",uid,"?fields=id,name,dataElementGroups[name,dataElements[id]]&paging=false") %>%
+    URLencode(.) %>%
+    httr::GET(.) %>%
+    httr::content(.,"text") %>%
+    jsonlite::fromJSON(.,flatten = TRUE) 
+  
+  r %>%
+    purrr::pluck(.,"dataElementGroups") %>% 
+    dplyr::mutate_if(is.list, purrr::simplify_all) %>% 
+    tidyr::unnest(cols = c(dataElements)) %>%
+    dplyr::distinct() %>%
+    dplyr::mutate(type=make.names(r$name))
+  
+}
+
+#Valid for COP20
+data_element_dims <-
+  c("HWPJnUTMjEq",
+    "LxhLO68FcXm",
+    "gIBfzXabKkt")
+
+degs_map <- purrr::map_dfr(data_element_dims, getDEGSMap) %>%
+  tidyr::spread(type, name, fill = NA)
+#Remapping of column names
+from <- c(
+  "dataElements",
+  "Disaggregation.Type",
+  "Technical.Area",
+  "Top.Level..USE.ONLY.for.FY20.Results.FY21.Targets."
+)
+
+to <- c("dataelement",
+        "disagg_type",
+        "technical_area",
+        "top_level")
+
+names(degs_map) <- plyr::mapvalues(names(degs_map),from,to)
+
+map_DataPack_DATIM_DEs_COCs %<>% 
+  dplyr::left_join(hiv_specific,by="categoryoptioncombouid") %>% 
+  dplyr::left_join(hiv_inclusive,by="categoryoptioncombouid") %>% 
+  dplyr::left_join(degs_map,by="dataelement")
+
+
+
 new <- map_DataPack_DATIM_DEs_COCs %>%
   dplyr::select(-categoryoption_specified)
 
@@ -69,9 +178,11 @@ compare_diffs <- datapackr::map_DataPack_DATIM_DEs_COCs %>%
   dplyr::full_join(new, by = c("indicator_code",
                                "valid_ages.name","valid_ages.id","valid_sexes.name",
                                "valid_sexes.id","valid_kps.name","valid_kps.id",
-                               "categoryOptions.ids","support_type")) %>%
+                               "categoryOptions.ids","support_type","hiv_specific","hiv_inclusive")) %>%
   dplyr::filter(is.na(dataelement.x) | is.na(dataelement.y.y))
 
-save(map_DataPack_DATIM_DEs_COCs, file = "./data/map_DataPack_DATIM_DEs_COCs.rda", compress = "xz")
+
+
+  save(map_DataPack_DATIM_DEs_COCs, file = "./data/map_DataPack_DATIM_DEs_COCs.rda", compress = "xz")
 
 

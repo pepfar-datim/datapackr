@@ -23,6 +23,26 @@ writePSNUxIM <- function(d,
   d$info$warning_msg <- NULL
   d$info$has_error <- FALSE
   
+  if (d$info$has_comments_issue) {
+    warning_msg <-
+      paste0(
+        "ERROR! Cannot update PSNUxIM information in a Data Pack with Threaded
+        Comments. Please remove these and resubmit. For more information about
+        the difference between Threaded Comments and Notes, see:
+        
+        https://support.office.com/en-us/article/the-difference-between-threaded-comments-and-notes-75a51eec-4092-42ab-abf8-7669077b7be3")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
+    
+    if (interactive()) {
+      options(warning.length = 8170)
+      cat(crayon::red(d$info$warning_msg))
+    }
+    
+    return(d)
+  }
+  
   # Check whether to write anything into SNU x IM tab and write if needed  
   if ( !is.null(d$keychain$snuxim_model_data_path ) ) {
     d <- packSNUxIM(d)
@@ -38,7 +58,7 @@ writePSNUxIM <- function(d,
         output_path = d$keychain$output_folder,
         type = "Data Pack",
         datapack_name = d$info$datapack_name)
-    } else {stop("Must supply output_folder path in order to export Data Pack")}
+    }
     
   }
   
