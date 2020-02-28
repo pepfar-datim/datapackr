@@ -13,31 +13,33 @@
 
 compareData_DatapackVsDatim <- function(d, base_url = getOption("baseurl")) {
   
-  datapack_data <- d$datim$MER
+  d$datim$MER$value<-as.character(d$datim$MER$value)
+  d$datim$subnat_impatt$value<-as.character(d$datim$subnat_impatt$value)
+  datapack_data <- dplyr::bind_rows(d$datim$MER,d$datim$subnat_impatt)
+  
   org_unit_uids <- d$info$country_uids
-  cop_year <- d$info$cop_year
+  cop_yyyy <- d$info$cop_year %>% as.character()
+  fiscal_yy <- (d$info$cop_year + 1) %>% 
+    stringr::str_sub(3,4)
   
   # ensure datapack_data has the expected columns
-  if (!identical(
-    names(datapack_data),
-    c(
-      "dataElement",
-      "period",
-      "orgUnit",
-      "categoryOptionCombo",
-      "attributeOptionCombo",
-      "value"
-    )
-  )) {
+  if (!identical(names(datapack_data),
+                 c("dataElement",
+                   "period",
+                   "orgUnit",
+                   "categoryOptionCombo",
+                   "attributeOptionCombo",
+                   "value"))) 
+    {
     stop("The column names of your data aren't as expected by compareData_DatapackVsDatim.")
-  }
-
-  dataset_uids <- cop_year %>% 
-    stringr::str_sub(3,4) %>% #get last two digits of cop year
-    datapackcommons::getDatasetUids("targets")
+    }
+  
+  dataset_uids <- datapackcommons::getDatasetUids(fiscal_yy, "targets") %>% 
+    c(datapackcommons::getDatasetUids(fiscal_yy, 
+                                      "subnat_impatt"))
   
     parameters <- tibble::tibble(key = "dataSet", value = dataset_uids) %>% 
-      dplyr::bind_rows(c(key = "period",  value = paste0(cop_year, "Oct")))
+      dplyr::bind_rows(c(key = "period",  value = paste0(cop_yyyy, "Oct")))
       
     parameters <- tibble::tribble(
     ~ key, ~ value,
