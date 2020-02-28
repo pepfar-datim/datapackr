@@ -73,7 +73,7 @@ exportSubnatToDATIM <- function(d) {
   }
   
   # TEST: Any Negative values? (not allowed for SUBNAT/IMPATT dataset)
-  if (any(d$datim$subnat_impatt < 0)) {
+  if (any(d$datim$subnat_impatt$value < 0)) {
     
     warning_msg <-("ERROR occurred. Negative values present in SUBNAT/IMPATT data.")
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
