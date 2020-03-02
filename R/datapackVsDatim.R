@@ -12,16 +12,17 @@
 #' @return  list object of differences $data_different_value, $data_datim_only and $data_site_tool_only
 
 compareData_DatapackVsDatim <- function(d, base_url = getOption("baseurl")) {
+  beautify <- function(data){
+    
+  }
   
-  d$datim$MER$value<-as.character(d$datim$MER$value)
-  d$datim$subnat_impatt$value<-as.character(d$datim$subnat_impatt$value)
+# start off with dedups included
+  d <- datapackr::exportDistributedDataToDATIM(d, keep_dedup = TRUE)
+  
+  d$datim$MER$value <- as.numeric(d$datim$MER$value)
+  d$datim$subnat_impatt$value <- as.numeric(d$datim$subnat_impatt$value)
   datapack_data <- dplyr::bind_rows(d$datim$MER,d$datim$subnat_impatt)
-  
-  org_unit_uids <- d$info$country_uids
-  cop_yyyy <- d$info$cop_year %>% as.character()
-  fiscal_yy <- (d$info$cop_year + 1) %>% 
-    stringr::str_sub(3,4)
-  
+
   # ensure datapack_data has the expected columns
   if (!identical(names(datapack_data),
                  c("dataElement",
@@ -29,14 +30,38 @@ compareData_DatapackVsDatim <- function(d, base_url = getOption("baseurl")) {
                    "orgUnit",
                    "categoryOptionCombo",
                    "attributeOptionCombo",
-                   "value"))) 
-    {
+                   "value"))) {
     stop("The column names of your data aren't as expected by compareData_DatapackVsDatim.")
-    }
+  }
+  # rename columns to fit standards
+
+  datapack_data <- datapack_data %>%
+    dplyr::rename(
+      datapack_value = value,
+      data_element_uid = dataElement,
+      org_unit_uid = orgUnit,
+      category_option_combo_uid = categoryOptionCombo,
+      attribute_option_combo_code = attributeOptionCombo)  
+  
+  datapack_data_psnu_w_dedup <- dplyr::group_by(datapack_data,
+                                                data_element_uid,
+                                                org_unit_uid,
+                                                category_option_combo_uid) %>% 
+    dplyr::summarise(datapack_value = sum(datapack_value)) %>% 
+    dplyr::ungroup()
+
+  datapack_data_psnu_x_im_wo_dedup <- datapack_data %>% 
+    dplyr::filter(attribute_option_combo_code != "99999")
+  
+  # Get data from datim using data value sets
+  
+  org_unit_uids <- d$info$country_uids
+  cop_yyyy <- d$info$cop_year %>% as.character()
+  fiscal_yy <- (d$info$cop_year + 1) %>% 
+    stringr::str_sub(3,4)
   
   dataset_uids <- datapackcommons::getDatasetUids(fiscal_yy, "targets") %>% 
-    c(datapackcommons::getDatasetUids(fiscal_yy, 
-                                      "subnat_impatt"))
+    c(datapackcommons::getDatasetUids(fiscal_yy, "subnat_impatt"))
   
     parameters <- tibble::tibble(key = "dataSet", value = dataset_uids) %>% 
       dplyr::bind_rows(c(key = "period",  value = paste0(cop_yyyy, "Oct")))
@@ -49,20 +74,7 @@ compareData_DatapackVsDatim <- function(d, base_url = getOption("baseurl")) {
   ) %>%
     dplyr::bind_rows(tibble::tibble(key = "orgUnit", value = org_unit_uids)) %>%
     dplyr::bind_rows(parameters)
-  
-    
-  # rename site_data columns to fit standards
-  # aggregate duplicate rows from site tool data as would be done before import
-  
-  datapack_data <- datapack_data %>%
-    dplyr::rename(
-      datapack_value = value,
-      data_element_uid = dataElement,
-      org_unit_uid = orgUnit,
-      category_option_combo_uid = categoryOptionCombo,
-      attribute_option_combo_code = attributeOptionCombo
-    )
-  
+
   # get data from datim
   # rename to standard names
   datim_data <-
@@ -76,30 +88,53 @@ compareData_DatapackVsDatim <- function(d, base_url = getOption("baseurl")) {
       category_option_combo_uid = category_option_combo,
       attribute_option_combo_code = attribute_option_combo
     ) %>% 
-    dplyr::filter(datim_value != 0) %>% 
-    dplyr::filter(datim_value != "") 
+    dplyr::filter(datim_value != 0) %>% # we don't import 0s up front so we should ignore any here
+    dplyr::filter(datim_value != "")
   
-  data <- dplyr::full_join(datapack_data, datim_data)
+  datim_data$attribute_option_combo_code[datim_data$attribute_option_combo_code == "00000" |
+                                           datim_data$attribute_option_combo_code == "00001"] <- "99999"
+  
+  
+  datim_data_psnu_w_dedup <- dplyr::group_by(datim_data,
+                                             data_element_uid,
+                                             org_unit_uid,
+                                             category_option_combo_uid) %>% 
+    dplyr::summarise(datim_value = sum(datim_value)) %>% 
+    dplyr::ungroup()
+  
+  datim_data_psnu_x_im_wo_dedup <- datim_data %>% 
+    dplyr::filter(attribute_option_combo_code != "99999")
+  
+  data_psnu_w_dedup <- dplyr::full_join(datim_data_psnu_w_dedup, 
+                                        datapack_data_psnu_w_dedup)
+  
+  data_psnu_im_wo_dedup <- dplyr::full_join(datim_data_psnu_x_im_wo_dedup, 
+                                             datapack_data_psnu_x_im_wo_dedup)
 
   # Find the cases with different values. These should be  imported into DATIM
   data_different_value <-
-    dplyr::filter(data, tool_value != datim_value | is.na(datim_value)) %>%
+    dplyr::filter(data_psnu_im_wo_dedup, 
+                  datapack_value != datim_value | is.na(datim_value)) %>%
   dplyr::select(data_element_uid,
                 period,
                 org_unit_uid,
                 category_option_combo_uid,
                 attribute_option_combo_code,
-                tool_value)
+                datapack_value)
   
   
-  data_datim_only <- dplyr::filter(data, is.na(tool_value)) %>% 
-    select(data_element_uid,period,org_unit_uid,category_option_combo_uid,attribute_option_combo_code,datim_value)
+  data_datim_only <- dplyr::filter(data_psnu_im_wo_dedup, 
+                                   is.na(datapack_value)) %>% 
+    select(data_element_uid,
+           period,
+           org_unit_uid,
+           category_option_combo_uid,
+           attribute_option_combo_code,
+           datim_value)
 
   #Make the data prettier
   data$data_element <-datimvalidation::remapDEs(data$data_element_uid,mode_in="id",mode_out = "shortName")
   data$disagg <- datimvalidation::remapCategoryOptionCombos(data$category_option_combo_uid,mode_in = "id",mode_out = "name")
-  
-
   
   data_pretty <-
     data %>%  dplyr::select(data_element,
@@ -107,36 +142,27 @@ compareData_DatapackVsDatim <- function(d, base_url = getOption("baseurl")) {
                             period,
                             disagg,
                             mechanism = attribute_option_combo_code,
-                            tool_value,
-                            datim_value) #%>%
-    #tidyr::gather(source,value,tool_value:datim_value) %>% 
-    #mutate(source = plyr::mapvalues(source,
-                #                    c("tool_value","datim_value"),
-                 #                   c("Site Tool","DATIM")))
+                            datapack_value,
+                            datim_value) 
   
     #Adorn the sites
-  site_list <- getSiteList(org_unit_uids) %>%
-    dplyr::select(psnu, site = name, 
-                  org_unit_uid=id)
+  
+  psnus <- datapackr::valid_PSNUs %>% dplyr::select(psnu, psnu_uid)
   
   data_pretty %<>% 
-    dplyr::left_join(site_list, by="org_unit_uid") %>%
-    dplyr::select(psnu, site,
+    dplyr::left_join(psnus, by = c("org_unit_uid" = "psnu_uid")) %>%
+    dplyr::select(psnu,
                   data_element,
                   disagg,
                   mechanism,
-                  tool_value,
+                  datapack_value,
                   datim_value) %>% 
-    dplyr::mutate(difference = tool_value - datim_value) %>% 
-    dplyr::mutate(effect = dplyr::case_when(is.na(difference) & is.na(tool_value) ~ "Delete",
+    dplyr::mutate(difference = datapack_value - datim_value) %>% 
+    dplyr::mutate(effect = dplyr::case_when(is.na(difference) & is.na(datapack_value) ~ "Delete",
                                             is.na(difference) & is.na(datim_value) ~ "Create",
                                             !is.na(difference) & difference != 0 ~ "Update",
-                                            difference == 0 ~ "No Change"))# %>%
-    # dplyr::group_by(data_element,period,disagg,mechanism,source,psnu) %>% 
-    # dplyr::summarise(value=sum(as.numeric(value),na.rm = TRUE)) %>% 
-    # dplyr::ungroup()
-    # 
- 
+                                            difference == 0 ~ "No Change"))
+    
    list(
     data_pretty = data_pretty,
     updates = data_different_value,
