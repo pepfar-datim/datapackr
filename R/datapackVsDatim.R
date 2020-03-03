@@ -1,7 +1,7 @@
 #' @export
 #' @title compareData_DatapackVsDatim
 #'
-#' @description Compares the data in a paesed data pack that would be destined for DATIM with target data in in DATIM.
+#' @description Compares the data in a parsed data pack that would be destined for DATIM with target data in in DATIM.
 #' @param d list object - parsed data pack object
 #' @param base_url string - base address of instance (text before api/ in URL)
 #' @return  list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,
@@ -9,9 +9,11 @@
 #' (import to bring DATIM up to date with datapack)
 
 compareData_DatapackVsDatim <-
-  function(d, base_url = getOption("baseurl")) {
+  function(d, base_url = getOption("baseurl")) { 
+    
+# internal beutify function to avoid repeated code used in the main function
+# just handles some formatting/ decoding of UIDs
     beautify <- function(data) {
-#  Decode UIDs for presentation
       data$data_element <-
         datimvalidation::remapDEs(data$data_element_uid,
                                   mode_in = "id",
@@ -63,7 +65,8 @@ compareData_DatapackVsDatim <-
         )
       ))
     }
-    
+# End Beautify function
+        
 # start main processing
 # start off with dedups included
     d <- datapackr::exportDistributedDataToDATIM(d, keep_dedup = TRUE)
