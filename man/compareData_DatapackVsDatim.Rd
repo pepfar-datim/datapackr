@@ -17,5 +17,5 @@ $updates (import to bring DATIM up to date with datapack), $deletes
 (import to bring DATIM up to date with datapack)
 }
 \description{
-Compares the data in a paesed data pack that would be destined for DATIM with target data in in DATIM.
+Compares the data in a parsed data pack that would be destined for DATIM with target data in in DATIM.
 }
