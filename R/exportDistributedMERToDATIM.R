@@ -9,14 +9,18 @@
 #' 
 #' @return Modified d object with  a DATIM compatible data frame for import id d$datim$MER
 #' 
-exportDistributedDataToDATIM <- function(d) {
+exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
   
+  if(keep_dedup == TRUE){
+    d$datim$MER <- d$data$distributedMER  
+  } else {
   #Filter the pseudo-dedupe mechanism data out
   d$datim$MER <- d$data$distributedMER %>%
-    dplyr::filter(mechanism_code != '99999') %>% 
-    
+    dplyr::filter(mechanism_code != '99999') 
+  }
+  
   # Readjust for PMTCT_EID
-    dplyr::mutate(
+  d$datim$MER %<>% dplyr::mutate(
       Age =
         dplyr::case_when(
           indicator_code %in% c("PMTCT_EID.N.Age.T.2mo","PMTCT_EID.N.Age.T.2to12mo")
