@@ -19,6 +19,17 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
     dplyr::filter(mechanism_code != '99999') 
   }
   
+# align   map_DataPack_DATIM_DEs_COCs with  d$datim$MER/d$data$distributedMER for KP_MAT 
+  map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
+  map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                      map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- "Male"
+  map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                       map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Female PWID"] <- "Female"
+  map_DataPack_DATIM_DEs_COCs_local$valid_kps.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                       map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- NA_character_
+  map_DataPack_DATIM_DEs_COCs_local$valid_kps.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                       map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Female PWID"] <- NA_character_
+  
   # Readjust for PMTCT_EID
   d$datim$MER %<>% dplyr::mutate(
       Age =
@@ -29,7 +40,7 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
     ) %>%
     
   # Pull in all dataElements and categoryOptionCombos
-    dplyr::left_join(., ( datapackr::map_DataPack_DATIM_DEs_COCs %>% 
+    dplyr::left_join(., ( map_DataPack_DATIM_DEs_COCs_local %>% 
                             dplyr::rename(Age = valid_ages.name,
                                           Sex = valid_sexes.name,
                                           KeyPop = valid_kps.name) )) %>% 
