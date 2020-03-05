@@ -277,7 +277,7 @@ packSNUxIM <- function(d) {
           # Add additional col_names if any
           openxlsx::writeData(wb = d$tool$wb,
                               sheet = "PSNUxIM",
-                              x = new_mech_cols,
+                              x = new_mech_cols %>% as.matrix() %>% t(),
                               xy = c(first_new_mech_col, top_rows),
                               colNames = F, rowNames = F, withFilter = FALSE)
           
