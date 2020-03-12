@@ -118,10 +118,6 @@ checkAnalytics <- function(d,
     
   }
   
-  
-    
-  
-  
   # If warnings, show all grouped by sheet and issue ####
   if (!is.null(d$info$analytics_warning_msg) & interactive()) {
     options(warning.length = 8170)
