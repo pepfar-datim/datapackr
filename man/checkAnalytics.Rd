@@ -4,7 +4,7 @@
 \alias{checkAnalytics}
 \title{Check Data Pack data for analytics concerns}
 \usage{
-checkAnalytics(d)
+checkAnalytics(d, model_data_path)
 }
 \arguments{
 \item{d}{Datapackr object.}
@@ -14,4 +14,5 @@ d
 }
 \description{
 Check data gathered from Data Pack to identify validation concerns
+at the PSNU level.
 }

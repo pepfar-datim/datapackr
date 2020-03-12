@@ -1,5 +1,5 @@
 #' @export
-#' @title validCOs
+#' @title getValidCategoryOptions
 #'
 #' @description
 #' Returns full list of all valid categoryOptions for specified FY.
@@ -9,7 +9,7 @@
 #'
 #' @return Dataframe of all valid categoryOptions for specified FY
 #'
-validCOs <- function(cop_year = getCurrentCOPYear()) {
+getValidCategoryOptions <- function(cop_year = getCurrentCOPYear()) {
 
   ## Pull full Code List from DATIM ####
   fullCodeList <- pullFullCodeList(FY = cop_year +1)
@@ -24,7 +24,7 @@ validCOs <- function(cop_year = getCurrentCOPYear()) {
   five_year_age_names <- c("<01","01-04","05-09","10-14","15-19","20-24",
                            "25-29","30-34","35-39","40-44","45-49","50+")
 
-  valid_COs <- valid_COCs_COs %>%
+  valid_category_options <- valid_COCs_COs %>%
     dplyr::select(categoryOptions) %>%
     tidyr::unnest(cols = categoryOptions) %>%
     dplyr::distinct() %>%
@@ -144,5 +144,5 @@ validCOs <- function(cop_year = getCurrentCOPYear()) {
       datapack_schema_group = stringr::str_replace(datapack_schema_group, "^,","")
     )
 
-  return(valid_COs)
+  return(valid_category_options)
 }

@@ -71,5 +71,6 @@ createAnalytics <- function(d) {
                    resultstatus_inclusive,
                    top_level,
                    target_value = value )
-  d
+  
+  return(d)
 }
