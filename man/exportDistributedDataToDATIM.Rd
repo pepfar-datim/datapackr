@@ -4,7 +4,7 @@
 \alias{exportDistributedDataToDATIM}
 \title{exportDistributedDataToDATIM(data)}
 \usage{
-exportDistributedDataToDATIM(d)
+exportDistributedDataToDATIM(d, keep_dedup = FALSE)
 }
 \arguments{
 \item{d}{}

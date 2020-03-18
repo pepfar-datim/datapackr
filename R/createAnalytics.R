@@ -24,11 +24,23 @@ createAnalytics <- function(d) {
   d <- adornPSNUs(d)
   #Adorn mechanisms
   d <- adornMechanisms(d)
+  #TODO: Centralize this fix with exportDistributeMERtoDATIM
+  map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
+  map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                       map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- "Male"
+  map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                       map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Female PWID"] <- "Female"
+  map_DataPack_DATIM_DEs_COCs_local$valid_kps.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                     map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- NA_character_
+  map_DataPack_DATIM_DEs_COCs_local$valid_kps.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                     map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Female PWID"] <- NA_character_
+  
+  
   #Adorn data element and category option group sets
   d$data$analytics %<>%  dplyr::left_join(
     .,
     (
-      datapackr::map_DataPack_DATIM_DEs_COCs %>%
+      map_DataPack_DATIM_DEs_COCs_local %>%
         dplyr::rename(
           Age = valid_ages.name,
           Sex = valid_sexes.name,
@@ -70,6 +82,8 @@ createAnalytics <- function(d) {
                    disagg_type,
                    resultstatus_inclusive,
                    top_level,
-                   target_value = value )
+                   target_value = value,
+                   indicator_code)
+  
   return(d)
 }

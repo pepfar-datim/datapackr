@@ -32,16 +32,6 @@ unPackSNUxIM <- function(d) {
   if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1,1]])) {
     d$info$has_psnuxim <- FALSE
     
-    # Alert to need for PSNUxIM tab
-    warning_msg <- 
-      paste0(
-        "WARNING! You must submit your Data Pack to the DATIM Help Desk to receive",
-        " a populated PSNUxIM tab. You can do this at DATIM.ZenDesk.com, or via",
-        " logging in to www.DATIM.org.",
-        "\n")
-    
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
-    
     return(d)
   } else {d$info$has_psnuxim <- TRUE}
   
