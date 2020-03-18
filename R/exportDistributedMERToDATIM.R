@@ -10,7 +10,7 @@
 #' @return Modified d object with  a DATIM compatible data frame for import id d$datim$MER
 #' 
 exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
-  
+ 
   if(keep_dedup == TRUE){
     d$datim$MER <- d$data$distributedMER  
   } else {
@@ -38,7 +38,7 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
             ~ NA_character_,
           TRUE ~ Age)
     ) %>%
-    
+  
   # Pull in all dataElements and categoryOptionCombos
     dplyr::left_join(., ( map_DataPack_DATIM_DEs_COCs_local %>% 
                             dplyr::rename(Age = valid_ages.name,

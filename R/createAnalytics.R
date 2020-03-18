@@ -36,7 +36,6 @@ createAnalytics <- function(d) {
                                                      map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Female PWID"] <- NA_character_
   
   
-  
   #Adorn data element and category option group sets
   d$data$analytics %<>%  dplyr::left_join(
     .,

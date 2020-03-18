@@ -44,6 +44,7 @@ unPackDataPackSheet <- function(d, sheet) {
   }
 
   # TEST TX_NEW <1 from somewhere other than EID ####
+    # TODO: Move this to checkAnalytics
   if (sheet == "TX") {
 
     d$tests$tx_new_invalid_lt1_sources <- d$data$extract %>%
