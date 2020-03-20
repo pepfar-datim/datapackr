@@ -12,7 +12,7 @@
 #' 
 #' @return Modified d object with d$data$analtyics
 #' 
-getMechanismView<-function() {
+getMechanismView <- function() {
   empty_mechs_view <- tibble::tibble(
     "mechanism_desc" = character() ,
     "mechanism_code"= character(),
@@ -45,7 +45,7 @@ getMechanismView<-function() {
     }
   }
   
-  support_files_directory<-getOption("support_files_directory")
+  support_files_directory <- getOption("support_files_directory")
   
   if (is.null(support_files_directory)) {
     mechs <- getMechanismViewFromDATIM() 

@@ -25,7 +25,7 @@ adornPSNUs<-function(d) {
   prio <- d$data$SUBNAT_IMPATT %>% 
     dplyr::filter(indicator_code == "IMPATT.PRIORITY_SNU.T") %>% 
     dplyr::select(psnuid, value) %>% 
-    dplyr::left_join(prio_defined, by= "value") %>% 
+    dplyr::left_join(prio_defined, by = "value") %>% 
     dplyr::select(-value)
   
   d$data$analytics %<>%
