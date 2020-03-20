@@ -383,3 +383,27 @@ isLoggedIn<-function() {
       }
     }
 }
+
+#' @export
+#' @title Define prioritization values.
+#' 
+#' @return dict
+#'
+prioritization_dict <- function() {
+  dict <-
+    tibble::tribble(
+      ~value, ~name,
+      0, "No Prioritization",
+      1, "Scale-up: Saturation",
+      2, "Scale-up: Aggressive",
+      4, "Sustained",
+      5, "Centrally Supported",
+      6, "Sustained: Commodities",
+      7, "Attained",
+      8, "Not PEPFAR Supported"
+    ) %>%
+    dplyr::mutate(Prioritization = paste0(value, " - ", name))
+  
+  return(dict)
+}
+

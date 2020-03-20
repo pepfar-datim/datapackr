@@ -33,6 +33,7 @@ getPSNUs <- function(country_uids = NULL,
   
   # Extract metadata ####
   PSNUs %<>%
+    dplyr::rename(psnu = name, psnu_uid = id) %>%
     dplyr::mutate(
       psnu_type =
         dplyr::case_when(
@@ -41,19 +42,30 @@ getPSNUs <- function(country_uids = NULL,
           stringr::str_detect(as.character(organisationUnitGroups), "AVy8gJXym2D") ~ "SNU"),
       level_4_type = purrr::map(ancestors, list("organisationUnitGroups",4), .default = NA),
       country_name = dplyr::case_when(
-        psnu_type == "Country" ~ name,
+        psnu_type == "Country" ~ psnu,
         stringr::str_detect(as.character(level_4_type), "cNzfcPWEGSH") ~ 
           purrr::map_chr(ancestors, list("name", 4), .default = NA),
         TRUE ~ purrr::map_chr(ancestors, list("name", 3), .default = NA)
       ),
       country_uid = dplyr::case_when(
-        psnu_type == "Country" ~ id,
+        psnu_type == "Country" ~ psnu_uid,
         stringr::str_detect(as.character(level_4_type), "cNzfcPWEGSH") ~ 
           purrr::map_chr(ancestors, list("id", 4), .default = NA),
         TRUE ~ purrr::map_chr(ancestors, list("id", 3), .default = NA)
-      )
+      ),
+      ou_id = purrr::map_chr(ancestors, list("id", 3), .default = NA),
+      ou = purrr::map_chr(ancestors, list("name", 3), .default = NA),
+      snu1_id = dplyr::if_else(
+        condition = is.na(purrr::map_chr(ancestors, list("id",4), .default = NA)),
+        true = psnu_uid,
+        false = purrr::map_chr(ancestors, list("id",4), .default = NA)),
+      snu1 = dplyr::if_else(
+        condition = is.na(purrr::map_chr(ancestors, list("name",4), .default = NA)),
+        true = psnu,
+        false = purrr::map_chr(ancestors, list("name",4), .default = NA))
     ) %>%
-    dplyr::select(psnu = name, psnu_uid = id, psnu_type, country_name, country_uid,
+    dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id,
+                  psnu, psnu_uid, psnu_type,
                   tidyselect::everything(), -level_4_type)
   
   return(PSNUs)
