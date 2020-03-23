@@ -328,14 +328,17 @@ getCountries <- function(datapack_uid = NA) {
 #' @param data Dataframe to add columns.
 #' @param cnames Character vector of one or more column names to be added to
 #' \code{data}.
+#' @param type \code{character}, \code{numeric}, \code{logical}
 #' 
 #' @return Dataframe \code{data} with added columns listed in \code{cnames}.
 #'
-addcols <- function(data, cnames) {
+addcols <- function(data, cnames, type) {
   add <- cnames[!cnames %in% names(data)]
   
   if (length(add) != 0) {
-    data[add] <- NA_character_
+    if (type == "character") {data[add] <- NA_character_
+    } else if (type == "numeric") {data[add] <- NA_real_
+    } else if (type == "logical") {data[add] <- NA}
   }
   
   return(data)
@@ -367,21 +370,22 @@ currentFY <- function() {
 #' 
 #' @return TRUE or FALSE
 #'
-isLoggedIn<-function() {
-  baseurl<-getOption("baseurl")
+isLoggedIn <- function() {
+  baseurl <- getOption("baseurl")
+  
   if (is.null(baseurl)) {
-    return(FALSE)} else {
-      httr::set_config(httr::config(http_version = 0))
-      url <- URLencode(URL = paste0(baseurl, "api/me"))
-      #Logging in here will give us a cookie to reuse
-      r <- httr::GET(url)
-      if (r$status != 200L) {
-        return(FALSE)
-      } else {
-        
-        return(TRUE)
-      }
-    }
+    return(FALSE)
+  }
+  
+  httr::set_config(httr::config(http_version = 0))
+  url <- URLencode(URL = paste0(baseurl, "api/me"))
+  
+  # Logging in here will give us a cookie to reuse
+  r <- httr::GET(url)
+  
+  (r$status == 200L
+    & stringr::str_detect(r$headers$`content-type`, "application/json"))
+
 }
 
 #' @export
