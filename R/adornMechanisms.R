@@ -7,10 +7,8 @@
 #' the support_files_directory option has been set, and the mechs.rds file
 #' is available to be read. Otherwise, if the user is logged in, the view 
 #' will be obtained from DATIM. Otherwise, an empty dataframe is returned.
-#'
-#' @param d
 #' 
-#' @return Modified d object with d$data$analtyics
+#' @return Mechs
 #' 
 getMechanismView <- function() {
   empty_mechs_view <- tibble::tibble(
@@ -70,21 +68,22 @@ getMechanismView <- function() {
   
 #' @export
 #' @importFrom magrittr %>% %<>%
-#' @title adornMechanisms(d)
+#' @title adornMechanisms(data)
 #'
 #' @description Join analytical dimensions with d$data$analtyics related
 #' to partner, agency and mechanism information. 
 #'
-#' @param d
+#' @param data
 #' 
-#' @return Modified d object with d$data$analtyics
+#' @return Modified data object
 #' 
-adornMechanisms <- function(d) {
+adornMechanisms <- function(data) {
   
   mechs <- getMechanismView() %>% 
     dplyr::select(-ou, -startdate, -enddate)
   
-  d$data$analytics <- dplyr::left_join(d$data$analytics, mechs, by = "mechanism_code") %>% 
+  data %<>%
+    dplyr::left_join(mechs, by = "mechanism_code") %>% 
     dplyr::mutate(
       mechanism_desc = dplyr::case_when(mechanism_code == "99999" ~ 'Dedupe approximation',
                                         TRUE ~ mechanism_desc),
@@ -95,5 +94,5 @@ adornMechanisms <- function(d) {
       agency = dplyr::case_when(mechanism_code == "99999" ~ 'Dedupe approximation',
                                 TRUE ~ agency))
   
-  d
+  data
 }

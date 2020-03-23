@@ -2,15 +2,15 @@
 % Please edit documentation in R/adornMechanisms.R
 \name{adornMechanisms}
 \alias{adornMechanisms}
-\title{adornMechanisms(d)}
+\title{adornMechanisms(data)}
 \usage{
-adornMechanisms(d)
+adornMechanisms(data)
 }
 \arguments{
-\item{d}{}
+\item{data}{}
 }
 \value{
-Modified d object with d$data$analtyics
+Modified data object
 }
 \description{
 Join analytical dimensions with d$data$analtyics related
