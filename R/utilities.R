@@ -444,26 +444,23 @@ getCopDatasetUids <- function(FY = NULL, types = NULL) {
 #' @example getCopDataFromDatim(country_uid = d$info$country_uids, 
 #'                    fiscal_year_yyyy = d$info$cop_year)
 
-getCopDataFromDatim <- function(country_uid, fiscal_year_yyyy, base_url = getOption("baseurl"))
+getCopDataFromDatim <- function(country_uid, 
+                                fiscal_year_yyyy, 
+                                base_url = getOption("baseurl"))
 {
-  org_unit_uids <- country_uid
-  cop_yyyy <- as.character(fiscal_year_yyyy)
-  fiscal_yy <- substr(fiscal_year_yyyy+1, 3, 4)  
   
-  dataset_uids <- ## this should use getCopDatasetUids
-    c(datapackcommons::getDatasetUids(fiscal_yy, "targets"),
-      datapackcommons::getDatasetUids(fiscal_yy, "subnat_impatt"))
-  
+  dataset_uids <- datapackr::getCopDatasetUids(fiscal_year_yyyy)
+
   # package parameters for getDataValueSets function call
   parameters <- 
     dplyr::bind_rows( 
       tibble::tibble(key = "dataSet", value = dataset_uids),
-      tibble::tibble(key = "orgUnit", value = org_unit_uids),
+      tibble::tibble(key = "orgUnit", value = country_uid),
       tibble::tribble(~ key, ~ value,
                       "children", "true",
                       "categoryOptionComboIdScheme", "code",
                       "includeDeleted", "false",
-                      "period", paste0(cop_yyyy, "Oct")
+                      "period", paste0(fiscal_year_yyyy - 1, "Oct")
       )
     )
   
@@ -483,10 +480,3 @@ getCopDataFromDatim <- function(country_uid, fiscal_year_yyyy, base_url = getOpt
   
   return(datim_data)
 }
-
-
-
-
-
-
-
