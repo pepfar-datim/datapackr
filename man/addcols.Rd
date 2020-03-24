@@ -4,13 +4,15 @@
 \alias{addcols}
 \title{Add list of columns as NULL columns to supplied dataframe.}
 \usage{
-addcols(data, cnames)
+addcols(data, cnames, type = "character")
 }
 \arguments{
 \item{data}{Dataframe to add columns.}
 
 \item{cnames}{Character vector of one or more column names to be added to
 \code{data}.}
+
+\item{type}{\code{character}, \code{numeric}, \code{logical}}
 }
 \value{
 Dataframe \code{data} with added columns listed in \code{cnames}.

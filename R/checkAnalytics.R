@@ -1,15 +1,14 @@
 #' @export
-#' @title Check Data Pack data for retention < 98%
+#' @title Check Data Pack data for retention < 98\% or >100\%
 #'
 #' @description Check data gathered from Data Pack to identify cases where
-#' retention is less than the standard of 98%.
+#' retention is less than the standard of 98\% or >100\%.
 #'
 #' @param data Analytics object to analyze
-#' @param msg Warning message to append issues to
 #' 
 #' @return a
 #' 
-analyze_retention <- function(data, msg = NULL) {
+analyze_retention <- function(data) {
   a <- NULL
   
   data %<>%
@@ -20,7 +19,7 @@ analyze_retention <- function(data, msg = NULL) {
     )
   
   retention_issues <- data %>%
-    dplyr::filter(TX.Retention.T < 0.98) %>%
+    dplyr::filter(TX.Retention.T < 0.98 | TX.Retention.T > 1) %>%
     dplyr::select(
       PSNU, psnuid, Age, Sex, KeyPop,
       TX.Retention.T,
@@ -48,9 +47,9 @@ analyze_retention <- function(data, msg = NULL) {
         / (TX_CURR.N.Age_Sex_HIVStatus.T_1 + TX_NEW.N.Age_Sex_HIVStatus.T)
       )
     
-    analytics_warning_msg <- 
+    a$msg <- 
       paste0(
-        "WARNING! RETENTION RATES < 98%: \n\n\t* ",
+        "WARNING! RETENTION RATES <98% OR >100%: \n\n\t* ",
         crayon::bold(
           paste0(
             length(unique(retention_issues$psnuid)), " of ",
@@ -63,8 +62,6 @@ analyze_retention <- function(data, msg = NULL) {
         crayon::bold(sprintf("%.1f%%", 100 * min(national_avg_ret$TX.Retention.T))),
         "\n")
     
-    a$msg <- append(msg, analytics_warning_msg)
-    
   } 
   
   return(a)
@@ -72,93 +69,53 @@ analyze_retention <- function(data, msg = NULL) {
 
 
 #' @export
-#' @title Check Data Pack data for linkage < 95%
+#' @title Check Data Pack data for linkage < 95\% or >100\%
 #'
 #' @description Check data gathered from Data Pack to identify cases where
-#' linkage rates are less than the standard of 95%.
+#' linkage rates are less than the standard of 95\% or >100\%.
 #'
 #' @param data Analytics object to analyze
-#' @param msg Warning message to append issues to
 #' 
 #' @return a
 #' 
-analyze_linkage <- function(data, msg = NULL) {
+analyze_linkage <- function(data) {
   a <- NULL
   
-  pmtct_hei_pos_data <- 
-    readxl::read_excel(
-      path = d$keychain$submission_path,
-      sheet = "PMTCT_EID",
-      range = readxl::cell_limits(
-        c(headerRow(tool = "Data Pack", cop_year = d$info$cop_year), 1),
-        c(NA, NA)),
-      .name_repair = "minimal"
-    )
-  
-  duplicate_cols <- duplicated(names(pmtct_hei_pos_data))
-  
-  if (any(duplicate_cols)) {
-    pmtct_hei_pos_data <- pmtct_hei_pos_data[,-which(duplicate_cols)]
-  }
-  
-  pmtct_hei_pos_data %<>%
-    dplyr::select(PSNU, PMTCT_HEI_POS.N.infected)  %<>%
-    dplyr::filter(complete.cases(.)) %>%
-    addcols(c("KeyPop", "Age", "Sex")) %>%
-    dplyr::mutate(
-      psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)"),
-      Age = "<01"
-    )
-  
-  tx_new_lt1 <- analytics_dataset %>%
-    dplyr::select(PSNU, psnuid, Age, Sex, KeyPop, TX_NEW.N.Age_Sex_HIVStatus.T) %>%
-    dplyr::filter(Age == "<01") %>%
-    dplyr::mutate(Sex = NA_character_) %>%
-    dplyr::group_by_at(dplyr::vars(-TX_NEW.N.Age_Sex_HIVStatus.T)) %>%
-    dplyr::summarise(
-      TX_NEW.N.Age_Sex_HIVStatus.T = sum(TX_NEW.N.Age_Sex_HIVStatus.T))
-  
-  linkage_lt1 <- tx_new_lt1 %>%
-    dplyr::full_join(pmtct_hei_pos_data,
-                     by = c("PSNU", "psnuid", "Age", "Sex", "KeyPop")) %>%
-    dplyr::mutate_at(dplyr::vars(-PSNU,-psnuid,-Age,-Sex,-KeyPop),
-                     tidyr::replace_na, 0)
-  
-  sj <- analytics_dataset %>%
-    dplyr::mutate(PMTCT_HEI_POS.N.infected = 0) %>%
-    dplyr::bind_rows(linkage_lt1) %>%
-    dplyr::mutate_at(dplyr::vars(-PSNU,-psnuid,-Age,-Sex,-KeyPop),
-                     tidyr::replace_na, 0) %>%
+  data %<>%
     dplyr::mutate(
       HTS_TST_POS.T =
         HTS_INDEX_COM.N.Age_Sex_Result.T.NewPos
-      + HTS_INDEX_FAC.N.Age_Sex_Result.T.NewPos
-      + HTS_TST_EmergencyWard.N.Age_Sex_Result.T.Positive
-      + HTS_TST_Inpat.N.Age_Sex_Result.T.Positive
-      + HTS_TST_Malnutrition.N.Age_Sex_Result.T.Positive
-      + HTS_TST_MobileMod.N.Age_Sex_Result.T.Positive
-      + HTS_TST_OtherMod.N.Age_Sex_Result.T.Positive
-      + HTS_TST_OtherPITC.N.Age_Sex_Result.T.Positive
-      + HTS_TST_Pediatric.N.Age_Sex_Result.T.Positive
-      + HTS_TST_PMTCTPostANC1.N.Age_Sex_Result.T.Positive
-      + HTS_TST_STIClinic.N.Age_Sex_Result.T.Positive
-      + HTS_TST_VCT.N.Age_Sex_Result.T.Positive
-      + HTS_TST.N.KeyPop_Result.T.Positive
-      + PMTCT_STAT.N.Age_Sex_KnownNewResult.T.NewPos
-      + TB_STAT.N.Age_Sex_KnownNewPosNeg.T.NewPos
-      + VMMC_CIRC.N.Age_Sex_HIVStatus.T.Positive
-      + PMTCT_HEI_POS.N.infected,
+        + HTS_INDEX_FAC.N.Age_Sex_Result.T.NewPos
+        + HTS_TST_EmergencyWard.N.Age_Sex_Result.T.Positive
+        + HTS_TST_Inpat.N.Age_Sex_Result.T.Positive
+        + HTS_TST_Malnutrition.N.Age_Sex_Result.T.Positive
+        + HTS_TST_MobileMod.N.Age_Sex_Result.T.Positive
+        + HTS_TST_OtherMod.N.Age_Sex_Result.T.Positive
+        + HTS_TST_OtherPITC.N.Age_Sex_Result.T.Positive
+        + HTS_TST_Pediatric.N.Age_Sex_Result.T.Positive
+        + HTS_TST_PMTCTPostANC1.N.Age_Sex_Result.T.Positive
+        + HTS_TST_STIClinic.N.Age_Sex_Result.T.Positive
+        + HTS_TST_VCT.N.Age_Sex_Result.T.Positive
+        + HTS_TST.N.KeyPop_Result.T.Positive
+        + PMTCT_STAT.N.Age_Sex_KnownNewResult.T.NewPos
+        + TB_STAT.N.Age_Sex_KnownNewPosNeg.T.NewPos
+        + VMMC_CIRC.N.Age_Sex_HIVStatus.T.Positive,
       HTS_TST.Linkage.T = 
         dplyr::case_when(
-          HTS_TST_POS.T == 0
-          & TX_NEW.N.Age_Sex_HIVStatus.T == 0
-          & TX_NEW.N.KeyPop_HIVStatus.T == 0
-          ~ NA_real_,
+          HTS_TST_POS.T == 0 ~ NA_real_,
           TRUE ~ 
             (TX_NEW.N.Age_Sex_HIVStatus.T + TX_NEW.N.KeyPop_HIVStatus.T)
           / (HTS_TST_POS.T)
         )
     )
+  
+  linkage_issues <- data %>%
+    dplyr::filter((HTS_TST.Linkage.T < 0.95 | HTS_TST.Linkage.T > 1)
+  # Need to analyze <01 linkage separately due to EID
+                  & (Age != "<01" | is.na(Age))) %>%
+    dplyr::select(PSNU, psnuid, Age, Sex, KeyPop,
+                  HTS_TST.Linkage.T, HTS_TST_POS.T, TX_NEW.N.Age_Sex_HIVStatus.T,
+                  TX_NEW.N.KeyPop_HIVStatus.T)
   
   if (NROW(linkage_issues) > 0 ) {
     
@@ -166,23 +123,28 @@ analyze_linkage <- function(data, msg = NULL) {
     attr(a$test_results, "test_name") <- "Linkage rate issues"
     
     national_avg_linkage <- data %>%
-      # dplyr::select(
-      #   TX_CURR.N.Age_Sex_HIVStatus.T,
-      #   TX_CURR.N.Age_Sex_HIVStatus.T_1,
-      #   TX_NEW.N.Age_Sex_HIVStatus.T) %>%
-      # dplyr::summarise(
-      #   TX_CURR.N.Age_Sex_HIVStatus.T = sum(TX_CURR.N.Age_Sex_HIVStatus.T, na.rm = T),
-      #   TX_CURR.N.Age_Sex_HIVStatus.T_1 = sum(TX_CURR.N.Age_Sex_HIVStatus.T_1, na.rm = T),
-      #   TX_NEW.N.Age_Sex_HIVStatus.T = sum(TX_NEW.N.Age_Sex_HIVStatus.T, na.rm = T)) %>%
-      # dplyr::mutate(
-      #   TX.Retention.T = 
-      #     (TX_CURR.N.Age_Sex_HIVStatus.T)
-      #   / (TX_CURR.N.Age_Sex_HIVStatus.T_1 + TX_NEW.N.Age_Sex_HIVStatus.T)
-      # )
+      dplyr::filter(Age != "<01" | is.na(Age)) %>%
+      dplyr::mutate(
+        HTS_TST_POS.KeyPop.T =
+          dplyr::if_else(is.na(KeyPop), 0, HTS_TST_POS.T),
+        HTS_TST_POS.T = dplyr::if_else(is.na(KeyPop), HTS_TST_POS.T, 0)
+      ) %>%
+      dplyr::select(
+       HTS_TST_POS.T,
+       HTS_TST_POS.KeyPop.T,
+       TX_NEW.N.Age_Sex_HIVStatus.T,
+       TX_NEW.N.KeyPop_HIVStatus.T) %>%
+      dplyr::summarise_all(list(sum), na.rm = T) %>%
+      dplyr::mutate(
+       HTS_TST.Linkage.T = 
+         TX_NEW.N.Age_Sex_HIVStatus.T / HTS_TST_POS.T,
+       HTS_TST.KeyPop.Linkage.T =
+         TX_NEW.N.KeyPop_HIVStatus.T / HTS_TST_POS.KeyPop.T
+      )
     
-    analytics_warning_msg <- 
+    a$msg <- 
       paste0(
-        "WARNING! LINKAGE RATES < 95%: \n\n\t* ",
+        "WARNING! LINKAGE RATES <95% OR >100%: \n\n\t* ",
         crayon::bold(
           paste0(
             length(unique(linkage_issues$psnuid)), " of ",
@@ -191,19 +153,18 @@ analyze_linkage <- function(data, msg = NULL) {
         "Lowest linkage rate observed: ",
         crayon::bold(sprintf("%.1f%%", 100 * min(linkage_issues$HTS_TST.Linkage.T))),
         "\n\n\t* ",
-        "National average linkage rate: ",
+        "National average GenPop linkage rate: ",
         crayon::bold(sprintf("%.1f%%", 100 * min(national_avg_linkage$HTS_TST.Linkage.T))),
+        "\n\n\t* ",
+        "National average KeyPop linkage rate: ",
+        crayon::bold(sprintf("%.1f%%", 100 * min(national_avg_linkage$HTS_TST.KeyPop.Linkage.T))),
         "\n")
-    
-    a$msg <- append(msg, analytics_warning_msg)
     
   } 
   
   return(a)
   
 }
-
-
 
 
 #' @export
@@ -224,12 +185,22 @@ checkAnalytics <- function(d,
   d$info$analytics_warning_msg <- NULL
   d$info$has_analytics_error <- FALSE
   
-  # Pull in PSNU-level data ####
-  PSNU <- d$data$MER %>%
-    dplyr::bind_rows(d$data$SUBNAT_IMPATT) %>%
-    dplyr::select(-sheet_name)
+  # Combine MER and SUBNAT data ####
+  data <- d$datim$MER %>%
+    dplyr::bind_rows(d$datim$subnat_impatt) %>%
+    dplyr::mutate(attributeOptionCombo = "HllvX50cXC0") %>%
+    dplyr::group_by(
+      dataElement, period, orgUnit, categoryOptionCombo, attributeOptionCombo) %>%
+    dplyr::summarise(value = sum(value)) %>%
+    dplyr::ungroup() %>%
+    
+  # Adorn metadata
+    adorn_import_file() %>%
+    dplyr::select(PSNU = dp_psnu, psnuid = psnu_uid,
+                  indicator_code, Age, Sex, KeyPop, value)
   
   # Prepare model data ####
+  #TODO: Generalize this as function
   model_data <- readRDS(d$keychain$model_data_path)
   
   if (!all(d$info$country_uids %in% names(model_data))) {
@@ -267,29 +238,31 @@ checkAnalytics <- function(d,
                   Sex, KeyPop, value)
   
   # Add model_data to PSNU-level dataset ####
-  analytics_dataset <- PSNU %>%
+  data %<>%
     dplyr::bind_rows(model_data) %>%
     dplyr::arrange(indicator_code, PSNU, Age, Sex, KeyPop) %>%
     tidyr::pivot_wider(names_from = indicator_code,
                        values_from = value) %>%
+    addcols((cop20_data_pack_schema %>%
+                dplyr::filter(col_type %in% c("target", "past")) %>%
+                dplyr::pull(indicator_code)),
+            type = "numeric") %>%
     dplyr::mutate_at(dplyr::vars(-PSNU,-psnuid,-Age,-Sex,-KeyPop),
                      tidyr::replace_na, 0)
   
   # TEST: Retention Rates ####
-  a <- analyze_retention(data = analytics_dataset,
-                         msg = d$info$analytics_warning_msg)
+  a <- analyze_retention(data)
   
   if (!is.null(a)) {
-    d$info$analytics_warning_msg <- a$msg
+    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
     d$tests$retention <- a$test_results
   }
   
   # TEST: Linkage rates ####
-  a <- analyze_linkage(data = analytics_dataset,
-                         msg = d$info$analytics_warning_msg)
+  a <- analyze_linkage(data)
   
   if (!is.null(a)) {
-    d$info$analytics_warning_msg <- a$msg
+    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
     d$tests$linkage <- a$test_results
   }
   

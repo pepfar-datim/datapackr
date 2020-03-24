@@ -23,7 +23,7 @@ createAnalytics <- function(d) {
   #Adorn organisation units
   d <- adornPSNUs(d)
   #Adorn mechanisms
-  d <- adornMechanisms(d)
+  d$data$analytics <- adornMechanisms(d$data$analytics)
   #TODO: Centralize this fix with exportDistributeMERtoDATIM
   map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
   map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
