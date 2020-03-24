@@ -142,7 +142,7 @@ analyze_linkage <- function(data) {
          TX_NEW.N.KeyPop_HIVStatus.T / HTS_TST_POS.KeyPop.T
       )
     
-    analytics_warning_msg <- 
+    a$msg <- 
       paste0(
         "WARNING! LINKAGE RATES <95% OR >100%: \n\n\t* ",
         crayon::bold(
@@ -159,8 +159,6 @@ analyze_linkage <- function(data) {
         "National average KeyPop linkage rate: ",
         crayon::bold(sprintf("%.1f%%", 100 * min(national_avg_linkage$HTS_TST.KeyPop.Linkage.T))),
         "\n")
-    
-    a$msg <- append(msg, analytics_warning_msg)
     
   } 
   

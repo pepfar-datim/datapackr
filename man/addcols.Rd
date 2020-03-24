@@ -4,7 +4,7 @@
 \alias{addcols}
 \title{Add list of columns as NULL columns to supplied dataframe.}
 \usage{
-addcols(data, cnames, type)
+addcols(data, cnames, type = "character")
 }
 \arguments{
 \item{data}{Dataframe to add columns.}

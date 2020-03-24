@@ -332,7 +332,7 @@ getCountries <- function(datapack_uid = NA) {
 #' 
 #' @return Dataframe \code{data} with added columns listed in \code{cnames}.
 #'
-addcols <- function(data, cnames, type) {
+addcols <- function(data, cnames, type = "character") {
   add <- cnames[!cnames %in% names(data)]
   
   if (length(add) != 0) {
