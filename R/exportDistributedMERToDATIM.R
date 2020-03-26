@@ -11,13 +11,36 @@
 #' 
 exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
   
+  
+  #We need to now indentify any cases where there was exaclty 100% distribution, but there was a dedupe. 
+  over_allocated<-d$data$SNUxIM %>% 
+    dplyr::filter(mechanism_code != '99999') %>% 
+    dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type) %>% 
+    dplyr::summarize(distribution = sum(distribution)) %>% 
+    dplyr::filter(distribution > 1.00) %>% 
+    dplyr::select(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type)
+  
+  potential_dupes<-d$data$distributedMER %>% 
+    dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type) %>% 
+    dplyr::filter(mechanism_code != '99999') %>% 
+    dplyr::tally() %>% 
+    dplyr::filter(n > 1) %>% 
+    dplyr::select(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type)
+  
+  sum_dupes<-dplyr::anti_join(potential_dupes,over_allocated) %>% 
+    dplyr::mutate(mechanism_code ='00000',
+                  value = 0)
+ 
+  
   if(keep_dedup == TRUE){
     d$datim$MER <- d$data$distributedMER  
   } else {
   #Filter the pseudo-dedupe mechanism data out
   d$datim$MER <- d$data$distributedMER %>%
-    dplyr::filter(mechanism_code != '99999') 
+     dplyr::filter(mechanism_code != '99999')
   }
+  
+  d$datim$MER<-dplyr::bind_rows(d$datim$MER,sum_dupes)
   
 # align   map_DataPack_DATIM_DEs_COCs with  d$datim$MER/d$data$distributedMER for KP_MAT 
   map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
@@ -67,6 +90,7 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
   # Remove anything which is NA here. Under COP19 guidance, this will include only TX_PVLS.N.Age/Sex/Indication/HIVStatus.20T.Routine
     dplyr::filter(complete.cases(.))
   
+
   return(d)
   
 }
