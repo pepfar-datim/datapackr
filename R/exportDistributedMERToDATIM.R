@@ -33,6 +33,28 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
     dplyr::mutate(mechanism_code ='00000',
                   value = 0)
   
+  #DSD_TA Crosswalk dupes which should be autoresolved
+  
+  crosswalk_dupes<-d$data$SNUxIM %>% 
+    dplyr::filter(mechanism_code != '99999') %>% 
+    dplyr::filter(distribution != 0) %>% 
+    dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type) %>% 
+    dplyr::summarize(distribution = sum(distribution)) %>% 
+    dplyr::mutate(distribution_diff = abs(distribution - 1.0)) %>% 
+    dplyr::filter(distribution_diff >= 1e-3 & distribution != 1.0) %>% 
+    dplyr::select(-distribution_diff) %>% 
+    tidyr::pivot_wider(names_from = support_type,values_from = distribution) %>% 
+    dplyr::mutate(total_distribution = DSD + TA,
+                  is_crosswalk = !is.na(DSD) & !is.na(TA)) %>% 
+    dplyr::filter(is_crosswalk) %>% 
+    dplyr::mutate(distribution_diff = abs(total_distribution - 1.0)) %>% 
+    dplyr::filter(distribution_diff <= 1e-3 ) %>% 
+    dplyr::select(PSNU,psnuid,indicator_code,Age,Sex,KeyPop) %>% 
+    dplyr::mutate(support_type = 'TA',
+                  sheet_name = NA,
+                  mechanism_code = '00001',
+                  value = 0) %>% 
+    dplyr::select(names(d$data$distributedMER))
   
   if(keep_dedup == TRUE){
     d$datim$MER <- d$data$distributedMER  
@@ -42,14 +64,25 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
       dplyr::filter(mechanism_code != '99999')
   }
   
-  d$datim$MER<-dplyr::bind_rows(d$datim$MER,sum_dupes)
-  
+  #Bind pure dupes
+ 
   if (NROW(sum_dupes) > 0) {
-    msg<-paste0("INFO! ", NROW(sum_dupes), " zero-valued deduplication adjustments will be added to your DATIM import.
+    d$datim$MER<-dplyr::bind_rows(d$datim$MER,sum_dupes)
+    msg<-paste0("INFO! ", NROW(sum_dupes), " zero-valued pure deduplication adjustments will be added to your DATIM import.
                 Please consult the DataPack wiki section on deduplication for more information. ")
     
     d$info$warning_msg<-append(d$info$warning_msg,msg)
   }
+  
+  #Bind crosswalk dupes
+  if (NROW(crosswalk_dupes) > 0) {
+    d$datim$MER<-dplyr::bind_rows(d$datim$MER,crosswalk_dupes)
+    msg<-paste0("INFO! ", NROW(crosswalk_dupes), " zero-valued crosswalk deduplication adjustments will be added to your DATIM import.
+                Please consult the DataPack wiki section on deduplication for more information. ")
+    
+    d$info$warning_msg<-append(d$info$warning_msg,msg)
+  }
+  
   
   # align   map_DataPack_DATIM_DEs_COCs with  d$datim$MER/d$data$distributedMER for KP_MAT 
   map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
