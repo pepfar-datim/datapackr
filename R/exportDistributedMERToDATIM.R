@@ -12,12 +12,14 @@
 exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
   
   
-  #We need to now indentify any cases where there was exaclty 100% distribution, but there was a dedupe. 
+  #We need to now indentify any cases where there was exactly 100% distribution, but there was a dedupe. 
   over_allocated<-d$data$SNUxIM %>% 
     dplyr::filter(mechanism_code != '99999') %>% 
+    dplyr::filter(distribution != 0) %>% 
     dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type) %>% 
     dplyr::summarize(distribution = sum(distribution)) %>% 
-    dplyr::filter(distribution > 1.00) %>% 
+    dplyr::mutate(distribution_diff = abs(distribution - 1.0)) %>% 
+    dplyr::filter(distribution_diff > 0.01) %>% 
     dplyr::select(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type)
   
   potential_dupes<-d$data$distributedMER %>% 
