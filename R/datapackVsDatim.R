@@ -100,7 +100,8 @@ compareData_DatapackVsDatim <-
         org_unit_uid = orgUnit,
         category_option_combo_uid = categoryOptionCombo,
         attribute_option_combo_code = attributeOptionCombo
-      )
+      ) %>%
+      dplyr::filter(datapack_value != 0)
 
 # Sum over IM including dedup    
     datapack_data_psnu_w_dedup <- dplyr::group_by(datapack_data,
