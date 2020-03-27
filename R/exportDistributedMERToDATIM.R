@@ -19,7 +19,7 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
     dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type) %>% 
     dplyr::summarize(distribution = sum(distribution)) %>% 
     dplyr::mutate(distribution_diff = abs(distribution - 1.0)) %>% 
-    dplyr::filter(distribution_diff >= 1e-3) %>% 
+    dplyr::filter(distribution_diff >= 1e-3 & distribution > 1.0) %>% 
     dplyr::select(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type)
   
   potential_dupes<-d$data$distributedMER %>% 
