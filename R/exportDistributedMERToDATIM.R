@@ -42,19 +42,27 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
     dplyr::summarize(distribution = sum(distribution)) %>% 
     dplyr::mutate(distribution_diff = abs(distribution - 1.0)) %>% 
     dplyr::filter(distribution_diff >= 1e-3 & distribution != 1.0) %>% 
-    dplyr::select(-distribution_diff) %>% 
-    tidyr::pivot_wider(names_from = support_type,values_from = distribution) %>% 
-    dplyr::mutate(total_distribution = DSD + TA,
-                  is_crosswalk = !is.na(DSD) & !is.na(TA)) %>% 
-    dplyr::filter(is_crosswalk) %>% 
-    dplyr::mutate(distribution_diff = abs(total_distribution - 1.0)) %>% 
-    dplyr::filter(distribution_diff <= 1e-3 ) %>% 
-    dplyr::select(PSNU,psnuid,indicator_code,Age,Sex,KeyPop) %>% 
-    dplyr::mutate(support_type = 'TA',
-                  sheet_name = NA,
-                  mechanism_code = '00001',
-                  value = 0) %>% 
-    dplyr::select(names(d$data$distributedMER))
+    dplyr::select(-distribution_diff) 
+  
+  if (setequal(unique(crosswalk_dupes$support_type),c("DSD","TA"))) {
+    crosswalk_dupes %<>% 
+      tidyr::pivot_wider(names_from = support_type,values_from = distribution) %>% 
+      dplyr::mutate(total_distribution = DSD + TA,
+                    is_crosswalk = !is.na(DSD) & !is.na(TA)) %>% 
+      dplyr::filter(is_crosswalk) %>% 
+      dplyr::mutate(distribution_diff = abs(total_distribution - 1.0)) %>% 
+      dplyr::filter(distribution_diff <= 1e-3 ) %>% 
+      dplyr::select(PSNU,psnuid,indicator_code,Age,Sex,KeyPop) %>% 
+      dplyr::mutate(support_type = 'TA',
+                    sheet_name = NA,
+                    mechanism_code = '00001',
+                    value = 0) %>% 
+      dplyr::select(names(d$data$distributedMER))
+  } else {
+    crosswalk_dupes<-data.frame(foo=character())
+  }
+  
+
   
   if(keep_dedup == TRUE){
     d$datim$MER <- d$data$distributedMER  
