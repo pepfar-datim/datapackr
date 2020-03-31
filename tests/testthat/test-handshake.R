@@ -1,4 +1,4 @@
-context("test-template")
+context("test-handshake")
 
 
 test_that("Can handshake template", {
