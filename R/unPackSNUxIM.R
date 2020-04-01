@@ -148,10 +148,10 @@ unPackSNUxIM <- function(d) {
   if (d$info$missing_psnuxim_combos) {
     warning_msg <- 
       paste0(
-        "WARNING! You must submit your Data Pack to the DATIM Help Desk to receive",
-        " an updated PSNUxIM tab that integrates targets set after you last",
-        " received an updated version of this tab. You can do this at",
-        "DATIM.ZenDesk.com, or via logging in to www.DATIM.org.",
+        "INFO! Your DataPack may need a new PSNUxIM tab.",
+        "This can be done via the self-service app in order to ",
+        " receive an updated version of this tab. You can also submit a help desk ticket at",
+        "DATIM.ZenDesk.com, or via logging in to www.DATIM.org and choosing the support app.",
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
