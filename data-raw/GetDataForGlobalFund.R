@@ -1,9 +1,10 @@
+devtools::install_github("pepfar-datim/datapackr","pr/145-sam")
+
 library(tidyverse)
 library(magrittr)
 library(devtools)
 library(lubridate)
 require(datapackcommons)
-devtools::install_github("pepfar-datim/datapackr","pr/145-sam")
 
 datapackr::loginToDATIM("/users/sam/.secrets/datim.json")
 base_url = getOption("baseurl")
@@ -28,7 +29,8 @@ beautify <- function(data) {
     datapackr::valid_PSNUs %>% dplyr::select(psnu, psnu_uid)
 
   data %<>%
-    dplyr::left_join(psnus, by = c("org_unit_uid" = "psnu_uid"))
+    dplyr::left_join(psnus, by = c("org_unit_uid" = "psnu_uid")) %>% 
+    dplyr::filter(!stringr::str_detect(psnu, "_Military"))
 }
 # End Beautify function
 
@@ -59,4 +61,4 @@ data <- purrr::map(names,
 
 data <- purrr::discard(data, ~is.null(.x))
 
-openxlsx::write.xlsx(data, paste0("gf_data_transfer_20200401.xlsx"))
+openxlsx::write.xlsx(data, paste0("gf_data_transfer_20200401_2.xlsx"))
