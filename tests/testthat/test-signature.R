@@ -23,6 +23,9 @@ test_that("Can generate a signature", {
    expect_null(d$info$warning_msg)
    expect_false(d$info$has_error)
    expect_false(d$info$newSNUxIM)
+   expect_equal(d$info$cop_year,getCurrentCOPYear())
+   #Since we are using a specific version of the template for these tests
+   expect_equal(d$info$cop_year,2020)
   
 } )
 
