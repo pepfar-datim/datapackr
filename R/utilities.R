@@ -383,3 +383,106 @@ isLoggedIn<-function() {
       }
     }
 }
+
+# this code relates to https://github.com/pepfar-datim/COP-Target-Setting/issues/700
+# it is not being exported pending https://github.com/pepfar-datim/COP-Target-Setting/issues/734
+# as it works for COP20 leaving it in place for now 
+
+#' @title Pull & combine all  UIDS for specified data_stream types and FY.
+#' 
+#' @description
+#' Pulls all uids for types argument for a specified FY.
+#' 
+#' @param FY Reporting FY for which to filter active code lists, numeric, if null current year is used.
+#' @param types Specify MER, SUBNAT, or IMPATT, or omit to specify all.
+#' 
+#' @return a character vector with the requested uids respecting the selection in the type parameter and FY parameter.
+#'
+#' @example getCopDatasetUids(FY=2021, types = c("MER", "SUBNAT", "IMPATT"))
+
+getCopDatasetUids <- function(FY = NULL, types = NULL) {
+if(FY != 2021){
+  stop("The fiscal year provided is not supported by the internal function getCopDatasetUids")
+}
+  if (is.null(FY)) {FY = currentFY()}
+  if (is.null(types)) {types = c("MER", "SUBNAT", "IMPATT")}
+
+  data <- api_get(api_call("dataSets"))
+  data <- data[grepl("^MER Targets: (Community|Facility)|MER Target Setting: PSNU|^(Host Country Targets|Planning Attributes): COP Prioritization SNU",
+        data$displayName),]
+  if(FY != currentFY()+1)
+  {
+    data <- data[grepl(paste0("FY",FY), data$displayName),]
+  }else{
+    data <- data[!(grepl("FY[0-9]{4}", data$displayName)),]
+  }
+
+  data$fiscal_year <- ifelse(!stringr::str_detect(data$displayName, "FY"), currentFY()+1,
+                        as.numeric(stringr::str_extract(data$displayName,"(?<=FY)\\d{4}$")))
+  data$data_stream <- ifelse(stringr::str_detect(data$displayName, "^MER "), "MER",
+                        ifelse(stringr::str_detect(data$displayName, "^Host Country Targets"),
+                               "SUBNAT","IMPATT"))
+  if(!(all((types %in% data$data_stream))))
+  {
+    stop(paste0("UID Not Found for ", setdiff(types, data$data_stream), " for FY ", FY))
+  }
+
+#  print(paste0("returning uids for " , FY))
+  return(data$id[data$data_stream %in% types])
+
+}
+
+
+#' @export
+#' @title grab all raw data in DATIM for a country for the COP data sets for a given fiscal year.
+#' 
+#' @description
+#' grab all raw data in DATIM for a country for the COP data sets for a given fiscal year.
+#' 
+#' @param country_uid country_uid
+#' @param fiscal_year_yyyy fiscal_year
+#' @param base_url base to append api calls normally defined beforehand
+#' 
+#' @return raw data in DATIM for a country for the COP data sets for a given fiscal year.
+#'
+#' @example getCopDataFromDatim(country_uid = d$info$country_uids, 
+#'                    fiscal_year_yyyy = d$info$cop_year)
+
+getCopDataFromDatim <- function(country_uid, 
+                                fiscal_year_yyyy, 
+                                base_url = getOption("baseurl"))
+{
+  if(fiscal_year_yyyy != 2021){
+    stop("The fiscal year provided is not supported by the internal function getCopDataFromDatim")
+  }
+  dataset_uids <- getCopDatasetUids(fiscal_year_yyyy)
+
+  # package parameters for getDataValueSets function call
+  parameters <- 
+    dplyr::bind_rows( 
+      tibble::tibble(key = "dataSet", value = dataset_uids),
+      tibble::tibble(key = "orgUnit", value = country_uid),
+      tibble::tribble(~ key, ~ value,
+                      "children", "true",
+                      "categoryOptionComboIdScheme", "code",
+                      "includeDeleted", "false",
+                      "period", paste0(fiscal_year_yyyy - 1, "Oct")
+      )
+    )
+  
+  # get data from datim usinfg dataValueSets
+  # rename to standard names
+  datim_data <-
+    getDataValueSets(parameters$key,
+                     parameters$value,
+                     base_url = base_url) %>%
+    dplyr::rename(
+      datim_value = value,
+      data_element_uid = data_element,
+      org_unit_uid = org_unit,
+      category_option_combo_uid = category_option_combo,
+      attribute_option_combo_code = attribute_option_combo
+    )
+  
+  return(datim_data)
+}
