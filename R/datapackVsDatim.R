@@ -69,6 +69,10 @@ compareData_DatapackVsDatim <-
         
 # start main processing
 # start off with dedups included
+    
+    if(d$info$cop_year != 2020){
+      stop("Attempting to use compareData_DatapackVsDatim doe unsupported COP year")
+    }
     d <- datapackr::exportDistributedDataToDATIM(d, keep_dedup = TRUE)
     
     d$datim$MER$value <- as.numeric(d$datim$MER$value)
@@ -119,7 +123,7 @@ compareData_DatapackVsDatim <-
 # Get data from DATIM using data value sets
     
     datim_data <- getCopDataFromDatim(country_uid = d$info$country_uids, 
-                        fiscal_year_yyyy = d$info$cop_year)
+                        fiscal_year_yyyy = d$info$cop_year + 1)
     
   datim_data  %>%
       dplyr::filter(datim_value != 0) %>% # we don't import 0s up front so we should ignore any here
