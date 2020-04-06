@@ -384,8 +384,10 @@ isLoggedIn<-function() {
     }
 }
 
+# this code relates to https://github.com/pepfar-datim/COP-Target-Setting/issues/700
+# it is not being exported pending https://github.com/pepfar-datim/COP-Target-Setting/issues/734
+# as it works for COP20 leaving it in place for now 
 
-#' @export
 #' @title Pull & combine all  UIDS for specified data_stream types and FY.
 #' 
 #' @description
@@ -399,10 +401,12 @@ isLoggedIn<-function() {
 #' @example getCopDatasetUids(FY=2021, types = c("MER", "SUBNAT", "IMPATT"))
 
 getCopDatasetUids <- function(FY = NULL, types = NULL) {
-  
+if(FY != 2021){
+  stop("The fiscal year provided is not supported by the internal function getCopDatasetUids")
+}
   if (is.null(FY)) {FY = currentFY()}
   if (is.null(types)) {types = c("MER", "SUBNAT", "IMPATT")}
-  
+
   data <- api_get(api_call("dataSets"))
   data <- data[grepl("^MER Targets: (Community|Facility)|MER Target Setting: PSNU|^(Host Country Targets|Planning Attributes): COP Prioritization SNU",
         data$displayName),]
@@ -412,8 +416,8 @@ getCopDatasetUids <- function(FY = NULL, types = NULL) {
   }else{
     data <- data[!(grepl("FY[0-9]{4}", data$displayName)),]
   }
-  
-  data$fiscal_year <- ifelse(!stringr::str_detect(data$displayName, "FY"), currentFY()+1, 
+
+  data$fiscal_year <- ifelse(!stringr::str_detect(data$displayName, "FY"), currentFY()+1,
                         as.numeric(stringr::str_extract(data$displayName,"(?<=FY)\\d{4}$")))
   data$data_stream <- ifelse(stringr::str_detect(data$displayName, "^MER "), "MER",
                         ifelse(stringr::str_detect(data$displayName, "^Host Country Targets"),
@@ -422,10 +426,10 @@ getCopDatasetUids <- function(FY = NULL, types = NULL) {
   {
     stop(paste0("UID Not Found for ", setdiff(types, data$data_stream), " for FY ", FY))
   }
-  
+
   print(paste0("returning uids for " , FY))
   return(data$id[data$data_stream %in% types])
-  
+
 }
 
 
@@ -448,8 +452,10 @@ getCopDataFromDatim <- function(country_uid,
                                 fiscal_year_yyyy, 
                                 base_url = getOption("baseurl"))
 {
-  
-  dataset_uids <- datapackr::getCopDatasetUids(fiscal_year_yyyy)
+  if(fiscal_year_yyyy != 2021){
+    stop("The fiscal year provided is not supported by the internal function getCopDataFromDatim")
+  }
+  dataset_uids <- getCopDatasetUids(fiscal_year_yyyy)
 
   # package parameters for getDataValueSets function call
   parameters <- 
