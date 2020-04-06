@@ -1,10 +1,9 @@
-devtools::install_github("pepfar-datim/datapackr","pr/145-sam")
-
 library(tidyverse)
 library(magrittr)
 library(devtools)
 library(lubridate)
 require(datapackcommons)
+require(datapackr)
 
 datapackr::loginToDATIM("/users/sam/.secrets/datim.json")
 base_url = getOption("baseurl")
