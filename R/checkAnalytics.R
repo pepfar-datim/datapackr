@@ -166,6 +166,130 @@ analyze_linkage <- function(data) {
   
 }
 
+#' @export
+#' @title Check Data Pack data for low representation of HTS_INDEX_POS
+#'
+#' @description Check data gathered from Data Pack to identify cases where
+#' the proportion of HTS_TST_POS represented by HTS_INDEX_POS is too low for the
+#' given ART Coverage rate:
+#' 
+#' \tabular{cc}{
+#'   \strong{ART Coverage}\tab  \strong{HTS_INDEX_POS \% of HTS_TST_POS}\cr
+#'   <70\%\tab  30\%\cr
+#'   70\% <= x < 80\%\tab  50\%\cr
+#'   >= 80\%\tab  75\%\cr 
+#' }
+#'
+#' @param data Analytics object to analyze
+#' 
+#' @return a
+#' 
+analyze_indexpos_ratio <- function(data) {
+  a <- NULL
+  
+  data %<>%
+    dplyr::mutate(
+      HTS_TST_POS.T =
+        HTS_INDEX_COM.N.Age_Sex_Result.T.NewPos
+        + HTS_INDEX_FAC.N.Age_Sex_Result.T.NewPos
+        + HTS_TST_EmergencyWard.N.Age_Sex_Result.T.Positive
+        + HTS_TST_Inpat.N.Age_Sex_Result.T.Positive
+        + HTS_TST_Malnutrition.N.Age_Sex_Result.T.Positive
+        + HTS_TST_MobileMod.N.Age_Sex_Result.T.Positive
+        + HTS_TST_OtherMod.N.Age_Sex_Result.T.Positive
+        + HTS_TST_OtherPITC.N.Age_Sex_Result.T.Positive
+        + HTS_TST_Pediatric.N.Age_Sex_Result.T.Positive
+        + HTS_TST_PMTCTPostANC1.N.Age_Sex_Result.T.Positive
+        + HTS_TST_STIClinic.N.Age_Sex_Result.T.Positive
+        + HTS_TST_VCT.N.Age_Sex_Result.T.Positive
+        + HTS_TST.N.KeyPop_Result.T.Positive
+        + PMTCT_STAT.N.Age_Sex_KnownNewResult.T.NewPos
+        + TB_STAT.N.Age_Sex_KnownNewPosNeg.T.NewPos
+        + VMMC_CIRC.N.Age_Sex_HIVStatus.T.Positive,
+      HTS_INDEX.total =
+        HTS_INDEX_COM.N.Age_Sex_Result.T.NewPos
+        + HTS_INDEX_FAC.N.Age_Sex_Result.T.NewPos,
+      HTS_TST_POS.index_rate = 
+        dplyr::case_when(
+          HTS_TST_POS.T == 0 ~ NA_real_,
+          TRUE ~ HTS_INDEX.total
+                / (HTS_TST_POS.T)
+        ),
+      ART_coverage = 
+        dplyr::case_when(
+          `PLHIV.NA.Age/Sex/HIVStatus.T` == 0 ~ NA_real_,
+          TRUE ~ `TX_CURR_SUBNAT.N.Age/Sex/HIVStatus.T`
+                / `PLHIV.NA.Age/Sex/HIVStatus.T`)
+    )
+    
+  issues <- data %>%
+    dplyr::select(PSNU, psnuid,
+                  `TX_CURR_SUBNAT.N.Age/Sex/HIVStatus.T`,
+                  `PLHIV.NA.Age/Sex/HIVStatus.T`,
+                  ART_coverage, HTS_INDEX.total, HTS_TST_POS.T,
+                  HTS_TST_POS.index_rate) %>%
+    dplyr::group_by(PSNU, psnuid) %>%
+    dplyr::mutate(
+      ART_coverage.psnu =
+        dplyr::case_when(
+          sum(`PLHIV.NA.Age/Sex/HIVStatus.T`) == 0
+            ~ NA_real_,
+          TRUE ~ (sum(`TX_CURR_SUBNAT.N.Age/Sex/HIVStatus.T`)
+                  / sum(`PLHIV.NA.Age/Sex/HIVStatus.T`))),
+      HTS_TST_POS.index_rate.psnu =
+        dplyr::case_when(
+          sum(HTS_TST_POS.T) == 0 ~ NA_real_,
+          TRUE ~ sum(HTS_INDEX.total) / sum(HTS_TST_POS.T)),
+      index_issues.psnu = (ART_coverage.psnu < 0.7 & HTS_TST_POS.index_rate.psnu < 0.3)
+      | (ART_coverage.psnu >= 0.7 & ART_coverage.psnu < 0.8  & HTS_TST_POS.index_rate.psnu < 0.5)
+      | (ART_coverage.psnu >= 0.8 & HTS_TST_POS.index_rate.psnu < 0.75)) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(
+      (ART_coverage < 0.7 & HTS_TST_POS.index_rate < 0.3)
+      | (ART_coverage >= 0.7 & ART_coverage < 0.8  & HTS_TST_POS.index_rate < 0.5)
+      | (ART_coverage >= 0.8 & HTS_TST_POS.index_rate < 0.75)) %>%
+    dplyr::mutate(
+      category = dplyr::case_when(
+        (ART_coverage > 1) | (ART_coverage == 0) ~ "Inspect ART Coverage",
+        HTS_TST_POS.T < 10 ~ "Low baseline HTS_TST_POS",
+        !index_issues.psnu ~ "Isolated case",
+        TRUE ~ "Likely Index Rate issue"
+      )
+    )
+    
+  if (NROW(issues) > 0 ) {
+    
+    a$test_results <- issues
+    attr(a$test_results, "test_name") <- "HTS_INDEX_POS Rate Issues"
+    
+    a$msg <- 
+      paste0(
+        "WARNING! HTS_INDEX_POS RATES TOO LOW: \n\n\t* ",
+        crayon::bold(
+          paste0(
+            length(unique(issues$psnuid)), " of ",
+            length(unique(data$psnuid)))),
+          " PSNUs affected.\n\n\t* ",
+        crayon::bold(
+          paste0(NROW(issues))), " total cases.\n\n\t\t- ",
+        crayon::bold(length(issues$category[issues$category == "Inspect ART Coverage"])),
+          " cases possibly due to faulty ART Coverage statistics",
+        "\n\n\t\t- ",
+        crayon::bold(length(issues$category[issues$category == "Low baseline HTS_TST_POS"])),
+          " cases possibly due to low baseline HTS_TST_POS",
+        "\n\n\t\t- ",
+        crayon::bold(length(issues$category[issues$category == "Isolated case"])),
+          " cases possibly due to an Age/Sex specific outlier",
+        "\n\n\t\t- ",
+        crayon::bold(length(issues$category[issues$category == "Likely Index Rate issue"])),
+          " cases possibly due to actual HTS_INDEX_POS rate issue",
+        "\n")
+  }
+  
+  return(a)
+  
+}
+
 
 #' @export
 #' @title Check Data Pack data for analytics concerns
@@ -264,6 +388,14 @@ checkAnalytics <- function(d,
   if (!is.null(a)) {
     d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
     d$tests$linkage <- a$test_results
+  }
+  
+  # TEST: HTS_INDEX_POS proportion of HTS_TST_POS ####
+  a <- analyze_indexpos_ratio(data)
+  
+  if (!is.null(a)) {
+    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
+    d$tests$index_rate <- a$test_results
   }
   
   # If warnings, show all grouped by sheet and issue ####
