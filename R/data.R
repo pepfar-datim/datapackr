@@ -271,33 +271,6 @@
 "site_tool_schema"
 
 #' @docType data
-#' @title Map of indicators from PSNU x IM dataset to DATIM
-#' 
-#' @description 
-#' Dataset that maps Data Pack indicators to DSD dataelements and
-#' categoryoptioncombos in DATIM, used for mapping PSNU x IM datasets
-#' extracted from Data Packs to DATIM import file structure.
-#' 
-#' @format 
-#' \describe{
-#'   \item{sheet_name}{Lists the sheet/tab name as used in the Data Pack.}
-#'   \item{indicatorCode}{Code used in the Data Pack to uniquely identify each
-#'   distinct programmatic area of target setting.}
-#'   \item{typeOptions}{Either DSD or TA. The crossing of these with
-#'   \code{indicatorCode} roughly corresponds to DATIM dataelements.}
-#'   \item{dataelementuid}{DATIM uid for dataElements.}
-#'   \item{dataset}{Name of DATIM dataset associated with the listed
-#'   \code{dataelementuid}, either "MER", "SUBNAT", or "IMPATT".}
-#'   \item{validAges}{Age disaggregate.}
-#'   \item{validSexes}{Sex disaggregate.}
-#'   \item{validKPs}{Key Population disaggregate.}
-#'   \item{categoryoptioncombouid}{DATIM uid for categoryOptionCombos.}
-#' }
-#' 
-"PSNUxIM_to_DATIM"
-
-
-#' @docType data
 #' @title periodInfo
 #' 
 #' @description 
