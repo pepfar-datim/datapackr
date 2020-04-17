@@ -446,33 +446,6 @@ If you have any questions, please submit a Help Desk ticket at DATIM.Zendesk.com
     }
   } else if (d$info$cop_year == 2019) {
     stop("Packing SNU x IM tabs is no longer supported for FY2019 Data Packs.")
-  #   data <- data %>%
-  #     dplyr::mutate(
-  #       period = datapackr::periodInfo$iso) %>% 
-  #     dplyr::left_join(datapackr::PSNUxIM_to_DATIM %>% #TODO: Build PSNUxIM_to_DATIM from API call.
-  #                        dplyr::filter(dataset == "MER") %>%
-  #                        dplyr::select(-sheet_name, -typeOptions, -dataset),
-  #                      by = c("indicator_code" = "indicatorCode",
-  #                             "Age" = "validAges",
-  #                             "Sex" = "validSexes",
-  #                             "KeyPop" = "validKPs")) %>%
-  #     # Under COP19 requirements, after this join, TX_PVLS N will remain NA for dataelementuid and categoryoptioncombouid
-  #     # Select and rename based on DATIM protocol
-  #     dplyr::select(
-  #       dataElement = dataelementuid,
-  #       period,
-  #       orgUnit = psnuid,
-  #       categoryOptionCombo = categoryoptioncombouid,
-  #       mechanism_code,
-  #       value) %>%
-  #     dplyr::group_by(dataElement, period, orgUnit,categoryOptionCombo,
-  #                     mechanism_code) %>% #TODO: Coordinate with self-service on this name change
-  #     dplyr::summarise(value = sum(value)) %>%
-  #     dplyr::ungroup() %>%
-  #   # Coerce decimals to integers now
-  #     dplyr::mutate(value = round_trunc(value)) %>%
-  #   # Remove anything which is NA here. Under COP19 guidance, this will include only TX_PVLS.N.Age/Sex/Indication/HIVStatus.20T.Routine
-  #     dplyr::filter(complete.cases(.))
   }
   
   return(d)
