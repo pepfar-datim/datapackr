@@ -10,6 +10,7 @@
 #' 
 analyze_retention <- function(data) {
   a <- NULL
+  #This is a comment
   
   data %<>%
     dplyr::mutate(
