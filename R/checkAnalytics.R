@@ -8,6 +8,67 @@
 #' 
 #' @return a
 #' 
+analyze_knownpos <- function(data) {
+  a <- NULL
+  
+  data %<>%
+    dplyr::mutate(
+      PMTCT_STAT.N.Total = 
+        PMTCT_STAT.N.Age_Sex_KnownNewResult.T.NewPos 
+        + PMTCT_STAT.N.Age_Sex_KnownNewResult.T.KnownPos
+        + PMTCT_STAT.N.Age_Sex_KnownNewResult.T.NewNeg
+    )
+  
+  knownpos_issues <- data %>%
+    dplyr::select(
+      PSNU, psnuid, Age, Sex, KeyPop,
+      PMTCT_STAT.N.Total,
+      PMTCT_STAT.N.Age_Sex_KnownNewResult.T.NewPos,
+      PMTCT_STAT.N.Age_Sex_KnownNewResult.T.KnownPos,
+      PMTCT_STAT.N.Age_Sex_KnownNewResult.T.NewNeg
+    ) %>%
+    dplyr::filter(
+      PMTCT_STAT.N.Age_Sex_KnownNewResult.T.KnownPos > PMTCT_STAT.N.Total
+    )
+  
+  if (NROW(knownpos_issues) > 0) {
+   
+    a$test_results <- knownpos_issues
+    attr(a$test_results, "test_name") <- "PMTCT or TB Known Pos issues"
+    
+    knownpos_issues_pct <- knownpos_issues %>%
+      dplyr::mutate(
+        knownpos_ratio = 
+          (PMTCT_STAT.N.Age_Sex_KnownNewResult.T.KnownPos / PMTCT_STAT.N.Total)
+      )
+    
+    a$msg <- 
+      paste0(
+        "WARNING! KNOWN POS > TOTAL POS: \n\n\t* ",
+        crayon::bold(
+          paste0(
+            length(unique(knownpos_issues$psnuid)), " of ",
+            length(unique(data$psnuid)))),
+        " PSNUs affected.\n\n\t* ",
+        "Highest Known Pos ratio observed: ",
+        crayon::bold(sprintf("%.1f%%", 100 * max(knownpos_issues_pct$knownpos_ratio))),
+        "\n")
+  }
+  
+  return(a)
+}
+
+
+#' @export
+#' @title Check Data Pack data for retention < 98\% or >100\%
+#'
+#' @description Check data gathered from Data Pack to identify cases where
+#' retention is less than the standard of 98\% or >100\%.
+#'
+#' @param data Analytics object to analyze
+#' 
+#' @return a
+#' 
 analyze_retention <- function(data) {
   a <- NULL
   
@@ -298,6 +359,7 @@ analyze_indexpos_ratio <- function(data) {
 #' at the PSNU level.
 #'
 #' @param d Datapackr object.
+#' @param model_data_path
 #' 
 #' @return d
 #' 
@@ -398,6 +460,14 @@ checkAnalytics <- function(d,
     d$tests$index_rate <- a$test_results
   }
   
+  # TEST: KNOWN POS proportion of Total Pos ####
+  a <- analyze_knownpos(data)
+  
+  if (!is.null(a)) {
+    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
+    d$tests$knownpos_issues <- a$test_results
+  }
+  
   # If warnings, show all grouped by sheet and issue ####
   if (!is.null(d$info$analytics_warning_msg) & interactive()) {
     options(warning.length = 8170)
@@ -424,5 +494,5 @@ checkAnalytics <- function(d,
     cat(crayon::red(messages))
   }
   
-  return(d)  
+  return(d)
 }
