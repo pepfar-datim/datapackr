@@ -35,8 +35,10 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
       dplyr::filter(distribution != 0) %>% 
       dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type) %>%
       dplyr::summarize(n = dplyr::n()) %>% 
-      tidyr::pivot_wider(names_from = support_type,values_from = n) %>% 
-      dplyr::filter(TA >=1 & DSD >=1) %>% 
+      tidyr::pivot_wider(names_from = support_type,
+                         values_from = n) %>% 
+      tidyr::drop_na(DSD,TA) %>% 
+      dplyr::filter(TA >=1 & DSD >=1 ) %>% 
       dplyr::select(-TA,-DSD)
     
     crosswalk_dupes<-d$data$SNUxIM %>% 
@@ -46,22 +48,21 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
     
     if ( NROW(crosswalk_dupes) > 0  ) {
       crosswalk_dupes %<>% 
-        dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type) %>% 
-        dplyr::summarise(distribution = sum(distribution,na.rm=TRUE)) %>% 
-        tidyr::pivot_wider(names_from = support_type,values_from = distribution) %>% 
-        dplyr::mutate(total_distribution = DSD + TA)
+        dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop) %>% 
+        dplyr::summarise(total_distribution = sum(distribution,na.rm=TRUE)) %>% 
+        dplyr::ungroup() %>% 
+        dplyr::mutate(distribution_diff = abs(total_distribution - 1.0)) 
       
       over_allocated<-crosswalk_dupes %>% 
-        dplyr::filter(total_distribution > 1)
-      
+        dplyr::filter(distribution_diff > 1e-3)
+        
       if (NROW(over_allocated) > 0) {
         msg<-paste0("INFO! ", NROW(over_allocated), " crosswalk duplicates with allocation greater than 100% were identified. These will need to be deduplicated in DATIM. 
                   Please consult the DataPack wiki section on deduplication for more information. ")
         d$info$warning_msg<-append(d$info$warning_msg,msg)
       }
       
-      crosswalk_dupes %<>% 
-        dplyr::mutate(distribution_diff = abs(total_distribution - 1.0)) %>% 
+      crosswalk_dupes_auto_resolved <- crosswalk_dupes %>% 
         dplyr::filter(distribution_diff <= 1e-3 ) %>% 
         dplyr::select(PSNU,psnuid,indicator_code,Age,Sex,KeyPop) %>% 
         dplyr::mutate(support_type = 'TA',
@@ -71,7 +72,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
         dplyr::select(names(d$data$distributedMER))
     } 
 } else {
-    crosswalk_dupes<-data.frame(foo=character())
+  crosswalk_dupes_auto_resolved<-data.frame(foo=character())
   }
   
   if( keep_dedup == TRUE ){
@@ -93,9 +94,9 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
   }
   
   #Bind crosswalk dupes
-  if ( NROW(crosswalk_dupes) > 0 ) {
-    d$datim$MER<-dplyr::bind_rows(d$datim$MER,crosswalk_dupes)
-    msg<-paste0("INFO! ", NROW(crosswalk_dupes), " zero-valued crosswalk deduplication adjustments will be added to your DATIM import.
+  if ( NROW(crosswalk_dupes_auto_resolved) > 0 ) {
+    d$datim$MER<-dplyr::bind_rows(d$datim$MER,crosswalk_dupes_auto_resolved)
+    msg<-paste0("INFO! ", NROW(crosswalk_dupes_auto_resolved), " zero-valued crosswalk deduplication adjustments will be added to your DATIM import.
                   Please consult the DataPack wiki section on deduplication for more information. ")
     
     d$info$warning_msg<-append(d$info$warning_msg,msg)
