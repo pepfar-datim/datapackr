@@ -51,7 +51,8 @@ analyze_pmtctknownpos <- function(data) {
             length(unique(data$psnuid)))),
         " PSNUs affected.\n\n\t* ",
         "Highest Known Pos ratio observed: ",
-        crayon::bold(sprintf("%.1f%%", 100 * max(knownpos_issues_pct$knownpos_ratio))),
+        crayon::bold(sprintf("%.1f%%",
+                             100 * max(knownpos_issues_pct$knownpos_ratio))),
         "\n")
   }
 
@@ -112,7 +113,8 @@ analyze_tbknownpos <- function(data) {
             length(unique(data$psnuid)))),
         " PSNUs affected.\n\n\t* ",
         "Highest Known Pos ratio observed: ",
-        crayon::bold(sprintf("%.1f%%", 100 * max(knownpos_issues_pct$knownpos_ratio))),
+        crayon::bold(sprintf("%.1f%%",
+                             100 * max(knownpos_issues_pct$knownpos_ratio))),
         "\n")
   }
 
@@ -149,7 +151,7 @@ analyze_retention <- function(data) {
       TX_CURR.N.Age_Sex_HIVStatus.T_1,
       TX_NEW.N.Age_Sex_HIVStatus.T)
 
-  if (NROW(retention_issues) > 0 ) {
+  if (NROW(retention_issues) > 0) {
 
     a$test_results <- retention_issues
     attr(a$test_results, "test_name") <- "Retention rate issues"
@@ -160,9 +162,12 @@ analyze_retention <- function(data) {
         TX_CURR.N.Age_Sex_HIVStatus.T_1,
         TX_NEW.N.Age_Sex_HIVStatus.T) %>%
       dplyr::summarise(
-        TX_CURR.N.Age_Sex_HIVStatus.T = sum(TX_CURR.N.Age_Sex_HIVStatus.T, na.rm = T),
-        TX_CURR.N.Age_Sex_HIVStatus.T_1 = sum(TX_CURR.N.Age_Sex_HIVStatus.T_1, na.rm = T),
-        TX_NEW.N.Age_Sex_HIVStatus.T = sum(TX_NEW.N.Age_Sex_HIVStatus.T, na.rm = T)) %>%
+        TX_CURR.N.Age_Sex_HIVStatus.T = sum(TX_CURR.N.Age_Sex_HIVStatus.T,
+                                            na.rm = T),
+        TX_CURR.N.Age_Sex_HIVStatus.T_1  = sum(TX_CURR.N.Age_Sex_HIVStatus.T_1,
+                                             na.rm = T),
+        TX_NEW.N.Age_Sex_HIVStatus.T = sum(TX_NEW.N.Age_Sex_HIVStatus.T,
+                                           na.rm = T)) %>%
       dplyr::mutate(
         TX.Retention.T =
           (TX_CURR.N.Age_Sex_HIVStatus.T)
@@ -178,10 +183,12 @@ analyze_retention <- function(data) {
             length(unique(data$psnuid)))),
         " PSNUs affected.\n\n\t* ",
         "Lowest retention rate observed: ",
-        crayon::bold(sprintf("%.1f%%", 100 * min(retention_issues$TX.Retention.T))),
+        crayon::bold(sprintf("%.1f%%",
+                             100 * min(retention_issues$TX.Retention.T))),
         "\n\n\t* ",
         "National average retention rate: ",
-        crayon::bold(sprintf("%.1f%%", 100 * min(national_avg_ret$TX.Retention.T))),
+        crayon::bold(sprintf("%.1f%%",
+                             100 * min(national_avg_ret$TX.Retention.T))),
         "\n")
 
   }
@@ -236,10 +243,11 @@ analyze_linkage <- function(data) {
   # Need to analyze <01 linkage separately due to EID
                   & (Age != "<01" | is.na(Age))) %>%
     dplyr::select(PSNU, psnuid, Age, Sex, KeyPop,
-                  HTS_TST.Linkage.T, HTS_TST_POS.T, TX_NEW.N.Age_Sex_HIVStatus.T,
+                  HTS_TST.Linkage.T, HTS_TST_POS.T,
+                  TX_NEW.N.Age_Sex_HIVStatus.T,
                   TX_NEW.N.KeyPop_HIVStatus.T)
 
-  if (NROW(linkage_issues) > 0 ) {
+  if (NROW(linkage_issues) > 0) {
 
     a$test_results <- linkage_issues
     attr(a$test_results, "test_name") <- "Linkage rate issues"
@@ -273,7 +281,8 @@ analyze_linkage <- function(data) {
             length(unique(data$psnuid)))),
         " PSNUs affected.\n\n\t* ",
         "Lowest linkage rate observed: ",
-        crayon::bold(sprintf("%.1f%%", 100 * min(linkage_issues$HTS_TST.Linkage.T))),
+        crayon::bold(sprintf("%.1f%%",
+                             100 * min(linkage_issues$HTS_TST.Linkage.T))),
         "\n\n\t* ",
         "National average GenPop linkage rate: ",
         crayon::bold(sprintf("%.1f%%", 100 * min(national_avg_linkage$HTS_TST.Linkage.T))),
@@ -362,13 +371,17 @@ analyze_indexpos_ratio <- function(data) {
         dplyr::case_when(
           sum(HTS_TST_POS.T) == 0 ~ NA_real_,
           TRUE ~ sum(HTS_INDEX.total) / sum(HTS_TST_POS.T)),
-      index_issues.psnu = (ART_coverage.psnu < 0.7 & HTS_TST_POS.index_rate.psnu < 0.3)
-      | (ART_coverage.psnu >= 0.7 & ART_coverage.psnu < 0.8  & HTS_TST_POS.index_rate.psnu < 0.5)
+      index_issues.psnu = (ART_coverage.psnu < 0.7 &
+                             HTS_TST_POS.index_rate.psnu < 0.3)
+      | (ART_coverage.psnu >= 0.7 &
+           ART_coverage.psnu < 0.8 &
+           HTS_TST_POS.index_rate.psnu < 0.5)
       | (ART_coverage.psnu >= 0.8 & HTS_TST_POS.index_rate.psnu < 0.75)) %>%
     dplyr::ungroup() %>%
     dplyr::filter(
       (ART_coverage < 0.7 & HTS_TST_POS.index_rate < 0.3)
-      | (ART_coverage >= 0.7 & ART_coverage < 0.8  & HTS_TST_POS.index_rate < 0.5)
+      | (ART_coverage >= 0.7 & ART_coverage < 0.8 &
+           HTS_TST_POS.index_rate < 0.5)
       | (ART_coverage >= 0.8 & HTS_TST_POS.index_rate < 0.75)) %>%
     dplyr::mutate(
       category = dplyr::case_when(
@@ -379,7 +392,7 @@ analyze_indexpos_ratio <- function(data) {
       )
     )
 
-  if (NROW(issues) > 0 ) {
+  if (NROW(issues) > 0) {
 
     a$test_results <- issues
     attr(a$test_results, "test_name") <- "HTS_INDEX_POS Rate Issues"
@@ -416,8 +429,8 @@ analyze_indexpos_ratio <- function(data) {
 #' @export
 #' @title Check Data Pack data for analytics concerns
 #'
-#' @description Check data gathered from Data Pack to identify validation concerns
-#' at the PSNU level.
+#' @description Check data gathered from Data Pack to identify
+#' validation concerns at the PSNU level.
 #'
 #' @param d Datapackr object.
 #' @param model_data_path
@@ -437,7 +450,8 @@ checkAnalytics <- function(d,
     dplyr::bind_rows(d$datim$subnat_impatt) %>%
     dplyr::mutate(attributeOptionCombo = "HllvX50cXC0") %>%
     dplyr::group_by(
-      dataElement, period, orgUnit, categoryOptionCombo, attributeOptionCombo) %>%
+      dataElement, period, orgUnit,
+      categoryOptionCombo, attributeOptionCombo) %>%
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup() %>%
 
@@ -458,7 +472,8 @@ checkAnalytics <- function(d,
         paste(missing, collapse = "\r\n\t* ")
       )
 
-    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, analytics_warning_msg)
+    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg,
+                                           analytics_warning_msg)
   }
 
   valid_cos <- datapackr::valid_category_options %>%
@@ -494,7 +509,7 @@ checkAnalytics <- function(d,
                 dplyr::filter(col_type %in% c("target", "past")) %>%
                 dplyr::pull(indicator_code)),
             type = "numeric") %>%
-    dplyr::mutate_at(dplyr::vars(-PSNU,-psnuid,-Age,-Sex,-KeyPop),
+    dplyr::mutate_at(dplyr::vars(-PSNU, -psnuid, -Age, -Sex, -KeyPop),
                      tidyr::replace_na, 0)
 
   # TEST: Retention Rates ####
@@ -545,7 +560,7 @@ checkAnalytics <- function(d,
       paste(
         paste(
           seq_along(d$info$analytics_warning_msg),
-          ": " , d$info$analytics_warning_msg
+          ": ", d$info$analytics_warning_msg
           #stringr::str_squish(gsub("\n", "", d$info$analytics_warning_msg))
         ),
         sep = "",
