@@ -1,4 +1,85 @@
 #' @export
+#' @title Check Data Pack data for VMMC_CIRC Indeterminate > Total Tested
+#'
+#' @description Check data gathered from Data Pack to identify cases where
+#' the expected number of VMMC_CIRC Indeterminate patients is greater than
+#' the total number of VMMC_CIRC patients tested.
+#'
+#' @param data Analytics object to analyze
+#'
+#' @return a
+#'
+analyze_vmmc_indeterminate <- function(data) {
+  a <- NULL
+
+  data %<>%
+    dplyr::mutate(
+      VMMC_CIRC.T = 
+        (VMMC_CIRC.Positive + VMMC_CIRC.Negative),
+      VMMC_CIRC.indeterminateRate = 
+        (VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown) /
+        (VMMC_CIRC.Positive + VMMC_CIRC.Negative)
+      )
+
+  vmmc_indeterminate_issues <- data %>%
+    dplyr::filter(VMMC_CIRC.T < VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown) %>%
+    dplyr::select(
+      PSNU, psnuid, Age, Sex, KeyPop,
+      VMMC_CIRC.T,
+      VMMC_CIRC.Positive,
+      VMMC_CIRC.Negative,
+      VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown,
+      VMMC_CIRC.indeterminateRate)
+
+  if (NROW(vmmc_indeterminate_issues) > 0 ) {
+
+    a$test_results <- vmmc_indeterminate_issues
+    attr(a$test_results, "test_name") <- "VMMC Indeterminate rate issues"
+
+    national_avg_ind <- data %>%
+      dplyr::select(
+        VMMC.Positive,
+        VMMC.Negative,
+        VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown) %>%
+      dplyr::summarise(
+        VMMC.Positive = sum(VMMC.Positive, na.rm = T),
+        VMMC.Negative = sum(VMMC.Negative, na.rm = T),
+        VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown = 
+          sum(VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown, na.rm = T)) %>%
+      dplyr::mutate(
+        VMMC_CIRC.indeterminateRate = 
+          (VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown) /
+          (VMMC_CIRC.Positive + VMMC_CIRC.Negative)
+      )
+
+    a$msg <- 
+      paste0(
+        "WARNING! VMMC_CIRC Indeterminate > Total: \n\n\t* ",
+        crayon::bold(
+          paste0(
+            length(unique(indeterminate_issues$psnuid)), " of ",
+            length(unique(data$psnuid)))),
+        " PSNUs affected.\n\n\t* ",
+        "Highest indeterminate/not tested rate observed: ",
+        crayon::bold(sprintf("%.1f%%",
+                             100 * max(
+                               indeterminate_issues$VMMC_CIRC.indeterminateRate
+                               ))),
+        "\n\n\t* ",
+        "National average indeterminate/not tested rate: ",
+        crayon::bold(sprintf("%.1f%%",
+                             100 * max(
+                               national_avg_ind$VMMC_CIRC.indeterminateRate
+                               ))),
+        "\n")
+
+  } 
+
+  return(a)
+}
+
+
+#' @export
 #' @title Check Data Pack data for retention < 98\% or >100\%
 #'
 #' @description Check data gathered from Data Pack to identify cases where
@@ -10,7 +91,6 @@
 #' 
 analyze_retention <- function(data) {
   a <- NULL
-  #This is a comment
   
   data %<>%
     dplyr::mutate(
@@ -398,7 +478,15 @@ checkAnalytics <- function(d,
     d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
     d$tests$index_rate <- a$test_results
   }
-  
+
+  # TEST: VMMC_CIRC Indeterminate/Not Tested Rate of VMMC_CIRC Total ####
+  a <- analyze_vmmc_indeterminate(data)
+
+  if (!is.null(a)) {
+    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
+    d$tests$vmmc_indeterminate_rate <- a$test_results
+  }
+
   # If warnings, show all grouped by sheet and issue ####
   if (!is.null(d$info$analytics_warning_msg) & interactive()) {
     options(warning.length = 8170)
