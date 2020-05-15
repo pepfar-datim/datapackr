@@ -1,3 +1,112 @@
+
+autoResolveDuplicates <- function(d, keep_dedup ) {
+  
+  #We need to now indentify any cases where there was exactly 100% distribution, but there was a dedupe. 
+  #This is the section for pure duplicates.
+  pure_duplicates<-d$data$SNUxIM %>% 
+    dplyr::filter(mechanism_code != '99999') %>% 
+    dplyr::filter(distribution != 0) %>% 
+    dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type) %>% 
+    dplyr::summarize(distribution = sum(distribution),
+                     n = dplyr::n()) %>% 
+    dplyr::filter(n > 1 ) %>% 
+    dplyr::mutate(distribution_diff = abs(distribution - 1.0)) 
+  
+  over_allocated <- pure_duplicates %>% 
+    dplyr::filter(distribution > 1.0)
+  
+  if (NROW(over_allocated) > 0) {
+    msg<-paste0("INFO! ", NROW(over_allocated), " pure duplicates with allocation greater than 100% were identified. These will need to be deduplicated in DATIM. 
+                  Please consult the DataPack wiki section on deduplication for more information. ")
+    d$info$warning_msg<-append(d$info$warning_msg,msg)
+  }
+  
+  auto_resolve_pure_dupes <- pure_duplicates %>% 
+    dplyr::filter(distribution_diff < 1e-3 ) %>%
+    dplyr::mutate(mechanism_code ='00000', 
+                  value = 0,
+                  sheet_name = NA) %>% 
+    dplyr::select(names(d$data$distributedMER))
+  
+  #DSD_TA Crosswalk dupes which should be autoresolved
+  if ( setequal(unique(d$data$SNUxIM$support_type),c("DSD","TA")) ) {
+    crosswalk_dupes_ids<-d$data$SNUxIM %>% 
+      dplyr::filter(mechanism_code != '99999') %>% 
+      dplyr::filter(distribution != 0) %>% 
+      dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type) %>%
+      dplyr::summarize(n = dplyr::n()) %>% 
+      tidyr::pivot_wider(names_from = support_type,
+                         values_from = n) %>% 
+      tidyr::drop_na(DSD,TA) %>% 
+      dplyr::filter(TA >=1 & DSD >=1 ) %>% 
+      dplyr::select(-TA,-DSD)
+    
+    crosswalk_dupes<-d$data$SNUxIM %>% 
+      dplyr::filter(mechanism_code != '99999') %>% 
+      dplyr::filter(distribution != 0) %>% 
+      dplyr::inner_join(crosswalk_dupes_ids) 
+    
+    if ( NROW(crosswalk_dupes) > 0  ) {
+      crosswalk_dupes %<>% 
+        dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop) %>% 
+        dplyr::summarise(total_distribution = sum(distribution,na.rm=TRUE)) %>% 
+        dplyr::ungroup() %>% 
+        dplyr::mutate(distribution_diff = abs(total_distribution - 1.0)) 
+      
+      over_allocated<-crosswalk_dupes %>% 
+        dplyr::filter(distribution_diff > 1e-3)
+        
+      if (NROW(over_allocated) > 0) {
+        msg<-paste0("INFO! ", NROW(over_allocated), " crosswalk duplicates with allocation greater than 100% were identified. These will need to be deduplicated in DATIM. 
+                  Please consult the DataPack wiki section on deduplication for more information. ")
+        d$info$warning_msg<-append(d$info$warning_msg,msg)
+      }
+      
+      crosswalk_dupes_auto_resolved <- crosswalk_dupes %>% 
+        dplyr::filter(distribution_diff <= 1e-3 ) %>% 
+        dplyr::select(PSNU,psnuid,indicator_code,Age,Sex,KeyPop) %>% 
+        dplyr::mutate(support_type = 'TA',
+                      sheet_name = NA,
+                      mechanism_code = '00001',
+                      value = 0) %>% 
+        dplyr::select(names(d$data$distributedMER))
+    } 
+} else {
+  crosswalk_dupes_auto_resolved<-data.frame(foo=character())
+  }
+  
+  if( keep_dedup == TRUE ){
+    d$datim$MER <- d$data$distributedMER  
+  } else {
+    #Filter the pseudo-dedupe mechanism data out
+    d$datim$MER <- d$data$distributedMER %>%
+      dplyr::filter(mechanism_code != '99999')
+  }
+  
+  #Bind pure dupes
+  
+  if ( NROW(auto_resolve_pure_dupes) > 0 ) {
+    d$datim$MER<-dplyr::bind_rows(d$datim$MER,auto_resolve_pure_dupes)
+    msg<-paste0("INFO! ", NROW(auto_resolve_pure_dupes), " zero-valued pure deduplication adjustments will be added to your DATIM import.
+                  Please consult the DataPack wiki section on deduplication for more information. ")
+    
+    d$info$warning_msg<-append(d$info$warning_msg,msg)
+  }
+  
+  #Bind crosswalk dupes
+  if ( NROW(crosswalk_dupes_auto_resolved) > 0 ) {
+    d$datim$MER<-dplyr::bind_rows(d$datim$MER,crosswalk_dupes_auto_resolved)
+    msg<-paste0("INFO! ", NROW(crosswalk_dupes_auto_resolved), " zero-valued crosswalk deduplication adjustments will be added to your DATIM import.
+                  Please consult the DataPack wiki section on deduplication for more information. ")
+    
+    d$info$warning_msg<-append(d$info$warning_msg,msg)
+  }
+  
+  d
+}
+
+
+
 #' @export
 #' @importFrom magrittr %>% %<>%
 #' @importFrom stats complete.cases
@@ -11,86 +120,7 @@
 #' 
 exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
   
-  
-  #We need to now indentify any cases where there was exactly 100% distribution, but there was a dedupe. 
-  over_allocated<-d$data$SNUxIM %>% 
-    dplyr::filter(mechanism_code != '99999') %>% 
-    dplyr::filter(distribution != 0) %>% 
-    dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type) %>% 
-    dplyr::summarize(distribution = sum(distribution)) %>% 
-    dplyr::mutate(distribution_diff = abs(distribution - 1.0)) %>% 
-    dplyr::filter(distribution_diff >= 1e-3 & distribution > 1.0) %>% 
-    dplyr::select(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type)
-  
-  potential_dupes<-d$data$distributedMER %>% 
-    dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type) %>% 
-    dplyr::filter(mechanism_code != '99999') %>% 
-    dplyr::tally() %>% 
-    dplyr::filter(n > 1) %>% 
-    dplyr::select(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type)
-  
-  sum_dupes<-dplyr::anti_join(potential_dupes,over_allocated) %>% 
-    dplyr::mutate(mechanism_code ='00000',
-                  value = 0)
-  
-  #DSD_TA Crosswalk dupes which should be autoresolved
-  
-  crosswalk_dupes<-d$data$SNUxIM %>% 
-    dplyr::filter(mechanism_code != '99999') %>% 
-    dplyr::filter(distribution != 0) %>% 
-    dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type) %>% 
-    dplyr::summarize(distribution = sum(distribution)) %>% 
-    dplyr::mutate(distribution_diff = abs(distribution - 1.0)) %>% 
-    dplyr::filter(distribution_diff >= 1e-3 & distribution != 1.0) %>% 
-    dplyr::select(-distribution_diff) 
-  
-  if (setequal(unique(crosswalk_dupes$support_type),c("DSD","TA"))) {
-    crosswalk_dupes %<>% 
-      tidyr::pivot_wider(names_from = support_type,values_from = distribution) %>% 
-      dplyr::mutate(total_distribution = DSD + TA,
-                    is_crosswalk = !is.na(DSD) & !is.na(TA)) %>% 
-      dplyr::filter(is_crosswalk) %>% 
-      dplyr::mutate(distribution_diff = abs(total_distribution - 1.0)) %>% 
-      dplyr::filter(distribution_diff <= 1e-3 ) %>% 
-      dplyr::select(PSNU,psnuid,indicator_code,Age,Sex,KeyPop) %>% 
-      dplyr::mutate(support_type = 'TA',
-                    sheet_name = NA,
-                    mechanism_code = '00001',
-                    value = 0) %>% 
-      dplyr::select(names(d$data$distributedMER))
-  } else {
-    crosswalk_dupes<-data.frame(foo=character())
-  }
-  
-
-  
-  if(keep_dedup == TRUE){
-    d$datim$MER <- d$data$distributedMER  
-  } else {
-    #Filter the pseudo-dedupe mechanism data out
-    d$datim$MER <- d$data$distributedMER %>%
-      dplyr::filter(mechanism_code != '99999')
-  }
-  
-  #Bind pure dupes
- 
-  if (NROW(sum_dupes) > 0) {
-    d$datim$MER<-dplyr::bind_rows(d$datim$MER,sum_dupes)
-    msg<-paste0("INFO! ", NROW(sum_dupes), " zero-valued pure deduplication adjustments will be added to your DATIM import.
-                Please consult the DataPack wiki section on deduplication for more information. ")
-    
-    d$info$warning_msg<-append(d$info$warning_msg,msg)
-  }
-  
-  #Bind crosswalk dupes
-  if (NROW(crosswalk_dupes) > 0) {
-    d$datim$MER<-dplyr::bind_rows(d$datim$MER,crosswalk_dupes)
-    msg<-paste0("INFO! ", NROW(crosswalk_dupes), " zero-valued crosswalk deduplication adjustments will be added to your DATIM import.
-                Please consult the DataPack wiki section on deduplication for more information. ")
-    
-    d$info$warning_msg<-append(d$info$warning_msg,msg)
-  }
-  
+  d<-autoResolveDuplicates(d,keep_dedup)
   
   # align   map_DataPack_DATIM_DEs_COCs with  d$datim$MER/d$data$distributedMER for KP_MAT 
   map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
