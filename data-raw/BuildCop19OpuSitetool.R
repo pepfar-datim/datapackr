@@ -12,8 +12,8 @@ require(stringr)
 secrets <- "~/.secrets/datim.json"
 output_path<-"/Users/sam/Documents/cop_19_data/opus"
 d=NULL
-d$info$datapack_uid = "G0BT4KrJouu"
-d$info$datapack_name = "West Africa Region"
+d$info$datapack_uid = "PcXTNoVUrUc" # I can put country UID here
+d$info$datapack_name = "Asia Region" # but if regional need the region here
 
 # Set up a site -> PSNU cache
 # sitePsnuCache <- new.env()
