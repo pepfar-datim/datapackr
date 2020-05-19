@@ -7,7 +7,9 @@
 exportDistributedDataToDATIM(d, keep_dedup = FALSE)
 }
 \arguments{
-\item{d}{}
+\item{d}{Datapackr object}
+
+\item{keep_dedup}{T/F as to whether to include Dedupe values in export file.}
 }
 \value{
 Modified d object with  a DATIM compatible data frame for import id d$datim$MER

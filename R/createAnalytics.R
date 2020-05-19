@@ -5,7 +5,7 @@
 #' @description Wrapper function for creation of d$data$analtyics object 
 #' which is suitable for export to external analytics sytems. 
 #'
-#' @param d
+#' @param d Datapackr object
 #' 
 #' @return Modified d object with d$data$analtyics
 #' 

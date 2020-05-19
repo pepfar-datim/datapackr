@@ -433,7 +433,8 @@ analyze_indexpos_ratio <- function(data) {
 #' validation concerns at the PSNU level.
 #'
 #' @param d Datapackr object.
-#' @param model_data_path
+#' @param model_data_path Filepath to model data produced from most recent DATIM
+#' sync.
 #'
 #' @return d
 #'
