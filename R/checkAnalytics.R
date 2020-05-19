@@ -1,9 +1,9 @@
 #' @export
-#' @title Check Data Pack data for VMMC_CIRC Indeterminate > Total Tested
+#' @title Check Data Pack data for VMMC_CIRC Indeterminate Rate > 5%
 #'
 #' @description Check data gathered from Data Pack to identify cases where
 #' the expected number of VMMC_CIRC Indeterminate patients is greater than
-#' the total number of VMMC_CIRC patients tested.
+#' 5% of the total number of VMMC_CIRC patients.
 #'
 #' @param data Analytics object to analyze
 #'
@@ -15,14 +15,15 @@ analyze_vmmc_indeterminate <- function(data) {
   data %<>%
     dplyr::mutate(
       VMMC_CIRC.T = 
-        (VMMC_CIRC.Positive + VMMC_CIRC.Negative),
-      VMMC_CIRC.indeterminateRate = 
+        (VMMC_CIRC.Positive + VMMC_CIRC.Negative +
+           VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown),
+      VMMC_CIRC.indeterminateRate =
         (VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown) /
-        (VMMC_CIRC.Positive + VMMC_CIRC.Negative)
+        (VMMC_CIRC.T)
       )
 
   vmmc_indeterminate_issues <- data %>%
-    dplyr::filter(VMMC_CIRC.T < VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown) %>%
+    dplyr::filter(VMMC_CIRC.indeterminateRate > 0.05) %>%
     dplyr::select(
       PSNU, psnuid, Age, Sex, KeyPop,
       VMMC_CIRC.T,
@@ -44,17 +45,18 @@ analyze_vmmc_indeterminate <- function(data) {
       dplyr::summarise(
         VMMC.Positive = sum(VMMC.Positive, na.rm = T),
         VMMC.Negative = sum(VMMC.Negative, na.rm = T),
-        VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown = 
+        VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown =
           sum(VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown, na.rm = T)) %>%
       dplyr::mutate(
-        VMMC_CIRC.indeterminateRate = 
+        VMMC_CIRC.indeterminateRate =
           (VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown) /
-          (VMMC_CIRC.Positive + VMMC_CIRC.Negative)
+          (VMMC_CIRC.Positive + VMMC_CIRC.Negative +
+             VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown)
       )
 
     a$msg <- 
       paste0(
-        "WARNING! VMMC_CIRC Indeterminate > Total: \n\n\t* ",
+        "WARNING! VMMC_CIRC Indeterminate > 5% : \n\n\t* ",
         crayon::bold(
           paste0(
             length(unique(indeterminate_issues$psnuid)), " of ",
@@ -73,7 +75,7 @@ analyze_vmmc_indeterminate <- function(data) {
                                ))),
         "\n")
 
-  } 
+  }
 
   return(a)
 }
