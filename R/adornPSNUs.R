@@ -5,7 +5,7 @@
 #' @description Creates an analtyical dimension for planning prioritization from SUBNAT data
 #' contained in the datapack
 #'
-#' @param d
+#' @param d Datapackr object
 #' 
 #' @return Modified d$data$distributedMER 
 #' object with a DATIM compatible data frame for import id d$datim$MER

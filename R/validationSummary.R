@@ -1,4 +1,5 @@
 #' @export
+#' @importFrom plyr ldply
 #' @title validationSummary(d)
 #'
 #' @description Produce an output of tests. 
