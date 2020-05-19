@@ -73,7 +73,7 @@ getMechanismView <- function() {
 #' @description Join analytical dimensions with d$data$analtyics related
 #' to partner, agency and mechanism information. 
 #'
-#' @param data
+#' @param data Dataset to adorn
 #' 
 #' @return Modified data object
 #' 

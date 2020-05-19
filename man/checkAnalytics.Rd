@@ -8,6 +8,9 @@ checkAnalytics(d, model_data_path)
 }
 \arguments{
 \item{d}{Datapackr object.}
+
+\item{model_data_path}{Filepath to model data produced from most recent DATIM
+sync.}
 }
 \value{
 d
