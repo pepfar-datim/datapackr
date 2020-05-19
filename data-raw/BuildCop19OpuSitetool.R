@@ -1,3 +1,8 @@
+country_name <-  "Malawi" ### if it is a region, escalate to sam
+secrets <- "~/.secrets/datim.json"
+output_path<-"~/Documents/cop_19_data/opus"
+
+
 require(jsonlite)
 require(assertthat)
 require(glue)
@@ -9,11 +14,14 @@ require(dplyr)
 require(stringr)
 
 # Main config options
-secrets <- "~/.secrets/datim.json"
-output_path<-"/Users/sam/Documents/cop_19_data/opus"
 d=NULL
-d$info$datapack_uid = "PcXTNoVUrUc" # I can put country UID here
-d$info$datapack_name = "Asia Region" # but if regional need the region here
+country_details <-  datapackr::dataPackMap %>% 
+  tibble::as_tibble() %>%
+  dplyr::filter(country_name == !!country_name)
+
+d$info$datapack_name = country_details$data_pack_name
+d$info$datapack_uid = country_details$country_uid
+
 
 # Set up a site -> PSNU cache
 # sitePsnuCache <- new.env()
