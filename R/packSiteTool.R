@@ -74,7 +74,7 @@ write_site_level_sheet <- function(wb, sheet, d) {
   
   schema %<>%
     dplyr::select(indicator_code) %>%
-    dplyr::mutate(fields = NA) %>%
+    dplyr::mutate(fields = NA_real_) %>%
     ## Transpose to look like Site Tool rows 1:3
     as.data.frame() %>%
     `row.names<-`(.[, 1]) %>%
