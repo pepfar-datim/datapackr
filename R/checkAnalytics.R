@@ -1,9 +1,9 @@
 #' @export
-#' @title Check Data Pack data for VMMC_CIRC Indeterminate Rate > 5%
+#' @title Check Data Pack data for VMMC_CIRC Indeterminate Rate > 5\%
 #'
 #' @description Check data gathered from Data Pack to identify cases where
 #' the expected number of VMMC_CIRC Indeterminate patients is greater than
-#' 5% of the total number of VMMC_CIRC patients.
+#' 5\% of the total number of VMMC_CIRC patients.
 #'
 #' @param data Analytics object to analyze
 #'

@@ -21,6 +21,6 @@ given ART Coverage rate:
   \strong{ART Coverage}\tab  \strong{HTS_INDEX_POS \% of HTS_TST_POS}\cr
   <70\%\tab  30\%\cr
   70\% <= x < 80\%\tab  50\%\cr
-  >= 80\%\tab  75\%\cr 
+  >= 80\%\tab  75\%\cr
 }
 }
