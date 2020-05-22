@@ -20,7 +20,7 @@ analyze_vmmc_indeterminate <- function(data) {
       VMMC_CIRC.indeterminateRate =
         (VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown) /
         (VMMC_CIRC.T)
-    )
+      )
 
   vmmc_indeterminate_issues <- data %>%
     dplyr::filter(VMMC_CIRC.indeterminateRate > 0.05) %>%
@@ -36,7 +36,7 @@ analyze_vmmc_indeterminate <- function(data) {
   
     a$test_results <- vmmc_indeterminate_issues
     attr(a$test_results, "test_name") <- "VMMC Indeterminate rate issues"
-  
+
     national_avg_ind <- data %>%
       dplyr::select(
         VMMC.Positive,
@@ -53,7 +53,7 @@ analyze_vmmc_indeterminate <- function(data) {
           (VMMC_CIRC.Positive + VMMC_CIRC.Negative +
              VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown)
       )
-  
+
     a$msg <- 
       paste0(
         "WARNING! VMMC_CIRC Indeterminate > 5% : \n\n\t* ",
@@ -66,7 +66,7 @@ analyze_vmmc_indeterminate <- function(data) {
         crayon::bold(sprintf("%.1f%%",
                              100 * max(
                                indeterminate_issues$VMMC_CIRC.indeterminateRate
-                             ))),
+                               ))),
         "\n\n\t* ",
         "National average indeterminate/not tested rate: ",
         crayon::bold(sprintf("%.1f%%",
@@ -634,6 +634,13 @@ checkAnalytics <- function(d,
   if (!is.null(a)) {
     d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
     d$tests$tbknownpos_issues <- a$test_results
+
+  # TEST: VMMC_CIRC Indeterminate/Not Tested Rate of VMMC_CIRC Total ####
+  a <- analyze_vmmc_indeterminate(data)
+
+  if (!is.null(a)) {
+    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
+    d$tests$vmmc_indeterminate_rate <- a$test_results
   }
 
   # If warnings, show all grouped by sheet and issue ####
