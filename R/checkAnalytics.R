@@ -634,6 +634,7 @@ checkAnalytics <- function(d,
   if (!is.null(a)) {
     d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
     d$tests$tbknownpos_issues <- a$test_results
+  }
 
   # TEST: VMMC_CIRC Indeterminate/Not Tested Rate of VMMC_CIRC Total ####
   a <- analyze_vmmc_indeterminate(data)
