@@ -10,7 +10,9 @@ Authors@R: c(
         role = c("aut")),
     person("Sam", "Garman", email = "sgarman@baosystems.com",
         role = c("aut")),
-    person("William", "Shiflett", , "wshiflett@guidehouse.com",
+    person("William", "Shiflett", "wshiflett@guidehouse.com",
+        role = c("ctb")),
+    person("Chris", "Nemarich", "cnemarich@guidehouse.com",
         role = c("ctb"))
   )
 Description: Generates and processes PEPFAR Data Packs and Site Tools.
