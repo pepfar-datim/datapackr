@@ -8,7 +8,7 @@ unPackTool(
   submission_path = NULL,
   tool = "Data Pack",
   country_uids = NULL,
-  cop_year = getCurrentCOPYear()
+  cop_year = NULL
 )
 }
 \arguments{
