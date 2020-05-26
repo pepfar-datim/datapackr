@@ -1,3 +1,37 @@
+createKeychainInfo <- function(submission_path = NULL,
+                               tool = "Data Pack",
+                               country_uids = NULL,
+                               cop_year = NULL) {
+  
+  # Create data train for use across remainder of program
+  d <- list(
+    keychain = list(
+      submission_path = submission_path
+    ),
+    info = list(
+      datapack_name = NULL,
+      tool = tool,
+      country_uids = country_uids,
+      cop_year = ifelse(is.null(cop_year),getCurrentCOPYear())
+    )
+  )
+  
+  # Start running log of all warning and information messages
+  d$info$warning_msg <- NULL
+  d$info$has_error <- FALSE
+  d$info$newSNUxIM <- FALSE
+  d$info$has_psnuxim <- FALSE
+  d$info$missing_psnuxim_combos <- FALSE
+  
+  # Check the submission file exists and prompt for user input if not
+  d$keychain$submission_path <- handshakeFile(path = d$keychain$submission_path,
+                                              tool = d$info$tool)
+  
+  
+  d
+  
+}
+
 #' @export
 #' @title Unpack a submitted tool
 #'
@@ -24,31 +58,12 @@
 unPackTool <- function(submission_path = NULL,
                        tool = "Data Pack",
                        country_uids = NULL,
-                       cop_year = getCurrentCOPYear()) {
-  
-  # Create data train for use across remainder of program
-  d <- list(
-    keychain = list(
-      submission_path = submission_path
-    ),
-    info = list(
-      datapack_name = NULL,
-      tool = tool,
-      country_uids = country_uids,
-      cop_year = cop_year
-    )
-  )
-  
-    # Start running log of all warning and information messages
-    d$info$warning_msg <- NULL
-    d$info$has_error <- FALSE
-    d$info$newSNUxIM <- FALSE
-    d$info$has_psnuxim <- FALSE
-    d$info$missing_psnuxim_combos <- FALSE
-    
-    # Check the submission file exists and prompt for user input if not
-    d$keychain$submission_path <- handshakeFile(path = d$keychain$submission_path,
-                                                tool = d$info$tool)
+                       cop_year = NULL) {
+
+  d<-createKeychainInfo(submission_path,
+                     tool,
+                     country_uids,
+                     cop_year)
   
   # unPack file based on type
   if (d$info$tool == "Data Pack") {

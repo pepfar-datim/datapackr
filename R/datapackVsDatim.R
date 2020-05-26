@@ -69,6 +69,10 @@ compareData_DatapackVsDatim <-
         
 # start main processing
 # start off with dedups included
+    
+    if(d$info$cop_year != 2020){
+      stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
+    }
     d <- datapackr::exportDistributedDataToDATIM(d, keep_dedup = TRUE)
     
     d$datim$MER$value <- as.numeric(d$datim$MER$value)
@@ -100,7 +104,8 @@ compareData_DatapackVsDatim <-
         org_unit_uid = orgUnit,
         category_option_combo_uid = categoryOptionCombo,
         attribute_option_combo_code = attributeOptionCombo
-      )
+      ) %>%
+      dplyr::filter(datapack_value != 0)
 
 # Sum over IM including dedup    
     datapack_data_psnu_w_dedup <- dplyr::group_by(datapack_data,
@@ -115,44 +120,10 @@ compareData_DatapackVsDatim <-
     datapack_data_psnu_x_im_wo_dedup <- datapack_data %>%
       dplyr::filter(attribute_option_combo_code != "99999") 
     
-    
 # Get data from DATIM using data value sets
     
-    org_unit_uids <- d$info$country_uids
-    cop_yyyy <- d$info$cop_year %>% as.character()
-    fiscal_yy <- (d$info$cop_year + 1) %>%
-      stringr::str_sub(3, 4)
-    
-    dataset_uids <-
-      c(datapackcommons::getDatasetUids(fiscal_yy, "targets"),
-        datapackcommons::getDatasetUids(fiscal_yy, "subnat_impatt"))
-    
-# package parameters for getDataValueSets function call
-    parameters <- 
-      dplyr::bind_rows( 
-        tibble::tibble(key = "dataSet", value = dataset_uids),
-        tibble::tibble(key = "orgUnit", value = org_unit_uids),
-        tibble::tribble(~ key, ~ value,
-                        "children", "true",
-                        "categoryOptionComboIdScheme", "code",
-                        "includeDeleted", "false",
-                        "period", paste0(cop_yyyy, "Oct")
-                        )
-        )
-    
-# get data from datim usinfg dataValueSets
-# rename to standard names
-    datim_data <-
-      getDataValueSets(parameters$key,
-                       parameters$value,
-                       base_url = base_url) %>%
-      dplyr::rename(
-        datim_value = value,
-        data_element_uid = data_element,
-        org_unit_uid = org_unit,
-        category_option_combo_uid = category_option_combo,
-        attribute_option_combo_code = attribute_option_combo
-      ) %>%
+    datim_data <- getCopDataFromDatim(country_uid = d$info$country_uids, 
+                        fiscal_year_yyyy = d$info$cop_year + 1) %>%
       dplyr::filter(datim_value != 0) %>% # we don't import 0s up front so we should ignore any here
       dplyr::filter(datim_value != "")
     

@@ -53,9 +53,11 @@ handshakeFile <- function(path = NULL,
     }
   
   # If path has issues or NA, prompt user to select file from window.
-  if (!canReadFile(path) & interactive()) {
+  if (!canReadFile(path) ) {
+    
+    if ( interactive() ) {
     interactive_print("Please choose a file.")
-    path <- file.choose()
+    path <- file.choose() }
     
     if (!canReadFile(path)) {stop("File could not be read!")}
     
