@@ -68,12 +68,6 @@ unPackTool <- function(submission_path = NULL,
   # unPack file based on type
   if (d$info$tool == "Data Pack") {
     d <- unPackDataPack(d)
-  } else if (d$info$tool == "Site Tool") {
-    d <- unPackSiteTool(d)
-  } else if (d$info$tool == "Mechanism Map") {
-    d <- unPackMechanismMap(d)
-  } else if (d$info$tool == "Site Filter") {
-    d <- unPackSiteFilter(d)
   } else {stop("Please select correct file type: Data Pack, Site Tool, Mechanism Map, or Site Filter.")}
   
   # If warnings, show all grouped by sheet and issue
