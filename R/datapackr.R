@@ -104,7 +104,6 @@ if (getRversion() >= "2.15.1")
       "duplicates",
       "effect",
       "enddate",
-      "FASTforward",
       "fiscal_year",
       "formula",
       "formula_15",
