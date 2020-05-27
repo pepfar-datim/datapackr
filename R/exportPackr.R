@@ -31,7 +31,7 @@ exportPackr <- function(data, output_path, type, datapack_name) {
     )
   }
   
-  if (type %in% c("Site Tool", "Data Pack", "Mechanism Map")) {
+  if (type %in% c("Site Tool", "Data Pack")) {
     if (class(data) != "Workbook") {
       stop("Output type and data do not match!")
     }
