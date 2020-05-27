@@ -237,7 +237,6 @@ if (getRversion() >= "2.15.1")
       "type",
       "uid",
       "uidlevel3",
-      "unPackMechanismMap",
       "unPackSiteFilter",
       "unPackSiteTool",
       "upload_timestamp",
