@@ -11,7 +11,7 @@ handshakeFile(path = NULL, tool = NULL)
 
 \item{tool}{What type of tool is the submission file? Options include 
 "Data Pack", "Data Pack Template", Site Tool", "Site Tool Template",
-"Mechanism Map", and "Site Filter".}
+and "Site Filter".}
 }
 \value{
 Character vector containing valid filepath for further use.
