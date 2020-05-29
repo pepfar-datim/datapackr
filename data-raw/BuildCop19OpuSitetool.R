@@ -1,4 +1,7 @@
-country_name <-  "Laos" ### if it is a region, escalate to sam
+devtools::install_github("https://github.com/pepfar-datim/datapackr",
+                         "COP-19-Master")
+
+country_name <-  "Vietnam" ### if it is a region, escalate to sam
 secrets <- "~/.secrets/datim.json"
 output_path<-"~/Documents/cop_19_data/opus"
 
@@ -19,70 +22,15 @@ country_details <-  datapackr::dataPackMap %>%
   tibble::as_tibble() %>%
   dplyr::filter(country_name == !!country_name)
 
+assertthat::assert_that(NROW(country_details) == 1)
+
 d$info$datapack_name = country_details$data_pack_name
 d$info$datapack_uid = country_details$country_uid
 
+if (d$info$datapack_name != country_name){
+  stop("seems like a regional data pack")
+}
 
-# Set up a site -> PSNU cache
-# sitePsnuCache <- new.env()
-
-#' Get the name of an OU from its UID
-#' 
-#'  @param uid A valid OU UID
-#'  @return The OU's name 
-# getOUNameFromUID<-function(uid) {
-#   paste0(getOption("baseurl"),"api/29/organisationUnits/",uid,"?fields=name") %>% 
-#     httr::GET() %>% 
-#     httr::content(as = "text") %>% 
-#     jsonlite::fromJSON(.) %>% 
-#     purrr::pluck("name")
-# }
-
-#' Get the OU path string
-#' 
-#' @param uid A valid OU UID
-#' @return '/' delimited list of parent OUs
-# getOUPathFromUID<-function(uid) {
-#     paste0(getOption("baseurl"),"api/29/organisationUnits/",uid,"?fields=path") %>% 
-#         httr::GET() %>% 
-#         httr::content(as = "text") %>% 
-#         jsonlite::fromJSON(.) %>% 
-#         purrr::pluck("path")
-# }
-
-#' Get the PSNU record set for a given site
-#' 
-#' @param siteUID OU UID
-#' @param psnus Existing list of PSNUs for this country
-#' @return row record or FALSE
-# getPsnuForSite<-function(siteUID,psnus) {
-#     # see if it is cached already
-#     if (exists(siteUID, envir = sitePsnuCache)) {
-#         return(sitePsnuCache[[siteUID]])
-#     } else {
-#         # pull it, shove it
-#         sitePath <- getOUPathFromUID(siteUID)
-#         if (length(sitePath) == 0) {
-#             # @TODO:: return exception
-#             return(FALSE)
-#         }
-#         sitePathList <- unlist(strsplit(sitePath,"/"))
-#         # compare this site to the PSNU list for the country
-#         for (s in sitePathList) {
-#             # skip this site and any leading blanks
-#             if (s == "" || s == siteUID) {
-#                 next
-#             }
-#             candidatePSNU <- psnus %>% filter(psnu_uid == s)
-#             if (length(candidatePSNU$psnu) == 0) {
-#                 next
-#             }
-#             sitePsnuCache[[siteUID]] <- candidatePSNU
-#             return(sitePsnuCache[[siteUID]])
-#         }
-#     }
-#     return(FALSE)
-# }
 
 #' Pull data for the relevant data sets from DATIM for FY20, excluding dedups and deleted values.
 #' 
@@ -101,6 +49,7 @@ getCOP19DataFromAPI<-function(country_uid) {
     "includeDeleted", "false",
     "orgUnit", country_uid) 
   
+  # remove any 0 value or dedup records, these do not go into site tool
   datapackr::getDataValueSets(parameters$key, parameters$value) %>%
     dplyr::filter(value != 0) %>%  # don't need 0s
     dplyr::filter(attribute_option_combo != '00000') %>% # dedup
@@ -123,31 +72,30 @@ datapackr::loginToDATIM(secrets)
    dplyr::filter(indicator_code != "TB_ART.N.Age/Sex/NewExistingART/HIVStatus.20T.Already")
    
 
-# Cache the PSNUs for this country
-# psnus = datapackr::getPSNUs(parent_uid, TRUE)
 sites  <-  datapackr::getSiteList(d$info$datapack_uid)
-# Store the country OU name
-# parent_name <- getOUNameFromUID(parent_uid)
-# Get the main dataset for looping through
-dataSets <- getCOP19DataFromAPI(d$info$datapack_uid)
+
+# Get the data
+data <- getCOP19DataFromAPI(d$info$datapack_uid)
 
 #join with site to datim table to back out columns for site tool 
-dataSets  <-  dplyr::left_join(dataSets, site_to_datim, 
+data  <-  dplyr::left_join(data, site_to_datim, 
                  by = c("data_element" = "dataelementuid",
                         "category_option_combo" = "categoryoptioncombouid"))
 
 # join with sites table to get PSNU details
 
-dataSets  <-  dplyr::left_join(dataSets, sites, 
+data  <-  dplyr::left_join(data, sites, 
                                 by = c("org_unit" = "id"))
 
 # store these for investigation - Why is there FY20 target data in DATIM 
 # that we cannot map to the site tool? Usually this is because the data collection form included
 # entry points that were not on the data pack and someone manually eneterd the target
 
-incomplete_records = dplyr::filter(dataSets, is.na(indicator_code) | is.na(psnu))
+incomplete_records = dplyr::filter(data, is.na(indicator_code) | is.na(psnu))
 
-dataSets = dplyr::filter(dataSets, !is.na(indicator_code) & !is.na(psnu)) %>% 
+assertthat::assert_that(NROW(incomplete_records) == 0)
+
+data = dplyr::filter(data, !is.na(indicator_code) & !is.na(psnu)) %>% 
   dplyr::select(PSNU = psnu,
                 psnuid = psnu_uid,
                 sheet_name   = sheet_name,
@@ -163,7 +111,7 @@ dataSets = dplyr::filter(dataSets, !is.na(indicator_code) & !is.na(psnu)) %>%
   dplyr::mutate(PSNU = glue::glue("{PSNU} ({psnuid})"), siteValue = value)
 
 
-d$data$site$distributed <- dataSets
-d$data$distributedMER <- dataSets
+d$data$site$distributed <- data
+d$data$distributedMER <- data
 datapackr::packSiteTool(d,
                         output_path = output_path )
