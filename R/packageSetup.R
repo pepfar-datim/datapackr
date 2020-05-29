@@ -35,10 +35,7 @@ dataPackName_homeCell <- function() { "B20" }
 #'
 skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
   if (tool %in% c("Data Pack", "Data Pack Template")) {
-    if (cop_year == 2019) {
-      skip = c("Home", "Quotes", "Summary", "Spectrum")
-    }
-    else if (cop_year == 2020) {
+    if (cop_year == 2020) {
       skip = c("Home", "Instructions", "Summary", "Spectrum", "Spectrum IDs")
     }
   } else {skip = c(NA_character_)}
