@@ -27,8 +27,7 @@ dataPackName_homeCell <- function() { "B20" }
 #' @export
 #' @title List of tabs to skip for given tool.
 #'
-#' @param tool "Data Pack", "Data Pack Template", "Site Tool", "Site Tool Template",
-#' or "Site Filter".
+#' @param tool "Data Pack", "Data Pack Template", "Site Tool", "Site Tool Template".
 #' @param cop_year COP year for dating as well as selection of
 #' templates.
 #'
@@ -50,8 +49,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 #' @export
 #' @title Tool header rows
 #'
-#' @param tool "Data Pack", "Data Pack Template", "Site Tool", "Site Tool Template",
-#' or "Site Filter".
+#' @param tool "Data Pack", "Data Pack Template", "Site Tool", "Site Tool Template".
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
 #'
@@ -62,7 +60,6 @@ headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
   if (cop_year == 2019) {
     if (tool %in% c("Data Pack","Site Tool")) {header_row <- 5}
     else if (tool %in% c("Data Pack Template","Site Tool Template")) {header_row <- 14}
-    else if (tool %in% c("Site Filter")) {header_row <- 1}
     else stop("That tool type is not supported for that cop_year.")
   } else if (cop_year == 2020) {
     if (tool %in% c("Data Pack", "Data Pack Template")) {header_row <- 14}

@@ -7,8 +7,7 @@
 skip_tabs(tool = "Data Pack", cop_year = getCurrentCOPYear())
 }
 \arguments{
-\item{tool}{"Data Pack", "Data Pack Template", "Site Tool", "Site Tool Template",
-or "Site Filter".}
+\item{tool}{"Data Pack", "Data Pack Template", "Site Tool", "Site Tool Template".}
 
 \item{cop_year}{COP year for dating as well as selection of
 templates.}
