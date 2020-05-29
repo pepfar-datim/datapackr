@@ -7,11 +7,10 @@
 \format{\describe{
   \item{sheet_num}{Lists the index value associated with the sheet name
   listed in \code{sheet_name}.}
-  \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack
-  and Site Tool.}
+  \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
   \item{col}{Value describing the column position of each 
   \code{indicatorCode}.}
-  \item{indicatorCode}{Code used in the Data Pack and Site Tool to uniquely
+  \item{indicatorCode}{Code used in the Data Pack to uniquely
   identify each distinct programmatic area of target setting.}
   \item{colType}{Flags whether an \code{indicatorCode} is a Target
   (\code{"Target"}) or not (\code{NA}).}

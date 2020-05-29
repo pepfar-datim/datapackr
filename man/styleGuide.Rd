@@ -16,6 +16,6 @@ styleGuide
 }
 \description{
 A list object containing styles pertaining to different portions of the Data
-Pack and Site Tool.
+Pack.
 }
 \keyword{datasets}

@@ -254,7 +254,6 @@ if (getRversion() >= "2.15.1")
       "value_numeric",
       "value_type",
       "value.datapack",
-      "value.sitetool",
       "valueRounded.datapack",
       "values",
       "VMMC_CIRC.N.Age_Sex_HIVStatus.T.Positive"

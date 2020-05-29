@@ -71,9 +71,8 @@
 #'
 #' @format 
 #' \describe{
-#'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack
-#'   and Site Tool.}
-#'   \item{indicatorCode}{Code used in the Data Pack and Site Tool to uniquely
+#'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
+#'   \item{indicatorCode}{Code used in the Data Pack to uniquely
 #'   identify each distinct programmatic area of target setting.}
 #'   \item{typeOptions}{Either DSD or TA. The crossing of these with
 #'   \code{indicatorCode} roughly corresponds to DATIM dataelements.}
@@ -117,11 +116,10 @@
 #' \describe{
 #'   \item{sheet_num}{Lists the index value associated with the sheet name
 #'   listed in \code{sheet_name}.}
-#'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack
-#'   and Site Tool.}
+#'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
 #'   \item{col}{Value describing the column position of each 
 #'   \code{indicatorCode}.}
-#'   \item{indicatorCode}{Code used in the Data Pack and Site Tool to uniquely
+#'   \item{indicatorCode}{Code used in the Data Pack to uniquely
 #'   identify each distinct programmatic area of target setting.}
 #'   \item{colType}{Flags whether an \code{indicatorCode} is a Target
 #'   (\code{"Target"}) or not (\code{NA}).}
@@ -132,9 +130,9 @@
 "template_schema"
 
 #' @docType data
-#' @title Lists valid disaggs for each Data Pack and Site Tool tab.
+#' @title Lists valid disaggs for each Data Pack tab.
 #'
-#' @description For each Site Tool and Data Pack sheet/tab, lists the Ages,
+#' @description For each Data Pack sheet/tab, lists the Ages,
 #' Sexes, and KPs allowed.
 "valid_dp_disaggs"
 
@@ -205,7 +203,7 @@
 #' 
 #' @description 
 #' A list object containing styles pertaining to different portions of the Data
-#' Pack and Site Tool.
+#' Pack.
 #' 
 #' @format 
 #' \describe{
@@ -228,12 +226,11 @@
 #' \describe{
 #'   \item{sheet_num}{Lists the index value associated with the sheet name
 #'   listed in \code{sheet_name}.}
-#'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack
-#'   and Site Tool.}
+#'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
 #'   \item{col}{Value describing the column position of each 
 #'   \code{indicator_code}.}
 #'   \item{label}{String label used to describe \code{indicator_code}.}
-#'   \item{indicator_code}{Code used in the Data Pack and Site Tool to uniquely
+#'   \item{indicator_code}{Code used in the Data Pack to uniquely
 #'   identify each distinct programmatic area of target setting.}
 #'   \item{formula}{Excel formula defined for \code{indicator_code}.}
 #'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
@@ -243,32 +240,6 @@
 #'   \code{IMPATT}, or \code{SUBNAT}.}
 #' }
 "data_pack_schema"
-
-
-#' @docType data
-#' @title Schema describing correct structure of Site Tool template. 
-#'
-#' @description This schema describes the correct structure of a Site Tool
-#' file, generated from the template used to produce Data Packs and useful in
-#' validating Site Tools passed through datapackr.
-#'
-#' @format 
-#' \describe{
-#'   \item{sheet_num}{Lists the index value associated with the sheet name
-#'   listed in \code{sheet_name}.}
-#'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack
-#'   and Site Tool.}
-#'   \item{col}{Value describing the column position of each 
-#'   \code{indicator_code}.}
-#'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
-#'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
-#'   \item{tech_area}{Header text used to distinguish groups of
-#'   \code{indicator_codes}.}
-#'   \item{label}{String label used to describe \code{indicator_code}.}
-#'   \item{indicator_code}{Code used in the Data Pack and Site Tool to uniquely
-#'   identify each distinct programmatic area of target setting.}
-#' }
-"site_tool_schema"
 
 #' @docType data
 #' @title periodInfo
@@ -286,30 +257,6 @@
 #' }
 #' 
 "periodInfo"
-
-#' @docType data
-#' @title SiteToDATIM
-#' 
-#' @description 
-#' Mapping of Site Tool indicators to DATIM dataelements & categoryoptioncombos.
-#' 
-#' @format 
-#' \describe{
-#'   \item{sheet_name}{Lists the sheet/tab name as used in the Data Pack.}
-#'   \item{indicatorCode}{Code used in the Data Pack to uniquely identify each
-#'   distinct programmatic area of target setting.}
-#'   \item{typeOptions}{Either DSD or TA. The crossing of these with
-#'   \code{indicatorCode} roughly corresponds to DATIM dataelements.}
-#'   \item{dataelementuid}{DATIM uid for dataElements.}
-#'   \item{dataset}{Name of DATIM dataset associated with the listed
-#'   \code{dataelementuid}, either "MER", "SUBNAT", or "IMPATT".}
-#'   \item{validAges}{Age disaggregate.}
-#'   \item{validSexes}{Sex disaggregate.}
-#'   \item{validKPs}{Key Population disaggregate.}
-#'   \item{categoryoptioncombouid}{DATIM uid for categoryOptionCombos.}
-#' }
-#' 
-"SiteToDATIM"
 
 #' @docType data
 #' @title fake_data_flattenDataPackModel_19
@@ -371,12 +318,11 @@
 #' \describe{
 #'   \item{sheet_num}{Lists the index value associated with the sheet name
 #'   listed in \code{sheet_name}.}
-#'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack
-#'   and Site Tool.}
+#'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
 #'   \item{data_structure}{}
 #'   \item{col}{Value describing the column position of each 
 #'   \code{indicator_code}.}
-#'   \item{indicator_code}{Code used in the Data Pack and Site Tool to uniquely
+#'   \item{indicator_code}{Code used in the Data Pack to uniquely
 #'   identify each distinct programmatic area of target setting.}
 #'   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
 #'   in the \code{col_type} field, documents the dataset, either \code{MER},

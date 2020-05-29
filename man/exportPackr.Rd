@@ -15,7 +15,6 @@ outputs to be saved. If not supplied, will output to working directory.}
 
 \item{type}{File prefix to be applied in output filename, as follows:
   \describe{
-    \item{\code{Site Tool}}{Openxlsx Workbook object containing Site Tool.}
     \item{\code{Data Pack}}{Openxlsx Workbook object containing Data Pack.}
     \item{\code{FAST Export}}{Data frame containing FAST export data.}
     \item{\code{SUBNAT IMPATT}}{Data frame containing SUBNAT/IMPATT data.}

@@ -23,12 +23,12 @@ representing countries.}
 
 \item{cop_year}{COP Year in format YYYY.}
 
-\item{type}{Either "Data Pack" or "Site Tool". Defaults to "Data Pack".}
+\item{type}{Either "Data Pack". Defaults to "Data Pack".}
 }
 \value{
 Openxlsx workbook object with added, styled Home tab.
 }
 \description{
-Function to write Home tab details into either Data Pack or Site Tool, as
+Function to write Home tab details into Data Pack as
 specified.
 }

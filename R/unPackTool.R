@@ -36,13 +36,11 @@ createKeychainInfo <- function(submission_path = NULL,
 #' @title Unpack a submitted tool
 #'
 #' @description
-#' Processes a submitted Data Pack, Site Tool, or Site Filter by
-#' identifying integrity issues, checking data against DATIM validations, and
-#' extracting data.
+#' Processes a submitted Data Pack by identifying integrity issues, checking
+#' data against DATIM validations, and extracting data.
 #'
 #' @param submission_path Local path to the file to import.
 #' @param tool What type of tool is the submission file? Default is "Data Pack".
-#' Other options include "Site Tool", and "Site Filter".
 #' @param country_uids List of 11 digit alphanumeric DATIM codes representing
 #' countries. If not provided, will check file for these codes. If not in file,
 #' will flag error.
@@ -50,7 +48,7 @@ createKeychainInfo <- function(submission_path = NULL,
 #' templates.
 #' 
 #' @details
-#' Executes the following operations in relation to a submitted Site Tool
+#' Executes the following operations in relation to a submitted tool
 #' \enumerate{
 #'     \item Performs integrity checks on file structure;
 #' }
@@ -68,7 +66,7 @@ unPackTool <- function(submission_path = NULL,
   # unPack file based on type
   if (d$info$tool == "Data Pack") {
     d <- unPackDataPack(d)
-  } else {stop("Please select correct file type: Data Pack, Site Tool, or Site Filter.")}
+  } else {stop("Please select correct file type: Data Pack.")}
   
   # If warnings, show all grouped by sheet and issue
   if (!is.null(d$info$warning_msg) & interactive()) {
