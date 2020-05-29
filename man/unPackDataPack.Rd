@@ -19,7 +19,7 @@ Executes the following operations in relation to a submitted Data Pack:
     \item Performs integrity checks on file structure;
     \item Runs DATIM validation tests;
     \item Extracts SUBNAT and IMPATT data as a DATIM import file;
-    \item Extracts FAST data for use by the FAST Tool; and
+    \item Extracts FAST data for use by the FAST Tool
 }
     
 If a Data Pack is submitted as an XLSB formatted document, you must open &
