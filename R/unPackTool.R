@@ -36,9 +36,8 @@ createKeychainInfo <- function(submission_path = NULL,
 #' @title Unpack a submitted tool
 #'
 #' @description
-#' Processes a submitted Data Pack by
-#' identifying integrity issues, checking data against DATIM validations, and
-#' extracting data.
+#' Processes a submitted Data Pack by identifying integrity issues, checking
+#' data against DATIM validations, and extracting data.
 #'
 #' @param submission_path Local path to the file to import.
 #' @param tool What type of tool is the submission file? Default is "Data Pack".

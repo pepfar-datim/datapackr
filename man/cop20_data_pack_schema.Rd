@@ -4,8 +4,7 @@
 \name{cop20_data_pack_schema}
 \alias{cop20_data_pack_schema}
 \title{Schema describing correct structure of COP20 Data Pack template.}
-\format{
-\describe{
+\format{\describe{
   \item{sheet_num}{Lists the index value associated with the sheet name
   listed in \code{sheet_name}.}
   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
@@ -27,8 +26,7 @@
   \item{valid_sexes}{}
   \item{valid_kps}{}
   \item{formula}{Excel formula defined for \code{indicator_code}.}
-}
-}
+}}
 \usage{
 cop20_data_pack_schema
 }

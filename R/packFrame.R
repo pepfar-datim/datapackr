@@ -6,7 +6,7 @@
 #'
 #' @param wb Openxlsx workbook object.
 #' @param sheet Name of the sheet
-#' @param type Either "Data Pack". Defaults to "Data Pack".
+#' @param type Defaults to "Data Pack".
 #'
 #' @return Openxlsx workbook object with added, styled Home tab.
 #'
@@ -89,7 +89,7 @@ frameDataSheet <- function(wb, sheet, type = "Data Pack") {
 #'
 #' @param datapack_uid A unique ID specifying the PEPFAR Operating Unit
 #' the Tool belongs to.
-#' @param type Either "Data Pack".
+#' @param type Defaults to "Data Pack".
 #'
 #' @return OpenXLSX workbook object for use in data writing functions.
 #'

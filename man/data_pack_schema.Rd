@@ -4,8 +4,7 @@
 \name{data_pack_schema}
 \alias{data_pack_schema}
 \title{Schema describing correct structure of Data Pack template.}
-\format{
-\describe{
+\format{\describe{
   \item{sheet_num}{Lists the index value associated with the sheet name
   listed in \code{sheet_name}.}
   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
@@ -20,8 +19,7 @@
   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
   in the \code{col_type} field, documents the dataset, either \code{MER},
   \code{IMPATT}, or \code{SUBNAT}.}
-}
-}
+}}
 \usage{
 data_pack_schema
 }
