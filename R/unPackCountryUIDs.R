@@ -7,7 +7,6 @@
 #' 
 #' @param submission_path Local path to the file to import.
 #' @param tool What type of tool is the submission file? Default is "Data Pack".
-#' Other options include "Site Tool".
 #' 
 #' @return Character vector of country_uids.
 #' 

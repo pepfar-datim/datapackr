@@ -14,8 +14,7 @@ unPackTool(
 \arguments{
 \item{submission_path}{Local path to the file to import.}
 
-\item{tool}{What type of tool is the submission file? Default is "Data Pack".
-Other options include "Site Tool".}
+\item{tool}{What type of tool is the submission file? Default is "Data Pack".}
 
 \item{country_uids}{List of 11 digit alphanumeric DATIM codes representing
 countries. If not provided, will check file for these codes. If not in file,
@@ -25,12 +24,12 @@ will flag error.}
 templates.}
 }
 \description{
-Processes a submitted Data Pack, Site Tool by
+Processes a submitted Data Pack by
 identifying integrity issues, checking data against DATIM validations, and
 extracting data.
 }
 \details{
-Executes the following operations in relation to a submitted Site Tool
+Executes the following operations in relation to a submitted tool
 \enumerate{
     \item Performs integrity checks on file structure;
 }

@@ -4,7 +4,7 @@
 #' @title writeHomeTab(wb, datapack_uid, type = "Data Pack")
 #'
 #' @description
-#' Function to write Home tab details into either Data Pack or Site Tool, as
+#' Function to write Home tab details into Data Pack as
 #' specified.
 #'
 #' @param wb Openxlsx workbook object.
@@ -13,7 +13,7 @@
 #' @param country_uids Character vector of 11 digit alphanumeric DATIM codes
 #' representing countries.
 #' @param cop_year COP Year in format YYYY.
-#' @param type Either "Data Pack" or "Site Tool". Defaults to "Data Pack".
+#' @param type Either "Data Pack". Defaults to "Data Pack".
 #'
 #' @return Openxlsx workbook object with added, styled Home tab.
 #'
