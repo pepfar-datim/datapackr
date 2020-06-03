@@ -81,11 +81,29 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
     #Filter the pseudo-dedupe mechanism data out
     d$datim$MER <- d$data$distributedMER %>%
       dplyr::filter(mechanism_code != '99999')
+  } 
+  
+  
+  exists_with_rows <- function(x) {
+    
+    sym <- deparse(substitute(x))
+    env <- parent.frame()
+    if (!exists(sym, env)) {
+      return(FALSE)
+    } else
+      if (NROW(x) > 0) {
+        return(TRUE)
+      } else
+      {
+        FALSE
+      }
   }
   
   #Bind pure dupes
   
-  if ( NROW(auto_resolve_pure_dupes) > 0 ) {
+ 
+  
+  if ( exists_with_rows(auto_resolve_pure_dupes) ) {
     d$datim$MER<-dplyr::bind_rows(d$datim$MER,auto_resolve_pure_dupes)
     msg<-paste0("INFO! ", NROW(auto_resolve_pure_dupes), " zero-valued pure deduplication adjustments will be added to your DATIM import.
                   Please consult the DataPack wiki section on deduplication for more information. ")
@@ -94,7 +112,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
   }
   
   #Bind crosswalk dupes
-  if ( NROW(crosswalk_dupes_auto_resolved) > 0 ) {
+  if ( exists_with_rows(crosswalk_dupes_auto_resolved) > 0 ) {
     d$datim$MER<-dplyr::bind_rows(d$datim$MER,crosswalk_dupes_auto_resolved)
     msg<-paste0("INFO! ", NROW(crosswalk_dupes_auto_resolved), " zero-valued crosswalk deduplication adjustments will be added to your DATIM import.
                   Please consult the DataPack wiki section on deduplication for more information. ")
