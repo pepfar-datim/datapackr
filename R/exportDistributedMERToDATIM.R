@@ -101,8 +101,6 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
   
   #Bind pure dupes
   
- 
-  
   if ( exists_with_rows(auto_resolve_pure_dupes) ) {
     d$datim$MER<-dplyr::bind_rows(d$datim$MER,auto_resolve_pure_dupes)
     msg<-paste0("INFO! ", NROW(auto_resolve_pure_dupes), " zero-valued pure deduplication adjustments will be added to your DATIM import.
@@ -112,7 +110,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
   }
   
   #Bind crosswalk dupes
-  if ( exists_with_rows(crosswalk_dupes_auto_resolved) > 0 ) {
+  if ( exists_with_rows(crosswalk_dupes_auto_resolved)  ) {
     d$datim$MER<-dplyr::bind_rows(d$datim$MER,crosswalk_dupes_auto_resolved)
     msg<-paste0("INFO! ", NROW(crosswalk_dupes_auto_resolved), " zero-valued crosswalk deduplication adjustments will be added to your DATIM import.
                   Please consult the DataPack wiki section on deduplication for more information. ")
