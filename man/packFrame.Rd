@@ -10,7 +10,7 @@ packFrame(datapack_uid, type = "Data Pack")
 \item{datapack_uid}{A unique ID specifying the PEPFAR Operating Unit
 the Tool belongs to.}
 
-\item{type}{Either "Data Pack".}
+\item{type}{Defaults to "Data Pack".}
 }
 \value{
 OpenXLSX workbook object for use in data writing functions.

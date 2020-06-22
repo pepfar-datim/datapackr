@@ -24,9 +24,8 @@ will flag error.}
 templates.}
 }
 \description{
-Processes a submitted Data Pack by
-identifying integrity issues, checking data against DATIM validations, and
-extracting data.
+Processes a submitted Data Pack by identifying integrity issues, checking
+data against DATIM validations, and extracting data.
 }
 \details{
 Executes the following operations in relation to a submitted tool
