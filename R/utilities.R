@@ -3,7 +3,9 @@
 #'
 #' @return `Default` categoryOptionCombo uid.
 #'
-default_catOptCombo <- function() { "HllvX50cXC0" }
+default_catOptCombo <- function() {
+  "HllvX50cXC0"
+}
 
 
 #' @title Round at 0.5 toward integer with highest absolute value
@@ -26,7 +28,7 @@ default_catOptCombo <- function() { "HllvX50cXC0" }
 #' round_trunc(-0.5)
 #' @export
 round_trunc <- function(x) {
-    trunc(abs(x) + 0.5) * sign(x)
+  trunc(abs(x) + 0.5) * sign(x)
 }
 
 
@@ -49,9 +51,9 @@ selectOU <- function() {
   ous <- datapackr::configFile %>%
     dplyr::select(DataPack_name) %>%
     dplyr::distinct()
-  promptText<-paste0("Please select the OU this file is associated with [1-",nrow(ous),"]:")
+  promptText <- paste0("Please select the OU this file is associated with [1-", nrow(ous), "]:")
   interactive_print(promptText)
-  selection <- utils::select.list(ous$DataPack_name,multiple=FALSE)
+  selection <- utils::select.list(ous$DataPack_name, multiple = FALSE)
   return(selection)
 }
 
@@ -68,37 +70,35 @@ selectOU <- function() {
 #' @return Dataframe of country metadata, including prioritization, planning,
 #' country, community, and facility levels in DATIM organization hierarchy.
 #'
-getIMPATTLevels <- function(){
+getIMPATTLevels <- function() {
   impatt_levels <-
-    paste0(getOption("baseurl"),"api/",datapackr::api_version(),
-           "/dataStore/dataSetAssignments/orgUnitLevels") %>%
-    httr::GET() %>%
-    httr::content(., "text") %>%
-    jsonlite::fromJSON(., flatten = TRUE) %>%
+    datimutils::api_get("dataStore/dataSetAssignments/orgUnitLevels") %>%
     do.call(rbind.data.frame, .) %>%
     dplyr::rename(operating_unit = name3, country_name = name4) %>%
     dplyr::mutate_if(is.factor, as.character) %>%
-    dplyr::mutate(country_name =
-                    dplyr::case_when(country == 3 ~ operating_unit,
-                                     country == 4 ~ country_name))
+    dplyr::mutate(
+      country_name =
+        dplyr::case_when(
+          country == 3 ~ operating_unit,
+          country == 4 ~ country_name
+        )
+    )
 
   # Add country_uids ####
-  countries <-
-    datapackr::api_call("organisationUnits") %>%
-    datapackr::api_filter(field = "organisationUnitGroups.id",
-                          operation = "eq",
-                          match = "cNzfcPWEGSH") %>%
-    datapackr::api_fields(fields = "id,name,level,ancestors[id,name]") %>%
-    datapackr::api_get()
+  countries <- getMetadata(organisationUnits,
+    organisationUnitGroups.id %.eq% "cNzfcPWEGSH",
+    fields = "id,name,level,ancestors[id,name]"
+  )
 
   impatt_levels %<>%
     dplyr::left_join(countries, by = c("country_name" = "name")) %>%
     dplyr::rename(country_uid = id) %>%
-    dplyr::select(operating_unit, country_name, country_uid,
-                  dplyr::everything(), -ancestors, -level)
+    dplyr::select(
+      operating_unit, country_name, country_uid,
+      dplyr::everything(), -ancestors, -level
+    )
 
   return(impatt_levels)
-
 }
 
 
@@ -114,35 +114,46 @@ getIMPATTLevels <- function(){
 #' and Countries.
 #'
 getMilitaryNodes <- function() {
-  #loginToDATIM(getOption("secrets"))
-
-  militaryNodes <- paste0(
-    getOption("baseurl"),"api/",datapackr::api_version(),
-      "/organisationUnits.json?paging=false",
-      "&filter=name:$ilike:_Military",
-      #"&filter=organisationUnitGroups.id:eq:nwQbMeALRjL", (New _Mil nodes not here...)
-      "&fields=name,id,level,ancestors[id,name]") %>%
-    httr::GET() %>%
-    httr::content(., "text") %>%
-    jsonlite::fromJSON(., flatten = TRUE) %>%
-    do.call(rbind.data.frame, .) %>%
-  # Tag Operating Unit and Country (name & id) - accommodate for eventuality of
-  #    _Military at level 5 in Regional OUs
+  # loginToDATIM(getOption("secrets"))
+  # datimutils::loginToDATIM(config_path = "~/secrets/datim.json")
+  militaryNodes <- getMetadata(organisationUnits,
+    name %.~^like% "_Military",
+    fields = "name,id,level,ancestors[id,name]"
+  ) %>%
+    # Tag Operating Unit and Country (name & id) - accommodate for eventuality of
+    #    _Military at level 5 in Regional OUs
     dplyr::mutate(
       country_uid = dplyr::case_when(
-        level == 4 ~ purrr::map_chr(ancestors,
-                              function(x) magrittr::use_series(x, id) %>%
-                                magrittr::extract(3)),
-        level == 5 ~ purrr::map_chr(ancestors,
-                                    function(x) magrittr::use_series(x, id) %>%
-                                      magrittr::extract(4))),
+        level == 4 ~ purrr::map_chr(
+          ancestors,
+          function(x) {
+            magrittr::use_series(x, id) %>%
+              magrittr::extract(3)
+          }
+        ),
+        level == 5 ~ purrr::map_chr(
+          ancestors,
+          function(x) {
+            magrittr::use_series(x, id) %>%
+              magrittr::extract(4)
+          }
+        )
+      ),
       country_name = dplyr::case_when(
-        level == 4 ~ purrr::map_chr(ancestors,
-                                    function(x) magrittr::use_series(x, name) %>%
-                                      magrittr::extract(3)),
-        level == 5 ~ purrr::map_chr(ancestors,
-                                    function(x) magrittr::use_series(x, name) %>%
-                                      magrittr::extract(4))
+        level == 4 ~ purrr::map_chr(
+          ancestors,
+          function(x) {
+            magrittr::use_series(x, name) %>%
+              magrittr::extract(3)
+          }
+        ),
+        level == 5 ~ purrr::map_chr(
+          ancestors,
+          function(x) {
+            magrittr::use_series(x, name) %>%
+              magrittr::extract(4)
+          }
+        )
       )
     ) %>%
     dplyr::select(-ancestors)
@@ -165,30 +176,30 @@ getMilitaryNodes <- function() {
 #'
 swapColumns <- function(to, from) {
   # Grab column names from `from`
-    cols = colnames(from)
+  cols <- colnames(from)
 
   # If `from` is a null dataframe, skip and return `to`
-    if (length(cols) != 0) {
+  if (length(cols) != 0) {
 
-  # Loop through `from` columns and if there's a match in `to`, copy and paste
-  #   it into `to`
-      for (i in 1:length(cols)) {
-        col = cols[i]
-        if (col %in% colnames(to)) {
-          dots <-
-            stats::setNames(list(lazyeval::interp(
-              ~ magrittr::use_series(from, x), x = as.name(col)
-            )), col)
-          to <- to %>%
-            dplyr::mutate_(.dots = dots)
-        } else {
-          next
-        }
+    # Loop through `from` columns and if there's a match in `to`, copy and paste
+    #   it into `to`
+    for (i in seq_along(cols)) {
+      col <- cols[i]
+      if (col %in% colnames(to)) {
+        dots <-
+          stats::setNames(list(lazyeval::interp(
+            ~ magrittr::use_series(from, x),
+            x = as.name(col)
+          )), col)
+        to <- to %>%
+          dplyr::mutate_(.dots = dots)
+      } else {
+        next
       }
     }
+  }
 
   return(to)
-
 }
 
 #' @export
@@ -213,7 +224,7 @@ writeFxColumnwise <- function(wb, sheet, x, xy) {
     as.data.frame() %>%
     dplyr::mutate_all(as.character)
 
-  for (i in 1:length(fx)) {
+  for (i in seq_along(fx)) {
     class(fx[[i]]) <- c(class(fx[[i]]), "formula")
   }
 
@@ -234,7 +245,9 @@ writeFxColumnwise <- function(wb, sheet, x, xy) {
 #' @return Printed message, \code{x}.
 #'
 interactive_print <- function(x) {
-  if (interactive()) { print(x) }
+  if (interactive()) {
+    print(x)
+  }
 }
 
 
@@ -255,57 +268,68 @@ interactive_print <- function(x) {
 getCountries <- function(datapack_uid = NA) {
 
   # Pull Country List
-    countries <-
-      datapackr::api_call("organisationUnits") %>%
-      datapackr::api_filter(field = "organisationUnitGroups.id",
-                            operation = "eq",
-                            match = "cNzfcPWEGSH") %>%
-      datapackr::api_fields(fields = "id,name,level,ancestors[id,name]") %>%
-      datapackr::api_get() %>%
+  countries <- getMetadata(organisationUnits,
+    organisationUnitGroups.id %.eq% "cNzfcPWEGSH",
+    fields = "id,name,level,ancestors[id,name]"
+  ) %>%
 
-  # Remove countries no longer supported
-      dplyr::filter(
-        !name %in%
-          c("Antigua & Barbuda","Bahamas","Belize","China","Dominica","Grenada",
-            "Saint Kitts & Nevis","Saint Lucia","Saint Vincent & the Grenadines",
-            "Turkmenistan","Uzbekistan")) %>%
-      dplyr::select(country_name = name, country_uid = id, dplyr::everything()) %>%
+    # Remove countries no longer supported
+    dplyr::filter(
+      !name %in%
+        c(
+          "Antigua & Barbuda", "Bahamas", "Belize", "China", "Dominica", "Grenada",
+          "Saint Kitts & Nevis", "Saint Lucia", "Saint Vincent & the Grenadines",
+          "Turkmenistan", "Uzbekistan"
+        )
+    ) %>%
+    dplyr::select(country_name = name, country_uid = id, dplyr::everything()) %>%
 
-  # Add metadata
-      dplyr::mutate(
-        data_pack_name = dplyr::case_when(
-          country_name %in% c("Burma","Cambodia","India","Indonesia",
-                              "Kazakhstan","Kyrgyzstan","Laos",
-                              "Nepal","Papua New Guinea","Tajikistan",
-                              "Thailand") ~ "Asia Region",
-          country_name %in% c("Barbados","Guyana","Jamaica","Suriname",
-                              "Trinidad & Tobago") ~ "Caribbean Region",
-          country_name %in% c("Brazil","Costa Rica","El Salvador",
-                              "Guatemala","Honduras","Nicaragua",
-                              "Panama") ~ "Central America Region",
-          country_name %in% c("Burkina Faso","Ghana","Liberia","Mali",
-                              "Senegal","Sierra Leone","Togo")
-                              ~ "West Africa Region",
-          TRUE ~ country_name),
-        model_uid = dplyr::case_when(
-          data_pack_name == "Asia Region" ~ "ptVxnBssua6",
-          data_pack_name == "Caribbean Region" ~ "nBo9Y4yZubB",
-          data_pack_name == "Central America Region" ~ "vSu0nPMbq7b",
-          data_pack_name == "West Africa Region" ~ "G0BT4KrJouu",
-          TRUE ~ country_uid
-        ),
-        is_region = data_pack_name %in% c("Asia Region",
-                                          "Caribbean Region",
-                                          "Central America Region",
-                                          "West Africa Region"),
-        level3name = purrr::map_chr(ancestors, list("name", 3), .default = NA),
-        level3name = dplyr::if_else(level == 3, country_name, level3name),
-        uidlevel3 = purrr::map_chr(ancestors, list("id", 3), .default = NA),
-        uidlevel3 = dplyr::if_else(level == 3, country_uid, uidlevel3),
-        level4name = dplyr::case_when(level == 4 ~ country_name),
-        uidlevel4 = dplyr::case_when(level == 4 ~ country_uid),
-        country_in_datim = TRUE
-      )
+    # Add metadata
+    dplyr::mutate(
+      data_pack_name = dplyr::case_when(
+        country_name %in% c(
+          "Burma", "Cambodia", "India", "Indonesia",
+          "Kazakhstan", "Kyrgyzstan", "Laos",
+          "Nepal", "Papua New Guinea", "Tajikistan",
+          "Thailand"
+        ) ~ "Asia Region",
+        country_name %in% c(
+          "Barbados", "Guyana", "Jamaica", "Suriname",
+          "Trinidad & Tobago"
+        ) ~ "Caribbean Region",
+        country_name %in% c(
+          "Brazil", "Costa Rica", "El Salvador",
+          "Guatemala", "Honduras", "Nicaragua",
+          "Panama"
+        ) ~ "Central America Region",
+        country_name %in% c(
+          "Burkina Faso", "Ghana", "Liberia", "Mali",
+          "Senegal", "Sierra Leone", "Togo"
+        )
+        ~ "West Africa Region",
+        TRUE ~ country_name
+      ),
+      model_uid = dplyr::case_when(
+        data_pack_name == "Asia Region" ~ "ptVxnBssua6",
+        data_pack_name == "Caribbean Region" ~ "nBo9Y4yZubB",
+        data_pack_name == "Central America Region" ~ "vSu0nPMbq7b",
+        data_pack_name == "West Africa Region" ~ "G0BT4KrJouu",
+        TRUE ~ country_uid
+      ),
+      is_region = data_pack_name %in% c(
+        "Asia Region",
+        "Caribbean Region",
+        "Central America Region",
+        "West Africa Region"
+      ),
+      level3name = purrr::map_chr(ancestors, list("name", 3), .default = NA),
+      level3name = dplyr::if_else(level == 3, country_name, level3name),
+      uidlevel3 = purrr::map_chr(ancestors, list("id", 3), .default = NA),
+      uidlevel3 = dplyr::if_else(level == 3, country_uid, uidlevel3),
+      level4name = dplyr::case_when(level == 4 ~ country_name),
+      uidlevel4 = dplyr::case_when(level == 4 ~ country_uid),
+      country_in_datim = TRUE
+    )
 
   if (!is.na(datapack_uid)) {
     countries %<>%
@@ -313,7 +337,6 @@ getCountries <- function(datapack_uid = NA) {
   }
 
   return(countries)
-
 }
 
 
@@ -336,13 +359,16 @@ addcols <- function(data, cnames, type = "character") {
   add <- cnames[!cnames %in% names(data)]
 
   if (length(add) != 0) {
-    if (type == "character") {data[add] <- NA_character_
-    } else if (type == "numeric") {data[add] <- NA_real_
-    } else if (type == "logical") {data[add] <- NA}
+    if (type == "character") {
+      data[add] <- NA_character_
+    } else if (type == "numeric") {
+      data[add] <- NA_real_
+    } else if (type == "logical") {
+      data[add] <- NA
+    }
   }
 
   return(data)
-
 }
 
 #' @export
@@ -374,18 +400,18 @@ isLoggedIn <- function() {
   baseurl <- getOption("baseurl")
 
   if (is.null(baseurl)) {
-    return(FALSE)} else {
-      httr::set_config(httr::config(http_version = 0))
-      url <- URLencode(URL = paste0(baseurl, "api/me"))
-      #Logging in here will give us a cookie to reuse
-      r <- httr::GET(url)
-      if (r$status != 200L) {
-        return(FALSE)
-      } else {
-
-        return(TRUE)
-      }
+    return(FALSE)
+  } else {
+    httr::set_config(httr::config(http_version = 0))
+    url <- URLencode(URL = paste0(baseurl, "api/me"))
+    # Logging in here will give us a cookie to reuse
+    r <- httr::GET(url)
+    if (r$status != 200L) {
+      return(FALSE)
+    } else {
+      return(TRUE)
     }
+  }
 }
 
 # this code relates to https://github.com/pepfar-datim/COP-Target-Setting/issues/700
@@ -405,35 +431,41 @@ isLoggedIn <- function() {
 #' @example getCopDatasetUids(FY=2021, types = c("MER", "SUBNAT", "IMPATT"))
 
 getCopDatasetUids <- function(FY = NULL, types = NULL) {
-if(FY != 2021){
-  stop("The fiscal year provided is not supported by the internal function getCopDatasetUids")
-}
-  if (is.null(FY)) {FY = currentFY()}
-  if (is.null(types)) {types = c("MER", "SUBNAT", "IMPATT")}
-
-  data <- api_get(api_call("dataSets"))
-  data <- data[grepl("^MER Targets: (Community|Facility)|MER Target Setting: PSNU|^(Host Country Targets|Planning Attributes): COP Prioritization SNU",
-        data$displayName),]
-  if(FY != currentFY()+1)
-  {
-    data <- data[grepl(paste0("FY",FY), data$displayName),]
-  }else{
-    data <- data[!(grepl("FY[0-9]{4}", data$displayName)),]
+  if (FY != 2021) {
+    stop("The fiscal year provided is not supported by the internal function getCopDatasetUids")
+  }
+  if (is.null(FY)) {
+    FY <- currentFY()
+  }
+  if (is.null(types)) {
+    types <- c("MER", "SUBNAT", "IMPATT")
   }
 
-  data$fiscal_year <- ifelse(!stringr::str_detect(data$displayName, "FY"), currentFY()+1,
-                        as.numeric(stringr::str_extract(data$displayName,"(?<=FY)\\d{4}$")))
+  data <- datimutils::api_get("dataSets") %>% datimutils::simplifyStructure()
+  data <- data[grepl(
+    "^MER Targets: (Community|Facility)|MER Target Setting: PSNU|^(Host Country Targets|Planning Attributes): COP Prioritization SNU",
+    data$displayName
+  ), ]
+  if (FY != currentFY() + 1) {
+    data <- data[grepl(paste0("FY", FY), data$displayName), ]
+  } else {
+    data <- data[!(grepl("FY[0-9]{4}", data$displayName)), ]
+  }
+
+  data$fiscal_year <- ifelse(!stringr::str_detect(data$displayName, "FY"), currentFY() + 1,
+    as.numeric(stringr::str_extract(data$displayName, "(?<=FY)\\d{4}$"))
+  )
   data$data_stream <- ifelse(stringr::str_detect(data$displayName, "^MER "), "MER",
-                        ifelse(stringr::str_detect(data$displayName, "^Host Country Targets"),
-                               "SUBNAT","IMPATT"))
-  if(!(all((types %in% data$data_stream))))
-  {
+    ifelse(stringr::str_detect(data$displayName, "^Host Country Targets"),
+      "SUBNAT", "IMPATT"
+    )
+  )
+  if (!(all((types %in% data$data_stream)))) {
     stop(paste0("UID Not Found for ", setdiff(types, data$data_stream), " for FY ", FY))
   }
 
-#  print(paste0("returning uids for " , FY))
+  #  print(paste0("returning uids for " , FY))
   return(data$id[data$data_stream %in% types])
-
 }
 
 
@@ -454,9 +486,8 @@ if(FY != 2021){
 
 getCopDataFromDatim <- function(country_uid,
                                 fiscal_year_yyyy,
-                                base_url = getOption("baseurl"))
-{
-  if(fiscal_year_yyyy != 2021){
+                                base_url = getOption("baseurl")) {
+  if (fiscal_year_yyyy != 2021) {
     stop("The fiscal year provided is not supported by the internal function getCopDataFromDatim")
   }
   dataset_uids <- getCopDatasetUids(fiscal_year_yyyy)
@@ -466,11 +497,12 @@ getCopDataFromDatim <- function(country_uid,
     dplyr::bind_rows(
       tibble::tibble(key = "dataSet", value = dataset_uids),
       tibble::tibble(key = "orgUnit", value = country_uid),
-      tibble::tribble(~ key, ~ value,
-                      "children", "true",
-                      "categoryOptionComboIdScheme", "code",
-                      "includeDeleted", "false",
-                      "period", paste0(fiscal_year_yyyy - 1, "Oct")
+      tibble::tribble(
+        ~key, ~value,
+        "children", "true",
+        "categoryOptionComboIdScheme", "code",
+        "includeDeleted", "false",
+        "period", paste0(fiscal_year_yyyy - 1, "Oct")
       )
     )
 
@@ -478,8 +510,9 @@ getCopDataFromDatim <- function(country_uid,
   # rename to standard names
   datim_data <-
     getDataValueSets(parameters$key,
-                     parameters$value,
-                     base_url = base_url) %>%
+      parameters$value,
+      base_url = base_url
+    ) %>%
     dplyr::rename(
       datim_value = value,
       data_element_uid = data_element,
