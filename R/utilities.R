@@ -441,7 +441,7 @@ getCopDatasetUids <- function(FY = NULL, types = NULL) {
     types <- c("MER", "SUBNAT", "IMPATT")
   }
 
-  data <- datimutils::api_get("dataSets") %>% datimutils::simplifyStructure()
+  data <- datimutils::getMetadata(dataSets)
   data <- data[grepl(
     "^MER Targets: (Community|Facility)|MER Target Setting: PSNU|^(Host Country Targets|Planning Attributes): COP Prioritization SNU",
     data$displayName
