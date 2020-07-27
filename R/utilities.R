@@ -117,7 +117,7 @@ getMilitaryNodes <- function() {
   # loginToDATIM(getOption("secrets"))
   # datimutils::loginToDATIM(config_path = "~/secrets/datim.json")
   militaryNodes <- getMetadata(organisationUnits,
-    name %.~^like% "_Military",
+    name %.~like% "_Military",
     fields = "name,id,level,ancestors[id,name]"
   ) %>%
     # Tag Operating Unit and Country (name & id) - accommodate for eventuality of
