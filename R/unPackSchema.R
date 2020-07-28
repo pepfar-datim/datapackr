@@ -159,6 +159,8 @@ unPackSchema_datapack <- function(filepath = NULL, skip = NULL, cop_year = getCu
   skipped_schema <- matrix(nrow = 0, ncol = NCOL(schema)) %>%
     as.data.frame() %>%
     setNames(names(schema)) %>%
+    dplyr::mutate_all(as.character) %>%
+    dplyr::mutate(sheet_num = as.integer(sheet_num)) %>%
     tibble::add_row(sheet_name = skip, sheet_num = 1:length(skip))
 
   skipped_schema[] <- mapply(FUN = as, skipped_schema, sapply(schema, class), SIMPLIFY = FALSE)
