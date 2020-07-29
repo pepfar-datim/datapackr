@@ -85,10 +85,9 @@ getIMPATTLevels <- function() {
     )
 
   # Add country_uids ####
-  countries <- getMetadata(organisationUnits,
-    organisationUnitGroups.id %.eq% "cNzfcPWEGSH",
-    fields = "id,name,level,ancestors[id,name]"
-  )
+  countries <- datimutils::getOrgUnitGroups("Country",
+   by = name,
+   fields = "organisationUnits[id,name,level,ancestors[id,name]]")
 
   impatt_levels %<>%
     dplyr::left_join(countries, by = c("country_name" = "name")) %>%
@@ -268,10 +267,9 @@ interactive_print <- function(x) {
 getCountries <- function(datapack_uid = NA) {
 
   # Pull Country List
-  countries <- getMetadata(organisationUnits,
-    organisationUnitGroups.id %.eq% "cNzfcPWEGSH",
-    fields = "id,name,level,ancestors[id,name]"
-  ) %>%
+  countries <- datimutils::getOrgUnitGroups("Country",
+   by = name,
+   fields = "organisationUnits[id,name,level,ancestors[id,name]]") %>%
 
     # Remove countries no longer supported
     dplyr::filter(
