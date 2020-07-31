@@ -3,13 +3,13 @@
 \docType{data}
 \name{valid_dp_disaggs}
 \alias{valid_dp_disaggs}
-\title{Lists valid disaggs for each Data Pack and Site Tool tab.}
+\title{Lists valid disaggs for each Data Pack tab.}
 \format{An object of class \code{list} of length 17.}
 \usage{
 valid_dp_disaggs
 }
 \description{
-For each Site Tool and Data Pack sheet/tab, lists the Ages,
+For each Data Pack sheet/tab, lists the Ages,
 Sexes, and KPs allowed.
 }
 \keyword{datasets}
