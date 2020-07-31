@@ -68,7 +68,6 @@ packOPUDataPack <- function(model_data,
     
     d$keychain$template_path <- handshakeFile(path = d$keychain$template_path,
                                               tool = "OPU Data Pack Template") 
-    #TODO: Update handshakeFile gh850
     
     # Test template against schema ####
     print("Checking template against schema and DATIM...")
@@ -96,8 +95,6 @@ packOPUDataPack <- function(model_data,
                               country_uids = d$info$country_uids,
                               cop_year = cop_year,
                               type = "OPU Data Pack")
-    
-    #TODO: Update writeHomeTab function gh852
     
     # Get PSNU List####
     d$data$PSNUs <- datapackr::valid_PSNUs %>%
