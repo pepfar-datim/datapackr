@@ -33,7 +33,7 @@ packOPUDataPack <- function(model_data,
                            results_archive = TRUE) {
   
   if (cop_year != 2020) {
-    stop("Sorry! We're only set up to run this for COP20 OPUs for right now. Check back later.")
+    stop("Sorry! We're only set up to run this for COP20 OPUs for right now. Check back later please. Stay safe!")
   }
   
   # Create data train for use across remainder of program
@@ -76,8 +76,6 @@ packOPUDataPack <- function(model_data,
         filepath = d$keychain$template,
         skip = skip_tabs(tool = "OPU Data Pack Template", cop_year = cop_year),
         cop_year = cop_year)
-    
-    #TODO: Update skip_tabs function gh851
     
     if (!identical(d$info$schema, schema)) {
       stop("Ruh roh. Template provided does not match archived schema.")

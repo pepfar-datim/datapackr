@@ -38,6 +38,9 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
     if (cop_year == 2020) {
       skip = c("Home", "Instructions", "Summary", "Spectrum", "Spectrum IDs")
     }
+  }
+  else if (tool == "OPU Data Pack Template" & cop_year == 2020) {
+    skip = c("Home")
   } else {skip = c(NA_character_)}
 
   return(skip)
