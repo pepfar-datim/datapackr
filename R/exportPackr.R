@@ -14,6 +14,7 @@
 #'     \item{\code{FAST Export}}{Data frame containing FAST export data.}
 #'     \item{\code{SUBNAT IMPATT}}{Data frame containing SUBNAT/IMPATT data.}
 #'     \item{\code{Results Archive}}{List object containing results archive.}
+#'     \item{\code{OPU Data Pack}}{Openxlsx Workbook object containing OPU Data Pack.}
 #' }
 #' @param datapack_name Name you would like associated with this Data Pack.
 #' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
@@ -30,7 +31,7 @@ exportPackr <- function(data, output_path, type, datapack_name) {
     )
   }
   
-  if (type %in% c("Data Pack")) {
+  if (type %in% c("Data Pack", "OPU Data Pack")) {
     if (class(data) != "Workbook") {
       stop("Output type and data do not match!")
     }
