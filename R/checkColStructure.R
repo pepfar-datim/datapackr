@@ -3,7 +3,7 @@
 #' @title checkColStructure(d)
 #'
 #' @description Checks structural integrity of columns on critical sheets for
-#'    submitted Data Pack or Site Tool.
+#'    submitted Data Pack.
 #'
 #' @param d Datapackr object.
 #' @param sheet Sheet to check

@@ -15,8 +15,9 @@ analyze_vmmc_indeterminate <- function(data) {
   data %<>%
     dplyr::mutate(
       VMMC_CIRC.T = 
-        (VMMC_CIRC.Positive + VMMC_CIRC.Negative +
-           VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown),
+        (VMMC_CIRC.N.Age_Sex_HIVStatus.T.Positive
+         + VMMC_CIRC.N.Age_Sex_HIVStatus.T.Negative
+         + VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown),
       VMMC_CIRC.indeterminateRate =
         (VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown) /
         (VMMC_CIRC.T)
@@ -27,8 +28,8 @@ analyze_vmmc_indeterminate <- function(data) {
     dplyr::select(
       PSNU, psnuid, Age, Sex, KeyPop,
       VMMC_CIRC.T,
-      VMMC_CIRC.Positive,
-      VMMC_CIRC.Negative,
+      VMMC_CIRC.N.Age_Sex_HIVStatus.T.Positive,
+      VMMC_CIRC.N.Age_Sex_HIVStatus.T.Negative,
       VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown,
       VMMC_CIRC.indeterminateRate)
 
@@ -39,19 +40,22 @@ analyze_vmmc_indeterminate <- function(data) {
 
     national_avg_ind <- data %>%
       dplyr::select(
-        VMMC.Positive,
-        VMMC.Negative,
+        VMMC_CIRC.N.Age_Sex_HIVStatus.T.Positive,
+        VMMC_CIRC.N.Age_Sex_HIVStatus.T.Negative,
         VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown) %>%
       dplyr::summarise(
-        VMMC.Positive = sum(VMMC.Positive, na.rm = T),
-        VMMC.Negative = sum(VMMC.Negative, na.rm = T),
+        VMMC_CIRC.N.Age_Sex_HIVStatus.T.Positive =
+          sum(VMMC_CIRC.N.Age_Sex_HIVStatus.T.Positive, na.rm = T),
+        VMMC_CIRC.N.Age_Sex_HIVStatus.T.Negative =
+          sum(VMMC_CIRC.N.Age_Sex_HIVStatus.T.Negative, na.rm = T),
         VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown =
           sum(VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown, na.rm = T)) %>%
       dplyr::mutate(
         VMMC_CIRC.indeterminateRate =
           (VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown) /
-          (VMMC_CIRC.Positive + VMMC_CIRC.Negative +
-             VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown)
+          (VMMC_CIRC.N.Age_Sex_HIVStatus.T.Positive
+           + VMMC_CIRC.N.Age_Sex_HIVStatus.T.Negative
+           + VMMC_CIRC.N.Age_Sex_HIVStatus.T.Unknown)
       )
 
     a$msg <- 
