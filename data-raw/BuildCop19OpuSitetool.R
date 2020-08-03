@@ -1,7 +1,8 @@
 devtools::install_github("https://github.com/pepfar-datim/datapackr",
-                         "COP-19-Master")
+                         "COP-19-Master",
+                         upgrade = FALSE)
 
-country_name <-  "Vietnam" ### if it is a region, escalate to sam
+country_name <-  "Burundi" ### if it is a region, escalate to sam
 secrets <- "~/.secrets/datim.json"
 output_path<-"~/Documents/cop_19_data/opus"
 
