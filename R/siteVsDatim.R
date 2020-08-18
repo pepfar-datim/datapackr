@@ -165,7 +165,9 @@ compareData_SiteVsDatim <- function(site_data,
                   mechanism,
                   tool_value,
                   datim_value) %>% 
-    dplyr::mutate(difference = tool_value - datim_value) %>% 
+    dplyr::mutate(difference = 
+                    dplyr::if_else(is.na(tool_value), 0, tool_value) - 
+                    dplyr::if_else(is.na(datim_value), 0, datim_value)) %>% 
     dplyr::mutate(effect = dplyr::case_when(is.na(difference) & is.na(tool_value) ~ "Delete",
                                             is.na(difference) & is.na(datim_value) ~ "Create",
                                             !is.na(difference) & difference != 0 ~ "Update",
