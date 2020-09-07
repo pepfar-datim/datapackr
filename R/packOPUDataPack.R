@@ -54,8 +54,7 @@ packOPUDataPack <- function(model_data,
   )
   
   # Open schema ####
-    #TODO: Update and store schema gh849
-    #d$info$schema <-  datapackr::cop20_data_pack_schema
+    d$info$schema <-  datapackr::cop20OPU_data_pack_schema
  
   # Open template ####
     # Grab correct schema
@@ -111,7 +110,6 @@ packOPUDataPack <- function(model_data,
                 output_path = d$keychain$output_folder,
                 type = d$info$type,
                 datapack_name = d$info$datapack_name)
-    #TODO: Update exportPackr gh853
     
     # Save & Export Archive
     if (results_archive) {

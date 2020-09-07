@@ -279,6 +279,7 @@ unPackSchema_datapack <- function(filepath = NULL,
                           list(disaggs$pwidKPs),empty)
     ) %>%
     dplyr::select(sheet_name,indicator_code,dplyr::matches("test")) %>%
+    {if (type == "OPU Data Pack Template") dplyr::select(., -dataset.test, -col_type.test, -value_type.test) else .} %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("test")), dplyr::any_vars(. == TRUE))
 
   if (NROW(tests) > 0) {
