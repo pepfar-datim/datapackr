@@ -5,7 +5,6 @@
 \title{Pack a COP20 OPU Data Pack}
 \usage{
 packOPUDataPack(
-  model_data,
   datapack_name,
   country_uids,
   template_path = NULL,
@@ -15,8 +14,6 @@ packOPUDataPack(
 )
 }
 \arguments{
-\item{model_data}{Data from DATIM needed to pack into Data Pack}
-
 \item{datapack_name}{Name you would like associated with this Data Pack.
 (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
 
@@ -36,6 +33,8 @@ saved upon export. If left as \code{NULL}, will output to
 
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}
+
+\item{model_data}{Data from DATIM needed to pack into Data Pack}
 }
 \value{
 Exports a COP20 OPU Data Pack to Excel within \code{output_folder}.

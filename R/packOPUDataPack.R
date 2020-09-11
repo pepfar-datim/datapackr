@@ -24,8 +24,7 @@
 #'
 #' @return Exports a COP20 OPU Data Pack to Excel within \code{output_folder}.
 #'
-packOPUDataPack <- function(model_data,
-                           datapack_name,
+packOPUDataPack <- function(datapack_name,
                            country_uids,
                            template_path = NULL,
                            cop_year = getCurrentCOPYear(),
@@ -36,7 +35,7 @@ packOPUDataPack <- function(model_data,
     stop("Sorry! We're only set up to run this for COP20 OPUs for right now. Check back later please. Stay safe!")
   }
   
-  # Create data train for use across remainder of program
+  # Create data sidecar ####
   d <- list(
     keychain = list(
       template_path = template_path,
@@ -47,14 +46,15 @@ packOPUDataPack <- function(model_data,
       country_uids = country_uids,
       type = "OPU Data Pack",
       cop_year =  cop_year
-    ),
-    data = list(
-      model_data = model_data
     )
   )
   
+  # Pull data from DATIM ####
+  d$data$model_data <- getOPUDataFromDATIM(cop_year = cop_year,
+                                           country_uids)
+  
   # Open schema ####
-    d$info$schema <-  datapackr::cop20OPU_data_pack_schema
+  d$info$schema <-  datapackr::cop20OPU_data_pack_schema
  
   # Open template ####
     # Grab correct schema
