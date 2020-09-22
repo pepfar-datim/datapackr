@@ -4,10 +4,12 @@
 \name{prioritizations}
 \alias{prioritizations}
 \title{Mapping of DATIM Prioritization numerals to strings.}
-\format{\describe{
+\format{
+\describe{
   \item{value}{Numeral associated with DATIM Prioritization.}
   \item{Prioritization}{Name associated with DATIM Prioritization}
-}}
+}
+}
 \usage{
 prioritizations
 }
