@@ -4,12 +4,14 @@
 \name{fullCodeList}
 \alias{fullCodeList}
 \title{Full Code List specific to current COP targets dataset}
-\format{\describe{
+\format{
+\describe{
   \item{dataelement}{}
   \item{dataelementuid}{}
   \item{categoryoptioncombo}{}
   \item{categoryoptioncombouid}{}
-}}
+}
+}
 \usage{
 fullCodeList
 }

@@ -5,7 +5,8 @@
 \alias{map_DataPack_DATIM_DEs_COCs}
 \title{Map of indicators from Data Pack indicator codes to DATIM dataelements
 and categoryoptioncombos}
-\format{\describe{
+\format{
+\describe{
   \item{indicator_code}{Code used in the Data Pack to uniquely identify each
   distinct programmatic area of target setting.}
   \item{categoryoption_specified}{}
@@ -30,7 +31,8 @@ and categoryoptioncombos}
   \item{disagg_type}{}
   \item{technical_area}{}
   \item{top_level}{}
-}}
+}
+}
 \usage{
 map_DataPack_DATIM_DEs_COCs
 }

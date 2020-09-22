@@ -4,7 +4,8 @@
 \name{valid_PSNUs}
 \alias{valid_PSNUs}
 \title{List of valid PSNUs used for generating Data Packs.}
-\format{\describe{
+\format{
+\describe{
   \item{ou}{}
   \item{ou_id}{}
   \item{country_name}{}
@@ -17,7 +18,8 @@
   \item{lastUpdated}{}
   \item{ancestors}{}
   \item{organisationUnitGroups}{}
-}}
+}
+}
 \usage{
 valid_PSNUs
 }

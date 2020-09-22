@@ -24,8 +24,7 @@
 #'
 #' @return Exports a COP20 OPU Data Pack to Excel within \code{output_folder}.
 #'
-packOPUDataPack <- function(model_data,
-                           datapack_name,
+packOPUDataPack <- function(datapack_name,
                            country_uids,
                            template_path = NULL,
                            cop_year = getCurrentCOPYear(),
@@ -36,7 +35,7 @@ packOPUDataPack <- function(model_data,
     stop("Sorry! We're only set up to run this for COP20 OPUs for right now. Check back later please. Stay safe!")
   }
   
-  # Create data train for use across remainder of program
+  # Create data sidecar ####
   d <- list(
     keychain = list(
       template_path = template_path,
@@ -47,15 +46,19 @@ packOPUDataPack <- function(model_data,
       country_uids = country_uids,
       type = "OPU Data Pack",
       cop_year =  cop_year
-    ),
-    data = list(
-      model_data = model_data
     )
   )
   
+  # Pull data from DATIM ####
+  d$data$model_data <- getOPUDataFromDATIM(cop_year = cop_year,
+                                           country_uids = country_uids)
+  
+  if (NROW(d$data$model_data) == 0) {
+    warning("Model data pull seems to have returned no data. Please check with DATIM.")
+  }
+  
   # Open schema ####
-    #TODO: Update and store schema gh849
-    #d$info$schema <-  datapackr::cop20_data_pack_schema
+  d$info$schema <-  datapackr::cop20OPU_data_pack_schema
  
   # Open template ####
     # Grab correct schema
@@ -75,6 +78,7 @@ packOPUDataPack <- function(model_data,
       unPackSchema_datapack(
         filepath = d$keychain$template,
         skip = skip_tabs(tool = "OPU Data Pack Template", cop_year = cop_year),
+        type = "OPU Data Pack Template",
         cop_year = cop_year)
     
     if (!identical(d$info$schema, schema)) {
@@ -102,8 +106,7 @@ packOPUDataPack <- function(model_data,
       dplyr::select(PSNU = dp_psnu, psnu_uid)
     
     # Write PSNUxIM tab ####
-    #TODO: Create function to write the new PSNUxIM tab gh854
-    
+    d <- packSNUxIM_OPU(d)
     
     # Save & Export Workbook
     print("Saving...")
@@ -111,10 +114,10 @@ packOPUDataPack <- function(model_data,
                 output_path = d$keychain$output_folder,
                 type = d$info$type,
                 datapack_name = d$info$datapack_name)
-    #TODO: Update exportPackr gh853
     
     # Save & Export Archive
     if (results_archive) {
+      print("Archiving...")
       exportPackr(data = d,
                   output_path = d$keychain$output_folder,
                   type = "Results Archive",

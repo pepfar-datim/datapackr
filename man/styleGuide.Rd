@@ -5,12 +5,14 @@
 \alias{styleGuide}
 \title{Library of Openxlsx style objects to apply to both Data Pack and Site
 Tool files.}
-\format{\describe{
+\format{
+\describe{
   \item{home}{Styles for title, Data Pack Name, & PEPFAR banner.}
   \item{siteList}{Styles for site names, broken out by Community, Facility,
   National, Military, or Inactive.}
   \item{data}{Styles for title, headers, labels, and Unique ID row.}
-}}
+}
+}
 \usage{
 styleGuide
 }
