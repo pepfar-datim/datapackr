@@ -51,7 +51,11 @@ packOPUDataPack <- function(datapack_name,
   
   # Pull data from DATIM ####
   d$data$model_data <- getOPUDataFromDATIM(cop_year = cop_year,
-                                           country_uids)
+                                           country_uids = country_uids)
+  
+  if (NROW(d$data$model_data) == 0) {
+    warning("Model data pull seems to have returned no data. Please check with DATIM.")
+  }
   
   # Open schema ####
   d$info$schema <-  datapackr::cop20OPU_data_pack_schema
@@ -74,6 +78,7 @@ packOPUDataPack <- function(datapack_name,
       unPackSchema_datapack(
         filepath = d$keychain$template,
         skip = skip_tabs(tool = "OPU Data Pack Template", cop_year = cop_year),
+        type = "OPU Data Pack Template",
         cop_year = cop_year)
     
     if (!identical(d$info$schema, schema)) {
@@ -101,8 +106,7 @@ packOPUDataPack <- function(datapack_name,
       dplyr::select(PSNU = dp_psnu, psnu_uid)
     
     # Write PSNUxIM tab ####
-    #TODO: Create function to write the new PSNUxIM tab gh854
-    
+    d <- packSNUxIM_OPU(d)
     
     # Save & Export Workbook
     print("Saving...")
@@ -113,6 +117,7 @@ packOPUDataPack <- function(datapack_name,
     
     # Save & Export Archive
     if (results_archive) {
+      print("Archiving...")
       exportPackr(data = d,
                   output_path = d$keychain$output_folder,
                   type = "Results Archive",

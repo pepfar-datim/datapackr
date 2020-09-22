@@ -24,8 +24,13 @@ unPackSchema_datapack <- function(filepath = NULL,
   filepath <- handshakeFile(path = filepath,
                             tool = type)
 
-  schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = FALSE) %>%
-    dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
+  if (type == "OPU Data Pack Template" & cop_year == 2020) {
+    schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = T) %>%
+      dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
+  } else {
+    schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = F) %>%
+      dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
+  }
 
   # Add sheet number based on order of occurrence in workbook, rather than A-Z ####
   data.table::setDT(schema)[,sheet_num:=.GRP, by = c("sheet_name")]
@@ -189,12 +194,12 @@ unPackSchema_datapack <- function(filepath = NULL,
   # Add skipped sheets ####
   skipped_schema <- matrix(nrow = 0, ncol = NCOL(schema)) %>%
     as.data.frame() %>%
-    setNames(names(schema)) %>%
-    tibble::add_row(sheet_name = skip, sheet_num = 1:length(skip))
+    setNames(names(schema))
 
   skipped_schema[] <- mapply(FUN = as, skipped_schema, sapply(schema, class), SIMPLIFY = FALSE)
 
   skipped_schema %<>%
+    tibble::add_row(sheet_name = skip, sheet_num = 1:length(skip)) %>%
     dplyr::mutate(valid_ages = empty, valid_sexes = empty, valid_kps = empty)
 
   schema %<>%

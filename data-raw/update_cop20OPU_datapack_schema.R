@@ -1,9 +1,7 @@
 ## If you've made any edits to the Excel template, rebuild package first to
 ## capture these, then run the below.
 
-secrets <- "/Users/scott/.secrets/datim.json"
-
-datapackr::loginToDATIM(secrets)
+datimutils::loginToDATIM("~/.secrets/datim.json")
 
 datapack_template_filepath <- system.file("extdata",
                                           "COP20_OPU_Data_Pack_Template.xlsx",

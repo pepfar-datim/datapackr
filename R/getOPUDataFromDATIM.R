@@ -70,11 +70,15 @@ getOPUDataFromDATIM <- function(cop_year,
   data_datim %<>%
     dplyr::filter(indicator_code %in% indicator_codes) %>% 
     dplyr::select(indicator_code,
+                  support_type,
                   period,
                   psnu_uid = org_unit_uid,
                   age_option_uid = valid_ages.id,
+                  Age = valid_ages.name,
                   sex_option_uid = valid_sexes.id,
+                  Sex = valid_sexes.name,
                   kp_option_uid = valid_kps.id,
+                  KeyPop = valid_kps.name,
                   attribute_option = attribute_option_combo_code,
                   value = datim_value)
   

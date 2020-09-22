@@ -1,7 +1,7 @@
 library(datapackr)
 library(magrittr)
 
-datimutils::loginToDATIM("~/.secrets/datim.json")
+datimutils::loginToDATIM("~/.secrets/triage.json")
 
 output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/COP20 OPUs/Test Packs"
 
@@ -62,7 +62,7 @@ for (i in 1:NROW(pick)) {
   print(paste0(i," of ",NROW(pick), ": ", pick[[i,1]]))
 
   packOPUDataPack(datapack_name = pick[[i,1]],
-                 country_uids = pick[[i,2]],
+                 country_uids = unlist(pick[[i,"country_uids"]]),
                  template_path = NULL,
                  cop_year = 2020,
                  output_folder = output_folder,
