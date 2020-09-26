@@ -54,7 +54,7 @@ packOPUDataPack <- function(datapack_name,
                                            country_uids = country_uids)
   
   if (NROW(d$data$model_data) == 0) {
-    warning("Model data pull seems to have returned no data. Please check with DATIM.")
+    stop("Model data pull seems to have returned no data. Please check with DATIM.")
   }
   
   # Open schema ####

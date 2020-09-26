@@ -26,7 +26,7 @@ unPackSchema_datapack <- function(filepath = NULL,
 
   if (type == "OPU Data Pack Template" & cop_year == 2020) {
     schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = T) %>%
-      dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
+      dplyr::select(sheet_name = sheet, col, row, character, formula, numeric, is_array)
   } else {
     schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = F) %>%
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
@@ -43,6 +43,14 @@ unPackSchema_datapack <- function(filepath = NULL,
   schema %<>%
     dplyr::filter(sheet_name %in% verbose_sheets,
                   row %in% c(5:(headerRow(type, cop_year)+1))) %>%
+    
+  # # Correctly enter array formulas ####
+  #   dplyr::mutate(
+  #     formula = dplyr::case_when(
+  #       is_array == "TRUE" ~ paste0("{",formula,"}"),
+  #       TRUE ~ formula
+  #     )
+  #   ) %>%
 
   # Gather and Spread to get formula, value, and indicator_code in separate cols ####
     tidyr::gather(key,value,-sheet_num,-sheet_name,-col,-row) %>%
