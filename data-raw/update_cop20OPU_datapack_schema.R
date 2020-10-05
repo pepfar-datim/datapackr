@@ -8,9 +8,9 @@ datapack_template_filepath <- system.file("extdata",
                                           package = "datapackr",
                                           mustWork = TRUE)
 cop20OPU_data_pack_schema <-
-  unPackSchema_datapack(
+  datapackr::unPackSchema_datapack(
     filepath = datapack_template_filepath,
-    skip = skip_tabs(tool = "OPU Data Pack Template", cop_year = 2020),
+    skip = datapackr::skip_tabs(tool = "OPU Data Pack Template", cop_year = 2020),
     type = "OPU Data Pack Template",
     cop_year = 2020)
 
