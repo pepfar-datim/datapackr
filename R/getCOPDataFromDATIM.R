@@ -27,10 +27,10 @@ getCOPDatasetUIDs <- function(cop_year = getCurrentCOPYear(),
   
   FY = cop_year + 1
   
-  if(FY != currentFY()+1)
-  {
+  # if(FY != currentFY()+1) #This only works if we assume that DATIM datasets all update and deploy by Oct 1
+  if(FY != getCurrentCOPYear()+1) {
     data <- data[grepl(paste0("FY",FY), data$displayName),]
-  }else{
+  } else {
     data <- data[!(grepl("FY[0-9]{4}", data$displayName)),]
   }
   

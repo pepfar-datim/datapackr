@@ -1,3 +1,17 @@
+#' @export
+#' @title Create Keychain Info for use in datapackr sidecar.
+#'
+#' @description
+#' Creates Keychain info needed for use across most datapackr unPack functions.
+#'
+#' @param submission_path Local path to the file to import.
+#' @param tool What type of tool is the submission file? Default is "Data Pack".
+#' @param country_uids List of 11 digit alphanumeric DATIM codes representing
+#' countries. If not provided, will check file for these codes. If not in file,
+#' will flag error.
+#' @param cop_year Specifies COP year for dating as well as selection of
+#' templates.
+#'
 createKeychainInfo <- function(submission_path = NULL,
                                tool = "Data Pack",
                                country_uids = NULL,
@@ -19,16 +33,17 @@ createKeychainInfo <- function(submission_path = NULL,
   # Start running log of all warning and information messages
   d$info$warning_msg <- NULL
   d$info$has_error <- FALSE
-  d$info$newSNUxIM <- FALSE
-  d$info$has_psnuxim <- FALSE
-  d$info$missing_psnuxim_combos <- FALSE
+  if (d$info$tool == "Data Pack" & d$info$cop_year %in% c("2020")) {
+    d$info$newSNUxIM <- FALSE
+    d$info$has_psnuxim <- FALSE
+    d$info$missing_psnuxim_combos <- FALSE
+  }
   
   # Check the submission file exists and prompt for user input if not
   d$keychain$submission_path <- handshakeFile(path = d$keychain$submission_path,
                                               tool = d$info$tool)
   
-  
-  d
+  return(d)
   
 }
 
@@ -58,7 +73,7 @@ unPackTool <- function(submission_path = NULL,
                        country_uids = NULL,
                        cop_year = NULL) {
 
-  d<-createKeychainInfo(submission_path,
+  d <- createKeychainInfo(submission_path,
                      tool,
                      country_uids,
                      cop_year)
@@ -66,7 +81,9 @@ unPackTool <- function(submission_path = NULL,
   # unPack file based on type
   if (d$info$tool == "Data Pack") {
     d <- unPackDataPack(d)
-  } else {stop("Please select correct file type: Data Pack.")}
+  } else if (d$info$tool == "OPU Data Pack") {
+    d <- unPackOPUDataPack(d)
+  } else {stop("Selected tool not currently supported.")}
   
   # If warnings, show all grouped by sheet and issue
   if (!is.null(d$info$warning_msg) & interactive()) {

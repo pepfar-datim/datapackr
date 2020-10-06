@@ -29,10 +29,10 @@ checkStructure <- function(d) {
   
   d$tests$missing_sheets <- sheets_check %>%
     dplyr::filter(is.na(submission_order))
-  attr(d$tests$missing_sheets,"test_name")<-"Missing sheets"
+  
+  attr(d$tests$missing_sheets,"test_name") <- "Missing sheets"
   
   if (any(is.na(sheets_check$submission_order))) {
-   
     warning_msg <- 
       paste0(
         "MISSING SHEETS: Did you delete or rename these tabs? -> \n  * ",
