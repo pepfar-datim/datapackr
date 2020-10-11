@@ -1,7 +1,8 @@
 devtools::install_github("https://github.com/pepfar-datim/datapackr",
-                         "COP-19-Master")
+                         "COP-19-Master",
+                         upgrade = FALSE)
 
-country_name = "South Africa"
+country_name = "Zambia"
 
 require(datapackr)
 require(datimvalidation)
@@ -94,7 +95,7 @@ httr::content(r)
 datapackr::runApp_CompareSiteVsDatim()
 
 
-# store a copy of the import file, I attach it to the zendesk ticket for herecord
+# store a copy of the import file, I attach it to the zendesk ticket for the record
 write(deletes_json[["pl"]], paste0("deletes_", 
                  country_name,
                  ".json"))
