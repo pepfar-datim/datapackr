@@ -168,10 +168,10 @@ compareData_SiteVsDatim <- function(site_data,
     dplyr::mutate(difference = 
                     dplyr::if_else(is.na(tool_value), 0, tool_value) - 
                     dplyr::if_else(is.na(datim_value), 0, datim_value)) %>% 
-    dplyr::mutate(effect = dplyr::case_when(is.na(difference) & is.na(tool_value) ~ "Delete",
-                                            is.na(difference) & is.na(datim_value) ~ "Create",
-                                            !is.na(difference) & difference != 0 ~ "Update",
-                                            difference == 0 ~ "No Change"))# %>%
+    dplyr::mutate(effect = dplyr::case_when(difference == 0 ~ "No Change",
+                                            is.na(tool_value) ~ "Delete",
+                                            is.na(datim_value) ~ "Create",
+                                            difference != 0 ~ "Update"))# %>%
     # dplyr::group_by(data_element,period,disagg,mechanism,source,psnu) %>% 
     # dplyr::summarise(value=sum(as.numeric(value),na.rm = TRUE)) %>% 
     # dplyr::ungroup()
