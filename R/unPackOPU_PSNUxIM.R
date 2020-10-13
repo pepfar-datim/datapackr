@@ -28,20 +28,61 @@ unPackOPU_PSNUxIM <- function(d) {
     )
   
   # TODO: Check column structures ####
-  # d <- checkColStructure(d, sheet)
+    # d <- checkColStructure(d, sheet)
   
   # Pare down to updated targets only ####
-  # TODO: Make this more dynamic
-  d$data$extract <- d$data$extract[c(1:5,90:NCOL(d$data$extract))]
+  cols_to_keep <- d$info$schema %>%
+    dplyr::filter(sheet_name == sheet,
+                  !is.na(indicator_code),
+                  !indicator_code %in% c("12345_DSD","12345_TA"),
+                  col_type %in% c("row_header", "target")) %>%
+    dplyr::pull(col)
+    
+  d$data$extract <- d$data$extract[c(cols_to_keep,(max(cols_to_keep)+1):NCOL(d$data$extract))]
   
   # TODO: Test for non-numeric data ####
+  non_numeric <- sapply(d$data$extract, function(x) stringr::str_extract(x, "[^[:digit:][:space:][:punct:]]+")) %>%
+    as.data.frame() %>%
+    dplyr::select(-PSNU, -indicator_code, -Age, -Sex, -KeyPop) %>%
+    dplyr::select_if(function(x) any(!is.na(x))) %>%
+    dplyr::filter_all(dplyr::all_vars(!is.na(.)))
   
+  d$tests$non_numeric <- dplyr::bind_rows(d$tests$non_numeric, non_numeric)
+  attr(d$tests$non_numeric,"test_name") <- "Non-numeric values"
   
-  # Convert to numeric data types ####
-  d$data$extract %<>%
-    dplyr::mutate_at(dplyr::vars(-PSNU, -indicator_code, -Age, -Sex, -KeyPop),
-                     as.numeric)
+  if(NROW(non_numeric) > 0) {
+    warning_msg <-
+      paste0(
+        "WARNING! In tab ",
+        sheet,
+        ": NON-NUMERIC VALUES found!",
+        "\n")
     
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  }
+         
+  #sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
+  
+  # Convert to numeric data types & drop non-numeric targets ####
+  d$data$extract %<>%
+    {suppressWarnings(dplyr::mutate_at(., dplyr::vars(-PSNU, -indicator_code, -Age, -Sex, -KeyPop),
+                     as.numeric))}
+  
+  # TEST for improper column names ####
+  d$data$extract %<>%
+    dplyr::rename_with(
+      ~paste0(stringr::str_extract(.x, "\\d+"),"_",stringr::str_extract(.x, "DSD|TA")),
+      -tidyselect::any_of(
+        c("PSNU", "indicator_code", "Age", "Sex", "KeyPop", 
+          "Max Total Deduplicated Rollup", "Min Total Deduplicated Rollup",
+          "Total Deduplicated Rollup", "Max Deduplicated DSD Rollup",
+          "Min Deduplicated DSD Rollup", "Deduplicated DSD Rollup",
+          "Max Deduplicated TA Rollup", "Min Deduplicated TA Rollup",
+          "Deduplicated TA Rollup", "Total Duplicated Rollup",
+          "DSD Duplicated Rollup", "TA Duplicated Rollup", "DSD Dedupe",
+          "TA Dedupe", "Crosswalk Dedupe")))
+  
+  
   # Recalculate dedupes ####
     ## Other than IM cols, only the following should be considered safe for reuse here:
       # - Deduplicated DSD Rollup
@@ -61,13 +102,6 @@ unPackOPU_PSNUxIM <- function(d) {
                 na.rm = TRUE),
       `Crosswalk Dedupe` = `Total Deduplicated Rollup` - `Max Total Deduplicated Rollup`
     )
-  
-  # Remove duplicate columns (Take the first example) ####
-  duplicate_cols <- duplicated(names(d$data$extract))
-  
-  if (any(duplicate_cols)) {
-    d$data$extract <- d$data$extract[,-which(duplicate_cols)]
-  }
   
   # Make sure no blank column names ####
   d$data$extract %<>%
@@ -113,6 +147,16 @@ unPackOPU_PSNUxIM <- function(d) {
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  }
+  
+  # Remove duplicate columns (Take the first example) ####
+  duplicate_cols <- duplicated(names(d$data$extract))
+  
+  if (any(duplicate_cols)) {
+    d$data$extract <- d$data$extract[,-which(duplicate_cols)]
+    
+    
+    
   }
   
   # Extract PSNU uid ####
@@ -223,7 +267,7 @@ unPackOPU_PSNUxIM <- function(d) {
   # TODO: TEST for duplicate rows ####
   #d <- checkDuplicateRows(d, sheet)
   
-  # TODO: TEST for defunct disaggs ####
+    # TODO: TEST for defunct disaggs ####
   #d <- defunctDisaggs(d, sheet)
   
   # TEST for invalid DSD TA ####
@@ -256,7 +300,7 @@ unPackOPU_PSNUxIM <- function(d) {
   #   Import all dedupes, whether 0 or <0
   
   
-  # Make sure Dedupes go in after values ####
+  # Separate Dedupes into separate file -- IMPORT SECOND ####
   
   
   

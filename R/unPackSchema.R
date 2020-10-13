@@ -260,7 +260,7 @@ unPackSchema_datapack <- function(filepath = NULL,
         dplyr::case_when(
           col_type %in% c("reference","assumption","calculation","row_header","allocation")
             ~ !dataset == c("datapack"),
-          col_type %in% c("target","past") ~ !dataset %in% c("mer","impatt","subnat"),
+          col_type %in% c("target","past") ~ !dataset %in% c("mer","impatt","subnat", "datapack"),
           sheet_num %in% skip_sheets_num ~ !is.na(dataset),
           TRUE ~ TRUE),
 

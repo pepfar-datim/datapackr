@@ -169,7 +169,7 @@ unPackSNUxIM <- function(d) {
       -PSNU, -indicator_code, -Age, -Sex, -KeyPop, -psnuid,
       na.rm = TRUE)
   
-  # TEST for non-numeric values
+  # TEST for non-numeric values ####
   non_numeric <- d$data$SNUxIM %>%
     dplyr::mutate(distribution_numeric = suppressWarnings(as.numeric(distribution))) %>%
     dplyr::filter(is.na(distribution_numeric)) %>%
