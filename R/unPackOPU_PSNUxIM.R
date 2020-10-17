@@ -9,7 +9,8 @@
 #' @return d
 #' 
 unPackOPU_PSNUxIM <- function(d) {
-
+  # NOTES:
+    # Unsure whether I need to wait so long to pivot_longer if I'm just going to drop all 0s anyway
   # Preamble ####
   if (d$info$tool != "OPU Data Pack") {
     stop("Cannot process that kind of tool. :(")
@@ -346,6 +347,9 @@ unPackOPU_PSNUxIM <- function(d) {
     dplyr::select(dplyr::all_of(header_cols$indicator_code),
                   mechCode_supportType, value)
     
+  # Drop NAs ####
+  d$data$extract %<>% tidyr::drop_na(value)
+  
   # TEST: Decimals; Flag; Round ####
   d$tests$decimals <- d$data$extract %>%
     dplyr::filter(value %% 1 != 0)
@@ -366,6 +370,101 @@ unPackOPU_PSNUxIM <- function(d) {
   
   d$data$extract %<>%
     dplyr::mutate(value = round_trunc(value))
+  # TEST: Positive Dedupes; Flag; Drop ####
+  d$tests$positive_dedupes <- d$data$extract %>%
+    dplyr::filter(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0)
+  attr(d$tests$positive_dedupes,"test_name") <- "Positive dedupes"
+
+  if (NROW(d$tests$positive_dedupes) > 0) {
+    warning_msg <-
+      paste0(
+        "WARNING!: ",
+        NROW(d$tests$positive_dedupes),
+        " cases where Deduplicated Rollups are greater than allowed maximum.",
+        " You can find these by filtering to positive values in the `DSD Dedupe`,
+        `TA Dedupe`, and `Crosswalk Dedupe` columns (columns CX, CY, and CZ) in
+        the PSNUxIM tab.")
+
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  }
+  
+  d$data$extract %<>%
+    dplyr::filter(!(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0))
+  
+  # TEST: Duplicate Rows; Flag; Combine ####
+  d$data$extract %<>%
+    dplyr::mutate(
+      mechCode_supportType = dplyr::case_when(
+        stringr::str_detect(mechCode_supportType, "Dedupe") ~ mechCode_supportType,
+        TRUE ~ paste0(stringr::str_extract(mechCode_supportType, "\\d{4,6}"),
+                      "_",
+                      stringr::str_extract(mechCode_supportType, "DSD|TA"))
+      )
+    )
+  
+  d <- checkDuplicateRows(d, sheet)
+    ## This may be a repeat of information already shared in checking duplicate
+    ## columns, but may also catch rows that were duplicates even before pivot_longer.
+  
+  d$data$extract %<>%
+    dplyr::group_by(
+      dplyr::across(c(header_cols$indicator_code, "mechCode_supportType"))) %>%
+    dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
+  
+  # TODO: TEST: Defunct disaggs; Flag; Drop ####
+    #d <- defunctDisaggs(d, sheet)
+  
+  # Drop all zeros against IMs ####
+  d$data$extract %<>%
+   dplyr::filter(!(!stringr::str_detect(mechCode_supportType, "Dedupe")
+                   & value == 0))
+  
+  # Drop unneeded Dedupes ####
+  d$data$extract %<>%
+    tidyr::pivot_wider(names_from = mechCode_supportType, values_from = value) %>%
+    datapackr::addcols(cnames = c("Crosswalk Dedupe", "DSD Dedupe", "TA Dedupe"), type = "numeric")
+    
+    ## If only 1 DSD mechanism or only 1 TA mechanism (1 mech total):
+    ##   - Do not import any dedupes (Dedupe = NA_real_)
+    ## If only 1 DSD mech and only 1 TA mech (2 mechs total):
+    ##   - Import Crosswalk Dedupe, whether 0 or <0
+    ##   - Do not import any DSD or TA Dedupes (NA_real_)
+    ## If >1 DSD mech, but no TA mechs (or vice versa):
+    ##   - Import DSD or TA dedupes, whether 0 or <0 (if NA -> 0)
+    ##   - Do not import any Crosswalk dedupes
+    ## If >1 DSD mech and >1 TA mech:
+    ##   - Import all dedupes, whether 0 or <0 (if NA -> 0)
+  
+  d$data$extract %<>%
+    dplyr::mutate(
+      DSD_count = rowSums(dplyr::select(., tidyselect::matches("\\d{4,6}_DSD")) > 1, na.rm = TRUE),
+      TA_count = rowSums(dplyr::select(., tidyselect::matches("\\d{4,6}_TA")) > 1, na.rm = TRUE),
+      Total_count = DSD_count + TA_count,
+      `DSD Dedupe` = dplyr::case_when(
+        DSD_count <= 1 ~ NA_real_,
+        DSD_count > 1 & is.na(`DSD Dedupe`) ~ 0,
+        TRUE ~ `DSD Dedupe`
+        ),
+      `TA Dedupe` = dplyr::case_when(
+        TA_count <= 1 ~ NA_real_,
+        TA_count > 1 & is.na(`TA Dedupe`) ~ 0,
+        TRUE ~ `TA Dedupe`
+        ),
+      `Crosswalk Dedupe` = dplyr::case_when(
+        TA_count == 0 | DSD_count == 0 ~ NA_real_,
+        TA_count > 0 & DSD_count > 0 & is.na(`Crosswalk Dedupe`) ~ 0,
+        TA_count > 0 & DSD_count > 0 & !is.na(`Crosswalk Dedupe`) ~ `Crosswalk Dedupe`,
+        TRUE ~ `Crosswalk Dedupe`
+        )
+    ) %>%
+    dplyr::select(-DSD_count, -TA_count, -Total_count) %>%
+    tidyr::pivot_longer(cols = -tidyselect::all_of(header_cols$indicator_code),
+                        names_to = "mechCode_supportType",
+                        values_to = "value",
+                        values_drop_na = TRUE) %>%
+    dplyr::select(dplyr::all_of(header_cols$indicator_code),
+                  mechCode_supportType, value)
+  
   # Rename Dedupe IMs ####
   d$data$extract %<>%
     dplyr::mutate(
@@ -373,63 +472,9 @@ unPackOPU_PSNUxIM <- function(d) {
         mechCode_supportType == "DSD Dedupe" ~ "00000_DSD",
         mechCode_supportType == "TA Dedupe" ~ "00000_TA",
         mechCode_supportType == "Crosswalk Dedupe" ~ "00001_TA",
-        TRUE ~ paste0(stringr::str_extract(mechCode_supportType, "\\d+"),
-                      "_",
-                      stringr::str_extract(mechCode_supportType, "DSD|TA"))
-      )
+        TRUE ~ mechCode_supportType)
     )
-  
-  # # TEST for positives against dedupes ####
-  # d$tests$positive_dedupes <- d$data$extract %>%
-  #   dplyr::filter(mech_code %in% c("00000", "00001") & value > 0)
-  # attr(d$tests$positive_dedupes,"test_name") <- "Positive dedupes"
-  # 
-  # if (NROW(d$tests$positive_dedupes) > 0) {
-  #   warning_msg <- 
-  #     paste0(
-  #       "WARNING!: ",
-  #       NROW(d$tests$positive_dedupes),
-  #       " cases where Deduplicated Rollups  positive numbers are being used for Dedupe allocations.",
-  #       " You can find these by filtering on the Dedupe column in the PSNUxIM tab.")
-  #   
-  #   d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
-  # }
-  # -> This is taken care of by testing for deduplication totals outside range.
-  
-  # TODO: TEST: Duplicate Rows; Flag; Combine ####
-    d <- checkDuplicateRows(d, sheet)
-  
-  # TODO: TEST: Defunct disaggs; Flag; Drop ####
-    #d <- defunctDisaggs(d, sheet)
-  
-  # Drop all zeros against IMs ####
-  d$data$extract %<>%
-    dplyr::filter(!(!stringr::str_detect(mechCode_supportType, "00000|00001")
-                    & value == 0))
-  
-  # Drop unneeded Dedupes ####
-  d$data$extract %<>%
-    tidyr::pivot_wider
-    
-    # If only 1 DSD mechanism or only 1 TA mechanism (1 mech total):
-      #   Do not import any dedupes
-  
-  
-  
-    # If only 1 DSD mech and only 1 TA mech (2 mechs total):
-      #   Import Crosswalk Dedupe, whether 0 or <0
-      #   Do not import any DSD or TA Dedupes
-    
-    # If >1 DSD mech, but no TA mechs (or vice versa):
-      #   Import DSD or TA dedupes, whether 0 or <0
-      #   Do not import any Crosswalk dedupes
-    
-    # If >1 DSD mech and >1 TA mech:
-      #   Import all dedupes, whether 0 or <0
 
-  # Drop NAs ####
-  d$data$extract %<>% tidyr::drop_na(value)
-  
   # Get mech codes and support types ####
   d$data$extract %<>%
     tidyr::separate(
@@ -449,8 +494,6 @@ unPackOPU_PSNUxIM <- function(d) {
     ) %>%
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
                   dplyr::everything())
-  
-  
   
   return(d)
   
