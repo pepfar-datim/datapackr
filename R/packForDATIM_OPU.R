@@ -8,7 +8,7 @@
 #'
 #' @return Modified d object with a DATIM compatible data frame for import id d$datim$OPU
 #'
-exportDistributedDataToDATIM <- function(d) {
+packForDATIM_OPU <- function(d) {
   
   # Add dataElement & categoryOptionCombo ####
   d$datim$OPU <- d$data$extract %>%

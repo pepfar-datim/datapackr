@@ -4,13 +4,13 @@
 \alias{packForDATIM}
 \title{packForDATIM(data)}
 \usage{
-packForDATIM(d, type = NA)
+packForDATIM(d, type = NULL)
 }
 \arguments{
 \item{d}{Datapackr object.}
 
 \item{type}{Type of dataset to prep for DATIM. Choose from \code{PSNUxIM},
-\code{SUBNAT_IMPATT}, or \code{Site}.}
+\code{SUBNAT_IMPATT}, \code{OPU PSNUxIM}, or \code{Site}.}
 }
 \value{
 Data frame ready for DATIM import

@@ -53,7 +53,7 @@ unPackOPU_PSNUxIM <- function(d) {
     
     warning_msg <-
       paste0(
-        "WARNING! In tab ",
+        "ERROR! In tab ",
         sheet,
         ", BLANK COLUMN HEADERS: The submission contains ",
         length(blank_col_headers),
@@ -85,10 +85,10 @@ unPackOPU_PSNUxIM <- function(d) {
     
     warning_msg <-
       paste0(
-        "WARNING! In tab ",
+        "ERROR! In tab ",
         sheet,
-        ", INVALID COLUMN HEADERS: The following column headers are invalid and
-        will be dropped in processing. Please use only the form 12345_DSD. ->  \n\t* ",
+        ", INVALID COLUMN HEADERS: The following column headers are invalid and",
+        " will be dropped in processing. Please use only the form 12345_DSD. ->  \n\t* ",
         paste(d$tests$invalid_mech_headers$invalid_mech_headers, collapse = "\n\t* "),
         "\n")
     
@@ -134,9 +134,9 @@ unPackOPU_PSNUxIM <- function(d) {
       paste0(
         "WARNING! In tab ",
         sheet,
-        ", DUPLICATE COLUMNS: The following columns appear to be duplicates and
-        should be consolidated in your submission. Only the first appearance of
-        these columns will be kept in processing. ->  \n\t* ",
+        ", DUPLICATE COLUMNS: The following columns appear to be duplicates and",
+        " should be consolidated in your submission. While duplicates will be combined",
+        " in processing, we cannot guarantee this will work as you might expect. ->  \n\t* ",
         paste(d$tests$duplicate_cols, collapse = "\n\t* "),
         "\n")
     
@@ -198,8 +198,8 @@ unPackOPU_PSNUxIM <- function(d) {
       paste0(
         "ERROR! In tab ",
         sheet,
-        ", FATALLY MISSING COLUMNS: The following columns are missing, or have
-        unexpected or blank column headers. Please check your submission. ->  \n\t* ",
+        ", FATALLY MISSING COLUMNS: The following columns are missing, or have",
+        " unexpected or blank column headers. Please check your submission. ->  \n\t* ",
         paste(missing_cols_fatal, collapse = "\n\t* "),
         "\n")
     
@@ -298,12 +298,12 @@ unPackOPU_PSNUxIM <- function(d) {
     
     warning_msg <-
       paste0(
-        "WARNING! In tab ",
+        "ERROR! In tab ",
         sheet,
-        ", DEDUPES OUTSIDE ACCEPTABLE RANGE: The following columns contain
-        total deduplicated targets that are outside acceptable maximum/minimum ranges.
-        (The OPU Data Pack notes these with red highlighting.) You must resolve
-        these issues prior to DATIM import. ->  \n\t* ",
+        ", DEDUPES OUTSIDE ACCEPTABLE RANGE: The following columns contain total",
+        " deduplicated targets that are outside acceptable maximum/minimum ranges.",
+        " (The OPU Data Pack notes these with red highlighting.) You must resolve",
+        " these issues prior to DATIM import. ->  \n\t* ",
         paste(
           dedupe_issue_cols$col,
           collapse = "\n\t* "),
@@ -326,7 +326,7 @@ unPackOPU_PSNUxIM <- function(d) {
     
     warning_msg <- 
       paste0(
-        "WARNING!: ",
+        "ERROR!: ",
         NROW(d$tests$negative_IM_targets),
         " cases where negative numbers are being used for mechanism allocations.",
         " The following mechanisms have been affected. These values will be dropped. -> \n\t* ",
@@ -371,7 +371,7 @@ unPackOPU_PSNUxIM <- function(d) {
     
     warning_msg <-
       paste0(
-        "WARNING! In tab ",
+        "ERROR! In tab ",
         sheet,
         ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
         paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
@@ -393,12 +393,11 @@ unPackOPU_PSNUxIM <- function(d) {
     
     warning_msg <-
       paste0(
-        "WARNING!: ",
+        "ERROR!: ",
         NROW(d$tests$positive_dedupes),
         " cases where Deduplicated Rollups are greater than allowed maximum.",
-        " You can find these by filtering to positive values in the `DSD Dedupe`,
-        `TA Dedupe`, and `Crosswalk Dedupe` columns (columns CX, CY, and CZ) in
-        the PSNUxIM tab.")
+        " You can find these by filtering to positive values in the `DSD Dedupe`,",
+        " `TA Dedupe`, and `Crosswalk Dedupe` columns (columns CX, CY, and CZ) in the PSNUxIM tab.")
 
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
