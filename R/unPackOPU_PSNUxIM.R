@@ -97,6 +97,7 @@ unPackOPU_PSNUxIM <- function(d) {
   col_names <- names(d$data$extract) %>%
     tibble::tibble(col_name = .) %>%
     dplyr::mutate(
+        # This also creates a standardized mech_code/support_type name
       col_name_new = dplyr::case_when(
         !col_name %in% cols_to_keep$indicator_code 
           ~ paste0(stringr::str_extract(col_name, "\\d+"),
@@ -302,15 +303,36 @@ unPackOPU_PSNUxIM <- function(d) {
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
   
-  # TODO: Check for Formula changes ####
+  # TEST: Negative IM Targets; Flag; Drop ####
+  d$tests$negative_IM_targets <- d$data$extract %>%
+    tidyr::gather(key = "mechCode_supportType",
+                  value = "value",
+                  -tidyselect::all_of(header_cols$indicator_code)) %>%
+    dplyr::filter(stringr::str_detect(mechCode_supportType, "\\d{4,6}_(DSD|TA)")
+                  & value < 0)
+  attr(d$tests$negative_IM_targets,"test_name") <- "Negative Mechanism Targets"
   
-  # Extract PSNU uid ####
+  if (NROW(d$tests$negative_IM_targets) > 0) {
+    warning_msg <- 
+      paste0(
+        "WARNING!: ",
+        NROW(d$tests$negative_IM_targets),
+        " cases where negative numbers are being used for mechanism allocations.",
+        " The following mechanisms have been affected. These values will be dropped. -> \n\t* ",
+        paste(unique(d$tests$negative_IM_targets$mechCode_supportType), collapse = "\n\t* "),
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  }
+  
   d$data$extract %<>%
     dplyr::mutate(
-      psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")
-    ) %>%
-    dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
-                  dplyr::everything())
+      dplyr::across(
+        dplyr::matches("\\d{4,6}_(DSD|TA)"),
+        ~ dplyr::if_else(.x < 0, NA_real_, .x))
+    )
+  
+  # TODO: Check for Formula changes ####
   
   # Remove all unneeded columns ####
   d$data$extract %<>%
@@ -320,10 +342,30 @@ unPackOPU_PSNUxIM <- function(d) {
   d$data$extract %<>%
     tidyr::gather(key = "mechCode_supportType",
                   value = "value",
-                  -PSNU, -indicator_code, -psnuid, -Age, -Sex, -KeyPop) %>%
-    dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
+                  -tidyselect::all_of(header_cols$indicator_code)) %>%
+    dplyr::select(dplyr::all_of(header_cols$indicator_code),
                   mechCode_supportType, value)
     
+  # TEST: Decimals; Flag; Round ####
+  d$tests$decimals <- d$data$extract %>%
+    dplyr::filter(value %% 1 != 0)
+  
+  attr(d$tests$decimals,"test_name") <- "Decimal values"
+  
+  if (NROW(d$tests$decimals) > 0) {
+    warning_msg <-
+      paste0(
+        "WARNING! In tab ",
+        sheet,
+        ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
+        paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  }
+  
+  d$data$extract %<>%
+    dplyr::mutate(value = round_trunc(value))
   # Rename Dedupe IMs ####
   d$data$extract %<>%
     dplyr::mutate(
@@ -334,18 +376,6 @@ unPackOPU_PSNUxIM <- function(d) {
         TRUE ~ mechCode_supportType
       )
     )
-  
-  # Get mech codes and support types ####
-  d$data$extract %<>%
-    tidyr::separate(
-      col = mechCode_supportType,
-      into = c("mech_code", "support_type"),
-      sep = "_",
-      remove = TRUE,
-      extra = "drop"
-    ) %>%
-    dplyr::select(PSNU, psnuid,  indicator_code, Age, Sex,
-                  KeyPop, mech_code, support_type, value)
   
   # # TEST for positives against dedupes ####
   # d$tests$positive_dedupes <- d$data$extract %>%
@@ -364,76 +394,59 @@ unPackOPU_PSNUxIM <- function(d) {
   # }
   # -> This is taken care of by testing for deduplication totals outside range.
   
-  # TEST: Negative IM Targets; Flag; Drop ####
-  d$tests$negative_IM_targets <- d$data$extract %>%
-    dplyr::filter(!mech_code %in% c("00000", "00001") & value < 0) %>%
-    tidyr::unite(col = "column_name", mech_code, support_type, sep = "_", remove = F)
-  attr(d$tests$negative_IM_targets,"test_name") <- "Negative Mechanism Targets"
-  
-  if (NROW(d$tests$negative_IM_targets) > 0) {
-    warning_msg <- 
-      paste0(
-        "WARNING!: ",
-        NROW(d$tests$negative_IM_targets),
-        " cases where negative numbers are being used for mechanism allocations.",
-        " The following mechanisms have been affected. These values will be dropped. -> \n\t* ",
-        paste(unique(d$tests$negative_IM_targets$column_name), collapse = "\n\t* "),
-        "\n")
-    
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
-  }
-  
-  d$data$extract %<>%
-    dplyr::filter(
-      !(!mech_code %in% c("00000", "00001")
-        & value < 0))
-  
-  # TEST: Decimals; Flag; Round ####
-  d$tests$decimals <- d$data$extract %>%
-    dplyr::filter(value %% 1 != 0)
-  
-  attr(d$tests$decimals,"test_name") <- "Decimal values"
-  
-  if (NROW(d$tests$decimals) > 0) {
-    warning_msg <-
-      paste0(
-        "WARNING! In tab ",
-        sheet,
-        ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
-        paste(unique(d$tests$decimals$mech_code), collapse = "\n\t* "),
-        "\n")
-    
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
-  }
-
-  d$data$extract %<>%
-    dplyr::mutate(value = round_trunc(value))
-    
   # TODO: TEST: Duplicate Rows; Flag; Combine ####
-  #d <- checkDuplicateRows(d, sheet)
+    #d <- checkDuplicateRows(d, sheet)
   
   # TODO: TEST: Defunct disaggs; Flag; Drop ####
-  #d <- defunctDisaggs(d, sheet)
+    #d <- defunctDisaggs(d, sheet)
+  
+  # Drop all zeros against IMs ####
+  d$data$extract %<>%
+    dplyr::filter(!(!stringr::str_detect(mechCode_supportType, "00000|00001")
+                    & value == 0))
   
   # Drop unneeded Dedupes ####
-    # If only 1 DSD mechanism or only 1 TA mechanism (1 mech total):
-    #   Do not import any dedupes
+  d$data$extract %<>%
+    tidyr::pivot_wider
     
+    # If only 1 DSD mechanism or only 1 TA mechanism (1 mech total):
+      #   Do not import any dedupes
+  
+  
   
     # If only 1 DSD mech and only 1 TA mech (2 mechs total):
-    #   Import Crosswalk Dedupe, whether 0 or <0
-    #   Do not import any DSD or TA Dedupes
-  
+      #   Import Crosswalk Dedupe, whether 0 or <0
+      #   Do not import any DSD or TA Dedupes
+    
     # If >1 DSD mech, but no TA mechs (or vice versa):
-    #   Import DSD or TA dedupes, whether 0 or <0
-    #   Do not import any Crosswalk dedupes
-  
+      #   Import DSD or TA dedupes, whether 0 or <0
+      #   Do not import any Crosswalk dedupes
+    
     # If >1 DSD mech and >1 TA mech:
-    #   Import all dedupes, whether 0 or <0
-  
-  
+      #   Import all dedupes, whether 0 or <0
+
   # Drop NAs ####
   d$data$extract %<>% tidyr::drop_na(value)
+  
+  # Get mech codes and support types ####
+  d$data$extract %<>%
+    tidyr::separate(
+      col = mechCode_supportType,
+      into = c("mech_code", "support_type"),
+      sep = "_",
+      remove = TRUE,
+      extra = "drop"
+    ) %>%
+    dplyr::select(dplyr::all_of(header_cols$indicator_code),
+                  mech_code, support_type, value)
+  
+  # Extract PSNU uid ####
+  d$data$extract %<>%
+    dplyr::mutate(
+      psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")
+    ) %>%
+    dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
+                  dplyr::everything())
   
   
   
