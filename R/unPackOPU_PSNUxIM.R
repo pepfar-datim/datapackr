@@ -373,7 +373,9 @@ unPackOPU_PSNUxIM <- function(d) {
         mechCode_supportType == "DSD Dedupe" ~ "00000_DSD",
         mechCode_supportType == "TA Dedupe" ~ "00000_TA",
         mechCode_supportType == "Crosswalk Dedupe" ~ "00001_TA",
-        TRUE ~ mechCode_supportType
+        TRUE ~ paste0(stringr::str_extract(mechCode_supportType, "\\d+"),
+                      "_",
+                      stringr::str_extract(mechCode_supportType, "DSD|TA"))
       )
     )
   
@@ -395,7 +397,7 @@ unPackOPU_PSNUxIM <- function(d) {
   # -> This is taken care of by testing for deduplication totals outside range.
   
   # TODO: TEST: Duplicate Rows; Flag; Combine ####
-    #d <- checkDuplicateRows(d, sheet)
+    d <- checkDuplicateRows(d, sheet)
   
   # TODO: TEST: Defunct disaggs; Flag; Drop ####
     #d <- defunctDisaggs(d, sheet)
