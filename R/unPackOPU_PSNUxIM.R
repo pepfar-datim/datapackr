@@ -45,10 +45,12 @@ unPackOPU_PSNUxIM <- function(d) {
   d$data$extract <- 
     d$data$extract[c(cols_to_keep$col,(max(cols_to_keep$col)+1):NCOL(d$data$extract))]
   
-  # TEST: Blank Col Names; Flag; Drop ####
+  # TEST: Blank Col Names; Error; Drop ####
   blank_col_headers <- names(d$data$extract)[which(nchar(names(d$data$extract))==0)]
   
   if (length(blank_col_headers) > 0) {
+    d$info$has_error <- TRUE
+    
     warning_msg <-
       paste0(
         "WARNING! In tab ",
@@ -68,7 +70,7 @@ unPackOPU_PSNUxIM <- function(d) {
     tibble::as_tibble(.name_repair = "unique") %>%
     dplyr::select_if(function(x) any(!is.na(x)))
   
-  # TEST: Improper Col Names; Flag; Drop ####
+  # TEST: Improper Col Names; Error; Drop ####
   invalid_mech_headers <- names(d$data$extract) %>%
     tibble::tibble(col_name = .) %>%
     dplyr::filter(!col_name %in% cols_to_keep$indicator_code,
@@ -79,6 +81,8 @@ unPackOPU_PSNUxIM <- function(d) {
   attr(d$tests$invalid_mech_headers,"test_name") <- "Invalid mechanism headers"
   
   if (NROW(d$tests$invalid_mech_headers) > 0) {
+    d$info$has_error <- TRUE
+    
     warning_msg <-
       paste0(
         "WARNING! In tab ",
@@ -94,7 +98,7 @@ unPackOPU_PSNUxIM <- function(d) {
   d$data$extract %<>%
     dplyr::select(-dplyr::all_of(d$tests$invalid_mech_headers$invalid_mech_headers))
   
-  # TEST: Duplicate Cols; Flag; Combine ####
+  # TEST: Duplicate Cols; Warn; Combine ####
   col_names <- names(d$data$extract) %>%
     tibble::tibble(col_name = .) %>%
     dplyr::mutate(
@@ -142,7 +146,7 @@ unPackOPU_PSNUxIM <- function(d) {
   names(d$data$extract) <- col_names$col_name_new
       # --> This also removes non-essential text from IM name to leave only 12345_DSD format.
   
-  # TEST: Non-numeric data; Flag; Convert & Drop ####
+  # TEST: Non-numeric data; Warn; Convert & Drop ####
   non_numeric <- sapply(d$data$extract, function(x) stringr::str_extract(x, "[^[:digit:][:space:][:punct:]]+")) %>%
     as.data.frame() %>%
     dplyr::select(-dplyr::all_of(header_cols$indicator_code)) %>%
@@ -174,10 +178,10 @@ unPackOPU_PSNUxIM <- function(d) {
   d$data$extract %<>%
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
   
-  # TEST: No missing metadata ####
+  # TODO TEST: No missing metadata ####
     #d <- checkMissingMetadata(d, sheet)
   
-  # TEST: Missing Dedupe Rollup cols; Flag; Add ####
+  # TEST: Missing Dedupe Rollup cols; Error; Add ####
   dedupe_rollup_cols <- cols_to_keep %>%
     dplyr::filter(dataset == "mer" & col_type == "target") %>%
     dplyr::pull(indicator_code)
@@ -188,6 +192,8 @@ unPackOPU_PSNUxIM <- function(d) {
   attr(d$tests$missing_cols_fatal, "test_name") <- "Fatally missing Dedupe Rollup columns"
   
   if (length(missing_cols_fatal) > 0) {
+    d$info$has_error <- TRUE
+    
     warning_msg <-
       paste0(
         "ERROR! In tab ",
@@ -244,7 +250,7 @@ unPackOPU_PSNUxIM <- function(d) {
       `Crosswalk Dedupe` = `Total Deduplicated Rollup` - `Max Total Deduplicated Rollup`
     )
   
-  # TEST: Improper dedupe values; Flag; Continue ####
+  # TEST: Improper dedupe values; Error; Continue ####
   
   dedupe_cols <- names(d$data$extract)[which(grepl("Deduplicated", names(d$data$extract)))]
   
@@ -279,6 +285,8 @@ unPackOPU_PSNUxIM <- function(d) {
   attr(d$tests$dedupes_outside_range, "test_name") <- "Dedupes Outside Acceptable Range"
   
   if (NROW(d$tests$dedupes_outside_range) > 0) {
+    d$info$has_error <- TRUE
+    
     dedupe_issue_cols <-
       tibble::tribble(
         ~col, ~warn,
@@ -304,7 +312,7 @@ unPackOPU_PSNUxIM <- function(d) {
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
   
-  # TEST: Negative IM Targets; Flag; Drop ####
+  # TEST: Negative IM Targets; Error; Drop ####
   d$tests$negative_IM_targets <- d$data$extract %>%
     tidyr::gather(key = "mechCode_supportType",
                   value = "value",
@@ -314,6 +322,8 @@ unPackOPU_PSNUxIM <- function(d) {
   attr(d$tests$negative_IM_targets,"test_name") <- "Negative Mechanism Targets"
   
   if (NROW(d$tests$negative_IM_targets) > 0) {
+    d$info$has_error <- TRUE
+    
     warning_msg <- 
       paste0(
         "WARNING!: ",
@@ -350,7 +360,7 @@ unPackOPU_PSNUxIM <- function(d) {
   # Drop NAs ####
   d$data$extract %<>% tidyr::drop_na(value)
   
-  # TEST: Decimals; Flag; Round ####
+  # TEST: Decimals; Error; Round ####
   d$tests$decimals <- d$data$extract %>%
     dplyr::filter(value %% 1 != 0)
   
@@ -372,12 +382,15 @@ unPackOPU_PSNUxIM <- function(d) {
   
   d$data$extract %<>%
     dplyr::mutate(value = round_trunc(value))
-  # TEST: Positive Dedupes; Flag; Drop ####
+  
+  # TEST: Positive Dedupes; Error; Drop ####
   d$tests$positive_dedupes <- d$data$extract %>%
     dplyr::filter(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0)
   attr(d$tests$positive_dedupes,"test_name") <- "Positive dedupes"
 
   if (NROW(d$tests$positive_dedupes) > 0) {
+    d$info$has_error <- TRUE
+    
     warning_msg <-
       paste0(
         "WARNING!: ",
@@ -393,7 +406,7 @@ unPackOPU_PSNUxIM <- function(d) {
   d$data$extract %<>%
     dplyr::filter(!(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0))
   
-  # TEST: Duplicate Rows; Flag; Combine ####
+  # TEST: Duplicate Rows; Warn; Combine ####
   d$data$extract %<>%
     dplyr::mutate(
       mechCode_supportType = dplyr::case_when(
@@ -413,7 +426,7 @@ unPackOPU_PSNUxIM <- function(d) {
       dplyr::across(c(header_cols$indicator_code, "mechCode_supportType"))) %>%
     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
   
-  # TODO: TEST: Defunct disaggs; Flag; Drop ####
+  # TODO: TEST: Defunct disaggs; Error; Drop ####
     #d <- defunctDisaggs(d, sheet)
   
   # Drop all zeros against IMs ####
