@@ -20,7 +20,7 @@
 #' The final message in the Console prints all warnings identified in the Data
 #' Pack being processed.
 #'
-unPackDataPack <- function(d) {
+unPackOPUDataPack <- function(d) {
 
   # Grab datapack_name from Home Page
   d$info$datapack_name <- unPackDataPackName(
