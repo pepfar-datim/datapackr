@@ -357,6 +357,8 @@ unPackOPU_PSNUxIM <- function(d) {
   attr(d$tests$decimals,"test_name") <- "Decimal values"
   
   if (NROW(d$tests$decimals) > 0) {
+    d$info$has_error <- TRUE
+    
     warning_msg <-
       paste0(
         "WARNING! In tab ",
