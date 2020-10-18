@@ -51,7 +51,9 @@ create_play_spectrum_output <- function(country_uids,
     dplyr::left_join(
       datapackr::map_DataPack_DATIM_DEs_COCs,
       by = c("data_element_uid" = "dataelement",
-             "category_option_combo_uid" = "categoryoptioncombouid"))
+             "category_option_combo_uid" = "categoryoptioncombouid")) %>%
+  # Map to renovated indicator_codes
+    dplyr::left_join()
   
   if (any(is.na(data_datim$indicator_code))) {
     stop("Problem mapping target data pulled from DATIM to datapack schema")
