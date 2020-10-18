@@ -53,7 +53,8 @@ create_play_spectrum_output <- function(country_uids,
       by = c("data_element_uid" = "dataelement",
              "category_option_combo_uid" = "categoryoptioncombouid")) %>%
   # Map to renovated indicator_codes
-    dplyr::left_join()
+    dplyr::left_join(datapackr::updated_indicator_codes,
+                     by = c("indicator_code"))
   
   if (any(is.na(data_datim$indicator_code))) {
     stop("Problem mapping target data pulled from DATIM to datapack schema")
@@ -71,7 +72,7 @@ create_play_spectrum_output <- function(country_uids,
                   #period,
                   psnu = PSNU,
                   psnu_uid = org_unit_uid,
-                  indicator_code,
+                  indicator_code = indicator_code_updated,
                   #dataelement = dataelement.y,
                   #dataelementuid = data_element_uid,
                   age = valid_ages.name,
@@ -80,7 +81,11 @@ create_play_spectrum_output <- function(country_uids,
                   sex_uid = valid_sexes.id,
                   #kp_option_uid = valid_kps.id,
                   #KeyPop = valid_kps.name,
-                  value = datim_value)
+                  value = datim_value) %>%
+    dplyr::mutate(
+      indicator_code = 
+        stringr::str_replace(indicator_code, "\\.T$", "\\.T_1")
+        )
   
   # Adjust for PMTCT ####
   pmtct_data <- play_spectrum_output %>%
