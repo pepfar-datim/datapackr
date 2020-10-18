@@ -40,11 +40,11 @@ canReadFile <- function(path) {
 handshakeFile <- function(path = NULL,
                           tool = NULL) {
   
-  if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template")) {
+  if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
     extension = "xlsx"
   } else {
     stop(
-      "Please specify correct file type: Data Pack, Data Pack Template, OPU Data Pack Template.")
+      "Please specify correct file type: Data Pack, Data Pack Template, OPU Data Pack Template, OPU Data Pack.")
     }
   
   # If path has issues or NA, prompt user to select file from window.
