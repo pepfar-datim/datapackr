@@ -10,7 +10,7 @@
 #' For full list of these IDs, see \code{datapackr::dataPackMap}.
 #' @param  cop_year Specifies COP year for dating as well as selection of
 #' templates.
-#' #' @param output_folder Local folder where you would like your Data Pack to be
+#' @param output_folder Local folder where you would like your Data Pack to be
 #' saved upon export. If left as \code{NULL}, will not output externally.
 #'
 #' @return Fake Spectrum dataset
@@ -118,9 +118,9 @@ create_play_spectrum_output <- function(country_uids,
       values_from = value
     ) %>%
     dplyr::select(-psnu, -age, -sex,
-                  pop = `POP_EST.NA.Age/Sex.T`,
-                  plhiv = `PLHIV.NA.Age/Sex/HIVStatus.T`,
-                  tx_curr = `TX_CURR_SUBNAT.N.Age/Sex/HIVStatus.T`)
+                  pop = `POP_EST.T_1`,
+                  plhiv = `PLHIV.T_1`,
+                  tx_curr = `TX_CURR_SUBNAT.T_1`)
   
   pmtct_data %<>%
     dplyr::left_join(

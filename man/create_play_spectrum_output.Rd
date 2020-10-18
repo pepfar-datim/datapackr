@@ -11,8 +11,9 @@ create_play_spectrum_output(country_uids, cop_year, output_folder = NULL)
 For full list of these IDs, see \code{datapackr::dataPackMap}.}
 
 \item{cop_year}{Specifies COP year for dating as well as selection of
-templates.
-#' @param output_folder Local folder where you would like your Data Pack to be
+templates.}
+
+\item{output_folder}{Local folder where you would like your Data Pack to be
 saved upon export. If left as \code{NULL}, will not output externally.}
 }
 \value{
