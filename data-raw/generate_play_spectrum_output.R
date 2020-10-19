@@ -3,7 +3,7 @@ library(magrittr)
 
 datimutils::loginToDATIM("~/.secrets/datim.json")
 
-output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/COP20 OPUs/Test Packs"
+output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/2) Development"
 
 batch <- tibble::tribble(
   ~datapack_name, ~country_uids,
@@ -56,15 +56,12 @@ batch <- tibble::tribble(
 )
 
 pick <- batch[c(12),]
-# i = 1
 
 for (i in 1:NROW(pick)) {
   print(paste0(i," of ",NROW(pick), ": ", pick[[i,1]]))
 
-  packOPUDataPack(datapack_name = pick[[i,1]],
-                 country_uids = unlist(pick[[i,"country_uids"]]),
-                 template_path = NULL,
-                 cop_year = 2020,
-                 output_folder = output_folder,
-                 results_archive = FALSE)
+  create_play_spectrum_output(
+    country_uids = unlist(pick[[i,"country_uids"]]),
+    cop_year = 2020,
+    output_folder = output_folder)
 }
