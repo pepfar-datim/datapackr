@@ -26,7 +26,7 @@ createKeychainInfo <- function(submission_path = NULL,
       datapack_name = NULL,
       tool = tool,
       country_uids = country_uids,
-      cop_year = ifelse(is.null(cop_year),getCurrentCOPYear())
+      cop_year = ifelse(is.null(cop_year),getCurrentCOPYear(), cop_year)
     )
   )
   
