@@ -63,13 +63,13 @@ analyze_vmmc_indeterminate <- function(data) {
         "WARNING! VMMC_CIRC Indeterminate > 5% : \n\n\t* ",
         crayon::bold(
           paste0(
-            length(unique(indeterminate_issues$psnuid)), " of ",
+            length(unique(vmmc_indeterminate_issues$psnuid)), " of ",
             length(unique(data$psnuid)))),
         " PSNUs affected.\n\n\t* ",
         "Highest indeterminate/not tested rate observed: ",
         crayon::bold(sprintf("%.1f%%",
                              100 * max(
-                               indeterminate_issues$VMMC_CIRC.indeterminateRate
+                               vmmc_indeterminate_issues$VMMC_CIRC.indeterminateRate
                                ))),
         "\n\n\t* ",
         "National average indeterminate/not tested rate: ",
@@ -546,7 +546,11 @@ checkAnalytics <- function(d,
   # Adorn metadata
     adorn_import_file() %>%
     dplyr::select(PSNU = dp_psnu, psnuid = psnu_uid,
-                  indicator_code, Age, Sex, KeyPop, value)
+                  indicator_code, Age, Sex, KeyPop, value) %>%
+    dplyr::group_by(
+      PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
+    dplyr::summarise(value = sum(value)) %>%
+    dplyr::ungroup()
 
   # Prepare model data ####
   #TODO: Generalize this as function
