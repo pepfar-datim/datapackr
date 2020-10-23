@@ -449,8 +449,6 @@ if(FY != 2021){
 #'
 #' @return raw data in DATIM for a country for the COP data sets for a given fiscal year.
 #'
-#' @example getCopDataFromDatim(country_uid = d$info$country_uids,
-#'                    fiscal_year_yyyy = d$info$cop_year)
 
 getCopDataFromDatim <- function(country_uid,
                                 fiscal_year_yyyy,
