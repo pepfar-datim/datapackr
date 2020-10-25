@@ -16,5 +16,5 @@ d
 }
 \description{
 Checks structural integrity of columns on critical sheets for
-   submitted Data Pack or Site Tool.
+   submitted Data Pack.
 }

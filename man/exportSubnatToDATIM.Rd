@@ -7,7 +7,7 @@
 exportSubnatToDATIM(d)
 }
 \arguments{
-\item{data}{SUBNAT/IMPATT dataframe to pack for DATIM.}
+\item{d}{Datapackr object}
 }
 \value{
 Datapackr d object

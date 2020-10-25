@@ -5,7 +5,7 @@
 #' @description Wrapper function for creation of d$data$analtyics object 
 #' which is suitable for export to external analytics sytems. 
 #'
-#' @param d
+#' @param d Datapackr object
 #' 
 #' @return Modified d object with d$data$analtyics
 #' 
@@ -23,7 +23,7 @@ createAnalytics <- function(d) {
   #Adorn organisation units
   d <- adornPSNUs(d)
   #Adorn mechanisms
-  d <- adornMechanisms(d)
+  d$data$analytics <- adornMechanisms(d$data$analytics)
   #TODO: Centralize this fix with exportDistributeMERtoDATIM
   map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
   map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
@@ -34,7 +34,6 @@ createAnalytics <- function(d) {
                                                      map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- NA_character_
   map_DataPack_DATIM_DEs_COCs_local$valid_kps.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
                                                      map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Female PWID"] <- NA_character_
-  
   
   
   #Adorn data element and category option group sets
