@@ -2,19 +2,20 @@
 % Please edit documentation in R/packFrame.R
 \name{packFrame}
 \alias{packFrame}
-\title{Create a Tool from scratch and prep it for data.}
+\title{Create a Site Tool from scratch and prep it for data.}
 \usage{
 packFrame(datapack_uid, type = "Data Pack")
 }
 \arguments{
 \item{datapack_uid}{A unique ID specifying the PEPFAR Operating Unit
-the Tool belongs to.}
+the Site Tool belongs to.}
 
-\item{type}{Defaults to "Data Pack".}
+\item{type}{Either "Data Pack" or "Site Tool". Defaults to "Site Tool".}
 }
 \value{
 OpenXLSX workbook object for use in data writing functions.
 }
 \description{
-Creates a blank Excel workbook, then packs it.
+Creates a blank Excel workbook, then packs it with non-data Site Tool
+elements and features.
 }

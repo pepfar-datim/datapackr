@@ -4,8 +4,7 @@
 \name{configFile}
 \alias{configFile}
 \title{Mapping of necessary Data Pack metadata}
-\format{
-A data frame with metadata for each Operating Unit's Data Pack:
+\format{A data frame with metadata for each Operating Unit's Data Pack:
 \describe{
   \item{DataPack_name}{Usually the same as Operating Unit, except in rare
   cases for some PEPFAR Regional Operating Units.}
@@ -59,8 +58,7 @@ A data frame with metadata for each Operating Unit's Data Pack:
   \code{countryName} is within a Regional OU.}
   \item{isMil}{Logical (1/0) field documenting whether the unit listed in 
   \code{countryName} is a Military node.}
-}
-}
+}}
 \usage{
 configFile
 }

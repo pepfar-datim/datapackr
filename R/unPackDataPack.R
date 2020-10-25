@@ -13,6 +13,9 @@
 #'     \item Performs integrity checks on file structure;
 #'     \item Runs DATIM validation tests;
 #'     \item Extracts SUBNAT and IMPATT data as a DATIM import file;
+#'     \item Extracts FAST data for use by the FAST Tool; and
+#   \item Extracts MER data for use by the \code{\link{packSiteTool}}
+#    function.
 #' }
 #'     
 #' If a Data Pack is submitted as an XLSB formatted document, you must open &
@@ -74,6 +77,10 @@ unPackDataPack <- function(d) {
       
     # Package SUBNAT/IMPATT DATIM import file ####
       d <- packForDATIM(d, type = "SUBNAT_IMPATT")
+      
+    # Package FAST export ####
+      if (d$info$cop_year == 2019) {d <- FASTforward(d)}
+
     }
     
   return(d)

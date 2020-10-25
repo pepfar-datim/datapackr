@@ -51,12 +51,12 @@ api_version <- function() { "30" }
 #' 
 ValidateConfig<-function(dhis_config) {
   
-  is.baseurl <- function(x) { grepl("^http(?:[s])?://.+datim.org/$", x)}
+  is.baseurl <-function(x) { grepl("^http(?:[s])?://.+datim.org/$", x)}
   is.missing <- function(x) { is.na(x) || missing(x) || x == "" }
   
   if (is.missing(dhis_config$dhis$username)) {stop("Username cannot by blank.")}
-  if (is.missing(dhis_config$dhis$password)) {stop("Password cannot by blank.")}
-  if (!is.baseurl(dhis_config$dhis$baseurl)) {stop("The base URL does not appear to be valid. It should end in /")}
+  if (is.missing(dhis_config$dhis$password)) {stop("Username cannot by blank.")}
+  if (!is.baseurl(dhis_config$dhis$baseurl)) {stop("The base url does not appear to be valid. It should end in /")}
 }
 
 
@@ -73,7 +73,7 @@ DHISLogin<-function(dhis_config) {
   r <- httr::GET(url ,
                  httr::authenticate(dhis_config$dhis$username, dhis_config$dhis$password),
                  httr::timeout(60))
-  if(!isLoggedIn()){
+  if(r$status != 200L){
     stop("Could not authenticate you with the server!")
   } else {
     me <- jsonlite::fromJSON(httr::content(r,as = "text"))

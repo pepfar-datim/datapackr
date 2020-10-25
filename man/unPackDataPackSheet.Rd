@@ -15,7 +15,7 @@ unPackDataPackSheet(d, sheet)
 d
 }
 \description{
-Within a submitted Data Pack (directed to by
+Within a submitted Data Pack or Site Tool (directed to by
    \code{d$keychain$submission_path}), extract data from a single sheet specified
    in \code{d$data$sheet}.
 }

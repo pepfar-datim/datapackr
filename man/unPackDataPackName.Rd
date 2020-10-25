@@ -10,6 +10,7 @@ unPackDataPackName(submission_path = NA, tool = "Data Pack")
 \item{submission_path}{Local path to the file to import.}
 
 \item{tool}{What type of tool is the submission file? Default is "Data Pack".
+Other options include "Site Tool", "Mechanism Map", and "Site Filter".
 javascript:;}
 }
 \value{

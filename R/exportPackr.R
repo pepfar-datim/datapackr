@@ -10,6 +10,7 @@
 #' outputs to be saved. If not supplied, will output to working directory.
 #' @param type File prefix to be applied in output filename, as follows:
 #'   \describe{
+#'     \item{\code{Site Tool}}{Openxlsx Workbook object containing Site Tool.}
 #'     \item{\code{Data Pack}}{Openxlsx Workbook object containing Data Pack.}
 #'     \item{\code{FAST Export}}{Data frame containing FAST export data.}
 #'     \item{\code{SUBNAT IMPATT}}{Data frame containing SUBNAT/IMPATT data.}
@@ -30,7 +31,7 @@ exportPackr <- function(data, output_path, type, datapack_name) {
     )
   }
   
-  if (type %in% c("Data Pack")) {
+  if (type %in% c("Site Tool", "Data Pack", "Mechanism Map")) {
     if (class(data) != "Workbook") {
       stop("Output type and data do not match!")
     }

@@ -4,22 +4,21 @@
 \name{template_schema}
 \alias{template_schema}
 \title{Schema describing correct structure of Data Pack template.}
-\format{
-\describe{
+\format{\describe{
   \item{sheet_num}{Lists the index value associated with the sheet name
   listed in \code{sheet_name}.}
-  \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
+  \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack
+  and Site Tool.}
   \item{col}{Value describing the column position of each 
   \code{indicatorCode}.}
-  \item{indicatorCode}{Code used in the Data Pack to uniquely
+  \item{indicatorCode}{Code used in the Data Pack and Site Tool to uniquely
   identify each distinct programmatic area of target setting.}
   \item{colType}{Flags whether an \code{indicatorCode} is a Target
   (\code{"Target"}) or not (\code{NA}).}
   \item{dataset}{For indicatorCodes listed as "Targets" in the 
   \code{colType} field, documents the dataset, either "MER", "IMPATT", or
   "SUBNAT"}
-}
-}
+}}
 \usage{
 template_schema
 }

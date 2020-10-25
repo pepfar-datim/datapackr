@@ -7,7 +7,7 @@
 adornPSNUs(d)
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{d}{}
 }
 \value{
 Modified d$data$distributedMER 
