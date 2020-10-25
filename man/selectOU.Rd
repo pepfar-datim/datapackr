@@ -11,10 +11,10 @@ An OU name, based on input selection.
 }
 \description{
 In some cases it may be necessary to manually identify the Operating Unit
-associated with a submitted Data Pack. This function allows
+associated with a submitted Data Pack or Site Tool. This function allows
 manual selection of Operating Unit using the R console.
 
 One case where this is necessarily invoked is when OU name and OU id read
-from a submitted Data Pack do not match one another, based on
+from a submitted Data Pack or Site Tool do not match one another, based on
 cross-reference with DATIM organization hierarchies.
 }

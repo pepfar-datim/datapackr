@@ -6,7 +6,7 @@
 #'     adds  a dataframe containing SUBNAT and IMPATT data,
 #'     \code{d$data$SUBNAT_IMPATT} into a standard DATIM import file.
 #'
-#' @param d Datapackr object
+#' @param data SUBNAT/IMPATT dataframe to pack for DATIM.
 #' 
 #' @return Datapackr d object
 #' 

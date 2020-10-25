@@ -1,11 +1,11 @@
-#' @title Derive non-Data Pack targets from others in the Data Pack
+#' @title Derive non-Data Pack targets from others in the Data Pack/Site Tool
 #' 
 #' @description
-#' Takes Data Pack data and derives other targets not explicitly
+#' Takes Data Pack or Site Tool data and derives other targets not explicitly
 #' set during COP.
 #' 
-#' @param data Dataframe with either Data Pack data.
-#' @param type Type of data, either \code{Data Pack}.
+#' @param data Dataframe with either Data Pack or Site Tool data.
+#' @param type Type of data, either \code{Data Pack}, or \code{Site Tool}.
 #' 
 #' @return Dataframe with added, derived targets.
 #' 

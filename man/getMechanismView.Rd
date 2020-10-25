@@ -6,8 +6,11 @@
 \usage{
 getMechanismView()
 }
+\arguments{
+\item{d}{}
+}
 \value{
-Mechs
+Modified d object with d$data$analtyics
 }
 \description{
 Retreives a view of mechanisms with partners and agencies

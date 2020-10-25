@@ -4,15 +4,13 @@
 \name{periodInfo}
 \alias{periodInfo}
 \title{periodInfo}
-\format{
-\describe{
+\format{\describe{
   \item{periodid}{Unique DATIM id corresponding to period.}
   \item{iso}{ISO period name.}
   \item{startdate}{Start date of period.}
   \item{enddate}{End date of period.}
   \item{periodtype}{Period type, whether Financial, Quarterly, etc.}
-}
-}
+}}
 \usage{
 periodInfo
 }

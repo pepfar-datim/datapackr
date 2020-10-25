@@ -1,9 +1,9 @@
 #' @export
-#' @title Unpack data from Data Pack sheets.
+#' @title Unpack data from Data Pack or Site Tool sheets.
 #'
 #' @description
-#' Loops through all critical sheets in a submitted Data Pack
-#' and extracts data, then compiles into single flat dataframe.
+#' Loops through all critical sheets in a submitted Data Pack or
+#' Site Tool and extracts data, then compiles into single flat dataframe.
 #'
 #' @param d Datapackr object
 #' 
@@ -31,6 +31,8 @@ unPackSheets <- function(d) {
     
     if (d$info$tool == "Data Pack") {
       d <- unPackDataPackSheet(d, sheet = sheet)
+    } else if (d$info$tool == "Site Tool") {
+      d <- unPackSiteToolSheet(d, sheet = sheet)
     } else {stop("Cannot process that kind of tool. :(")}
     
     if (!is.null(d$data$extract)) {

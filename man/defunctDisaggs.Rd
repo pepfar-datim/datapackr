@@ -15,7 +15,7 @@ defunctDisaggs(d, sheet)
 d
 }
 \description{
-Checks data extracted from a sheet in a submitted Data Pack
-   identify cases where invalid Disaggregate combinations have
+Checks data extracted from a sheet in a submitted Data Pack or
+   Site Tool to identify cases where invalid Disaggregate combinations have
    been used.
 }

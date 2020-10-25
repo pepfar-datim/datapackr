@@ -2,19 +2,19 @@
 % Please edit documentation in R/deriveTargets.R
 \name{deriveTargets}
 \alias{deriveTargets}
-\title{Derive non-Data Pack targets from others in the Data Pack}
+\title{Derive non-Data Pack targets from others in the Data Pack/Site Tool}
 \usage{
 deriveTargets(data, type)
 }
 \arguments{
-\item{data}{Dataframe with either Data Pack data.}
+\item{data}{Dataframe with either Data Pack or Site Tool data.}
 
-\item{type}{Type of data, either \code{Data Pack}.}
+\item{type}{Type of data, either \code{Data Pack}, or \code{Site Tool}.}
 }
 \value{
 Dataframe with added, derived targets.
 }
 \description{
-Takes Data Pack data and derives other targets not explicitly
+Takes Data Pack or Site Tool data and derives other targets not explicitly
 set during COP.
 }
