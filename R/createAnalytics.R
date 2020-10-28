@@ -51,12 +51,8 @@ createAnalytics <- function(d) {
   ) %>% 
   dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S"),
                 fiscal_year = "FY21") %>% 
-    dplyr::select( ou,
-                   ou_id,
-                   country_name,
+    dplyr::select( country_name,
                    country_uid,
-                   snu1,
-                   snu1_id,
                    psnu,
                    psnuid,
                    prioritization,
