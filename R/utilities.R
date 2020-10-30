@@ -388,55 +388,6 @@ isLoggedIn <- function() {
     }
 }
 
-# this code relates to https://github.com/pepfar-datim/COP-Target-Setting/issues/700
-# it is not being exported pending https://github.com/pepfar-datim/COP-Target-Setting/issues/734
-# as it works for COP20 leaving it in place for now
-
-#' @title Pull & combine all  UIDS for specified data_stream types and FY.
-#'
-#' @description
-#' Pulls all uids for types argument for a specified FY.
-#'
-#' @param FY Reporting FY for which to filter active code lists, numeric, if null current year is used.
-#' @param types Specify MER, SUBNAT, or IMPATT, or omit to specify all.
-#'
-#' @return a character vector with the requested uids respecting the selection in the type parameter and FY parameter.
-#'
-#' @example getCopDatasetUids(FY=2021, types = c("MER", "SUBNAT", "IMPATT"))
-
-getCopDatasetUids <- function(FY = NULL, types = NULL) {
-if(FY != 2021){
-  stop("The fiscal year provided is not supported by the internal function getCopDatasetUids")
-}
-  if (is.null(FY)) {FY = currentFY()}
-  if (is.null(types)) {types = c("MER", "SUBNAT", "IMPATT")}
-
-  data <- api_get(api_call("dataSets"))
-  data <- data[grepl("^MER Targets: (Community|Facility)|MER Target Setting: PSNU|^(Host Country Targets|Planning Attributes): COP Prioritization SNU",
-        data$displayName),]
-  if(FY != currentFY()+1)
-  {
-    data <- data[grepl(paste0("FY",FY), data$displayName),]
-  }else{
-    data <- data[!(grepl("FY[0-9]{4}", data$displayName)),]
-  }
-
-  data$fiscal_year <- ifelse(!stringr::str_detect(data$displayName, "FY"), currentFY()+1,
-                        as.numeric(stringr::str_extract(data$displayName,"(?<=FY)\\d{4}$")))
-  data$data_stream <- ifelse(stringr::str_detect(data$displayName, "^MER "), "MER",
-                        ifelse(stringr::str_detect(data$displayName, "^Host Country Targets"),
-                               "SUBNAT","IMPATT"))
-  if(!(all((types %in% data$data_stream))))
-  {
-    stop(paste0("UID Not Found for ", setdiff(types, data$data_stream), " for FY ", FY))
-  }
-
-#  print(paste0("returning uids for " , FY))
-  return(data$id[data$data_stream %in% types])
-
-}
-
-
 #' @export
 #' @title grab all raw data in DATIM for a country for the COP data sets for a given fiscal year.
 #'
@@ -449,17 +400,14 @@ if(FY != 2021){
 #'
 #' @return raw data in DATIM for a country for the COP data sets for a given fiscal year.
 #'
-#' @example getCopDataFromDatim(country_uid = d$info$country_uids,
-#'                    fiscal_year_yyyy = d$info$cop_year)
 
 getCopDataFromDatim <- function(country_uid,
                                 fiscal_year_yyyy,
                                 base_url = getOption("baseurl"))
 {
-  if(fiscal_year_yyyy != 2021){
-    stop("The fiscal year provided is not supported by the internal function getCopDataFromDatim")
-  }
-  dataset_uids <- getCopDatasetUids(fiscal_year_yyyy)
+
+  dataset_uids <- getDatasetUids(fiscal_year_yyyy,
+                                 c("targets", "subnat", "impatt"))
 
   # package parameters for getDataValueSets function call
   parameters <-
@@ -490,6 +438,90 @@ getCopDataFromDatim <- function(country_uid,
 
   return(datim_data)
 }
+
+#' @export
+#' @title getDatasetUids
+#'
+#' @description returns character vector of dataset uids for a given FY {"2019", "2020", "2021"}
+#' and type {"targets", "results","subnat_impatt"}
+#' @param fiscal_year character - one of {"2019", "2020", "2021"}
+#' @param type character vector - one or more of {"targets", "results", "subnat_impatt"}
+#' @return returns a character vector of the related dataset uids
+#'
+getDatasetUids <-  function(fiscal_year,
+                            type = c("targets", "results", "subnat", "impatt")){
+  datasets = character(0)
+  if(fiscal_year == "2021") {
+    if("targets" %in% type) {
+      datasets <- c(datasets,
+                    "Pmc0yYAIi1t", # MER Target Setting: PSNU (Facility and Community Combined)
+                    "s1sxJuqXsvV")  # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
+    }
+    if("results" %in% type) {
+      stop("FY21 results input not supported by getDatasetUids")
+    }
+    if("subnat" %in% type) {
+      datasets <- c(datasets,
+                    "j7jzezIhgPj") # Host Country Targets: COP Prioritization SNU (USG)
+
+    }
+    if("impatt" %in% type) {
+      datasets <- c(datasets,
+                    "jxnjnBAb1VD") # Planning Attributes: COP Prioritization SNU
+
+    }
+  } else if (fiscal_year == "2020") {
+    if("targets" %in% type) {
+      datasets <- c(datasets,
+                    "sBv1dj90IX6", # MER Targets: Facility Based FY2020
+                    "nIHNMxuPUOR", # MER Targets: Community Based FY2020
+                    "C2G7IyPPrvD", # MER Targets: Community Based - DoD ONLY FY2020
+                    "HiJieecLXxN") # MER Targets: Facility Based - DoD ONLY FY2020
+    }
+    if ("results" %in% type){
+      datasets <- c(datasets,
+                    "qzVASYuaIey", # MER Results: Community Based
+                    "BPEyzcDb8fT", # MER Results: Community Based - DoD ONLY
+                    "jKdHXpBfWop", # MER Results: Facility Based
+                    "em1U5x9hhXh")  # MER Results: Facility Based - DoD ONLY
+    }
+    if("subnat" %in% type) {
+      datasets <- c(datasets,
+                    "N4X89PgW01w") # Host Country Targets: COP Prioritization SNU (USG) FY2020
+    }
+    if("impatt" %in% type) {
+      datasets <- c(datasets,
+                    "pTuDWXzkAkJ") # Planning Attributes: COP Prioritization SNU FY2020
+    }
+  } else if (fiscal_year == "2019") {
+    if("targets" %in% type) {
+      datasets <- c(datasets,
+                    "BWBS39fydnX", # MER Targets: Community Based - DoD ONLY FY2019
+                    "l796jk9SW7q", # MER Targets: Community Based FY2019
+                    "X8sn5HE5inC", # MER Targets: Facility Based - DoD ONLY FY2019
+                    "eyI0UOWJnDk") # MER Targets: Facility Based FY2019)
+    }
+    if("results" %in% type) {
+      datasets <- c(datasets,
+                    "KWRj80vEfHU", # MER Results: Facility Based FY2019Q4
+                    "fi9yMqWLWVy", # MER Results: Facility Based - DoD ONLY FY2019Q4
+                    "zUoy5hk8r0q", # MER Results: Community Based FY2019Q4
+                    "PyD4x9oFwxJ") # MER Results: Community Based - DoD ONLY FY2019Q4
+    }
+    if("subnat" %in% type) {
+      datasets <- c(datasets,
+                    "Ncq22MRC6gd") # Host Country Targets: COP Prioritization SNU (USG) FY2019
+    }
+    if("impatt" %in% type) {
+      datasets <- c(datasets,
+                    "pTuDWXzkAkJ") # Planning Attributes: COP Prioritization SNU FY2020 - last used FY2020 also valid for FY2019
+
+    }
+  } else {
+    stop(paste("FY", fiscal_year, "input not supported by getDatasetUids"))
+  }
+  return(datasets)
+  }
 
 #' @export
 #' @title Define prioritization values.

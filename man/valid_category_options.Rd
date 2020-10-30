@@ -4,13 +4,15 @@
 \name{valid_category_options}
 \alias{valid_category_options}
 \title{List of  valid categoryoptions based on current COP Target Code List.}
-\format{\describe{
+\format{
+\describe{
   \item{name}{}
   \item{id}{}
   \item{categoryoptiongroup}{}
   \item{datapack_disagg}{}
   \item{datapack_schema_group}{}
-}}
+}
+}
 \usage{
 valid_category_options
 }
