@@ -147,25 +147,7 @@ unPackOPU_PSNUxIM <- function(d) {
       # --> This also removes non-essential text from IM name to leave only 12345_DSD format.
   
   # TEST: Non-numeric data; Warn; Convert & Drop ####
-  non_numeric <- sapply(d$data$extract, function(x) stringr::str_extract(x, "[^[:digit:][:space:][:punct:]]+")) %>%
-    as.data.frame() %>%
-    dplyr::select(-dplyr::all_of(header_cols$indicator_code)) %>%
-    dplyr::select_if(function(x) any(!is.na(x))) %>%
-    dplyr::filter_all(dplyr::any_vars(!is.na(.)))
-  
-  d$tests$non_numeric <- dplyr::bind_rows(d$tests$non_numeric, non_numeric)
-  attr(d$tests$non_numeric,"test_name") <- "Non-numeric values"
-  
-  if(NROW(non_numeric) > 0) {
-    warning_msg <-
-      paste0(
-        "WARNING! In tab ",
-        sheet,
-        ": NON-NUMERIC VALUES found!",
-        "\n")
-    
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
-  }
+  d <- checkNumericValues(d, sheet, header_cols)
   
     #sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
 
