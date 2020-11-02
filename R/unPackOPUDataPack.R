@@ -45,7 +45,7 @@ unPackOPUDataPack <- function(d) {
   d <- unPackOPU_PSNUxIM(d)
   
   # Prepare data for sharing with other systems ####
-  #d <- createAnalytics(d)
+  d <- createAnalytics(d)
   
   # Prepare SNU x IM dataset for DATIM import & validation ####
   d <- packForDATIM(d, type = "OPU PSNUxIM")
