@@ -1,10 +1,10 @@
 context("Test GetDataValueSets")
 
 test_that("GetDataValueSets", {
-  datapackcommons::DHISLogin_Play("2.30")
+  base <- datapackcommons::DHISLogin_Play("2.34")
   data <- getDataValueSets(c("dataElementGroup", "orgUnit", "startDate", "endDate", "children", "limit"), 
                   c("qfxEYY9xAl6", "O6uvpzGd5pu", "2013-01-01", "2090-01-01","true","25"), 
-                  "https://play.dhis2.org/2.30/")
+                  base)
   testthat::expect_named(data, c("data_element",
                          "period",
                          "org_unit",
@@ -19,6 +19,6 @@ test_that("GetDataValueSets", {
   testthat::expect_equal(NROW(data), 25)
   testthat::expect_error(getDataValueSets(c("limit"), 
                                          c("25"), 
-                                         "https://play.dhis2.org/2.30/", 
+                                         base, 
                                          max_attempts = 1))
   })
