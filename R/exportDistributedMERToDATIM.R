@@ -137,13 +137,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
 #'
 exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
 
-  if(keep_dedup == TRUE){
-    d$datim$MER <- d$data$distributedMER
-  } else {
-  #Filter the pseudo-dedupe mechanism data out
-  d$datim$MER <- d$data$distributedMER %>%
-    dplyr::filter(mechanism_code != '99999')
-  }
+  d<-autoResolveDuplicates(d,keep_dedup)
 
   # align   map_DataPack_DATIM_DEs_COCs with  d$datim$MER/d$data$distributedMER for KP_MAT
   map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
