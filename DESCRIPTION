@@ -55,7 +55,7 @@ Suggests:
     httptest,
     testthat
 Remotes: jason-p-pickering/datim-validation,
-          pepfar-datim/data-pack-commons
+          pepfar-datim/data-pack-commons,
           pepfar-datim/datimutils
 License: GPL-2 + file LICENSE
 Encoding: UTF-8
