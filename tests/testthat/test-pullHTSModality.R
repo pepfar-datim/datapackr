@@ -1,6 +1,4 @@
-library(httptest)
-
-with_mock_api({
+httptest::with_mock_api({
 
 test_that("test getHTSModality: ", {
 
