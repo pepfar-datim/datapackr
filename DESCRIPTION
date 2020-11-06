@@ -57,7 +57,7 @@ Suggests:
 Remotes: jason-p-pickering/datim-validation,
           pepfar-datim/data-pack-commons,
           pepfar-datim/datimutils
-License: GPL-2 + file LICENSE
+License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1

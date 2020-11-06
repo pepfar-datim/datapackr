@@ -10,3 +10,8 @@ testthat::expect_named(data, c("dataElement", "hts_modality"))
 rm(data) })
 
 })
+
+
+#capture_requests(data <- getHTSModality(cop_year = 2020))
+#start_capturing(simplify = F)
+#stop_capturing()

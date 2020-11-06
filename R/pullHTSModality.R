@@ -23,7 +23,6 @@ getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL) 
                                     by = "id",
                                     fields = "dataElementGroups[name,dataElements[id]]")
 
- #
   modality_map <- modality_map$dataElementGroups[[1]]
 
   modality_map <- modality_map %>% tidyr::unnest(cols = dataElements) %>%
