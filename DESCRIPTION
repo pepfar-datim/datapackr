@@ -1,7 +1,7 @@
 Package: datapackr
 Type: Package
 Title: A Package that Packs and Unpacks all Data Packs
-Version: 3.0.6
+Version: 3.0.7
 Date: 2020-05-19
 Authors@R: c(
     person("Scott", "Jackson", email = "sjackson@baosystems.com",
@@ -10,16 +10,16 @@ Authors@R: c(
         role = c("aut")),
     person("Sam", "Garman", email = "sgarman@baosystems.com",
         role = c("aut")),
-    person("William", "Shiflett", , "wshiflett@guidehouse.com",
+    person("William", "Shiflett", "wshiflett@guidehouse.com",
         role = c("ctb")),
-    person("Chris", "Nemarich", , "cnemarich@guidehouse.com",
+    person("Chris", "Nemarich", "cnemarich@guidehouse.com",
         role = c("ctb"))
   )
 Description: Generates and processes PEPFAR Data Packs and Site Tools.
 URL: https://github.com/pepfar-datim/datapackr
 BugReports: https://github.com/pepfar-datim/datapackr
 Depends: R (>= 3.6.0)
-Imports: 
+Imports:
     dplyr (>= 0.8.3),
     tidyr (>= 1.0.0),
     tidyxl (>= 1.0.4),
@@ -48,7 +48,7 @@ Imports:
     rlang (>= 0.4.2),
     assertthat,
     plyr
-Suggests: 
+Suggests:
     devtools (>= 2.0.1),
     httptest,
     testthat

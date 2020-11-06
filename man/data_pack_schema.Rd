@@ -4,15 +4,15 @@
 \name{data_pack_schema}
 \alias{data_pack_schema}
 \title{Schema describing correct structure of Data Pack template.}
-\format{\describe{
+\format{
+\describe{
   \item{sheet_num}{Lists the index value associated with the sheet name
   listed in \code{sheet_name}.}
-  \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack
-  and Site Tool.}
+  \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
   \item{col}{Value describing the column position of each 
   \code{indicator_code}.}
   \item{label}{String label used to describe \code{indicator_code}.}
-  \item{indicator_code}{Code used in the Data Pack and Site Tool to uniquely
+  \item{indicator_code}{Code used in the Data Pack to uniquely
   identify each distinct programmatic area of target setting.}
   \item{formula}{Excel formula defined for \code{indicator_code}.}
   \item{col_type}{Flags whether an \code{indicator_code} is a Target
@@ -20,7 +20,8 @@
   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
   in the \code{col_type} field, documents the dataset, either \code{MER},
   \code{IMPATT}, or \code{SUBNAT}.}
-}}
+}
+}
 \usage{
 data_pack_schema
 }

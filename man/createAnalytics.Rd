@@ -7,7 +7,7 @@
 createAnalytics(d)
 }
 \arguments{
-\item{d}{}
+\item{d}{Datapackr object}
 }
 \value{
 Modified d object with d$data$analtyics

@@ -8,11 +8,14 @@ checkAnalytics(d, model_data_path)
 }
 \arguments{
 \item{d}{Datapackr object.}
+
+\item{model_data_path}{Filepath to model data produced from most recent DATIM
+sync.}
 }
 \value{
 d
 }
 \description{
-Check data gathered from Data Pack to identify validation concerns
-at the PSNU level.
+Check data gathered from Data Pack to identify
+validation concerns at the PSNU level.
 }

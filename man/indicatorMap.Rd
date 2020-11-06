@@ -5,9 +5,8 @@
 \alias{indicatorMap}
 \title{Map of Data Pack dataelements and categoryoptioncombos.}
 \format{\describe{
-  \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack
-  and Site Tool.}
-  \item{indicatorCode}{Code used in the Data Pack and Site Tool to uniquely
+  \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
+  \item{indicatorCode}{Code used in the Data Pack to uniquely
   identify each distinct programmatic area of target setting.}
   \item{typeOptions}{Either DSD or TA. The crossing of these with
   \code{indicatorCode} roughly corresponds to DATIM dataelements.}
