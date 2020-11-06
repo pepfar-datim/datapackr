@@ -17,7 +17,7 @@ adorn_import_file <- function(psnu_import_file) {
     dplyr::left_join(
       dplyr::select(
         valid_PSNUs %>% add_dp_psnu(),
-        ou, ou_id, country_name, country_uid, snu1, snu1_id, psnu, psnu_uid, dp_psnu),
+        country_name, country_uid, psnu, psnu_uid, dp_psnu),
       by = c("psnu_uid" = "psnu_uid"))
   
   # Adorn Mechanisms ####

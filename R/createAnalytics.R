@@ -2,18 +2,18 @@
 #' @importFrom magrittr %>% %<>%
 #' @title createAnalytics(d)
 #'
-#' @description Wrapper function for creation of d$data$analtyics object 
-#' which is suitable for export to external analytics sytems. 
+#' @description Wrapper function for creation of d$data$analtyics object
+#' which is suitable for export to external analytics sytems.
 #'
 #' @param d Datapackr object
-#' 
+#'
 #' @return Modified d object with d$data$analtyics
-#' 
-#' 
+#'
+#'
 createAnalytics <- function(d) {
   #Append the distributed MER data and subnat data together
   if (d$info$tool == "OPU Data Pack") {
-    d$data$analytics <- d$data$extract %>% 
+    d$data$analytics <- d$data$extract %>%
       dplyr::select(
         PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
         mechanism_code = mech_code, support_type, value
@@ -42,8 +42,8 @@ createAnalytics <- function(d) {
                                                      map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- NA_character_
   map_DataPack_DATIM_DEs_COCs_local$valid_kps.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
                                                      map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Female PWID"] <- NA_character_
-  
-  
+
+
   #Adorn data element and category option group sets
   d$data$analytics %<>%  dplyr::left_join(
     .,
@@ -56,19 +56,15 @@ createAnalytics <- function(d) {
         )
     ),
     by = c("Age", "Sex", "KeyPop", "indicator_code", "support_type")
-  ) %>% 
+  ) %>%
   dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S"),
                 fiscal_year = "FY21")
-  
+
   # Selects appropriate columns based on COP or OPU tool
   if (d$info$tool == "Data Pack") {
-    d$data$analytics %<>% 
-      dplyr::select( ou,
-                     ou_id,
-                     country_name,
+    d$data$analytics %<>%
+      dplyr::select( country_name,
                      country_uid,
-                     snu1,
-                     snu1_id,
                      psnu,
                      psnuid,
                      prioritization,
@@ -87,7 +83,7 @@ createAnalytics <- function(d) {
                      categoryoptioncombo_id = categoryoptioncombouid,
                      categoryoptioncombo_name = categoryoptioncombo,
                      age = Age,
-                     sex = Sex, 
+                     sex = Sex,
                      key_population = KeyPop,
                      resultstatus_specific = resultstatus,
                      upload_timestamp,
@@ -97,13 +93,9 @@ createAnalytics <- function(d) {
                      target_value = value,
                      indicator_code)
   } else {
-    d$data$analytics %<>% 
-      dplyr::select( ou,
-                     ou_id,
-                     country_name,
+    d$data$analytics %<>%
+      dplyr::select( country_name,
                      country_uid,
-                     snu1,
-                     snu1_id,
                      psnu,
                      psnuid,
                      mechanism_code,
@@ -121,7 +113,7 @@ createAnalytics <- function(d) {
                      categoryoptioncombo_id = categoryoptioncombouid,
                      categoryoptioncombo_name = categoryoptioncombo,
                      age = Age,
-                     sex = Sex, 
+                     sex = Sex,
                      key_population = KeyPop,
                      resultstatus_specific = resultstatus,
                      upload_timestamp,
@@ -131,6 +123,6 @@ createAnalytics <- function(d) {
                      target_value = value,
                      indicator_code)
   }
-  
+
   return(d)
 }

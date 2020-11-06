@@ -16,7 +16,7 @@ createKeychainInfo <- function(submission_path = NULL,
                                tool = "Data Pack",
                                country_uids = NULL,
                                cop_year = NULL) {
-  
+
   # Create data train for use across remainder of program
   d <- list(
     keychain = list(
@@ -29,7 +29,7 @@ createKeychainInfo <- function(submission_path = NULL,
       cop_year = ifelse(is.null(cop_year),getCurrentCOPYear(), cop_year)
     )
   )
-  
+
   # Start running log of all warning and information messages
   d$info$warning_msg <- NULL
   d$info$has_error <- FALSE
@@ -38,13 +38,13 @@ createKeychainInfo <- function(submission_path = NULL,
     d$info$has_psnuxim <- FALSE
     d$info$missing_psnuxim_combos <- FALSE
   }
-  
+
   # Check the submission file exists and prompt for user input if not
   d$keychain$submission_path <- handshakeFile(path = d$keychain$submission_path,
                                               tool = d$info$tool)
-  
+
   return(d)
-  
+
 }
 
 #' @export
@@ -61,13 +61,13 @@ createKeychainInfo <- function(submission_path = NULL,
 #' will flag error.
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
-#' 
+#'
 #' @details
 #' Executes the following operations in relation to a submitted tool
 #' \enumerate{
 #'     \item Performs integrity checks on file structure;
 #' }
-#'     
+#'
 unPackTool <- function(submission_path = NULL,
                        tool = "Data Pack",
                        country_uids = NULL,
@@ -77,18 +77,18 @@ unPackTool <- function(submission_path = NULL,
                      tool,
                      country_uids,
                      cop_year)
-  
+
   # unPack file based on type
   if (d$info$tool == "Data Pack") {
     d <- unPackDataPack(d)
   } else if (d$info$tool == "OPU Data Pack") {
     d <- unPackOPUDataPack(d)
   } else {stop("Selected tool not currently supported.")}
-  
+
   # If warnings, show all grouped by sheet and issue
   if (!is.null(d$info$warning_msg) & interactive()) {
     options(warning.length = 8170)
-    
+
     messages <-
       paste(
         paste(
@@ -98,14 +98,14 @@ unPackTool <- function(submission_path = NULL,
         ),
         sep = "",
         collapse = "\r\n")
-    
+
     key = paste0(
       "*********************\r\n",
       "KEY:\r\n",
       "- WARNING!: Problematic, but doesn't stop us from processing your tool.\r\n",
       "- ERROR!: You MUST address these issues and resubmit your tool.\r\n",
       "*********************\r\n\r\n")
-    
+
     cat(crayon::red(crayon::bold("VALIDATION ISSUES: \r\n\r\n")))
     cat(crayon::red(key))
     cat(crayon::red(messages))

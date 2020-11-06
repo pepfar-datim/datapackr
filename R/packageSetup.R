@@ -1,5 +1,5 @@
 #:TODO Move these next three methods of this into the schema and make a function of the COP Year.
-#This should NOT be hard coded here as it may and will change. 
+#This should NOT be hard coded here as it may and will change.
 #' @export
 #' @title Returns current COP Year
 #'
