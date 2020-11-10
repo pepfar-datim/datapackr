@@ -21,7 +21,8 @@ getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL) 
 
   modality_map <- datimutils::getDataElementGroupSets(groupSet,
                                     by = "id",
-                                    fields = "dataElementGroups[name,dataElements[id]]")
+                                    fields = "dataElementGroups[name,dataElements[id]]",
+                                    base_url = "https://www.datim.org/")
 
   modality_map <- modality_map$dataElementGroups[[1]]
 
