@@ -13,6 +13,6 @@ createAnalytics(d)
 Modified d object with d$data$analtyics
 }
 \description{
-Wrapper function for creation of d$data$analtyics object 
+Wrapper function for creation of d$data$analtyics object
 which is suitable for export to external analytics sytems.
 }
