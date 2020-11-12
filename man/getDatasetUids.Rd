@@ -4,7 +4,10 @@
 \alias{getDatasetUids}
 \title{getDatasetUids}
 \usage{
-getDatasetUids(fiscal_year, type = c("targets", "results", "subnat", "impatt"))
+getDatasetUids(
+  fiscal_year,
+  type = c("mer_targets", "mer_results", "subnat_targets", "subnat_results", "impatt")
+)
 }
 \arguments{
 \item{fiscal_year}{character - one of {"2019", "2020", "2021"}}
