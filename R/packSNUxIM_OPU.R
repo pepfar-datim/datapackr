@@ -38,7 +38,10 @@ packSNUxIM_OPU <- function(d) {
                        values_from = value) %>%
     
   # Double check that Dedupe cols all exist as expected
-    datapackr::addcols(cnames = c("DSD Dedupe", "TA Dedupe", "Crosswalk Dedupe")) %>%
+    datapackr::addcols(cnames = c("DSD Dedupe",
+                                  "TA Dedupe",
+                                  "Crosswalk Dedupe"),
+                       type = "numeric") %>%
   
   # Create calculated columns ####
     dplyr::mutate(
