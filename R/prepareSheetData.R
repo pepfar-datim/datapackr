@@ -25,17 +25,23 @@ prepareSheetData <- function(sheet,
   valid_disaggs <- schema %>%
     dplyr::filter(data_structure == "normal"
                   & sheet_name == sheet
-                  & col_type == "target") %>%
-    dplyr::select(valid_ages, valid_sexes, valid_kps) %>%
-    unique() %>%
-    tidyr::unnest(valid_ages, .drop = FALSE, .sep = ".") %>%
-    tidyr::unnest(valid_sexes, .drop = FALSE, .sep = ".") %>%
-    tidyr::unnest(valid_kps, .drop = FALSE, .sep = ".") %>%
-    unique() %>%
-    dplyr::rename(Age = valid_ages.name,
-                  Sex = valid_sexes.name,
-                  KeyPop = valid_kps.name) %>%
-    dplyr::arrange(Age, Sex, KeyPop)
+                  & col_type == "target")
+  
+  if (NROW(valid_disaggs) > 0) {
+    valid_disaggs %<>%
+      dplyr::select(valid_ages, valid_sexes, valid_kps) %>%
+      unique() %>%
+      tidyr::unnest(valid_ages, .drop = FALSE, .sep = ".") %>%
+      tidyr::unnest(valid_sexes, .drop = FALSE, .sep = ".") %>%
+      tidyr::unnest(valid_kps, .drop = FALSE, .sep = ".") %>%
+      unique() %>%
+      dplyr::rename(Age = valid_ages.name,
+                    Sex = valid_sexes.name,
+                    KeyPop = valid_kps.name) %>%
+      dplyr::arrange(Age, Sex, KeyPop)
+  } else {valid_disaggs = tibble::tribble(
+    ~Age, ~Sex, ~KeyPop, ~valid_ages.id, ~valid_sexes.id, ~valid_kps.id,
+    NA_character_, NA_character_, NA_character_, NA_character_, NA_character_, NA_character_)}
 
   # Cross PSNUs and disaggs ####
   row_headers <- org_units %>%
@@ -44,7 +50,7 @@ prepareSheetData <- function(sheet,
       AgeCoarse = dplyr::case_when(
         sheet == "OVC" ~ dplyr::case_when(
           Age %in% c("<01","01-04","05-09","10-14","15-17","<18") ~ "<18",
-          Age %in% c("18-24","25+","18+") ~ "18+"),
+          Age %in% c("18-24","25+","18+", "18-20") ~ "18+"),
         TRUE ~ dplyr::case_when(
           Age %in% c("<01","01-04","05-09","10-14","<15") ~ "<15",
           Age %in% c("15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+","15+") ~ "15+")

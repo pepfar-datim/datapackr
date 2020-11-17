@@ -42,7 +42,7 @@ unPackSchema_datapack <- function(filepath = NULL,
 
   schema %<>%
     dplyr::filter(sheet_name %in% verbose_sheets,
-                  row %in% c(5:(headerRow(type, cop_year)+1))) %>%
+                  row %in% c(5:(headerRow(type, cop_year)+1)))
     
   # # Correctly enter array formulas ####
   #   dplyr::mutate(
@@ -53,6 +53,7 @@ unPackSchema_datapack <- function(filepath = NULL,
   #   ) %>%
 
   # Gather and Spread to get formula, value, and indicator_code in separate cols ####
+  schema %<>%
     tidyr::gather(key,value,-sheet_num,-sheet_name,-col,-row) %>%
     tidyr::unite(new.col, c(key,row)) %>%
     tidyr::spread(new.col,value) %>%
@@ -69,9 +70,10 @@ unPackSchema_datapack <- function(filepath = NULL,
                   valid_kps = character_13,
                   indicator_code = character_14,
                   formula = formula_15,
-                  value = numeric_15) %>%
+                  value = numeric_15)
 
   # When formula is empty, pull from value (Assumed value) ####
+  schema %<>%
     dplyr::mutate(formula = dplyr::if_else(is.na(formula), value, formula))
     
   # For OPU Data Packs, delete everything in metadata rows/cols
@@ -103,41 +105,61 @@ unPackSchema_datapack <- function(filepath = NULL,
     
     
   } else {
-    valid_COs <- getValidCategoryOptions(cop_year = cop_year)
-  
-    disaggs <- valid_COs %>%
-      dplyr::select(name = datapack_disagg, id, group = datapack_schema_group) %>%
-      dplyr::filter(group != "") %>%
-      tidyr::separate_rows(group, sep = ",") %>%
-      dplyr::arrange(group, name) %>%
-      dplyr::group_by(group) %>%
-      tidyr::nest(options = c(name,id)) %>%
-      tibble::deframe()
+    map_datapack_cogs <- 
+      datimutils::getMetadata(categoryOptionGroups,
+                              fields = "id,name,categoryOptions[id,name]",
+                              "groupSets.name:like:COP 21 Data Pack")
+    
+    # Left-Pad digits with zeros
+    pad <- function(digit) {padded <- paste0("0", digit)}
+    
+    map_datapack_cogs %<>%
+      dplyr::mutate(
+        categoryOptions = purrr::map(
+          categoryOptions,
+          ~ .x %>%
+              dplyr::mutate(
+                name = stringr::str_replace_all(name, "(?<!\\d)\\d(?!\\d)", pad))
+        )
+      )
+    
+    # Add disagg lists to schema ####
+    map_datapack_cogs %<>%
+      dplyr::select(-id) %>%
+      dplyr::rename(datapack_cog = name) %>%
+      tidyr::unnest(cols = categoryOptions) %>%
+      dplyr::distinct() %>%
+      dplyr::arrange(datapack_cog, name) %>%
+      dplyr::group_by(datapack_cog) %>%
+      tidyr::nest(options = c(name,id))
+    
+    # TODO: Add test to make sure Data Pack COGs match the above list
+    
+    schema %<>%
+      dplyr::left_join(
+        map_datapack_cogs %>% dplyr::rename(valid_ages.options = options),
+        by = c("valid_ages" = "datapack_cog")
+      ) %>%
+      dplyr::left_join(
+        map_datapack_cogs %>% dplyr::rename(valid_sexes.options = options),
+        by = c("valid_sexes" = "datapack_cog")
+      ) %>%
+      dplyr::left_join(
+        map_datapack_cogs %>% dplyr::rename(valid_kps.options = options),
+        by = c("valid_kps" = "datapack_cog")
+      )
   
     schema %<>%
       dplyr::mutate(
         valid_ages.options = dplyr::case_when(
-          valid_ages == "5 yr" ~ list(disaggs$`5yr`),
-          valid_ages == "5 yr, 25-49" ~ list(disaggs$`25-49`),
-          valid_ages == "15s" ~ list(disaggs$coarse),
-          valid_ages == "5 yr, 1+" ~ list(disaggs$`01+`),
-          valid_ages == "5 yr, 15+" ~ list(disaggs$`15+`),
-          valid_ages == "5 yr, 10+" ~ list(disaggs$`10+`),
-          valid_ages == "5 yr, <01-18+" ~ list(disaggs$ovc_serv),
-          valid_ages == "5 yr, <01-17" ~ list(disaggs$ovc_hiv_stat),
-          valid_ages == "01-04" ~ list(disaggs$`01-04`),
-          valid_ages == "<01" ~ list(disaggs$`<01`),
+          !is.na(valid_ages) ~ valid_ages.options,
           TRUE ~ empty),
         valid_sexes.options = dplyr::case_when(
-          valid_sexes == "M/F" ~ list(disaggs$`M/F`),
-          valid_sexes == "M" ~ list(disaggs$`M/F`[disaggs$`M/F`$name == "Male",]),
-          valid_sexes == "F" ~ list(disaggs$`M/F`[disaggs$`M/F`$name == "Female",]),
+          !is.na(valid_sexes) ~ valid_sexes.options,
           TRUE ~ empty),
         valid_kps.options = dplyr::case_when(
-          valid_kps == "coarseKPs" ~ list(disaggs$coarseKPs),
-          valid_kps == "fineKPs" ~ list(disaggs$fineKPs),
-          valid_kps == "pwidKPs" ~ list(disaggs$pwidKPs),
-          TRUE ~ empty)
+          !is.na(valid_kps) ~ valid_kps.options,
+          TRUE ~ empty),
         )
   }
   
@@ -227,6 +249,8 @@ unPackSchema_datapack <- function(filepath = NULL,
     dplyr::pull()
 
   #TODO: Add check to make sure T, T_1, and R map correctly to rows 5-13
+  #TODO: Add check for any #REF in formulas
+  #TODO: Add check for duplicate indicator_codes in row 14
 
   tests <- schema %>%
 
@@ -277,19 +301,16 @@ unPackSchema_datapack <- function(filepath = NULL,
 
   ## Test valid_ages ####
       valid_ages.test =
-       !(valid_ages %in% disaggs | valid_ages %in% empty),
+       !(valid_ages %in% map_datapack_cogs$options | valid_ages %in% empty),
 
   ## Test valid_sexes ####
       valid_sexes.test =
-        !valid_sexes %in% c(list(disaggs$`M/F`),
-                            list(disaggs$`M/F`[disaggs$`M/F`$name == "Male",]),
-                            list(disaggs$`M/F`[disaggs$`M/F`$name == "Female",]),
+        !valid_sexes %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog %in% c("Females","Males","M/F")],
                             empty),
 
   ## Test valid_kps
       valid_kps.test =
-        !valid_kps %in% c(list(disaggs$fineKPs),list(disaggs$coarseKPs),
-                          list(disaggs$pwidKPs),empty)
+        !valid_kps %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog == "Coarse KPs"],empty)
     ) %>%
     dplyr::select(sheet_name,indicator_code,dplyr::matches("test")) %>%
     {if (type == "OPU Data Pack Template") dplyr::select(., -dataset.test, -col_type.test, -value_type.test) else .} %>%
@@ -306,7 +327,7 @@ unPackSchema_datapack <- function(filepath = NULL,
         print(as.data.frame(tests), row.names = FALSE)
       )
 
-    stop(
+    warning(
       paste0(
         "ERROR! Issues with schema values!\n\t",
         paste(stop_msg, collapse = "\n\t"),
