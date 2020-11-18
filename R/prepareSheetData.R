@@ -57,7 +57,7 @@ prepareSheetData <- function(sheet,
       )
     ) %>%
     dplyr::select(
-      PSNU, Age, Sex, KeyPop, AgeCoarse,
+      SNU1 = snu1, PSNU, Age, Sex, KeyPop, AgeCoarse,
       psnu_uid, valid_ages.id, valid_sexes.id, valid_kps.id) %>%
     dplyr::arrange_at(dplyr::vars(dplyr::everything()))
 
