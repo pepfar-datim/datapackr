@@ -2,6 +2,7 @@ library(datapackr)
 library(magrittr)
 
 secrets <- "/Users/scott/.secrets/test-mer2.json"
+#secrets <- "/Users/scott/.secrets/cop-test.json"
 
 datapackr::loginToDATIM(secrets)
 
@@ -61,7 +62,7 @@ batch <- tibble::tribble(
   "Togo","EIUtrKbw8PQ"                                                 #46
 )
 
-pick <- batch[c(25),]
+pick <- batch[c(18),]
 # i = 1
 
 for (i in 1:NROW(pick)) {
