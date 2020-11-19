@@ -123,21 +123,22 @@ hiv_inclusive<-getCOGSMap("ipBFu42t2sJ") %>% # HIV Test Status (Inclusive)
   dplyr::mutate(resultstatus_inclusive = stringr::str_trim(resultstatus_inclusive))
 
 
-getDEGSMap <- function(uid) {
-  
-  r <- paste0(getOption("baseurl"),"api/dataElementGroupSets/",uid,"?fields=id,name,dataElementGroups[name,dataElements[id]]&paging=false") %>%
-    URLencode(.) %>%
-    httr::GET(.) %>%
-    httr::content(.,"text") %>%
-    jsonlite::fromJSON(.,flatten = TRUE) 
-  
-  r %>%
-    purrr::pluck(.,"dataElementGroups") %>% 
-    dplyr::mutate_if(is.list, purrr::simplify_all) %>% 
-    tidyr::unnest(cols = c(dataElements)) %>%
-    dplyr::distinct() %>%
-    dplyr::mutate(type=make.names(r$name))
-  
+getDEGSMap <- function(uid, d2_session = parent.frame()$d2_default_session) {
+
+   r <-  datimutils::getDataElementGroupSets(values = uid,
+                                 by = "id",
+                                 fields = "id,name,dataElementGroups[name,dataElements[id]]",
+                                          d2_session = d2_session
+   )
+
+  name <- r[["name"]]
+  r <- r[["dataElementGroups"]][[1]]
+  r <- tidyr::unnest(r, cols = c(dataElements))
+  r <- dplyr::distinct(r)
+  r$type <- name
+  colnames(r)[colnames(r) == 'id'] <- 'dataElements'
+
+  return(r)
 }
 
 #Valid for COP20
