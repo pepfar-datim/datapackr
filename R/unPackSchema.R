@@ -201,6 +201,7 @@ unPackSchema_datapack <- function(filepath = NULL,
         )
       
     } else {stop("Cannot map valid disaggregates for that COP Year")}
+  }
   
   schema %<>%
     dplyr::select(sheet_num, sheet_name, col, indicator_code,
