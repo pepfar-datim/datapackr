@@ -71,12 +71,14 @@ createKeychainInfo <- function(submission_path = NULL,
 unPackTool <- function(submission_path = NULL,
                        tool = "Data Pack",
                        country_uids = NULL,
-                       cop_year = NULL) {
+                       cop_year = NULL,
+                       d2_session = parent.frame()$d2_default_session) {
 
   d <- createKeychainInfo(submission_path,
                      tool,
                      country_uids,
                      cop_year)
+  d$info$d2_session <- d2_session
 
   # unPack file based on type
   if (d$info$tool == "Data Pack") {
