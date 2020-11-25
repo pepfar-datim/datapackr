@@ -20,7 +20,9 @@
 #' The final message in the Console prints all warnings identified in the Data
 #' Pack being processed.
 #'
-unPackOPUDataPack <- function(d) {
+unPackOPUDataPack <- function(d,
+                              d2_session = dynGet("d2_default_session",
+                                                  inherits = TRUE)) {
 
   # Grab datapack_name from Home Page
   d$info$datapack_name <- unPackDataPackName(
@@ -45,7 +47,8 @@ unPackOPUDataPack <- function(d) {
   d <- unPackOPU_PSNUxIM(d)
   
   # Prepare data for sharing with other systems ####
-  d <- createAnalytics(d)
+  d <- createAnalytics(d,
+                       d2_session = d2_session)
   
   # Prepare SNU x IM dataset for DATIM import & validation ####
   d <- packForDATIM(d, type = "OPU PSNUxIM")
