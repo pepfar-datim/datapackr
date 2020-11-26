@@ -349,7 +349,7 @@ unPackSchema_datapack <- function(filepath = NULL,
         !valid_kps %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog == "Coarse KPs"],empty),
   
   ## Test formulas
-      formula.test = str_detect(formula, "#REF")
+      formula.test = stringr::str_detect(formula, "#REF")
     ) %>%
     dplyr::select(sheet_name,indicator_code,dplyr::matches("test")) %>%
     {if (type == "OPU Data Pack Template") dplyr::select(., -dataset.test, -col_type.test, -value_type.test) else .} %>%
