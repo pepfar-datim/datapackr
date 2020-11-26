@@ -139,5 +139,11 @@ loginToDATIM <- function(secrets = NULL) {
   options("baseurl" = s$dhis$baseurl)
   options("secrets" = secrets)
   options("maxCacheAge" = "7 days")
+  datimutils::loginToDATIM(base_url = s$dhis$baseurl,
+                              username = s$dhis$username,
+                              password = s$dhis$password)
+  assign("d2_default_session", 
+         d2_default_session, 
+         envir = parent.frame())
   DHISLogin(s)
 }
