@@ -91,7 +91,7 @@ prepareSheetData <- function(sheet,
 
   # Adjust KP_MAT data to fit inside KP tab ####
   if (sheet == "KP") {
-   sheet_data <- sheet_data %>%
+   sheet_data %<>%
      dplyr::mutate(
        kp_option_uid =
          dplyr::case_when(
@@ -102,7 +102,7 @@ prepareSheetData <- function(sheet,
        sex_option_uid = NA_character_
      )
   }
-
+  
   # Swap in model data ####
   if (!is.null(sheet_data)) {
     sheet_data_spread <- sheet_data %>%
@@ -121,6 +121,20 @@ prepareSheetData <- function(sheet,
   dataStructure %<>%
     swapColumns(., combined) %>%
     as.data.frame(.)
+  
+
+  ## Add Custom "M" Prioritization for _Military ####
+  # if (sheet == "Prioritization") {
+  #   dataStructure %<>%
+  #     dplyr::mutate(
+  #       IMPATT.PRIORITY_SNU.T_1 = as.character(IMPATT.PRIORITY_SNU.T_1),
+  #       IMPATT.PRIORITY_SNU.T_1 =
+  #         dplyr::case_when(
+  #           stringr::str_detect(PSNU, "^_Military") ~ "M",
+  #           TRUE ~ IMPATT.PRIORITY_SNU.T_1
+  #         )
+  #     )
+  # }
 
   # # Translate Prioritizations
   # if (sheet == "Prioritization") {

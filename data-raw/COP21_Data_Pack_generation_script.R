@@ -1,14 +1,13 @@
 library(datapackr)
 library(magrittr)
 
-secrets <- "/Users/scott/.secrets/test-mer2.json"
-#secrets <- "/Users/scott/.secrets/cop-test.json"
+secrets <- "/Users/scott/.secrets/cop-test.json"
 
 datapackr::loginToDATIM(secrets)
 
 output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/Data Packs"
 
-model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/model_data_pack_input_21_20201119_1_flat.rds"
+model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/model_data_pack_input_21_20201123_1_flat.rds"
 
 model_data <- readRDS(model_data_path)
 
@@ -62,7 +61,7 @@ batch <- tibble::tribble(
   "Togo","EIUtrKbw8PQ"                                                 #46
 )
 
-pick <- batch[c(18,14),]
+pick <- batch[c(18),]
 # i = 1
 
 for (i in 1:NROW(pick)) {
