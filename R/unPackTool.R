@@ -33,7 +33,7 @@ createKeychainInfo <- function(submission_path = NULL,
   # Start running log of all warning and information messages
   d$info$warning_msg <- NULL
   d$info$has_error <- FALSE
-  if (d$info$tool %in% c("Data Pack", "Data Pack Template") & d$info$cop_year %in% c("2020")) {
+  if (d$info$tool %in% c("Data Pack", "Data Pack Template") & d$info$cop_year %in% c("2020", "2021")) {
     d$info$newSNUxIM <- FALSE
     d$info$has_psnuxim <- FALSE
     d$info$missing_psnuxim_combos <- FALSE
