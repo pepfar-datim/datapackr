@@ -1,9 +1,9 @@
 ## If you've made any edits to the Excel template, rebuild package first to
 ## capture these, then run the below.
 
-secrets <- "/Users/scott/.secrets/test-mer2.json"
+secrets <- "/Users/scott/.secrets/cop-test.json"
 
-datapackr::loginToDATIM(secrets)
+datimutils::loginToDATIM(secrets)
 
 datapack_template_filepath <- system.file("extdata",
                                           "COP21_Data_Pack_Template.xlsx",
@@ -14,6 +14,11 @@ cop21_data_pack_schema <-
     filepath = datapack_template_filepath,
     skip = skip_tabs(tool = "Data Pack Template", cop_year = 2021),
     cop_year = 2021)
+
+comparison <- diffdf::diffdf(base = datapackr::cop21_data_pack_schema,
+                             compare = cop21_data_pack_schema)
+
+
 
 comparison <- compareDF::compare_df(df_new = cop21_data_pack_schema,
                                     df_old = datapackr::cop21_data_pack_schema,
