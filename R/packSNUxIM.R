@@ -10,7 +10,7 @@
 #' @return d
 #' 
 packSNUxIM <- function(d) {
-  if ( d$info$cop_year == 2020 ) {
+  if ( d$info$cop_year %in% c(2020,2021) ) {
   # Check if SNUxIM data already exists ####
     if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1,1]])) {
       d$info$has_psnuxim <- FALSE
@@ -75,16 +75,19 @@ packSNUxIM <- function(d) {
           tidyr::pivot_wider(names_from = c(mechanism_code, type),
                              values_from = percent) %>%
           dplyr::select_at(dplyr::vars(-tidyselect::one_of("NA_TA","NA_DSD"),
-                                       -psnuid, -sheet_name)) %>%
+                                       -psnuid, -sheet_name))
           
       # Allow DataPackTarget formula to lookup KP_MAT correctly ####
-          dplyr::mutate(
-            KeyPop = dplyr::case_when(
-              indicator_code == "KP_MAT.N.Sex.T" ~ paste0(Sex, " PWID"),
-              TRUE ~ KeyPop),
-            Sex = dplyr::case_when(indicator_code == "KP_MAT.N.Sex.T" ~ NA_character_,
-                                   TRUE ~ Sex)
-          )
+        if (cop_year == 2020) {
+          d$data$SNUxIM_combined %<>%  
+            dplyr::mutate(
+              KeyPop = dplyr::case_when(
+                indicator_code == "KP_MAT.N.Sex.T" ~ paste0(Sex, " PWID"),
+                TRUE ~ KeyPop),
+              Sex = dplyr::case_when(indicator_code == "KP_MAT.N.Sex.T" ~ NA_character_,
+                                     TRUE ~ Sex)
+            )
+        }
   
       # Add ID & sheet_num formulas ####
       top_rows <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
@@ -445,7 +448,7 @@ If you have any questions, please submit a Help Desk ticket at DATIM.Zendesk.com
       
     }
   } else if (d$info$cop_year == 2019) {
-    stop("Packing SNU x IM tabs is no longer supported for FY2019 Data Packs.")
+    stop("Packing SNU x IM tabs is no longer supported for COP 19 Data Packs.")
   }
   
   return(d)
