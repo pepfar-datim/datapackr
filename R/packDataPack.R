@@ -123,11 +123,9 @@ packDataPack <- function(model_data,
                                   sheets = NULL,
                                   cop_year = d$info$cop_year)
 
-  # Write SNU x IM tab ####
-  # print("Writing SNU x IM tab. This can sometimes take a few minutes...")
-  # TODO: Move this to separate function for use in shiny app
-  psnu_sheet_num <- grep("PSNUxIM",names(d$tool$wb))
-  openxlsx::sheetVisibility(d$tool$wb)[psnu_sheet_num] <- "hidden"
+  # Hide unneeded sheets ####
+  sheets_to_hide <- which(stringr::str_detect(names(d$tool$wb),"PSNUxIM|Summary"))
+  openxlsx::sheetVisibility(d$tool$wb)[sheets_to_hide] <- "hidden"
 
   # Add Styles ####
   print("Cleaning up Styles...")
