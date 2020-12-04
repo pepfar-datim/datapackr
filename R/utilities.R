@@ -370,15 +370,17 @@ currentFY <- function() {
 #'
 #' @return TRUE or FALSE
 #'
-isLoggedIn <- function() {
-  baseurl <- getOption("baseurl")
+isLoggedIn <- function(d2_session = dynGet("d2_default_session",
+                                           inherits = TRUE)) {
+  baseurl <- d2_session$base_url
 
   if (is.null(baseurl)) {
     return(FALSE)} else {
       httr::set_config(httr::config(http_version = 0))
       url <- URLencode(URL = paste0(baseurl, "api/me"))
       #Logging in here will give us a cookie to reuse
-      r <- httr::GET(url)
+      r <- httr::GET(url,
+                     handle = d2_session$handle)
       if (r$status != 200L) {
         return(FALSE)
       } else {

@@ -10,7 +10,8 @@
 #' 
 #' @return Mechs
 #' 
-getMechanismView <- function() {
+getMechanismView <- function(d2_session = dynGet("d2_default_session",
+                                                 inherits = TRUE)) {
   empty_mechs_view <- tibble::tibble(
     "mechanism_desc" = character() ,
     "mechanism_code"= character(),
@@ -23,14 +24,15 @@ getMechanismView <- function() {
     "enddate" = character()
     )
   
-  getMechanismViewFromDATIM <- function() {
-    if (!isLoggedIn()) {
+  getMechanismViewFromDATIM <- function(d2_session = dynGet("d2_default_session",
+                                                            inherits = TRUE)) {
+    if (!isLoggedIn(d2_session)) {
       warning("You are not logged in but have requested a mechanism view.")
       return(empty_mechs_view)
     } else {
-      paste0(getOption("baseurl"),
+      paste0(d2_session$base_url,
              "api/sqlViews/fgUtV6e9YIX/data.csv") %>%
-        httr::GET() %>%
+        httr::GET(handle = d2_session$handle) %>%
         httr::content(., "text") %>%
         readr::read_csv(col_names = TRUE) %>%
         dplyr::rename(
@@ -46,14 +48,14 @@ getMechanismView <- function() {
   support_files_directory <- getOption("support_files_directory")
   
   if (is.null(support_files_directory)) {
-    mechs <- getMechanismViewFromDATIM() 
+    mechs <- getMechanismViewFromDATIM(d2_session = d2_session) 
   } else {
       
     cached_mechs_path <- paste0(support_files_directory,"mechs.rds")
     
     if (file.access(cached_mechs_path, 4) == 0) {
       mechs <- readRDS(cached_mechs_path)
-    } else {mechs <- getMechanismViewFromDATIM()}
+    } else {mechs <- getMechanismViewFromDATIM(d2_session = d2_session)}
     
   }
   
@@ -77,9 +79,11 @@ getMechanismView <- function() {
 #' 
 #' @return Modified data object
 #' 
-adornMechanisms <- function(data) {
+adornMechanisms <- function(data,
+                            d2_session = dynGet("d2_default_session",
+                                                inherits = TRUE)) {
   
-  mechs <- getMechanismView() %>% 
+  mechs <- getMechanismView(d2_session = d2_session) %>% 
     dplyr::select(-ou, -startdate, -enddate)
   
   data %<>%

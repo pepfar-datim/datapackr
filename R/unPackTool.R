@@ -71,8 +71,9 @@ createKeychainInfo <- function(submission_path = NULL,
 unPackTool <- function(submission_path = NULL,
                        tool = "Data Pack",
                        country_uids = NULL,
-                       cop_year = NULL) {
-
+                       cop_year = NULL,
+                       d2_session = dynGet("d2_default_session",
+                                           inherits = TRUE)) {
   d <- createKeychainInfo(submission_path,
                      tool,
                      country_uids,
@@ -82,7 +83,8 @@ unPackTool <- function(submission_path = NULL,
   if (d$info$tool == "Data Pack") {
     d <- unPackDataPack(d)
   } else if (d$info$tool == "OPU Data Pack") {
-    d <- unPackOPUDataPack(d)
+    d <- unPackOPUDataPack(d,
+                           d2_session = d2_session)
   } else {stop("Selected tool not currently supported.")}
 
   # If warnings, show all grouped by sheet and issue
