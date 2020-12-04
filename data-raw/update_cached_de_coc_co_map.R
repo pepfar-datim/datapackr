@@ -1,5 +1,4 @@
-secrets <- "/home/jason/.secrets/datim.json"
-loginToDATIM(secrets)
+datimutils::loginToDATIM("~/.secrets/cop-test.json")
 
 cop_year = getCurrentCOPYear()
 
