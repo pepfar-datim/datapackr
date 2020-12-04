@@ -79,6 +79,11 @@ unPackDataPackSheet <- function(d, sheet) {
   # Filter by what's in submission to avoid unknown column warning messages
                   & indicator_code %in% colnames(d$data$extract)) %>%
     dplyr::pull(indicator_code)
+  
+  if (NROW(target_cols) == 0) {
+    d$data$extract <- NULL
+    return(d)
+  }
 
   # Add cols to allow compiling with other sheets ####
   d$data$extract %<>%
