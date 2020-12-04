@@ -433,8 +433,8 @@ unPackOPU_PSNUxIM <- function(d) {
   
   d$data$extract %<>%
     dplyr::mutate(
-      DSD_count = rowSums(dplyr::select(., tidyselect::matches("\\d{4,6}_DSD")) > 1, na.rm = TRUE),
-      TA_count = rowSums(dplyr::select(., tidyselect::matches("\\d{4,6}_TA")) > 1, na.rm = TRUE),
+      DSD_count = rowSums(dplyr::select(., tidyselect::matches("\\d{4,6}_DSD")) >= 1, na.rm = TRUE),
+      TA_count = rowSums(dplyr::select(., tidyselect::matches("\\d{4,6}_TA")) >= 1, na.rm = TRUE),
       Total_count = DSD_count + TA_count,
       `DSD Dedupe` = dplyr::case_when(
         DSD_count <= 1 ~ NA_real_,
