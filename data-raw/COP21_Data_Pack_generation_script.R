@@ -7,7 +7,7 @@ datapackr::loginToDATIM(secrets)
 
 output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/Data Packs"
 
-model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/model_data_pack_input_21_20201123_1_flat.rds"
+model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/model_data_pack_input_21_20201202_1_flat.rds"
 
 model_data <- readRDS(model_data_path)
 
@@ -61,7 +61,8 @@ batch <- tibble::tribble(
   "Togo","EIUtrKbw8PQ"                                                 #46
 )
 
-pick <- batch[c(18),]
+#pick <- batch[c(18),]
+pick <- batch[c(16,18,20,21,24,25,28,41,42,43,45),]
 # i = 1
 
 for (i in 1:NROW(pick)) {
