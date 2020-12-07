@@ -206,7 +206,8 @@ unPackOPU_PSNUxIM <- function(d) {
   
   rowMax <- function(df, cn, regex) {
       df[[cn]] <- df %>%
-        dplyr::select(tidyselect::matches(match = regex)) %>%
+        dplyr::select(tidyselect::matches(match = regex)) %>% 
+        dplyr::mutate(default = 0) %>% # included to make sure there is at least 1 column 
         purrr::pmap(pmax, na.rm = T) %>%
         as.numeric
 
