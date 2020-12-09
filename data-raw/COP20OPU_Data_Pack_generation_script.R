@@ -1,7 +1,7 @@
 library(datapackr)
 library(magrittr)
 
-datimutils::loginToDATIM("~/.secrets/datim.json")
+datapackr::loginToDATIM("~/.secrets/datim.json")
 
 output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/COP20 OPUs/Test Packs"
 
@@ -55,7 +55,7 @@ batch <- tibble::tribble(
   "Togo","EIUtrKbw8PQ"                                                 #46
 )
 
-pick <- batch[c(12),]
+pick <- batch[c(14),]
 # i = 1
 
 for (i in 1:NROW(pick)) {

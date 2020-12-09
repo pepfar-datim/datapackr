@@ -45,9 +45,9 @@ packSNUxIM_OPU <- function(d) {
   
   # Create calculated columns ####
     dplyr::mutate(
-      `Total Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{5,}")), na.rm = TRUE),
-      `DSD Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{5,}_DSD")), na.rm = TRUE),
-      `TA Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{5,}_TA")), na.rm = TRUE)) %>%
+      `Total Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}")), na.rm = TRUE),
+      `DSD Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_DSD")), na.rm = TRUE),
+      `TA Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_TA")), na.rm = TRUE)) %>%
     dplyr::mutate(
       `Deduplicated DSD Rollup` =
         rowSums(dplyr::select(., tidyselect::all_of(c("DSD Duplicated Rollup","DSD Dedupe"))),
@@ -100,11 +100,11 @@ packSNUxIM_OPU <- function(d) {
   
   # data %<>%
   #   rowMax(cn = "Min Deduplicated TA Rollup.updated",
-  #          regex = "\\d{5,}_TA\\.updated") %>%
+  #          regex = "\\d{4,}_TA\\.updated") %>%
   #   rowMax(cn = "Min Deduplicated DSD Rollup.updated",
-  #          regex = "\\d{5,}_DSD\\.updated") %>%
+  #          regex = "\\d{4,}_DSD\\.updated") %>%
     # rowMax(cn = "Min Total Deduplicated Rollup.updated",
-    #        regex = "\\d{5,}_TA\\.updated") %>%
+    #        regex = "\\d{4,}_TA\\.updated") %>%
     # dplyr::mutate(
       # `Min Total Deduplicated Rollup.updated` =
       #   pmax(`Deduplicated DSD Rollup.updated`, `Deduplicated TA Rollup.updated`, na.rm = T),
