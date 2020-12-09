@@ -129,7 +129,7 @@ unPackOPU_PSNUxIM <- function(d) {
 
   attr(d$tests$duplicate_cols, "test_name") <- "Duplicate columns"
   
-  if (length(d$tests$duplicate_cols) > 0) {
+  if (NROW(d$tests$duplicate_cols) > 0) {
     warning_msg <-
       paste0(
         "WARNING! In tab ",
