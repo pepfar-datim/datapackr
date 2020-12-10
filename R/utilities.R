@@ -460,6 +460,7 @@ getDatasetUids <-  function(fiscal_year,
     if ("mer_targets" %in% type) {
       datasets <- c(datasets,
                     "YfZot37BbTm", # MER Target Setting: PSNU (Facility and Community Combined)
+                    "cihuwjoY5xP", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
                     "wvnouBMuLuE") # Host Country Targets: DREAMS (USG)
     }
     if ("mer_results" %in% type) {
@@ -480,7 +481,7 @@ getDatasetUids <-  function(fiscal_year,
     if("mer_targets" %in% type) {
       datasets <- c(datasets,
                     "Pmc0yYAIi1t", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2021
-                    "s1sxJuqXsvV")  # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
+                    "s1sxJuqXsvV")  # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY) FY2021
     }
     if("mer_results" %in% type) {
       datasets <- c(datasets,
