@@ -336,17 +336,17 @@ unPackSchema_datapack <- function(filepath = NULL,
         & (sheet_num %in% skip_sheets_num & !is.na(value_type)),
 
   ## Test valid_ages ####
-      valid_ages.test =
-       !(valid_ages %in% map_datapack_cogs$options | valid_ages %in% empty),
-
-  ## Test valid_sexes ####
-      valid_sexes.test =
-        !valid_sexes %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog %in% c("Females","Males","M/F")],
-                            empty),
-
-  ## Test valid_kps
-      valid_kps.test =
-        !valid_kps %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog == "Coarse KPs"],empty),
+  #     valid_ages.test =
+  #      !(valid_ages %in% map_datapack_cogs$options | valid_ages %in% empty),
+  # 
+  # ## Test valid_sexes ####
+  #     valid_sexes.test =
+  #       !valid_sexes %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog %in% c("Females","Males","M/F")],
+  #                           empty),
+  # 
+  # ## Test valid_kps
+  #     valid_kps.test =
+  #       !valid_kps %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog == "Coarse KPs"],empty),
   
   ## Test formulas
       formula.test = stringr::str_detect(formula, "#REF")
