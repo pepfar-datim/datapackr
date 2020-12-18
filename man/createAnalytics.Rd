@@ -4,7 +4,7 @@
 \alias{createAnalytics}
 \title{createAnalytics(d)}
 \usage{
-createAnalytics(d)
+createAnalytics(d, d2_session = dynGet("d2_default_session", inherits = TRUE))
 }
 \arguments{
 \item{d}{Datapackr object}

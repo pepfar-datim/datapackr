@@ -4,7 +4,7 @@
 \alias{isLoggedIn}
 \title{Determine whether the user is logged into DATIM or not.}
 \usage{
-isLoggedIn()
+isLoggedIn(d2_session = dynGet("d2_default_session", inherits = TRUE))
 }
 \value{
 TRUE or FALSE

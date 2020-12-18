@@ -4,7 +4,10 @@
 \alias{unPackOPUDataPack}
 \title{Unpack a submitted OPU Data Pack}
 \usage{
-unPackOPUDataPack(d)
+unPackOPUDataPack(
+  d,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
 \item{d}{datapackr sidecar}
