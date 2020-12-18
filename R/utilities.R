@@ -454,7 +454,7 @@ getDatasetUids <-  function(fiscal_year,
                             type = c("mer_targets", "mer_results",
                                      "subnat_targets", "subnat_results",
                                      "impatt")){
-  
+
   datasets = character(0)
   if (fiscal_year == "2022") {
     if ("mer_targets" %in% type) {
@@ -499,7 +499,7 @@ getDatasetUids <-  function(fiscal_year,
     if("subnat_results" %in% type) {
       datasets <- c(datasets,
                     "xiTCzZJ2GPP") #Host Country Results: COP Prioritization SNU (USG)
-      
+
     }
     if("impatt" %in% type) {
       datasets <- c(datasets,
