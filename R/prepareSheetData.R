@@ -108,7 +108,11 @@ prepareSheetData <- function(sheet,
       dplyr::filter(indicator_code == "DREAMS_SNU.Flag") %>%
       tidyr::spread(key = indicator_code,
                     value = value) %>%
-      dplyr::select(-age_option_uid, -sex_option_uid, -kp_option_uid)
+      dplyr::select(-age_option_uid, -sex_option_uid, -kp_option_uid) %>%
+      dplyr::mutate(
+        DREAMS_SNU.Flag = as.character(DREAMS_SNU.Flag),
+        DREAMS_SNU.Flag = stringr::str_replace(DREAMS_SNU.Flag,"1","Y")
+      )
     
     sheet_data %<>%
       dplyr::filter(indicator_code != "DREAMS_SNU.Flag")
@@ -119,12 +123,6 @@ prepareSheetData <- function(sheet,
     sheet_data_spread <- sheet_data %>%
       tidyr::spread(key = indicator_code,
                     value = value)
-    
-    if (sheet == "OVC") {
-      sheet_data_spread %<>%
-        dplyr::left_join(
-          DREAMS_FLAG, by = c("psnu_uid" = "psnu_uid"))
-    }
 
     combined <- row_headers %>%
       dplyr::left_join(
@@ -133,6 +131,13 @@ prepareSheetData <- function(sheet,
                "valid_ages.id" = "age_option_uid",
                "valid_sexes.id" = "sex_option_uid",
                "valid_kps.id" = "kp_option_uid"))
+    
+    if (sheet == "OVC") {
+      combined %<>%
+        dplyr::left_join(
+          DREAMS_FLAG, by = c("psnu_uid" = "psnu_uid"))
+    }
+    
   } else {combined = row_headers}
 
   dataStructure %<>%
