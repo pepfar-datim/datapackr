@@ -86,7 +86,7 @@ api_fields <- function(api_call, fields) {
 #' 
 api_get <- function(api_call) {
   r <- api_call %>%
-    httr::GET() %>%
+    httr::GET(httr::timeout(180)) %>%
     httr::content(., "text") %>%
     jsonlite::fromJSON(., flatten = TRUE) %>%
     do.call(rbind.data.frame, .)
@@ -121,7 +121,7 @@ api_sql_call <- function(sqlView, var = NULL) {
     
   r <- 
     URL %>%
-    httr::GET() %>%
+    httr::GET(httr::timeout(180)) %>%
     httr::content(., "text") %>%
     readr::read_csv()
     

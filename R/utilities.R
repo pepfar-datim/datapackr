@@ -72,7 +72,7 @@ getIMPATTLevels <- function(){
   impatt_levels <-
     paste0(getOption("baseurl"),"api/",datapackr::api_version(),
            "/dataStore/dataSetAssignments/orgUnitLevels") %>%
-    httr::GET() %>%
+    httr::GET(httr::timeout(180)) %>%
     httr::content(., "text") %>%
     jsonlite::fromJSON(., flatten = TRUE) %>%
     do.call(rbind.data.frame, .) %>%
@@ -122,7 +122,7 @@ getMilitaryNodes <- function() {
       "&filter=name:$ilike:_Military",
       #"&filter=organisationUnitGroups.id:eq:nwQbMeALRjL", (New _Mil nodes not here...)
       "&fields=name,id,level,ancestors[id,name]") %>%
-    httr::GET() %>%
+    httr::GET(httr::timeout(180)) %>%
     httr::content(., "text") %>%
     jsonlite::fromJSON(., flatten = TRUE) %>%
     do.call(rbind.data.frame, .) %>%
@@ -380,6 +380,7 @@ isLoggedIn <- function(d2_session = dynGet("d2_default_session",
       url <- URLencode(URL = paste0(baseurl, "api/me"))
       #Logging in here will give us a cookie to reuse
       r <- httr::GET(url,
+                     httr::timeout(180),
                      handle = d2_session$handle)
       if (r$status != 200L) {
         return(FALSE)
