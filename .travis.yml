@@ -7,3 +7,4 @@ apt_packages:
  - libxml2-dev
  - libcurl3
  - libgit2-dev
+ - libsodium-dev
