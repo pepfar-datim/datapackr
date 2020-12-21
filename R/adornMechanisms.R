@@ -32,7 +32,8 @@ getMechanismView <- function(d2_session = dynGet("d2_default_session",
     } else {
       paste0(d2_session$base_url,
              "api/sqlViews/fgUtV6e9YIX/data.csv") %>%
-        httr::GET(handle = d2_session$handle) %>%
+        httr::GET(httr::timeout(180),
+                  handle = d2_session$handle) %>%
         httr::content(., "text") %>%
         readr::read_csv(col_names = TRUE) %>%
         dplyr::rename(

@@ -120,7 +120,7 @@ CountriesContained <- function(org_unit_uid, base_url = getOption("baseurl")) {
   assertthat::assert_that(stringr::str_length(org_unit_uid) == 11)
 # get list of countries using the country orgUnitGroup = cNzfcPWEGSH
   r <- paste0(base_url, "api/organisationUnitGroups/cNzfcPWEGSH.csv?fields=organisationUnits[name,id,path]") %>% 
-    httr::GET() %>% 
+    httr::GET(httr::timeout(180)) %>% 
     httr::content(as = "text") %>% 
     readr::read_csv(col_names = TRUE, col_types = readr::cols(.default = "c"))
   

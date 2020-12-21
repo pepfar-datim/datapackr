@@ -67,7 +67,7 @@ getCOGSMap<-function(uid) {
   r<-paste0(getOption("baseurl"),"api/categoryOptionGroupSets/",uid,
             "?fields=id,name,categoryOptionGroups[id,name,categoryOptions[id,name,categoryOptionCombos[id,name]]") %>%
     URLencode(.) %>%
-    httr::GET(.) %>%
+    httr::GET(., httr::timeout(180)) %>%
     httr::content(.,"text") %>%
     jsonlite::fromJSON(.,flatten = TRUE) 
   
@@ -126,7 +126,7 @@ getDEGSMap <- function(uid) {
   
   r <- paste0(getOption("baseurl"),"api/dataElementGroupSets/",uid,"?fields=id,name,dataElementGroups[name,dataElements[id]]&paging=false") %>%
     URLencode(.) %>%
-    httr::GET(.) %>%
+    httr::GET(., httr::timeout(180)) %>%
     httr::content(.,"text") %>%
     jsonlite::fromJSON(.,flatten = TRUE) 
   

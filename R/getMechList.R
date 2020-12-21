@@ -35,7 +35,7 @@ getMechList <- function(country_uids = NULL,
                ifelse(operation == "in", paste0("[",paste0(match, collapse=","),"]"), match))
         else . } %>%
       utils::URLencode() %>%
-      httr::GET() %>%
+      httr::GET(httr::timeout(180)) %>%
       httr::content(., "text") %>%
       readr::read_csv(col_types = readr::cols(.default = "c")) %>%
       dplyr::rename(

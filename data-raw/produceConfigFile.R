@@ -235,7 +235,7 @@ getPeriodInfo <- function(FY = NA) {
                 periodISO) %>%
     utils::URLencode()
 
-    r <- httr::GET(url , httr::timeout(60))
+    r <- httr::GET(url , httr::timeout(180))
     if (r$status == 200L) {
       r <- httr::content(r, "text")
       r <- jsonlite::fromJSON(r)
