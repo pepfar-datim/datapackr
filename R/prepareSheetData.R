@@ -103,11 +103,29 @@ prepareSheetData <- function(sheet,
      )
   }
   
+  if (sheet == "OVC") {
+    DREAMS_FLAG <- sheet_data %>%
+      dplyr::filter(indicator_code == "DREAMS_SNU.Flag") %>%
+      tidyr::spread(key = indicator_code,
+                    value = value) %>%
+      dplyr::select(-age_option_uid, -sex_option_uid, -kp_option_uid)
+    
+    sheet_data %<>%
+      dplyr::filter(indicator_code != "DREAMS_SNU.Flag")
+  }
+  
   # Swap in model data ####
   if (!is.null(sheet_data)) {
     sheet_data_spread <- sheet_data %>%
       tidyr::spread(key = indicator_code,
                     value = value)
+    
+    if (sheet == "OVC") {
+      sheet_data_spread %<>%
+        dplyr::left_join(
+          DREAMS_FLAG, by = c("psnu_uid" = "psnu_uid"))
+        )
+    }
 
     combined <- row_headers %>%
       dplyr::left_join(
