@@ -10,7 +10,7 @@ adornPSNUs(d)
 \item{d}{Datapackr object}
 }
 \value{
-Modified d$data$distributedMER 
+Modified d$data$distributedMER
 object with a DATIM compatible data frame for import id d$datim$MER
 }
 \description{

@@ -11,8 +11,8 @@ Mechs
 }
 \description{
 Retreives a view of mechanisms with partners and agencies
-The function will attempt to read from a cached file, if defined in 
+The function will attempt to read from a cached file, if defined in
 the support_files_directory option has been set, and the mechs.rds file
-is available to be read. Otherwise, if the user is logged in, the view 
+is available to be read. Otherwise, if the user is logged in, the view
 will be obtained from DATIM. Otherwise, an empty dataframe is returned.
 }
