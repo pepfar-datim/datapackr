@@ -7,7 +7,7 @@ datapackr::loginToDATIM(secrets)
 
 output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/Data Packs"
 
-model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/model_data_pack_input_21_20201202_1_flat.rds"
+model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/model_data_pack_input_21_20201216_1_flat.rds"
 
 model_data <- readRDS(model_data_path)
 
