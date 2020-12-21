@@ -124,7 +124,6 @@ prepareSheetData <- function(sheet,
       sheet_data_spread %<>%
         dplyr::left_join(
           DREAMS_FLAG, by = c("psnu_uid" = "psnu_uid"))
-        )
     }
 
     combined <- row_headers %>%
