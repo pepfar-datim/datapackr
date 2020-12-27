@@ -46,7 +46,11 @@ unPackDataPack <- function(d) {
   # Store schema ####
   if (d$info$cop_year == 2020) {
     d$info$schema <-  datapackr::cop20_data_pack_schema
-  } else {d$info$schema <- datapackr::data_pack_schema}
+  } else if(d$info$cop_year == 2021) {
+    d$info$schema <- datapackr::cop21_data_pack_schema 
+  } else {
+    d$info$schema <- datapackr::data_pack_schema
+  }
     
   # Check whether there exist any troublesome comments in the file
     d <- checkComments(d)
@@ -61,6 +65,7 @@ unPackDataPack <- function(d) {
     d <- separateDataSets(d)
 
   # Unpack the SNU x IM sheet ####
+    interactive_print("Unpacking the PSNUxIM tab...")
     d <- unPackSNUxIM(d)
 
   # Combine Targets with SNU x IM for PSNU x IM level targets ####

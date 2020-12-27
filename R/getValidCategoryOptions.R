@@ -12,7 +12,10 @@
 getValidCategoryOptions <- function(cop_year = getCurrentCOPYear()) {
 
   ## Pull full Code List from DATIM ####
-  fullCodeList <- pullFullCodeList(FY = cop_year +1)
+  fullCodeList <- datapackr::pullFullCodeList(FY = cop_year + 1,
+                                              datastream = c("mer_targets",
+                                                             "subnat_targets",
+                                                             "impatt"))
 
   ## Map COCs from Code List to COs
   valid_COCs_COs <- map_COCs_to_COs() %>%
@@ -83,25 +86,35 @@ getValidCategoryOptions <- function(cop_year = getCurrentCOPYear()) {
           & datapack_disagg != "50+",
         yes = paste(datapack_schema_group,"25-49",sep = ","),
         no =  datapack_schema_group),
-
-    ## ovcHIVStatAges ####
+    
+    ## 10-29 ####
       datapack_schema_group = ifelse(
-        test = categoryoptiongroup == "Age"
-          & datapack_disagg %in% c(five_year_age_names[1:4],"15-17"),
-        yes = paste(datapack_schema_group,"ovc_hiv_stat",sep = ","),
+        test = stringr::str_detect(datapack_schema_group,"5yr")
+        & (stringr::str_extract(datapack_disagg,"\\d\\d") %>% as.numeric) >= 10
+        & (stringr::str_extract(datapack_disagg,"\\d\\d") %>% as.numeric) <= 29,
+        yes = paste(datapack_schema_group,"10-29",sep = ","),
         no =  datapack_schema_group),
 
     ## ovcServAges ####
+    datapack_schema_group = ifelse(
+      test = categoryoptiongroup == "Age"
+      & datapack_disagg %in% c(five_year_age_names[1:4],"15-17","18+","18-20"),
+      yes = paste(datapack_schema_group,"ovc_serv",sep = ","),
+      no =  datapack_schema_group),
+    
+    ## ovcHIVStatAges ####
       datapack_schema_group = ifelse(
-        test = categoryoptiongroup == "Age"
-          & datapack_disagg %in% c(five_year_age_names[1:4],"15-17","18+"),
-        yes = paste(datapack_schema_group,"ovc_serv",sep = ","),
+        test = stringr::str_detect(datapack_schema_group, "ovc_serv")
+          & !datapack_disagg %in% c(five_year_age_names[1:4],"15-17"),
+        yes = paste(datapack_schema_group,"ovc_hiv_stat",sep = ","),
         no =  datapack_schema_group),
+
+    
 
     ## coarseAges ####
       datapack_schema_group = ifelse(
         test = categoryoptiongroup == "Age" & datapack_disagg %in% c("<15","15+"),
-        yes = paste(datapack_schema_group,"coarse",sep = ","),
+        yes = paste(datapack_schema_group,"15s",sep = ","),
         no = datapack_schema_group),
 
     ## EID ####
@@ -119,21 +132,21 @@ getValidCategoryOptions <- function(cop_year = getCurrentCOPYear()) {
         yes = paste(datapack_schema_group,"coarseKPs",sep = ","),
         no = datapack_schema_group),
 
-    ## fineKPs ####
-      datapack_schema_group = ifelse(
-        test = categoryoptiongroup == "Key Population"
-          & datapack_disagg %in% c("Female PWID","FSW","Male PWID","MSM not SW",
-                                  "MSM SW","TG not SW","TG SW",
-                                  "People in prisons and other enclosed settings"),
-        yes = paste(datapack_schema_group,"fineKPs",sep = ","),
-        no = datapack_schema_group),
+    # ## fineKPs ####
+    #   datapack_schema_group = ifelse(
+    #     test = categoryoptiongroup == "Key Population"
+    #       & datapack_disagg %in% c("Female PWID","FSW","Male PWID","MSM not SW",
+    #                               "MSM SW","TG not SW","TG SW",
+    #                               "People in prisons and other enclosed settings"),
+    #     yes = paste(datapack_schema_group,"fineKPs",sep = ","),
+    #     no = datapack_schema_group),
 
-    ## pwidKPs ####
-      datapack_schema_group = ifelse(
-        test = categoryoptiongroup == "Key Population"
-          & datapack_disagg %in% c("Female PWID","Male PWID"),
-        yes = paste(datapack_schema_group,"pwidKPs",sep = ","),
-        no = datapack_schema_group),
+    # ## pwidKPs ####
+    #   datapack_schema_group = ifelse(
+    #     test = categoryoptiongroup == "Key Population"
+    #       & datapack_disagg %in% c("Female PWID","Male PWID"),
+    #     yes = paste(datapack_schema_group,"pwidKPs",sep = ","),
+    #     no = datapack_schema_group),
 
     ## M/F
       datapack_schema_group = ifelse(

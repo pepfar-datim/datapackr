@@ -24,7 +24,7 @@ getDataValueSets <- function(keys, values,
   # we can disregard that warning
   #  row col   expected     actual         file
   #  1  -- 11 columns 10 columns literal data
-  datapackcommons::RetryAPI(api_call, "application/csv", max_attempts = max_attempts) %>%   
+  data <- datapackcommons::RetryAPI(api_call, "application/csv", max_attempts = max_attempts) %>%   
     httr::content(., "text") %>% 
     {suppressWarnings(readr::read_csv(., 
                                       col_names = TRUE, 
@@ -37,4 +37,6 @@ getDataValueSets <- function(keys, values,
                   attribute_option_combo = attributeoptioncombo,
                   stored_by = storedby,
                   last_updated = lastupdated)
+
+  return(data)
 }

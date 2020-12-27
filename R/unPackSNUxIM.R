@@ -14,7 +14,7 @@
 #' 
 unPackSNUxIM <- function(d) {
   
-  if (d$info$cop_year == 2020) {sheet = "PSNUxIM"} else {sheet = "SNU x IM"}
+  if (d$info$cop_year %in% c(2020,2021)) {sheet = "PSNUxIM"} else {sheet = "SNU x IM"}
   
   d$data$SNUxIM <-
     readxl::read_excel(
@@ -169,7 +169,7 @@ unPackSNUxIM <- function(d) {
       -PSNU, -indicator_code, -Age, -Sex, -KeyPop, -psnuid,
       na.rm = TRUE)
   
-  # TEST for non-numeric values
+  # TEST for non-numeric values ####
   non_numeric <- d$data$SNUxIM %>%
     dplyr::mutate(distribution_numeric = suppressWarnings(as.numeric(distribution))) %>%
     dplyr::filter(is.na(distribution_numeric)) %>%

@@ -4,7 +4,10 @@
 \alias{adornMechanisms}
 \title{adornMechanisms(data)}
 \usage{
-adornMechanisms(data)
+adornMechanisms(
+  data,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
 \item{data}{Dataset to adorn}

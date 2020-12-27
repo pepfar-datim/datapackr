@@ -11,7 +11,7 @@ map_COCs_to_COs <- function() {
   
   COCs_to_COs <- api_call("categoryOptionCombos") %>%
     api_filter("categoryCombo.name", "!like", "Funding Mechanism") %>%
-    api_fields("id,name,categoryOptions[id,name]") %>%
+    api_fields("id,name,categoryOptions[id,name],categoryCombos[id,name]") %>%
     api_get()
   
   return(COCs_to_COs)

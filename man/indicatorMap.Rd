@@ -4,7 +4,8 @@
 \name{indicatorMap}
 \alias{indicatorMap}
 \title{Map of Data Pack dataelements and categoryoptioncombos.}
-\format{\describe{
+\format{
+\describe{
   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
   \item{indicatorCode}{Code used in the Data Pack to uniquely
   identify each distinct programmatic area of target setting.}
@@ -23,7 +24,8 @@
   \item{categoryoptioncombouid}{DATIM uid used to uniquely describe the
   combination of all disaggregates (Age, Sex, KP, etc.) for each
   \code{indicatorCode}}
-}}
+}
+}
 \usage{
 indicatorMap
 }

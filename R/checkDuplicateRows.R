@@ -11,28 +11,39 @@
 #' @return d
 #' 
 checkDuplicateRows <- function(d, sheet) {
-  if (sheet %in% c("SNU x IM","PSNUxIM")) {
+  if (sheet %in% c("SNU x IM","PSNUxIM") & d$info$tool == "Data Pack") {
     data = d$data$SNUxIM
   } else {
     data = d$data$extract
   }
   
+  if (d$info$tool == "OPU Data Pack") {
+    header_cols <- d$info$schema %>%
+      dplyr::filter(
+        sheet == sheet,
+        col_type == "row_header"
+      ) %>%
+      dplyr::pull(indicator_code) %>%
+      c(., "mechCode_supportType")
+  } else {
+    header_cols <- c("PSNU", "Age", "Sex", "KeyPop", "indicator_code")
+  }
+  
   # TEST for duplicates ####
   duplicates <- data %>%
-    dplyr::select(PSNU, Age, Sex, KeyPop, indicator_code) %>%
-    dplyr::group_by(PSNU, Age, Sex, KeyPop, indicator_code) %>%
-    dplyr::summarise(n = (dplyr::n())) %>%
+    dplyr::select(tidyselect::all_of(header_cols)) %>%
+    dplyr::group_by(dplyr::across(tidyselect::everything())) %>%
+    dplyr::summarise(n = (dplyr::n()), .groups = "drop") %>%
     dplyr::filter(n > 1) %>%
-    dplyr::ungroup() %>%
+    dplyr::select(-n) %>%
     dplyr::distinct() %>%
-    dplyr::select(PSNU, Age, Sex, KeyPop) %>%
-    dplyr::distinct() %>% 
-    dplyr::mutate(sheet=sheet)
+    dplyr::arrange(dplyr::across(tidyselect::everything())) %>%
+    dplyr::mutate(sheet = sheet)
   
   if (NROW(duplicates) > 0) {
 
-    d$tests$duplicate_rows<-dplyr::bind_rows(d$tests$duplicate_rows,duplicates)
-    attr(d$tests$duplicate_rows,"test_name")<-"Duplicated rows in PSNUxIM"
+    d$tests$duplicate_rows <- dplyr::bind_rows(d$tests$duplicate_rows, duplicates)
+    attr(d$tests$duplicate_rows, "test_name") <- "Duplicated rows in PSNUxIM"
     
     dupes_msg <-
       capture.output(

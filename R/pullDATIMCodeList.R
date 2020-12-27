@@ -11,14 +11,13 @@
 pullDATIMCodeList <- function(dataset) {
   
   # TEST that dataset is valid
-  ds <- api_call("dataSets") %>%
-    api_get()
+  ds <- datimutils::getMetadata(dataSets)
   
   if (!dataset %in% ds$id) {
     stop("Invalid dataset uid provided!")
   }
   
-  print(ds$displayName[ds$id == dataset])
+  print(ds$name[ds$id == dataset])
   
   # Pull Code List
   codeList <- api_sql_call(sqlView = "DotdxKrNZxG",

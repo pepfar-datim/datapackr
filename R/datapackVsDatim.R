@@ -192,3 +192,116 @@ compareData_DatapackVsDatim <-
       deletes = data_datim_only
     )
   }
+
+
+#' @export
+#' @title compareData_OpuDatapackVsDatim
+#'
+#' @description Compares the data in a parsed data pack that would be destined for DATIM with target data in in DATIM.
+#' @param d list object - parsed data pack object
+#' @param base_url string - base address of instance (text before api/ in URL)
+#' @return  list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,
+#' $updates (import to bring DATIM up to date with datapack), $deletes
+#' (import to bring DATIM up to date with datapack)
+
+compareData_OpuDatapackVsDatim <-
+  function(d, base_url = getOption("baseurl")) {
+    
+    if(d$info$cop_year != 2020){
+      stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
+    }
+    
+    datapack_data <- d$datim$OPU
+    
+    # ensure datapack_data has the expected columns
+    if (!identical(
+      names(datapack_data),
+      c(
+        "dataElement",
+        "period",
+        "orgUnit",
+        "categoryOptionCombo",
+        "attributeOptionCombo",
+        "value"
+      )
+    )) {
+      stop("The column names of your data aren't as expected by compareData_DatapackVsDatim.")
+    }
+    
+    # rename columns to fit standards
+    datapack_data <- datapack_data %>%
+      dplyr::rename(
+        datapack_value = value,
+        data_element_uid = dataElement,
+        org_unit_uid = orgUnit,
+        category_option_combo_uid = categoryOptionCombo,
+        attribute_option_combo_code = attributeOptionCombo
+      )
+    
+
+    # Get mer target data from DATIM using data value sets
+    dataset_uids <- getDatasetUids(d$info$cop_year + 1,
+                                   c("mer_targets"))
+    
+    # package parameters for getDataValueSets function call
+    parameters <-
+      dplyr::bind_rows(
+        tibble::tibble(key = "dataSet", value = dataset_uids),
+        tibble::tibble(key = "orgUnit", value = d$info$country_uids),
+        tibble::tribble(~ key, ~ value,
+                        "children", "true",
+                        "categoryOptionComboIdScheme", "code",
+                        "includeDeleted", "false",
+                        "period", paste0(d$info$cop_year, "Oct")
+        )
+      )
+    
+    # get data from datim usinfg dataValueSets
+    # rename to standard names
+    datim_data <-
+      getDataValueSets(parameters$key,
+                       parameters$value) %>%
+      dplyr::rename(
+        datim_value = value,
+        data_element_uid = data_element,
+        org_unit_uid = org_unit,
+        category_option_combo_uid = category_option_combo,
+        attribute_option_combo_code = attribute_option_combo
+      ) %>% 
+      dplyr::select(data_element_uid,
+                    period,
+                    org_unit_uid,
+                    category_option_combo_uid,
+                    attribute_option_combo_code,
+                    datim_value)
+
+# extract dedupes from import file to handle seperatly  
+    dedupes <- dplyr::filter(datapack_data,
+                             attribute_option_combo_code %in%
+                               c("00000", "00001")) %>% 
+                               dplyr::rename(value = datapack_value)
+
+# for non dedups, extract cases where datapack and datim have different values    
+    data_differences <- dplyr::full_join(datapack_data, datim_data) %>% 
+      dplyr::filter(datapack_value != datim_value |
+                      is.na(datapack_value) |
+                      is.na(datim_value)) %>% 
+      dplyr::filter(!(attribute_option_combo_code %in%
+                      c("00000", "00001")))
+
+# cases in which datim has a value but datapack does not
+    deletes <- dplyr::filter(data_differences, is.na(datapack_value)) %>% 
+      dplyr::select(-datapack_value) %>% 
+      dplyr::rename(value = datim_value)
+    
+# cases in which datapack has a new orupdated value    
+    updates <- dplyr::filter(data_differences, !is.na(datapack_value)) %>% 
+      dplyr::select(-datim_value) %>% 
+      dplyr::rename(value = datapack_value)
+    
+    list(
+      updates = updates,
+      deletes = deletes,
+      dedupes = dedupes
+    )
+  }

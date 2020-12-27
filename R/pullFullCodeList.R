@@ -10,20 +10,35 @@
 #' 
 #' @return Combined code list as dataframe.
 #'
-pullFullCodeList <- function(FY = currentFY(), 
-                             datastream = c("MER", "SUBNAT", "IMPATT")) {
+pullFullCodeList <- function(FY = getCurrentCOPYear() + 1, 
+                             datastream = c("mer_targets", "mer_results",
+                                            "subnat_targets", "subnat_results",
+                                            "impatt")) {
   
-  if ("MER" %in% datastream) {
-    MER <- datapackr::getDatasetUids(FY, type = "targets")
-    }
-  if ("SUBNAT" %in% datastream) {
-    SUBNAT <- datapackr::getDatasetUids(FY, type = "subnat")
+  datasets_list <- character(0)
+  
+  if ("mer_targets" %in% datastream) {
+    datasets_list <- c(datasets_list,
+                       datapackr::getDatasetUids(FY, type = "mer_targets"))
+  }
+  if ("mer_results" %in% datastream) {
+    datasets_list <- c(datasets_list,
+                       datapackr::getDatasetUids(FY, type = "mer_results"))
+  }
+  if ("subnat_targets" %in% datastream) {
+    datasets_list <- c(datasets_list,
+                       datapackr::getDatasetUids(FY, type = "subnat_targets"))
+  }
+  if ("subnat_results" %in% datastream) {
+    datasets_list <- c(datasets_list,
+                       datapackr::getDatasetUids(FY, type = "subnat_results"))
   }
   if ("IMPATT" %in% datastream) {
-    IMPATT <- datapackr::getDatasetUids(FY, type = "impatt")
+    datasets_list <- c(datasets_list,
+                       datapackr::getDatasetUids(FY, type = "impatt"))
   }
   
-  datasets_list <- c(MER, SUBNAT, IMPATT)
+  datasets_list <- unique(datasets_list)
   
   ds <- data.frame()
   

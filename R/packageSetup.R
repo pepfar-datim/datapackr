@@ -1,5 +1,5 @@
 #:TODO Move these next three methods of this into the schema and make a function of the COP Year.
-#This should NOT be hard coded here as it may and will change. 
+#This should NOT be hard coded here as it may and will change.
 #' @export
 #' @title Returns current COP Year
 #'
@@ -37,7 +37,12 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
   if (tool %in% c("Data Pack", "Data Pack Template")) {
     if (cop_year == 2020) {
       skip = c("Home", "Instructions", "Summary", "Spectrum", "Spectrum IDs")
+    } else if (cop_year == 2021) {
+      skip = c("Home", "Summary", "Spectrum")
     }
+  }
+  else if (tool == "OPU Data Pack Template" & cop_year == 2020) {
+    skip = c("Home")
   } else {skip = c(NA_character_)}
 
   return(skip)
@@ -54,9 +59,10 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 #'
 headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
 
-  if (cop_year == 2020) {
-    if (tool %in% c("Data Pack", "Data Pack Template")) {header_row <- 14}
-    else stop("That tool type is not supported for that cop_year.")
+  if (cop_year %in% c(2020,2021)) {
+    if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
+      header_row <- 14
+    } else stop("That tool type is not supported for that cop_year.")
   } else stop("That cop_year is not currently supported.")
 
   return(header_row)

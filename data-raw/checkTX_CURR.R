@@ -78,7 +78,7 @@ pad <- function(digit) {padded <- paste0("0", digit)}
 
 tx_datim <- URL %>%
   utils::URLencode() %>%
-  httr::GET() %>%
+  httr::GET(httr::timeout(180)) %>%
   httr::content(., "text") %>%
   readr::read_csv() %>%
   tidyr::pivot_longer(

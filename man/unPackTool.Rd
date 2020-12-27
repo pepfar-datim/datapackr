@@ -8,7 +8,8 @@ unPackTool(
   submission_path = NULL,
   tool = "Data Pack",
   country_uids = NULL,
-  cop_year = NULL
+  cop_year = NULL,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{

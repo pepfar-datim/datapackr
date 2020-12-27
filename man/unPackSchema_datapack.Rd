@@ -7,6 +7,7 @@
 unPackSchema_datapack(
   filepath = NULL,
   skip = NULL,
+  type = "Data Pack Template",
   cop_year = getCurrentCOPYear()
 )
 }
@@ -14,6 +15,8 @@ unPackSchema_datapack(
 \item{filepath}{Local filepath for a Data Pack template (XLSX).}
 
 \item{skip}{Character vector of Sheet Names to label for skipping in schema.}
+
+\item{type}{Type of tool to unpack.}
 
 \item{cop_year}{Specifies COP year for dating as well as selection of
 templates.}

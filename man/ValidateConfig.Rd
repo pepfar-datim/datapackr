@@ -7,7 +7,7 @@
 ValidateConfig(dhis_config)
 }
 \arguments{
-\item{dhis_config}{List of DATIM login credentials, including username, 
+\item{dhis_config}{List of DATIM login credentials, including username,
 password, and login URL.}
 }
 \description{

@@ -57,10 +57,10 @@ packDataPackSheet <- function(wb,
   }
   
   # Format HIV_PREV ####
-  if (sheet == "Epi Cascade I") {
+  if (sheet %in% c("Epi Cascade I","Cascade")) {
     percentDecimalCols <- schema %>%
       dplyr::filter(sheet_name == sheet,
-                    indicator_code == "HIV_PREV.NA.Age/Sex/HIVStatus.T") %>%
+                    indicator_code %in% c("HIV_PREV.NA.Age/Sex/HIVStatus.T","HIV_PREV.T_1")) %>%
       dplyr::pull(col)
     
     percentDecimalStyle = openxlsx::createStyle(numFmt = "0.00%")

@@ -19,6 +19,8 @@ outputs to be saved. If not supplied, will output to working directory.}
     \item{\code{FAST Export}}{Data frame containing FAST export data.}
     \item{\code{SUBNAT IMPATT}}{Data frame containing SUBNAT/IMPATT data.}
     \item{\code{Results Archive}}{List object containing results archive.}
+    \item{\code{OPU Data Pack}}{Openxlsx Workbook object containing OPU Data Pack.}
+    \item{\code{Spectrum Example}}{Data frame containing example Spectrum output.}
 }}
 
 \item{datapack_name}{Name you would like associated with this Data Pack.
