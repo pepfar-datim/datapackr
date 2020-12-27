@@ -17,13 +17,15 @@
 #' 
 getPSNUs <- function(country_uids = NULL,
                      include_mil = TRUE,
+                     include_DREAMS = TRUE,
                      additional_fields = NULL) {
   
   # Pull PSNUs from DATIM ####
   PSNUs <- api_call("organisationUnits") %>%
     api_filter("organisationUnitGroups.id","in",
                paste0("AVy8gJXym2D",
-                      dplyr::if_else(include_mil, ",nwQbMeALRjL", ""))) %>%
+                      dplyr::if_else(include_mil, ",nwQbMeALRjL", ""),
+                      dplyr::if_else(include_DREAMS, ",mRRlkbZolDR", ""))) %>%
     {if (all(!is.null(country_uids)))
       api_filter(., "ancestors.id", "in", match = paste(country_uids, collapse = ","))
       else . } %>%
@@ -40,6 +42,10 @@ getPSNUs <- function(country_uids = NULL,
           stringr::str_detect(as.character(organisationUnitGroups), "nwQbMeALRjL") ~ "Military",
           stringr::str_detect(as.character(organisationUnitGroups), "cNzfcPWEGSH") ~ "Country",
           stringr::str_detect(as.character(organisationUnitGroups), "AVy8gJXym2D") ~ "SNU"),
+      DREAMS = 
+        dplyr::case_when(
+          stringr::str_detect(as.character(organisationUnitGroups), "mRRlkbZolDR") ~ "Y"
+        ),
       level_4_type = purrr::map(ancestors, list("organisationUnitGroups",4), .default = NA),
       country_name = dplyr::case_when(
         psnu_type == "Country" ~ psnu,
@@ -94,7 +100,8 @@ add_dp_psnu <- function(PSNUs) {
           paste0(country_name, " > "),
           ""),
         psnu,
-        " [#", psnu_type,"]",
+        dplyr::if_else(!is.na(psnu_type), paste0(" [#", psnu_type,"]"), ""),
+        dplyr::if_else(!is.na(DREAMS), " [#DREAMS]", ""),
         " [", psnu_uid,"]")
     )
   
