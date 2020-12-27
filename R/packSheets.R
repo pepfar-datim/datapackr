@@ -107,6 +107,19 @@ packDataPackSheets <- function(wb,
       sheet_data <- data %>%
         dplyr::filter(indicator_code %in% sheet_codes)
     } else {sheet_data = NULL}
+    
+    if (sheet == "AGYW") {
+      org_units <- datapackr::valid_PSNUs %>%
+        dplyr::filter(country_uid %in% country_uids) %>%
+        add_dp_psnu(.) %>%
+        dplyr::arrange(dp_psnu) %>%
+        dplyr::filter(!is.na(DREAMS)) %>%
+        dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)
+      
+      if (NROW(org_units) == 0) {
+        next
+      }
+    }
 
     wb <- packDataPackSheet(wb = wb,
                             sheet = sheet,
