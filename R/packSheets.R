@@ -45,7 +45,9 @@ packDataPackSheets <- function(wb,
         dplyr::filter(country_uid %in% country_uids) %>%
         add_dp_psnu(.) %>%
         dplyr::arrange(dp_psnu) %>%
-        dplyr::select(PSNU = dp_psnu, psnu_uid)
+        ## Remove DSNUs
+        dplyr::filter(!is.na(psnu_type)) %>%
+        dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)
       #TODO: Update Data Pack and here to use `OrgUnit as column header instead
       # of PSNU to allow custom org unit list.
 
@@ -109,7 +111,7 @@ packDataPackSheets <- function(wb,
     } else {sheet_data = NULL}
     
     if (sheet == "AGYW") {
-      org_units <- datapackr::valid_PSNUs %>%
+      org_unit_list <- datapackr::valid_PSNUs %>%
         dplyr::filter(country_uid %in% country_uids) %>%
         add_dp_psnu(.) %>%
         dplyr::arrange(dp_psnu) %>%
@@ -119,11 +121,11 @@ packDataPackSheets <- function(wb,
       if (NROW(org_units) == 0) {
         next
       }
-    }
+    } else {org_unit_list = org_units}
 
     wb <- packDataPackSheet(wb = wb,
                             sheet = sheet,
-                            org_units = org_units,
+                            org_units = org_unit_list,
                             schema = schema,
                             sheet_data = sheet_data,
                             cop_year = cop_year)

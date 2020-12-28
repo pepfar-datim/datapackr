@@ -106,6 +106,7 @@ packDataPack <- function(model_data,
     dplyr::filter(country_uid %in% country_uids) %>%
     add_dp_psnu(.) %>%
     dplyr::arrange(dp_psnu) %>%
+    ## Remove DSNUs
     dplyr::filter(!is.na(psnu_type)) %>%
     dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)
   
