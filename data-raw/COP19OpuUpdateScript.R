@@ -2,7 +2,7 @@ devtools::install_github("https://github.com/pepfar-datim/datapackr",
                          "COP-19-Master",
                          upgrade = FALSE)
 
-country_name = "Zambia"
+country_name = "Nigeria"
 
 require(datapackr)
 require(datimvalidation)
@@ -72,6 +72,15 @@ r <- httr::POST(url, body = updates_json[["raw_file"]],
 
 # prin import summary
 httr::content(r)
+
+site_tool <- datapackr::unPackSiteToolData(file.choose())
+data  <- site_tool$datim$site_data
+orgunit <- site_tool$info$datapack_uid
+
+compare_out <- datapackr::compareData_SiteVsDatim(data,
+                                                  orgunit,
+                                                  "2019Oct")
+
 
 datapackcommons::DHISLogin("~/.secrets/datim.json")
 prod_base_url <- getOption("baseurl")
