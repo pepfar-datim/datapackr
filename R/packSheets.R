@@ -99,6 +99,7 @@ packDataPackSheets <- function(wb,
 
   for (sheet in sheets) {
     print(sheet)
+    org_units_sheet <- org_units
     sheet_codes <- schema %>%
       dplyr::filter(sheet_name == sheet
                     & col_type %in% c("past","calculation")) %>%
@@ -111,21 +112,21 @@ packDataPackSheets <- function(wb,
     } else {sheet_data = NULL}
     
     if (sheet == "AGYW") {
-      org_unit_list <- datapackr::valid_PSNUs %>%
+      org_units_sheet <- datapackr::valid_PSNUs %>%
         dplyr::filter(country_uid %in% country_uids) %>%
         add_dp_psnu(.) %>%
         dplyr::arrange(dp_psnu) %>%
         dplyr::filter(!is.na(DREAMS)) %>%
         dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)
       
-      if (NROW(org_units) == 0) {
+      if (NROW(org_units_sheet) == 0) {
         next
       }
-    } else {org_unit_list = org_units}
+    }
 
     wb <- packDataPackSheet(wb = wb,
                             sheet = sheet,
-                            org_units = org_unit_list,
+                            org_units = org_units_sheet,
                             schema = schema,
                             sheet_data = sheet_data,
                             cop_year = cop_year)

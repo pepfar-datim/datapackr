@@ -108,11 +108,14 @@ prepareSheetData <- function(sheet,
       dplyr::filter(indicator_code == "DREAMS_SNU.Flag") %>%
       tidyr::spread(key = indicator_code,
                     value = value) %>%
-      dplyr::select(-age_option_uid, -sex_option_uid, -kp_option_uid) %>%
-      dplyr::mutate(
-        DREAMS_SNU.Flag = as.character(DREAMS_SNU.Flag),
-        DREAMS_SNU.Flag = stringr::str_replace(DREAMS_SNU.Flag,"1","Y")
-      )
+      dplyr::select(-age_option_uid, -sex_option_uid, -kp_option_uid)
+    
+    if (NROW(DREAMS_FLAG) > 0) {
+      DREAMS_FLAG <- 
+        dplyr::mutate(DREAMS_FLAG,
+                      DREAMS_SNU.Flag = as.character(DREAMS_SNU.Flag),
+                      DREAMS_SNU.Flag = stringr::str_replace(DREAMS_SNU.Flag,"1","Y"))
+    }
     
     sheet_data %<>%
       dplyr::filter(indicator_code != "DREAMS_SNU.Flag")
