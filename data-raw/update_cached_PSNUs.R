@@ -2,7 +2,7 @@
 library(magrittr)
 library(datapackr)
 
-secrets <- "/Users/scott/.secrets/datim.json"
+secrets <- "~/.secrets/datim.json"
 
 datapackr::loginToDATIM(secrets)
 
