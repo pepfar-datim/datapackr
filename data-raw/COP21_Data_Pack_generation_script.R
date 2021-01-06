@@ -61,10 +61,17 @@ batch <- tibble::tribble(
   "Togo","EIUtrKbw8PQ"                                                 #46
 )
 
-pick <- batch[c(13),]
-#pick <- batch[c(16,18,20,21,24,25,28,41,42,43,45),]
+#Beta Pack Countries list ####
+pick <- batch[c(16,18,20,21,24,25,28,41,42,43,45),]
+
+# For individual testing ####
+#pick <- batch[c(13),]
 # i = 1
 
+# For full Production run
+# for (i in 1:NROW(batch)) {  
+
+# For sub-group run
 for (i in 1:NROW(pick)) {
   print(paste0(i," of ",NROW(pick)))
 
