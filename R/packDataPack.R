@@ -127,8 +127,8 @@ packDataPack <- function(model_data,
                                   cop_year = d$info$cop_year)
 
   # Hide unneeded sheets ####
-  sheets_to_hide <- which(stringr::str_detect(names(d$tool$wb),"PSNUxIM|Summary"))
-  openxlsx::sheetVisibility(d$tool$wb)[sheets_to_hide] <- "hidden"
+  # sheets_to_hide <- which(stringr::str_detect(names(d$tool$wb),"PSNUxIM|Summary"))
+  # openxlsx::sheetVisibility(d$tool$wb)[sheets_to_hide] <- "hidden"
 
   # Add Styles ####
   print("Cleaning up Styles...")
