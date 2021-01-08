@@ -37,6 +37,7 @@ createKeychainInfo <- function(submission_path = NULL,
     d$info$newSNUxIM <- FALSE
     d$info$has_psnuxim <- FALSE
     d$info$missing_psnuxim_combos <- FALSE
+    d$info$missing_DSNUs <- FALSE
   }
 
   # Check the submission file exists and prompt for user input if not

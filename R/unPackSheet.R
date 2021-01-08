@@ -26,14 +26,14 @@ unPackDataPackSheet <- function(d, sheet) {
   # Run structural checks ####
   d <- checkColStructure(d, sheet)
 
-  # Remove duplicate columns (Take the first example)
+  # Remove duplicate columns (Take the first example) ####
   duplicate_cols <- duplicated(names(d$data$extract))
 
   if (any(duplicate_cols)) {
     d$data$extract <- d$data$extract[,-which(duplicate_cols)]
   }
 
-  # Make sure no blank column names
+  # Make sure no blank column names ####
   d$data$extract %<>%
     tibble::as_tibble(.name_repair = "unique")
 
@@ -72,7 +72,7 @@ unPackDataPackSheet <- function(d, sheet) {
     }
   }
 
-  # List Target Columns
+  # List Target Columns ####
   target_cols <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet
                   & col_type == "target"
@@ -105,14 +105,66 @@ unPackDataPackSheet <- function(d, sheet) {
   # TEST: No missing metadata ####
   d <- checkMissingMetadata(d, sheet)
   
-  # If PSNU has been deleted, drop the row
+  # If PSNU has been deleted, drop the row ####
   d$data$extract %<>%
     dplyr::filter(!is.na(PSNU))
+  
+  # TEST AGYW Tab for missing DSNUs ####
+  if (sheet == "AGYW") {
+    DataPack_DSNUs <- d$data$extract %>%
+      dplyr::select(PSNU, psnu_uid = psnuid) %>%
+      dplyr::distinct() %>%
+      dplyr::mutate(DataPack = 1)
+    
+    DATIM_DSNUs <- datapackr::valid_PSNUs %>%
+      dplyr::filter(country_uid %in% d$info$country_uids) %>%
+      add_dp_psnu(.) %>%
+      dplyr::arrange(dp_psnu) %>%
+      dplyr::filter(!is.na(DREAMS)) %>%
+      dplyr::select(PSNU = dp_psnu, psnu_uid, snu1) %>%
+      dplyr::mutate(DATIM = 1)
+    
+    DSNU_comparison <- DataPack_DSNUs %>%
+      dplyr::full_join(DATIM_DSNUs, by = "psnu_uid")
+    
+    d$tests$DSNU_comparison <- DSNU_comparison
+    attr(d$tests$DSNU_comparison,"test_name") <- "DSNU List Comparison"
+   
+    if (any(is.na(DSNU_comparison$DataPack))) {
+      missing_DSNUs <- DSNU_comparison %>%
+        dplyr::filter(is.na(DataPack))
+      
+      warning_msg <- paste0(
+        "WARNING! In tab ",
+        sheet,
+        ": MISSING DREAMS SNUs found! ->  \n\t* ",
+        paste(missing_DSNUs$PSNU.y, collapse = "\n\t* "),
+        "\n")
+      
+      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+      d$info$missing_DSNUs <- TRUE
+    } 
+    
+    if (any(is.na(DSNU_comparison$DATIM))) {
+      invalid_DSNUs <- DSNU_comparison %>%
+        dplyr::filter(is.na(DATIM))
+      
+      warning_msg <- paste0(
+        "WARNING! In tab ",
+        sheet,
+        ": INVALID DREAMS SNUs found! ->  \n\t* ",
+        paste(invalid_DSNUs$PSNU.x, collapse = "\n\t* "),
+        "\n")
+      
+      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    } 
+    
+  }
   
   # Check for Formula changes ####
   d <- checkFormulas(d, sheet)
 
-  # Gather all indicators as single column for easier processing
+  # Gather all indicators as single column for easier processing ####
   d$data$extract %<>%
     tidyr::gather(key = "indicator_code",
                   value = "value",

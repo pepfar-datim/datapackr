@@ -26,7 +26,7 @@ prepareSheetData <- function(sheet,
     dplyr::filter(data_structure == "normal"
                   & sheet_name == sheet
                   & col_type == "target")
-  
+
   if (NROW(valid_disaggs) > 0) {
     valid_disaggs %<>%
       dplyr::select(valid_ages, valid_sexes, valid_kps) %>%
@@ -102,26 +102,25 @@ prepareSheetData <- function(sheet,
        sex_option_uid = NA_character_
      )
   }
-  
+
   if (sheet == "OVC") {
     DREAMS_FLAG <- sheet_data %>%
       dplyr::filter(indicator_code == "DREAMS_SNU.Flag") %>%
       tidyr::spread(key = indicator_code,
                     value = value) %>%
       dplyr::select(-age_option_uid, -sex_option_uid, -kp_option_uid)
-    
+
     if (NROW(DREAMS_FLAG) > 0) {
-      DREAMS_FLAG <- 
+      DREAMS_FLAG <-
         dplyr::mutate(DREAMS_FLAG,
                       DREAMS_SNU.Flag = as.character(DREAMS_SNU.Flag),
-                      DREAMS_SNU.Flag = 
-                        stringr::str_replace(DREAMS_SNU.Flag,"1","Y"))
+                      DREAMS_SNU.Flag = stringr::str_replace(DREAMS_SNU.Flag,"1","Y"))
     }
-    
+
     sheet_data %<>%
       dplyr::filter(indicator_code != "DREAMS_SNU.Flag")
   }
-  
+
   # Swap in model data ####
   if (!is.null(sheet_data)) {
     sheet_data_spread <- sheet_data %>%
@@ -135,19 +134,19 @@ prepareSheetData <- function(sheet,
                "valid_ages.id" = "age_option_uid",
                "valid_sexes.id" = "sex_option_uid",
                "valid_kps.id" = "kp_option_uid"))
-    
+
     if (sheet == "OVC") {
       combined %<>%
         dplyr::left_join(
           DREAMS_FLAG, by = c("psnu_uid" = "psnu_uid"))
     }
-    
+
   } else {combined = row_headers}
 
   dataStructure %<>%
     swapColumns(., combined) %>%
     as.data.frame(.)
-  
+
 
   ## Add Custom "M" Prioritization for _Military ####
   # if (sheet == "Prioritization") {

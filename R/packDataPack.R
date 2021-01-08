@@ -106,6 +106,7 @@ packDataPack <- function(model_data,
     dplyr::filter(country_uid %in% country_uids) %>%
     add_dp_psnu(.) %>%
     dplyr::arrange(dp_psnu) %>%
+    ## Remove DSNUs
     dplyr::filter(!is.na(psnu_type)) %>%
     dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)
   
@@ -126,8 +127,8 @@ packDataPack <- function(model_data,
                                   cop_year = d$info$cop_year)
 
   # Hide unneeded sheets ####
-  sheets_to_hide <- which(stringr::str_detect(names(d$tool$wb),"PSNUxIM|Summary"))
-  openxlsx::sheetVisibility(d$tool$wb)[sheets_to_hide] <- "hidden"
+  # sheets_to_hide <- which(stringr::str_detect(names(d$tool$wb),"PSNUxIM|Summary"))
+  # openxlsx::sheetVisibility(d$tool$wb)[sheets_to_hide] <- "hidden"
 
   # Add Styles ####
   print("Cleaning up Styles...")

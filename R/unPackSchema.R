@@ -305,15 +305,18 @@ unPackSchema_datapack <- function(filepath = NULL,
 
   ## Test Data Elements ####
       dataelement_dsd.test =
-        !stringr::str_detect(dataelement_dsd, "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$"),
+        dplyr::if_else(sheet_name == "PSNUxIM",dataelement_dsd != "NA",
+                       !stringr::str_detect(dataelement_dsd, "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$")),
       dataelement_ta.test =
-        !stringr::str_detect(dataelement_ta, "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$"),
+        dplyr::if_else(sheet_name == "PSNUxIM",dataelement_ta != "NA",
+                      !stringr::str_detect(dataelement_ta, "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$")),
 
   ## Test categoryOptions
       categoryoption.test =
-        !stringr::str_detect(
-          categoryoption_specified,
-          "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$"),
+        dplyr::if_else(sheet_name == "PSNUxIM",categoryoption_specified != "NA",
+                        !stringr::str_detect(
+                          categoryoption_specified,
+                          "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$")),
 
   ## Test datasets ####
       dataset.test =

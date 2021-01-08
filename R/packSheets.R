@@ -45,7 +45,9 @@ packDataPackSheets <- function(wb,
         dplyr::filter(country_uid %in% country_uids) %>%
         add_dp_psnu(.) %>%
         dplyr::arrange(dp_psnu) %>%
-        dplyr::select(PSNU = dp_psnu, psnu_uid)
+        ## Remove DSNUs
+        dplyr::filter(!is.na(psnu_type)) %>%
+        dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)
       #TODO: Update Data Pack and here to use `OrgUnit as column header instead
       # of PSNU to allow custom org unit list.
 
