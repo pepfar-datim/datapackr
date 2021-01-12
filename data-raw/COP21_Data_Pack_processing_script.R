@@ -1,7 +1,7 @@
 
 datapackr::loginToDATIM("~/.secrets/cop-test.json")
 
-snuxim_model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/PSNUxIM_20200207.rds"
+snuxim_model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/PSNUxIM_20201229_1.rds"
 output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment"
 #model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/model_data_pack_input_20_20200220_1_flat.rds"
 
@@ -168,4 +168,11 @@ d <- unPackTool(cop_year = 2021)
 # d <- checkAnalytics(d,
 #                    model_data_path)
  
-# d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
+d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
+
+  
+# Export DATIM import files
+  exportPackr(data = d$datim$MER,
+              output_path = output_folder,
+              type = "DATIM Export File",
+              datapack_name = d$info$datapack_name)
