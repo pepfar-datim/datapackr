@@ -18,7 +18,7 @@ map_DataPack_DATIM_DEs_COCs <- datapackr::cop21_data_pack_schema %>%
   tidyr::unnest(cols = valid_sexes, names_sep  = ".") %>%
   tidyr::unnest(cols = valid_kps, names_sep  = ".") %>%
   dplyr::mutate_at(c("valid_sexes.name","valid_ages.name","valid_ages.id","valid_sexes.id"),
-                   ~dplyr::case_when(indicator_code == "OVC_HIVSTAT.N.total.T"
+                   ~dplyr::case_when(indicator_code == "OVC_HIVSTAT.T"
                                      ~ NA_character_,
                                      TRUE ~ .)) %>%
   dplyr::distinct() %>%
