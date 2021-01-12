@@ -6,6 +6,7 @@
 #'     issues, checking data against DATIM validations, and extracting data.
 #'
 #' @param d Datapackr object
+#' @param d2_session DHIS2 Session ID
 #'
 #' @details
 #' Executes the following operations in relation to a submitted Data Pack:
@@ -30,7 +31,8 @@
 #' The final message in the Console prints all warnings identified in the Data
 #' Pack being processed.
 #'
-unPackDataPack <- function(d) {
+unPackDataPack <- function(d,
+                           d2_session) {
   
   # Grab datapack_name from Home Page
     d$info$datapack_name <- unPackDataPackName(

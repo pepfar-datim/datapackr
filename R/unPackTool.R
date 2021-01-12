@@ -82,7 +82,8 @@ unPackTool <- function(submission_path = NULL,
 
   # unPack file based on type
   if (d$info$tool == "Data Pack") {
-    d <- unPackDataPack(d)
+    d <- unPackDataPack(d,
+                        d2_session = d2_session)
   } else if (d$info$tool == "OPU Data Pack") {
     d <- unPackOPUDataPack(d,
                            d2_session = d2_session)
