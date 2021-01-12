@@ -26,12 +26,12 @@ checkDuplicateRows <- function(d, sheet) {
       dplyr::pull(indicator_code) %>%
       c(., "mechCode_supportType")
   } else {
-    header_cols <- c("PSNU", "Age", "Sex", "KeyPop", "indicator_code")
+    header_cols <- c("PSNU", "Age", "Sex", "KeyPop", "indicator_code", "mechCode_supportType")
   }
   
   # TEST for duplicates ####
   duplicates <- data %>%
-    dplyr::select(tidyselect::all_of(header_cols)) %>%
+    dplyr::select(tidyselect::any_of(header_cols)) %>%
     dplyr::group_by(dplyr::across(tidyselect::everything())) %>%
     dplyr::summarise(n = (dplyr::n()), .groups = "drop") %>%
     dplyr::filter(n > 1) %>%
@@ -43,7 +43,7 @@ checkDuplicateRows <- function(d, sheet) {
   if (NROW(duplicates) > 0) {
 
     d$tests$duplicate_rows <- dplyr::bind_rows(d$tests$duplicate_rows, duplicates)
-    attr(d$tests$duplicate_rows, "test_name") <- "Duplicated rows in PSNUxIM"
+    attr(d$tests$duplicate_rows, "test_name") <- "Duplicated rows"
     
     dupes_msg <-
       capture.output(
