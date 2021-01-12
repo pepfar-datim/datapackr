@@ -95,8 +95,15 @@ packSNUxIM <- function(d) {
     
   # Create Max columns
   rowMax <- function(df, cn, regex) {
-    df[[cn]] <- df %>%
-      dplyr::select(tidyselect::matches(match = regex)) %>%
+    df_filtered <- df %>%
+      dplyr::select(tidyselect::matches(match = regex))
+    
+    if (NCOL(df_filtered) == 0) {
+      df[[cn]] <- NA_integer_
+      return(df)
+    }
+    
+    df[[cn]] <- df_filtered %>%
       purrr::pmap(pmax, na.rm = T) %>%
       as.numeric
     
