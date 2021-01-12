@@ -22,7 +22,24 @@ map_DataPack_DATIM_DEs_COCs <- datapackr::cop21_data_pack_schema %>%
                                      ~ NA_character_,
                                      TRUE ~ .)) %>%
   dplyr::distinct() %>%
-  dplyr::mutate(categoryoption_specified = stringr::str_split(categoryoption_specified, "[.]")) %>%
+  dplyr::mutate(categoryoption_specified = stringr::str_split(categoryoption_specified, "[.]"),
+                dataelement_dsd = dplyr::case_when(
+                  indicator_code %in% c("OVC_SERV.Active.T","OVC_SERV.Grad.T")
+                    & valid_ages.id == "Q6xWcyHDq6e"
+                  ~ stringr::str_extract(dataelement_dsd, "(?<=\\.)([A-Za-z][A-Za-z0-9]{10})$"),
+                  indicator_code %in% c("OVC_SERV.Active.T","OVC_SERV.Grad.T")
+                    & valid_ages.id != "Q6xWcyHDq6e"
+                  ~ stringr::str_extract(dataelement_dsd, "^([A-Za-z][A-Za-z0-9]{10})(?=\\.)"),
+                  TRUE ~ dataelement_dsd),
+                dataelement_ta = dplyr::case_when(
+                  indicator_code %in% c("OVC_SERV.Active.T","OVC_SERV.Grad.T")
+                  & valid_ages.id == "Q6xWcyHDq6e"
+                  ~ stringr::str_extract(dataelement_ta, "(?<=\\.)([A-Za-z][A-Za-z0-9]{10})$"),
+                  indicator_code %in% c("OVC_SERV.Active.T","OVC_SERV.Grad.T")
+                  & valid_ages.id != "Q6xWcyHDq6e"
+                  ~ stringr::str_extract(dataelement_ta, "^([A-Za-z][A-Za-z0-9]{10})(?=\\.)"),
+                  TRUE ~ dataelement_ta)
+                ) %>%
   dplyr::mutate(
     valid_kps.id =
       dplyr::case_when(
