@@ -173,6 +173,11 @@ unPackDataPackSheet <- function(d, sheet) {
 
   # TEST that all Prioritizations completed ####
   if (sheet == "Prioritization") {
+    
+    # Remove _Military district from Prioritization extract as this can't be assigned a prioritization ####
+    d$data$extract %<>%
+      dplyr::filter(!stringr::str_detect(PSNU, "^_Military"))
+    
     blank_prioritizations <- d$data$extract %>%
       dplyr::filter(is.na(value)) %>%
       dplyr::select(PSNU)
@@ -195,12 +200,6 @@ unPackDataPackSheet <- function(d, sheet) {
       d$info$has_error <- TRUE
 
     }
-  # Remove _Military district from Prioritization extract as this can't be assigned a prioritization ####
-    d$data$extract %<>%
-      dplyr::filter(!stringr::str_detect(PSNU, "^_Military"),
-
-  # Excuse valid NA Prioritizations
-                    value != "NA")
 
     # Test that no non-Military district is categorized as "M"
     invalid_prioritizations <- d$data$extract %>%
@@ -227,15 +226,6 @@ unPackDataPackSheet <- function(d, sheet) {
       d$info$has_error <- TRUE
     }
 
-    # Convert Prioritization from text to short-number.
-    # d$data$extract %<>%
-    #   dplyr::mutate(
-    #     value = dplyr::case_when(
-    #       stringr::str_detect(indicator_code,"IMPATT.PRIORITY_SNU")
-    #         ~ stringr::str_sub(value, start = 1, end = 2),
-    #       TRUE ~ value
-    #       )
-    #     )
   }
 
   # Drop NAs ####
