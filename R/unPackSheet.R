@@ -203,7 +203,8 @@ unPackDataPackSheet <- function(d, sheet) {
 
     # Test that no non-Military district is categorized as "M"
     invalid_prioritizations <- d$data$extract %>%
-      dplyr::filter(value == "M" & !stringr::str_detect(PSNU, "^_Military"))
+      dplyr::filter(value == "M" & !stringr::str_detect(PSNU, "^_Military") | !(value %in% c("1","2","4","5","6","7","8")) )
+
 
     if (NROW(invalid_prioritizations) > 0) {
       d$tests$invalid_prioritizations <- invalid_prioritizations
