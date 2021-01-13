@@ -17,6 +17,29 @@ createKeychainInfo <- function(submission_path = NULL,
                                country_uids = NULL,
                                cop_year = NULL) {
 
+
+  #Attempt to bootstrap the tool type and COP year if it is not explicitly provided
+  tool_name<-readxl::read_excel(
+    path = submission_path,
+    sheet = "Home",
+    range = "B10", #May need to be a global variable
+    col_types = "text", 
+    col_names = FALSE) %>% 
+    stringi::stri_split_fixed(pattern = " ",n=2 ) %>% 
+    unlist()
+  
+  if (is.null(tool)) {
+    
+    tool<-tool_name[2]
+  }
+  
+  if (is.null(cop_year)) {
+    
+    cop_year<-gsub("COP","20",tool_name[1])
+  
+    }
+  
+  
   # Create data train for use across remainder of program
   d <- list(
     keychain = list(
