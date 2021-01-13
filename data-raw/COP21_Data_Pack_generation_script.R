@@ -62,10 +62,10 @@ batch <- tibble::tribble(
 )
 
 #Beta Pack Countries list ####
-pick <- batch[c(16,18,20,21,24,25,28,41,42,43,45),]
+# pick <- batch[c(16,18,20,21,24,25,28,41,42,43,45),]
 
 # For individual testing ####
-#pick <- batch[c(13),]
+pick <- batch[c(4,24),]
 # i = 1
 
 # For full Production run

@@ -35,6 +35,8 @@ packSNUxIM <- function(d) {
   }
   
   # Prepare SNU x IM model dataset ####
+  interactive_print("Getting data about your FY21 Mechanism Allocations from DATIM...")
+  
   snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path)[d$info$country_uids] %>%
     dplyr::bind_rows() %>%
     tidyr::unite(col = mechcode_supporttype, mechanism_code, type) %>%
@@ -118,24 +120,26 @@ packSNUxIM <- function(d) {
         pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = T))
   
   # Create Dedupe Resolution columns
+  interactive_print("Studying your deduplication patterns...")
+  
   snuxim_model_data %<>%
     dplyr::rowwise() %>%
     dplyr::mutate(ta_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_TA")))),
                   dsd_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_DSD"))))) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(
-      `Observed TA Dedupe Resolution (FY21)` = dplyr::case_when(
+      `TA Dedupe Resolution (FY22)` = dplyr::case_when(
         `TA Duplicated Rollup` == 0 | ta_im_count <= 1 ~ NA_character_,
         # or where count(TA IMs) == 1
         `Deduplicated TA Rollup` == `TA Duplicated Rollup` ~ "SUM",
         `Deduplicated TA Rollup` == `Max_TA.T_1` ~ "MAX",
         TRUE ~ "CUSTOM"),
-      `Observed DSD Dedupe Resolution (FY21)` = dplyr::case_when(
+      `DSD Dedupe Resolution (FY22)` = dplyr::case_when(
         `DSD Duplicated Rollup` == 0 | dsd_im_count <= 1 ~ NA_character_,
         `Deduplicated DSD Rollup` == `DSD Duplicated Rollup` ~ "SUM",
         `Deduplicated DSD Rollup` == `Max_DSD.T_1` ~ "MAX",
         TRUE ~ "CUSTOM"),
-      `Observed Crosswalk Dedupe Resolution (FY21)` = dplyr::case_when(
+      `Crosswalk Dedupe Resolution (FY22)` = dplyr::case_when(
         `Total Duplicated Rollup` == 0 | `Deduplicated TA Rollup` == 0 | `Deduplicated DSD Rollup` == 0 
           ~ NA_character_,
         `Total Deduplicated Rollup` == `Total Duplicated Rollup` ~ "SUM",
@@ -144,14 +148,16 @@ packSNUxIM <- function(d) {
     ) %>%
     dplyr::select(psnu_uid, indicator_code, Age, Sex, KeyPop,
                   tidyselect::matches("\\d{4,}"),
-                  `Observed Custom DSD Dedupe Allocation (FY21) (%)` = `DSD Dedupe`,
-                  `Observed Custom TA Dedupe Allocation (FY21) (%)` = `TA Dedupe`,
-                  `Observed Custom Crosswalk Dedupe Allocation (FY21) (%)` = `Crosswalk Dedupe`,
-                  `Observed DSD Dedupe Resolution (FY21)`,
-                  `Observed TA Dedupe Resolution (FY21)`,
-                  `Observed Crosswalk Dedupe Resolution (FY21)`)
+                  `Custom DSD Dedupe Allocation (FY22) (% of DataPackTarget)` = `DSD Dedupe`,
+                  `Custom TA Dedupe Allocation (FY22) (% of DataPackTarget)` = `TA Dedupe`,
+                  `Custom Crosswalk Dedupe Allocation (FY22) (% of DataPackTarget)` = `Crosswalk Dedupe`,
+                  `DSD Dedupe Resolution (FY22)`,
+                  `TA Dedupe Resolution (FY22)`,
+                  `Crosswalk Dedupe Resolution (FY22)`)
       
   # Filter SNU x IM model dataset to only those data needed in tab ####
+  interactive_print("Focusing on patterns relevant to your submitted tool...")
+  
   if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
     targets_data <- d$data$missingCombos
   } else {
@@ -176,17 +182,19 @@ packSNUxIM <- function(d) {
       dplyr::select(-value)
   } else {
     snuxim_model_data <- targets_data %>%
-      datapackr::addcols(cnames = c("Observed Custom DSD Dedupe Allocation (FY21)",
-                                    "Observed Custom TA Dedupe Allocation (FY21)",
-                                    "Observed Custom Crosswalk Dedupe Allocation (FY21)"),
+      datapackr::addcols(cnames = c("Custom DSD Dedupe Allocation (FY22) (% of DataPackTarget)",
+                                    "Custom TA Dedupe Allocation (FY22) (% of DataPackTarget)",
+                                    "Custom Crosswalk Dedupe Allocation (FY22) (% of DataPackTarget)"),
                          type = "numeric") %>%
-      datapackr::addcols(cnames = c("Observed Custom DSD Dedupe Resolution (FY21)",
-                                    "Observed Custom TA Dedupe Resolution (FY21)",
-                                    "Observed Custom Crosswalk Dedupe Resolution (FY21)"),
+      datapackr::addcols(cnames = c("DSD Dedupe Resolution (FY22)",
+                                    "TA Dedupe Resolution (FY22)",
+                                    "Crosswalk Dedupe Resolution (FY22)"),
                          type = "character")
   }
 
   # Add DataPackTarget ####
+  interactive_print("Analyzing targets set across your Data Pack...")
+  
   top_rows <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
   
   if (d$info$has_psnuxim) {
@@ -254,31 +262,62 @@ packSNUxIM <- function(d) {
   class(snuxim_model_data[["DataPackTarget"]]) <- c(class(snuxim_model_data[["DataPackTarget"]]), "formula")
         
   # Get formulas & column order from schema ####
+  interactive_print("Building your custom PSNUxIM tab...")
+  
   data_structure <- datapackr::cop21_data_pack_schema %>%
-    dplyr::filter(sheet_name == "PSNUxIM") %>%
+    dplyr::filter(sheet_name == "PSNUxIM")
+  
+  col.im.targets <- data_structure %>%
+    dplyr::filter(col_type == "target" & indicator_code %in% c("12345_DSD","")) %>%
+    dplyr::filter(
+      indicator_code == "12345_DSD" | col == max(col)) %>%
+    dplyr::pull(col)
+  
+  col.im.percents <- data_structure %>%
+    dplyr::filter(col_type == "allocation" & (indicator_code =="12345_DSD" | is.na(indicator_code))) %>%
+    dplyr::filter(
+      indicator_code == "12345_DSD" | col == max(col)) %>%
+    dplyr::pull(col)
+  
+  count.im.datim <- names(snuxim_model_data)[stringr::str_detect(names(snuxim_model_data), "\\d{4,}_(DSD|TA)")] %>%
+    length()
+  
+  col.formulas <- data_structure %>%
+    dplyr::filter(
+      !is.na(formula)
+      & stringr::str_detect(
+        formula,
+        paste0("(?<=[:upper:])", top_rows
+               +1)),
+      col <= (col.im.targets[1]+count.im.datim-1)) %>%
+    dplyr::pull(col)
+  
+  data_structure %<>%
     dplyr::arrange(col) %>%
     dplyr::mutate(
       column_names = dplyr::case_when(
-        col > 10 & col < 86 ~ paste0("percent_col_",col),
-        col > 112 ~ paste0("target_col_",col),
+        col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_",col),
+        col >= col.im.targets[1] & col <= (col.im.targets[1]+count.im.datim-1) ~ paste0("target_col_",col),
         TRUE ~ indicator_code)
     ) %>%
+    dplyr::filter(column_names != "") %>%
     tibble::column_to_rownames(var = "column_names") %>%
     dplyr::select(formula) %>%
     t() %>%
     tibble::as_tibble() %>%
     ## Setup formulas
     dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
-    dplyr::mutate_if(
-      is.character,
-      stringr::str_replace_all,
-      pattern = paste0("(?<=[:upper:])", headerRow(tool = "Data Pack Template",
-                                                   cop_year = d$info$cop_year)
-                       +1),
-      replacement = as.character(1:NROW(snuxim_model_data)
-                                 + headerRow(tool = "Data Pack Template",
-                                             cop_year = d$info$cop_year)))
-  
+    dplyr::mutate(
+      dplyr::across(dplyr::all_of(col.formulas),
+        ~stringr::str_replace_all(
+          .,
+          pattern = paste0("(?<=[:upper:])", top_rows
+                           +1),
+          replacement = as.character(1:NROW(snuxim_model_data) + top_rows)
+          )
+        )
+      )
+    
   # Classify formula columns as formulas
   ## TODO: Improve approach
   for (i in 1:length(data_structure)) {
@@ -296,7 +335,7 @@ packSNUxIM <- function(d) {
   
   header_cols <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(sheet_name == "PSNUxIM"
-                  & col <= 10) %>%
+                  & col < col.im.percents[1]) %>%
     dplyr::pull(indicator_code)
   
   IM_cols <- data_structure %>%
@@ -317,6 +356,7 @@ packSNUxIM <- function(d) {
     )
         
   # Write data to sheet ####
+  interactive_print("Writing your new PSNUxIM data to your Data Pack...")
   d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
   openxlsx::removeFilter(d$tool$wb, names(d$tool$wb))
   
@@ -330,7 +370,7 @@ packSNUxIM <- function(d) {
     openxlsx::writeData(wb = d$tool$wb,
                         sheet = "PSNUxIM",
                         x = right_side,
-                        xy = c(86, top_rows + 1),
+                        xy = c(col.im.percents[2]+1, top_rows + 1),
                         colNames = F, rowNames = F, withFilter = FALSE)
     
     d$info$newSNUxIM <- TRUE
@@ -410,6 +450,8 @@ packSNUxIM <- function(d) {
   }
         
   # Format percent columns ####
+  interactive_print("Stylizing percent columns...")
+  
   percentCols <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(sheet_name == "PSNUxIM",
                   value_type == "percentage") %>%
@@ -446,6 +488,7 @@ packSNUxIM <- function(d) {
   normalStyle <- openxlsx::createStyle(fontColour = "#000000", bgFill = "#FFFFFF")
         
   # Hide rows 5-13 ####
+  interactive_print("Tidying up...")
   openxlsx::setRowHeights(wb = d$tool$wb,
                           sheet = "PSNUxIM",
                           rows = 4:(top_rows-1),
@@ -477,6 +520,7 @@ packSNUxIM <- function(d) {
                       colNames = F)
   
   # Warning Messages ####
+  interactive_print("Compiling alert messages...")
   warning_msg <- 
     paste0(
       "NOTE: Based on your submission, we have ",
