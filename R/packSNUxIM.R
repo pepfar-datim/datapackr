@@ -254,7 +254,7 @@ packSNUxIM <- function(d) {
       DataPackTarget = paste0(
         'SUMIF(',
         sheet_name, '!$', id_col, ':$', id_col,
-        ',$G', row,
+        ',$F', row,
         ',', sheet_name, '!$', target_col, ':$', target_col, ')')
     ) %>%
     dplyr::select(-id_col, -sheet_name, -target_col, -row)
@@ -289,7 +289,7 @@ packSNUxIM <- function(d) {
         formula,
         paste0("(?<=[:upper:])", top_rows
                +1)),
-      col <= (col.im.targets[1]+count.im.datim-1)) %>%
+      col < (col.im.targets[1])) %>%
     dplyr::pull(col)
   
   data_structure %<>%
@@ -300,7 +300,7 @@ packSNUxIM <- function(d) {
         col >= col.im.targets[1] & col <= (col.im.targets[1]+count.im.datim-1) ~ paste0("target_col_",col),
         TRUE ~ indicator_code)
     ) %>%
-    dplyr::filter(column_names != "") %>%
+    dplyr::filter(col < col.im.targets[1]) %>%
     tibble::column_to_rownames(var = "column_names") %>%
     dplyr::select(formula) %>%
     t() %>%
