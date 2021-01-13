@@ -24,9 +24,13 @@ test_that("Can generate a signature", {
    expect_null(d$info$warning_msg)
    expect_false(d$info$has_error)
    expect_false(d$info$newSNUxIM)
-   #expect_equal(d$info$cop_year,getCurrentCOPYear())
-   #Since we are using a specific version of the template for these tests
-   expect_equal(d$info$cop_year,2020)
+
   
 } )
 
+test_that("Can get the type and COP year of tool of a COP20 Data Pack",{
+   
+   d <- datapackr:::createKeychainInfo(submission_path = test_sheet('COP20_Data_Pack_Template_vFINAL.xlsx'))
+   expect_equal(d$info$tool,"Data Pack")
+   expect_equal(d$info$cop_year,"2020")
+})
