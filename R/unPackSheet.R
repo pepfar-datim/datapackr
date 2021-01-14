@@ -22,6 +22,13 @@ unPackDataPackSheet <- function(d, sheet) {
       col_types = "text",
       .name_repair = "minimal"
     )
+  
+  # If sheet is totally empty, skip
+  if (all(is.na(d$data$extract$PSNU))) {
+    d$data$extract <- NULL
+    
+    return(d)
+  }
 
   # Run structural checks ####
   d <- checkColStructure(d, sheet)
