@@ -176,9 +176,9 @@ unPackDataPackSheet <- function(d, sheet) {
     
     # Remove _Military district from Prioritization extract as this can't be assigned a prioritization ####
     d$data$extract %<>%
-      dplyr::filter(!stringr::str_detect(PSNU, "^_Military",)
+      dplyr::filter(!stringr::str_detect(PSNU, "^_Military"),
                     # Excuse valid NA Prioritizations
-                    value != "NA"))
+                    value != "NA")
     
     blank_prioritizations <- d$data$extract %>%
       dplyr::filter(is.na(value)) %>%
