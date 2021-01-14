@@ -11,7 +11,9 @@
 #' @return Mechs
 #'
 getMechanismView <- function(d2_session = dynGet("d2_default_session",
-                                                 inherits = TRUE)) {
+                                                 inherits = TRUE), 
+                             support_files_directory = getOption("support_files_directory"),
+                             max_cache_age = "1 day") {
   empty_mechs_view <- tibble::tibble(
     "mechanism_desc" = character() ,
     "mechanism_code"= character(),
@@ -46,23 +48,38 @@ getMechanismView <- function(d2_session = dynGet("d2_default_session",
     }
   }
 
-  support_files_directory <- getOption("support_files_directory")
 
   if (is.null(support_files_directory)) {
     mechs <- getMechanismViewFromDATIM(d2_session = d2_session)
   } else {
 
-    cached_mechs_path <- paste0(support_files_directory,"mechs.rds")
-
-    if (file.access(cached_mechs_path, 4) == 0) {
-      mechs <- readRDS(cached_mechs_path)
-    } else {mechs <- getMechanismViewFromDATIM(d2_session = d2_session)}
-
+    cached_mechs_path <- paste0(support_files_directory, "mechs.rds")
+    can_read_file <- file.access(cached_mechs_path, 4) == 0
+    if (can_read_file) {
+      is_fresh <-
+        lubridate::as.duration(lubridate::interval(Sys.time(), file.info(cached_mechs_path)$mtime)) < lubridate::duration(max_cache_age)
+      if (is_fresh) {
+        mechs <- readRDS(cached_mechs_path)
+      } else {
+        mechs <- getMechanismViewFromDATIM(d2_session = d2_session)
+        #Attempt to save a cached copy for later use
+        print(paste0("Overwriting stale mechanisms view to ", cached_mechs_path))
+        saveRDS(mechs, file = cached_mechs_path)
+        
+      }
+      
+    } else {
+      mechs <- getMechanismViewFromDATIM(d2_session = d2_session)
+      #Attempt to save a cached copy for later use
+      print(paste0("Saving cached mechanisms view to ", cached_mechs_path))
+      saveRDS(mechs, file = cached_mechs_path)
+    }
+    
   }
 
   structure_ok <- dplyr::setequal(names(empty_mechs_view), names(mechs))
 
-  if (!structure_ok) {warning("Mechanism structure is not correct.")}
+  if (!structure_ok) y
 
   mechs
 
