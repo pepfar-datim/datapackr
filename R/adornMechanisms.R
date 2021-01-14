@@ -2,17 +2,21 @@
 #' @importFrom magrittr %>% %<>%
 #' @title getMechanismView()
 #'
-#' @description Retreives a view of mechanisms with partners and agencies
+#' @description Retrieves a view of mechanisms with partners and agencies
 #' The function will attempt to read from a cached file, if defined in
 #' the support_files_directory option has been set, and the mechs.rds file
 #' is available to be read. Otherwise, if the user is logged in, the view
 #' will be obtained from DATIM. Otherwise, an empty dataframe is returned.
 #'
+#' @param d2_session datimutils d2Session object
+#' @param cached_support_file An RDS file containing a cached copy of the 
+#' SQL view used. 
+#' @param max_cache_age Set by default to "1 day" but can be adjusted as required. 
 #' @return Mechs
 #'
 getMechanismView <- function(d2_session = dynGet("d2_default_session",
                                                  inherits = TRUE), 
-                             support_files_directory = getOption("support_files_directory"),
+                             cached_support_file = "mechs.rds",
                              max_cache_age = "1 day") {
   empty_mechs_view <- tibble::tibble(
     "mechanism_desc" = character() ,
@@ -48,35 +52,28 @@ getMechanismView <- function(d2_session = dynGet("d2_default_session",
     }
   }
 
-
-  if (is.null(support_files_directory)) {
-    mechs <- getMechanismViewFromDATIM(d2_session = d2_session)
-  } else {
-
-    cached_mechs_path <- paste0(support_files_directory, "mechs.rds")
-    can_read_file <- file.access(cached_mechs_path, 4) == 0
-    if (can_read_file) {
-      is_fresh <-
-        lubridate::as.duration(lubridate::interval(Sys.time(), file.info(cached_mechs_path)$mtime)) < lubridate::duration(max_cache_age)
-      if (is_fresh) {
-        mechs <- readRDS(cached_mechs_path)
-      } else {
-        mechs <- getMechanismViewFromDATIM(d2_session = d2_session)
-        #Attempt to save a cached copy for later use
-        print(paste0("Overwriting stale mechanisms view to ", cached_mechs_path))
-        saveRDS(mechs, file = cached_mechs_path)
-        
-      }
-      
+  #Test for existence of support file
+  can_read_file <- file.access(cached_support_file, 4) == 0
+  
+  if (can_read_file) {
+    is_fresh <-
+      lubridate::as.duration(lubridate::interval(Sys.time(), file.info(cached_support_file)$mtime)) < lubridate::duration(max_cache_age)
+    if (is_fresh) {
+      mechs <- readRDS(cached_support_file)
     } else {
       mechs <- getMechanismViewFromDATIM(d2_session = d2_session)
       #Attempt to save a cached copy for later use
-      print(paste0("Saving cached mechanisms view to ", cached_mechs_path))
-      saveRDS(mechs, file = cached_mechs_path)
+      print(paste0("Overwriting stale mechanisms view to ", cached_support_file))
+      saveRDS(mechs, file = cached_support_file)
     }
     
+  } else {
+    mechs <- getMechanismViewFromDATIM(d2_session = d2_session)
+    #Attempt to save a cached copy for later use
+    print(paste0("Saving cached mechanisms view to ", cached_support_file))
+    saveRDS(mechs, file = cached_support_file)
   }
-
+  
   structure_ok <- dplyr::setequal(names(empty_mechs_view), names(mechs))
 
   if (!structure_ok) y
