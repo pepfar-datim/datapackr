@@ -123,7 +123,7 @@ checkFormulas <- function(d, sheet) {
     
     warning_msg <- 
       paste0(
-        "WARNING! In tab ",
+        "WARNING! In tab, ensure all Data Pack formulas are as originally provided,  ",
         sheet,
         ", " ,NROW(cols_affected)," ALTERED FORMULAS: Note that this may be due to a formula being deleted",
         " or overwritten, or a manual fix not being applied. See",
