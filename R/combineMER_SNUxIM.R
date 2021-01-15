@@ -116,6 +116,10 @@ combineMER_SNUxIM <- function(d) {
       paste0(
         "WARNING: ",
         NROW(d$tests$PSNUxIM_rounding_diffs),
+        " Review the PSNUxIM tab to identify and address cases where multiplication of
+          distribution percentages against FY22 Targets has caused rounding error. You
+          may address this by gradually altering distribution percentages to fine tune
+          allocations against one or more mechanisms."
         " cases where rounding based on PSNUxIM distributions has caused a small",
         " amount of variation from original targets set in other sheets.",
         " A small amount of rounding may be unavoidable given the nature of the",
