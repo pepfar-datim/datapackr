@@ -11,13 +11,11 @@
 #' @param d2_session datimutils d2Session object
 #' @param cached_support_file An RDS file containing a cached copy of the 
 #' SQL view used. 
-#' @param max_cache_age Set by default to "1 day" but can be adjusted as required. 
 #' @return Mechs
 #'
 getMechanismView <- function(d2_session = dynGet("d2_default_session",
                                                  inherits = TRUE), 
-                             cached_support_file = "mechs.rds",
-                             max_cache_age = "1 day") {
+                             cached_support_file = "mechs.rds") {
   empty_mechs_view <- tibble::tibble(
     "mechanism_desc" = character() ,
     "mechanism_code"= character(),
@@ -56,6 +54,14 @@ getMechanismView <- function(d2_session = dynGet("d2_default_session",
   can_read_file <- file.access(cached_support_file, 4) == 0
   
   if (can_read_file) {
+    
+    #Set a reasonable default here
+    if (is.null(d2_session$max_cache_age)) {
+      max_cache_age<-"1 day"
+    } else {
+      max_cache_age<-d2_session$max_cache_age
+    } 
+    
     is_fresh <-
       lubridate::as.duration(lubridate::interval(Sys.time(), file.info(cached_support_file)$mtime)) < lubridate::duration(max_cache_age)
     if (is_fresh) {
