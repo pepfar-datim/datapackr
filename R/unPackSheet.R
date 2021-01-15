@@ -302,7 +302,7 @@ unPackDataPackSheet <- function(d, sheet) {
 
     warning_msg <-
       paste0(
-        "ERROR! In tab ",
+        "ERROR! Ensure all values entered against FY22 Targets are whole, positive, numeric values. In tab ",
         sheet,
         ": NEGATIVE VALUES found in the following columns! These will be removed. -> \n\t* ",
         paste(unique(d$tests$negative_values$indicator_code), collapse = "\n\t* "),
@@ -333,7 +333,8 @@ unPackDataPackSheet <- function(d, sheet) {
 
     warning_msg <-
       paste0(
-        "WARNING! In tab ",
+        "WARNING! Ensure all values entered against FY22 Targets are whole, positive, numeric
+          values. (The only exception to this rule may be HIV_PREV.) In tab ",
         sheet,
         ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
         paste(unique(decimal_cols$indicator_code), collapse = "\n\t* "),
