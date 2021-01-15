@@ -10,12 +10,12 @@
 #'
 #' @param d2_session datimutils d2Session object
 #' @param cached_support_file An RDS file containing a cached copy of the 
-#' SQL view used. 
+#' SQL view used defined via a envionment variable.
 #' @return Mechs
 #'
 getMechanismView <- function(d2_session = dynGet("d2_default_session",
                                                  inherits = TRUE), 
-                             cached_support_file = "mechs.rds") {
+                             cached_support_file = Sys.getenv("MECHS_SUPPORT_FILE")) {
   empty_mechs_view <- tibble::tibble(
     "mechanism_desc" = character() ,
     "mechanism_code"= character(),
@@ -65,19 +65,27 @@ getMechanismView <- function(d2_session = dynGet("d2_default_session",
     is_fresh <-
       lubridate::as.duration(lubridate::interval(Sys.time(), file.info(cached_support_file)$mtime)) < lubridate::duration(max_cache_age)
     if (is_fresh) {
+      print(paste0("Using cached mechanism support file at ",cached_support_file))
       mechs <- readRDS(cached_support_file)
     } else {
       mechs <- getMechanismViewFromDATIM(d2_session = d2_session)
-      #Attempt to save a cached copy for later use
-      print(paste0("Overwriting stale mechanisms view to ", cached_support_file))
-      saveRDS(mechs, file = cached_support_file)
+      #TODO: Need to check and be sure we can write here. 
+      if (cached_support_file != "") {
+        #Attempt to save a cached copy for later use if it has been defined
+        print(paste0("Overwriting stale mechanisms view to ", cached_support_file))
+        saveRDS(mechs, file = cached_support_file)        
+      }
     }
     
   } else {
     mechs <- getMechanismViewFromDATIM(d2_session = d2_session)
-    #Attempt to save a cached copy for later use
-    print(paste0("Saving cached mechanisms view to ", cached_support_file))
-    saveRDS(mechs, file = cached_support_file)
+    #Attempt to save a cached copy for later use if it has been defined
+    #TODO: Need to check and be sure we can write here. 
+    if (cached_support_file != "") {
+      #Attempt to save a cached copy for later use if it has been defined
+      print(paste0("Saving cached mechanisms view to ", cached_support_file))
+      saveRDS(mechs, file = cached_support_file)        
+    }
   }
   
   structure_ok <- dplyr::setequal(names(empty_mechs_view), names(mechs))
