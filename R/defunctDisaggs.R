@@ -45,7 +45,9 @@ defunctDisaggs <- function(d, sheet) {
     
     warning_msg <-
       paste0(
-        "ERROR! In tab ",
+        "ERROR! Please review all tabs flagged by this test to ensure no Age, Sex, or Key Population disaggregates have been inadvertently or
+         incorrectly altered. If you believe this has been flagged in error, please first refer to MER Guidance to confirm valid
+         disaggregates for the data element flagged. In tab ",
         sheet,
         ": INVALID DISAGGS ",
         "(Check MER Guidance for correct alternatives) -> \n\t",
