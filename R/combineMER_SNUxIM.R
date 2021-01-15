@@ -35,6 +35,8 @@ combineMER_SNUxIM <- function(d) {
       paste0(
         "WARNING!: ",
         NROW(no_targets_inds),
+        " Identify these cases in the PSNUxIM tab by filter for cases where the total Data Pack total is 0, but some non-zero
+          distribution proportion has been allocated against one or more mechanisms.",
         " cases where distribution attempted where no Target set.",
         " NOTE that these will be ignored and won't prevent further processing.",
         " This has affected the following indicators -> \n\t* ",
