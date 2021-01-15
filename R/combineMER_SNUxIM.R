@@ -140,6 +140,8 @@ combineMER_SNUxIM <- function(d) {
       paste0(
         "WARNING!: ",
         NROW(d$tests$invalid_dedupes),
+        " Review the Deduplication columns on the PSNUxIM tab to identify cases where any of these contains a positive value. (Only
+          negative values are allowable for Deduplication offsets.)",
         " cases where positive numbers are being used for Dedupe allocations.",
         " You can find these by filtering on the Dedupe column in the PSNUxIM tab.")
     
@@ -156,6 +158,8 @@ combineMER_SNUxIM <- function(d) {
       paste0(
         "WARNING!: ",
         NROW(d$tests$negative_distributed_targets),
+        " Ensure there are no negative values applied against mechanisms in the PSNUxIM tab. Mechanisms can only
+          have positive targets applied against them."
         " cases where negative numbers are being used for mechanism allocations.",
         " The following mechanisms have been affected. -> \n\t* ",
         paste(unique(d$tests$negative_distributed_targets$mechanism_code), collapse = "\n\t* "),
@@ -196,6 +200,7 @@ combineMER_SNUxIM <- function(d) {
       paste0(
         "WARNING!: ",
         NROW(d$tests$invalid_DSDTA),
+        "Ensure that all mechanism column headers in the PSNUxIM tab clearly denote either DSD or TA.",
         " cases where column headers in row 14 of your PSNUxIM tab have prevented",
         " us from determining whether you intended data to be distributed to DSD or TA.",
         "\n")
