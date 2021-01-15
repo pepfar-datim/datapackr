@@ -37,11 +37,11 @@ checkInvalidOrgUnits <- function(d, sheet) {
     
     warning_msg <-
       paste0(
-        "ERROR! Please review all tabs flagged by this test to correct any incorrectly added or edited organization units in the PSNU/DSNU 
-         column. If you believe this is in error, please also confirm in DATIM that all flagged organization units are correctly
-         added and valid. In tab ",
+        "ERROR! In tab ",
         sheet,
-        ", INVALID ORG UNITS: The following org units are not valid PSNUs, or do not",
+        ", INVALID ORG UNITS: Please review all tabs flagged by this test to correct any incorrectly added or edited organization units in the PSNU/DSNU 
+         column. If you believe this is in error, please also confirm in DATIM that all flagged organization units are correctly
+         added and valid. The following org units are not valid PSNUs, or do not",
         " contain the required DATIM PSNU UID ->  \n\t* ",
         paste(invalid_orgunits$PSNU, collapse = "\n\t* "),
         "\n")
