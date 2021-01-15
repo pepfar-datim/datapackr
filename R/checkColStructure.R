@@ -48,8 +48,7 @@ checkColStructure <- function(d, sheet) {
       paste0(
         "WARNING! In tab ",
         sheet,
-        ", MISSING COLUMNS: Note that this may be due to missing/renamed sheets,
-        or added or renamed columns. ->  \n\t* ",
+        ", MISSING COLUMNS: Please ensure no columns have been deleted or renamed from the original Data Pack you have received. ->  \n\t* ",
         paste(missing_cols$indicator_code, collapse = "\n\t* "),
         "\n")
     
@@ -102,7 +101,9 @@ checkColStructure <- function(d, sheet) {
       paste0(
         "WARNING! In tab ",
         sheet,
-        ", OUT OF ORDER COLUMNS: DO NOT add columns on the left or remove any columns. ->  \n\t* ",
+        ", OUT OF ORDER COLUMNS: While it is permitted to rearrange columns within your Data Pack as needed, this is 
+          not encouraged as it may introduce unintended formula errors. Please review these columns to ensure their
+          rearrangement has not caused any issues. ->  \n\t* ",
         paste(columns_out_of_order$columns_out_of_order, collapse = "\n\t* "),
         "\n")
     
