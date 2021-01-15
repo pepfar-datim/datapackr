@@ -16,8 +16,10 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
     dplyr::filter(distribution > 1.0)
 
   if (NROW(over_allocated) > 0) {
-    msg<-paste0("INFO! ", NROW(over_allocated), " pure duplicates with allocation greater than 100% were identified. These will need to be deduplicated in DATIM.
-                  Please consult the DataPack wiki section on deduplication for more information. ")
+    msg<-paste0("INFO! ", NROW(over_allocated), " pure duplicates with allocation greater than 100% were identified. 
+          These will need to be deduplicated in DATIM. 
+          Ensure all necessary deduplication values are 100% addressed.
+          Please consult the DataPack wiki section on deduplication for more information. ")
     d$info$warning_msg<-append(d$info$warning_msg,msg)
   }
 
@@ -57,8 +59,10 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
         dplyr::filter(distribution_diff > 1e-3)
 
       if (NROW(over_allocated) > 0) {
-        msg<-paste0("INFO! ", NROW(over_allocated), " crosswalk duplicates with allocation greater than 100% were identified. These will need to be deduplicated in DATIM.
-                  Please consult the DataPack wiki section on deduplication for more information. ")
+        msg<-paste0("INFO! ", NROW(over_allocated), " crosswalk duplicates with allocation greater than 100% were identified. 
+        These will need to be deduplicated in DATIM.
+        Ensure all necessary crosswalk deduplication values are 100% addressed.
+        Please consult the DataPack wiki section on deduplication for more information. ")
         d$info$warning_msg<-append(d$info$warning_msg,msg)
       }
 
