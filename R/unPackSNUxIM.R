@@ -18,24 +18,11 @@ unPackSNUxIM <- function(d) {
   
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
   
-  cols_to_keep <- d$info$schema %>%
-    dplyr::filter(sheet_name == sheet,
-                  !is.na(indicator_code),
-                  !indicator_code %in% c("sheet_num", "ID", "SNU1"),
-                  col_type %in% c("row_header", "target"))
-  
-  header_cols <- cols_to_keep %>%
-    dplyr::filter(col_type == "row_header")
-  
   d$data$SNUxIM <-
     readxl::read_excel(
       path = d$keychain$submission_path,
       sheet = sheet,
-      range =
-        readxl::cell_limits(
-          c(headerRow(tool = d$info$tool, cop_year = d$info$cop_year),
-            1),
-          c(NA, NA)),
+      range = readxl::cell_limits(c(header_row,1), c(NA, NA)),
       col_types = "text",
       .name_repair = "minimal"
     )
@@ -50,20 +37,34 @@ unPackSNUxIM <- function(d) {
   #TODO: Update this for new structure
   d <- checkColStructure(d, "PSNUxIM")
   
-  # Pare down to updated targets only ####
-  d$data$SNUxIM <- d$data$SNUxIM[,cols_to_keep$col]
+  # Pare down to populated, updated targets only ####
+  cols_to_keep <- d$info$schema %>%
+    dplyr::filter(sheet_name == sheet,
+                  !is.na(indicator_code),
+                  !indicator_code %in% c("sheet_num", "ID", "SNU1"),
+                  col_type %in% c("row_header", "target"))
   
-  # Drop blank columns ####
+  header_cols <- cols_to_keep %>%
+    dplyr::filter(col_type == "row_header")
+  
+  d$data$SNUxIM <- d$data$SNUxIM[,cols_to_keep$col]
+
   d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
   
   # TODO: Add test for columns with data that had a blank col name
   
-  # Remove rows with NAs in key cols ####
+  # Drop rows where entire row is NA ####
   d$data$SNUxIM %<>%
-    dplyr::filter_at(dplyr::vars(PSNU, indicator_code), dplyr::any_vars(!is.na(.)))
+    dplyr::filter_all(dplyr::any_vars(!is.na(.)))
   
-  # TEST for missing metadata (PSNU, indicator_code, ID) ####
+  # TEST: Missing key metadata; Error; Drop ####
   d <- checkMissingMetadata(d, sheet)
+  
+  # d$data$SNUxIM %<>%
+  #   dplyr::filter_at(dplyr::vars(PSNU, indicator_code), dplyr::any_vars(!is.na(.)))
+  
+  d$data$SNUxIM %<>%
+    tidyr::drop_na(PSNU, indicator_code)
   
   # TEST: Improper Col Names; Error; Drop ####
   invalid_mech_headers <- names(d$data$SNUxIM) %>%
@@ -151,13 +152,9 @@ unPackSNUxIM <- function(d) {
                                        as.numeric))
     }
   
-  # Drop rows where entire row is NA ####
-  d$data$SNUxIM %<>%
-    dplyr::filter_all(dplyr::any_vars(!is.na(.)))
-  
   # TEST: Missing Dedupe Rollup cols; Error; Add ####
   dedupe_rollup_cols <- cols_to_keep %>%
-    dplyr::filter(dataset == "mer" & col_type == "target" & indicator_code != "") %>%
+    dplyr::filter(dataset == "mer" & col_type == "target" & !indicator_code %in% c("","12345_DSD")) %>%
     dplyr::pull(indicator_code)
   
   missing_cols_fatal <- dedupe_rollup_cols[!dedupe_rollup_cols %in% names(d$data$SNUxIM)]
@@ -185,10 +182,6 @@ unPackSNUxIM <- function(d) {
       missing_cols_fatal,
       type = "numeric")
   
-  # If PSNU or indicator_code has been deleted, drop the row ####
-  d$data$SNUxIM %<>%
-    tidyr::drop_na(PSNU, indicator_code)
-  
   # Recalculate dedupes ####
     ## Other than IM cols, only the following should be considered safe for reuse here:
     # - Deduplicated DSD Rollup (FY22)
@@ -196,19 +189,9 @@ unPackSNUxIM <- function(d) {
     # - Total Deduplicated Rollup (FY22)
     ## All others must be recalculated to protect against formula breakers.
   
-  rowMax <- function(df, cn, regex) {
-    df[[cn]] <- df %>%
-      dplyr::select(tidyselect::matches(match = regex)) %>% 
-      dplyr::mutate(default = 0) %>% # included to make sure there is at least 1 column 
-      purrr::pmap(pmax, na.rm = T) %>%
-      as.numeric
-    
-    return(df)
-  }
-  
   d$data$SNUxIM %<>%
-    rowMax(cn = "MAX - TA", regex = "\\d{4,6}_TA") %>%
-    rowMax(cn = "MAX - DSD", regex = "\\d{4,6}_DSD") %>%
+    datapackr::rowMax(cn = "MAX - TA", regex = "\\d{4,6}_TA") %>%
+    datapackr::rowMax(cn = "MAX - DSD", regex = "\\d{4,6}_DSD") %>%
     dplyr::mutate(
       `TA Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_TA")), na.rm = TRUE),
       `DSD Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_DSD")), na.rm = TRUE),
@@ -229,7 +212,7 @@ unPackSNUxIM <- function(d) {
   
   dedupe_cols <- names(d$data$SNUxIM)[which(grepl("Deduplicated", names(d$data$SNUxIM)))]
   
-  # Deduplicated DSD within range
+    # Deduplicated DSD within range
   d$tests$dedupes_outside_range <- d$data$SNUxIM %>%
     dplyr::mutate(
       dplyr::across(dplyr::all_of(dedupe_cols), ~tidyr::replace_na(.x, 0))
@@ -250,6 +233,8 @@ unPackSNUxIM <- function(d) {
           & `Total Deduplicated Rollup (FY22)` <= `SUM - Crosswalk Total`)
     ) %>%
     dplyr::select(dplyr::all_of(c(header_cols$indicator_code, dedupe_cols)),
+                  `MAX - DSD`, `SUM - DSD`, `MAX - TA`, `SUM - TA`,
+                  `MAX - Crosswalk Total`, `SUM - Crosswalk Total`,
                   tidyselect::matches("issues\\.")) %>%
     dplyr::filter(
       `issues.Deduplicated DSD Rollup`
