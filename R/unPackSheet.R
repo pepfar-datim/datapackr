@@ -193,7 +193,9 @@ unPackDataPackSheet <- function(d, sheet) {
         paste0(
           "ERROR! In tab ",
           sheet,
-          ": MISSING PRIORITIZATIONS. You must enter a prioritization value for",
+          ": MISSING PRIORITIZATIONS. Ensure a prioritization value is entered in each row of the column labeled ‘SNU
+          Prioritization’ on the Prioritization tab. Refer to guidance on that tab and in the Data Pack User Guide to see appropriate 
+          entry options. You must enter a prioritization value for",
           " the following PSNUs -> \n\t* ",
           paste(blank_prioritizations$PSNU, collapse = "\n\t* "),
           "\n")
