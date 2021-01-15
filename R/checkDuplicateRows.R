@@ -52,7 +52,8 @@ checkDuplicateRows <- function(d, sheet) {
     
     warning_msg <-
       paste0(
-        "ERROR! In tab ",
+        "ERROR! Ensure rows are all unique, and the SNU Disaggregates are not repeated within tabs. This issue may have been caused
+         by inadvertent or incorrect copying of data from one row to another. In tab ",
         sheet,
         ": DUPLICATE ROWS found. Duplicates are not permitted. -> \n\t",
         paste(dupes_msg, collapse = "\n\t"),
