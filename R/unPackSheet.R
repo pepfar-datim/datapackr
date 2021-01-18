@@ -259,6 +259,7 @@ unPackDataPackSheet <- function(d, sheet) {
     tidyr::drop_na(value)
 
   # TEST for non-numeric values ####
+  # TODO: Update to use checkNumericValues instead
   non_numeric <- d$data$extract %>%
     dplyr::mutate(value_numeric = suppressWarnings(as.numeric(value))) %>%
     dplyr::filter(is.na(value_numeric)) %>%
@@ -281,7 +282,10 @@ unPackDataPackSheet <- function(d, sheet) {
       paste0(
         "WARNING! In tab ",
         sheet,
-        ": NON-NUMERIC VALUES found! ->  \n\t* ",
+        ": NON-NUMERIC VALUES found! Please ensure all values entered against",
+        " FY22 Target columns include numeric values only — no letters or punctuation."
+        " It may be helpful to use an Excel filter to check unique values in a column for"
+        " any non-numeric entries. ->  \n\t* ",
         paste(non_numeric$row_id, collapse = "\n\t* "),
         "\n")
 
