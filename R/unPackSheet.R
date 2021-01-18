@@ -207,6 +207,8 @@ unPackDataPackSheet <- function(d, sheet) {
   # Remove _Military district from Prioritization extract as this can't be assigned a prioritization ####
     d$data$extract %<>%
       dplyr::filter(!stringr::str_detect(PSNU, "^_Military"),
+                    
+      # TODO: Update to assign all _Mil a 0 in prioritization
 
   # Excuse valid NA Prioritizations
                     value != "NA")
@@ -228,7 +230,10 @@ unPackDataPackSheet <- function(d, sheet) {
           "ERROR! In tab ",
           sheet,
           ": INVALID PRIORITIZATIONS. The following Prioritizations are not valid for",
-          " the listed PSNUs -> \n\t* ",
+          " the listed PSNUs. Review the guidance on the Prioritization tab and in the",
+          " Data Pack User Guide to understand valid prioritization options. Refer to those",
+          " PSNUs flagged by this check and correct their validation values in the 'SNU Prioritization'",
+          " column on the Prioritization tab. -> \n\t* ",
           paste(invalid_prioritizations_strings, collapse = "\n\t* "),
           "\n")
 
@@ -246,6 +251,8 @@ unPackDataPackSheet <- function(d, sheet) {
     #       )
     #     )
   }
+  
+  # TODO: Update this test to drop invalid Prioritizations, or maybe revert to prev yr prioritization
 
   # Drop NAs ####
   d$data$extract %<>%
