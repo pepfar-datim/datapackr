@@ -143,6 +143,7 @@ unPackSNUxIM <- function(d) {
   # --> This also removes non-essential text from IM name to leave only 12345_DSD format.
   
   # TEST: Non-numeric data; Warn; Convert & Drop ####
+  # TODO: Fix this test to work here
   #d <- checkNumericValues(d, sheet, header_cols)
   
   #sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
