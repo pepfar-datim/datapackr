@@ -78,7 +78,7 @@ packSNUxIM <- function(d) {
                                        -psnuid, -sheet_name))
           
       # Allow DataPackTarget formula to lookup KP_MAT correctly ####
-        if (cop_year == 2020) {
+        if (d$info$cop_year == 2020) {
           d$data$SNUxIM_combined %<>%  
             dplyr::mutate(
               KeyPop = dplyr::case_when(
