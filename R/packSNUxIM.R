@@ -9,7 +9,13 @@
 #' 
 #' @return d
 #' 
+
+
+ 
 packSNUxIM <- function(d) {
+  if (is.empty(d$info$cop_year)) {
+    stop("COP Year cannot be empty!")
+  }
   if ( d$info$cop_year %in% c(2020,2021) ) {
   # Check if SNUxIM data already exists ####
     if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1,1]])) {
@@ -78,7 +84,7 @@ packSNUxIM <- function(d) {
                                        -psnuid, -sheet_name))
           
       # Allow DataPackTarget formula to lookup KP_MAT correctly ####
-        if (cop_year == 2020) {
+        if (d$info$cop_year == "2020") {
           d$data$SNUxIM_combined %<>%  
             dplyr::mutate(
               KeyPop = dplyr::case_when(

@@ -593,3 +593,45 @@ prioritization_dict <- function() {
 
   return(dict)
 }
+
+
+
+
+#' @title is.empty(x,trim=TRUE) Helper function to determine if an input is empty
+#'
+#' @param x An R object.
+#' @param trim Should the input be trimmed? Defaults to TRUE
+#'
+#' @return TRUE or FALSE
+#' @export
+#'
+#' @examples
+#' is.empty(NULL)     # [1] TRUE
+#' is.empty(c())      # [1] TRUE
+#' is.empty(NA)       # [1] TRUE
+#' is.empty(NaN)      # [1] TRUE
+#' is.empty("")       # [1] TRUE
+#' is.empty(0)        # [1] FALSE
+#' is.empty(0.00)     # [1] FALSE
+#' is.empty("    ")   # [1] TRUE
+#' is.empty("foobar") # [1] FALSE
+
+is.empty <- function(x, trim = TRUE) {
+  if (is.null(x)) {
+    return(TRUE)
+  }
+  if (is.na(x)) {
+    return(TRUE)
+  }
+  
+  if (is.nan(x)) {
+    return(TRUE)
+  }
+  
+  if (stringr::str_trim(as.character(x)) == "") {
+    return(TRUE)
+  }
+  
+  
+  FALSE
+}
