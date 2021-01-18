@@ -48,7 +48,8 @@ checkColStructure <- function(d, sheet) {
       paste0(
         "WARNING! In tab ",
         sheet,
-        ", MISSING COLUMNS: Please ensure no columns have been deleted or renamed from the original Data Pack you have received. ->  \n\t* ",
+        ", MISSING COLUMNS: Please ensure no columns have been deleted or renamed from",
+        " the original Data Pack you have received. ->  \n\t* ",
         paste(missing_cols$indicator_code, collapse = "\n\t* "),
         "\n")
     
@@ -76,13 +77,17 @@ checkColStructure <- function(d, sheet) {
         "ERROR! In tab ",
         sheet,
         ", DUPLICATE COLUMNS: The following required columns appear twice. This",
-        " must be resolved in your submission in order for processing to continue  ->  \n\t* ",
+        " must be resolved in your submission in order for processing to continue.",
+        " Please review those columns flagged by this test to determine whether they",
+        " may have been inadvertently duplicated. ->  \n\t* ",
         paste(duplicate_columns$indicator_code, collapse = "\n\t* "),
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE
   }
+  
+  #  TODO: Add code to combine or drop duplicate columns.
   
   # Alert to columns which may be out of order ####
   
@@ -94,16 +99,17 @@ checkColStructure <- function(d, sheet) {
   
   if ( NROW(columns_out_of_order) > 0 ) {
 
-    d$tests$columns_out_of_order<-dplyr::bind_rows(columns_out_of_order,d$tests$columns_out_of_order)
-    attr(d$tests$columns_out_of_order,"test_name")<-"Columns out of order"
+    d$tests$columns_out_of_order <- dplyr::bind_rows(columns_out_of_order,d$tests$columns_out_of_order)
+    attr(d$tests$columns_out_of_order,"test_name") <- "Columns out of order"
     
     warning_msg <-
       paste0(
         "WARNING! In tab ",
         sheet,
-        ", OUT OF ORDER COLUMNS: While it is permitted to rearrange columns within your Data Pack as needed, this is 
-          not encouraged as it may introduce unintended formula errors. Please review these columns to ensure their
-          rearrangement has not caused any issues. ->  \n\t* ",
+        ", OUT OF ORDER COLUMNS: While it is permitted to rearrange columns within",
+        " your Data Pack as needed, this is not encouraged as it may introduce unintended",
+        " formula errors. Please review these columns to ensure their rearrangement has",
+        " not caused any issues. ->  \n\t* ",
         paste(columns_out_of_order$columns_out_of_order, collapse = "\n\t* "),
         "\n")
     
