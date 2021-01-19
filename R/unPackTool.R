@@ -34,9 +34,8 @@ createKeychainInfo <- function(submission_path,
   }
   
   if (is.null(cop_year)) {
-    
-    cop_year<-gsub("COP","20",tool_name[1])
-  
+    cop_year <- gsub("COP","20", tool_name[1]) %>% 
+      as.integer()
     }
   
   
