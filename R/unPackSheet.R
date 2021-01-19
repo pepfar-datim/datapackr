@@ -193,9 +193,10 @@ unPackDataPackSheet <- function(d, sheet) {
         paste0(
           "ERROR! In tab ",
           sheet,
-          ": MISSING PRIORITIZATIONS. Ensure a prioritization value is entered in each row of the column labeled ‘SNU
-          Prioritization’ on the Prioritization tab. Refer to guidance on that tab and in the Data Pack User Guide to see appropriate 
-          entry options. You must enter a prioritization value for",
+          ": MISSING PRIORITIZATIONS. Ensure a prioritization value is entered in each",
+          " row of the column labeled ‘SNU Prioritization’ on the Prioritization tab."
+          " Refer to guidance on that tab and in the Data Pack User Guide to see"
+          " appropriate entry options. You must enter a prioritization value for",
           " the following PSNUs -> \n\t* ",
           paste(blank_prioritizations$PSNU, collapse = "\n\t* "),
           "\n")
@@ -315,8 +316,8 @@ unPackDataPackSheet <- function(d, sheet) {
       paste0(
         "ERROR! In tab ",
         sheet,
-        ": NEGATIVE VALUES found in the following columns! Ensure all values entered against FY22 Targets are whole, positive, numeric values. 
-          These will be removed. -> \n\t* ",
+        ": NEGATIVE VALUES found in the following columns! Ensure all values entered",
+        " against FY22 Targets are whole, positive, numeric values. These will be removed. -> \n\t* ",
         paste(unique(d$tests$negative_values$indicator_code), collapse = "\n\t* "),
         "\n")
 
@@ -347,8 +348,9 @@ unPackDataPackSheet <- function(d, sheet) {
       paste0(
         "WARNING! In tab ",
         sheet,
-        ": DECIMAL VALUES found in the following columns! Ensure all values entered against FY22 Targets are whole, positive, numeric
-          values. (The only exception to this rule may be HIV_PREV.) These will be rounded. -> \n\t* ",
+        ": DECIMAL VALUES found in the following columns! Ensure all values entered",
+        " against FY22 Targets are whole, positive, numeric values. (The only exception",
+        " to this rule may be HIV_PREV.) These will be rounded. -> \n\t* ",
         paste(unique(decimal_cols$indicator_code), collapse = "\n\t* "),
         "\n")
 
