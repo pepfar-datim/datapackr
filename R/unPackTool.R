@@ -12,8 +12,8 @@
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
 #'
-createKeychainInfo <- function(submission_path = NULL,
-                               tool = "Data Pack",
+createKeychainInfo <- function(submission_path,
+                               tool = NULL,
                                country_uids = NULL,
                                cop_year = NULL) {
 
@@ -30,7 +30,7 @@ createKeychainInfo <- function(submission_path = NULL,
   
   if (is.null(tool)) {
     
-    tool<-tool_name[2]
+    tool <- tool_name[2]
   }
   
   if (is.null(cop_year)) {
@@ -92,8 +92,8 @@ createKeychainInfo <- function(submission_path = NULL,
 #'     \item Performs integrity checks on file structure;
 #' }
 #'
-unPackTool <- function(submission_path = NULL,
-                       tool = "Data Pack",
+unPackTool <- function(submission_path,
+                       tool = NULL,
                        country_uids = NULL,
                        cop_year = NULL,
                        d2_session = dynGet("d2_default_session",

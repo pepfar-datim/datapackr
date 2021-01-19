@@ -10,8 +10,8 @@
 #' 
 #' @return Character vector of country_uids.
 #' 
-unPackCountryUIDs <- function(submission_path = NA,
-                              tool = "Data Pack") {
+unPackCountryUIDs <- function(submission_path,
+                              tool) {
   
   submission_path <- handshakeFile(path = submission_path,
                                    tool = tool)
