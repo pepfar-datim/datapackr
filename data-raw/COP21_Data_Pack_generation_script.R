@@ -1,11 +1,9 @@
 library(datapackr)
 library(magrittr)
 
-secrets <- "/Users/scott/.secrets/cop-test.json"
+datapackr::loginToDATIM("/Users/scott/.secrets/datim.json")
 
-datapackr::loginToDATIM(secrets)
-
-output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/Data Packs"
+output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/PSNUxIM Testing"
 
 model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/model_data_pack_input_21_20210105_1_flat.rds"
 
@@ -53,19 +51,20 @@ batch <- tibble::tribble(
   "Caribbean Region",c("RKoVudgb05Y","PeOHqAwdtez","WuxG6jzaypt","zhJINyURZ5Y","WSl5y9jxCpC"), #38
   "Latin America Region",c("joGQFpKiHl9","QKD4CzBG2GM","N7QAPGSaODP","EXVC4bNtv84","w5NMe34EjPN","aUTsSmqqu9O","oK0gC85xx2f"), #39
   "Burkina Faso","ZeB2eGmDfGw",                                        #40
-  "Ghana","y3zhsvdXlhN",                                                #41
+  "Ghana","y3zhsvdXlhN",                                               #41
   "Liberia","kH29I939rDQ",                                             #42
   "Mali","N3xTKNKu5KM",                                                #43
   "Senegal","N5GhQWVpVFs",                                             #44
   "Sierra Leone","ODOymOOWyl0",                                        #45
-  "Togo","EIUtrKbw8PQ"                                                 #46
+  "Togo","EIUtrKbw8PQ",                                                #46
+  "Benin","QLimmm7UUKT"                                                #47
 )
 
 #Beta Pack Countries list ####
 # pick <- batch[c(16,18,20,21,24,25,28,41,42,43,45),]
 
 # For individual testing ####
-pick <- batch[c(13),]
+pick <- batch[c(4,24,15,8,13,19),]
 # i = 1
 
 # For full Production run
