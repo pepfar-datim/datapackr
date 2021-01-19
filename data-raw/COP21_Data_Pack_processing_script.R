@@ -1,13 +1,34 @@
+library(datapackr)
+library(magrittr)
 
-datapackr::loginToDATIM("~/.secrets/cop-test.json")
+datapackr::loginToDATIM("~/.secrets/datim.json")
 
-snuxim_model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/PSNUxIM_20201229_1.rds"
-output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment"
-#model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/model_data_pack_input_20_20200220_1_flat.rds"
+snuxim_model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/PSNUxIM_20210113_1.rds"
+output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/PSNUxIM Testing"
+#model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/model_data_pack_input_21_20210118_1_flat.rds"
 
 # Unpack Submitted Data Pack ####
 d <- unPackTool(cop_year = 2021)
 
+# d <- checkAnalytics(d,
+#                    model_data_path)
+ 
+d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
+
+
+
+
+
+  
+# Export DATIM import files ####
+  exportPackr(data = d$datim$MER,
+              output_path = output_folder,
+              type = "DATIM Export File",
+              datapack_name = d$info$datapack_name)
+  
+  
+  
+  
 # Produce Beta Pack data for PAW ####
   d$keychain$snuxim_model_data_path = snuxim_model_data_path
   d$keychain$output_folder = output_folder
@@ -66,7 +87,7 @@ d <- unPackTool(cop_year = 2021)
              "Age" = "age_option_name",
              "Sex" = "sex_option_name",
              "KeyPop" = "kp_option_name")
-      ) %>%
+    ) %>%
     dplyr::select(-age_option_uid, -sex_option_uid, -kp_option_uid) %>%
     tidyr::drop_na(value) %>%
     dplyr::mutate(distributed_value = value * percent,
@@ -136,10 +157,10 @@ d <- unPackTool(cop_year = 2021)
                             "categoryOptions.ids" = "categoryOptions"))
   
   d$datim$MER <- d$data$SNUxIM_combined %>%
-  dplyr::left_join(., ( map_DataPack_DATIM_DEs_COCs_local %>%
-                          dplyr::rename(Age = valid_ages.name,
-                                        Sex = valid_sexes.name,
-                                        KeyPop = valid_kps.name) )) %>%
+    dplyr::left_join(., ( map_DataPack_DATIM_DEs_COCs_local %>%
+                            dplyr::rename(Age = valid_ages.name,
+                                          Sex = valid_sexes.name,
+                                          KeyPop = valid_kps.name) )) %>%
     dplyr::mutate(
       period = paste0(d$info$cop_year,"Oct") ) %>%
     dplyr::select(
@@ -163,16 +184,3 @@ d <- unPackTool(cop_year = 2021)
   )
   
   
-# Carry on ####
-
-# d <- checkAnalytics(d,
-#                    model_data_path)
- 
-d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
-
-  
-# Export DATIM import files
-  exportPackr(data = d$datim$MER,
-              output_path = output_folder,
-              type = "DATIM Export File",
-              datapack_name = d$info$datapack_name)
