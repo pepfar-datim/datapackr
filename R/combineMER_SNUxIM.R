@@ -163,7 +163,7 @@ combineMER_SNUxIM <- function(d) {
         NROW(d$tests$negative_distributed_targets),
         " cases where negative numbers are being used for mechanism allocations.",
         " Ensure there are no negative values applied against mechanisms in the PSNUxIM tab.",
-        " Mechanisms can only have positive targets applied against them."
+        " Mechanisms can only have positive targets applied against them.",
         " The following mechanisms have been affected. -> \n\t* ",
         paste(unique(d$tests$negative_distributed_targets$mechanism_code), collapse = "\n\t* "),
         "\n")

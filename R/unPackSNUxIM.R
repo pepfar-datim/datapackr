@@ -344,7 +344,7 @@ unPackSNUxIM <- function(d) {
         "WARNING! Your Data Pack may need a new PSNUxIM tab. Along with this warning,",
         " you should also receive an updated copy of your Data Pack with new rows added",
         " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
-        " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack,"
+        " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack,",
         " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
         " all changes to other tabs of your Data Pack are complete.  Once all other updates",
         " are complete, you may return here to update your PSNUxIM tab at any time.",

@@ -125,9 +125,9 @@ checkFormulas <- function(d, sheet) {
       paste0(
         "WARNING! In tab ",
         sheet,
-        ", " ,NROW(cols_affected)," ALTERED FORMULAS: Ensure all Data Pack formulas are as originally provided."
+        ", " ,NROW(cols_affected)," ALTERED FORMULAS: Ensure all Data Pack formulas are as originally provided.",
         " Note that this may be due to a formula being deleted",
-        " or overwritten, or a manual fix not being applied."
+        " or overwritten, or a manual fix not being applied.",
         " Affected columns and the number of violations are listed below. ->  \n\t* ",
         paste(cols_affected$fx_violations, collapse = "\n\t* "),
         "\n")
