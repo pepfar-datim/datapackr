@@ -203,7 +203,7 @@ unPackTool <- function(submission_path = NULL,
     key = paste0(
       "*********************\r\n",
       "KEY:\r\n",
-      "- WARNING!: Problematic, but doesn't stop us from processing your tool.\r\n",
+      "- WARNING!: Problematic, but doesn't stop us from processing your tool. May waive with approval from PPM and DUIT.\r\n",
       "- ERROR!: You MUST address these issues and resubmit your tool.\r\n",
       "*********************\r\n\r\n")
 

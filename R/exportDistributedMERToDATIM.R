@@ -16,9 +16,17 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
     dplyr::filter(distribution > 1.0)
 
   if (NROW(over_allocated) > 0) {
-    msg<-paste0("INFO! ", NROW(over_allocated), " pure duplicates with allocation greater than 100% were identified. These will need to be deduplicated in DATIM.
-                  Please consult the DataPack wiki section on deduplication for more information. ")
-    d$info$warning_msg<-append(d$info$warning_msg,msg)
+    msg <- 
+      paste0(
+        "INFO! ",
+        NROW(over_allocated),
+        " pure duplicates with allocation greater than 100% were identified. These will",
+        " need to be deduplicated in DATIM. Ensure all necessary deduplication values are",
+        " 100% addressed. Please consult the Data Pack User Guide for more information.",
+        "/n"
+      )
+    
+    d$info$warning_msg <- append(d$info$warning_msg,msg)
   }
 
   auto_resolve_pure_dupes <- pure_duplicates %>%
@@ -30,7 +38,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
 
   #DSD_TA Crosswalk dupes which should be autoresolved
   if ( setequal(unique(d$data$SNUxIM$support_type),c("DSD","TA")) ) {
-    crosswalk_dupes_ids<-d$data$SNUxIM %>%
+    crosswalk_dupes_ids <- d$data$SNUxIM %>%
       dplyr::filter(mechanism_code != '99999') %>%
       dplyr::filter(distribution != 0) %>%
       dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type) %>%
@@ -41,7 +49,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
       dplyr::filter(TA >=1 & DSD >=1 ) %>%
       dplyr::select(-TA,-DSD)
 
-    crosswalk_dupes<-d$data$SNUxIM %>%
+    crosswalk_dupes <- d$data$SNUxIM %>%
       dplyr::filter(mechanism_code != '99999') %>%
       dplyr::filter(distribution != 0) %>%
       dplyr::inner_join(crosswalk_dupes_ids)
@@ -53,13 +61,21 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
         dplyr::ungroup() %>%
         dplyr::mutate(distribution_diff = abs(total_distribution - 1.0))
 
-      over_allocated<-crosswalk_dupes %>%
+      over_allocated <- crosswalk_dupes %>%
         dplyr::filter(distribution_diff > 1e-3)
 
       if (NROW(over_allocated) > 0) {
-        msg<-paste0("INFO! ", NROW(over_allocated), " crosswalk duplicates with allocation greater than 100% were identified. These will need to be deduplicated in DATIM.
-                  Please consult the DataPack wiki section on deduplication for more information. ")
-        d$info$warning_msg<-append(d$info$warning_msg,msg)
+        msg <-
+          paste0(
+            "INFO! ",
+            NROW(over_allocated),
+            " crosswalk duplicates with allocation greater than 100% were identified. These",
+            " will need to be deduplicated in DATIM. Ensure all necessary crosswalk",
+            " deduplication values are 100% addressed. Please consult the Data Pack User Guide for more information.",
+            "/n"
+          )
+       
+        d$info$warning_msg <- append(d$info$warning_msg,msg)
       }
 
       crosswalk_dupes_auto_resolved <- crosswalk_dupes %>%

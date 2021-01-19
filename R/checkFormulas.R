@@ -125,11 +125,10 @@ checkFormulas <- function(d, sheet) {
       paste0(
         "WARNING! In tab ",
         sheet,
-        ", " ,NROW(cols_affected)," ALTERED FORMULAS: Note that this may be due to a formula being deleted",
-        " or overwritten, or a manual fix not being applied. See",
-        " https://github.com/pepfar-datim/Data-Pack-Feedback/wiki/Manual-Data-Pack-Fixes-for-COP20",
-        " for all manual fixes that must be applied to your Data Pack prior to",
-        " submission. Affected columns and the number of violations include ->  \n\t* ",
+        ", " ,NROW(cols_affected)," ALTERED FORMULAS: Ensure all Data Pack formulas are as originally provided."
+        " Note that this may be due to a formula being deleted",
+        " or overwritten, or a manual fix not being applied."
+        " Affected columns and the number of violations are listed below. ->  \n\t* ",
         paste(cols_affected$fx_violations, collapse = "\n\t* "),
         "\n")
     

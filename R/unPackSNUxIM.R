@@ -83,7 +83,9 @@ unPackSNUxIM <- function(d) {
       paste0(
         "ERROR! In tab ",
         sheet,
-        ", INVALID COLUMN HEADERS: The following column headers are invalid and",
+        ", INVALID COLUMN HEADERS: Ensure all PSNUxIM column header mechanism are accurate",
+        " and complete, and contain at least the 5- or 6-digit mechanism code and either",
+        " `DSD` or `TA` (e.g., `12345_DSD`). The following column headers are invalid and",
         " will be dropped in processing. Please use only the form 12345_DSD. ->  \n\t* ",
         paste(d$tests$invalid_mech_headers$invalid_mech_headers, collapse = "\n\t* "),
         "\n")
@@ -143,6 +145,7 @@ unPackSNUxIM <- function(d) {
   # --> This also removes non-essential text from IM name to leave only 12345_DSD format.
   
   # TEST: Non-numeric data; Warn; Convert & Drop ####
+  # TODO: Fix this test to work here
   #d <- checkNumericValues(d, sheet, header_cols)
   
   #sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
@@ -338,10 +341,13 @@ unPackSNUxIM <- function(d) {
   if (d$info$missing_psnuxim_combos) {
     warning_msg <- 
       paste0(
-        "INFO! Your DataPack may need a new PSNUxIM tab.",
-        "This can be done via the self-service app in order to ",
-        " receive an updated version of this tab. You can also submit a help desk ticket at",
-        "DATIM.ZenDesk.com, or via logging in to www.DATIM.org and choosing the support app.",
+        "WARNING! Your Data Pack may need a new PSNUxIM tab. Along with this warning,",
+        " you should also receive an updated copy of your Data Pack with new rows added",
+        " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
+        " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack,"
+        " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
+        " all changes to other tabs of your Data Pack are complete.  Once all other updates",
+        " are complete, you may return here to update your PSNUxIM tab at any time.",
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
