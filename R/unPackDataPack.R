@@ -34,27 +34,6 @@
 unPackDataPack <- function(d,
                            d2_session) {
   
-  # Grab datapack_name from Home Page
-    d$info$datapack_name <- unPackDataPackName(
-      submission_path = d$keychain$submission_path,
-      tool = d$info$tool)  
-  
-  # Determine country uids ####
-    if (is.null(d$info$country_uids)) {
-      d$info$country_uids <- 
-        unPackCountryUIDs(submission_path = d$keychain$submission_path,
-                          tool = d$info$tool)
-    }
-  
-  # Store schema ####
-  if (d$info$cop_year == 2020) {
-    d$info$schema <-  datapackr::cop20_data_pack_schema
-  } else if(d$info$cop_year == 2021) {
-    d$info$schema <- datapackr::cop21_data_pack_schema 
-  } else {
-    d$info$schema <- datapackr::data_pack_schema
-  }
-    
   # Check whether there exist any troublesome comments in the file
     d <- checkComments(d)
     
