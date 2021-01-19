@@ -82,8 +82,9 @@ unPackSNUxIM <- function(d) {
       paste0(
         "ERROR! In tab ",
         sheet,
-        ", INVALID COLUMN HEADERS: Ensure all PSNUxIM column header mechanism are accurate and complete, and contain at least the 5- or 6-digit
-          mechanism code and either `DSD` or `TA` (e.g., `12345_DSD`). The following column headers are invalid and",
+        ", INVALID COLUMN HEADERS: Ensure all PSNUxIM column header mechanism are accurate",
+        " and complete, and contain at least the 5- or 6-digit mechanism code and either",
+        " `DSD` or `TA` (e.g., `12345_DSD`). The following column headers are invalid and",
         " will be dropped in processing. Please use only the form 12345_DSD. ->  \n\t* ",
         paste(d$tests$invalid_mech_headers$invalid_mech_headers, collapse = "\n\t* "),
         "\n")
