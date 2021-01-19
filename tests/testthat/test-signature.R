@@ -17,7 +17,8 @@ test_that("Can generate a signature", {
        "has_error",
        "newSNUxIM",
        "has_psnuxim",
-       "missing_psnuxim_combos"
+       "missing_psnuxim_combos",
+       "missing_DSNUs"
      )
    )
    expect_null(d$info$warning_msg)
