@@ -19,7 +19,7 @@ writePSNUxIM <- function(d,
   d$keychain$snuxim_model_data_path = snuxim_model_data_path
   d$keychain$output_folder = output_folder
   
-  # Start running log of all warning and information messages
+  # Start running log of all warning and information messages ####
   d$info$warning_msg <- NULL
   d$info$has_error <- FALSE
   
@@ -43,7 +43,7 @@ writePSNUxIM <- function(d,
     return(d)
   }
   
-  # Check whether to write anything into SNU x IM tab and write if needed  
+  # Check whether to write anything into SNU x IM tab and write if needed ####
   if ( !is.null(d$keychain$snuxim_model_data_path ) ) {
     if (d$info$cop_year == 2020) { 
       d <- packSNUxIM_2020(d)
@@ -54,7 +54,7 @@ writePSNUxIM <- function(d,
     }
   } else {stop("Cannot update PSNUxIM tab without model data.")}
   
-  # If new information added to SNU x IM tab, reexport Data Pack for user
+  # If new information added to SNU x IM tab, reexport Data Pack for user ####
   if (d$info$newSNUxIM) {
     interactive_print("Removing troublesome NAs that may have been added inadvertently...")
     d <- strip_wb_NAs(d)
@@ -70,7 +70,7 @@ writePSNUxIM <- function(d,
     
   }
   
-  # If warnings, show all grouped by issue
+  # If warnings, show all grouped by issue ####
   if (!is.null(d$info$warning_msg) & interactive()) {
     options(warning.length = 8170)
     cat(crayon::red(d$info$warning_msg))
