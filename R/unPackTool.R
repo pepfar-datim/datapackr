@@ -22,7 +22,7 @@ createKeychainInfo <- function(submission_path,
   tool_name<-readxl::read_excel(
     path = submission_path,
     sheet = "Home",
-    range = "B10", #May need to be a global variable
+    range = datapackr::toolName_homeCell(),
     col_types = "text", 
     col_names = FALSE) %>% 
     stringi::stri_split_fixed(pattern = " ",n=2 ) %>% 
