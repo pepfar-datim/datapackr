@@ -12,11 +12,33 @@
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
 #'
-createKeychainInfo <- function(submission_path = NULL,
-                               tool = "Data Pack",
+createKeychainInfo <- function(submission_path,
+                               tool = NULL,
                                country_uids = NULL,
                                cop_year = NULL) {
 
+
+  #Attempt to bootstrap the tool type and COP year if it is not explicitly provided
+  tool_name<-readxl::read_excel(
+    path = submission_path,
+    sheet = "Home",
+    range = datapackr::toolName_homeCell(),
+    col_types = "text", 
+    col_names = FALSE) %>% 
+    stringi::stri_split_fixed(pattern = " ",n=2 ) %>% 
+    unlist()
+  
+  if (is.null(tool)) {
+    
+    tool <- tool_name[2]
+  }
+  
+  if (is.null(cop_year)) {
+    cop_year <- gsub("COP","20", tool_name[1]) %>% 
+      as.integer()
+    }
+  
+  
   # Create data train for use across remainder of program
   d <- list(
     keychain = list(
@@ -69,8 +91,8 @@ createKeychainInfo <- function(submission_path = NULL,
 #'     \item Performs integrity checks on file structure;
 #' }
 #'
-unPackTool <- function(submission_path = NULL,
-                       tool = "Data Pack",
+unPackTool <- function(submission_path,
+                       tool = NULL,
                        country_uids = NULL,
                        cop_year = NULL,
                        d2_session = dynGet("d2_default_session",

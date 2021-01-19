@@ -27,7 +27,8 @@ unPackOPUDataPack <- function(d,
 
   # Grab datapack_name from Home Page
   d$info$datapack_name <- unPackDataPackName(
-    submission_path = d$keychain$submission_path)  
+    submission_path = d$keychain$submission_path,
+    tool = d$info$tool)  
   
   # Determine country uids ####
   if (is.null(d$info$country_uids)) {

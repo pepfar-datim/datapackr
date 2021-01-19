@@ -4,7 +4,7 @@
 \alias{unPackDataPackName}
 \title{Extract the name of the datapack}
 \usage{
-unPackDataPackName(submission_path = NA, tool = "Data Pack")
+unPackDataPackName(submission_path, tool)
 }
 \arguments{
 \item{submission_path}{Local path to the file to import.}

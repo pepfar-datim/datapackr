@@ -9,6 +9,13 @@ getCurrentCOPYear <- function() { 2021 }
 
 
 #' @export
+#' @title Location of name of the tool on Home tab.
+#'
+#' @return Cell reference where the name of the tool is located.
+#'
+toolName_homeCell<-function() {"B10"}
+
+#' @export
 #' @title Location of Country UIDs on Home tab.
 #'
 #' @return Cell reference where the name of the DataPack is located.
