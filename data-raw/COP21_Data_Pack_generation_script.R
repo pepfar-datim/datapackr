@@ -64,7 +64,25 @@ batch <- tibble::tribble(
 # pick <- batch[c(16,18,20,21,24,25,28,41,42,43,45),]
 
 # For individual testing ####
-pick <- batch[c(4,24,15,8,13,19),]
+pick <- batch %>%
+  dplyr::filter(
+    !datapack_name %in% c(
+      "Botswana",
+      "Cote d'Ivoire",
+      "Eswatini",
+      "Ethiopia",
+      "India",
+      "Laos",
+      "Lesotho",
+      "Malawi",
+      "Mozambique",
+      "Rwanda",
+      "Senegal",
+      "South Africa",
+      "Tanzania",
+      "Uganda",
+      "Zambia")
+  )
 # i = 1
 
 # For full Production run
