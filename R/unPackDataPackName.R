@@ -9,8 +9,8 @@
 #' javascript:;
 #' @return Character vector of the name of the data pack.
 #' 
-unPackDataPackName <- function(submission_path = NA,
-                              tool = "Data Pack") {
+unPackDataPackName <- function(submission_path,
+                              tool) {
   
   submission_path <- handshakeFile(path = submission_path,
                                    tool = tool)

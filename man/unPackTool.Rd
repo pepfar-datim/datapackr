@@ -5,8 +5,8 @@
 \title{Unpack a submitted tool}
 \usage{
 unPackTool(
-  submission_path = NULL,
-  tool = "Data Pack",
+  submission_path,
+  tool = NULL,
   country_uids = NULL,
   cop_year = NULL,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
