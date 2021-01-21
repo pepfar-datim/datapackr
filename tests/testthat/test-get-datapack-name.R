@@ -16,9 +16,11 @@ test_that("Can read a Datapack Name and UIDs", {
                       xy = c(home_address$col,home_address$row))
   
   openxlsx::saveWorkbook(wb = wb,file = template_copy,overwrite = TRUE)
-  foo<-unPackDataPackName(submission_path = template_copy)
+  foo<-unPackDataPackName(submission_path = template_copy,
+                          "Data Pack Template")
   expect_equal(foo,"Demoland")
-  foo<-unPackCountryUIDs(submission_path = template_copy)
+  foo<-unPackCountryUIDs(submission_path = template_copy,
+                         tool = "Data Pack")
   expect_equal(foo,"abc12345678")
   unlink(template_copy)
 } )
