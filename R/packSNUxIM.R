@@ -241,6 +241,7 @@ packSNUxIM <- function(d) {
   d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
   openxlsx::removeFilter(d$tool$wb, names(d$tool$wb))
   
+  # Write data to new PSNUxIM tab ####
   if (!d$info$has_psnuxim) {
     openxlsx::writeData(wb = d$tool$wb,
                         sheet = "PSNUxIM",
@@ -256,76 +257,85 @@ packSNUxIM <- function(d) {
     
     d$info$newSNUxIM <- TRUE
   } else if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
-    if (d$info$has_psnuxim) {
-      # Don't count blank rows at bottom or blank columns to left
-      SNUxIM_cols <- 
-        readxl::read_excel(
-          path = d$keychain$submission_path,
-          sheet = "PSNUxIM",
-          range = readxl::cell_limits(c(top_rows, 1), c(top_rows, NA))
-        )
-      
-      SNUxIM_rows <-
-        readxl::read_excel(
-          path = d$keychain$submission_path,
-          sheet = "PSNUxIM",
-          range = readxl::cell_limits(c(1,2), c(NA,2)),
-          col_names = F
-        ) %>%
-        NROW()
-      
-      existing_rows <- SNUxIM_rows
-      first_new_mech_col <- NCOL(SNUxIM_cols) + 1
-      
-    } else {
-      SNUxIM_cols <- datapackr::cop21_data_pack_schema %>%
-        dplyr::filter(sheet_name == "PSNUxIM",
-                      !indicator_code %in% c("12345_DSD","12345_TA")) %>%
-        dplyr::select(indicator_code) %>%
-        `row.names<-`(.[, 1]) %>%
-        t() %>%
-        tibble::as_tibble()
-      
-      existing_rows <- top_rows
-      first_new_mech_col <- length(header_cols) + 1
-    }
+    warning_msg <- 
+      paste0(
+        "NOTE: Your Data Pack requires data to be appended to the bottom of your",
+        " PSNUxIM tab, however this app is currently not yet configured to do that.",
+        " Please continue working as best you can and check back soon.",
+        "\n")
     
-    new_mech_cols <- names(d$data$SNUxIM_combined)[!names(d$data$SNUxIM_combined) %in% c(names(SNUxIM_cols), "row")]
-    non_appended_mech_cols <- names(SNUxIM_cols)[!names(SNUxIM_cols) %in% names(d$data$SNUxIM_combined)]
-    
-    d$data$SNUxIM_combined %<>%
-      {if (length(non_appended_mech_cols) > 0) {
-        (.) %>% addcols(non_appended_mech_cols)
-      } else {.}} %>%
-      dplyr::select(names(SNUxIM_cols), tidyselect::all_of(new_mech_cols))
-    
-    openxlsx::writeData(wb = d$tool$wb,
-                        sheet = "PSNUxIM",
-                        x = d$data$SNUxIM_combined,
-                        xy = c(1, existing_rows + 1),
-                        colNames = F, rowNames = F, withFilter = FALSE)
-          
-    d$info$newSNUxIM <- TRUE
-          
-  # Add additional col_names if any
-    openxlsx::writeData(wb = d$tool$wb,
-                        sheet = "PSNUxIM",
-                        x = new_mech_cols %>% as.matrix() %>% t(),
-                        xy = c(first_new_mech_col, top_rows),
-                        colNames = F, rowNames = F, withFilter = FALSE)
-            
-  # Add green highlights to appended rows, if any ####
-    newRowStyle <- openxlsx::createStyle(fontColour = "#006100", fgFill = "#C6EFCE")
-          
-    openxlsx::addStyle(
-      wb = d$tool$wb,
-      sheet = "PSNUxIM",
-      newRowStyle,
-      rows = (existing_rows + 1):(existing_rows + NROW(d$data$SNUxIM_combined)),
-      cols = 1:2,
-      gridExpand = TRUE,
-      stack = FALSE)
-            
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)  
+  # # OR, Append rows to bottom of existing PSNUxIM tab ####
+  #   if (d$info$has_psnuxim) {
+  #     # Don't count blank rows at bottom or blank columns to left
+  #     SNUxIM_cols <- 
+  #       readxl::read_excel(
+  #         path = d$keychain$submission_path,
+  #         sheet = "PSNUxIM",
+  #         range = readxl::cell_limits(c(top_rows, 1), c(top_rows, NA))
+  #       )
+  #     
+  #     SNUxIM_rows <-
+  #       readxl::read_excel(
+  #         path = d$keychain$submission_path,
+  #         sheet = "PSNUxIM",
+  #         range = readxl::cell_limits(c(1,2), c(NA,2)),
+  #         col_names = F
+  #       ) %>%
+  #       NROW()
+  #     
+  #     existing_rows <- SNUxIM_rows
+  #     first_new_mech_col <- NCOL(SNUxIM_cols) + 1
+  #     
+  #   } else {
+  #     SNUxIM_cols <- datapackr::cop21_data_pack_schema %>%
+  #       dplyr::filter(sheet_name == "PSNUxIM",
+  #                     !indicator_code %in% c("12345_DSD","12345_TA")) %>%
+  #       dplyr::select(indicator_code) %>%
+  #       `row.names<-`(.[, 1]) %>%
+  #       t() %>%
+  #       tibble::as_tibble()
+  #     
+  #     existing_rows <- top_rows
+  #     first_new_mech_col <- length(header_cols) + 1
+  #   }
+  #   
+  #   new_mech_cols <- names(d$data$SNUxIM_combined)[!names(d$data$SNUxIM_combined) %in% c(names(SNUxIM_cols), "row")]
+  #   non_appended_mech_cols <- names(SNUxIM_cols)[!names(SNUxIM_cols) %in% names(d$data$SNUxIM_combined)]
+  #   
+  #   d$data$SNUxIM_combined %<>%
+  #     {if (length(non_appended_mech_cols) > 0) {
+  #       (.) %>% addcols(non_appended_mech_cols)
+  #     } else {.}} %>%
+  #     dplyr::select(names(SNUxIM_cols), tidyselect::all_of(new_mech_cols))
+  #   
+  #   openxlsx::writeData(wb = d$tool$wb,
+  #                       sheet = "PSNUxIM",
+  #                       x = d$data$SNUxIM_combined,
+  #                       xy = c(1, existing_rows + 1),
+  #                       colNames = F, rowNames = F, withFilter = FALSE)
+  #         
+  #   d$info$newSNUxIM <- TRUE
+  #         
+  # # Add additional col_names if any
+  #   openxlsx::writeData(wb = d$tool$wb,
+  #                       sheet = "PSNUxIM",
+  #                       x = new_mech_cols %>% as.matrix() %>% t(),
+  #                       xy = c(first_new_mech_col, top_rows),
+  #                       colNames = F, rowNames = F, withFilter = FALSE)
+  #           
+  # # Add green highlights to appended rows, if any ####
+  #   newRowStyle <- openxlsx::createStyle(fontColour = "#006100", fgFill = "#C6EFCE")
+  #         
+  #   openxlsx::addStyle(
+  #     wb = d$tool$wb,
+  #     sheet = "PSNUxIM",
+  #     newRowStyle,
+  #     rows = (existing_rows + 1):(existing_rows + NROW(d$data$SNUxIM_combined)),
+  #     cols = 1:2,
+  #     gridExpand = TRUE,
+  #     stack = FALSE)
+  #           
   } else {
    stop("Cannot write data where there seems to be no new data needed.")
   }
