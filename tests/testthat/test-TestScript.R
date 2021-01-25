@@ -155,7 +155,9 @@ test_that("All", {
   # d <- datapackr::checkAnalytics(d, model_data_path = model_data_path)
   # datapackr::compareData_DatapackVsDatim(d)
   # 
-   source("/Users/sam/Documents/GitHub/datapackr/data-raw/update_cached_PSNUs.R")
+  setwd("~/Documents/GitHub/datapackr")
+   source("/Users/sam/Documents/GitHub/datapackr/data-raw/update_cached_PSNUs.R",
+          local = TRUE)
  #  source("/Users/sam/Documents/GitHub/datapackr/data-raw/update_cached_de_coc_co_map.R")
  #  source("/Users/sam/Documents/GitHub/datapackr/data-raw/produceConfigFile.R")
   # 
