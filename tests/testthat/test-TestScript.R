@@ -1,7 +1,11 @@
 context("All")
 
 test_that("All", {
-
+  branch <- "master"
+  
+  # detach("package:datapackr")
+  # rstudioapi::restartSession()
+  
   library(datapackr)
   library(magrittr)
   
@@ -10,7 +14,7 @@ test_that("All", {
   loginToDATIM(secrets)
   
   model_data_path <- "~/datapackr_test_files/COP21/model_data_pack_input_21_20210122_1_flat copy.rds"
-  snuxim_model_data_path <- "~/datapackr_test_files/COP21/PSNUxIM_20210113_1.rds"
+  snuxim_model_data_path <- "~/datapackr_test_files/COP21/PSNUxIM_20210113_1 copy.rds"
   
   
   model_data <- readRDS(model_data_path)
@@ -85,8 +89,11 @@ test_that("All", {
   d <- unPackTool("/Users/sam/datapackr_test_files/OPU_returned/OPU Data Pack_Eswatini_20201116165741_CDC_USAID_with dedup.xlsx",
                   tool = "OPU Data Pack")
 
-  foo <- datapackr::compareData_OpuDatapackVsDatim(d)
-      
+    assign(paste0("d_cop20_opu_", branch), d)
+  
+    foo <- datapackr::compareData_OpuDatapackVsDatim(d)
+    assign(paste0("compare_cop20_opu", branch), foo)  
+    
 # pack a cop 21 data pack
   for (i in 1:NROW(pick)) {
     print(paste0(i," of ",NROW(pick)))
@@ -107,6 +114,7 @@ test_that("All", {
 
   d <- unPackTool("/Users/sam/datapackr_test_files/COP21/Data Pack_South Africa_20201203125459 (1).xlsx",
                   cop_year = 2021)
+  assign(paste0("d_cop21", branch), d)  
   
   
   foo <- datapackr::create_play_spectrum_output("XtxUYCsDWrR",
