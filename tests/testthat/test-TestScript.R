@@ -105,7 +105,7 @@ test_that("All", {
   
   output_folder <- "~/datapackr_test_files/Data Packs SNUxIM"
 
-  d <- unPackTool("/Users/sam/datapackr_test_files/Data Packs/Data Pack_South Africa_20201203125459 (1).xlsx",
+  d <- unPackTool("/Users/sam/datapackr_test_files/COP21/Data Pack_South Africa_20201203125459 (1).xlsx",
                   cop_year = 2021)
   
   
