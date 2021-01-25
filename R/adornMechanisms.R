@@ -2,7 +2,7 @@
 #' @importFrom magrittr %>% %<>%
 #' @title getMechanismView()
 #'
-#' @description Retreives a view of mechanisms with partners and agencies
+#' @description Retrieves a view of mechanisms with partners and agencies
 #' The function will attempt to read from a cached file, if defined in
 #' the support_files_directory option has been set, and the mechs.rds file
 #' is available to be read. Otherwise, if the user is logged in, the view
@@ -11,6 +11,7 @@
 #' @return Mechs
 #'
 getMechanismView <- function(d2_session = dynGet("d2_default_session",
+                                                 ifnotfound = NULL,
                                                  inherits = TRUE)) {
   empty_mechs_view <- tibble::tibble(
     "mechanism_desc" = character() ,
@@ -24,8 +25,7 @@ getMechanismView <- function(d2_session = dynGet("d2_default_session",
     "enddate" = character()
     )
 
-  getMechanismViewFromDATIM <- function(d2_session = dynGet("d2_default_session",
-                                                            inherits = TRUE)) {
+  getMechanismViewFromDATIM <- function(d2_session) {
     if (!isLoggedIn(d2_session)) {
       warning("You are not logged in but have requested a mechanism view.")
       return(empty_mechs_view)
@@ -46,9 +46,10 @@ getMechanismView <- function(d2_session = dynGet("d2_default_session",
     }
   }
 
-  support_files_directory <- getOption("support_files_directory")
-
-  if (is.null(support_files_directory)) {
+  support_files_directory <- Sys.getenv("support_files_directory")
+  #Check to see if we can access this directory
+  
+  if (!dir.exists(support_files_directory)) {
     mechs <- getMechanismViewFromDATIM(d2_session = d2_session)
   } else {
 
@@ -76,12 +77,13 @@ getMechanismView <- function(d2_session = dynGet("d2_default_session",
 #' @description Join analytical dimensions with d$data$analtyics related
 #' to partner, agency and mechanism information.
 #'
-#' @param data Dataset to adorn
+#' @param data Dataset to adorn, typically d$data$analytics
 #'
 #' @return Modified data object
 #'
 adornMechanisms <- function(data,
                             d2_session = dynGet("d2_default_session",
+                                                ifnotfound = NULL,
                                                 inherits = TRUE)) {
 
   mechs <- getMechanismView(d2_session = d2_session) %>%
