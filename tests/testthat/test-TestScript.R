@@ -5,12 +5,12 @@ test_that("All", {
   library(datapackr)
   library(magrittr)
   
-  secrets <- "~/.secrets/cop.json"
+  secrets <- "~/.secrets/datim.json"
   
   loginToDATIM(secrets)
   
-  model_data_path <- "~/datapackr_test_files/COP21/model_data_pack_input_21_20201216_1_flat.rds"
-  snuxim_model_data_path <- "~/datapackr_test_files/COP21/PSNUxIM_20201215_1.rds"
+  model_data_path <- "~/datapackr_test_files/COP21/model_data_pack_input_21_20210122_1_flat copy.rds"
+  snuxim_model_data_path <- "~/datapackr_test_files/COP21/PSNUxIM_20210113_1.rds"
   
   
   model_data <- readRDS(model_data_path)
