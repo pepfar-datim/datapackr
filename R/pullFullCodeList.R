@@ -33,7 +33,7 @@ pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
     datasets_list <- c(datasets_list,
                        datapackr::getDatasetUids(FY, type = "subnat_results"))
   }
-  if ("impatt" %in% datastream) {
+  if ("IMPATT" %in% datastream) {
     datasets_list <- c(datasets_list,
                        datapackr::getDatasetUids(FY, type = "impatt"))
   }

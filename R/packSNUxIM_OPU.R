@@ -23,9 +23,9 @@ packSNUxIM_OPU <- function(d) {
     dplyr::left_join(d$data$PSNUs, by = c("psnu_uid" = "psnu_uid")) %>%
   
   # Pivot wider ####
-  tidyr::unite(col = mechcode_supporttype, attribute_option, support_type) %>%  
-  dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop,
-                  mechcode_supporttype, value) %>%
+    dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop,
+                  mech_code = attribute_option, support_type, value) %>%
+    tidyr::unite(col = mechcode_supporttype, mech_code, support_type) %>%
     dplyr::mutate(
       mechcode_supporttype = dplyr::case_when(
         mechcode_supporttype == "00000_DSD" ~ "DSD Dedupe",
