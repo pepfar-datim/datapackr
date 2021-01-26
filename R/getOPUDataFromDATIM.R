@@ -17,6 +17,13 @@ getOPUDataFromDATIM <- function(cop_year,
                                 country_uids = NULL,
                                 country_names = NULL) {
   
+  if (cop_year == 2020){
+    map_DataPack_DATIM_DEs_COCs_local <- 
+      datapackr::cop20_map_DataPack_DATIM_DEs_COCs
+  } else {
+    stop("The COP year provided is not supported by getOPUDataFromDATIM")
+  }
+  
   options("scipen" = 999)
   options(warning.length = 8170)
   
@@ -59,7 +66,7 @@ getOPUDataFromDATIM <- function(cop_year,
     .[["indicator_code"]]
   
   data_datim %<>%
-    dplyr::left_join(datapackr::map_DataPack_DATIM_DEs_COCs,
+    dplyr::left_join(map_DataPack_DATIM_DEs_COCs_local,
                       by = c("data_element_uid" = "dataelement",
                             "category_option_combo_uid" = "categoryoptioncombouid"))
   
