@@ -5,7 +5,7 @@
 \title{Unpack a submitted tool}
 \usage{
 unPackTool(
-  submission_path = NULL,
+  submission_path,
   tool = NULL,
   country_uids = NULL,
   cop_year = NULL,

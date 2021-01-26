@@ -1,45 +1,27 @@
-datapackr::loginToDATIM("~/.secrets/datim.json")
+datimutils::loginToDATIM("~/.secrets/cop-test.json")
 
 cop_year = getCurrentCOPYear()
 
-fullCodeList <- pullFullCodeList(FY = cop_year +1,
-                                 datastream = c("mer_targets", "subnat_targets", "impatt")) %>%
+fullCodeList <- pullFullCodeList(FY = cop_year +1) %>%
   dplyr::left_join(
     api_call("categoryOptionCombos") %>% api_fields("id, categoryOptions") %>% api_get(),
     by = c("categoryoptioncombouid" = "id")) %>%
   dplyr::mutate(categoryOptions = purrr::map_chr(categoryOptions,~.x[["id"]] %>% 
                                                    sort() %>% paste(collapse = ".")))
 
-map_DataPack_DATIM_DEs_COCs <- datapackr::cop21_data_pack_schema %>%
-  dplyr::filter(col_type == "target" & dataset %in% c("mer", "subnat", "impatt")) %>%
+map_DataPack_DATIM_DEs_COCs <- datapackr::cop20_data_pack_schema %>%
+  dplyr::filter(col_type == "target") %>%
   dplyr::select(indicator_code, dataelement_dsd, dataelement_ta,
                 categoryoption_specified, valid_ages, valid_sexes, valid_kps) %>%
   tidyr::unnest(cols = valid_ages, names_sep  = ".") %>%
   tidyr::unnest(cols = valid_sexes, names_sep  = ".") %>%
   tidyr::unnest(cols = valid_kps, names_sep  = ".") %>%
   dplyr::mutate_at(c("valid_sexes.name","valid_ages.name","valid_ages.id","valid_sexes.id"),
-                   ~dplyr::case_when(indicator_code == "OVC_HIVSTAT.T"
+                   ~dplyr::case_when(indicator_code == "OVC_HIVSTAT.N.total.T"
                                      ~ NA_character_,
                                      TRUE ~ .)) %>%
   dplyr::distinct() %>%
-  dplyr::mutate(categoryoption_specified = stringr::str_split(categoryoption_specified, "[.]"),
-                dataelement_dsd = dplyr::case_when(
-                  indicator_code %in% c("OVC_SERV.Active.T","OVC_SERV.Grad.T")
-                    & valid_ages.id == "Q6xWcyHDq6e"
-                  ~ stringr::str_extract(dataelement_dsd, "(?<=\\.)([A-Za-z][A-Za-z0-9]{10})$"),
-                  indicator_code %in% c("OVC_SERV.Active.T","OVC_SERV.Grad.T")
-                    & valid_ages.id != "Q6xWcyHDq6e"
-                  ~ stringr::str_extract(dataelement_dsd, "^([A-Za-z][A-Za-z0-9]{10})(?=\\.)"),
-                  TRUE ~ dataelement_dsd),
-                dataelement_ta = dplyr::case_when(
-                  indicator_code %in% c("OVC_SERV.Active.T","OVC_SERV.Grad.T")
-                  & valid_ages.id == "Q6xWcyHDq6e"
-                  ~ stringr::str_extract(dataelement_ta, "(?<=\\.)([A-Za-z][A-Za-z0-9]{10})$"),
-                  indicator_code %in% c("OVC_SERV.Active.T","OVC_SERV.Grad.T")
-                  & valid_ages.id != "Q6xWcyHDq6e"
-                  ~ stringr::str_extract(dataelement_ta, "^([A-Za-z][A-Za-z0-9]{10})(?=\\.)"),
-                  TRUE ~ dataelement_ta)
-                ) %>%
+  dplyr::mutate(categoryoption_specified = stringr::str_split(categoryoption_specified, "[.]")) %>%
   dplyr::mutate(
     valid_kps.id =
       dplyr::case_when(
@@ -80,9 +62,9 @@ map_DataPack_DATIM_DEs_COCs <- datapackr::cop21_data_pack_schema %>%
 
 
 
-getCOGSMap <- function(uid) {
+getCOGSMap<-function(uid) {
   
-  r <- paste0(getOption("baseurl"),"api/categoryOptionGroupSets/",uid,
+  r<-paste0(getOption("baseurl"),"api/categoryOptionGroupSets/",uid,
             "?fields=id,name,categoryOptionGroups[id,name,categoryOptions[id,name,categoryOptionCombos[id,name]]") %>%
     URLencode(.) %>%
     httr::GET(., httr::timeout(180)) %>%
@@ -121,7 +103,7 @@ getCOGSMap <- function(uid) {
 }
 
 
-hiv_specific <- getCOGSMap("bDWsPYyXgWP") %>% #HIV Test Status (Specific)
+hiv_specific<-getCOGSMap("bDWsPYyXgWP") %>% #HIV Test Status (Specific)
   purrr::pluck("dimension_map") %>%
   dplyr::select("categoryoptioncombouid"=coc_uid,
                 "resultstatus"=category_option_group_name) %>%
@@ -130,7 +112,7 @@ hiv_specific <- getCOGSMap("bDWsPYyXgWP") %>% #HIV Test Status (Specific)
   dplyr::mutate(resultstatus = stringr::str_trim(resultstatus))
 
 
-hiv_inclusive <- getCOGSMap("ipBFu42t2sJ") %>% # HIV Test Status (Inclusive)
+hiv_inclusive<-getCOGSMap("ipBFu42t2sJ") %>% # HIV Test Status (Inclusive)
   purrr::pluck("dimension_map") %>%
   dplyr::select("categoryoptioncombouid"=coc_uid,
                 "resultstatus_inclusive"=category_option_group_name) %>%
@@ -157,11 +139,11 @@ getDEGSMap <- function(uid) {
   
 }
 
-#Valid for COP21
+#Valid for COP20
 data_element_dims <-
   c("HWPJnUTMjEq",
     "LxhLO68FcXm",
-    "NLZgRe4FuQJ")
+    "gIBfzXabKkt")
 
 degs_map <- purrr::map_dfr(data_element_dims, getDEGSMap) %>%
   tidyr::spread(type, name, fill = NA)
@@ -170,7 +152,7 @@ from <- c(
   "dataElements",
   "Disaggregation.Type",
   "Technical.Area",
-  "Top.Level..USE.ONLY.for.FY21.Results.FY22.Targets."
+  "Top.Level..USE.ONLY.for.FY20.Results.FY21.Targets."
 )
 
 to <- c("dataelement",

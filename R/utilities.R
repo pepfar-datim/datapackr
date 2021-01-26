@@ -593,28 +593,3 @@ prioritization_dict <- function() {
 
   return(dict)
 }
-
-#' @export
-#' @title Take Max along row among columns matching regex
-#' 
-#' @param df Dataframe
-#' @param cn Name (character string) of Max column to create
-#' @param regex String of regex to use in identifying columns.
-#'
-#' @return df
-#'
-rowMax <- function(df, cn, regex) {
-  df_filtered <- df %>%
-    dplyr::select(tidyselect::matches(match = regex))
-  
-  if (NCOL(df_filtered) == 0) {
-    df[[cn]] <- NA_integer_
-    return(df)
-  }
-  
-  df[[cn]] <- df_filtered %>%
-    purrr::pmap(pmax, na.rm = T) %>%
-    as.numeric
-  
-  return(df)
-}

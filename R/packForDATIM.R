@@ -19,7 +19,7 @@ packForDATIM <- function(d, type = NULL) {
   } else if (type == "SUBNAT_IMPATT") {
     d <- exportSubnatToDATIM(d)
   } else if (type == "PSNUxIM") {
-    d <- packForDATIM_MER(d)
+    d <- exportDistributedDataToDATIM(d)
   } else if (type == "OPU PSNUxIM") {
     d <- packForDATIM_OPU(d)
   } else{

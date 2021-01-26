@@ -6,7 +6,6 @@
 #'     issues, checking data against DATIM validations, and extracting data.
 #'
 #' @param d Datapackr object
-#' @param d2_session DHIS2 Session ID
 #'
 #' @details
 #' Executes the following operations in relation to a submitted Data Pack:
@@ -31,9 +30,29 @@
 #' The final message in the Console prints all warnings identified in the Data
 #' Pack being processed.
 #'
-unPackDataPack <- function(d,
-                           d2_session) {
+unPackDataPack <- function(d) {
   
+  # Grab datapack_name from Home Page
+    d$info$datapack_name <- unPackDataPackName(
+      submission_path = d$keychain$submission_path,
+      tool = d$info$tool)  
+  
+  # Determine country uids ####
+    if (is.null(d$info$country_uids)) {
+      d$info$country_uids <- 
+        unPackCountryUIDs(submission_path = d$keychain$submission_path,
+                          tool = d$info$tool)
+    }
+  
+  # Store schema ####
+  if (d$info$cop_year == 2020) {
+    d$info$schema <-  datapackr::cop20_data_pack_schema
+  } else if(d$info$cop_year == 2021) {
+    d$info$schema <- datapackr::cop21_data_pack_schema 
+  } else {
+    d$info$schema <- datapackr::data_pack_schema
+  }
+    
   # Check whether there exist any troublesome comments in the file
     d <- checkComments(d)
     
@@ -52,7 +71,7 @@ unPackDataPack <- function(d,
 
   # Combine Targets with SNU x IM for PSNU x IM level targets ####
     if (d$info$has_psnuxim) {
-      #d <- combineMER_SNUxIM(d)
+      d <- combineMER_SNUxIM(d)
       
       d <- createAnalytics(d)
       
