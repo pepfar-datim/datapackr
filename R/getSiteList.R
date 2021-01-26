@@ -117,13 +117,17 @@ getSiteList <- function(org_unit_uids,
 #' @return character vector of country uids, length of 0 if no countries at or below
 #' the org unit
 #'
-CountriesContained <- function(org_unit_uid, base_url = getOption("baseurl")) {
+CountriesContained <- function(org_unit_uid, 
+                               d2_session = dynGet("d2_default_session",
+                                                   inherits = TRUE)) {
 #TODO have this make the api call using a standard function once developed such as getMetadata
 # in dataPackCommons
   assertthat::assert_that(stringr::str_length(org_unit_uid) == 11)
 # get list of countries using the country orgUnitGroup = cNzfcPWEGSH
-  r <- paste0(base_url, "api/organisationUnitGroups/cNzfcPWEGSH.csv?fields=organisationUnits[name,id,path]") %>% 
-    httr::GET(httr::timeout(180)) %>% 
+  r <- paste0(d2_session$base_url, 
+              "api/organisationUnitGroups/cNzfcPWEGSH.csv?fields=organisationUnits[name,id,path]") %>% 
+    httr::GET(httr::timeout(180),
+              handle = d2_session$handle) %>% 
     httr::content(as = "text") %>% 
     readr::read_csv(col_names = TRUE, col_types = readr::cols(.default = "c"))
   

@@ -80,12 +80,14 @@ map_DataPack_DATIM_DEs_COCs <- datapackr::cop21_data_pack_schema %>%
 
 
 
-getCOGSMap <- function(uid) {
+getCOGSMap <- function(uid,
+                       d2_session = dynGet("d2_default_session",
+                                           inherits = TRUE)) {
   
-  r <- paste0(getOption("baseurl"),"api/categoryOptionGroupSets/",uid,
+  r <- paste0(d2_session$base_url,"api/categoryOptionGroupSets/",uid,
             "?fields=id,name,categoryOptionGroups[id,name,categoryOptions[id,name,categoryOptionCombos[id,name]]") %>%
     URLencode(.) %>%
-    httr::GET(., httr::timeout(180)) %>%
+    httr::GET(., httr::timeout(180), handle = d2_session$handle) %>%
     httr::content(.,"text") %>%
     jsonlite::fromJSON(.,flatten = TRUE) 
   
@@ -140,11 +142,16 @@ hiv_inclusive <- getCOGSMap("ipBFu42t2sJ") %>% # HIV Test Status (Inclusive)
   dplyr::mutate(resultstatus_inclusive = stringr::str_trim(resultstatus_inclusive))
 
 
-getDEGSMap <- function(uid) {
+getDEGSMap <- function(uid,
+                       d2_session = dynGet("d2_default_session",
+                                           inherits = TRUE)) {
   
-  r <- paste0(getOption("baseurl"),"api/dataElementGroupSets/",uid,"?fields=id,name,dataElementGroups[name,dataElements[id]]&paging=false") %>%
+  r <- paste0(d2_session$base_url,
+              "api/dataElementGroupSets/",
+              uid,
+              "?fields=id,name,dataElementGroups[name,dataElements[id]]&paging=false") %>%
     URLencode(.) %>%
-    httr::GET(., httr::timeout(180)) %>%
+    httr::GET(., httr::timeout(180), handle = d2_session$handle) %>%
     httr::content(.,"text") %>%
     jsonlite::fromJSON(.,flatten = TRUE) 
   

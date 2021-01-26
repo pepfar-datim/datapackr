@@ -112,11 +112,13 @@ api_get <- function(api_call,
 #' 
 #' @return Web-encoded URL for DATIM API query.
 #' 
-api_sql_call <- function(sqlView, var = NULL) {
+api_sql_call <- function(sqlView, var = NULL,
+                         d2_session = dynGet("d2_default_session",
+                                             inherits = TRUE)) {
   
   URL <-   
-    paste0(
-      getOption("baseurl"),"api/",datapackr::api_version(),
+    paste0(d2_session$base_url,
+      "api/", datapackr::api_version(),
       "/sqlViews/",
       sqlView,
       "/data.csv?",
@@ -126,7 +128,8 @@ api_sql_call <- function(sqlView, var = NULL) {
     
   r <- 
     URL %>%
-    httr::GET(httr::timeout(180)) %>%
+    httr::GET(httr::timeout(180),
+              handle = d2_session$handle) %>%
     httr::content(., "text") %>%
     readr::read_csv()
     

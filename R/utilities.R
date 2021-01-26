@@ -114,16 +114,18 @@ getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
 #' @return Dataframe of _Military names and ids, with associated Operating Units
 #' and Countries.
 #'
-getMilitaryNodes <- function() {
+getMilitaryNodes <- function(d2_session = dynGet("d2_default_session",
+                                                 inherits = TRUE)) {
   #loginToDATIM(getOption("secrets"))
 
   militaryNodes <- paste0(
-    getOption("baseurl"),"api/",datapackr::api_version(),
+    d2_session$base_url,"api/",datapackr::api_version(),
       "/organisationUnits.json?paging=false",
       "&filter=name:$ilike:_Military",
       #"&filter=organisationUnitGroups.id:eq:nwQbMeALRjL", (New _Mil nodes not here...)
       "&fields=name,id,level,ancestors[id,name]") %>%
-    httr::GET(httr::timeout(180)) %>%
+    httr::GET(httr::timeout(180),
+              handle = d2_session$handle) %>%
     httr::content(., "text") %>%
     jsonlite::fromJSON(., flatten = TRUE) %>%
     do.call(rbind.data.frame, .) %>%
