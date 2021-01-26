@@ -118,7 +118,7 @@ test_that("All", {
   
   
   foo <- datapackr::create_play_spectrum_output("XtxUYCsDWrR",
-                                                2021,
+                                                2020,
                                                 "~/datapackr_test_files")
   
 #  d <- writePSNUxIM(d,
