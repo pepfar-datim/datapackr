@@ -32,7 +32,8 @@
 #' Pack being processed.
 #'
 unPackDataPack <- function(d,
-                           d2_session) {
+                           d2_session = dynGet("d2_default_session",
+                                               inherits = TRUE)) {
   
   # Check whether there exist any troublesome comments in the file
     d <- checkComments(d)
@@ -54,7 +55,8 @@ unPackDataPack <- function(d,
     if (d$info$has_psnuxim) {
       #d <- combineMER_SNUxIM(d)
       
-      d <- createAnalytics(d)
+      d <- createAnalytics(d,
+                           d2_session = d2_session)
       
       # Prepare SNU x IM dataset for DATIM import & validation ####
       d <- packForDATIM(d, type = "PSNUxIM")

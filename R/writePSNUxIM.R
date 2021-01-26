@@ -14,7 +14,9 @@
 #' 
 writePSNUxIM <- function(d,
                         snuxim_model_data_path = NULL,
-                        output_folder = NULL) {
+                        output_folder = NULL,
+                        d2_session = dynGet("d2_default_session",
+                                            inherits = TRUE)) {
  
   d$keychain$snuxim_model_data_path = snuxim_model_data_path
   d$keychain$output_folder = output_folder
@@ -48,7 +50,8 @@ writePSNUxIM <- function(d,
     if (d$info$cop_year == 2020) { 
       d <- packSNUxIM_2020(d)
     } else if (d$info$cop_year == 2021) {
-      d <- packSNUxIM(d) 
+      d <- packSNUxIM(d,
+                      d2_session = d2_session) 
     } else {
       stop(paste0("Packing SNU x IM tabs is not supported for COP ",d$info$cop_year," Data Packs."))
     }

@@ -9,7 +9,9 @@
 #' 
 #' @return d
 #' 
-packSNUxIM <- function(d) {
+packSNUxIM <- function(d,
+                       d2_session = dynGet("d2_default_session",
+                                           inherits = TRUE)) {
 
   if (!d$info$cop_year %in% c(2021)) {
     stop(paste0("Packing SNU x IM tabs is not supported for COP ",d$info$cop_year," Data Packs."))
