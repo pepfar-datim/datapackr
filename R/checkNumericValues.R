@@ -53,7 +53,10 @@ checkNumericValues <- function(d, sheet, header_cols = NULL){
       paste0(
         "WARNING! In tab ",
         sheet,
-        ": NON-NUMERIC VALUES found! ->  \n\t* ",
+        ": NON-NUMERIC VALUES found! Please ensure all values entered against",
+        " FY22 Target columns include numeric values only — no letters or punctuation.",
+        " It may be helpful to use an Excel filter to check unique values in a column for",
+        " any non-numeric entries. ->  \n\t* ",
         paste(non_numeric$row_id, collapse = "\n\t* "),
         "\n")
 
