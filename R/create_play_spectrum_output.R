@@ -18,6 +18,15 @@
 create_play_spectrum_output <- function(country_uids,
                                         cop_year,
                                         output_folder = NULL) {
+  
+  if (cop_year == 2021) {
+    map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
+  } else if (cop_year == 2020) {
+    map_DataPack_DATIM_DEs_COCs_local <- datapackr::cop20_map_DataPack_DATIM_DEs_COCs
+  } else {
+    stop("That COP Year currently isn't supported for processing by create_play_spectrum_output.")
+  }
+  
   # Get PSNU list ####
   PSNUs <- datapackr::valid_PSNUs %>%
     dplyr::filter(country_uid %in% country_uids) %>%
@@ -49,7 +58,7 @@ create_play_spectrum_output <- function(country_uids,
   data_datim <- datapackr::getCOPDataFromDATIM(country_uids,
                                                cop_year = 2020) %>%
     dplyr::left_join(
-      datapackr::map_DataPack_DATIM_DEs_COCs,
+      map_DataPack_DATIM_DEs_COCs_local,
       by = c("data_element_uid" = "dataelement",
              "category_option_combo_uid" = "categoryoptioncombouid")) %>%
   # Map to renovated indicator_codes
@@ -94,7 +103,7 @@ create_play_spectrum_output <- function(country_uids,
   )
   
   # Get PMTCT ages/sexes
-  pmtct_subnat_cos <- datapackr::map_DataPack_DATIM_DEs_COCs %>%
+  pmtct_subnat_cos <- map_DataPack_DATIM_DEs_COCs_local %>%
     dplyr::filter(indicator_code == "PMTCT_STAT.D.Age_Sex.T") %>%
     dplyr::select(
       age = valid_ages.name,
