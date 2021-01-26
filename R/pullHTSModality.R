@@ -9,7 +9,9 @@
 #' 
 #' @return Dataframe of HTS modalities mapped to dataElements
 #' 
-getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL) {
+getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL,
+                           d2_session = dynGet("d2_default_session",
+                                               inherits = TRUE)) {
   if (cop_year %in% c(2020,2021)) {
     groupSet = "ra9ZqrTtSQn"
   } else if (cop_year == 2019) {
@@ -17,9 +19,10 @@ getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL) 
   } else if (cop_year == 2018) {
     groupSet = "CKTkg8dLlr7"}
   
-  modality_map <- api_call(paste0("dataElementGroupSets/",groupSet)) %>%
+  modality_map <- api_call(paste0("dataElementGroupSets/",groupSet),
+                           d2_session = d2_session) %>%
     api_fields("dataElementGroups[name,dataElements[id]]") %>%
-    api_get() %>%
+    api_get(d2_session = d2_session) %>%
     tidyr::unnest(cols = dataElements) %>%
     dplyr::distinct() %>%
     dplyr::select(dataElement = id,

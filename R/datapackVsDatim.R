@@ -205,7 +205,8 @@ compareData_DatapackVsDatim <-
 #' (import to bring DATIM up to date with datapack)
 
 compareData_OpuDatapackVsDatim <-
-  function(d, base_url = getOption("baseurl")) {
+  function(d, d2_session = dynGet("d2_default_session",
+                                  inherits = TRUE)) {
     
     if(d$info$cop_year != 2020){
       stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
@@ -260,7 +261,8 @@ compareData_OpuDatapackVsDatim <-
     # rename to standard names
     datim_data <-
       getDataValueSets(parameters$key,
-                       parameters$value) %>%
+                       parameters$value,
+                       d2_session = d2_session) %>%
       dplyr::rename(
         datim_value = value,
         data_element_uid = data_element,

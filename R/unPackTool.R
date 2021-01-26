@@ -159,6 +159,7 @@ createKeychainInfo <- function(submission_path = NULL,
 #' will flag error.
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
+#' @param d2_session DHIS2 Session id
 #'
 #' @details
 #' Executes the following operations in relation to a submitted tool

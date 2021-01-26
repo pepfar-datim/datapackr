@@ -8,13 +8,16 @@
 #' 
 #' @return Dataframe of Numerator and Denominators mapped to dataElements
 #' 
-getNumeratorDenominator <- function(dataElements = NULL) {
+getNumeratorDenominator <- function(dataElements = NULL,
+                                    d2_session = dynGet("d2_default_session",
+                                                        inherits = TRUE)) {
   
   groupSet = "lD2x0c8kywj"
   
-  num_den <- api_call(paste0("dataElementGroupSets/",groupSet)) %>%
+  num_den <- api_call(paste0("dataElementGroupSets/",groupSet),
+                      d2_session = d2_session) %>%
     api_fields("dataElementGroups[name,dataElements[id]]") %>%
-    api_get() %>%
+    api_get(d2_session = d2_session) %>%
     tidyr::unnest(cols = dataElements) %>%
     dplyr::distinct() %>%
     dplyr::select(dataElement = id,

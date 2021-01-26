@@ -8,10 +8,12 @@
 #' 
 #' @return Web-encoded URL for DATIM API query.
 #' 
-api_call <- function(endpoint) {
+api_call <- function(endpoint,
+                     d2_session = dynGet("d2_default_session",
+                                         inherits = TRUE)) {
   
   URL <- paste0(
-    getOption("baseurl"),"api/",datapackr::api_version(),
+    d2_session$base_url,"api/",datapackr::api_version(),
     "/",
     endpoint,
     ".json?paging=false") %>%
@@ -84,9 +86,12 @@ api_fields <- function(api_call, fields) {
 #' 
 #' @return Result of DATIM API query returned as dataframe.
 #' 
-api_get <- function(api_call) {
+api_get <- function(api_call,
+                    d2_session = dynGet("d2_default_session",
+                                        inherits = TRUE)) {
   r <- api_call %>%
-    httr::GET(httr::timeout(180)) %>%
+    httr::GET(httr::timeout(180),
+              handle = d2_session$handle) %>%
     httr::content(., "text") %>%
     jsonlite::fromJSON(., flatten = TRUE) %>%
     do.call(rbind.data.frame, .)

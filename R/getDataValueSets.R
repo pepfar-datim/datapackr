@@ -9,22 +9,24 @@
 #' @param max_attempts - number of times to try for a valid response
 #' @return  tibble with the data requested
 #'
-getDataValueSets <- function(keys, values, 
-                            base_url = getOption("baseurl"), 
+getDataValueSets <- function(keys, values,  
                             api_version = "30",
-                            max_attempts = 3){
+                            max_attempts = 3,
+                            d2_session = dynGet("d2_default_session",
+                                                inherits = TRUE)){
   
   # concatenate and format the keys and values provided for the api call 
   parameters <- stringr::str_c(keys, 
                                values, 
                                sep = "=", 
                                collapse = "&")
-  api_call <- glue::glue("{base_url}api/{api_version}/dataValueSets.csv?{parameters}")
+  api_call <- glue::glue("{d2_session$base_url}api/{api_version}/dataValueSets.csv?{parameters}")
   # note the deleted column comes back empty (missing a comma in fact) which results in a warning
   # we can disregard that warning
   #  row col   expected     actual         file
   #  1  -- 11 columns 10 columns literal data
-  data <- datapackcommons::RetryAPI(api_call, "application/csv", max_attempts = max_attempts) %>%   
+  data <- datapackcommons::RetryAPI(api_call, "application/csv", max_attempts = max_attempts,
+                                    d2_session = d2_session) %>%   
     httr::content(., "text") %>% 
     {suppressWarnings(readr::read_csv(., 
                                       col_names = TRUE, 

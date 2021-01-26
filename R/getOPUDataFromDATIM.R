@@ -10,12 +10,15 @@
 #' this or Country Names.
 #' @param country_names Names of Countries to return data for. Can supply either this
 #' or DATIM Country UIDs.
+#' @param d2_session DHIS2 Session id
 #'
 #' @return Returns dataset needed for use in \code{\link{packOPUDataPack}}.
 #'
 getOPUDataFromDATIM <- function(cop_year,
                                 country_uids = NULL,
-                                country_names = NULL) {
+                                country_names = NULL,
+                                d2_session = dynGet("d2_default_session",
+                                                    inherits = TRUE)) {
   
   if (cop_year == 2020){
     map_DataPack_DATIM_DEs_COCs_local <- 
@@ -35,8 +38,9 @@ getOPUDataFromDATIM <- function(cop_year,
   if (is.null(country_uids)) {
     all_country_uids <- 
       datimutils::getOrgUnitGroups("Country",
-                                    by = name,
-                                    fields = "organisationUnits[name,id]") %>%
+                                   by = name,
+                                   fields = "organisationUnits[name,id]",
+                                   d2_session = d2_session) %>%
       dplyr::arrange(name)
     
     mapped_country_uids <- all_country_uids %>%
@@ -57,7 +61,8 @@ getOPUDataFromDATIM <- function(cop_year,
   
   # Pull data from DATIM ####
   data_datim <- datapackr::getCOPDataFromDATIM(country_uids,
-                                               cop_year)
+                                               cop_year,
+                                               d2_session = d2_session)
   
   # Filter data by required indicator_codes ####
   indicator_codes <- datapackr::cop20_data_pack_schema %>% 

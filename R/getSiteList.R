@@ -15,7 +15,9 @@
 #' site list.
 #'
 getSiteList <- function(org_unit_uids,
-                        include_mil = TRUE) {
+                        include_mil = TRUE,
+                        d2_session = dynGet("d2_default_session",
+                                            inherits = TRUE)) {
 
   country_uids <- purrr::map(org_unit_uids, CountriesContained) %>% 
     purrr::reduce(c)  %>% 
@@ -23,7 +25,7 @@ getSiteList <- function(org_unit_uids,
   
   # Pull Community & Facility Sites ####
     siteList <- 
-      datapackr::api_call("organisationUnits") %>%
+      datapackr::api_call("organisationUnits", d2_session = d2_session) %>%
       datapackr::api_filter(paste0(
         "ancestors.id:in:[", paste0(country_uids,collapse = ","),"]")) %>%
       datapackr::api_filter(paste0(
@@ -50,14 +52,15 @@ getSiteList <- function(org_unit_uids,
         )
     
   # Pull levels ####
-    countries <- datapackr::api_call("organisationUnits") %>%
+    countries <- datapackr::api_call("organisationUnits",
+                                     d2_session = d2_session) %>%
       datapackr::api_filter("organisationUnitGroups.id:eq:cNzfcPWEGSH") %>%
       datapackr::api_filter(paste0(
         "id:in:[",
         paste0(country_uids,collapse = ","),
         "]")) %>%
       datapackr::api_fields("id,name") %>%
-      datapackr::api_get() %>%
+      datapackr::api_get(d2_session = d2_session) %>%
       dplyr::rename(country_name = name)
     
     levels <- datapackr::getIMPATTLevels() %>%
