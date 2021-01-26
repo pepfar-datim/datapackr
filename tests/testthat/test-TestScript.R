@@ -1,3 +1,4 @@
+
 context("All")
 
 test_that("All", {
@@ -12,6 +13,10 @@ test_that("All", {
   secrets <- "~/.secrets/datim.json"
   
   loginToDATIM(secrets)
+
+  # datimutils::loginToDATIM(secrets,
+  #              d2_session_name = "d2_session")
+
   
   model_data_path <- "~/datapackr_test_files/COP21/model_data_pack_input_21_20210122_1_flat copy.rds"
   snuxim_model_data_path <- "~/datapackr_test_files/COP21/PSNUxIM_20210113_1 copy.rds"
@@ -82,16 +87,18 @@ test_that("All", {
                     template_path = NULL,
                     cop_year = 2020,
                     output_folder = output_folder,
+                    # d2_session = d2_session,
                     results_archive = FALSE)
   }
     
 # unpack a cop 20 data pack
-  d <- unPackTool("/Users/sam/datapackr_test_files/OPU_returned/OPU Data Pack_Eswatini_20201116165741_CDC_USAID_with dedup.xlsx",
-                  tool = "OPU Data Pack")
+  d <- unPackTool("/Users/sam/datapackr_test_files/OPU_returned/OPU Data Pack_Eswatini_20201116165741_CDC_USAID_with dedup.xlsx")
 
     assign(paste0("d_cop20_opu_", branch), d)
   
-    foo <- datapackr::compareData_OpuDatapackVsDatim(d)
+    foo <- datapackr::compareData_OpuDatapackVsDatim(d 
+                                                     #, d2_session = d2_session
+                                                     )
     assign(paste0("compare_cop20_opu", branch), foo)  
     
 # pack a cop 21 data pack
@@ -104,6 +111,7 @@ test_that("All", {
                  template_path = NULL,
                  cop_year = 2021,
                  output_folder = output_folder,
+                # d2_session = d2_session,
                  results_archive = FALSE)
   }
   ## don't forget I need to open and save the file
@@ -112,22 +120,42 @@ test_that("All", {
   
   output_folder <- "~/datapackr_test_files/Data Packs SNUxIM"
 
-  d <- unPackTool("/Users/sam/datapackr_test_files/COP21/Data Pack_South Africa_20201203125459 (1).xlsx",
-                  cop_year = 2021)
+  d <- unPackTool("/Users/sam/datapackr_test_files/COP21/Data Pack_South Africa_20201203125459 (1).xlsx")
   assign(paste0("d_cop21", branch), d)  
   
   
   foo <- datapackr::create_play_spectrum_output("XtxUYCsDWrR",
                                                 2020,
-                                                "~/datapackr_test_files")
+                                                "~/datapackr_test_files"
+                                                #, d2_session = d2_session
+                                                )
   
-#  d <- writePSNUxIM(d,
-#                    snuxim_model_data_path,
-#                    output_folder)
+  assign(paste0("d_cop21", branch), d)  
 
+    d <- writePSNUxIM(d,
+                      snuxim_model_data_path,
+                      output_folder
+                      #, d2_session = d2_session
+                      )  
+
+    
+    d <- unPackTool( "/Users/sam/datapackr_test_files/COP21/Data Pack_Malawi_20210121230425.xlsx"
+                     #, d2_session = d2_session
+                     )
+    d <- writePSNUxIM(d,
+                      snuxim_model_data_path,
+                      output_folder
+                      #, d2_session = d2_session
+                      )
+  #  packForPAW(d)
+  
+
+  getMechanismView(#d2_session
+    )
+  
+  
 #  d <- checkAnalytics(d,
 #                      model_data_path)
-  
   # d <- writePSNUxIM(d,
   #                   snuxim_model_data_path,
   #                   output_folder)
