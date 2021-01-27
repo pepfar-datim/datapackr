@@ -14,27 +14,10 @@ checkFormulas <- function(d, sheet) {
   header_row <- headerRow(tool = "Data Pack", cop_year = d$info$cop_year)
   
   # Pull in formulas from schema ###
-  formulas_schema <- datapackr::cop20_data_pack_schema %>%
+  formulas_schema <- d$info$schema %>%
     dplyr::filter(
       sheet_name == sheet,
-      !is.na(formula),
-      !sheet_name %in% c("Epi Cascade I","Epi PMTCT","Prioritization","PrEP","PSNUxIM"),
-      !indicator_code %in% c("TX_CURR.N.growth",
-                             "TX_CURR.N.natlContribution",
-                             "TX_NEW.N.VMMCRateNew",
-                             "VMMC_CIRC_SUBNAT.Age_Sex.T_1",
-                             "VMMC_TOTALCIRC_SUBNAT.N.Age_Sex.T_1",
-                             "VMMC_CIRC.N.natlContribution",
-                             "KP_ESTIMATES.N.KeyPop_TotalSizeEstimate.T",
-                             "KP_ESTIMATES.N.KeyPop_PositiveEstimate.T",
-                             "KP_ESTIMATES.N.KeyPop_Prevalence.T"),
-      (indicator_code == "TX_NEW.N.otherRate"
-       | col_type %in% c("reference","target")),
-      !(sheet_name == "KP" 
-          & !(indicator_code %in% c("HTS_RECENT.N.KeyPop_HIVStatus.T",
-                                    "TX_PVLS.D.KeyPop_HIVStatus.T",
-                                    "TX_PVLS.N.KeyPop_HIVStatus.T")))
-      ) %>%
+      !is.na(formula)) %>%
     dplyr::select(col, indicator_code, formula) %>%
     # tidyr::crossing(row = ((header_row+1):max(formulas_datapack$row))) %>%
     # dplyr::select(row, col, indicator_code, formula) %>%
@@ -92,6 +75,7 @@ checkFormulas <- function(d, sheet) {
       ))
   
   # Compare formulas from schema against Data Pack to see diffs ####
+  #TODO: Add sheet to the output for audit purposes
   altered_formulas <- formulas_schema %>%
     dplyr::left_join(
       formulas_datapack,
@@ -125,7 +109,9 @@ checkFormulas <- function(d, sheet) {
       paste0(
         "WARNING! In tab ",
         sheet,
-        ", " ,NROW(cols_affected)," ALTERED FORMULAS: Ensure all Data Pack formulas are as originally provided.",
+        ", " ,NROW(cols_affected)," ALTERED FORMULAS:",
+        " Altering formulas without DUIT and PPM approval may lead to programmatic",
+        " and technical issues in your Data Pack.",
         " Note that this may be due to a formula being deleted",
         " or overwritten, or a manual fix not being applied.",
         " Affected columns and the number of violations are listed below. ->  \n\t* ",
