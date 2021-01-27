@@ -156,6 +156,24 @@ test_that("All", {
   d <- checkAnalytics(d,
                       model_data_path)
   
+  d <- unPackTool( "/Users/sam/datapackr_test_files/COP21/Data Pack_Zambia_20210121230920.xlsx"
+                   #, d2_session = d2_session
+  )
+  d <- writePSNUxIM(d,
+                    snuxim_model_data_path,
+                    output_folder
+                    #, d2_session = d2_session
+  )
+  
+  d <- unPackTool("/Users/sam/datapackr_test_files/COP21/Data Pack_Eswatini_20210121230249.xlsx"
+                   #, d2_session = d2_session
+  )
+  d <- writePSNUxIM(d,
+                    snuxim_model_data_path,
+                    output_folder
+                    #, d2_session = d2_session
+  )
+  
  # code_list = pullFullCodeList(2021)
   
   #sites = getSiteList("XtxUYCsDWrR")

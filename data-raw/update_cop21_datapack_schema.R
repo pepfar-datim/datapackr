@@ -1,7 +1,7 @@
 ## If you've made any edits to the Excel template, rebuild package first to
 ## capture these, then run the below.
 
-secrets <- "/Users/scott/.secrets/cop-test.json"
+secrets <- "~/.secrets/datim.json"
 
 datapackr::loginToDATIM(secrets)
 
