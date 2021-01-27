@@ -153,9 +153,15 @@ test_that("All", {
   getMechanismView(#d2_session
     )
   
+  d <- checkAnalytics(d,
+                      model_data_path)
   
-#  d <- checkAnalytics(d,
-#                      model_data_path)
+ # code_list = pullFullCodeList(2021)
+  
+  #sites = getSiteList("XtxUYCsDWrR")
+  
+  #packForPAW(d)
+  
   # d <- writePSNUxIM(d,
   #                   snuxim_model_data_path,
   #                   output_folder)
@@ -186,7 +192,10 @@ test_that("All", {
   setwd("~/Documents/GitHub/datapackr")
    source("/Users/sam/Documents/GitHub/datapackr/data-raw/update_cached_PSNUs.R",
           local = TRUE)
- #  source("/Users/sam/Documents/GitHub/datapackr/data-raw/update_cached_de_coc_co_map.R")
+   source("/Users/sam/Documents/GitHub/datapackr/data-raw/update_cached_de_coc_co_map.R",
+          local = TRUE)
+  source("/Users/sam/Documents/GitHub/datapackr/data-raw/update_cop21_datapack_schema.R",
+         local = TRUE)
  #  source("/Users/sam/Documents/GitHub/datapackr/data-raw/produceConfigFile.R")
   # 
   
