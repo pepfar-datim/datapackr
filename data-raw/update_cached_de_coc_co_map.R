@@ -7,7 +7,7 @@ fullCodeList <- pullFullCodeList(FY = cop_year +1,
   dplyr::left_join(
     api_call("categoryOptionCombos") %>% api_fields("id, categoryOptions") %>% api_get(),
     by = c("categoryoptioncombouid" = "id")) %>%
-  dplyr::mutate(categoryOptions = purrr::map_chr(categoryOptions,~.x[["id"]] %>% 
+  dplyr::mutate(categoryOptions = purrr::map_chr(categoryOptions,~.x[["id"]] %>%
                                                    sort() %>% paste(collapse = ".")))
 
 map_DataPack_DATIM_DEs_COCs <- datapackr::cop21_data_pack_schema %>%
@@ -43,9 +43,9 @@ map_DataPack_DATIM_DEs_COCs <- datapackr::cop21_data_pack_schema %>%
   dplyr::mutate(
     valid_kps.id =
       dplyr::case_when(
-        (indicator_code %in% c("KP_MAT_SUBNAT.N.Sex.T", "KP_MAT.N.Sex.T") 
+        (indicator_code %in% c("KP_MAT_SUBNAT.N.Sex.T", "KP_MAT.N.Sex.T")
           & valid_kps.id == "G6OYSzplF5a") ~ "Z1EnpTPaUfq",
-        (indicator_code %in% c("KP_MAT_SUBNAT.N.Sex.T", "KP_MAT.N.Sex.T") 
+        (indicator_code %in% c("KP_MAT_SUBNAT.N.Sex.T", "KP_MAT.N.Sex.T")
          & valid_kps.id == "wyeCT63FkXB") ~ "Qn0I5FbKQOA",
         TRUE ~ valid_kps.id),
     categoryOptions.ids =
@@ -53,9 +53,9 @@ map_DataPack_DATIM_DEs_COCs <- datapackr::cop21_data_pack_schema %>%
                        valid_sexes.id,
                        valid_kps.id,
                        categoryoption_specified),
-                  c)) %>% 
+                  c)) %>%
   dplyr::mutate(categoryOptions.ids = purrr::map(categoryOptions.ids, sort)) %>%
-  dplyr::mutate(categoryOptions.ids = purrr::map(categoryOptions.ids, na.omit)) %>% 
+  dplyr::mutate(categoryOptions.ids = purrr::map(categoryOptions.ids, na.omit)) %>%
   dplyr::mutate(categoryOptions.ids = purrr::map_chr(categoryOptions.ids, paste, collapse = ".")) %>%
   dplyr::mutate(
     categoryOptions.ids =
@@ -83,43 +83,43 @@ map_DataPack_DATIM_DEs_COCs <- datapackr::cop21_data_pack_schema %>%
 getCOGSMap <- function(uid,
                        d2_session = dynGet("d2_default_session",
                                            inherits = TRUE)) {
-  
+
   r <- paste0(d2_session$base_url,"api/categoryOptionGroupSets/",uid,
             "?fields=id,name,categoryOptionGroups[id,name,categoryOptions[id,name,categoryOptionCombos[id,name]]") %>%
     URLencode(.) %>%
     httr::GET(., httr::timeout(180), handle = d2_session$handle) %>%
     httr::content(.,"text") %>%
-    jsonlite::fromJSON(.,flatten = TRUE) 
-  
+    jsonlite::fromJSON(.,flatten = TRUE)
+
   dim_name<- r$name
   dim_id<- r$id
-  
+
   cogs <- r %>% purrr::pluck(.,"categoryOptionGroups") %>% dplyr::select(id,name)
-  
+
   cogs_cocs_map<-list()
-  
+
   for (i in 1:NROW(cogs) ) {
-    
+
     cos_cocs <- r %>%
-      purrr::pluck(.,"categoryOptionGroups") %>% 
+      purrr::pluck(.,"categoryOptionGroups") %>%
       purrr::pluck(.,"categoryOptions") %>%
-      purrr::pluck(., i) %>% 
+      purrr::pluck(., i) %>%
       purrr::pluck(.,"categoryOptionCombos") %>%
       do.call(rbind.data.frame,.) %>%
       dplyr::distinct() %>%
       dplyr::select("category_option_combo"=name,"coc_uid"=id)
-    
+
     cos_cocs$category_option_group_name<-cogs[i,"name"]
     cos_cocs$category_option_group_uid<-cogs[i,"id"]
     cogs_cocs_map<-rlist::list.append(cogs_cocs_map,cos_cocs)
   }
-  
+
   cogs_cocs_map %<>% do.call(rbind.data.frame,.)
-  
+
   return(list(dimension_name=r$name,
               dimension_id=r$id,
               dimension_map= cogs_cocs_map))
-  
+
 }
 
 
@@ -145,7 +145,7 @@ hiv_inclusive <- getCOGSMap("ipBFu42t2sJ") %>% # HIV Test Status (Inclusive)
 getDEGSMap <- function(uid,
                        d2_session = dynGet("d2_default_session",
                                            inherits = TRUE)) {
-  
+
   r <- paste0(d2_session$base_url,
               "api/dataElementGroupSets/",
               uid,
@@ -153,15 +153,15 @@ getDEGSMap <- function(uid,
     URLencode(.) %>%
     httr::GET(., httr::timeout(180), handle = d2_session$handle) %>%
     httr::content(.,"text") %>%
-    jsonlite::fromJSON(.,flatten = TRUE) 
-  
+    jsonlite::fromJSON(.,flatten = TRUE)
+
   r %>%
-    purrr::pluck(.,"dataElementGroups") %>% 
-    dplyr::mutate_if(is.list, purrr::simplify_all) %>% 
+    purrr::pluck(.,"dataElementGroups") %>%
+    dplyr::mutate_if(is.list, purrr::simplify_all) %>%
     tidyr::unnest(cols = c(dataElements)) %>%
     dplyr::distinct() %>%
     dplyr::mutate(type=make.names(r$name))
-  
+
 }
 
 #Valid for COP21
@@ -187,9 +187,9 @@ to <- c("dataelement",
 
 names(degs_map) <- plyr::mapvalues(names(degs_map),from,to)
 
-map_DataPack_DATIM_DEs_COCs %<>% 
-  dplyr::left_join(hiv_specific,by="categoryoptioncombouid") %>% 
-  dplyr::left_join(hiv_inclusive,by="categoryoptioncombouid") %>% 
+map_DataPack_DATIM_DEs_COCs %<>%
+  dplyr::left_join(hiv_specific,by="categoryoptioncombouid") %>%
+  dplyr::left_join(hiv_inclusive,by="categoryoptioncombouid") %>%
   dplyr::left_join(degs_map,by="dataelement")
 
 
@@ -208,5 +208,3 @@ compare_diffs <- datapackr::map_DataPack_DATIM_DEs_COCs %>%
 
 
   save(map_DataPack_DATIM_DEs_COCs, file = "./data/map_DataPack_DATIM_DEs_COCs.rda", compress = "xz")
-
-
