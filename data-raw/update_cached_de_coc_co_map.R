@@ -202,7 +202,7 @@ compare_diffs <- datapackr::map_DataPack_DATIM_DEs_COCs %>%
   dplyr::full_join(new, by = c("indicator_code",
                                "valid_ages.name","valid_ages.id","valid_sexes.name",
                                "valid_sexes.id","valid_kps.name","valid_kps.id",
-                               "categoryOptions.ids","support_type","hiv_specific","hiv_inclusive")) %>%
+                               "categoryOptions.ids","support_type","resultstatus","resultstatus_inclusive")) %>%
   dplyr::filter(is.na(dataelement.x) | is.na(dataelement.y.y))
 
 
