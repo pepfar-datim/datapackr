@@ -35,7 +35,8 @@ checkStructure <- function(d) {
   if (any(is.na(sheets_check$submission_order))) {
     warning_msg <- 
       paste0(
-        "MISSING SHEETS: Did you delete or rename these tabs? -> \n  * ",
+        "WARNING! MISSING SHEETS: Please ensure no original sheets have",
+        " been deleted or renamed in your Data Pack. -> \n  * ",
         paste0(d$tests$missing_sheets$sheet_name, collapse = "\n  * "),
         "\n")
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)

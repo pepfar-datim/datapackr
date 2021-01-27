@@ -4,10 +4,12 @@
 \alias{unPackDataPack}
 \title{Unpack a submitted Data Pack}
 \usage{
-unPackDataPack(d)
+unPackDataPack(d, d2_session)
 }
 \arguments{
 \item{d}{Datapackr object}
+
+\item{d2_session}{DHIS2 Session ID}
 }
 \description{
 Processes a submitted Data Pack (in .xlsx format) by identifying integrity
