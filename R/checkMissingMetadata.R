@@ -36,7 +36,9 @@ checkMissingMetadata <- function(d, sheet) {
       paste0(
         "ERROR! In tab ",
         sheet,
-        ", MISSING PSNU, INDICATOR_CODE, OR ID: ",
+        ", MISSING PSNU, INDICATOR_CODE, OR ID: Review any tabs flagged by this test",
+        " to investigate whether PSNU, Age, Sex, or Key Population identifier",
+        " information data have been deleted.",
         NROW(missing_metadata),
         " rows where blank entries exist in the PSNU, indicator_code, or ID columns.",
         " Note that blank entries in these columns will prevent processing of",

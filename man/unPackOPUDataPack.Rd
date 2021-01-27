@@ -11,6 +11,8 @@ unPackOPUDataPack(
 }
 \arguments{
 \item{d}{datapackr sidecar}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \description{
 Processes a submitted OPU Data Pack (in .xlsx format) by identifying integrity
