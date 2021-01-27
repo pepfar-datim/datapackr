@@ -12,7 +12,6 @@
 #'
 createAnalytics <- function(d,
                             d2_session = dynGet("d2_default_session",
-                                                ifnotfound = NULL,
                                                 inherits = TRUE)) {
   #Append the distributed MER data and subnat data together
   if (d$info$tool == "OPU Data Pack") {

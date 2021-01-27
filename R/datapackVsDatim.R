@@ -9,7 +9,9 @@
 #' (import to bring DATIM up to date with datapack)
 
 compareData_DatapackVsDatim <-
-  function(d, base_url = getOption("baseurl")) { 
+  function(d, 
+           d2_session = dynGet("d2_default_session",
+                               inherits = TRUE)) { 
     
 # internal beutify function to avoid repeated code used in the main function
 # just handles some formatting/ decoding of UIDs
@@ -17,12 +19,14 @@ compareData_DatapackVsDatim <-
       data$data_element <-
         datimvalidation::remapDEs(data$data_element_uid,
                                   mode_in = "id",
-                                  mode_out = "shortName")
+                                  mode_out = "shortName",
+                                  d2_session = d2_session)
       
       data$disagg <-
         datimvalidation::remapCategoryOptionCombos(data$category_option_combo_uid,
                                                    mode_in = "id",
-                                                   mode_out = "name")
+                                                   mode_out = "name",
+                                                   d2_session = d2_session)
       
       psnus <-
         datapackr::valid_PSNUs %>% dplyr::select(psnu, psnu_uid)
@@ -123,7 +127,8 @@ compareData_DatapackVsDatim <-
 # Get data from DATIM using data value sets
     
     datim_data <- getCopDataFromDatim(country_uid = d$info$country_uids, 
-                        fiscal_year_yyyy = d$info$cop_year + 1) %>%
+                        fiscal_year_yyyy = d$info$cop_year + 1,
+                        d2_session = d2_session) %>%
       dplyr::filter(datim_value != 0) %>% # we don't import 0s up front so we should ignore any here
       dplyr::filter(datim_value != "")
     
@@ -205,7 +210,8 @@ compareData_DatapackVsDatim <-
 #' (import to bring DATIM up to date with datapack)
 
 compareData_OpuDatapackVsDatim <-
-  function(d, base_url = getOption("baseurl")) {
+  function(d, d2_session = dynGet("d2_default_session",
+                                  inherits = TRUE)) {
     
     if(d$info$cop_year != 2020){
       stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
@@ -260,7 +266,8 @@ compareData_OpuDatapackVsDatim <-
     # rename to standard names
     datim_data <-
       getDataValueSets(parameters$key,
-                       parameters$value) %>%
+                       parameters$value,
+                       d2_session = d2_session) %>%
       dplyr::rename(
         datim_value = value,
         data_element_uid = data_element,

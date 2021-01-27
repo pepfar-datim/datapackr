@@ -6,43 +6,45 @@
 #' @description Packs SNUxIM data prepared from unPackSNUxIM for import to DATIM.
 #'
 #' @param d Datapackr object
-#' 
+#'
 #' @return d
-#' 
-packSNUxIM <- function(d) {
+#'
+packSNUxIM <- function(d,
+                       d2_session = dynGet("d2_default_session",
+                                           inherits = TRUE)) {
 
   if (!d$info$cop_year %in% c(2021)) {
     stop(paste0("Packing SNU x IM tabs is not supported for COP ",d$info$cop_year," Data Packs."))
   }
-  
+
   # Check if SNUxIM data already exists ####
   if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM$PSNU[1])) {
     d$info$has_psnuxim <- FALSE
   } else {d$info$has_psnuxim <- TRUE}
-  
+
   # If does exist, extract missing combos ####
   if (d$info$has_psnuxim) {
     d$data$missingCombos <- d$data$MER %>%
       # TODO: Create this here rather than upstream
       dplyr::anti_join(d$data$PSNUxIM_combos)
-    
+
     d$info$missing_psnuxim_combos <- (NROW(d$data$missingCombos) > 0)
   }
-    
+
   # Proceed IFF no PSNU x IM tab exists, or exists but with missing combos ####
   if (d$info$has_psnuxim & !d$info$missing_psnuxim_combos) {
     return(d)
   }
-  
+
   # Prepare SNU x IM model dataset ####
     #TODO: Consider preparing this ahead of time for all OUs
   snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path) %>%
     prepare_model_data.PSNUxIM(model_data = .,
                                country_uids = d$info$country_uids)
-      
+
   # Filter SNU x IM model dataset to only those data needed in tab ####
   interactive_print("Focusing on patterns relevant to your submitted tool...")
-  
+
   if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
     targets_data <- d$data$missingCombos
   } else {
@@ -50,7 +52,7 @@ packSNUxIM <- function(d) {
     # Do not include AGYW_PREV -- These are not allocated to IMs
       dplyr::filter(!indicator_code %in% c("AGYW_PREV.N.T", "AGYW_PREV.D.T"))
   }
-  
+
   if (NROW(snuxim_model_data) > 0) {
     snuxim_model_data %<>%
       dplyr::right_join(
@@ -75,9 +77,9 @@ packSNUxIM <- function(d) {
 
   # Add DataPackTarget ####
   interactive_print("Analyzing targets set across your Data Pack...")
-  
+
   top_rows <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
-  
+
   if (d$info$has_psnuxim) {
     SNUxIM_rows <-
       readxl::read_excel(
@@ -87,41 +89,41 @@ packSNUxIM <- function(d) {
         col_names = F
       ) %>%
       NROW()
-    
+
     existing_rows <- SNUxIM_rows
   } else {
     existing_rows <- top_rows
   }
-  
+
   get_ID_col <- function(data) {
     col_letter <- data %>%
       dplyr::filter(indicator_code == "ID")
-    
+
     if (NROW(col_letter) == 0) {
       col_letter <- data %>%
-        dplyr::filter(indicator_code == "PSNU")}  
-    
+        dplyr::filter(indicator_code == "PSNU")}
+
     col_letter %<>%
       dplyr::pull(submission_order) %>%
       openxlsx::int2col()
-    
+
     return(col_letter)
   }
-        
+
   id_cols <- lapply(d$info$col_check, get_ID_col) %>%
     dplyr::bind_rows() %>%
     t() %>%
     as.data.frame(stringsAsFactors = FALSE) %>%
     dplyr::rename(id_col = V1) %>%
     tibble::rownames_to_column("sheet_name")
-  
+
   target_cols <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(dataset == "mer" & col_type == "target" & (!sheet_name %in% c("PSNUxIM", "AGYW"))) %>%
     dplyr::mutate(
       target_col = openxlsx::int2col(col)
     ) %>%
     dplyr::select(indicator_code, target_col)
-        
+
   snuxim_model_data %<>%
     dplyr::left_join(
       id_cols, by = c("sheet_name" = "sheet_name")) %>%
@@ -139,30 +141,30 @@ packSNUxIM <- function(d) {
         ',', sheet_name, '!$', target_col, ':$', target_col, ')')
     ) %>%
     dplyr::select(-id_col, -sheet_name, -target_col, -row)
-  
+
   class(snuxim_model_data[["DataPackTarget"]]) <- c(class(snuxim_model_data[["DataPackTarget"]]), "formula")
-        
+
   # Get formulas & column order from schema ####
   interactive_print("Building your custom PSNUxIM tab...")
-  
+
   data_structure <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(sheet_name == "PSNUxIM")
-  
+
   col.im.targets <- data_structure %>%
     dplyr::filter(col_type == "target" & indicator_code %in% c("12345_DSD","")) %>%
     dplyr::filter(
       indicator_code == "12345_DSD" | col == max(col)) %>%
     dplyr::pull(col)
-  
+
   col.im.percents <- data_structure %>%
     dplyr::filter(col_type == "allocation" & (indicator_code =="12345_DSD" | is.na(indicator_code))) %>%
     dplyr::filter(
       indicator_code == "12345_DSD" | col == max(col)) %>%
     dplyr::pull(col)
-  
+
   count.im.datim <- names(snuxim_model_data)[stringr::str_detect(names(snuxim_model_data), "\\d{4,}_(DSD|TA)")] %>%
     length()
-  
+
   col.formulas <- data_structure %>%
     dplyr::filter(
       !is.na(formula)
@@ -172,7 +174,7 @@ packSNUxIM <- function(d) {
                +1)),
       col < (col.im.targets[1])) %>%
     dplyr::pull(col)
-  
+
   data_structure %<>%
     dplyr::arrange(col) %>%
     dplyr::mutate(
@@ -198,7 +200,7 @@ packSNUxIM <- function(d) {
           )
         )
       )
-    
+
   # Classify formula columns as formulas
   ## TODO: Improve approach
   for (i in 1:length(data_structure)) {
@@ -206,41 +208,41 @@ packSNUxIM <- function(d) {
       class(data_structure[[i]]) <- c(class(data_structure[[i]]), "formula")
     }
   }
-  
+
   # Combine schema with SNU x IM model dataset ####
   data_structure <- datapackr::swapColumns(data_structure, snuxim_model_data) %>%
     dplyr::bind_cols(
       snuxim_model_data %>%
         dplyr::select(tidyselect::matches("\\d{4,}"))
       )
-  
+
   header_cols <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(sheet_name == "PSNUxIM"
                   & col < col.im.percents[1]) %>%
     dplyr::pull(indicator_code)
-  
+
   IM_cols <- data_structure %>%
     dplyr::select(tidyselect::matches("\\d{4,}")) %>%
     names() %>%
     sort()
-    
+
   left_side <- data_structure %>%
     dplyr::select(
       tidyselect::all_of(header_cols),
       tidyselect::all_of(IM_cols)
     )
-  
+
   right_side <- data_structure %>%
     dplyr::select(
       -tidyselect::all_of(names(left_side)),
       -tidyselect::matches("percent_col_\\d{1,3}")
     )
-        
+
   # Write data to sheet ####
   interactive_print("Writing your new PSNUxIM data to your Data Pack...")
   d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
   openxlsx::removeFilter(d$tool$wb, names(d$tool$wb))
-  
+
   # Write data to new PSNUxIM tab ####
   if (!d$info$has_psnuxim) {
     openxlsx::writeData(wb = d$tool$wb,
@@ -248,33 +250,33 @@ packSNUxIM <- function(d) {
                         x = left_side,
                         xy = c(1, top_rows),
                         colNames = T, rowNames = F, withFilter = FALSE)
-    
+
     openxlsx::writeData(wb = d$tool$wb,
                         sheet = "PSNUxIM",
                         x = right_side,
                         xy = c(col.im.percents[2]+1, top_rows + 1),
                         colNames = F, rowNames = F, withFilter = FALSE)
-    
+
     d$info$newSNUxIM <- TRUE
   } else if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
-    warning_msg <- 
+    warning_msg <-
       paste0(
         "NOTE: Your Data Pack requires data to be appended to the bottom of your",
         " PSNUxIM tab, however this app is currently not yet configured to do that.",
         " Please continue working as best you can and check back soon.",
         "\n")
-    
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)  
+
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   # # OR, Append rows to bottom of existing PSNUxIM tab ####
   #   if (d$info$has_psnuxim) {
   #     # Don't count blank rows at bottom or blank columns to left
-  #     SNUxIM_cols <- 
+  #     SNUxIM_cols <-
   #       readxl::read_excel(
   #         path = d$keychain$submission_path,
   #         sheet = "PSNUxIM",
   #         range = readxl::cell_limits(c(top_rows, 1), c(top_rows, NA))
   #       )
-  #     
+  #
   #     SNUxIM_rows <-
   #       readxl::read_excel(
   #         path = d$keychain$submission_path,
@@ -283,10 +285,10 @@ packSNUxIM <- function(d) {
   #         col_names = F
   #       ) %>%
   #       NROW()
-  #     
+  #
   #     existing_rows <- SNUxIM_rows
   #     first_new_mech_col <- NCOL(SNUxIM_cols) + 1
-  #     
+  #
   #   } else {
   #     SNUxIM_cols <- datapackr::cop21_data_pack_schema %>%
   #       dplyr::filter(sheet_name == "PSNUxIM",
@@ -295,38 +297,38 @@ packSNUxIM <- function(d) {
   #       `row.names<-`(.[, 1]) %>%
   #       t() %>%
   #       tibble::as_tibble()
-  #     
+  #
   #     existing_rows <- top_rows
   #     first_new_mech_col <- length(header_cols) + 1
   #   }
-  #   
+  #
   #   new_mech_cols <- names(d$data$SNUxIM_combined)[!names(d$data$SNUxIM_combined) %in% c(names(SNUxIM_cols), "row")]
   #   non_appended_mech_cols <- names(SNUxIM_cols)[!names(SNUxIM_cols) %in% names(d$data$SNUxIM_combined)]
-  #   
+  #
   #   d$data$SNUxIM_combined %<>%
   #     {if (length(non_appended_mech_cols) > 0) {
   #       (.) %>% addcols(non_appended_mech_cols)
   #     } else {.}} %>%
   #     dplyr::select(names(SNUxIM_cols), tidyselect::all_of(new_mech_cols))
-  #   
+  #
   #   openxlsx::writeData(wb = d$tool$wb,
   #                       sheet = "PSNUxIM",
   #                       x = d$data$SNUxIM_combined,
   #                       xy = c(1, existing_rows + 1),
   #                       colNames = F, rowNames = F, withFilter = FALSE)
-  #         
+  #
   #   d$info$newSNUxIM <- TRUE
-  #         
+  #
   # # Add additional col_names if any
   #   openxlsx::writeData(wb = d$tool$wb,
   #                       sheet = "PSNUxIM",
   #                       x = new_mech_cols %>% as.matrix() %>% t(),
   #                       xy = c(first_new_mech_col, top_rows),
   #                       colNames = F, rowNames = F, withFilter = FALSE)
-  #           
+  #
   # # Add green highlights to appended rows, if any ####
   #   newRowStyle <- openxlsx::createStyle(fontColour = "#006100", fgFill = "#C6EFCE")
-  #         
+  #
   #   openxlsx::addStyle(
   #     wb = d$tool$wb,
   #     sheet = "PSNUxIM",
@@ -335,21 +337,21 @@ packSNUxIM <- function(d) {
   #     cols = 1:2,
   #     gridExpand = TRUE,
   #     stack = FALSE)
-  #           
+  #
   } else {
    stop("Cannot write data where there seems to be no new data needed.")
   }
-        
+
   # Format percent columns ####
   interactive_print("Stylizing percent columns...")
-  
+
   percentCols <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(sheet_name == "PSNUxIM",
                   value_type == "percentage") %>%
     dplyr::pull(col)
-  
+
   percentStyle = openxlsx::createStyle(numFmt = "0%")
-  
+
   openxlsx::addStyle(wb = d$tool$wb,
                     sheet = "PSNUxIM",
                     percentStyle,
@@ -360,9 +362,9 @@ packSNUxIM <- function(d) {
 
   # Format integers ####
   # integerStyle = openxlsx::createStyle(numFmt = "#,##0")
-  # 
+  #
   # integerCols <- grep("DataPackTarget", final_snuxim_cols)
-  # 
+  #
   # openxlsx::addStyle(
   #   wb = d$tool$wb,
   #   sheet = "PSNUxIM",
@@ -371,48 +373,48 @@ packSNUxIM <- function(d) {
   #   cols = integerCols,
   #   gridExpand = TRUE,
   #   stack = TRUE)
-        
-  
+
+
   # Consider adding errorStyling here to emphasize where incorrect disaggs entered.
   errorStyle <- openxlsx::createStyle(fontColour = "#9C0006", bgFill = "#FFC7CE")
   warningStyle <- openxlsx::createStyle(fontColour = "#9C5700", bgFill = "#FFEB9C")
   normalStyle <- openxlsx::createStyle(fontColour = "#000000", bgFill = "#FFFFFF")
-        
+
   # Hide rows 5-13 ####
   interactive_print("Tidying up...")
   openxlsx::setRowHeights(wb = d$tool$wb,
                           sheet = "PSNUxIM",
                           rows = 4:(top_rows-1),
                           heights = 0)
-        
+
   # Hide columns ####
   hiddenCols <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(sheet_name == "PSNUxIM",
                   indicator_code %in% c("ID", "sheet_num", "DSD Dedupe",
                                         "TA Dedupe", "Crosswalk Dedupe")) %>%
     dplyr::pull(col)
-  
+
   openxlsx::setColWidths(wb = d$tool$wb,
                          sheet = "PSNUxIM",
                          cols = hiddenCols,
                          hidden = TRUE)
-        
+
   # Tab generation date ####
   openxlsx::writeData(d$tool$wb, "PSNUxIM",
                       paste("Generated on:", Sys.time()),
                       xy = c(1,2),
                       colNames = F)
-        
+
   # Package Version ####
   openxlsx::writeData(d$tool$wb, "PSNUxIM",
                       paste("Package version:",
                             as.character(utils::packageVersion("datapackr"))),
                       xy = c(2,2),
                       colNames = F)
-  
+
   # Warning Messages ####
   interactive_print("Compiling alert messages...")
-  warning_msg <- 
+  warning_msg <-
     paste0(
       "NOTE: Based on your submission, we have ",
       ifelse(d$info$has_psnuxim,
@@ -422,18 +424,18 @@ packSNUxIM <- function(d) {
       " An updated copy of your Data Pack is available for download from this app.",
       " Please review your PSNUxIM tab and carefully review the Data Pack User Guide
   for detailed guidance on how to use this tab.
-  
+
 NOTE: DO NOT delete any columns in this tool, and do not add any new columns between
 existing columns.
-        
+
 NOTE: Any external references used in cell formulas will now be corrupt and
 cause '#N/A' errors. Please review your Data Pack for these cases and correct.
-      
+
 If you have any questions, please submit a Help Desk ticket at DATIM.Zendesk.com.",
       "\n")
-        
+
   d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
-  
+
   return(d)
 
 }

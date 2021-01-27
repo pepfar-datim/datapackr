@@ -11,16 +11,18 @@
 #' 
 #' @return validCategoryOptions
 #'
-getValidCOs <- function(data_element_group.id) {
+getValidCOs <- function(data_element_group.id,
+                        d2_session = dynGet("d2_default_session",
+                                            inherits = TRUE)) {
   
   # Query dataElementGroups end point ####
   dataElementGroup <- 
-    datapackr::api_call("dataElementGroups") %>%
+    datapackr::api_call("dataElementGroups", d2_session = d2_session) %>%
   # Filter to include only the dataElementGroup specified
     datapackr::api_filter(field = "id", operation = "eq", match = "XUA8pDYjPsw") %>%
       # TODO generate match automatically based on current FY...
     datapackr::api_fields("dataElements[id,name,categoryCombo[categories[id,name,categoryOptions[id,name]]]]") %>%
-    datapackr::api_get() %>%
+    datapackr::api_get(d2_session = d2_session) %>%
     tidyr::unnest() %>%
     tidyr::unnest() %>%
     tidyr::unnest() %>%

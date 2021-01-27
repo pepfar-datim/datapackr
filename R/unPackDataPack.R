@@ -33,7 +33,8 @@
 #'
 unPackDataPack <- function(d,
                            d2_session = dynGet("d2_default_session",
-                                  inherits = TRUE)) {
+                                               inherits = TRUE)) {
+
 
   # Check whether there exist any troublesome comments in the file
   interactive_print("Checking comments...")

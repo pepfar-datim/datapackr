@@ -17,7 +17,9 @@
 #'
 create_play_spectrum_output <- function(country_uids,
                                         cop_year,
-                                        output_folder = NULL) {
+                                        output_folder = NULL,
+                                        d2_session = dynGet("d2_default_session",
+                                                            inherits = TRUE)) {
   
   if (cop_year == 2021) {
     map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
@@ -56,7 +58,8 @@ create_play_spectrum_output <- function(country_uids,
   )
   
   data_datim <- datapackr::getCOPDataFromDATIM(country_uids,
-                                               cop_year = 2020) %>%
+                                               cop_year = 2020,
+                                               d2_session = d2_session) %>%
     dplyr::left_join(
       map_DataPack_DATIM_DEs_COCs_local,
       by = c("data_element_uid" = "dataelement",
@@ -173,7 +176,8 @@ create_play_spectrum_output <- function(country_uids,
   # Export
   if (!is.null(output_folder)) {
     print("Saving...")
-    country_name <- datimutils::getOrgUnits(country_uids)
+    country_name <- datimutils::getOrgUnits(country_uids,
+                                            d2_session = d2_session)
     exportPackr(data = play_spectrum_output,
                 output_path = output_folder,
                 type = "Spectrum Example",

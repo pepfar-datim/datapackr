@@ -68,11 +68,12 @@ selectOU <- function() {
 #' @return Dataframe of country metadata, including prioritization, planning,
 #' country, community, and facility levels in DATIM organization hierarchy.
 #'
-getIMPATTLevels <- function(){
+getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
+                                                inherits = TRUE)){
   impatt_levels <-
-    paste0(getOption("baseurl"),"api/",datapackr::api_version(),
+    paste0(d2_session$base_url,"api/",datapackr::api_version(),
            "/dataStore/dataSetAssignments/orgUnitLevels") %>%
-    httr::GET(httr::timeout(180)) %>%
+    httr::GET(httr::timeout(180), handle = d2_session$handle) %>%
     httr::content(., "text") %>%
     jsonlite::fromJSON(., flatten = TRUE) %>%
     do.call(rbind.data.frame, .) %>%
@@ -84,12 +85,12 @@ getIMPATTLevels <- function(){
 
   # Add country_uids ####
   countries <-
-    datapackr::api_call("organisationUnits") %>%
+    datapackr::api_call("organisationUnits", d2_session = d2_session) %>%
     datapackr::api_filter(field = "organisationUnitGroups.id",
                           operation = "eq",
                           match = "cNzfcPWEGSH") %>%
     datapackr::api_fields(fields = "id,name,level,ancestors[id,name]") %>%
-    datapackr::api_get()
+    datapackr::api_get(d2_session = d2_session)
 
   impatt_levels %<>%
     dplyr::left_join(countries, by = c("country_name" = "name")) %>%
@@ -113,16 +114,18 @@ getIMPATTLevels <- function(){
 #' @return Dataframe of _Military names and ids, with associated Operating Units
 #' and Countries.
 #'
-getMilitaryNodes <- function() {
+getMilitaryNodes <- function(d2_session = dynGet("d2_default_session",
+                                                 inherits = TRUE)) {
   #loginToDATIM(getOption("secrets"))
 
   militaryNodes <- paste0(
-    getOption("baseurl"),"api/",datapackr::api_version(),
+    d2_session$base_url,"api/",datapackr::api_version(),
       "/organisationUnits.json?paging=false",
       "&filter=name:$ilike:_Military",
       #"&filter=organisationUnitGroups.id:eq:nwQbMeALRjL", (New _Mil nodes not here...)
       "&fields=name,id,level,ancestors[id,name]") %>%
-    httr::GET(httr::timeout(180)) %>%
+    httr::GET(httr::timeout(180),
+              handle = d2_session$handle) %>%
     httr::content(., "text") %>%
     jsonlite::fromJSON(., flatten = TRUE) %>%
     do.call(rbind.data.frame, .) %>%
@@ -256,7 +259,7 @@ getCountries <- function(datapack_uid = NA) {
 
   # Pull Country List
     countries <-
-      datapackr::api_call("organisationUnits") %>%
+      datapackr::api_call("organisationUnits", d2_session = d2_session) %>%
       datapackr::api_filter(field = "organisationUnitGroups.id",
                             operation = "eq",
                             match = "cNzfcPWEGSH") %>%
@@ -406,7 +409,8 @@ isLoggedIn <- function(d2_session = dynGet("d2_default_session",
 
 getCopDataFromDatim <- function(country_uid,
                                 fiscal_year_yyyy,
-                                base_url = getOption("baseurl"))
+                                d2_session = dynGet("d2_default_session",
+                                                    inherits = TRUE))
 {
 
   dataset_uids <- getDatasetUids(fiscal_year_yyyy,
@@ -430,7 +434,7 @@ getCopDataFromDatim <- function(country_uid,
   datim_data <-
     getDataValueSets(parameters$key,
                      parameters$value,
-                     base_url = base_url) %>%
+                     d2_session = d2_session) %>%
     dplyr::rename(
       datim_value = value,
       data_element_uid = data_element,
