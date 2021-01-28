@@ -6,13 +6,13 @@
 #'
 #' @param d Datapackr object.
 #' @param sheet Sheet to unpack.
-#' 
+#'
 #' @return d
-#' 
+#'
 checkFormulas <- function(d, sheet) {
 
   header_row <- headerRow(tool = "Data Pack", cop_year = d$info$cop_year)
-  
+
   # Pull in formulas from schema ###
   formulas_schema <- d$info$schema %>%
     dplyr::filter(
@@ -31,12 +31,12 @@ checkFormulas <- function(d, sheet) {
     # )
     dplyr::mutate(
       formula = stringr::str_replace_all(
-        formula, 
+        formula,
         "(?<=[:upper:])\\d+",
         "\\\\d+"
       )
     )
-  
+
   # Pull in formulas from Data Pack sheet ####
   formulas_datapack <-
     tidyxl::xlsx_cells(path = d$keychain$submission_path,
@@ -45,7 +45,7 @@ checkFormulas <- function(d, sheet) {
     dplyr::filter(row >= header_row,
                   row <= (NROW(d$data$extract) + header_row)) %>%
     dplyr::mutate(
-      formula = 
+      formula =
         dplyr::case_when(
           is.na(formula) ~ as.character(numeric),
           TRUE ~ formula
@@ -73,7 +73,7 @@ checkFormulas <- function(d, sheet) {
         "(?<=[:upper:])\\d+",
         "\\\\d+"
       ))
-  
+
   # Compare formulas from schema against Data Pack to see diffs ####
   #TODO: Add sheet to the output for audit purposes
   altered_formulas <- formulas_schema %>%
@@ -90,22 +90,22 @@ checkFormulas <- function(d, sheet) {
     dplyr::group_by(indicator_code, correct_fx, submitted_fx, count) %>%
     dplyr::summarise(affected_rows = list(unique(row))) %>%
     dplyr::ungroup()
-  
-  d$tests$altered_formulas <- 
+
+  d$tests$altered_formulas <-
     dplyr::bind_rows(d$tests$altered_formulas, altered_formulas)
   attr(d$tests$altered_formulas,"test_name") <- "Altered Formulas"
-  
+
   # Compile warning message ####
   if (NROW(altered_formulas) > 0) {
-  
+
     cols_affected <- altered_formulas %>%
       dplyr::select(indicator_code, correct_fx, count) %>%
       dplyr::group_by(indicator_code, correct_fx) %>%
       dplyr::summarize(count = sum(count)) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(fx_violations = paste0(indicator_code,":  ", count))
-    
-    warning_msg <- 
+
+    warning_msg <-
       paste0(
         "WARNING! In tab ",
         sheet,
@@ -117,10 +117,10 @@ checkFormulas <- function(d, sheet) {
         " Affected columns and the number of violations are listed below. ->  \n\t* ",
         paste(cols_affected$fx_violations, collapse = "\n\t* "),
         "\n")
-    
+
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
-      
+
   }
-  
-  return(d)  
+
+  return(d)
 }

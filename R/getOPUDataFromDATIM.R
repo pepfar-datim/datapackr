@@ -10,12 +10,22 @@
 #' this or Country Names.
 #' @param country_names Names of Countries to return data for. Can supply either this
 #' or DATIM Country UIDs.
+#' @param d2_session DHIS2 Session id
 #'
 #' @return Returns dataset needed for use in \code{\link{packOPUDataPack}}.
 #'
 getOPUDataFromDATIM <- function(cop_year,
                                 country_uids = NULL,
-                                country_names = NULL) {
+                                country_names = NULL,
+                                d2_session = dynGet("d2_default_session",
+                                                    inherits = TRUE)) {
+  
+  if (cop_year == 2020){
+    map_DataPack_DATIM_DEs_COCs_local <- 
+      datapackr::cop20_map_DataPack_DATIM_DEs_COCs
+  } else {
+    stop("The COP year provided is not supported by getOPUDataFromDATIM")
+  }
   
   options("scipen" = 999)
   options(warning.length = 8170)
@@ -28,8 +38,9 @@ getOPUDataFromDATIM <- function(cop_year,
   if (is.null(country_uids)) {
     all_country_uids <- 
       datimutils::getOrgUnitGroups("Country",
-                                    by = name,
-                                    fields = "organisationUnits[name,id]") %>%
+                                   by = name,
+                                   fields = "organisationUnits[name,id]",
+                                   d2_session = d2_session) %>%
       dplyr::arrange(name)
     
     mapped_country_uids <- all_country_uids %>%
@@ -50,7 +61,8 @@ getOPUDataFromDATIM <- function(cop_year,
   
   # Pull data from DATIM ####
   data_datim <- datapackr::getCOPDataFromDATIM(country_uids,
-                                               cop_year)
+                                               cop_year,
+                                               d2_session = d2_session)
   
   # Filter data by required indicator_codes ####
   indicator_codes <- datapackr::cop20_data_pack_schema %>% 
@@ -59,7 +71,7 @@ getOPUDataFromDATIM <- function(cop_year,
     .[["indicator_code"]]
   
   data_datim %<>%
-    dplyr::left_join(datapackr::map_DataPack_DATIM_DEs_COCs,
+    dplyr::left_join(map_DataPack_DATIM_DEs_COCs_local,
                       by = c("data_element_uid" = "dataelement",
                             "category_option_combo_uid" = "categoryoptioncombouid"))
   
