@@ -8,7 +8,9 @@
 #' 
 #' @return data
 #'
-adorn_import_file <- function(psnu_import_file) {
+adorn_import_file <- function(psnu_import_file,
+                              d2_session = dynGet("d2_default_session",
+                                                  inherits = TRUE)) {
   #TODO: Generalize this outside the context of COP
   data <- psnu_import_file %>%
   
@@ -21,7 +23,8 @@ adorn_import_file <- function(psnu_import_file) {
       by = c("psnu_uid" = "psnu_uid"))
   
   # Adorn Mechanisms ####
-  mechs <- getMechList(include_dedupe = TRUE, include_MOH = TRUE) %>% 
+  mechs <- getMechList(include_dedupe = TRUE, include_MOH = TRUE,
+                       d2_session = d2_session) %>% 
     dplyr::select(-ou, -startdate, -enddate)
   
   data_codes <- data %>%

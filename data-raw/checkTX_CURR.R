@@ -69,7 +69,8 @@ country_uids <-
     tool = "Data Pack")
 
 URL <- paste0(
-  getOption("baseurl"),"api/29/analytics.csv?dimension=dx:XC0nrb9ZbQR&dimension=ou:OU_GROUP-AVy8gJXym2D;",
+  d2_default_session$base_url,
+  "api/29/analytics.csv?dimension=dx:XC0nrb9ZbQR&dimension=ou:OU_GROUP-AVy8gJXym2D;",
   country_uids,
   "&dimension=e485zBiR7vG:Z8MTaDxRBP6;BURHq262iEL;RV1ZeOr98rI;tIZRQs0FK5P;QOawCj9oLNS;BDPEHrovntA;K9Cw4402aAh;JqZFtdn1sG3;ftAnvKhxRxl;kyKHoWxTzHR;MsbFixtB8mu;bePcXLCq9Ov&dimension=jyUTj5YC3OK:hDBPKTjUPDm;ZOYVg7Hosni&filter=pe:2019Oct&outputIdScheme=NAME&columns=dx&rows=ou;e485zBiR7vG;jyUTj5YC3OK"
 )
@@ -78,7 +79,8 @@ pad <- function(digit) {padded <- paste0("0", digit)}
 
 tx_datim <- URL %>%
   utils::URLencode() %>%
-  httr::GET(httr::timeout(180)) %>%
+  httr::GET(httr::timeout(180),
+            handle = d2_default_session$handle) %>%
   httr::content(., "text") %>%
   readr::read_csv() %>%
   tidyr::pivot_longer(

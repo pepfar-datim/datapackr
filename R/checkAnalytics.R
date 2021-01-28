@@ -526,7 +526,9 @@ analyze_indexpos_ratio <- function(data) {
 #' @return d
 #'
 checkAnalytics <- function(d,
-                           model_data_path) {
+                           model_data_path,
+                           d2_session = dynGet("d2_default_session",
+                                               inherits = TRUE)) {
 
   # Start running log of all warning and information messages ####
   d$keychain$model_data_path <- model_data_path
@@ -544,7 +546,7 @@ checkAnalytics <- function(d,
     dplyr::ungroup() %>%
 
   # Adorn metadata
-    adorn_import_file() %>%
+    adorn_import_file(d2_session = d2_session) %>%
     dplyr::select(PSNU = dp_psnu, psnuid = psnu_uid,
                   indicator_code, Age, Sex, KeyPop, value) %>%
     dplyr::group_by(
