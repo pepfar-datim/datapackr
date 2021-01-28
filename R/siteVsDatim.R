@@ -131,7 +131,7 @@ compareData_SiteVsDatim <- function(site_data,
   
   
   data_datim_only <- dplyr::filter(data, is.na(tool_value)) %>% 
-    select(data_element_uid,period,org_unit_uid,category_option_combo_uid,attribute_option_combo_code,datim_value)
+    dplyr::select(data_element_uid,period,org_unit_uid,category_option_combo_uid,attribute_option_combo_code,datim_value)
 
   #Make the data prettier
   data$data_element <-datimvalidation::remapDEs(data$data_element_uid,mode_in="id",mode_out = "shortName")
