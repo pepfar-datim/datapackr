@@ -18,7 +18,9 @@
 unPackSchema_datapack <- function(filepath = NULL,
                                   skip = NULL,
                                   type = "Data Pack Template",
-                                  cop_year = getCurrentCOPYear()) {
+                                  cop_year = getCurrentCOPYear(),
+                                  d2_session = dynGet("d2_default_session",
+                                                      inherits = TRUE)) {
 
   # Check the filepath is valid. If NA, request via window. ####
   filepath <- handshakeFile(path = filepath,
@@ -146,7 +148,8 @@ unPackSchema_datapack <- function(filepath = NULL,
       map_datapack_cogs <- 
         datimutils::getMetadata(categoryOptionGroups,
                                 fields = "id,name,categoryOptions[id,name]",
-                                "groupSets.name:like:COP 21 Data Pack")
+                                "groupSets.name:like:COP 21 Data Pack",
+                                d2_session = d2_session)
       
     # Left-Pad digits with zeros
       pad <- function(digit) {padded <- paste0("0", digit)}

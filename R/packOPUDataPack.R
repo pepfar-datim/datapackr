@@ -21,6 +21,7 @@
 #' \code{Working Directory}.
 #' @param results_archive If TRUE, will export compiled results of all tests and
 #' processes to output_folder.
+#' @param d2_session DHIS2 Session id
 #'
 #' @return Exports a COP20 OPU Data Pack to Excel within \code{output_folder}.
 #'
@@ -29,7 +30,9 @@ packOPUDataPack <- function(datapack_name,
                            template_path = NULL,
                            cop_year = getCurrentCOPYear(),
                            output_folder,
-                           results_archive = TRUE) {
+                           results_archive = TRUE,
+                           d2_session = dynGet("d2_default_session",
+                                               inherits = TRUE)) {
   
   if (cop_year != 2020) {
     stop("Sorry! We're only set up to run this for COP20 OPUs for right now. Check back later please. Stay safe!")
@@ -51,7 +54,8 @@ packOPUDataPack <- function(datapack_name,
   
   # Pull data from DATIM ####
   d$data$model_data <- getOPUDataFromDATIM(cop_year = cop_year,
-                                           country_uids = country_uids)
+                                           country_uids = country_uids,
+                                           d2_session = d2_session)
   
   if (NROW(d$data$model_data) == 0) {
     stop("Model data pull seems to have returned no data. Please check with DATIM.")
@@ -79,7 +83,8 @@ packOPUDataPack <- function(datapack_name,
         filepath = d$keychain$template,
         skip = skip_tabs(tool = "OPU Data Pack Template", cop_year = cop_year),
         type = "OPU Data Pack Template",
-        cop_year = cop_year)
+        cop_year = cop_year,
+        d2_session = d2_session)
     
     if (!identical(d$info$schema, schema)) {
       stop("Ruh roh. Template provided does not match archived schema.")
