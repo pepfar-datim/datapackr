@@ -20,14 +20,21 @@ checkColStructure <- function(d, sheet) {
   submission_cols <- names(data) %>%
     tibble::enframe(name = NULL) %>%
     dplyr::select(indicator_code = value) %>%
-    dplyr::mutate( sheet = sheet,
-      submission_order = as.integer(1:(dplyr::n())))
+    dplyr::mutate(
+      sheet = sheet,
+      submission_order = as.integer(1:(dplyr::n()))) %>%
+    {if (sheet == "PSNUxIM") {
+      dplyr::filter(.,
+        !stringr::str_detect(indicator_code, "\\d{4,}_(DSD|TA)|^$"))
+      } else {.}}
   
   col_check <- d$info$schema %>%
-    dplyr::filter(sheet_name == sheet
-                  & !(sheet %in% c("SNU x IM","PSNUxIM")
-                        & indicator_code %in% c("12345_DSD","12345_TA"))) %>%
+    dplyr::filter(sheet_name == sheet) %>%
     dplyr::select(indicator_code, template_order = col) %>%
+    {if (sheet == "PSNUxIM") {
+      dplyr::filter(.,
+                    !stringr::str_detect(indicator_code, "\\d{4,}_(DSD|TA)|^$"))
+    } else {.}} %>%
     dplyr::left_join(submission_cols, by = c("indicator_code" = "indicator_code")) %>%
     dplyr::mutate(order_check = template_order == submission_order)
   
@@ -61,7 +68,7 @@ checkColStructure <- function(d, sheet) {
     dplyr::filter(indicator_code != "") %>%
     dplyr::select(sheet,indicator_code)
   
-  duplicate_columns <-submission_cols_no_blanks %>% 
+  duplicate_columns <- submission_cols_no_blanks %>% 
     dplyr::mutate(duplicated_cols=duplicated(indicator_code)) %>% 
     dplyr::filter(duplicated_cols)
     
