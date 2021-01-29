@@ -18,10 +18,13 @@
 getPSNUs <- function(country_uids = NULL,
                      include_mil = TRUE,
                      include_DREAMS = TRUE,
-                     additional_fields = NULL) {
+                     additional_fields = NULL,
+                     d2_session = dynGet("d2_default_session",
+                                         inherits = TRUE)) {
   
   # Pull PSNUs from DATIM ####
-  PSNUs <- api_call("organisationUnits") %>%
+  PSNUs <- api_call("organisationUnits",
+                    d2_session = d2_session) %>%
     api_filter("organisationUnitGroups.id","in",
                paste0("AVy8gJXym2D",
                       dplyr::if_else(include_mil, ",nwQbMeALRjL", ""),
@@ -31,7 +34,7 @@ getPSNUs <- function(country_uids = NULL,
       else . } %>%
     datapackr::api_fields("id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]") %>%
     {if (!is.null(additional_fields)) datapackr::api_fields(., additional_fields) else . } %>%
-    datapackr::api_get()
+    datapackr::api_get(d2_session = d2_session)
   
   # Extract metadata ####
   PSNUs %<>%

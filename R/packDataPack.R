@@ -31,7 +31,9 @@ packDataPack <- function(model_data,
                          template_path = NULL,
                          cop_year = getCurrentCOPYear(),
                          output_folder = getwd(),
-                         results_archive = TRUE) {
+                         results_archive = TRUE,
+                         d2_session = dynGet("d2_default_session",
+                                             inherits = TRUE)) {
 
   print(datapack_name)
   print(country_uids)
@@ -82,7 +84,8 @@ packDataPack <- function(model_data,
     unPackSchema_datapack(
       filepath = d$keychain$template,
       skip = skip_tabs(tool = "Data Pack Template", cop_year = cop_year),
-      cop_year = cop_year)
+      cop_year = cop_year,
+      d2_session = d2_session)
 
   if (!identical(d$info$schema, schema)) {
     stop("Ruh roh. Template provided does not match archived schema.")

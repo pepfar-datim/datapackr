@@ -9,13 +9,16 @@
 #' 
 #' @return Dataframe of COP indicators retrieved from DATIM
 #'
-pull_COPindicators <- function(cop_year = datapackr::getCurrentCOPYear()) {
-  indicators <- datapackr::api_call("indicators") %>%
+pull_COPindicators <- function(cop_year = datapackr::getCurrentCOPYear(),
+                               d2_session = dynGet("d2_default_session",
+                                                   inherits = TRUE)) {
+  indicators <- datapackr::api_call("indicators",
+                                    d2_session = d2_session) %>%
     datapackr::api_filter(field = "indicatorGroups.name",
                           operation = "eq",
                           match = paste("COP",stringr::str_sub(cop_year,start = -2),"indicators")) %>%
     datapackr::api_fields("code,id,name,numeratorDescription,numerator,denominatorDescription,denominator,indicatorType[id,name]") %>%
-    datapackr::api_get()
+    datapackr::api_get(d2_session = d2_session)
   
   row.names(indicators) <- NULL
   

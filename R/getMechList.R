@@ -25,17 +25,21 @@
 getMechList <- function(country_uids = NULL,
                         include_dedupe = FALSE,
                         include_MOH = FALSE,
-                        cop_year = NULL) {
+                        cop_year = NULL,
+                        d2_session = dynGet("d2_default_session",
+                                            inherits = TRUE)) {
   
-  getMechsView <- function(filter = FALSE, field = NULL, operation = NULL, match = NULL) {
-    paste0(getOption("baseurl"), "api/",datapackr::api_version(),
+  getMechsView <- function(filter = FALSE, field = NULL, operation = NULL, match = NULL,
+                           d2_session = dynGet("d2_default_session",
+                                               inherits = TRUE)) {
+    paste0(d2_session$base_url, "api/",datapackr::api_version(),
            "/sqlViews/fgUtV6e9YIX/data.csv") %>%
       {if (filter)
         paste0(., "?filter=",field,":",operation,":",
                ifelse(operation == "in", paste0("[",paste0(match, collapse=","),"]"), match))
         else . } %>%
       utils::URLencode() %>%
-      httr::GET(httr::timeout(180)) %>%
+      httr::GET(httr::timeout(180), handle = d2_session$handle) %>%
       httr::content(., "text") %>%
       readr::read_csv(col_types = readr::cols(.default = "c")) %>%
       dplyr::rename(
@@ -59,17 +63,18 @@ getMechList <- function(country_uids = NULL,
     "enddate" = character()
   )
   
-  if (!isLoggedIn()) {
+  if (!isLoggedIn(d2_session = d2_session)) {
     warning("You are not logged in but have requested a mechanism view.")
     return(empty_mechs_view)
   }
   
   # Convert country_uids to OU names for filtering
   if (!is.null(country_uids)) {
-    ous <- api_call("organisationUnits") %>%
+    ous <- api_call("organisationUnits",
+                    d2_session = d2_session) %>%
       api_filter("id", "in", match = paste(country_uids, collapse = ",")) %>%
       datapackr::api_fields("id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]") %>%
-      datapackr::api_get() %>%
+      datapackr::api_get(d2_session = d2_session) %>%
       dplyr::mutate(
         ou = purrr::map_chr(ancestors, list("name", 3), .default = NA),
         ou = dplyr::if_else(is.na(ou), name, ou)
@@ -77,10 +82,11 @@ getMechList <- function(country_uids = NULL,
    
   # Pull Mechs #### 
     mechs <-
-      getMechsView(filter = TRUE, field = "ou", operation = "in", match = ous$ou)
+      getMechsView(filter = TRUE, field = "ou", operation = "in", match = ous$ou,
+                   d2_session = d2_session)
   } else {
     mechs <-
-      getMechsView()
+      getMechsView(d2_session = d2_session)
   }
     
   # Filter by Fiscal Year ####
@@ -102,7 +108,8 @@ getMechList <- function(country_uids = NULL,
         getMechsView(filter = TRUE,
                      field = "uid",
                      operation = "in",
-                     match = c("X8hrDf6bLDC","YGT1o7UxfFu"))
+                     match = c("X8hrDf6bLDC","YGT1o7UxfFu"),
+                     d2_session = d2_session)
       
       mechs %<>%
         dplyr::bind_rows(dedupes)
@@ -119,7 +126,8 @@ getMechList <- function(country_uids = NULL,
         getMechsView(filter = TRUE,
                      field = "uid",
                      operation = "in",
-                     match = c("QCJpv5aDCJU","TRX0yuTsJA9"))
+                     match = c("QCJpv5aDCJU","TRX0yuTsJA9"),
+                     d2_session = d2_session)
       
       mechs %<>%
         dplyr::bind_rows(MOH)

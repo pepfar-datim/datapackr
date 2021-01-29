@@ -8,10 +8,13 @@
 #' 
 #' @return Code list as dataframe.
 #'
-pullDATIMCodeList <- function(dataset) {
+pullDATIMCodeList <- function(dataset,
+                              d2_session = dynGet("d2_default_session",
+                                                  inherits = TRUE)) {
   
   # TEST that dataset is valid
-  ds <- datimutils::getMetadata(dataSets)
+  ds <- datimutils::getMetadata(dataSets,
+                                d2_session = d2_session)
   
   if (!dataset %in% ds$id) {
     stop("Invalid dataset uid provided!")
@@ -21,7 +24,8 @@ pullDATIMCodeList <- function(dataset) {
   
   # Pull Code List
   codeList <- api_sql_call(sqlView = "DotdxKrNZxG",
-                           var = dataset)
+                           var = dataset,
+                           d2_session = d2_session)
   
   return(codeList)
   
