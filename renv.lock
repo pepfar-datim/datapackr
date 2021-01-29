@@ -174,13 +174,6 @@
       "Repository": "CRAN",
       "Hash": "ebaa97ac99cc2daf04e77eecc7b781d7"
     },
-    "codetools": {
-      "Package": "codetools",
-      "Version": "0.2-16",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "89cf4b8207269ccf82fbeb6473fd662b"
-    },
     "colorspace": {
       "Package": "colorspace",
       "Version": "2.0-0",
@@ -253,11 +246,11 @@
     },
     "datapackcommons": {
       "Package": "datapackcommons",
-      "Version": "0.2.0.0.0.0.1609228900",
+      "Version": "0.2.2.0.0.0.1611852716",
       "Source": "Repository",
       "Repository": "RSPM",
-      "RemoteSha": "5a1b88e69782d61e41dfa16a988aabd648d67a35",
-      "Hash": "17e68bccb5ba0c1b53f51dd02b78240a"
+      "RemoteSha": "811a405f09793aa990a202085f942dd95f5e48a1",
+      "Hash": "fe221e1ef27dc232417cda367a5b7287"
     },
     "datimutils": {
       "Package": "datimutils",
@@ -311,14 +304,6 @@
       "Repository": "CRAN",
       "Hash": "a0cbe758a531d054b537d16dff4d58a1"
     },
-    "doMC": {
-      "Package": "doMC",
-      "Version": "1.3.7",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "OS_type": "unix",
-      "Hash": "a51780731e2ec5eee714097df69ea204"
-    },
     "dplyr": {
       "Package": "dplyr",
       "Version": "1.0.3",
@@ -367,13 +352,6 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "1cb4279e697650f0bd78cd3601ee7576"
-    },
-    "foreach": {
-      "Package": "foreach",
-      "Version": "1.5.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "e32cfc0973caba11b65b1fa691b4d8c9"
     },
     "fs": {
       "Package": "fs",
@@ -507,13 +485,6 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "53647fb507373700028b2ce6cd30751a"
-    },
-    "iterators": {
-      "Package": "iterators",
-      "Version": "1.0.13",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "64778782a89480e9a644f69aad9a2877"
     },
     "jsonlite": {
       "Package": "jsonlite",
