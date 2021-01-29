@@ -7,7 +7,8 @@
 #' @return dataframe of categoryoptioncombos mapped to underlying category
 #' options
 #'
-map_Cs_to_COs <- function() {
+map_Cs_to_COs <- function(d2_session = dynGet("d2_default_session",
+                                              inherits = TRUE)) {
   
   str <-
     paste0(
@@ -17,9 +18,10 @@ map_Cs_to_COs <- function() {
       "|Observed Commodity|Outcome Type|Receiving ART|Service Delivery Point",
       "|TB Therapy Type")
   
-  Cs_to_COs <- api_call("categories") %>%
+  Cs_to_COs <- api_call("categories",
+                        d2_session = d2_session) %>%
     api_fields("id,name,categoryOptions[id,name]") %>%
-    api_get() %>%
+    api_get(d2_session = d2_session) %>%
     dplyr::mutate(
       categoryoptiongroup = stringr::str_extract(name, str),
       categoryoptiongroup = ifelse(is.na(categoryoptiongroup),name,categoryoptiongroup)) %>%

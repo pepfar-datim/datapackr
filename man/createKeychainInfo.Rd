@@ -6,7 +6,7 @@
 \usage{
 createKeychainInfo(
   submission_path = NULL,
-  tool = "Data Pack",
+  tool = NULL,
   country_uids = NULL,
   cop_year = NULL
 )

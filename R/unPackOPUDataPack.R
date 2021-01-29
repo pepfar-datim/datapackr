@@ -6,6 +6,7 @@
 #'     issues, checking data against DATIM validations, and extracting data.
 #'
 #' @param d datapackr sidecar
+#' @param d2_session DHIS2 Session id
 #'
 #' @details
 #' Once this function is called, it will present a dialog box where you can
@@ -24,22 +25,6 @@ unPackOPUDataPack <- function(d,
                               d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
 
-  # Grab datapack_name from Home Page
-  d$info$datapack_name <- unPackDataPackName(
-    submission_path = d$keychain$submission_path)  
-  
-  # Determine country uids ####
-  if (is.null(d$info$country_uids)) {
-    d$info$country_uids <- 
-      unPackCountryUIDs(submission_path = d$keychain$submission_path,
-                        tool = d$info$tool)
-  }
-  
-  # Store schema ####
-  if (d$info$cop_year == 2020) {
-    d$info$schema <-  datapackr::cop20OPU_data_pack_schema
-  } else {stop("That COP Year currently isn't supported for processing OPU Data Packs.")}
-  
   # Check integrity of Workbook tabs ####
   d <- checkStructure(d)
   

@@ -8,13 +8,17 @@
 #' 
 #' @return Dataframe of Tech Areas mapped to dataElements
 #' 
-getTechArea <- function(dataElements = NULL) {
+getTechArea <- function(dataElements = NULL,
+                        d2_session = dynGet("d2_default_session",
+                                            inherits = TRUE)) {
   
   groupSet = "LxhLO68FcXm"
   
-  tech_areas <- api_call(paste0("dataElementGroupSets/",groupSet)) %>%
+  tech_areas <- api_call(paste0("dataElementGroupSets/",
+                                groupSet),
+                                d2_session = d2_session) %>%
     api_fields("dataElementGroups[name,dataElements[id]]") %>%
-    api_get() %>%
+    api_get(d2_session = d2_session) %>%
     tidyr::unnest(cols = dataElements) %>%
     dplyr::distinct() %>%
     dplyr::select(dataElement = id,

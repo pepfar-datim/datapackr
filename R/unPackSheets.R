@@ -25,8 +25,7 @@ unPackSheets <- function(d) {
   
   d$data$targets <- NULL
   
-  for (i in 1:length(sheets_to_read)) {
-    sheet = sheets_to_read[i]
+  for (sheet in sheets_to_read) {
     interactive_print(sheet)
     
     if (d$info$tool == "Data Pack") {

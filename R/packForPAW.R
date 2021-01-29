@@ -11,6 +11,14 @@
 #' 
 packForPAW <- function(d) {
   
+  if (d$info$cop_year == 2021) {
+    map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
+  } else if (d$info$cop_year == 2020) {
+    map_DataPack_DATIM_DEs_COCs_local <- datapackr::cop20_map_DataPack_DATIM_DEs_COCs
+  } else {
+    stop("That COP Year currently isn't supported for processing by createAnalytics.")
+  }
+  
   PSNUs <- datapackr::valid_PSNUs %>%
     dplyr::mutate(
       ou_id = purrr::map_chr(ancestors, list("id", 3), .default = NA),
@@ -35,7 +43,7 @@ packForPAW <- function(d) {
             indicator_code %in% c("PMTCT_EID.N.Age.T.2mo","PMTCT_EID.N.Age.T.2to12mo") ~ NA_character_,
             TRUE ~ Age
           )) %>%
-      dplyr::left_join(datapackr::map_DataPack_DATIM_DEs_COCs,
+      dplyr::left_join(map_DataPack_DATIM_DEs_COCs_local,
                        by = c("indicator_code" = "indicator_code",
                               "Age" = "valid_ages.name",
                               "Sex" = "valid_sexes.name",

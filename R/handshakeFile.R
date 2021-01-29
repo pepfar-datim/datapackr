@@ -37,8 +37,8 @@ canReadFile <- function(path) {
 #'
 #' @return Character vector containing valid filepath for further use.
 #'
-handshakeFile <- function(path = NULL,
-                          tool = NULL) {
+handshakeFile <- function(path,
+                          tool) {
 
   if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
     extension = "xlsx"

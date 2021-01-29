@@ -20,7 +20,7 @@ combineMER_SNUxIM <- function(d) {
     dplyr::filter((is.na(value) | value == 0)
                   & !is.na(distribution)
                   & distribution != 0)
-  attr(d$tests$no_targets ,"test_name")<-"Distribution with no targets"
+  attr(d$tests$no_targets ,"test_name") <- "Distribution with no targets"
   
   
   if (NROW(d$tests$no_targets) > 0) {
@@ -36,6 +36,9 @@ combineMER_SNUxIM <- function(d) {
         "WARNING!: ",
         NROW(no_targets_inds),
         " cases where distribution attempted where no Target set.",
+        " Identify these cases in the PSNUxIM tab by filtering for cases where the total",
+        " DataPackTarget is 0, but some non-zero distribution proportion has been allocated",
+        " against one or more mechanisms.",        
         " NOTE that these will be ignored and won't prevent further processing.",
         " This has affected the following indicators -> \n\t* ",
         paste(unique(no_targets_inds$indicator_code), collapse = "\n\t* "),
@@ -80,10 +83,10 @@ combineMER_SNUxIM <- function(d) {
         NROW(d$tests$imbalanced_distribution),
         " cases where distributed total across all mechanisms and Dedupe is",
         " either more or less than PSNU-level Target.",
-        " To identify these, go to your PSNUxIM tab and filter the Rollup column ",
-        "to find cases where this is not equal to 100%.",
+        " To identify these, go to your PSNUxIM tab and filter the Rollup column",
+        " to find cases where this is not equal to 100%.",
         " NOTE that this may be due to any invalid mechanism names in row 14 of your PSNUxIM tab.",
-        " For reference, this has affected the following indicators -> \n\t* ",
+        " For reference, this has affected the following indicators. -> \n\t* ",
         paste(imbalanced_distribution_inds, collapse = "\n\t* "),
       "\n")
   
@@ -118,7 +121,12 @@ combineMER_SNUxIM <- function(d) {
         " amount of variation from original targets set in other sheets.",
         " A small amount of rounding may be unavoidable given the nature of the",
         " target-setting process. You can review these cases in the FlatPack",
-        " provided as an output from this app.\n"
+        " provided as an output from this app.",
+        " To resolve these cases, please review the PSNUxIM tab to identify and address cases where multiplication of",
+        " distribution percentages against FY22 Targets has caused rounding error. You may",
+        " address this by gradually altering distribution percentages to fine tune",
+        " allocations against one or more mechanisms.",
+        "\n"
       )
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
@@ -135,7 +143,10 @@ combineMER_SNUxIM <- function(d) {
         "WARNING!: ",
         NROW(d$tests$invalid_dedupes),
         " cases where positive numbers are being used for Dedupe allocations.",
-        " You can find these by filtering on the Dedupe column in the PSNUxIM tab.")
+        " Review the Deduplication columns on the PSNUxIM tab to identify cases where any of ",
+        " these contains a positive value. (Only negative values are allowable for Deduplication offsets.)",
+        "\n"
+      )
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
@@ -151,6 +162,8 @@ combineMER_SNUxIM <- function(d) {
         "WARNING!: ",
         NROW(d$tests$negative_distributed_targets),
         " cases where negative numbers are being used for mechanism allocations.",
+        " Ensure there are no negative values applied against mechanisms in the PSNUxIM tab.",
+        " Mechanisms can only have positive targets applied against them.",
         " The following mechanisms have been affected. -> \n\t* ",
         paste(unique(d$tests$negative_distributed_targets$mechanism_code), collapse = "\n\t* "),
         "\n")
@@ -192,6 +205,7 @@ combineMER_SNUxIM <- function(d) {
         NROW(d$tests$invalid_DSDTA),
         " cases where column headers in row 14 of your PSNUxIM tab have prevented",
         " us from determining whether you intended data to be distributed to DSD or TA.",
+        "Ensure that all mechanism column headers in the PSNUxIM tab clearly denote either DSD or TA.",
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
