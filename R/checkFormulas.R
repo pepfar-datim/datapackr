@@ -69,7 +69,7 @@ checkFormulas <- function(d, sheet) {
     {if (sheet == "PSNUxIM" & d$info$tool == "Data Pack") {
       (.)
     } else {
-      dplyr::group_by(row) %>%
+      dplyr::group_by(., row) %>%
         dplyr::mutate(occurrence = duplicated(indicator_code)) %>%
         dplyr::ungroup() %>%
         dplyr::filter(occurrence == FALSE) %>%
