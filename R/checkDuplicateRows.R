@@ -20,7 +20,7 @@ checkDuplicateRows <- function(d, sheet) {
   if (d$info$tool == "OPU Data Pack") {
     header_cols <- d$info$schema %>%
       dplyr::filter(
-        sheet == sheet,
+        sheet_name == sheet,
         col_type == "row_header"
       ) %>%
       dplyr::pull(indicator_code) %>%

@@ -303,7 +303,7 @@ unPackSNUxIM <- function(d) {
         ~ dplyr::if_else(.x < 0, NA_real_, .x))
     )
   
-  # TODO: Check for Formula changes ####
+  # TEST: Formula changes; Warning; Continue ####
   d <- checkFormulas(d, sheet)
   
   
@@ -418,7 +418,6 @@ unPackSNUxIM <- function(d) {
       )
     )
   
-  # TODO: Troubleshoot why this is flagging false duplicates ####
   d <- checkDuplicateRows(d, sheet)
   ## This may be a repeat of information already shared in checking duplicate
   ## columns, but may also catch rows that were duplicates even before pivot_longer.
