@@ -10,7 +10,7 @@ adornMechanisms(
 )
 }
 \arguments{
-\item{data}{Dataset to adorn}
+\item{data}{Dataset to adorn, typically d$data$analytics}
 }
 \value{
 Modified data object

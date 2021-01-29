@@ -4,7 +4,7 @@
 \alias{map_COCs_to_COs}
 \title{Map categoryoptioncombos to underlying categoryoptions.}
 \usage{
-map_COCs_to_COs()
+map_COCs_to_COs(d2_session = dynGet("d2_default_session", inherits = TRUE))
 }
 \value{
 dataframe of categoryoptioncombos mapped to underlying category

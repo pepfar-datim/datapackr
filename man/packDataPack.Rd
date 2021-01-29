@@ -11,7 +11,8 @@ packDataPack(
   template_path = NULL,
   cop_year = getCurrentCOPYear(),
   output_folder = getwd(),
-  results_archive = TRUE
+  results_archive = TRUE,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{

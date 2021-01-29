@@ -6,7 +6,8 @@
 \usage{
 getCOPDatasetUIDs(
   cop_year = getCurrentCOPYear(),
-  types = c("MER", "SUBNAT", "IMPATT")
+  types = c("MER", "SUBNAT", "IMPATT"),
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{

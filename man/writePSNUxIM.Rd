@@ -4,7 +4,12 @@
 \alias{writePSNUxIM}
 \title{writePSNUxIM(d)}
 \usage{
-writePSNUxIM(d, snuxim_model_data_path = NULL, output_folder = NULL)
+writePSNUxIM(
+  d,
+  snuxim_model_data_path = NULL,
+  output_folder = NULL,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
 \item{d}{Datapackr object}
