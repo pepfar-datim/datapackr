@@ -10,7 +10,12 @@
 #' @return d
 #'
 checkFormulas <- function(d, sheet) {
-
+  if (sheet %in% c("SNU x IM","PSNUxIM") & d$info$tool == "Data Pack") {
+    data = d$data$SNUxIM
+  } else {
+    data = d$data$extract
+  }
+  
   header_row <- headerRow(tool = "Data Pack", cop_year = d$info$cop_year)
 
   # Pull in formulas from schema ###
@@ -43,7 +48,7 @@ checkFormulas <- function(d, sheet) {
                       sheets = sheet,
                       include_blank_cells = T) %>%
     dplyr::filter(row >= header_row,
-                  row <= (NROW(d$data$extract) + header_row)) %>%
+                  row <= (NROW(data) + header_row)) %>%
     dplyr::mutate(
       formula =
         dplyr::case_when(
@@ -59,14 +64,20 @@ checkFormulas <- function(d, sheet) {
       by = c("col" = "col")) %>%
     dplyr::select(row, col, indicator_code, formula) %>%
     dplyr::filter(row != header_row) %>%
+  
   # Handle duplicate column headers ####
-    dplyr::group_by(row) %>%
-    dplyr::mutate(occurrence = duplicated(indicator_code)) %>%
-    dplyr::ungroup() %>%
-    dplyr::filter(occurrence == FALSE) %>%
-    dplyr::select(-occurrence) %>%
-  # Limit to only columns that DUIT cares about
-    dplyr::filter(indicator_code %in% formulas_schema$indicator_code) %>%
+    {if (sheet == "PSNUxIM" & d$info$tool == "Data Pack") {
+      (.)
+    } else {
+      dplyr::group_by(row) %>%
+        dplyr::mutate(occurrence = duplicated(indicator_code)) %>%
+        dplyr::ungroup() %>%
+        dplyr::filter(occurrence == FALSE) %>%
+        dplyr::select(-occurrence) %>%
+        # Limit to only columns that DUIT cares about
+        dplyr::filter(indicator_code %in% formulas_schema$indicator_code)
+        }
+      } %>%
     dplyr::mutate(
       formula = stringr::str_replace_all(
         formula,
@@ -79,10 +90,16 @@ checkFormulas <- function(d, sheet) {
   altered_formulas <- formulas_schema %>%
     dplyr::left_join(
       formulas_datapack,
-      by = c("indicator_code" = "indicator_code")) %>%
-    dplyr::mutate(
-      formula_diff = formula.x == formula.y) %>%
-    dplyr::filter(formula_diff == FALSE) %>%
+      by = 
+        {if (sheet == "PSNUxIM" & d$info$tool == "Data Pack") {
+          c("col" = "col")
+          } else {c("indicator_code" = "indicator_code")}
+        }
+    ) %>%
+    dplyr::filter(formula.x != formula.y) %>%
+    {if (sheet == "PSNUxIM" & d$info$tool == "Data Pack") {
+      dplyr::rename(., indicator_code = indicator_code.y)
+      } else {.}} %>%
     dplyr::select(
       indicator_code, correct_fx = formula.x, submitted_fx = formula.y, row) %>%
     dplyr::group_by(indicator_code, correct_fx, submitted_fx) %>%

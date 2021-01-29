@@ -241,7 +241,6 @@ unPackSNUxIM <- function(d) {
       | `issues.Total Deduplicated Rollup`
     )
   
-  # TODO: Fix issues with Crosswalk dedupes here... I think related to the function in template
   attr(d$tests$dedupes_outside_range, "test_name") <- "Dedupes Outside Acceptable Range"
   
   if (NROW(d$tests$dedupes_outside_range) > 0) {
@@ -262,7 +261,7 @@ unPackSNUxIM <- function(d) {
         sheet,
         ", DEDUPES OUTSIDE ACCEPTABLE RANGE: The following columns contain total",
         " deduplicated targets that are outside acceptable maximum/minimum ranges.",
-        " (The OPU Data Pack notes these with red highlighting.) You must resolve",
+        " (Your Data Pack notes these with red highlighting.) You must resolve",
         " these issues prior to DATIM import. ->  \n\t* ",
         paste(
           dedupe_issue_cols$col,
@@ -305,6 +304,8 @@ unPackSNUxIM <- function(d) {
     )
   
   # TODO: Check for Formula changes ####
+  d <- checkFormulas(d, sheet)
+  
   
   # Remove all unneeded columns ####
   d$data$SNUxIM %<>%
@@ -417,7 +418,7 @@ unPackSNUxIM <- function(d) {
       )
     )
   
-  # TODO: Troubleshoot why this is flagging false duplicates
+  # TODO: Troubleshoot why this is flagging false duplicates ####
   d <- checkDuplicateRows(d, sheet)
   ## This may be a repeat of information already shared in checking duplicate
   ## columns, but may also catch rows that were duplicates even before pivot_longer.
@@ -503,7 +504,7 @@ unPackSNUxIM <- function(d) {
     dplyr::select(dplyr::all_of(header_cols$indicator_code),
                   mech_code, support_type, value)
   
-  #TODO: Add somewhere:
+  #TODO: Add somewhere: ####
   # - Test for where distribution != Data Pack Target
   # - Rounding discrepancies
   
