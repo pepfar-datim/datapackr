@@ -34,8 +34,7 @@ unPackSNUxIM <- function(d) {
   } else {d$info$has_psnuxim <- TRUE}
   
   # Run structural checks ####
-  #TODO: Update this for new structure
-  d <- checkColStructure(d, "PSNUxIM")
+  d <- checkColStructure(d, sheet)
   
   # Pare down to populated, updated targets only ####
   cols_to_keep <- d$info$schema %>%
@@ -50,8 +49,6 @@ unPackSNUxIM <- function(d) {
   d$data$SNUxIM <- d$data$SNUxIM[,cols_to_keep$col]
 
   d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
-  
-  # TODO: Add test for columns with data that had a blank col name
   
   # Drop rows where entire row is NA ####
   d$data$SNUxIM %<>%
@@ -145,8 +142,7 @@ unPackSNUxIM <- function(d) {
   # --> This also removes non-essential text from IM name to leave only 12345_DSD format.
   
   # TEST: Non-numeric data; Warn; Convert & Drop ####
-  # TODO: Fix this test to work here
-  #d <- checkNumericValues(d, sheet, header_cols)
+  d <- checkNumericValues(d, sheet, header_cols)
   
   #sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
   
