@@ -37,15 +37,19 @@ getMechanismViewFromDATIM <- function(d2_session = dynGet("d2_default_session",
 #' @param cached_mechs_path Local file path to the cached mechanisms file. 
 #'
 #' @description Retrieves a view of mechanisms with partners and agencies
-#' The function will attempt to read from a cached file, if defined and accessible.
-#'Otherwise, if the user is logged in, the view
+#' The function will attempt to read from a cached file, if defined in
+#' the support_files_directory option has been set, and the mechs.rds file
+#' is available to be read. Otherwise, if the user is logged in, the view
 #' will be obtained from DATIM. Otherwise, an empty dataframe is returned.
 #'
+#' @param d2_session datimutils d2Session object
+#' @param cached_support_file An RDS file containing a cached copy of the 
+#' SQL view used defined via a envionment variable.
 #' @return Mechs
 #'
 getMechanismView <- function(d2_session = dynGet("d2_default_session",
-                                                 inherits = TRUE),
-                             cached_mechs_path = paste0(Sys.getenv("support_files_directory"), "mechs.rds")) {
+                                                 inherits = TRUE), 
+                             cached_support_file = Sys.getenv("MECHS_SUPPORT_FILE")) {
   empty_mechs_view <- tibble::tibble(
     "mechanism_desc" = character() ,
     "mechanism_code"= character(),
@@ -58,15 +62,69 @@ getMechanismView <- function(d2_session = dynGet("d2_default_session",
     "enddate" = character()
     )
 
-  if (file.access(cached_mechs_path, 4) == 0) {
-    mechs <- readRDS(cached_mechs_path)
-  } else {
-    mechs <- getMechanismViewFromDATIM(d2_session = d2_session)
+  getMechanismViewFromDATIM <- function(d2_session = dynGet("d2_default_session",
+                                                            inherits = TRUE)) {
+    if (!isLoggedIn(d2_session)) {
+      warning("You are not logged in but have requested a mechanism view.")
+      return(empty_mechs_view)
+    } else {
+      paste0(d2_session$base_url,
+             "api/sqlViews/fgUtV6e9YIX/data.csv") %>%
+        httr::GET(httr::timeout(180),
+                  handle = d2_session$handle) %>%
+        httr::content(., "text") %>%
+        readr::read_csv(col_names = TRUE) %>%
+        dplyr::rename(
+          mechanism_desc = mechanism,
+          attributeOptionCombo = uid,
+          mechanism_code = code,
+          partner_desc = partner,
+          partner_id = primeid
+        )
+    }
   }
 
+  #Test for existence of support file
+  can_read_file <- file.access(cached_support_file, 4) == 0
+  
+  if (can_read_file) {
+    
+    #Set a reasonable default here
+    if (is.null(d2_session$max_cache_age)) {
+      max_cache_age<-"1 day"
+    } else {
+      max_cache_age<-d2_session$max_cache_age
+    } 
+    
+    is_fresh <-
+      lubridate::as.duration(lubridate::interval(Sys.time(), file.info(cached_support_file)$mtime)) < lubridate::duration(max_cache_age)
+    if (is_fresh) {
+      print(paste0("Using cached mechanism support file at ",cached_support_file))
+      mechs <- readRDS(cached_support_file)
+    } else {
+      mechs <- getMechanismViewFromDATIM(d2_session = d2_session)
+      #TODO: Need to check and be sure we can write here. 
+      if (cached_support_file != "") {
+        #Attempt to save a cached copy for later use if it has been defined
+        print(paste0("Overwriting stale mechanisms view to ", cached_support_file))
+        saveRDS(mechs, file = cached_support_file)        
+      }
+    }
+    
+  } else {
+    mechs <- getMechanismViewFromDATIM(d2_session = d2_session)
+    #Attempt to save a cached copy for later use if it has been defined
+    #TODO: Need to check and be sure we can write here. 
+    if (cached_support_file != "") {
+      #Attempt to save a cached copy for later use if it has been defined
+      print(paste0("Saving cached mechanisms view to ", cached_support_file))
+      saveRDS(mechs, file = cached_support_file)        
+    }
+  }
+  
   structure_ok <- dplyr::setequal(names(empty_mechs_view), names(mechs))
 
-  if (!structure_ok) {warning("Mechanism structure is not correct.")}
+  if (!structure_ok) y
 
   mechs
 
