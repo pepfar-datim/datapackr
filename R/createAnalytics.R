@@ -20,16 +20,33 @@ createAnalytics <- function(d,
         PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
         mechanism_code = mech_code, support_type, value
       )
-  } else {
-    d$data$analytics <- dplyr::bind_rows(
-      d$data$distributedMER,
-      dplyr::mutate(
-        d$data$SUBNAT_IMPATT,
-        mechanism_code = "HllvX50cXC0",
-        support_type = "DSD"
+  } 
+  
+  if (d$info$tool == "Data Pack") {
+    if (d$info$cop_year == 2020) {
+      d$data$analytics <- dplyr::bind_rows(
+        d$data$distributedMER,
+        dplyr::mutate(
+          d$data$SUBNAT_IMPATT,
+          mechanism_code = "HllvX50cXC0",
+          support_type = "DSD"
+        )
       )
-    )
+    }
+    if (d$info$cop_year == 2021) {
+        d$data$analytics <- dplyr::bind_rows(
+          d$data$SNUxIM,
+          dplyr::mutate(
+            d$data$SUBNAT_IMPATT,
+            mechanism_code = "HllvX50cXC0",
+            support_type = "DSD"
+          )
+        )
+    }
+    
+    
   }
+  
   #Adorn organisation units
   d <- adornPSNUs(d)
   #Adorn mechanisms

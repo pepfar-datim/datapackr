@@ -58,7 +58,8 @@ unPackDataPack <- function(d,
 
   # Combine Targets with SNU x IM for PSNU x IM level targets ####
     if (d$info$has_psnuxim) {
-      #d <- combineMER_SNUxIM(d)
+      if (d$info$cop_year == 2020 )  {
+        d <- combineMER_SNUxIM(d) }
       interactive_print("Creating analytics...")
       d <- createAnalytics(d, d2_session = d2_session )
 

@@ -604,7 +604,7 @@ unPackSNUxIM <- function(d) {
       remove = TRUE,
       extra = "drop"
     ) %>%
-    dplyr::select(dplyr::all_of(header_cols$indicator_code),
+    dplyr::select(dplyr::all_of(header_cols$indicator_code),psnuid,
                   mech_code, support_type, value)
   
   return(d)
