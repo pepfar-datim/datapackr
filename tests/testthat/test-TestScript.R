@@ -179,7 +179,9 @@ test_that("All", {
                     output_folder
                     , d2_session = d2_session
   )
-  
+  d <- unPackTool("/Users/sam/datapackr_test_files/COP21/Appended PSNUxIM/Data Pack_Eswatini_20210127104607.xlsx"
+                  , d2_session = d2_session
+  )
  # code_list = pullFullCodeList(2021)
   
   #sites = getSiteList("XtxUYCsDWrR")
