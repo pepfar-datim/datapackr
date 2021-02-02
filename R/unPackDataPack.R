@@ -48,9 +48,9 @@ unPackDataPack <- function(d,
     interactive_print("Unpacking sheets...")
     d <- unPackSheets(d)
 
-      # Separate Data Sets ####
-        interactive_print("Separating datasets...")
-        d <- separateDataSets(d)
+  # Separate Data Sets ####
+    interactive_print("Separating datasets...")
+    d <- separateDataSets(d)
 
   # Unpack the SNU x IM sheet ####
     interactive_print("Unpacking the PSNUxIM tab...")
