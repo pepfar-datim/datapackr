@@ -18,7 +18,9 @@
 unPackSchema_datapack <- function(filepath = NULL,
                                   skip = NULL,
                                   type = "Data Pack Template",
-                                  cop_year = getCurrentCOPYear()) {
+                                  cop_year = getCurrentCOPYear(),
+                                  d2_session = dynGet("d2_default_session",
+                                                      inherits = TRUE)) {
 
   # Check the filepath is valid. If NA, request via window. ####
   filepath <- handshakeFile(path = filepath,
@@ -146,7 +148,8 @@ unPackSchema_datapack <- function(filepath = NULL,
       map_datapack_cogs <- 
         datimutils::getMetadata(categoryOptionGroups,
                                 fields = "id,name,categoryOptions[id,name]",
-                                "groupSets.name:like:COP 21 Data Pack")
+                                "groupSets.name:like:COP 21 Data Pack",
+                                d2_session = d2_session)
       
     # Left-Pad digits with zeros
       pad <- function(digit) {padded <- paste0("0", digit)}
@@ -323,14 +326,14 @@ unPackSchema_datapack <- function(filepath = NULL,
         dplyr::case_when(
           col_type %in% c("reference","assumption","calculation","row_header","allocation")
             ~ !dataset == c("datapack"),
-          col_type %in% c("target","past") ~ !dataset %in% c("mer","impatt","subnat", "datapack"),
+          col_type %in% c("target","past","result") ~ !dataset %in% c("mer","impatt","subnat"),
           sheet_num %in% skip_sheets_num ~ !is.na(dataset),
           TRUE ~ TRUE),
 
   ## Test col_type ####
       col_type.test =
         (!col_type %in% c("target","reference","assumption","calculation", "past",
-                        "row_header","allocation"))
+                        "row_header","allocation","result"))
         & (sheet_num %in% skip_sheets_num & !is.na(col_type)),
 
   ## Test value_type ####
@@ -338,6 +341,7 @@ unPackSchema_datapack <- function(filepath = NULL,
         (!value_type %in% c("integer","percentage","string"))
         & (sheet_num %in% skip_sheets_num & !is.na(value_type)),
 
+  # TODO: Update
   ## Test valid_ages ####
   #     valid_ages.test =
   #      !(valid_ages %in% map_datapack_cogs$options | valid_ages %in% empty),

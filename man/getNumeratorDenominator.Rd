@@ -4,7 +4,10 @@
 \alias{getNumeratorDenominator}
 \title{getNumeratorDenominator}
 \usage{
-getNumeratorDenominator(dataElements = NULL)
+getNumeratorDenominator(
+  dataElements = NULL,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
 \item{dataElements}{List of dataElements to filter against. (Optional)}

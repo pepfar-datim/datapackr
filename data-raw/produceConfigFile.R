@@ -225,17 +225,20 @@ getSiteToolSchema <- function(data_pack_schema) {
   return(site_schema)
 }
 
-getPeriodInfo <- function(FY = NA) {
+getPeriodInfo <- function(FY = NA,
+                          d2_session = dynGet("d2_default_session",
+                                              inherits = TRUE)) {
   periodISO <- paste0(FY, "Oct")
 
-  url <- paste0(getOption("baseurl"),
+  url <- paste0(d2_session$base_url,
                 "api/",
                 datapackr::api_version(),
                 "/sqlViews/TTM90ytCCdY/data.json?filter=iso:eq:",
                 periodISO) %>%
     utils::URLencode()
 
-    r <- httr::GET(url , httr::timeout(180))
+    r <- httr::GET(url , httr::timeout(180),
+                   handle = d2_session$handle)
     if (r$status == 200L) {
       r <- httr::content(r, "text")
       r <- jsonlite::fromJSON(r)

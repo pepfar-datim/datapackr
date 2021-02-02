@@ -5,7 +5,7 @@
 \title{Unpack a submitted tool}
 \usage{
 unPackTool(
-  submission_path,
+  submission_path = NULL,
   tool = NULL,
   country_uids = NULL,
   cop_year = NULL,
@@ -23,6 +23,8 @@ will flag error.}
 
 \item{cop_year}{Specifies COP year for dating as well as selection of
 templates.}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \description{
 Processes a submitted Data Pack by identifying integrity issues, checking

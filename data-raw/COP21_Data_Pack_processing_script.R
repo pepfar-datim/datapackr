@@ -1,29 +1,50 @@
+library(datapackr)
+library(magrittr)
 
-datapackr::loginToDATIM("~/.secrets/cop-test.json")
+datapackr::loginToDATIM("~/.secrets/datim.json")
 
-snuxim_model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/PSNUxIM_20200207.rds"
-output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment"
-#model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/model_data_pack_input_20_20200220_1_flat.rds"
+snuxim_model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/PSNUxIM_20210113_1.rds"
+output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/PSNUxIM Testing/Appended PSNUxIM"
+#model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/model_data_pack_input_21_20210118_1_flat.rds"
 
 # Unpack Submitted Data Pack ####
 d <- unPackTool(cop_year = 2021)
 
+# d <- checkAnalytics(d,
+#                    model_data_path)
+
+d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
+
+
+
+
+
+
+# Export DATIM import files ####
+  exportPackr(data = d$datim$MER,
+              output_path = output_folder,
+              type = "DATIM Export File",
+              datapack_name = d$info$datapack_name)
+
+
+
+
 # Produce Beta Pack data for PAW ####
   d$keychain$snuxim_model_data_path = snuxim_model_data_path
   d$keychain$output_folder = output_folder
-  
+
   d$data$snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path)[d$info$country_uids] %>%
     dplyr::bind_rows()
-  
+
   dsd_ta <- tibble::tribble(
     ~type,
     "DSD",
     "TA"
   )
-  
+
   d$data$SNUxIM_combined <- d$data$MER %>%
     tidyr::crossing(dsd_ta)
-  
+
   d$data$snuxim_model_data %<>%
     dplyr::left_join(
       (cop20_data_pack_schema %>%
@@ -40,7 +61,7 @@ d <- unPackTool(cop_year = 2021)
       by = c("indicator_code" = "indicator_code",
              "type" = "type")) %>%
     dplyr::select(-type, -indicator_code, -value)
-  
+
   d$data$SNUxIM_combined %<>%
     dplyr::left_join(
       (cop21_data_pack_schema %>%
@@ -57,7 +78,7 @@ d <- unPackTool(cop_year = 2021)
       by = c("indicator_code" = "indicator_code",
              "type" = "type")
     )
-  
+
   d$data$SNUxIM_combined %<>%
     dplyr::left_join(
       d$data$snuxim_model_data,
@@ -66,7 +87,7 @@ d <- unPackTool(cop_year = 2021)
              "Age" = "age_option_name",
              "Sex" = "sex_option_name",
              "KeyPop" = "kp_option_name")
-      ) %>%
+    ) %>%
     dplyr::select(-age_option_uid, -sex_option_uid, -kp_option_uid) %>%
     tidyr::drop_na(value) %>%
     dplyr::mutate(distributed_value = value * percent,
@@ -77,7 +98,7 @@ d <- unPackTool(cop_year = 2021)
     dplyr::mutate(value = round_trunc(value)) %>%
     dplyr::filter(value != 0) %>%
     tidyr::drop_na(value)
-  
+
   map_DataPack_DATIM_DEs_COCs_local <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(col_type == "target") %>%
     dplyr::select(indicator_code, dataelement_dsd, dataelement_ta,
@@ -94,9 +115,9 @@ d <- unPackTool(cop_year = 2021)
     dplyr::mutate(
       valid_kps.id =
         dplyr::case_when(
-          (indicator_code %in% c("KP_MAT_SUBNAT.N.Sex.T", "KP_MAT.N.Sex.T") 
+          (indicator_code %in% c("KP_MAT_SUBNAT.N.Sex.T", "KP_MAT.N.Sex.T")
            & valid_kps.id == "G6OYSzplF5a") ~ "Z1EnpTPaUfq",
-          (indicator_code %in% c("KP_MAT_SUBNAT.N.Sex.T", "KP_MAT.N.Sex.T") 
+          (indicator_code %in% c("KP_MAT_SUBNAT.N.Sex.T", "KP_MAT.N.Sex.T")
            & valid_kps.id == "wyeCT63FkXB") ~ "Qn0I5FbKQOA",
           TRUE ~ valid_kps.id),
       categoryOptions.ids =
@@ -104,9 +125,9 @@ d <- unPackTool(cop_year = 2021)
                          valid_sexes.id,
                          valid_kps.id,
                          categoryoption_specified),
-                    c)) %>% 
+                    c)) %>%
     dplyr::mutate(categoryOptions.ids = purrr::map(categoryOptions.ids, sort)) %>%
-    dplyr::mutate(categoryOptions.ids = purrr::map(categoryOptions.ids, na.omit)) %>% 
+    dplyr::mutate(categoryOptions.ids = purrr::map(categoryOptions.ids, na.omit)) %>%
     dplyr::mutate(categoryOptions.ids = purrr::map_chr(categoryOptions.ids, paste, collapse = ".")) %>%
     dplyr::mutate(
       categoryOptions.ids =
@@ -119,7 +140,7 @@ d <- unPackTool(cop_year = 2021)
                         names_prefix = "dataelement_",
                         values_drop_na = TRUE) %>%
     dplyr::mutate(support_type = toupper(support_type))
-  
+
   fullCodeList <- pullFullCodeList(FY = 2022,
                                    datastream = c("mer_targets", "subnat_targets", "impatt")) %>%
     dplyr::left_join(
@@ -127,19 +148,19 @@ d <- unPackTool(cop_year = 2021)
                               fields = "id,categoryOptions",
                               "categoryCombo.id:ne:wUpfppgjEza"),
       by = c("categoryoptioncombouid" = "id")) %>%
-    dplyr::mutate(categoryOptions = purrr::map_chr(categoryOptions,~.x[["id"]] %>% 
+    dplyr::mutate(categoryOptions = purrr::map_chr(categoryOptions,~.x[["id"]] %>%
                                                      sort() %>% paste(collapse = ".")))
-  
+
   map_DataPack_DATIM_DEs_COCs_local %<>%
     dplyr::left_join(fullCodeList,
                      by = c("dataelement" = "dataelementuid",
                             "categoryOptions.ids" = "categoryOptions"))
-  
+
   d$datim$MER <- d$data$SNUxIM_combined %>%
-  dplyr::left_join(., ( map_DataPack_DATIM_DEs_COCs_local %>%
-                          dplyr::rename(Age = valid_ages.name,
-                                        Sex = valid_sexes.name,
-                                        KeyPop = valid_kps.name) )) %>%
+    dplyr::left_join(., ( map_DataPack_DATIM_DEs_COCs_local %>%
+                            dplyr::rename(Age = valid_ages.name,
+                                          Sex = valid_sexes.name,
+                                          KeyPop = valid_kps.name) )) %>%
     dplyr::mutate(
       period = paste0(d$info$cop_year,"Oct") ) %>%
     dplyr::select(
@@ -154,18 +175,10 @@ d <- unPackTool(cop_year = 2021)
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup() %>%
     dplyr::filter(complete.cases(.))
-  
+
   exportPackr(
     data = d$datim$MER,
     output_path = d$keychain$output_folder,
     type = "DATIM Export File",
     datapack_name = d$info$datapack_name
   )
-  
-  
-# Carry on ####
-
-# d <- checkAnalytics(d,
-#                    model_data_path)
- 
-# d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)

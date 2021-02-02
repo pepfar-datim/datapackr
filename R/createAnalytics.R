@@ -20,23 +20,48 @@ createAnalytics <- function(d,
         PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
         mechanism_code = mech_code, support_type, value
       )
-  } else {
-    d$data$analytics <- dplyr::bind_rows(
-      d$data$distributedMER,
-      dplyr::mutate(
-        d$data$SUBNAT_IMPATT,
-        mechanism_code = "HllvX50cXC0",
-        support_type = "DSD"
+  } 
+  
+  if (d$info$tool == "Data Pack") {
+    if (d$info$cop_year == 2020) {
+      d$data$analytics <- dplyr::bind_rows(
+        d$data$distributedMER,
+        dplyr::mutate(
+          d$data$SUBNAT_IMPATT,
+          mechanism_code = "HllvX50cXC0",
+          support_type = "DSD"
+        )
       )
-    )
+    }
+    if (d$info$cop_year == 2021) {
+        d$data$analytics <- dplyr::bind_rows(
+          d$data$SNUxIM,
+          dplyr::mutate(
+            d$data$SUBNAT_IMPATT,
+            mechanism_code = "HllvX50cXC0",
+            support_type = "DSD"
+          )
+        )
+    }
+    
+    
   }
+  
   #Adorn organisation units
   d <- adornPSNUs(d)
   #Adorn mechanisms
   d$data$analytics <- adornMechanisms(d$data$analytics,
                                       d2_session = d2_session)
   #TODO: Centralize this fix with exportDistributeMERtoDATIM
-  map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
+  
+  if (d$info$cop_year == 2021) {
+    map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
+  } else if (d$info$cop_year == 2020) {
+    map_DataPack_DATIM_DEs_COCs_local <- datapackr::cop20_map_DataPack_DATIM_DEs_COCs
+  } else {
+    stop("That COP Year currently isn't supported for processing by createAnalytics.")
+  }
+  
   map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
                                                        map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- "Male"
   map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &

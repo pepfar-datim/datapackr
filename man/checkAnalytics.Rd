@@ -4,7 +4,11 @@
 \alias{checkAnalytics}
 \title{Check Data Pack data for analytics concerns}
 \usage{
-checkAnalytics(d, model_data_path)
+checkAnalytics(
+  d,
+  model_data_path,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
 \item{d}{Datapackr object.}

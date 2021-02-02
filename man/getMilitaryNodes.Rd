@@ -4,7 +4,7 @@
 \alias{getMilitaryNodes}
 \title{Pull all _Military nodes from DATIM for all PEPFAR countries}
 \usage{
-getMilitaryNodes()
+getMilitaryNodes(d2_session = dynGet("d2_default_session", inherits = TRUE))
 }
 \value{
 Dataframe of _Military names and ids, with associated Operating Units

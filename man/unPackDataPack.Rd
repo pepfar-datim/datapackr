@@ -4,10 +4,12 @@
 \alias{unPackDataPack}
 \title{Unpack a submitted Data Pack}
 \usage{
-unPackDataPack(d)
+unPackDataPack(d, d2_session = dynGet("d2_default_session", inherits = TRUE))
 }
 \arguments{
 \item{d}{Datapackr object}
+
+\item{d2_session}{DHIS2 Session ID}
 }
 \description{
 Processes a submitted Data Pack (in .xlsx format) by identifying integrity
@@ -20,7 +22,7 @@ Executes the following operations in relation to a submitted Data Pack:
     \item Runs DATIM validation tests;
     \item Extracts SUBNAT and IMPATT data as a DATIM import file;
 }
-    
+
 If a Data Pack is submitted as an XLSB formatted document, you must open &
 re-save as an XLSX in order to process it with this function.
 

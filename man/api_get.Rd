@@ -4,7 +4,7 @@
 \alias{api_get}
 \title{Execute and return a DATIM API query.}
 \usage{
-api_get(api_call)
+api_get(api_call, d2_session = dynGet("d2_default_session", inherits = TRUE))
 }
 \arguments{
 \item{api_call}{Base DATIM API query, specifying API table and setting paging

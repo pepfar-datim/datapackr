@@ -16,12 +16,16 @@
 #' @example getCOPDatasetUIDs(cop_year = 2020, types = c("MER", "SUBNAT", "IMPATT"))
 #' 
 getCOPDatasetUIDs <- function(cop_year = getCurrentCOPYear(),
-                              types = c("MER", "SUBNAT", "IMPATT")) {
+                              types = c("MER", "SUBNAT", "IMPATT"),
+                              d2_session = dynGet("d2_default_session",
+                                                  inherits = TRUE)) {
   if(cop_year != 2020){
     stop("The COP year provided is not supported by the internal function getCOPDatasetUids")
   }
   
-  data <- api_get(api_call("dataSets"))
+  data <- api_get(api_call("dataSets",
+                           d2_session = d2_session),
+                  d2_session = d2_session)
   data <- data[grepl("^MER Targets: (Community|Facility)|MER Target Setting: PSNU|^(Host Country Targets|Planning Attributes): COP Prioritization SNU",
                      data$displayName),]
   
@@ -59,7 +63,7 @@ getCOPDatasetUIDs <- function(cop_year = getCurrentCOPYear(),
 #' @param country_uid country_uid
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
-#' @param base_url base to append api calls normally defined beforehand
+#' @param d2_session DHIS2 Session id
 #'
 #' @return Raw data in DATIM for a country for the COP data sets for a given COP Year.
 #'
@@ -68,12 +72,14 @@ getCOPDatasetUIDs <- function(cop_year = getCurrentCOPYear(),
 #'
 getCOPDataFromDATIM <- function(country_uids,
                                 cop_year = getCurrentCOPYear(),
-                                base_url = getOption("baseurl")) {
+                                d2_session = dynGet("d2_default_session",
+                                                    inherits = TRUE)) {
   if(cop_year != 2020){
     stop("The COP year provided is not supported by the internal function getCOPDataFromDATIM")
   }
   
-  dataset_uids <- getCOPDatasetUIDs(cop_year)
+  dataset_uids <- getCOPDatasetUIDs(cop_year,
+                                    d2_session = d2_session)
   
   # package parameters for getDataValueSets function call
   parameters <-
@@ -93,7 +99,7 @@ getCOPDataFromDATIM <- function(country_uids,
   datim_data <-
     getDataValueSets(parameters$key,
                      parameters$value,
-                     base_url = base_url) %>%
+                     d2_session = d2_session) %>%
     dplyr::rename(
       datim_value = value,
       data_element_uid = data_element,

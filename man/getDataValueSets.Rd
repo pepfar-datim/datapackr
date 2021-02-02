@@ -7,9 +7,9 @@
 getDataValueSets(
   keys,
   values,
-  base_url = getOption("baseurl"),
   api_version = "30",
-  max_attempts = 3
+  max_attempts = 3,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{
@@ -17,11 +17,11 @@ getDataValueSets(
 
 \item{values}{character vector - values marching the key from keys (e.g. "Abcde123456", "2019Q1"}
 
-\item{base_url}{string - base address of instance (text before api/ in URL)}
-
 \item{api_version}{- api version to use when calling DHIS2}
 
 \item{max_attempts}{- number of times to try for a valid response}
+
+\item{base_url}{string - base address of instance (text before api/ in URL)}
 }
 \value{
 tibble with the data requested

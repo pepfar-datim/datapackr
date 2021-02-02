@@ -4,7 +4,12 @@
 \alias{create_play_spectrum_output}
 \title{Create fake Spectrum output for testing}
 \usage{
-create_play_spectrum_output(country_uids, cop_year, output_folder = NULL)
+create_play_spectrum_output(
+  country_uids,
+  cop_year,
+  output_folder = NULL,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
 \item{country_uids}{Unique IDs for countries to include in the Data Pack.

@@ -20,18 +20,19 @@ checkDuplicateRows <- function(d, sheet) {
   if (d$info$tool == "OPU Data Pack") {
     header_cols <- d$info$schema %>%
       dplyr::filter(
-        sheet == sheet,
+        sheet_name == sheet,
         col_type == "row_header"
       ) %>%
       dplyr::pull(indicator_code) %>%
       c(., "mechCode_supportType")
   } else {
-    header_cols <- c("PSNU", "Age", "Sex", "KeyPop", "indicator_code")
+    header_cols <- c("PSNU", "indicator_code", "Age", "Sex", "KeyPop")
   }
   
   # TEST for duplicates ####
   duplicates <- data %>%
-    dplyr::select(tidyselect::all_of(header_cols)) %>%
+    dplyr::filter(value != 0) %>%
+    dplyr::select(tidyselect::any_of(header_cols)) %>%
     dplyr::group_by(dplyr::across(tidyselect::everything())) %>%
     dplyr::summarise(n = (dplyr::n()), .groups = "drop") %>%
     dplyr::filter(n > 1) %>%
@@ -43,7 +44,7 @@ checkDuplicateRows <- function(d, sheet) {
   if (NROW(duplicates) > 0) {
 
     d$tests$duplicate_rows <- dplyr::bind_rows(d$tests$duplicate_rows, duplicates)
-    attr(d$tests$duplicate_rows, "test_name") <- "Duplicated rows in PSNUxIM"
+    attr(d$tests$duplicate_rows, "test_name") <- "Duplicated rows"
     
     dupes_msg <-
       capture.output(
@@ -54,7 +55,9 @@ checkDuplicateRows <- function(d, sheet) {
       paste0(
         "ERROR! In tab ",
         sheet,
-        ": DUPLICATE ROWS found. Duplicates are not permitted. -> \n\t",
+        ": DUPLICATE ROWS found. Ensure rows are all unique, and the SNU Disaggregates",
+        " are not repeated within tabs. This issue may have been caused by inadvertent", 
+        " or incorrect copying of data from one row to another. Duplicates are not permitted. -> \n\t",
         paste(dupes_msg, collapse = "\n\t"),
         "\n")
     

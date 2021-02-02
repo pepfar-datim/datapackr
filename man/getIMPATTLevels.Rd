@@ -4,7 +4,7 @@
 \alias{getIMPATTLevels}
 \title{Pull IMPATT levels from DATIM for all PEPFAR countries}
 \usage{
-getIMPATTLevels()
+getIMPATTLevels(d2_session = dynGet("d2_default_session", inherits = TRUE))
 }
 \value{
 Dataframe of country metadata, including prioritization, planning,

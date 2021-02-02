@@ -8,7 +8,8 @@ unPackSchema_datapack(
   filepath = NULL,
   skip = NULL,
   type = "Data Pack Template",
-  cop_year = getCurrentCOPYear()
+  cop_year = getCurrentCOPYear(),
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{
