@@ -91,8 +91,12 @@ createAnalytics <- function(d,
   # Selects appropriate columns based on COP or OPU tool
   if (d$info$tool == "Data Pack") {
     d$data$analytics %<>%
-      dplyr::select( country_name,
+      dplyr::select( ou,
+                     ou_id,
+                     country_name,
                      country_uid,
+                     snu1,
+                     snu1_id,
                      psnu,
                      psnuid,
                      prioritization,
@@ -122,8 +126,12 @@ createAnalytics <- function(d,
                      indicator_code)
   } else {
     d$data$analytics %<>%
-      dplyr::select( country_name,
+      dplyr::select( ou,
+                     ou_id,
+                     country_name,
                      country_uid,
+                     snu1,
+                     snu1_id,
                      psnu,
                      psnuid,
                      mechanism_code,
