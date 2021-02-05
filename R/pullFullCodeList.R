@@ -51,6 +51,7 @@ pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
         }) %>%
     do.call(rbind, .) %>%
     dplyr::select(dataelement, dataelementuid, categoryoptioncombo, categoryoptioncombouid) %>%
+    dplyr::mutate(FY = FY) %>%
     dplyr::distinct() %>%
     dplyr::arrange(dataelement, categoryoptioncombo)
   
