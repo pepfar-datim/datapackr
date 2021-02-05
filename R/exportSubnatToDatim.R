@@ -12,7 +12,7 @@
 #' 
 exportSubnatToDATIM <- function(d) {
   
-  d$datim$subnat_impatt <- d$data$SUBNAT_IMPATT %>%
+  SUBNAT_IMPATT <- d$data$SUBNAT_IMPATT %>%
     dplyr::left_join(datapackr::map_DataPack_DATIM_DEs_COCs,
                      by = c("indicator_code" = "indicator_code",
                             "Age" = "valid_ages.name",
@@ -38,13 +38,13 @@ exportSubnatToDATIM <- function(d) {
     ) %>%
     dplyr::pull(indicator_code)
   
-  d$datim$subnat_impatt %<>%
+  SUBNAT_IMPATT %<>%
     dplyr::filter(
       !indicator_code %in% pmtct_subnat_indicator_codes
     )
     
   # Form into DATIM import file ####
-  d$datim$subnat_impatt %<>%
+  SUBNAT_IMPATT %<>%
     dplyr::select(
       dataElement = dataelementuid,
       period,
@@ -55,7 +55,7 @@ exportSubnatToDATIM <- function(d) {
     )
   
  # TEST: Duplicate Rows; Error; Continue ####
-  duplicated_rows <- d$datim$subnat_impatt %>%
+  duplicated_rows <- SUBNAT_IMPATT %>%
     dplyr::group_by(dataElement,orgUnit,categoryOptionCombo,attributeOptionCombo,period) %>% 
     dplyr::tally() %>% 
     dplyr::filter(n > 1)
@@ -74,7 +74,7 @@ exportSubnatToDATIM <- function(d) {
   
   
   # TEST: Blank Rows; Error;
-  blank_rows <- d$datim$subnat_impatt %>% 
+  blank_rows <- SUBNAT_IMPATT %>% 
     dplyr::filter_all(dplyr::any_vars(is.na(.)))
   
   # TEST: Whether any NAs in any columns
@@ -89,11 +89,63 @@ exportSubnatToDATIM <- function(d) {
   }
   
   # TEST: Negative values; Error; 
-  if (any(d$datim$subnat_impatt$value < 0)) {
+  if (any(SUBNAT_IMPATT$value < 0)) {
     warning_msg <- "ERROR occurred. Negative values present in SUBNAT/IMPATT data."
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     d$info$has_error <- TRUE
   }
+  
+  d$datim$subnat_impatt <- SUBNAT_IMPATT
+  
+  d$datim$subnat_fy20 <-  SUBNAT_IMPATT %>%
+    dplyr::filter(
+      period == "2019Oct",
+      dataElement %in%
+        (datapackr::map_DataPack_DATIM_DEs_COCs %>%
+           dplyr::filter(dataset == "FY20 SUBNAT Results" & !is.na(indicator_code)) %>%
+           dplyr::pull(dataelementuid)
+        )
+    )
+    
+  d$datim$subnat_fy21 <-  SUBNAT_IMPATT %>%
+    dplyr::filter(
+      period == "2020Oct",
+      dataElement %in%
+        (datapackr::map_DataPack_DATIM_DEs_COCs %>%
+           dplyr::filter(dataset == "FY21 SUBNAT Targets" & !is.na(indicator_code)) %>%
+           dplyr::pull(dataelementuid)
+        )
+    )
+    
+  d$datim$subnat_fy22 <- SUBNAT_IMPATT %>%
+    dplyr::filter(
+      period == "2021Oct",
+      dataElement %in%
+        (datapackr::map_DataPack_DATIM_DEs_COCs %>%
+           dplyr::filter(dataset == "FY22 SUBNAT Targets" & !is.na(indicator_code)) %>%
+           dplyr::pull(dataelementuid)
+        )
+    )
+    
+  d$datim$impatt_fy21 <- SUBNAT_IMPATT %>%
+    dplyr::filter(
+      period == "2020Oct",
+      dataElement %in%
+        (datapackr::map_DataPack_DATIM_DEs_COCs %>%
+           dplyr::filter(dataset == "FY21 IMPATT" & !is.na(indicator_code)) %>%
+           dplyr::pull(dataelementuid)
+      )
+    )
+      
+  d$datim$fy22_prioritizations <- SUBNAT_IMPATT %>%
+    dplyr::filter(
+      period == "2021Oct",
+      dataElement %in%
+        (datapackr::map_DataPack_DATIM_DEs_COCs %>%
+           dplyr::filter(dataset == "FY22 IMPATT" & !is.na(indicator_code)) %>%
+           dplyr::pull(dataelementuid)
+        )
+    )
   
   return(d)
 }
