@@ -37,7 +37,7 @@ unPackDataPack <- function(d,
 
 
   # Check whether there exist any troublesome comments in the file
-  interactive_print("Checking comments...")
+    interactive_print("Checking comments...")
     d <- checkComments(d)
 
   # Check integrity of Workbook tabs ####
@@ -60,6 +60,7 @@ unPackDataPack <- function(d,
     if (d$info$has_psnuxim) {
       if (d$info$cop_year == 2020 )  {
         d <- combineMER_SNUxIM(d) }
+      
       interactive_print("Creating analytics...")
       d <- createAnalytics(d, d2_session = d2_session )
 
