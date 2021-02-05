@@ -61,15 +61,19 @@ unPackDataPack <- function(d,
       if (d$info$cop_year == 2020 )  {
         d <- combineMER_SNUxIM(d) }
       
+  # Create Analytics Function
       interactive_print("Creating analytics...")
       d <- createAnalytics(d, d2_session = d2_session )
 
-      # Prepare SNU x IM dataset for DATIM import & validation ####
+  # Prepare SNUxIM dataset for DATIM import & validation ####
       d <- packForDATIM(d, type = "PSNUxIM")
-
-    # Package SUBNAT/IMPATT DATIM import file ####
-      d <- packForDATIM(d, type = "SUBNAT_IMPATT")
     }
+    
+  # Prepare undistributed import file for use in analytics if necessary ####
+    d <- packForDATIM(d, type = "Undistributed MER")
+    
+  # Package SUBNAT/IMPATT DATIM import file ####
+    d <- packForDATIM(d, type = "SUBNAT_IMPATT")
 
   return(d)
 

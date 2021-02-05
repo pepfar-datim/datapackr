@@ -1,17 +1,23 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
-#' @title packForDATIM_MER(d)
+#' @title packForDATIM_UndistributedMER(d)
 #'
-#' @description Packs extracted PSNUxIM data from COP Data Pack for DATIM import.
+#' @description Packs undistributed MER data from Data Pack for use in analytics (NOT IMPORT).
 #'
 #' @param d Datapackr object
 #'
-#' @return Modified d object with a DATIM compatible data frame for import id d$datim$MER
+#' @return Modified d object with a DATIM compatible data frame for analytics id d$datim$UndistributedMER
 #'
-packForDATIM_MER <- function(d) {
+packForDATIM_UndistributedMER <- function(d) {
   
   # Add dataElement & categoryOptionCombo ####
-  d$datim$MER <- d$data$SNUxIM %>%
+  d$datim$UndistributedMER <- d$data$MER %>%
+    dplyr::mutate(
+      support_type = "DSD",
+      mech_code = "999999"
+    ) %>%
+    dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, psnuid,
+                  mech_code, support_type, value) %>%
     dplyr::left_join(., (datapackr::map_DataPack_DATIM_DEs_COCs %>%
                            dplyr::rename(Age = valid_ages.name,
                                          Sex = valid_sexes.name,
@@ -24,9 +30,9 @@ packForDATIM_MER <- function(d) {
     period = paste0(FY,"Oct")) %>%
     
     # Add PSNU uid ####
-    dplyr::mutate(
-      psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")
-    ) %>%
+  dplyr::mutate(
+    psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")
+  ) %>%
     
     # Select and rename based on DATIM protocol ####
   dplyr::select(
