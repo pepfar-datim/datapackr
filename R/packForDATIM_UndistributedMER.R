@@ -27,7 +27,7 @@ packForDATIM_UndistributedMER <- function(d) {
     
     # Add period ####
   dplyr::mutate(
-    period = paste0(FY,"Oct")) %>%
+    period = paste0(FY-1,"Oct")) %>%
     
     # Add PSNU uid ####
   dplyr::mutate(
