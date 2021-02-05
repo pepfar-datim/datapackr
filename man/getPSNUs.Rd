@@ -8,7 +8,8 @@ getPSNUs(
   country_uids = NULL,
   include_mil = TRUE,
   include_DREAMS = TRUE,
-  additional_fields = NULL
+  additional_fields = NULL,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{

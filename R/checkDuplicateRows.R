@@ -20,17 +20,18 @@ checkDuplicateRows <- function(d, sheet) {
   if (d$info$tool == "OPU Data Pack") {
     header_cols <- d$info$schema %>%
       dplyr::filter(
-        sheet == sheet,
+        sheet_name == sheet,
         col_type == "row_header"
       ) %>%
       dplyr::pull(indicator_code) %>%
       c(., "mechCode_supportType")
   } else {
-    header_cols <- c("PSNU", "Age", "Sex", "KeyPop", "indicator_code", "mechCode_supportType")
+    header_cols <- c("PSNU", "indicator_code", "Age", "Sex", "KeyPop")
   }
   
   # TEST for duplicates ####
   duplicates <- data %>%
+    dplyr::filter(value != 0) %>%
     dplyr::select(tidyselect::any_of(header_cols)) %>%
     dplyr::group_by(dplyr::across(tidyselect::everything())) %>%
     dplyr::summarise(n = (dplyr::n()), .groups = "drop") %>%

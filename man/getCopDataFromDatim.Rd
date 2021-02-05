@@ -7,7 +7,7 @@
 getCopDataFromDatim(
   country_uid,
   fiscal_year_yyyy,
-  base_url = getOption("baseurl")
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{

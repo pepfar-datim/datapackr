@@ -4,7 +4,10 @@
 \alias{compareData_DatapackVsDatim}
 \title{compareData_DatapackVsDatim}
 \usage{
-compareData_DatapackVsDatim(d, base_url = getOption("baseurl"))
+compareData_DatapackVsDatim(
+  d,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
 \item{d}{list object - parsed data pack object}

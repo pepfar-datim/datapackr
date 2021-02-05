@@ -4,7 +4,7 @@
 \alias{api_call}
 \title{Start DATIM API query and specify table}
 \usage{
-api_call(endpoint)
+api_call(endpoint, d2_session = dynGet("d2_default_session", inherits = TRUE))
 }
 \arguments{
 \item{endpoint}{Character. DATIM API endpoint to query.}

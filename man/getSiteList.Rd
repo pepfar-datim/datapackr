@@ -4,7 +4,11 @@
 \alias{getSiteList}
 \title{Compile Site List for Site Tool}
 \usage{
-getSiteList(org_unit_uids, include_mil = TRUE)
+getSiteList(
+  org_unit_uids,
+  include_mil = TRUE,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
 \item{org_unit_uids}{Character vector of DATIM country IDs. This can only

@@ -20,16 +20,33 @@ createAnalytics <- function(d,
         PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
         mechanism_code = mech_code, support_type, value
       )
-  } else {
-    d$data$analytics <- dplyr::bind_rows(
-      d$data$distributedMER,
-      dplyr::mutate(
-        d$data$SUBNAT_IMPATT,
-        mechanism_code = "HllvX50cXC0",
-        support_type = "DSD"
+  } 
+  
+  if (d$info$tool == "Data Pack") {
+    if (d$info$cop_year == 2020) {
+      d$data$analytics <- dplyr::bind_rows(
+        d$data$distributedMER,
+        dplyr::mutate(
+          d$data$SUBNAT_IMPATT,
+          mechanism_code = "HllvX50cXC0",
+          support_type = "DSD"
+        )
       )
-    )
+    }
+    if (d$info$cop_year == 2021) {
+        d$data$analytics <- dplyr::bind_rows(
+          d$data$SNUxIM,
+          dplyr::mutate(
+            d$data$SUBNAT_IMPATT,
+            mechanism_code = "HllvX50cXC0",
+            support_type = "DSD"
+          )
+        )
+    }
+    
+    
   }
+  
   #Adorn organisation units
   d <- adornPSNUs(d)
   #Adorn mechanisms
@@ -74,8 +91,12 @@ createAnalytics <- function(d,
   # Selects appropriate columns based on COP or OPU tool
   if (d$info$tool == "Data Pack") {
     d$data$analytics %<>%
-      dplyr::select( country_name,
+      dplyr::select( ou,
+                     ou_id,
+                     country_name,
                      country_uid,
+                     snu1,
+                     snu1_id,
                      psnu,
                      psnuid,
                      prioritization,
@@ -105,8 +126,12 @@ createAnalytics <- function(d,
                      indicator_code)
   } else {
     d$data$analytics %<>%
-      dplyr::select( country_name,
+      dplyr::select( ou,
+                     ou_id,
+                     country_name,
                      country_uid,
+                     snu1,
+                     snu1_id,
                      psnu,
                      psnuid,
                      mechanism_code,
