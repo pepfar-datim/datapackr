@@ -4,7 +4,10 @@
 \alias{adorn_import_file}
 \title{Convert PSNU-level DATIM import file into analytics-friendly object}
 \usage{
-adorn_import_file(psnu_import_file)
+adorn_import_file(
+  psnu_import_file,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
 \item{psnu_import_file}{PSNU-level DATIM import file to convert}

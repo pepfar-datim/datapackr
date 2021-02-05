@@ -33,9 +33,47 @@ unPackSNUxIM <- function(d) {
     return(d)
   } else {d$info$has_psnuxim <- TRUE}
   
+  # TEST: Duplicate Rows; Warn; Combine ####
+  duplicates <- d$data$SNUxIM %>%
+    dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget) %>%
+    dplyr::filter(DataPackTarget > 0) %>%
+    dplyr::select(-DataPackTarget) %>%
+    dplyr::group_by(dplyr::across(tidyselect::everything())) %>%
+    dplyr::summarise(n = (dplyr::n()), .groups = "drop") %>%
+    dplyr::filter(n > 1) %>%
+    dplyr::select(-n) %>%
+    dplyr::distinct() %>%
+    dplyr::arrange(dplyr::across(tidyselect::everything())) %>%
+    dplyr::mutate(sheet = sheet) %>%
+    dplyr::select(sheet, dplyr::everything())
+  
+  if (NROW(duplicates) > 0) {
+    
+    d$tests$duplicate_rows <- dplyr::bind_rows(d$tests$duplicate_rows, duplicates)
+    attr(d$tests$duplicate_rows, "test_name") <- "Duplicated rows"
+    
+    dupes_msg <-
+      capture.output(
+        print(as.data.frame(duplicates), row.names = FALSE)
+      )
+    
+    warning_msg <-
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ": DUPLICATE ROWS found. Ensure rows are all unique, and the SNU Disaggregates",
+        " are not repeated within tabs. This issue may have been caused by inadvertent", 
+        " or incorrect copying of data from one row to another. Duplicates are not permitted. -> \n\t",
+        paste(dupes_msg, collapse = "\n\t"),
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
+    
+  }
+  
   # Run structural checks ####
-  #TODO: Update this for new structure
-  d <- checkColStructure(d, "PSNUxIM")
+  d <- checkColStructure(d, sheet)
   
   # Pare down to populated, updated targets only ####
   cols_to_keep <- d$info$schema %>%
@@ -50,8 +88,6 @@ unPackSNUxIM <- function(d) {
   d$data$SNUxIM <- d$data$SNUxIM[,cols_to_keep$col]
 
   d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
-  
-  # TODO: Add test for columns with data that had a blank col name
   
   # Drop rows where entire row is NA ####
   d$data$SNUxIM %<>%
@@ -145,8 +181,7 @@ unPackSNUxIM <- function(d) {
   # --> This also removes non-essential text from IM name to leave only 12345_DSD format.
   
   # TEST: Non-numeric data; Warn; Convert & Drop ####
-  # TODO: Fix this test to work here
-  #d <- checkNumericValues(d, sheet, header_cols)
+  d <- checkNumericValues(d, sheet, header_cols)
   
   #sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
   
@@ -245,7 +280,6 @@ unPackSNUxIM <- function(d) {
       | `issues.Total Deduplicated Rollup`
     )
   
-  # TODO: Fix issues with Crosswalk dedupes here... I think related to the function in template
   attr(d$tests$dedupes_outside_range, "test_name") <- "Dedupes Outside Acceptable Range"
   
   if (NROW(d$tests$dedupes_outside_range) > 0) {
@@ -266,7 +300,7 @@ unPackSNUxIM <- function(d) {
         sheet,
         ", DEDUPES OUTSIDE ACCEPTABLE RANGE: The following columns contain total",
         " deduplicated targets that are outside acceptable maximum/minimum ranges.",
-        " (The OPU Data Pack notes these with red highlighting.) You must resolve",
+        " (Your Data Pack notes these with red highlighting.) You must resolve",
         " these issues prior to DATIM import. ->  \n\t* ",
         paste(
           dedupe_issue_cols$col,
@@ -308,7 +342,9 @@ unPackSNUxIM <- function(d) {
         ~ dplyr::if_else(.x < 0, NA_real_, .x))
     )
   
-  # TODO: Check for Formula changes ####
+  # TEST: Formula changes; Warning; Continue ####
+  d <- checkFormulas(d, sheet)
+  
   
   # Remove all unneeded columns ####
   d$data$SNUxIM %<>%
@@ -402,7 +438,8 @@ unPackSNUxIM <- function(d) {
         NROW(d$tests$positive_dedupes),
         " cases where Deduplicated Rollups are greater than allowed maximum.",
         " You can find these by filtering to positive values in the `DSD Dedupe`,",
-        " `TA Dedupe`, and `Crosswalk Dedupe` columns (columns CX, CY, and CZ) in the PSNUxIM tab.")
+        " `TA Dedupe`, and `Crosswalk Dedupe` columns (columns CX, CY, and CZ) in the PSNUxIM tab.",
+        "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
   }
@@ -410,7 +447,7 @@ unPackSNUxIM <- function(d) {
   d$data$SNUxIM %<>%
     dplyr::filter(!(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0))
   
-  # TEST: Duplicate Rows; Warn; Combine ####
+  # Remove unneeded strings from mechanism codes ####
   d$data$SNUxIM %<>%
     dplyr::mutate(
       mechCode_supportType = dplyr::case_when(
@@ -420,15 +457,9 @@ unPackSNUxIM <- function(d) {
                       stringr::str_extract(mechCode_supportType, "DSD|TA"))
       )
     )
-  
-  # TODO: Troubleshoot why this is flagging false duplicates
-  d <- checkDuplicateRows(d, sheet)
-  ## This may be a repeat of information already shared in checking duplicate
-  ## columns, but may also catch rows that were duplicates even before pivot_longer.
-  
   d$data$SNUxIM %<>%
     dplyr::group_by(
-      dplyr::across(c(header_cols$indicator_code, "mechCode_supportType"))) %>%
+      dplyr::across(c(header_cols$indicator_code, "psnuid", "mechCode_supportType"))) %>%
     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
   
   # TODO: TEST: Defunct disaggs; Error; Drop ####
@@ -478,12 +509,81 @@ unPackSNUxIM <- function(d) {
       )
     ) %>%
     dplyr::select(-DSD_count, -TA_count, -Total_count) %>%
-    tidyr::pivot_longer(cols = -tidyselect::all_of(header_cols$indicator_code),
+    tidyr::pivot_longer(cols = -tidyselect::all_of(c(header_cols$indicator_code, "psnuid")),
                         names_to = "mechCode_supportType",
                         values_to = "value",
                         values_drop_na = TRUE) %>%
-    dplyr::select(dplyr::all_of(header_cols$indicator_code),
+    dplyr::select(dplyr::all_of(header_cols$indicator_code), psnuid,
                   mechCode_supportType, value)
+  
+  # TEST: Rounding Errors; Warn; Continue ####
+  comparison <- d$data$SNUxIM %>%
+    dplyr::select(-mechCode_supportType, PSNUxIM_value = value) %>%
+    dplyr::group_by(dplyr::across(c(tidyselect::everything(), -PSNUxIM_value))) %>%
+    dplyr::summarise(PSNUxIM_value = sum(PSNUxIM_value, na.rm = TRUE), .groups = "drop") %>%
+    dplyr::full_join(.,
+      d$data$MER %>%
+        dplyr::select(-sheet_name, DataPackTarget = value) %>%
+        dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T"))
+    ) %>%
+    dplyr::filter(is.na(PSNUxIM_value) | is.na(DataPackTarget) | PSNUxIM_value != DataPackTarget) %>%
+    dplyr::mutate(diff = PSNUxIM_value - DataPackTarget)
+  
+  d$tests$PSNUxIM_rounding_diffs <- comparison %>%
+    tidyr::drop_na(PSNUxIM_value, DataPackTarget) %>%
+    dplyr::filter(abs(diff) <= 2)
+  
+  attr(d$tests$PSNUxIM_rounding_diffs,"test_name") <- "PSNUxIM Rounding diffs"
+  
+  if (NROW(d$tests$PSNUxIM_rounding_diffs) > 0) {
+    warning_msg <-
+      paste0(
+        "WARNING: ",
+        NROW(d$tests$PSNUxIM_rounding_diffs),
+        " cases where rounding based on PSNUxIM distributions has caused a small",
+        " amount of variation from original targets set in other sheets.",
+        " A small amount of rounding may be unavoidable given the nature of the",
+        " target-setting process. You can review these cases in the FlatPack",
+        " provided as an output from this app.",
+        " To resolve these cases, please review the PSNUxIM tab to identify and address cases where multiplication of",
+        " distribution percentages against FY22 Targets has caused rounding error. You may",
+        " address this by gradually altering distribution percentages to fine tune",
+        " allocations against one or more mechanisms. For additional guidance, see the Data Pack User Guide.",
+        "\n"
+      )
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  }
+  
+  # TEST: Data Pack total not fully distributed to IM ####
+  d$tests$imbalanced_distribution <- comparison %>%
+    dplyr::filter(is.na(PSNUxIM_value) | is.na(DataPackTarget) | abs(diff) > 2)
+  
+  attr(d$tests$imbalanced_distribution, "test_name") <- "Imbalanced distribution"
+  
+  if (NROW(d$tests$imbalanced_distribution) > 0) {
+    
+    imbalanced_distribution_inds <-  d$tests$imbalanced_distribution%>%
+      dplyr::pull(indicator_code) %>%
+      unique() %>%
+      sort()
+    
+    warning_msg <-
+      paste0(
+        "ERROR!: ",
+        NROW(d$tests$imbalanced_distribution),
+        " cases where distributed total across all mechanisms and Dedupe is",
+        " either more or less than PSNU-level Target.",
+        " To identify these, go to your PSNUxIM tab and filter the Rollup column",
+        " to find cases where this is not equal to the Data Pack Target column (highlighted red).",
+        " NOTE that this may be due to invalid mechanism names in row 14 of your PSNUxIM tab.",
+        " For reference, this has affected the following indicators. -> \n\t* ",
+        paste(imbalanced_distribution_inds, collapse = "\n\t* "),
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
+  }
   
   # Rename Dedupe IMs ####
   d$data$SNUxIM %<>%
@@ -504,13 +604,8 @@ unPackSNUxIM <- function(d) {
       remove = TRUE,
       extra = "drop"
     ) %>%
-    dplyr::select(dplyr::all_of(header_cols$indicator_code),
+    dplyr::select(dplyr::all_of(header_cols$indicator_code),psnuid,
                   mech_code, support_type, value)
-  
-  #TODO: Add somewhere:
-  # - Test for where distribution != Data Pack Target
-  # - Rounding discrepancies
-  
   
   return(d)
 }

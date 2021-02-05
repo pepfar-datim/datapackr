@@ -4,7 +4,10 @@
 \alias{CountriesContained}
 \title{CountriesContained}
 \usage{
-CountriesContained(org_unit_uid, base_url = getOption("baseurl"))
+CountriesContained(
+  org_unit_uid,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
 \item{org_unit_uid}{single org unit uid as a character string}

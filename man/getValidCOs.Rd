@@ -4,7 +4,10 @@
 \alias{getValidCOs}
 \title{Compile valid categoryOptions for a given dataset}
 \usage{
-getValidCOs(data_element_group.id)
+getValidCOs(
+  data_element_group.id,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
 \item{data_element_group.id}{DATIM dataElementGroup id to filter against.}

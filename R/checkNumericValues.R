@@ -7,6 +7,7 @@
 #'
 #' @param d Datapackr object.
 #' @param sheet Sheet to check
+#' @param header_cols Header columns to check
 #' 
 #' @return d
 #' 
@@ -17,6 +18,13 @@ checkNumericValues <- function(d, sheet, header_cols = NULL){
   } else {
     data = d$data$extract
   }
+  
+  header_cols <- d$info$schema %>%
+    dplyr::filter(sheet_name == sheet,
+                  !is.na(indicator_code),
+                  !indicator_code %in% c("sheet_num", "ID", "SNU1"),
+                  col_type %in% c("row_header", "target")) %>%
+    dplyr::filter(col_type == "row_header")
 
   if (d$info$tool == "OPU Data Pack") {
     
@@ -29,6 +37,16 @@ checkNumericValues <- function(d, sheet, header_cols = NULL){
                     mechCode_supportType, value) %>%
       tidyr::drop_na(value)
 
+  }
+  
+  if (d$info$tool == "Data Pack" & sheet == "PSNUxIM" & d$info$cop_year == 2021) {
+    data %<>%
+      tidyr::gather(key = "mechCode_supportType",
+                    value = "value",
+                    -tidyselect::all_of(c(header_cols$indicator_code))) %>%
+      dplyr::select(dplyr::all_of(header_cols$indicator_code), -indicator_code,
+                    indicator_code = mechCode_supportType, value) %>%
+      tidyr::drop_na(value)
   }
 
   non_numeric <- data %>%

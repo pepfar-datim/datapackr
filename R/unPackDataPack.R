@@ -48,9 +48,9 @@ unPackDataPack <- function(d,
     interactive_print("Unpacking sheets...")
     d <- unPackSheets(d)
 
-      # Separate Data Sets ####
-        interactive_print("Separating datasets...")
-        d <- separateDataSets(d)
+  # Separate Data Sets ####
+    interactive_print("Separating datasets...")
+    d <- separateDataSets(d)
 
   # Unpack the SNU x IM sheet ####
     interactive_print("Unpacking the PSNUxIM tab...")
@@ -58,7 +58,8 @@ unPackDataPack <- function(d,
 
   # Combine Targets with SNU x IM for PSNU x IM level targets ####
     if (d$info$has_psnuxim) {
-      #d <- combineMER_SNUxIM(d)
+      if (d$info$cop_year == 2020 )  {
+        d <- combineMER_SNUxIM(d) }
       interactive_print("Creating analytics...")
       d <- createAnalytics(d, d2_session = d2_session )
 

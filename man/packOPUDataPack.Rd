@@ -10,7 +10,8 @@ packOPUDataPack(
   template_path = NULL,
   cop_year = getCurrentCOPYear(),
   output_folder,
-  results_archive = TRUE
+  results_archive = TRUE,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ saved upon export. If left as \code{NULL}, will output to
 
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}
+
+\item{d2_session}{DHIS2 Session id}
 
 \item{model_data}{Data from DATIM needed to pack into Data Pack}
 }

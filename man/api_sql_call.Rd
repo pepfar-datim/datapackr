@@ -4,7 +4,11 @@
 \alias{api_sql_call}
 \title{Query DATIM SQL View.}
 \usage{
-api_sql_call(sqlView, var = NULL)
+api_sql_call(
+  sqlView,
+  var = NULL,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
 \item{sqlView}{uid of sqlView table to query.}

@@ -10,6 +10,8 @@ checkNumericValues(d, sheet, header_cols = NULL)
 \item{d}{Datapackr object.}
 
 \item{sheet}{Sheet to check}
+
+\item{header_cols}{Header columns to check}
 }
 \value{
 d
