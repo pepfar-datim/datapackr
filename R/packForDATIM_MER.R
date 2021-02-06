@@ -10,8 +10,18 @@
 #'
 packForDATIM_MER <- function(d) {
   
-  # Add dataElement & categoryOptionCombo ####
+  # Combine PSNUxIM distributed data with undistributed AGYW_PREV
+  agyw_data <- d$data$MER %>%
+    dplyr::filter(stringr::str_detect(indicator_code,"^AGYW_PREV")) %>%
+    dplyr::mutate(
+      support_type = "No Support Type",
+      mech_code = datapackr::default_catOptCombo()
+    ) %>%
+    dplyr::select(names(d$data$SNUxIM))
+    
   d$datim$MER <- d$data$SNUxIM %>%
+    dplyr::bind_rows(agyw_data) %>%
+  # Add dataElement & categoryOptionCombo ####
     dplyr::left_join(., (datapackr::map_DataPack_DATIM_DEs_COCs %>%
                            dplyr::rename(Age = valid_ages.name,
                                          Sex = valid_sexes.name,

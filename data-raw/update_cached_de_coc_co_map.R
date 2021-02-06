@@ -125,15 +125,18 @@ cop_year = getCurrentCOPYear()
                         values_to = "dataelementuid",
                         names_prefix = "dataelement_",
                         values_drop_na = TRUE) %>%
-    dplyr::mutate(support_type = toupper(support_type))
+    dplyr::mutate(support_type = toupper(support_type)) %>%
+    dplyr::mutate(
+      support_type = dplyr::case_when(
+        stringr::str_detect(indicator_code, "^AGYW_PREV") ~ "No Support Type",
+        dataset %in% c("impatt","subnat") ~ "Sub-National",
+        TRUE ~ support_type
+      )
+    )
   
 # Adorn dataset ####
   map_DataPack_DATIM_DEs_COCs %<>%
     dplyr::left_join(getHTSModality(cop_year = cop_year),
-                     by = c("dataelementuid" = "dataElement")) %>%
-    dplyr::left_join(getTechArea(),
-                     by = c("dataelementuid" = "dataElement")) %>%
-    dplyr::left_join(getNumeratorDenominator(),
                      by = c("dataelementuid" = "dataElement"))
   
 # Join Full Code List with Schema ####
@@ -224,24 +227,37 @@ getDEGSMap <- function(uid,
 
 degs_map <- getDEGSMap(c("HWPJnUTMjEq",
                          "LxhLO68FcXm",
-                         "NLZgRe4FuQJ")) %>%
-  dplyr::select(dataElementGroupSets.name, dataElementGroups.name, dataelementuid = dataElements.id) %>%
+                         "NLZgRe4FuQJ",
+                         "TWXpUVE2MqL",
+                         "lD2x0c8kywj")) %>%
+  dplyr::select(dataElementGroupSets.name, dataElementGroupSets.id,
+                dataElementGroups.name, dataelementuid = dataElements.id) %>%
   dplyr::distinct() %>%
   dplyr::mutate(
     dataElementGroupSets.name =
       dplyr::case_when(
-        dataElementGroupSets.name == "Disaggregation Type" ~ "disagg_type",
-        dataElementGroupSets.name == "Technical Area" ~ "technical_area",
-        stringr::str_detect(dataElementGroupSets.name,  "Top Level") ~ "top_level",
+        dataElementGroupSets.id == "HWPJnUTMjEq" ~ "disagg_type",
+        dataElementGroupSets.id == "LxhLO68FcXm" ~ "technical_area",
+        dataElementGroupSets.id == "NLZgRe4FuQJ" ~ "top_level",
+        dataElementGroupSets.id == "TWXpUVE2MqL" ~ "support_type",
+        dataElementGroupSets.id == "lD2x0c8kywj" ~ "numerator_denominator",
         TRUE ~ dataElementGroupSets.name
       )
   ) %>%
-  tidyr::pivot_wider(names_from = dataElementGroupSets.name, values_from = dataElementGroups.name, values_fill = NA)
+  dplyr::select(-dataElementGroupSets.id) %>%
+  tidyr::pivot_wider(names_from = dataElementGroupSets.name,
+                     values_from = dataElementGroups.name,
+                     values_fill = NA)
 
 map_DataPack_DATIM_DEs_COCs %<>%
   dplyr::left_join(getHIVSpecific(), by = "categoryoptioncombouid") %>%
   dplyr::left_join(getHIVInclusive(), by = "categoryoptioncombouid") %>%
-  dplyr::left_join(degs_map, by = "dataelementuid")
+  dplyr::rename(support_type_dp = support_type) %>%
+  dplyr::left_join(degs_map, by = "dataelementuid") %>%
+  dplyr::mutate(
+    support_type = dplyr::if_else(is.na(support_type), support_type_dp, support_type)
+  ) %>%
+  dplyr::select(-support_type_dp)
 
 # Compare old and new maps for accuracy ####
 new <- map_DataPack_DATIM_DEs_COCs %>%
