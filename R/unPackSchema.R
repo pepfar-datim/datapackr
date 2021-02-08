@@ -391,6 +391,8 @@ unPackSchema_datapack <- function(filepath = NULL,
         "\n")
       )
   }
-
+if (cop_year == 2020){
+  schema <- dplyr::select(schema, -FY)
+}
   return(schema)
 }
