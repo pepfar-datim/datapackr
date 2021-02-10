@@ -97,7 +97,7 @@ exportSubnatToDATIM <- function(d) {
   
   # Drop any rows with any NA to prevent breakage in iHub ####
   SUBNAT_IMPATT %<>%
-    tidy::drop_na()
+    tidyr::drop_na()
   
   d$datim$subnat_impatt <- SUBNAT_IMPATT
   

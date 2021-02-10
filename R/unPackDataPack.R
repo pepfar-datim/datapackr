@@ -37,43 +37,43 @@ unPackDataPack <- function(d,
 
 
   # Check whether there exist any troublesome comments in the file
-    interactive_print("Checking comments...")
-    d <- checkComments(d)
+  interactive_print("Checking comments...")
+  d <- checkComments(d)
 
   # Check integrity of Workbook tabs ####
-    interactive_print("Checking structure...")
-    d <- checkStructure(d)
+  interactive_print("Checking structure...")
+  d <- checkStructure(d)
 
   # Unpack the Targets ####
-    interactive_print("Unpacking sheets...")
-    d <- unPackSheets(d)
+  interactive_print("Unpacking sheets...")
+  d <- unPackSheets(d)
 
   # Separate Data Sets ####
-    interactive_print("Separating datasets...")
-    d <- separateDataSets(d)
+  interactive_print("Separating datasets...")
+  d <- separateDataSets(d)
 
   # Unpack the SNU x IM sheet ####
-    interactive_print("Unpacking the PSNUxIM tab...")
-    d <- unPackSNUxIM(d)
-
-  # Combine Targets with SNU x IM for PSNU x IM level targets ####
-    if (d$info$has_psnuxim) {
-      if (d$info$cop_year == 2020 )  {
-        d <- combineMER_SNUxIM(d) }
-      
-  # Create Analytics Function
-      interactive_print("Creating analytics...")
-      d <- createAnalytics(d, d2_session = d2_session )
-
-  # Prepare SNUxIM dataset for DATIM import & validation ####
-      d <- packForDATIM(d, type = "PSNUxIM")
-    }
+  interactive_print("Unpacking the PSNUxIM tab...")
+  d <- unPackSNUxIM(d)
     
   # Prepare undistributed import file for use in analytics if necessary ####
-    d <- packForDATIM(d, type = "Undistributed MER")
+  d <- packForDATIM(d, type = "Undistributed MER")
     
   # Package SUBNAT/IMPATT DATIM import file ####
-    d <- packForDATIM(d, type = "SUBNAT_IMPATT")
+  d <- packForDATIM(d, type = "SUBNAT_IMPATT")
+
+  # Combine Targets with SNU x IM for PSNU x IM level targets ####
+  if (d$info$has_psnuxim) {
+    if (d$info$cop_year == 2020 )  {
+      d <- combineMER_SNUxIM(d) }
+
+  # Prepare SNUxIM dataset for DATIM import & validation ####
+    d <- packForDATIM(d, type = "PSNUxIM")
+      
+  # Create Analytics Function ####
+    interactive_print("Creating analytics...")
+    d <- createAnalytics(d, d2_session = d2_session )
+  }
 
   return(d)
 
