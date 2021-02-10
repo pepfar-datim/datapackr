@@ -29,23 +29,26 @@ packForDATIM_MER <- function(d) {
                      by = c("indicator_code", "Age", "Sex", "KeyPop", "support_type")) %>%
     tidyr::drop_na(dataelementuid, categoryoptioncombouid) %>%
     
-    # Add period ####
+  # Add period ####
   dplyr::mutate(
     period = paste0(FY-1,"Oct")) %>%
     
-    # Add PSNU uid ####
+  # Add PSNU uid ####
     dplyr::mutate(
       psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")
     ) %>%
     
-    # Select and rename based on DATIM protocol ####
+  # Select and rename based on DATIM protocol ####
   dplyr::select(
     dataElement = dataelementuid,
     period,
     orgUnit = psnuid,
     categoryOptionCombo = categoryoptioncombouid,
     attributeOptionCombo = mech_code,
-    value)
+    value) %>%
+    
+  # Drop any rows with NA in any col to prevent breakage in iHub ####
+    tidyr::drop_na()
   
   return(d)
   
