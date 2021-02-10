@@ -2,18 +2,18 @@
 #' @importFrom magrittr %>% %<>%
 #' @title createAnalytics(d)
 #'
-#' @description Wrapper function for creation of d$data$analtyics object
+#' @description Wrapper function for creation of d$data$analytics object
 #' which is suitable for export to external analytics sytems.
 #'
 #' @param d Datapackr object
 #'
-#' @return Modified d object with d$data$analtyics
+#' @return Modified d object with d$data$analytics
 #'
 #'
 createAnalytics <- function(d,
                             d2_session = dynGet("d2_default_session",
                                                 inherits = TRUE)) {
-  #Append the distributed MER data and subnat data together
+  # Append the distributed MER data and subnat data together
   if (d$info$tool == "OPU Data Pack") {
     d$data$analytics <- d$data$extract %>%
       dplyr::select(
@@ -26,67 +26,43 @@ createAnalytics <- function(d,
     if (d$info$cop_year == 2020) {
       d$data$analytics <- dplyr::bind_rows(
         d$data$distributedMER,
-        dplyr::mutate(
-          d$data$SUBNAT_IMPATT,
-          mechanism_code = "HllvX50cXC0",
-          support_type = "DSD"
+        d$data$SUBNAT_IMPATT %>%
+          dplyr::mutate(
+            mechanism_code = "HllvX50cXC0",
+            support_type = "DSD")
         )
-      )
     }
     if (d$info$cop_year == 2021) {
-        d$data$analytics <- dplyr::bind_rows(
-          d$data$SNUxIM,
-          dplyr::mutate(
-            d$data$SUBNAT_IMPATT,
-            mechanism_code = "HllvX50cXC0",
-            support_type = "DSD"
-          )
-        )
+      d$data$analytics <-
+  # Get data from import files for better consistency
+        dplyr::bind_rows(
+          d$datim$MER,
+          d$datim$subnat_impatt) %>%
+        adorn_import_file(cop_year = 2021,
+                          d2_session)
+      
+      prio_defined <- prioritization_dict() %>%
+        dplyr::select(value, prioritization = name)
+        
+  # We need to add the prioritization as a dimension here
+      prio <- d$datim$fy22_prioritizations %>%
+        dplyr::select(psnu_uid = orgUnit, value) %>%
+        dplyr::left_join(prio_defined, by = "value") %>%
+        dplyr::select(-value)
+      
+      d$data$analytics %<>%
+        dplyr::left_join(prio, by = "psnu_uid") %>%
+        dplyr::mutate(
+          prioritization =
+            dplyr::case_when(is.na(prioritization) ~ "No Prioritization",
+                             TRUE ~ prioritization))
     }
-    
-    
   }
   
-  #Adorn organisation units
-  d <- adornPSNUs(d)
-  #Adorn mechanisms
-  d$data$analytics <- adornMechanisms(d$data$analytics,
-                                      d2_session = d2_session)
-  #TODO: Centralize this fix with exportDistributeMERtoDATIM
-  
-  if (d$info$cop_year == 2021) {
-    map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
-  } else if (d$info$cop_year == 2020) {
-    map_DataPack_DATIM_DEs_COCs_local <- datapackr::cop20_map_DataPack_DATIM_DEs_COCs
-  } else {
-    stop("That COP Year currently isn't supported for processing by createAnalytics.")
-  }
-  
-  map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                       map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- "Male"
-  map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                       map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Female PWID"] <- "Female"
-  map_DataPack_DATIM_DEs_COCs_local$valid_kps.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                     map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- NA_character_
-  map_DataPack_DATIM_DEs_COCs_local$valid_kps.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                     map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Female PWID"] <- NA_character_
-
-
-  #Adorn data element and category option group sets
-  d$data$analytics %<>%  dplyr::left_join(
-    .,
-    (
-      map_DataPack_DATIM_DEs_COCs_local %>%
-        dplyr::rename(
-          Age = valid_ages.name,
-          Sex = valid_sexes.name,
-          KeyPop = valid_kps.name
-        )
-    ),
-    by = c("Age", "Sex", "KeyPop", "indicator_code", "support_type")
-  ) %>%
-  dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S"),
-                fiscal_year = "FY21")
+  # Add timestamp and FY ####
+  d$data$analytics %<>%
+    dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S"),
+                  fiscal_year = paste0("FY", stringr::str_sub(FY,-2)))
 
   # Selects appropriate columns based on COP or OPU tool
   if (d$info$tool == "Data Pack") {
@@ -94,7 +70,7 @@ createAnalytics <- function(d,
       dplyr::select( country_name,
                      country_uid,
                      psnu,
-                     psnuid,
+                     psnu_uid,
                      prioritization,
                      mechanism_code,
                      mechanism_desc,
@@ -102,14 +78,14 @@ createAnalytics <- function(d,
                      partner_desc,
                      funding_agency  = agency,
                      fiscal_year,
-                     dataelement_id  = dataelement,
-                     dataelement_name = dataelement.y,
+                     dataelement_id  = dataElement,
+                     dataelement_name = dataelementname,
                      indicator = technical_area,
-                     numerator_denominator ,
-                     support_type ,
-                     hts_modality ,
-                     categoryoptioncombo_id = categoryoptioncombouid,
-                     categoryoptioncombo_name = categoryoptioncombo,
+                     numerator_denominator,
+                     support_type,
+                     hts_modality,
+                     categoryoptioncombo_id = categoryOptionCombo,
+                     categoryoptioncombo_name = categoryoptioncomboname,
                      age = Age,
                      sex = Sex,
                      key_population = KeyPop,

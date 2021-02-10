@@ -6,11 +6,14 @@
 \usage{
 adorn_import_file(
   psnu_import_file,
+  cop_year = getCurrentCOPYear(),
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{
-\item{psnu_import_file}{PSNU-level DATIM import file to convert}
+\item{psnu_import_file}{DHIS2 import file to convert}
+
+\item{d2_session}{}
 }
 \value{
 data
