@@ -117,6 +117,7 @@ createKeychainInfo <- function(submission_path = NULL,
   } else {stop("Unable to process that type of Data Pack.")}
   
   # TEST to make sure tool type matches what we see in the submitted file's structure ####
+  # TODO: Improve to use checkColStructure
   # tab_names_expected <- unique(d$info$schema$sheet_name)
   # tab_names_received <- readxl::excel_sheets(d$keychain$submission_path)
   # 
