@@ -10,7 +10,7 @@ test_that("All", {
   library(datapackr)
   library(magrittr)
   
-  secrets <- "~/.secrets/triage.json"
+  secrets <- "~/secrets/datim.json"
   model_data_path <- "~/datapackr_test_files/Testing/support_files/model_data_pack_input_21_20210208_1_flat.rds"
   snuxim_model_data_path <- "~/datapackr_test_files/Testing/support_files/PSNUxIM_20210201_1.rds"
   output_folder <- "~/datapackr_test_files"
@@ -22,7 +22,7 @@ test_that("All", {
      # datimutils::loginToDATIM(secrets)
      
      model_data <- readRDS(model_data_path)
-     
+
      batch <- tibble::tribble(
        ~datapack_name, ~country_uids,
        "Angola","XOivy2uDpMF",                                               #1
@@ -91,7 +91,7 @@ test_that("All", {
      }
      
      # unpack a cop 20 data pack
-     d <- unPackTool("/Users/sam/datapackr_test_files/Testing/OPU/OPU Data Pack_Eswatini_20201116165741_CDC_USAID_with dedup.xlsx"
+     d <- unPackTool("~/datapackr_test_files/Testing/OPU/OPU Data Pack_Eswatini_20201116165741_CDC_USAID_with dedup.xlsx"
                      ,d2_session = d2_session
      )
      
@@ -118,7 +118,7 @@ test_that("All", {
      ## don't forget I need to open and save the file
      
      
-     d <- unPackTool("/Users/sam/datapackr_test_files/Testing/No PSNUxIM/Data Pack_Zambia_20210121180718.xlsx"
+     d <- unPackTool("~/datapackr_test_files/Testing/No PSNUxIM/Data Pack_Zambia_20210121180718.xlsx"
                      ,d2_session = d2_session
      )
      assign(paste0("d_cop21", branch), d)  
@@ -139,7 +139,7 @@ test_that("All", {
      )  
      
      
-     d <- unPackTool( "/Users/sam/datapackr_test_files/Testing/With PSNUxIM/Data Pack_Malawi_20210121230425.xlsx"
+     d <- unPackTool( "~/datapackr_test_files/Testing/With PSNUxIM/Data Pack_Malawi_20210121230425.xlsx"
                       , d2_session = d2_session
      )
      d <- writePSNUxIM(d,
@@ -163,14 +163,10 @@ test_that("All", {
      
      # datapackr::compareData_DatapackVsDatim(d)
      
-     
-  setwd("~/Documents/GitHub/datapackr")
-   source("/Users/sam/Documents/GitHub/datapackr/data-raw/update_cached_PSNUs.R",
-          local = TRUE)
-   source("/Users/sam/Documents/GitHub/datapackr/data-raw/update_cached_de_coc_co_map.R",
-          local = TRUE)
-  source("/Users/sam/Documents/GitHub/datapackr/data-raw/update_cop21_datapack_schema.R",
-         local = TRUE)
+
+   source("data-raw/update_cached_PSNUs.R")
+   source("data-raw/update_cached_de_coc_co_map.R")
+  source("data-raw/update_cop21_datapack_schema.R")
  #  source("/Users/sam/Documents/GitHub/datapackr/data-raw/produceConfigFile.R")
 
 testthat::expect_equal(1,1)
