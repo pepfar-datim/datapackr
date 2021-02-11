@@ -10,7 +10,8 @@ getMechanismView(
   include_dedupe = FALSE,
   include_MOH = FALSE,
   d2_session = dynGet("d2_default_session", inherits = TRUE),
-  cached_mechs_path = paste0(Sys.getenv("support_files_directory"), "mechs.rds")
+  cached_mechs_path = paste0(Sys.getenv("support_files_directory"), "mechs.rds"),
+  update_stale_cache = FALSE
 )
 }
 \arguments{
@@ -30,14 +31,19 @@ FALSE.}
 
 \item{d2_session}{datimutils d2Session object}
 
-\item{cached_mechs_path}{Local file path to the cached mechanisms file.}
+\item{cached_mechs_path}{Filepath to an RDS file containing a cached copy of the 
+SQL view used defined via a envionment variable.}
+
+\item{update_stale_cache}{If the cached_mechs_path file is outdated or unreadable,
+should a new cache be saved?}
 }
 \value{
 Mechs
 }
 \description{
 Retrieves a view of mechanisms with partners and agencies
-The function will attempt to read from a cached file, if defined and accessible.
-Otherwise, if the user is logged in, the view
+The function will attempt to read from a cached file, if defined in
+the support_files_directory option has been set, and the mechs.rds file
+is available to be read. Otherwise, if the user is logged in, the view
 will be obtained from DATIM. Otherwise, an empty dataframe is returned.
 }
