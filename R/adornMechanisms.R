@@ -1,3 +1,32 @@
+fetchMechsViewFromAPI <- function(operating_units = NULL,
+                         cop_year = NULL,
+                         uids = NULL,
+                         d2_session = dynGet("d2_default_session",
+                                             inherits = TRUE)) {
+  paste0(d2_session$base_url, "api/",datapackr::api_version(),
+         "/sqlViews/fgUtV6e9YIX/data.csv?paging=false") %>%
+    {if (!is.null(operating_units))
+      paste0(., "&filter=ou:in:[",paste(operating_units, collapse = "."),"]")
+      else . } %>%
+    {if (!is.null(cop_year))
+      paste0(., "&filter=startdate:lt:", cop_year+1, "-10-01",
+             "&filter=enddate:gt:", cop_year, "-09-30")
+      else . } %>%
+    {if (!is.null(uids))
+      paste0(., "&filter=uid:in:[",paste(uids, collapse = ","),"]")
+      else . } %>%
+    utils::URLencode() %>%
+    httr::GET(httr::timeout(180), handle = d2_session$handle) %>%
+    httr::content(., "text") %>%
+    readr::read_csv(col_types = readr::cols(.default = "c")) %>%
+    dplyr::rename(
+      mechanism_desc = mechanism,
+      attributeOptionCombo = uid,
+      mechanism_code = code,
+      partner_desc = partner,
+      partner_id = primeid)
+}
+
 #' @export
 #' @title getMechanismViewFromDATIM
 #'
@@ -21,36 +50,9 @@ getMechanismViewFromDATIM <- function(operating_units = NULL,
                                       include_MOH = FALSE,
                                       d2_session = dynGet("d2_default_session",
                                                           inherits = TRUE)) {
-  getMechsView <- function(operating_units = NULL,
-                           cop_year = NULL,
-                           uids = NULL,
-                           d2_session = dynGet("d2_default_session",
-                                              inherits = TRUE)) {
-    paste0(d2_session$base_url, "api/",datapackr::api_version(),
-           "/sqlViews/fgUtV6e9YIX/data.csv?paging=false") %>%
-    {if (!is.null(operating_units))
-      paste0(., "&filter=ou:in:[",paste(operating_units, collapse = "."),"]")
-      else . } %>%
-    {if (!is.null(cop_year))
-      paste0(., "&filter=startdate:lt:", cop_year+1, "-10-01",
-                "&filter=enddate:gt:", cop_year, "-09-30")
-      else . } %>%
-    {if (!is.null(uids))
-      paste0(., "&filter=uid:in:[",paste(uids, collapse = ","),"]")
-      else . } %>%
-    utils::URLencode() %>%
-    httr::GET(httr::timeout(180), handle = d2_session$handle) %>%
-    httr::content(., "text") %>%
-    readr::read_csv(col_types = readr::cols(.default = "c")) %>%
-    dplyr::rename(
-      mechanism_desc = mechanism,
-      attributeOptionCombo = uid,
-      mechanism_code = code,
-      partner_desc = partner,
-      partner_id = primeid)
-  }
+ 
   
-  mechs <- getMechsView(operating_units = operating_units,
+  mechs <- fetchMechsViewFromAPI(operating_units = operating_units,
                    cop_year = cop_year,
                    d2_session = d2_session)
   
@@ -62,7 +64,7 @@ getMechanismViewFromDATIM <- function(operating_units = NULL,
     if (include_dedupe) {uids <- c(uids, dedupes)}
     if (include_MOH) {uids <- c(uids, MOH)}
     
-    dedupe_MOH <- getMechsView(uids = uids,
+    dedupe_MOH <- fetchMechsViewFromAPI(uids = uids,
                                d2_session = d2_session)
     
     mechs %<>%
