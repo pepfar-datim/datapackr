@@ -3,26 +3,21 @@ context("All")
 
 test_that("All", {
   branch <- "master"
+  print("ipdate")
   
-  # detach("package:datapackr")
+  detach("package:datapackr")
   # rstudioapi::restartSession()
-  
-  library(datapackr)
-  library(magrittr)
-  
+
   secrets <- "~/secrets/datim.json"
   model_data_path <- "~/datapackr_test_files/Testing/support_files/model_data_pack_input_21_20210208_1_flat.rds"
   snuxim_model_data_path <- "~/datapackr_test_files/Testing/support_files/PSNUxIM_20210201_1.rds"
   output_folder <- "~/datapackr_test_files"
   
-# app style login with explicit session
      datimutils::loginToDATIM(secrets,
                 d2_session_name = "d2_session")
-# console style login with default session
-     # datimutils::loginToDATIM(secrets)
      
      model_data <- readRDS(model_data_path)
-
+     
      batch <- tibble::tribble(
        ~datapack_name, ~country_uids,
        "Angola","XOivy2uDpMF",                                               #1
@@ -81,7 +76,7 @@ test_that("All", {
      for (i in 1:NROW(pick)) {
        print(paste0(i," of ",NROW(pick), ": ", pick[[i,1]]))
        
-       packOPUDataPack(datapack_name = pick[[i,1]],
+       datapackr::packOPUDataPack(datapack_name = pick[[i,1]],
                        country_uids = unlist(pick[[i,"country_uids"]]),
                        template_path = NULL,
                        cop_year = 2020,
@@ -91,7 +86,7 @@ test_that("All", {
      }
      
      # unpack a cop 20 data pack
-     d <- unPackTool("~/datapackr_test_files/Testing/OPU/OPU Data Pack_Eswatini_20201116165741_CDC_USAID_with dedup.xlsx"
+     d <- datapackr::unPackTool("~/datapackr_test_files/Testing/OPU/OPU Data Pack_Eswatini_20201116165741_CDC_USAID_with dedup.xlsx"
                      ,d2_session = d2_session
      )
      
@@ -105,10 +100,13 @@ test_that("All", {
      # pack a cop 21 data pack
      for (i in 1:NROW(pick)) {
        print(paste0(i," of ",NROW(pick)))
+       print(output_folder)
+       print(pick[[i,2]][[1]])
+       print(pick[[i,1]])
        
-       packDataPack(model_data = model_data,
+       datapackr::packDataPack(model_data = model_data,
                     datapack_name = pick[[i,1]],
-                    country_uids = pick[[i,2]],
+                    country_uids = pick[[i,2]][[1]],
                     template_path = NULL,
                     cop_year = 2021,
                     output_folder = output_folder,
@@ -118,7 +116,7 @@ test_that("All", {
      ## don't forget I need to open and save the file
      
      
-     d <- unPackTool("~/datapackr_test_files/Testing/No PSNUxIM/Data Pack_Zambia_20210121180718.xlsx"
+     d <- datapackr::unPackTool("~/datapackr_test_files/Testing/No PSNUxIM/Data Pack_Zambia_20210121180718.xlsx"
                      ,d2_session = d2_session
      )
      assign(paste0("d_cop21", branch), d)  
@@ -132,25 +130,25 @@ test_that("All", {
      
      assign(paste0("d_cop21", branch), d)  
      
-     d <- writePSNUxIM(d,
+     d <- datapackr::writePSNUxIM(d,
                        snuxim_model_data_path,
                        output_folder
                        , d2_session = d2_session
      )  
      
      
-     d <- unPackTool( "~/datapackr_test_files/Testing/With PSNUxIM/Data Pack_Malawi_20210121230425.xlsx"
+     d <- datapackr::unPackTool( "~/datapackr_test_files/Testing/With PSNUxIM/Data Pack_Malawi_20210121230425.xlsx"
                       , d2_session = d2_session
      )
-     d <- writePSNUxIM(d,
+     d <- datapackr::writePSNUxIM(d,
                        snuxim_model_data_path,
                        output_folder
                        , d2_session = d2_session
      )
      
-     getMechanismView(d2_session)
+     datapackr::getMechanismView(d2_session)
      
-     d <- checkAnalytics(d,
+     d <- datapackr::checkAnalytics(d,
                          model_data_path
                          ,d2_session = d2_session
      )
@@ -166,7 +164,7 @@ test_that("All", {
 
    source("data-raw/update_cached_PSNUs.R")
    source("data-raw/update_cached_de_coc_co_map.R")
-  source("data-raw/update_cop21_datapack_schema.R")
+   source("data-raw/update_cop21_datapack_schema.R")
  #  source("/Users/sam/Documents/GitHub/datapackr/data-raw/produceConfigFile.R")
 
 testthat::expect_equal(1,1)
