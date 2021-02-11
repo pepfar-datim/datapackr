@@ -74,6 +74,8 @@ unPackDataPack <- function(d,
     interactive_print("Creating analytics...")
     d <- createAnalytics(d, d2_session = d2_session )
   }
+  
+  # TODO: Check that country_uids matches observed data
 
   return(d)
 
