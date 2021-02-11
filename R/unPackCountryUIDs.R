@@ -126,7 +126,27 @@ unPackCountryUIDs <- function(submission_path,
     stop(msg)
   }
   
-  # TODO: Check country_uids and PSNUs in Data Pack match
+  # TEST: Check country_uids and PSNUs in Data Pack match
+  PSNUs <-
+    readxl::read_excel(
+      path = submission_path,
+      sheet = ifelse(tool %in% c("Data Pack", "Data Pack Template"), "Prioritization", "SNUxIM"),
+      range = readxl::cell_limits(
+        c(headerRow(tool = tool, cop_year = cop_year), 1),
+        c(NA, NA)),
+      col_types = "text",
+      .name_repair = "minimal") %>%
+    dplyr::select(PSNU) %>%
+    # Add PSNU uid ####
+  dplyr::mutate(
+    psnu_uid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
+    dplyr::left_join(datapackr::valid_PSNUs %>%
+                       dplyr::select(psnu_uid, country_name, country_uid),
+                     by = "psnu_uid")
+  
+  if (!country_uids %in% unique(PSNUs$country_uid)) {
+    stop("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
+  }
   
   return(country_uids)
   

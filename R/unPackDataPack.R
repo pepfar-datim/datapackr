@@ -75,7 +75,22 @@ unPackDataPack <- function(d,
     d <- createAnalytics(d, d2_session = d2_session )
   }
   
-  # TODO: Check that country_uids matches observed data
+  # TEST: Check that country_uids matches observed data
+  observed_country_uids <-
+    dplyr::bind_rows(d$data$MER,
+                     d$data$SNUxIM,
+                     d$data$SUBNAT_IMPATT) %>%
+    dplyr::select(psnuid) %>%
+    dplyr::distinct() %>%
+    dplyr::left_join(datapackr::valid_PSNUs %>%
+                       dplyr::select(psnu_uid, country_name, country_uid),
+                     by = c("psnuid" = "psnu_uid")) %>%
+    dplyr::pull(country_uid) %>%
+    unique()
+
+  if (!d$info$country_uids %in% unique(observed_country_uids)) {
+    stop("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
+  }
 
   return(d)
 
