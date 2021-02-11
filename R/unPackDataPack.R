@@ -55,10 +55,10 @@ unPackDataPack <- function(d,
   # Unpack the SNU x IM sheet ####
   interactive_print("Unpacking the PSNUxIM tab...")
   d <- unPackSNUxIM(d)
-    
+
   # Prepare undistributed import file for use in analytics if necessary ####
   d <- packForDATIM(d, type = "Undistributed MER")
-    
+
   # Package SUBNAT/IMPATT DATIM import file ####
   d <- packForDATIM(d, type = "SUBNAT_IMPATT")
 
@@ -69,7 +69,7 @@ unPackDataPack <- function(d,
 
   # Prepare SNUxIM dataset for DATIM import & validation ####
     d <- packForDATIM(d, type = "PSNUxIM")
-      
+
   # Create Analytics Function ####
     interactive_print("Creating analytics...")
     d <- createAnalytics(d, d2_session = d2_session )

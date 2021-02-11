@@ -6,4 +6,5 @@ packrat/lib*/
 .R_Cache/
 .DS_Store
 Icon
+mechs.rds
 .Rprofile

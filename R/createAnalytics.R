@@ -20,8 +20,8 @@ createAnalytics <- function(d,
         PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
         mechanism_code = mech_code, support_type, value
       )
-  } 
-  
+  }
+
   if (d$info$tool == "Data Pack") {
     if (d$info$cop_year == 2020) {
       d$data$analytics <- dplyr::bind_rows(
@@ -40,16 +40,16 @@ createAnalytics <- function(d,
           d$datim$subnat_impatt) %>%
         adorn_import_file(cop_year = 2021,
                           d2_session)
-      
+
       prio_defined <- prioritization_dict() %>%
         dplyr::select(value, prioritization = name)
-        
+
   # We need to add the prioritization as a dimension here
       prio <- d$datim$fy22_prioritizations %>%
         dplyr::select(psnu_uid = orgUnit, value) %>%
         dplyr::left_join(prio_defined, by = "value") %>%
         dplyr::select(-value)
-      
+
       d$data$analytics %<>%
         dplyr::left_join(prio, by = "psnu_uid") %>%
         dplyr::mutate(
@@ -58,7 +58,7 @@ createAnalytics <- function(d,
                              TRUE ~ prioritization))
     }
   }
-  
+
   # Add timestamp and FY ####
   d$data$analytics %<>%
     dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S"),
