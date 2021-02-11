@@ -13,3 +13,8 @@ compare_diffs <- datapackr::valid_PSNUs %>%
   dplyr::filter(is.na(psnu.x) | is.na(psnu.y))
 
 save(valid_PSNUs, file = "./data/valid_PSNUs.rda", compress = "xz")
+
+
+# Create play PSNUs ####
+
+names(valid_PSNUs)
