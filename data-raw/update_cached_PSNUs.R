@@ -15,6 +15,3 @@ compare_diffs <- datapackr::valid_PSNUs %>%
 save(valid_PSNUs, file = "./data/valid_PSNUs.rda", compress = "xz")
 
 
-# Create play PSNUs ####
-
-names(valid_PSNUs)
