@@ -7,11 +7,18 @@
 #' 
 #' @param submission_path Local path to the file to import.
 #' @param tool What type of tool is the submission file? Default is "Data Pack".
+#' @param cop_year Specifies COP year for dating as well as selection of
+#' templates.
 #' 
 #' @return Character vector of country_uids.
 #' 
 unPackCountryUIDs <- function(submission_path,
-                              tool) {
+                              tool = "Data Pack",
+                              cop_year = getCurrentCOPYear()) {
+  
+  if (!tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack", "OPU Data Pack Template")) {
+    stop("Cannot unpack Country UIDs for that type of tool.")
+  }
   
   submission_path <- handshakeFile(path = submission_path,
                                    tool = tool)
@@ -25,6 +32,70 @@ unPackCountryUIDs <- function(submission_path,
     stringr::str_remove_all("\\s") %>%
     stringr::str_split(",") %>%
     unlist()
+  
+  country_uids <- country_uids[grep("[A-Za-z][A-Za-z0-9]{10}", country_uids)]
+  
+  # Check that country_uids in correct cell
+  if (length(country_uids) == 0) {
+    warning(
+      paste0(
+        "Unable to deduce Country UIDs from cell B25 on Home tab. ",
+        "Attempting to deduce from org units listed on ",
+          ifelse(tool %in% c("Data Pack", "Data Pack Template"), "Prioritization", "SNUxIM"),
+        " tab instead."))
+    
+    PSNUs <-
+      readxl::read_excel(
+        path = submission_path,
+        sheet = ifelse(tool %in% c("Data Pack", "Data Pack Template"), "Prioritization", "SNUxIM"),
+        range = readxl::cell_limits(
+          c(headerRow(tool = tool, cop_year = cop_year), 1),
+          c(NA, NA)),
+        col_types = "text",
+        .name_repair = "minimal") %>%
+      dplyr::select(PSNU) %>%
+      # Add PSNU uid ####
+      dplyr::mutate(
+        psnu_uid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
+      dplyr::left_join(datapackr::valid_PSNUs %>%
+                         dplyr::select(psnu_uid, country_name, country_uid),
+                       by = "psnu_uid")
+    
+    if (NROW(PSNUs) == 0) {
+      blank_psnus = TRUE
+    } else if (all(is.na(PSNUs$PSNU))) {
+      blank_psnus = TRUE
+    } else {blank_psnus = FALSE}
+    
+    if (!blank_psnus) {
+      country_uids <- unique(PSNUs$country_uid)
+    } else {
+      warning(
+        paste0("Unable to deduce Country UIDs from ",
+               ifelse(tool %in% c("Data Pack", "Data Pack Template"), "Prioritization", "SNUxIM"),
+               " tab. Attempting to deduce from Data Pack name on Home tab.")
+      )
+      
+      datapack_name <-
+        datapackr::unPackDataPackName(
+          submission_path = submission_path,
+          tool = tool)
+      
+      if (datapack_name == "Latin America Region") {
+        country_uids <- c("joGQFpKiHl9","QKD4CzBG2GM","N7QAPGSaODP","EXVC4bNtv84","w5NMe34EjPN","aUTsSmqqu9O","oK0gC85xx2f")
+      } else if (datapack_name == "Caribbean Region") {
+        country_uids <- c("RKoVudgb05Y","PeOHqAwdtez","WuxG6jzaypt","zhJINyURZ5Y","WSl5y9jxCpC")
+      } else if (datapack_name %in% unique(valid_PSNUs$country_name)) {
+        country_uids <- unique(valid_PSNUs$country_uid[valid_PSNUs$country_name == datapack_name])
+      } else if (datapack_name %in% unique(valid_PSNUs$ou)) {
+        country_uids <- unique(valid_PSNUs$country_uid[valid_PSNUs$ou == datapack_name])
+      } else {
+        stop("Impossible to deduce Country UIDs from submission.")
+      }
+      
+    }
+    
+  }
   
   # If Regional UID provided, prompt for list of individual Country UIDs instead
   invalid_uids <-
@@ -54,6 +125,8 @@ unPackCountryUIDs <- function(submission_path,
     
     stop(msg)
   }
+  
+  # TODO: Check country_uids and PSNUs in Data Pack match
   
   return(country_uids)
   
