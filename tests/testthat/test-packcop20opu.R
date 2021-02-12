@@ -1,4 +1,8 @@
 test_that("pack a cop 20 OPU datapack", {
+  
+  datimutils::loginToDATIM(secrets,
+                           d2_session_name = "d2_session")
+  
 for (i in 1:NROW(pick)) {
   print(paste0(i," of ",NROW(pick), ": ", pick[[i,1]]))
   

@@ -26,13 +26,11 @@ getSiteList <- function(org_unit_uids,
   # Pull Community & Facility Sites ####
     siteList <- 
       datapackr::api_call("organisationUnits", d2_session = d2_session) %>%
-      datapackr::api_filter(paste0(
-        "ancestors.id:in:[", paste0(country_uids,collapse = ","),"]")) %>%
-      datapackr::api_filter(paste0(
-        "organisationUnitGroups.id:in:[POHZmzofoVx,PvuaP6YALSA",
-  # Pull Military nodes if requested
-         dplyr::if_else(include_mil, ",nwQbMeALRjL", ""),
-         "]")) %>%
+      datapackr::api_filter(
+        "ancestors.id", "in", paste0(country_uids,collapse = ",")) %>%
+      datapackr::api_filter(
+        "organisationUnitGroups.id", "in", c("POHZmzofoVx","PvuaP6YALSA", dplyr::if_else(include_mil, "nwQbMeALRjL", ""))
+         ) %>%
       datapackr::api_fields("id,name,level,ancestors[id,name],organisationUnitGroups[id,name]") %>%
       datapackr::api_get() %>%
       dplyr::mutate(
@@ -54,11 +52,8 @@ getSiteList <- function(org_unit_uids,
   # Pull levels ####
     countries <- datapackr::api_call("organisationUnits",
                                      d2_session = d2_session) %>%
-      datapackr::api_filter("organisationUnitGroups.id:eq:cNzfcPWEGSH") %>%
-      datapackr::api_filter(paste0(
-        "id:in:[",
-        paste0(country_uids,collapse = ","),
-        "]")) %>%
+      datapackr::api_filter("organisationUnitGroups.id","eq","cNzfcPWEGSH") %>%
+      datapackr::api_filter("id","in", country_uids) %>%
       datapackr::api_fields("id,name") %>%
       datapackr::api_get(d2_session = d2_session) %>%
       dplyr::rename(country_name = name)
@@ -67,9 +62,9 @@ getSiteList <- function(org_unit_uids,
       dplyr::filter(country_name %in% countries$country_name)
 
   # Tag PSNUs ####
-    siteList %<>%
+    siteList <- siteList %>%
       dplyr::left_join(countries, by = c("country_uid" = "id")) %>%
-      dplyr::left_join(levels, by = c("country_name")) %>%
+      dplyr::left_join(levels[ , !(names(levels) %in% "country_uid")], by = c("country_name")) %>%
       dplyr::mutate(
         in_region = country_uid %in% 
           (datapackr::dataPackMap %>%

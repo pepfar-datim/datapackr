@@ -1,19 +1,23 @@
+.libPaths( c( .libPaths(), "custom_datapackr") )
 unloadNamespace("datapackr")
 detach_package("datapackr", TRUE)
-library(datapackr, lib.loc="custom_datapackr/master")
-print(packageVersion("datapackr"))
+# library(datapackr, lib.loc="~/datapackr/custom_datapackr/master")
+# print(paste0("USING PACKGE VERSION: ", packageVersion("datapackr")))
+library("datapackr")
 
 secrets <- "~/secrets/datim.json"
-model_data_path <- "datapackr_test_files/Testing/support_files/model_data_pack_input_21_20210208_1_flat.rds"
-snuxim_model_data_path <- "datapackr_test_files/Testing/support_files/PSNUxIM_20210201_1.rds"
-output_folder <- "datapackr_test_files"
-analytics_data_path <- "datapackr_test_files/Testing/With PSNUxIM/Data Pack_Malawi_20210121230425.xlsx"
+model_data_path <- "~/datapackr_test_files/Testing/support_files/model_data_pack_input_21_20210208_1_flat.rds"
+snuxim_model_data_path <- "~/datapackr_test_files/Testing/support_files/PSNUxIM_20210201_1.rds"
+output_folder <- "~/datapackr_test_files"
+analytics_data_path <- "~/datapackr_test_files/Testing/With PSNUxIM/Data Pack_Malawi_20210121230425.xlsx"
 
-datimutils::loginToDATIM(secrets,
-                         d2_session_name = "d2_session")
 
 d2_session <- list(base_url = "https://datim.org/",
                 handle = httr::handle("https://datim.org/"))
+
+
+d2_default_session <- list(base_url = "https://datim.org/",
+                   handle = httr::handle("https://datim.org/"))
 
 batch <- tibble::tribble(
   ~datapack_name, ~country_uids,
