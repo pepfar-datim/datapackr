@@ -33,35 +33,23 @@ createAnalytics <- function(d,
         )
     }
     if (d$info$cop_year == 2021) {
+  # For COP21+, get data from import files for better consistency ####
+      fy22_prioritizations <- d$datim$fy22_prioritizations %>%
+        dplyr::select(orgUnit, value)
+      
       d$data$analytics <-
-  # Get data from import files for better consistency
         dplyr::bind_rows(
           d$datim$MER,
           d$datim$subnat_impatt) %>%
         adorn_import_file(cop_year = 2021,
+                          psnu_prioritizations = fy22_prioritizations,
                           d2_session)
-
-      prio_defined <- prioritization_dict() %>%
-        dplyr::select(value, prioritization = name)
-
-  # We need to add the prioritization as a dimension here
-      prio <- d$datim$fy22_prioritizations %>%
-        dplyr::select(psnu_uid = orgUnit, value) %>%
-        dplyr::left_join(prio_defined, by = "value") %>%
-        dplyr::select(-value)
-
-      d$data$analytics %<>%
-        dplyr::left_join(prio, by = "psnu_uid") %>%
-        dplyr::mutate(
-          prioritization =
-            dplyr::case_when(is.na(prioritization) ~ "No Prioritization",
-                             TRUE ~ prioritization))
     }
   }
 
   # Add timestamp and FY ####
   d$data$analytics %<>%
-    dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S"),
+    dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"),
                   fiscal_year = paste0("FY", stringr::str_sub(FY,-2)))
 
   # Selects appropriate columns based on COP or OPU tool
