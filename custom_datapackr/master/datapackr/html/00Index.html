@@ -1,0 +1,395 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>R: A Package that Packs and Unpacks all Data Packs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+<h1> A Package that Packs and Unpacks all Data Packs
+<img class="toplogo" src="../../../doc/html/Rlogo.svg" alt="[R logo]" />
+</h1>
+<hr/>
+<div style="text-align: center;">
+<a href="../../../doc/html/packages.html"><img class="arrow" src="../../../doc/html/left.jpg" alt="[Up]" /></a>
+<a href="../../../doc/html/index.html"><img class="arrow" src="../../../doc/html/up.jpg" alt="[Top]" /></a>
+</div><h2>Documentation for package &lsquo;datapackr&rsquo; version 4.2.1</h2>
+
+<ul><li><a href="../DESCRIPTION">DESCRIPTION file</a>.</li>
+</ul>
+
+<h2>Help Pages</h2>
+
+
+<p style="text-align: center;">
+<a href="#A">A</a>
+<a href="#C">C</a>
+<a href="#D">D</a>
+<a href="#E">E</a>
+<a href="#F">F</a>
+<a href="#G">G</a>
+<a href="#H">H</a>
+<a href="#I">I</a>
+<a href="#L">L</a>
+<a href="#M">M</a>
+<a href="#P">P</a>
+<a href="#R">R</a>
+<a href="#S">S</a>
+<a href="#T">T</a>
+<a href="#U">U</a>
+<a href="#V">V</a>
+<a href="#W">W</a>
+</p>
+
+
+<h2><a name="A">-- A --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="addcols.html">addcols</a></td>
+<td>Add list of columns as NULL columns to supplied dataframe.</td></tr>
+<tr><td style="width: 25%;"><a href="add_dp_psnu.html">add_dp_psnu</a></td>
+<td>Modify PSNU list to add datapackr IDs.</td></tr>
+<tr><td style="width: 25%;"><a href="adornMechanisms.html">adornMechanisms</a></td>
+<td>adornMechanisms(data)</td></tr>
+<tr><td style="width: 25%;"><a href="adornPSNUs.html">adornPSNUs</a></td>
+<td>adornPSNUs(d)</td></tr>
+<tr><td style="width: 25%;"><a href="adorn_import_file.html">adorn_import_file</a></td>
+<td>Convert PSNU-level DATIM import file into analytics-friendly object</td></tr>
+<tr><td style="width: 25%;"><a href="analyze_indexpos_ratio.html">analyze_indexpos_ratio</a></td>
+<td>Check Data Pack data for low representation of HTS_INDEX_POS</td></tr>
+<tr><td style="width: 25%;"><a href="analyze_linkage.html">analyze_linkage</a></td>
+<td>Check Data Pack data for linkage &lt; 95% or &gt;100%</td></tr>
+<tr><td style="width: 25%;"><a href="analyze_pmtctknownpos.html">analyze_pmtctknownpos</a></td>
+<td>Check Data Pack data for PMTCT retention &lt; 98% or &gt;100%</td></tr>
+<tr><td style="width: 25%;"><a href="analyze_retention.html">analyze_retention</a></td>
+<td>Check Data Pack data for retention &lt; 98% or &gt;100%</td></tr>
+<tr><td style="width: 25%;"><a href="analyze_tbknownpos.html">analyze_tbknownpos</a></td>
+<td>Check Data Pack data for TB retention &lt; 98% or &gt;100%</td></tr>
+<tr><td style="width: 25%;"><a href="analyze_vmmc_indeterminate.html">analyze_vmmc_indeterminate</a></td>
+<td>Check Data Pack data for VMMC_CIRC Indeterminate Rate &gt; 5%</td></tr>
+<tr><td style="width: 25%;"><a href="api_call.html">api_call</a></td>
+<td>Start DATIM API query and specify table</td></tr>
+<tr><td style="width: 25%;"><a href="api_fields.html">api_fields</a></td>
+<td>Select fields to return from a DATIM API query.</td></tr>
+<tr><td style="width: 25%;"><a href="api_filter.html">api_filter</a></td>
+<td>Filter a DATIM API query.</td></tr>
+<tr><td style="width: 25%;"><a href="api_get.html">api_get</a></td>
+<td>Execute and return a DATIM API query.</td></tr>
+<tr><td style="width: 25%;"><a href="api_sql_call.html">api_sql_call</a></td>
+<td>Query DATIM SQL View.</td></tr>
+<tr><td style="width: 25%;"><a href="api_version.html">api_version</a></td>
+<td>Returns version of the API</td></tr>
+</table>
+
+<h2><a name="C">-- C --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="canReadFile.html">canReadFile</a></td>
+<td>Test for file read access</td></tr>
+<tr><td style="width: 25%;"><a href="checkAnalytics.html">checkAnalytics</a></td>
+<td>Check Data Pack data for analytics concerns</td></tr>
+<tr><td style="width: 25%;"><a href="checkColStructure.html">checkColStructure</a></td>
+<td>checkColStructure(d)</td></tr>
+<tr><td style="width: 25%;"><a href="checkComments.html">checkComments</a></td>
+<td>Detect troublesome comment types</td></tr>
+<tr><td style="width: 25%;"><a href="checkDuplicateRows.html">checkDuplicateRows</a></td>
+<td>checkDuplicateRows(d)</td></tr>
+<tr><td style="width: 25%;"><a href="checkFormulas.html">checkFormulas</a></td>
+<td>Check formulas used in specified sheet in submitted Data Pack.</td></tr>
+<tr><td style="width: 25%;"><a href="checkInvalidOrgUnits.html">checkInvalidOrgUnits</a></td>
+<td>checkInvalidOrgUnits(d)</td></tr>
+<tr><td style="width: 25%;"><a href="checkMissingMetadata.html">checkMissingMetadata</a></td>
+<td>checkMissingMetadata(d)</td></tr>
+<tr><td style="width: 25%;"><a href="checkNumericValues.html">checkNumericValues</a></td>
+<td>Check Data Pack sheet for non-numeric values</td></tr>
+<tr><td style="width: 25%;"><a href="checkStructure.html">checkStructure</a></td>
+<td>Check tab structure of submitted tool.=</td></tr>
+<tr><td style="width: 25%;"><a href="combineMER_SNUxIM.html">combineMER_SNUxIM</a></td>
+<td>combineMER_SNUxIM(d)</td></tr>
+<tr><td style="width: 25%;"><a href="compareData_DatapackVsDatim.html">compareData_DatapackVsDatim</a></td>
+<td>compareData_DatapackVsDatim</td></tr>
+<tr><td style="width: 25%;"><a href="compareData_OpuDatapackVsDatim.html">compareData_OpuDatapackVsDatim</a></td>
+<td>compareData_OpuDatapackVsDatim</td></tr>
+<tr><td style="width: 25%;"><a href="comparePacks.html">comparePacks</a></td>
+<td>Compare Data Pack and Site Tool data</td></tr>
+<tr><td style="width: 25%;"><a href="configFile.html">configFile</a></td>
+<td>Mapping of necessary Data Pack metadata</td></tr>
+<tr><td style="width: 25%;"><a href="cop20_data_pack_schema.html">cop20_data_pack_schema</a></td>
+<td>Schema describing correct structure of COP20 Data Pack template.</td></tr>
+<tr><td style="width: 25%;"><a href="CountriesContained.html">CountriesContained</a></td>
+<td>CountriesContained</td></tr>
+<tr><td style="width: 25%;"><a href="countryUIDs_homeCell.html">countryUIDs_homeCell</a></td>
+<td>Location of Country UIDs on Home tab.</td></tr>
+<tr><td style="width: 25%;"><a href="createAnalytics.html">createAnalytics</a></td>
+<td>createAnalytics(d)</td></tr>
+<tr><td style="width: 25%;"><a href="createKeychainInfo.html">createKeychainInfo</a></td>
+<td>Create Keychain Info for use in datapackr sidecar.</td></tr>
+<tr><td style="width: 25%;"><a href="create_play_spectrum_output.html">create_play_spectrum_output</a></td>
+<td>Create fake Spectrum output for testing</td></tr>
+<tr><td style="width: 25%;"><a href="currentFY.html">currentFY</a></td>
+<td>Return current FY based on system date.</td></tr>
+</table>
+
+<h2><a name="D">-- D --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="dataPackMap.html">dataPackMap</a></td>
+<td>Mapping of necessary Data Pack metadata</td></tr>
+<tr><td style="width: 25%;"><a href="dataPackName_homeCell.html">dataPackName_homeCell</a></td>
+<td>Location of Name of the DataPack on the Home tab</td></tr>
+<tr><td style="width: 25%;"><a href="datapackr.html">datapackr</a></td>
+<td>Data Pack on R datapackr: a grammar of Data Pack manipulation datapackr is the engine behind PEPFAR Data Packs, a tool used annually to aid PEPFAR Country Teams in setting targets for their annual Country Operating Plan (COP). It has three main goals:         • Generate Data Packs, either at District or Site Level as           directed.         • Process and validate Data Packs submitted for review         • Prepare Data Pack data for import into DATIM, the PEPFAR data           collection database.</td></tr>
+<tr><td style="width: 25%;"><a href="data_pack_schema.html">data_pack_schema</a></td>
+<td>Schema describing correct structure of Data Pack template.</td></tr>
+<tr><td style="width: 25%;"><a href="default_catOptCombo.html">default_catOptCombo</a></td>
+<td>Returns 'default' categoryOptionCombo uid.</td></tr>
+<tr><td style="width: 25%;"><a href="defunctDisaggs.html">defunctDisaggs</a></td>
+<td>defunctDisaggs(d)</td></tr>
+<tr><td style="width: 25%;"><a href="deriveTargets.html">deriveTargets</a></td>
+<td>Derive non-Data Pack targets from others in the Data Pack</td></tr>
+<tr><td style="width: 25%;"><a href="DHISLogin.html">DHISLogin</a></td>
+<td>DHISLogin(config_path)</td></tr>
+</table>
+
+<h2><a name="E">-- E --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="exportDistributedDataToDATIM.html">exportDistributedDataToDATIM</a></td>
+<td>exportDistributedDataToDATIM(data)</td></tr>
+<tr><td style="width: 25%;"><a href="exportPackr.html">exportPackr</a></td>
+<td>Export output.</td></tr>
+<tr><td style="width: 25%;"><a href="exportSubnatToDATIM.html">exportSubnatToDATIM</a></td>
+<td>exportSubnatToDATIM(d)</td></tr>
+</table>
+
+<h2><a name="F">-- F --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="fake_data_flattenDataPackModel_19.html">fake_data_flattenDataPackModel_19</a></td>
+<td>fake_data_flattenDataPackModel_19</td></tr>
+<tr><td style="width: 25%;"><a href="flattenDataPackModel_19.html">flattenDataPackModel_19</a></td>
+<td>flattenDataPackModel_19</td></tr>
+<tr><td style="width: 25%;"><a href="frameDataSheet.html">frameDataSheet</a></td>
+<td>writeDataSheet(wb, type = "Data Pack")</td></tr>
+<tr><td style="width: 25%;"><a href="fullCodeList.html">fullCodeList</a></td>
+<td>Full Code List specific to current COP targets dataset</td></tr>
+</table>
+
+<h2><a name="G">-- G --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="getCopDataFromDatim.html">getCopDataFromDatim</a></td>
+<td>grab all raw data in DATIM for a country for the COP data sets for a given fiscal year.</td></tr>
+<tr><td style="width: 25%;"><a href="getCOPDatasetUIDs.html">getCOPDatasetUIDs</a></td>
+<td>Pull &amp; combine all UIDS for specified data_stream types and FY.</td></tr>
+<tr><td style="width: 25%;"><a href="getCountries.html">getCountries</a></td>
+<td>Pull list of Countries from DATIM.</td></tr>
+<tr><td style="width: 25%;"><a href="GetCredentialsFromConsole.html">GetCredentialsFromConsole</a></td>
+<td>GetCredentialsFromConsole()</td></tr>
+<tr><td style="width: 25%;"><a href="getCurrentCOPYear.html">getCurrentCOPYear</a></td>
+<td>Returns current COP Year</td></tr>
+<tr><td style="width: 25%;"><a href="getDatasetUids.html">getDatasetUids</a></td>
+<td>getDatasetUids</td></tr>
+<tr><td style="width: 25%;"><a href="getDataValueSets.html">getDataValueSets</a></td>
+<td>getDataValueSets</td></tr>
+<tr><td style="width: 25%;"><a href="getHTSModality.html">getHTSModality</a></td>
+<td>getHTSModality</td></tr>
+<tr><td style="width: 25%;"><a href="getIMPATTLevels.html">getIMPATTLevels</a></td>
+<td>Pull IMPATT levels from DATIM for all PEPFAR countries</td></tr>
+<tr><td style="width: 25%;"><a href="getMechanismView.html">getMechanismView</a></td>
+<td>getMechanismView(d2_session, support_files_path)</td></tr>
+<tr><td style="width: 25%;"><a href="getMechanismViewFromDATIM.html">getMechanismViewFromDATIM</a></td>
+<td>Title</td></tr>
+<tr><td style="width: 25%;"><a href="getMechList.html">getMechList</a></td>
+<td>Compile Mechanism List for Site Tool</td></tr>
+<tr><td style="width: 25%;"><a href="getMilitaryNodes.html">getMilitaryNodes</a></td>
+<td>Pull all _Military nodes from DATIM for all PEPFAR countries</td></tr>
+<tr><td style="width: 25%;"><a href="getNumeratorDenominator.html">getNumeratorDenominator</a></td>
+<td>getNumeratorDenominator</td></tr>
+<tr><td style="width: 25%;"><a href="getOPUDataFromDATIM.html">getOPUDataFromDATIM</a></td>
+<td>Pull data for packing OPU Data Pack</td></tr>
+<tr><td style="width: 25%;"><a href="getPSNUs.html">getPSNUs</a></td>
+<td>Pull list of PSNUs from DATIM based on provided country UIDs.</td></tr>
+<tr><td style="width: 25%;"><a href="getSiteList.html">getSiteList</a></td>
+<td>Compile Site List for Site Tool</td></tr>
+<tr><td style="width: 25%;"><a href="getTechArea.html">getTechArea</a></td>
+<td>getTechArea</td></tr>
+<tr><td style="width: 25%;"><a href="getValidCategoryOptions.html">getValidCategoryOptions</a></td>
+<td>getValidCategoryOptions</td></tr>
+<tr><td style="width: 25%;"><a href="getValidCOs.html">getValidCOs</a></td>
+<td>Compile valid categoryOptions for a given dataset</td></tr>
+</table>
+
+<h2><a name="H">-- H --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="handshakeFile.html">handshakeFile</a></td>
+<td>Test an input file for read access and type. Prompt if issues.</td></tr>
+<tr><td style="width: 25%;"><a href="headerRow.html">headerRow</a></td>
+<td>Tool header rows</td></tr>
+</table>
+
+<h2><a name="I">-- I --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="indicatorMap.html">indicatorMap</a></td>
+<td>Map of Data Pack dataelements and categoryoptioncombos.</td></tr>
+<tr><td style="width: 25%;"><a href="interactive_print.html">interactive_print</a></td>
+<td>Prints message if session is interactive.</td></tr>
+<tr><td style="width: 25%;"><a href="isLoggedIn.html">isLoggedIn</a></td>
+<td>Determine whether the user is logged into DATIM or not.</td></tr>
+</table>
+
+<h2><a name="L">-- L --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="LoadConfigFile.html">LoadConfigFile</a></td>
+<td>LoadConfig(config_path)</td></tr>
+<tr><td style="width: 25%;"><a href="loginToDATIM.html">loginToDATIM</a></td>
+<td>Log into DATIM using DATIM credentials</td></tr>
+</table>
+
+<h2><a name="M">-- M --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="map_COCs_to_COs.html">map_COCs_to_COs</a></td>
+<td>Map categoryoptioncombos to underlying categoryoptions.</td></tr>
+<tr><td style="width: 25%;"><a href="map_Cs_to_COs.html">map_Cs_to_COs</a></td>
+<td>Map categoryoptioncombos to underlying categoryoptions.</td></tr>
+<tr><td style="width: 25%;"><a href="map_DataPack_DATIM_DEs_COCs.html">map_DataPack_DATIM_DEs_COCs</a></td>
+<td>Map of indicators from Data Pack indicator codes to DATIM dataelements and categoryoptioncombos</td></tr>
+</table>
+
+<h2><a name="P">-- P --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="packDataPack.html">packDataPack</a></td>
+<td>Pack a Data Pack</td></tr>
+<tr><td style="width: 25%;"><a href="packDataPackSheet.html">packDataPackSheet</a></td>
+<td>Pack data into a Data Pack sheet</td></tr>
+<tr><td style="width: 25%;"><a href="packDataPackSheets.html">packDataPackSheets</a></td>
+<td>Loop through and populate normal Data Pack sheets</td></tr>
+<tr><td style="width: 25%;"><a href="packForDATIM.html">packForDATIM</a></td>
+<td>packForDATIM(data)</td></tr>
+<tr><td style="width: 25%;"><a href="packForDATIM_MER.html">packForDATIM_MER</a></td>
+<td>packForDATIM_OPU(d)</td></tr>
+<tr><td style="width: 25%;"><a href="packForDATIM_OPU.html">packForDATIM_OPU</a></td>
+<td>packForDATIM_OPU(d)</td></tr>
+<tr><td style="width: 25%;"><a href="packForPAW.html">packForPAW</a></td>
+<td>packForPAW</td></tr>
+<tr><td style="width: 25%;"><a href="packFrame.html">packFrame</a></td>
+<td>Create a Tool from scratch and prep it for data.</td></tr>
+<tr><td style="width: 25%;"><a href="packOPUDataPack.html">packOPUDataPack</a></td>
+<td>Pack a COP20 OPU Data Pack</td></tr>
+<tr><td style="width: 25%;"><a href="packSNUxIM.html">packSNUxIM</a></td>
+<td>packSNUxIM(data)</td></tr>
+<tr><td style="width: 25%;"><a href="packSNUxIM_2020.html">packSNUxIM_2020</a></td>
+<td>packSNUxIM(data)</td></tr>
+<tr><td style="width: 25%;"><a href="packSNUxIM_OPU.html">packSNUxIM_OPU</a></td>
+<td>packSNUxIM_OPU(d)</td></tr>
+<tr><td style="width: 25%;"><a href="periodInfo.html">periodInfo</a></td>
+<td>periodInfo</td></tr>
+<tr><td style="width: 25%;"><a href="prepareSheetData.html">prepareSheetData</a></td>
+<td>Prepare sheet-specific dataset for writing into a Data Pack sheet.</td></tr>
+<tr><td style="width: 25%;"><a href="prepare_model_data.PSNUxIM.html">prepare_model_data.PSNUxIM</a></td>
+<td>packSNUxIM(data)</td></tr>
+<tr><td style="width: 25%;"><a href="prioritizations.html">prioritizations</a></td>
+<td>Mapping of DATIM Prioritization numerals to strings.</td></tr>
+<tr><td style="width: 25%;"><a href="prioritization_dict.html">prioritization_dict</a></td>
+<td>Define prioritization values.</td></tr>
+<tr><td style="width: 25%;"><a href="pullDATIMCodeList.html">pullDATIMCodeList</a></td>
+<td>Pull DATIM code list.</td></tr>
+<tr><td style="width: 25%;"><a href="pullFullCodeList.html">pullFullCodeList</a></td>
+<td>Pull &amp; combine all MER, SUBNAT, IMPATT code lists for specified FY.</td></tr>
+<tr><td style="width: 25%;"><a href="pull_COPindicators.html">pull_COPindicators</a></td>
+<td>Extract COP indicators list from DATIM</td></tr>
+</table>
+
+<h2><a name="R">-- R --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="round_trunc.html">round_trunc</a></td>
+<td>Round at 0.5 toward integer with highest absolute value</td></tr>
+<tr><td style="width: 25%;"><a href="rowMax.html">rowMax</a></td>
+<td>Take Max along row among columns matching regex</td></tr>
+</table>
+
+<h2><a name="S">-- S --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="selectOU.html">selectOU</a></td>
+<td>Use the console to select OU</td></tr>
+<tr><td style="width: 25%;"><a href="separateDataSets.html">separateDataSets</a></td>
+<td>separateDataSets(d)</td></tr>
+<tr><td style="width: 25%;"><a href="skip_tabs.html">skip_tabs</a></td>
+<td>List of tabs to skip for given tool.</td></tr>
+<tr><td style="width: 25%;"><a href="strip_wb_NAs.html">strip_wb_NAs</a></td>
+<td>Remove errant NAs in a Data Pack</td></tr>
+<tr><td style="width: 25%;"><a href="styleGuide.html">styleGuide</a></td>
+<td>Library of Openxlsx style objects to apply to both Data Pack and Site Tool files.</td></tr>
+<tr><td style="width: 25%;"><a href="swapColumns.html">swapColumns</a></td>
+<td>Swap columns between dataframes</td></tr>
+</table>
+
+<h2><a name="T">-- T --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="template_schema.html">template_schema</a></td>
+<td>Schema describing correct structure of Data Pack template.</td></tr>
+<tr><td style="width: 25%;"><a href="toolName_homeCell.html">toolName_homeCell</a></td>
+<td>Location of name of the tool on Home tab.</td></tr>
+</table>
+
+<h2><a name="U">-- U --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="unPackCountryUIDs.html">unPackCountryUIDs</a></td>
+<td>Extract country uids from submitted file</td></tr>
+<tr><td style="width: 25%;"><a href="unPackDataPack.html">unPackDataPack</a></td>
+<td>Unpack a submitted Data Pack</td></tr>
+<tr><td style="width: 25%;"><a href="unPackDataPackName.html">unPackDataPackName</a></td>
+<td>Extract the name of the datapack</td></tr>
+<tr><td style="width: 25%;"><a href="unPackDataPackSheet.html">unPackDataPackSheet</a></td>
+<td>Unpack a Data Pack sheet.</td></tr>
+<tr><td style="width: 25%;"><a href="unPackOPUDataPack.html">unPackOPUDataPack</a></td>
+<td>Unpack a submitted OPU Data Pack</td></tr>
+<tr><td style="width: 25%;"><a href="unPackOPU_PSNUxIM.html">unPackOPU_PSNUxIM</a></td>
+<td>Unpack data from OPU Data Pack PSNUxIM tab.</td></tr>
+<tr><td style="width: 25%;"><a href="unPackSchema_datapack.html">unPackSchema_datapack</a></td>
+<td>Extract and save schema from Data Pack template.</td></tr>
+<tr><td style="width: 25%;"><a href="unPackSheets.html">unPackSheets</a></td>
+<td>Unpack data from Data Pack sheets.</td></tr>
+<tr><td style="width: 25%;"><a href="unPackSNUxIM.html">unPackSNUxIM</a></td>
+<td>unPackSNUxIM(d)</td></tr>
+<tr><td style="width: 25%;"><a href="unPackTool.html">unPackTool</a></td>
+<td>Unpack a submitted tool</td></tr>
+</table>
+
+<h2><a name="V">-- V --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="ValidateConfig.html">ValidateConfig</a></td>
+<td>Check login credentials</td></tr>
+<tr><td style="width: 25%;"><a href="validationSummary.html">validationSummary</a></td>
+<td>validationSummary(d)</td></tr>
+<tr><td style="width: 25%;"><a href="validDPDisaggs.html">validDPDisaggs</a></td>
+<td>List Valid Data Pack Disaggs</td></tr>
+<tr><td style="width: 25%;"><a href="valid_category_options.html">valid_category_options</a></td>
+<td>List of valid categoryoptions based on current COP Target Code List.</td></tr>
+<tr><td style="width: 25%;"><a href="valid_dp_disaggs.html">valid_dp_disaggs</a></td>
+<td>Lists valid disaggs for each Data Pack tab.</td></tr>
+<tr><td style="width: 25%;"><a href="valid_PSNUs.html">valid_PSNUs</a></td>
+<td>List of valid PSNUs used for generating Data Packs.</td></tr>
+</table>
+
+<h2><a name="W">-- W --</a></h2>
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="writeComparisonWorkbook.html">writeComparisonWorkbook</a></td>
+<td>Write a comparison workbook</td></tr>
+<tr><td style="width: 25%;"><a href="writeFxColumnwise.html">writeFxColumnwise</a></td>
+<td>Write character vector of Excel formulas into Openxlsx Workbook object horizontally, rather than vertically.</td></tr>
+<tr><td style="width: 25%;"><a href="writeHomeTab.html">writeHomeTab</a></td>
+<td>writeHomeTab(wb, datapack_uid, type = "Data Pack")</td></tr>
+<tr><td style="width: 25%;"><a href="writePSNUxIM.html">writePSNUxIM</a></td>
+<td>writePSNUxIM(d)</td></tr>
+</table>
+</body></html>

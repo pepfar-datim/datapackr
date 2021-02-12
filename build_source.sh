@@ -1,0 +1,1 @@
+R CMD INSTALL --no-multiarch --with-keep.source datapackr
