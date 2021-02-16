@@ -2,7 +2,7 @@ devtools::install_github("https://github.com/pepfar-datim/datapackr",
                          "COP-19-Master",
                          upgrade = FALSE)
 
-country_name = "Nigeria"
+country_name = "Tanzania"
 
 require(datapackr)
 require(datimvalidation)
@@ -10,7 +10,7 @@ require(httr)
 require(jsonlite)
 require(magrittr)
 
-datapackr::runApp_CompareSiteVsDatim()
+#datapackr::runApp_CompareSiteVsDatim()
 
 compare_flat <- file.choose()
 options("scipen"=999)
@@ -100,8 +100,11 @@ r <- httr::POST(url, body = updates_json[["raw_file"]],
 # prin import summary
 httr::content(r)
 
+compare_out <- datapackr::compareData_SiteVsDatim(data,
+                                                  orgunit,
+                                                  "2019Oct")
 
-datapackr::runApp_CompareSiteVsDatim()
+#datapackr::runApp_CompareSiteVsDatim()
 
 
 # store a copy of the import file, I attach it to the zendesk ticket for the record
