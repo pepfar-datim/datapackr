@@ -61,7 +61,7 @@ createKeychainInfo <- function(submission_path = NULL,
         | !tool_name_type$type[1] %in% c("Data Pack","OPU Data Pack")) {
     stop("Please correct cell B10 on the Home tab. This should read 'COP21 Data Pack', or similar")
   }
-  
+
   # Determine if template, and if so, label type as template ####
   is_template <-
     readxl::read_excel(
@@ -109,7 +109,7 @@ createKeychainInfo <- function(submission_path = NULL,
     } else if (d$info$cop_year == 2019) {
       d$info$schema <- datapackr::data_pack_schema
     } else {stop(paste0("Unable to process Data Packs from COP ", d$info$cop_year))}
-  } else if (tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
+  } else if (d$info$tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
     if (d$info$cop_year == 2020) {
       d$info$schema <- datapackr::cop20OPU_data_pack_schema
     } else {stop(paste0("Unable to process OPU Data Packs from COP ", d$info$cop_year))}
