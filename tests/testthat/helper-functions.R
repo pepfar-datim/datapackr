@@ -4,7 +4,7 @@ test_sheet <-
 #rprojroot::find_package_root_file("inst/extdata",fname)
 
 
-detach_package <- function(pkg, character.only = FALSE)
+detach_all_instances <- function(pkg, character.only = FALSE)
 {
   if(!character.only)
   {

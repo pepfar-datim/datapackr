@@ -1,3 +1,5 @@
+context("pack a cop 20 OPU datapack")
+httptest::with_mock_api({
 test_that("pack a cop 20 OPU datapack", {
   
   datimutils::loginToDATIM(secrets,
@@ -20,4 +22,5 @@ testthat::expect_equal(1,1)
 
 cleanup()
 
+})
 })

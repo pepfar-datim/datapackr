@@ -1,3 +1,5 @@
+context("unpack a cop 20 data pack and compare")
+httptest::with_mock_api({
 test_that("unpack a cop 20 data pack and compare", {
 # unpack a cop 20 data pack
   
@@ -16,4 +18,5 @@ foo <- datapackr::compareData_OpuDatapackVsDatim(d
 testthat::expect_equal(1,1)
 
 cleanup()
+})
 })

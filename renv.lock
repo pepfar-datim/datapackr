@@ -253,7 +253,7 @@
     },
     "datapackcommons": {
       "Package": "datapackcommons",
-      "Version": "0.2.0.0.0.0.1609228900",
+      "Version": "0.2.2.0.0.0.1612206672",
       "Source": "Repository",
       "Repository": "RSPM",
       "RemoteSha": "5a1b88e69782d61e41dfa16a988aabd648d67a35",
@@ -269,7 +269,7 @@
     },
     "datimvalidation": {
       "Package": "datimvalidation",
-      "Version": "1.0.112.0.0.0.1608550523",
+      "Version": "1.0.112.0.0.0.1611316513",
       "Source": "Repository",
       "Repository": "RSPM",
       "Remotes": "pepfar-datim/datimutils",
@@ -923,7 +923,7 @@
     },
     "testthat": {
       "Package": "testthat",
-      "Version": "3.0.1",
+      "Version": "3.0.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "17826764cb92d8b5aae6619896e5a161"

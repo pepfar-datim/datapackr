@@ -1,23 +1,24 @@
-.libPaths( c( .libPaths(), "custom_datapackr") )
-unloadNamespace("datapackr")
-detach_package("datapackr", TRUE)
+# libPaths( c( .libPaths(), "custom_datapackr") )
+# unloadNamespace("datapackr")
+# detach_all_instances("datapackr", TRUE)
 # library(datapackr, lib.loc="~/datapackr/custom_datapackr/master")
 # print(paste0("USING PACKGE VERSION: ", packageVersion("datapackr")))
-library("datapackr")
 
 secrets <- "~/secrets/datim.json"
 model_data_path <- "~/datapackr_test_files/Testing/support_files/model_data_pack_input_21_20210208_1_flat.rds"
 snuxim_model_data_path <- "~/datapackr_test_files/Testing/support_files/PSNUxIM_20210201_1.rds"
 output_folder <- "~/datapackr_test_files"
 analytics_data_path <- "~/datapackr_test_files/Testing/With PSNUxIM/Data Pack_Malawi_20210121230425.xlsx"
-
+httptest::.mockPaths("tests/testthat")
+options(install.opts = "--no-staged-install")
+options(renv.consent = TRUE)
+renv::restore()
 
 d2_session <- list(base_url = "https://datim.org/",
                 handle = httr::handle("https://datim.org/"))
 
 
-d2_default_session <- list(base_url = "https://datim.org/",
-                   handle = httr::handle("https://datim.org/"))
+d2_default_session <- d2_session
 
 batch <- tibble::tribble(
   ~datapack_name, ~country_uids,

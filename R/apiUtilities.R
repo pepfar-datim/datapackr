@@ -125,6 +125,8 @@ api_sql_call <- function(sqlView, var = NULL,
       ifelse(!is.null(var),paste0("var=dataSets:",var,"&"),""),
       "paging=false") %>%
     utils::URLencode()
+  
+  print(URL)
     
   r <- 
     URL %>%

@@ -1,3 +1,5 @@
+context("unpack and write PSNUxIM")
+httptest::with_mock_api({
 test_that("unpack and write PSNUxIM", {
   
   datimutils::loginToDATIM(secrets,
@@ -15,4 +17,5 @@ test_that("unpack and write PSNUxIM", {
   
   testthat::expect_equal(1,1)
   cleanup()
+})
 })
