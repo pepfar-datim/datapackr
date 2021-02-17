@@ -31,7 +31,9 @@ unPackTool <- function(submission_path = NULL,
                            country_uids,
                            cop_year)
   
-  d$keychain$d2_session <- d2_session
+  #TODO: Are we sure we want to make this change ? If so, the object must be cloned. 
+  
+  #d$keychain$d2_session <- d2_session$clone()
 
   # unPack file based on type
   if (d$info$tool == "Data Pack") {

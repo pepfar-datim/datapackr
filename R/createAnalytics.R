@@ -15,11 +15,7 @@ createAnalytics <- function(d,
                                                 inherits = TRUE)) {
   # Append the distributed MER data and subnat data together
   if (d$info$tool == "OPU Data Pack") {
-    d$data$analytics <- d$data$extract %>%
-      dplyr::select(
-        PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
-        mechanism_code = mech_code, support_type, value
-      ) %>% 
+    d$data$analytics <- d$datim$OPU %>% 
       adorn_import_file(cop_year = d$info$cop_year,
                         psnu_prioritizations = NULL,
                         d2_session = d2_session)
@@ -56,8 +52,11 @@ createAnalytics <- function(d,
   # d$data$analytics %<>%
   #   dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"),
   #                 fiscal_year = paste0("FY", stringr::str_sub(as.integer(d$info$cop_year)+1,-2)))
+
+  #TODO: This seems to no longer be required since it has been 
+  # moved to adorn_import_file
+  # Column names coming out of adorn_import_file
   # 
-  # # Selects appropriate columns based on COP or OPU tool
   # if (d$info$tool == "Data Pack") {
   #   d$data$analytics %<>%
   #     dplyr::select( ou,
