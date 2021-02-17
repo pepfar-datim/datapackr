@@ -101,7 +101,7 @@ adorn_import_file <- function(psnu_import_file,
        dplyr::rename(dataelementuid = dataelement,
                      dataelementname = dataelement.y,
                      categoryoptioncomboname =categoryoptioncombo) %>% 
-       dplyr::mutate(FY = "2021")
+       dplyr::mutate(FY = 2021)
 
    } else {
      #TODO: Do we need to throw an error here? 
