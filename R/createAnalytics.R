@@ -19,7 +19,10 @@ createAnalytics <- function(d,
       dplyr::select(
         PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
         mechanism_code = mech_code, support_type, value
-      )
+      ) %>% 
+      adorn_import_file(cop_year = d$info$cop_year,
+                        psnu_prioritizations = NULL,
+                        d2_session = d2_session)
   }
 
   if (d$info$tool == "Data Pack") {
@@ -41,88 +44,90 @@ createAnalytics <- function(d,
         dplyr::bind_rows(
           d$datim$MER,
           d$datim$subnat_impatt) %>%
-        adorn_import_file(cop_year = 2021,
+        adorn_import_file(cop_year = d$info$cop_year,
                           psnu_prioritizations = fy22_prioritizations,
                           d2_session)
     }
   }
 
-  # Add timestamp and FY ####
-  d$data$analytics %<>%
-    dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"),
-                  fiscal_year = paste0("FY", stringr::str_sub(FY,-2)))
-
-  # Selects appropriate columns based on COP or OPU tool
-  if (d$info$tool == "Data Pack") {
-    d$data$analytics %<>%
-      dplyr::select( ou,
-                     ou_id,
-                     country_name,
-                     country_uid,
-                     snu1,
-                     snu1_id,
-                     psnu,
-                     psnu_uid,
-                     prioritization,
-                     mechanism_code,
-                     mechanism_desc,
-                     partner_id,
-                     partner_desc,
-                     funding_agency  = agency,
-                     fiscal_year,
-                     dataelement_id  = dataElement,
-                     dataelement_name = dataelementname,
-                     indicator = technical_area,
-                     numerator_denominator,
-                     support_type,
-                     hts_modality,
-                     categoryoptioncombo_id = categoryOptionCombo,
-                     categoryoptioncombo_name = categoryoptioncomboname,
-                     age = Age,
-                     sex = Sex,
-                     key_population = KeyPop,
-                     resultstatus_specific = resultstatus,
-                     upload_timestamp,
-                     disagg_type,
-                     resultstatus_inclusive,
-                     top_level,
-                     target_value = value,
-                     indicator_code)
-  } else {
-    d$data$analytics %<>%
-      dplyr::select( ou,
-                     ou_id,
-                     country_name,
-                     country_uid,
-                     snu1,
-                     snu1_id,
-                     psnu,
-                     psnu_uid,
-                     mechanism_code,
-                     mechanism_desc,
-                     partner_id,
-                     partner_desc,
-                     funding_agency  = agency,
-                     fiscal_year,
-                     dataelement_id  = dataelement,
-                     dataelement_name = dataelement.y,
-                     indicator = technical_area,
-                     numerator_denominator ,
-                     support_type ,
-                     hts_modality ,
-                     categoryoptioncombo_id = categoryoptioncombouid,
-                     categoryoptioncombo_name = categoryoptioncombo,
-                     age = Age,
-                     sex = Sex,
-                     key_population = KeyPop,
-                     resultstatus_specific = resultstatus,
-                     upload_timestamp,
-                     disagg_type,
-                     resultstatus_inclusive,
-                     top_level,
-                     target_value = value,
-                     indicator_code)
-  }
+  
+  #This has been moved to adorn_import_file :point_up
+  # # Add timestamp and FY ####
+  # d$data$analytics %<>%
+  #   dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"),
+  #                 fiscal_year = paste0("FY", stringr::str_sub(as.integer(d$info$cop_year)+1,-2)))
+  # 
+  # # Selects appropriate columns based on COP or OPU tool
+  # if (d$info$tool == "Data Pack") {
+  #   d$data$analytics %<>%
+  #     dplyr::select( ou,
+  #                    ou_id,
+  #                    country_name,
+  #                    country_uid,
+  #                    snu1,
+  #                    snu1_id,
+  #                    psnu,
+  #                    psnu_uid,
+  #                    prioritization,
+  #                    mechanism_code,
+  #                    mechanism_desc,
+  #                    partner_id,
+  #                    partner_desc,
+  #                    funding_agency  = agency,
+  #                    fiscal_year,
+  #                    dataelement_id  = dataElement,
+  #                    dataelement_name = dataelementname,
+  #                    indicator = technical_area,
+  #                    numerator_denominator,
+  #                    support_type,
+  #                    hts_modality,
+  #                    categoryoptioncombo_id = categoryOptionCombo,
+  #                    categoryoptioncombo_name = categoryoptioncomboname,
+  #                    age = Age,
+  #                    sex = Sex,
+  #                    key_population = KeyPop,
+  #                    resultstatus_specific = resultstatus,
+  #                    upload_timestamp,
+  #                    disagg_type,
+  #                    resultstatus_inclusive,
+  #                    top_level,
+  #                    target_value = value,
+  #                    indicator_code)
+  # } else {
+  #   d$data$analytics %<>%
+  #     dplyr::select( ou,
+  #                    ou_id,
+  #                    country_name,
+  #                    country_uid,
+  #                    snu1,
+  #                    snu1_id,
+  #                    psnu,
+  #                    psnu_uid,
+  #                    mechanism_code,
+  #                    mechanism_desc,
+  #                    partner_id,
+  #                    partner_desc,
+  #                    funding_agency  = agency,
+  #                    fiscal_year,
+  #                    dataelement_id  = dataelement,
+  #                    dataelement_name = dataelement.y,
+  #                    indicator = technical_area,
+  #                    numerator_denominator ,
+  #                    support_type ,
+  #                    hts_modality ,
+  #                    categoryoptioncombo_id = categoryoptioncombouid,
+  #                    categoryoptioncombo_name = categoryoptioncombo,
+  #                    age = Age,
+  #                    sex = Sex,
+  #                    key_population = KeyPop,
+  #                    resultstatus_specific = resultstatus,
+  #                    upload_timestamp,
+  #                    disagg_type,
+  #                    resultstatus_inclusive,
+  #                    top_level,
+  #                    target_value = value,
+  #                    indicator_code)
+  # }
 
   return(d)
 }

@@ -59,7 +59,7 @@ adorn_import_file <- function(psnu_import_file,
   mechs <-
     getMechanismView(
       country_uids = country_uids,
-      cop_year = NULL,
+      cop_year = cop_year,
       include_dedupe = TRUE,
       include_MOH = TRUE,
       d2_session = d2_session) %>%
@@ -116,10 +116,10 @@ adorn_import_file <- function(psnu_import_file,
   # Add timestamp and FY ####
   data %<>%
     dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"),
-                  fiscal_year = paste0("FY", stringr::str_sub(FY,-2)))
+                  fiscal_year = paste0("FY", stringr::str_sub(as.integer(cop_year)+1,-2)))
   
   # Select/order columns ####
-  data %<>%
+  data %>%
     dplyr::select( ou,
                    ou_id,
                    country_name,
