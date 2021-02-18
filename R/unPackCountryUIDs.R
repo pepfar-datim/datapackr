@@ -130,7 +130,7 @@ unPackCountryUIDs <- function(submission_path,
   PSNUs <-
     readxl::read_excel(
       path = submission_path,
-      sheet = ifelse(tool %in% c("Data Pack", "Data Pack Template"), "Prioritization", "SNUxIM"),
+      sheet = ifelse(tool %in% c("Data Pack", "Data Pack Template"), "Prioritization", "PSNUxIM"),
       range = readxl::cell_limits(
         c(headerRow(tool = tool, cop_year = cop_year), 1),
         c(NA, NA)),
