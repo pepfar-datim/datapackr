@@ -70,10 +70,11 @@ unPackDataPack <- function(d,
   # Prepare SNUxIM dataset for DATIM import & validation ####
     d <- packForDATIM(d, type = "PSNUxIM")
 
-  # Create Analytics Function ####
-    interactive_print("Creating analytics...")
-    d <- createAnalytics(d, d2_session = d2_session )
   }
+  
+  # Create Analytics Function ####
+  interactive_print("Creating analytics...")
+  d <- createAnalytics(d, d2_session = d2_session )
   
   # TEST: Check that country_uids matches observed data
   observed_country_uids <-
