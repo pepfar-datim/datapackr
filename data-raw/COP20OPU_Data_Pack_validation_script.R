@@ -21,6 +21,57 @@ d <- validateMechanisms(d, d2_session = d2_session)
 
 datapack_name <-d$info$datapack_name
 
+# Defines function for later use ===============================================
+modalitySummaryTable<-function(d, yield_age_filter = "All Ages"){
+  
+  hts<- d %>%
+    purrr::pluck(.,"data") %>%
+    purrr::pluck(.,"analytics")
+  
+  if (yield_age_filter == "15+") {
+    fifteen_plus <- c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44",
+                      "45-49", "50+", "15+", "15-17", "18+")
+    
+    hts %<>% dplyr::filter(age %in% fifteen_plus)
+  } else if (yield_age_filter == "20+") {
+    twenty_plus <- c("20-24", "25-29", "30-34", "35-39",
+                     "40-44", "45-49", "50+")
+    
+    hts %<>% dplyr::filter(age %in% twenty_plus)
+  }
+  
+  hts %<>%
+    dplyr::filter(!is.na(hts_modality)) %>%
+    dplyr::filter(resultstatus_specific != "Known at Entry Positive") %>%
+    dplyr::group_by(resultstatus_inclusive, hts_modality) %>%
+    dplyr::summarise(value = sum(target_value)) %>%
+    dplyr::ungroup() %>%
+    dplyr::arrange(resultstatus_inclusive, desc(resultstatus_inclusive)) %>%
+    dplyr::mutate(resultstatus_inclusive = factor(resultstatus_inclusive, c("Unknown","Negative", "Positive")))
+  if (NROW(hts) > 0) {
+    hts %<>%
+      tidyr::pivot_wider(names_from = resultstatus_inclusive, values_from = value ) %>%
+      dplyr::mutate(yield = Positive/(Negative + Positive) * 100,
+                    modality_share = Positive / sum(Positive) * 100 ,
+                    Total = Positive + Negative) %>%
+      dplyr::select(hts_modality,Positive,Total,yield,modality_share)
+    
+    hts_total<- hts %>%
+      dplyr::select(Positive,Total) %>%
+      dplyr::mutate(hts_modality = "Total") %>%
+      dplyr::group_by(hts_modality) %>%
+      dplyr::summarise_all(sum) %>%
+      dplyr::mutate(yield = Positive/Total * 100,
+                    modality_share = 100)
+    
+    dplyr::bind_rows(hts,hts_total)
+  } else {
+    return(NULL)
+  }
+  
+  
+}
+
 # Generate Validation Messages =================================================
 
 messages_file <- file(paste("DataPack_Validation_Messages_",
