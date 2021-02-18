@@ -4,7 +4,7 @@
 # library(datapackr, lib.loc="~/datapackr/custom_datapackr/master")
 # print(paste0("USING PACKGE VERSION: ", packageVersion("datapackr")))
 
-secrets <- "~/secrets/datim.json"
+secrets <- "~/.secrets/datim.json"
 model_data_path <- "~/datapackr_test_files/Testing/support_files/model_data_pack_input_21_20210208_1_flat.rds"
 snuxim_model_data_path <- "~/datapackr_test_files/Testing/support_files/PSNUxIM_20210201_1.rds"
 output_folder <- "~/datapackr_test_files"
