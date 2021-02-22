@@ -110,7 +110,8 @@ adorn_import_file <- function(psnu_import_file,
   
   data %<>%
     dplyr::mutate(
-      FY = as.numeric(stringr::str_replace(period, "Oct|Q4", "")) + 1) %>%
+      upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"),
+      fiscal_year = as.numeric(stringr::str_replace(period, "Oct|Q4", "")) + 1 ) %>%
     dplyr::left_join(
       (map_DataPack_DATIM_DEs_COCs_local %>%
           dplyr::rename(
@@ -119,13 +120,8 @@ adorn_import_file <- function(psnu_import_file,
             KeyPop = valid_kps.name)),
       by = c("dataElement" = "dataelementuid",
              "categoryOptionCombo" = "categoryoptioncombouid",
-             "FY" = "FY")
+             "fiscal_year" = "FY")
     )
-  
-  # Add timestamp and FY ####
-  data %<>%
-    dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"),
-                  fiscal_year = paste0("FY", stringr::str_sub(as.integer(cop_year)+1,-2)))
   
   # Select/order columns ####
   data %>%
