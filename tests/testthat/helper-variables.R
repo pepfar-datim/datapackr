@@ -1,16 +1,43 @@
-# libPaths( c( .libPaths(), "custom_datapackr") )
-# unloadNamespace("datapackr")
-# detach_all_instances("datapackr", TRUE)
+unloadNamespace("datapackr")
+search_item <- paste("package", "datapackr", sep = ":")
+
+while(search_item %in% search())
+{
+  detach(search_item, unload = TRUE, character.only = TRUE)
+}
+
+##########CHANGE THIS LINE FOR NEW LIBRARY
+
+#Note to update the custom libraries the following pattern needs to be followed:
+#mkdir
+#chmod u+w
+
+# options(install.opts = "--no-staged-install")
+
+#remotes::install_github(repo = "https://github.com/pepfar-datim/datapackr.git", ref = "master", force = T, lib = "custom_datapackr/master")
+
+# .libPaths( c( .libPaths(), "~/datapackr/custom_datapackr") )
+# 
 # library(datapackr, lib.loc="~/datapackr/custom_datapackr/master")
-# print(paste0("USING PACKGE VERSION: ", packageVersion("datapackr")))
+
+#Alternatively comment out line above and use the plain library call below to test current project
+
+#try(remove.packages("datapackr"), silent = T)
+#utils::install.packages("~/datapackr", repos = NULL, type="source")
+library(datapackr)
+
+#################################################################
+
+print(paste0("USING PACKGE VERSION: ", packageVersion("datapackr")))
 
 secrets <- "~/.secrets/datim.json"
-model_data_path <- "~/datapackr_test_files/Testing/support_files/model_data_pack_input_21_20210208_1_flat.rds"
-snuxim_model_data_path <- "~/datapackr_test_files/Testing/support_files/PSNUxIM_20210201_1.rds"
-output_folder <- "~/datapackr_test_files"
-analytics_data_path <- "~/datapackr_test_files/Testing/With PSNUxIM/Data Pack_Malawi_20210121230425.xlsx"
+model_data_path <- "~/datapackr/datapackr_test_files/Testing/support_files/model_data_pack_input_21_20210208_1_flat.rds"
+snuxim_model_data_path <- "~/datapackr/datapackr_test_files/Testing/support_files/PSNUxIM_20210201_1.rds"
+output_folder <- "~/datapackr/datapackr_test_files"
+analytics_data_path <- "~/datapackr/datapackr_test_files/Testing/With PSNUxIM/Data Pack_Malawi_20210121230425.xlsx"
+zambia_path <- "~/datapackr/datapackr_test_files/Testing/No PSNUxIM/Data Pack_Zambia_20210121180718.xlsx"
+eswantini_path <- "~/datapackr/datapackr_test_files/Testing/OPU/OPU Data Pack_Eswatini_20201116165741_CDC_USAID_with dedup.xlsx"
 httptest::.mockPaths("tests/testthat")
-options(install.opts = "--no-staged-install")
 options(renv.consent = TRUE)
 renv::restore()
 

@@ -20,7 +20,7 @@ createAnalytics <- function(d,
         PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
         mechanism_code = mech_code, support_type, value
       )
-  } 
+  }  
   
   if (d$info$tool == "Data Pack") {
     if (d$info$cop_year == 2020) {

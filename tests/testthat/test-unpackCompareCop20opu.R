@@ -6,8 +6,8 @@ test_that("unpack a cop 20 data pack and compare", {
   datimutils::loginToDATIM(secrets,
                            d2_session_name = "d2_session")
   
-d <- datapackr::unPackTool("~/datapackr_test_files/Testing/OPU/OPU Data Pack_Eswatini_20201116165741_CDC_USAID_with dedup.xlsx"
-                           ,d2_session = d2_session
+d <- datapackr::unPackTool(eswantini_path,
+                           d2_session = d2_session
 )
 
 
