@@ -78,14 +78,12 @@ unPackDataPack <- function(d,
   
   # TEST: Check that country_uids matches observed data
   observed_country_uids <-
-    dplyr::bind_rows(d$data$MER,
-                     d$data$SNUxIM,
-                     d$data$SUBNAT_IMPATT) %>%
-    dplyr::select(psnuid) %>%
+    dplyr::bind_rows(d$datim) %>%
+    dplyr::select(orgUnit) %>%
     dplyr::distinct() %>%
     dplyr::left_join(datapackr::valid_PSNUs %>%
                        dplyr::select(psnu_uid, country_name, country_uid),
-                     by = c("psnuid" = "psnu_uid")) %>%
+                     by = c("orgUnit" = "psnu_uid")) %>%
     dplyr::pull(country_uid) %>%
     unique()
 
