@@ -16,8 +16,6 @@ packForDATIM_UndistributedMER <- function(d) {
       support_type = "DSD",
       mech_code = "999999"
     ) %>%
-    dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, psnuid,
-                  mech_code, support_type, value) %>%
     dplyr::left_join(., (datapackr::map_DataPack_DATIM_DEs_COCs %>%
                            dplyr::rename(Age = valid_ages.name,
                                          Sex = valid_sexes.name,

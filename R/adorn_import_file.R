@@ -68,10 +68,9 @@ adorn_import_file <- function(psnu_import_file,
   # Allow mapping of either numeric codes or alphanumeric uids
   data_codes <- data %>%
     dplyr::filter(stringr::str_detect(attributeOptionCombo, "\\d{4,}")) %>%
-    dplyr::left_join(mechs, by = c("attributeOptionCombo" = "mechanism_code")) %>%
-    dplyr::rename(mechanism_code = attributeOptionCombo,
-                  attributeOptionCombo = attributeOptionCombo.y)
-  
+    dplyr:::rename(mechanism_code = attributeOptionCombo) %>%
+    dplyr::left_join(mechs, by = c("mechanism_code" = "mechanism_code"))
+
   data_ids <- data %>%
     dplyr::filter(
       stringr::str_detect(
@@ -84,7 +83,7 @@ adorn_import_file <- function(psnu_import_file,
   # Adorn dataElements & categoryOptionCombos ####
    if (cop_year == 2021) {
     map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
-  # TODO: Is this munging still required with the map being a function of fiscal year?l
+  # TODO: Is this munging still required with the map being a function of fiscal year?
    } else if (cop_year == 2020) {
      map_DataPack_DATIM_DEs_COCs_local <- datapackr::cop20_map_DataPack_DATIM_DEs_COCs
      
@@ -100,7 +99,7 @@ adorn_import_file <- function(psnu_import_file,
      map_DataPack_DATIM_DEs_COCs_local %<>% 
        dplyr::rename(dataelementuid = dataelement,
                      dataelementname = dataelement.y,
-                     categoryoptioncomboname =categoryoptioncombo) %>% 
+                     categoryoptioncomboname = categoryoptioncombo) %>% 
        dplyr::mutate(FY = 2021)
 
    } else {
@@ -158,7 +157,5 @@ adorn_import_file <- function(psnu_import_file,
                    top_level,
                    target_value = value,
                    indicator_code)
-  
-
   
 }

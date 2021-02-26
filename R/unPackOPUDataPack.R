@@ -36,7 +36,7 @@ unPackOPUDataPack <- function(d,
   d <- packForDATIM(d, type = "OPU PSNUxIM")
   
   # Prepare data for sharing with other systems ####
-  d<-createAnalytics(d, d2_session = d2_session)
+  d <- createAnalytics(d, d2_session = d2_session)
   
 
   return(d)
