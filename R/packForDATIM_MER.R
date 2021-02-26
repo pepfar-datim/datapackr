@@ -31,7 +31,9 @@ packForDATIM_MER <- function(d) {
     
   # Add period ####
   dplyr::mutate(
-    period = paste0(FY-1,"Oct")) %>%
+    period = dplyr::case_when(
+      stringr::str_detect(indicator_code, "\\.R$") ~ paste0(FY-1,"Q4" ),
+      TRUE ~ paste0(FY-1,"Oct" ))) %>%
     
   # Add PSNU uid ####
     dplyr::mutate(
