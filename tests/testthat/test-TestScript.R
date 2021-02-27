@@ -148,7 +148,7 @@ test_that("All", {
                        , d2_session = d2_session
      )
      
-     getMechanismView(d2_session)
+     getMechanismView(d2_session = d2_session)
      
      d <- checkAnalytics(d,
                          model_data_path
