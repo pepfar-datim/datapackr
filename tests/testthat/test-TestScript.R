@@ -150,10 +150,10 @@ test_that("All", {
      
      getMechanismView(d2_session = d2_session)
      
-     d <- checkAnalytics(d,
-                         model_data_path
-                         ,d2_session = d2_session
-     )
+     # d <- checkAnalytics(d,
+     #                     model_data_path
+     #                     ,d2_session = d2_session
+     # )
      
      
      # code_list = pullFullCodeList(2021)
