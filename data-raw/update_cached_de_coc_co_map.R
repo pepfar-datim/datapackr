@@ -247,7 +247,7 @@ degs_map <- getDEGSMap(c("HWPJnUTMjEq",
   dplyr::select(-dataElementGroupSets.id) %>%
   tidyr::pivot_wider(names_from = dataElementGroupSets.name,
                      values_from = dataElementGroups.name,
-                     values_fill = NA)
+                     values_fill = list(dataElementGroups.name = NA))
 
 map_DataPack_DATIM_DEs_COCs %<>%
   dplyr::left_join(getHIVSpecific(), by = "categoryoptioncombouid") %>%
