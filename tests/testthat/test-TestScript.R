@@ -108,7 +108,7 @@ test_that("All", {
        
        packDataPack(model_data = model_data,
                     datapack_name = pick[[i,1]],
-                    country_uids = pick[[i,2]],
+                    country_uids = unlist(pick[[i,2]]),
                     template_path = NULL,
                     cop_year = 2021,
                     output_folder = output_folder,
@@ -147,7 +147,7 @@ test_that("All", {
                        output_folder
                        , d2_session = d2_session
      )
-     
+     assign(paste0("d_cop21_last", branch), d) 
      getMechanismView(d2_session = d2_session)
      
      # d <- checkAnalytics(d,
@@ -171,6 +171,7 @@ test_that("All", {
           local = TRUE)
   source("/Users/sam/Documents/GitHub/datapackr/data-raw/update_cop21_datapack_schema.R",
          local = TRUE)
+  assign(paste0("map_DataPack_DATIM_DEs_COCs_", branch), d) 
  #  source("/Users/sam/Documents/GitHub/datapackr/data-raw/produceConfigFile.R")
 
 testthat::expect_equal(1,1)
