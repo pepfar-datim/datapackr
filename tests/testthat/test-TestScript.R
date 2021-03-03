@@ -91,17 +91,17 @@ test_that("All", {
      }
      
      # unpack a cop 20 data pack
-     d <- unPackTool("/Users/sam/datapackr_test_files/Testing/OPU/OPU Data Pack_Eswatini_20201116165741_CDC_USAID_with dedup.xlsx"
+     d <- datapackr::unPackTool("/Users/sam/datapackr_test_files/Testing/OPU/OPU Data Pack_Eswatini_20201116165741_CDC_USAID_with dedup.xlsx"
                      ,d2_session = d2_session
      )
      
      assign(paste0("d_cop20_opu_", branch), d)
-     
+     #readr::write_rds(d_cop20_opu_master,"d_cop20_opu_master.rds")
      foo <- datapackr::compareData_OpuDatapackVsDatim(d 
                                                       , d2_session = d2_session
      )
      assign(paste0("compare_cop20_opu", branch), foo)  
-     
+  
      # pack a cop 21 data pack
      for (i in 1:NROW(pick)) {
        print(paste0(i," of ",NROW(pick)))
