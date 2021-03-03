@@ -16,9 +16,9 @@ while(search_item %in% search())
 
 #remotes::install_github(repo = "https://github.com/pepfar-datim/datapackr.git", ref = "master", force = T, lib = "custom_datapackr/master")
 
-# .libPaths( c( .libPaths(), "~/datapackr/custom_datapackr") )
+# .libPaths( c( .libPaths(), "~/datapackr/tests/custom_datapackr") )
 # 
-# library(datapackr, lib.loc="~/datapackr/custom_datapackr/master")
+# library(datapackr, lib.loc="~/datapackr/tests/ustom_datapackr/master")
 
 #Alternatively comment out line above and use the plain library call below to test current project
 
@@ -31,12 +31,13 @@ library(datapackr)
 print(paste0("USING PACKGE VERSION: ", packageVersion("datapackr")))
 
 secrets <- "~/.secrets/datim.json"
-model_data_path <- "~/datapackr/datapackr_test_files/Testing/support_files/model_data_pack_input_21_20210208_1_flat.rds"
-snuxim_model_data_path <- "~/datapackr/datapackr_test_files/Testing/support_files/PSNUxIM_20210201_1.rds"
-output_folder <- "~/datapackr/datapackr_test_files"
-analytics_data_path <- "~/datapackr/datapackr_test_files/Testing/With PSNUxIM/Data Pack_Malawi_20210121230425.xlsx"
-zambia_path <- "~/datapackr/datapackr_test_files/Testing/No PSNUxIM/Data Pack_Zambia_20210121180718.xlsx"
-eswantini_path <- "~/datapackr/datapackr_test_files/Testing/OPU/OPU Data Pack_Eswatini_20201116165741_CDC_USAID_with dedup.xlsx"
+model_data_path <- "~/datapackr/tests/datapackr_test_files/Testing/support_files/model_data_pack_input_21_20210208_1_flat.rds"
+snuxim_model_data_path <- "~/datapackr/tests/datapackr_test_files/Testing/support_files/PSNUxIM_20210201_1.rds"
+output_folder <- "~/datapackr/tests/datapackr_test_files"
+analytics_data_path <- "~/datapackr/tests/datapackr_test_files/Testing/With PSNUxIM/Data Pack_Malawi_20210121230425.xlsx"
+zambia_path <- "~/datapackr/tests/datapackr_test_files/Testing/No PSNUxIM/Data Pack_Zambia_20210121180718.xlsx"
+eswantini_path <- "~/datapackr/tests/datapackr_test_files/Testing/OPU/OPU Data Pack_Eswatini_20201116165741_CDC_USAID_with dedup.xlsx"
+test_directory <- "~/datapackr/tests/datapackr_test_files"
 httptest::.mockPaths("tests/testthat")
 options(renv.consent = TRUE)
 renv::restore()

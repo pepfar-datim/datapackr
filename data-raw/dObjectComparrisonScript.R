@@ -1,7 +1,7 @@
 datimutils::loginToDATIM("~/.secrets/datim.json")
 .libPaths( c( .libPaths(), "~/datapackr/custom_datapackr") )
-analytics_data_path <- "~/datapackr/datapackr_test_files/Testing/With PSNUxIM/Data Pack_Malawi_20210121230425.xlsx"
-model_data_path <- "~/datapackr/datapackr_test_files/Testing/support_files/model_data_pack_input_21_20210208_1_flat.rds"
+analytics_data_path <- "~/datapackr/tests//datapackr_test_files/Testing/With PSNUxIM/Data Pack_Malawi_20210121230425.xlsx"
+model_data_path <- "~/datapackr/tests/datapackr_test_files/Testing/support_files/model_data_pack_input_21_20210208_1_flat.rds"
 
 create_d_objects <- function(branch_1, branch_2){
   
@@ -12,7 +12,7 @@ create_d_objects <- function(branch_1, branch_2){
   {
     detach(search_item, unload = TRUE, character.only = TRUE)
   }
-  library(datapackr, lib.loc=paste0("~/datapackr/custom_datapackr/", branch_1))
+  library(datapackr, lib.loc=paste0("~/datapackr/tests/custom_datapackr/", branch_1))
   
   print(paste0("GENERATING OBJECTS WITH PACKGE VERSION: ", packageVersion("datapackr")))
   
@@ -34,7 +34,7 @@ while(search_item %in% search())
 {
   detach(search_item, unload = TRUE, character.only = TRUE)
 }
-library(datapackr, lib.loc=paste0("~/datapackr/custom_datapackr/", branch_2))
+library(datapackr, lib.loc=paste0("~/datapackr/tests/custom_datapackr/", branch_2))
 
 print(paste0("GENERATING OBJECTS WITH PACKGE VERSION: ", packageVersion("datapackr")))
 
