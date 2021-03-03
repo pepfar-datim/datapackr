@@ -15,13 +15,15 @@
 packForDATIM <- function(d, type = NULL) {
 
   if (is.null(type)) {
-    stop("Please specify data type in parameters: 'PSNUxIM', 'SUBNAT_IMPATT', 'OPU PSNUxIM'")
+    stop("Please specify data type in parameters: 'PSNUxIM', 'SUBNAT_IMPATT', 'OPU PSNUxIM', 'Undistributed MER'")
   } else if (type == "SUBNAT_IMPATT") {
     d <- exportSubnatToDATIM(d)
   } else if (type == "PSNUxIM") {
     d <- packForDATIM_MER(d)
   } else if (type == "OPU PSNUxIM") {
     d <- packForDATIM_OPU(d)
+  } else if (type == "Undistributed MER") {
+    d <- packForDATIM_UndistributedMER(d)
   } else{
     stop("Please specify data type in parameters: 'PSNUxIM', 'SUBNAT_IMPATT', 'OPU PSNUxIM'")
   }
