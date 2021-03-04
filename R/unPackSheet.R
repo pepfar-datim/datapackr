@@ -23,24 +23,17 @@ unPackDataPackSheet <- function(d, sheet) {
       .name_repair = "minimal"
     )
 
-  # If sheet is totally empty, skip
-  if (all(is.na(d$data$extract$PSNU))) {
-    d$data$extract <- NULL
-
-    return(d)
-  }
-
   # Run structural checks ####
   d <- checkColStructure(d, sheet)
 
-  # Remove duplicate columns (Take the first example) ####
+  # Remove duplicate columns (Take the first example)
   duplicate_cols <- duplicated(names(d$data$extract))
 
   if (any(duplicate_cols)) {
     d$data$extract <- d$data$extract[,-which(duplicate_cols)]
   }
 
-  # Make sure no blank column names ####
+  # Make sure no blank column names
   d$data$extract %<>%
     tibble::as_tibble(.name_repair = "unique")
 
@@ -79,18 +72,13 @@ unPackDataPackSheet <- function(d, sheet) {
     }
   }
 
-  # List Target Columns ####
+  # List Target Columns
   target_cols <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet
-                  & (col_type == "target" | (col_type == "result" & dataset == "subnat"))
+                  & col_type == "target"
   # Filter by what's in submission to avoid unknown column warning messages
                   & indicator_code %in% colnames(d$data$extract)) %>%
     dplyr::pull(indicator_code)
-
-  if (NROW(target_cols) == 0) {
-    d$data$extract <- NULL
-    return(d)
-  }
 
   # Add cols to allow compiling with other sheets ####
   d$data$extract %<>%
@@ -108,70 +96,18 @@ unPackDataPackSheet <- function(d, sheet) {
     ) %>%
     dplyr::select(PSNU, psnuid, sheet_name, Age, Sex, KeyPop,
                   dplyr::everything())
-
+  
   # TEST: No missing metadata ####
   d <- checkMissingMetadata(d, sheet)
-
-  # If PSNU has been deleted, drop the row ####
+  
+  # If PSNU has been deleted, drop the row
   d$data$extract %<>%
     dplyr::filter(!is.na(PSNU))
-
-  # TEST AGYW Tab for missing DSNUs ####
-  if (sheet == "AGYW") {
-    DataPack_DSNUs <- d$data$extract %>%
-      dplyr::select(PSNU, psnu_uid = psnuid) %>%
-      dplyr::distinct() %>%
-      dplyr::mutate(DataPack = 1)
-
-    DATIM_DSNUs <- datapackr::valid_PSNUs %>%
-      dplyr::filter(country_uid %in% d$info$country_uids) %>%
-      add_dp_psnu(.) %>%
-      dplyr::arrange(dp_psnu) %>%
-      dplyr::filter(!is.na(DREAMS)) %>%
-      dplyr::select(PSNU = dp_psnu, psnu_uid, snu1) %>%
-      dplyr::mutate(DATIM = 1)
-
-    DSNU_comparison <- DataPack_DSNUs %>%
-      dplyr::full_join(DATIM_DSNUs, by = "psnu_uid")
-
-    d$tests$DSNU_comparison <- DSNU_comparison
-    attr(d$tests$DSNU_comparison,"test_name") <- "DSNU List Comparison"
-
-    if (any(is.na(DSNU_comparison$DataPack))) {
-      missing_DSNUs <- DSNU_comparison %>%
-        dplyr::filter(is.na(DataPack))
-
-      warning_msg <- paste0(
-        "WARNING! In tab ",
-        sheet,
-        ": MISSING DREAMS SNUs found! ->  \n\t* ",
-        paste(missing_DSNUs$PSNU.y, collapse = "\n\t* "),
-        "\n")
-
-      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
-      d$info$missing_DSNUs <- TRUE
-    }
-
-    if (any(is.na(DSNU_comparison$DATIM))) {
-      invalid_DSNUs <- DSNU_comparison %>%
-        dplyr::filter(is.na(DATIM))
-
-      warning_msg <- paste0(
-        "WARNING! In tab ",
-        sheet,
-        ": INVALID DREAMS SNUs found! ->  \n\t* ",
-        paste(invalid_DSNUs$PSNU.x, collapse = "\n\t* "),
-        "\n")
-
-      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
-    }
-
-  }
-
+  
   # Check for Formula changes ####
   d <- checkFormulas(d, sheet)
 
-  # Gather all indicators as single column for easier processing ####
+  # Gather all indicators as single column for easier processing
   d$data$extract %<>%
     tidyr::gather(key = "indicator_code",
                   value = "value",
@@ -180,13 +116,6 @@ unPackDataPackSheet <- function(d, sheet) {
 
   # TEST that all Prioritizations completed ####
   if (sheet == "Prioritization") {
-
-    # Remove _Military district from Prioritization extract as this can't be assigned a prioritization ####
-    d$data$extract %<>%
-      dplyr::filter(!stringr::str_detect(PSNU, "^_Military"),
-                    # Excuse valid NA Prioritizations
-                    value != "NA")
-
     blank_prioritizations <- d$data$extract %>%
       dplyr::filter(is.na(value)) %>%
       dplyr::select(PSNU)
@@ -200,10 +129,7 @@ unPackDataPackSheet <- function(d, sheet) {
         paste0(
           "ERROR! In tab ",
           sheet,
-          ": MISSING PRIORITIZATIONS. Ensure a prioritization value is entered in each",
-          " row of the column labeled ‘SNU Prioritization’ on the Prioritization tab.",
-          " Refer to guidance on that tab and in the Data Pack User Guide to see",
-          " appropriate entry options. You must enter a prioritization value for",
+          ": MISSING PRIORITIZATIONS. You must enter a prioritization value for",
           " the following PSNUs -> \n\t* ",
           paste(blank_prioritizations$PSNU, collapse = "\n\t* "),
           "\n")
@@ -212,11 +138,16 @@ unPackDataPackSheet <- function(d, sheet) {
       d$info$has_error <- TRUE
 
     }
+  # Remove _Military district from Prioritization extract as this can't be assigned a prioritization ####
+    d$data$extract %<>%
+      dplyr::filter(!stringr::str_detect(PSNU, "^_Military"),
 
-    # Test for valid priortization values
+  # Excuse valid NA Prioritizations
+                    value != "NA")
+
+    # Test that no non-Military district is categorized as "M"
     invalid_prioritizations <- d$data$extract %>%
-      dplyr::filter(!(value %in% c("1","2","4","5","6","7","8")) )
-
+      dplyr::filter(value == "M" & !stringr::str_detect(PSNU, "^_Military"))
 
     if (NROW(invalid_prioritizations) > 0) {
       d$tests$invalid_prioritizations <- invalid_prioritizations
@@ -231,10 +162,7 @@ unPackDataPackSheet <- function(d, sheet) {
           "ERROR! In tab ",
           sheet,
           ": INVALID PRIORITIZATIONS. The following Prioritizations are not valid for",
-          " the listed PSNUs. Review the guidance on the Prioritization tab and in the",
-          " Data Pack User Guide to understand valid prioritization options. Refer to those",
-          " PSNUs flagged by this check and correct their validation values in the 'SNU Prioritization'",
-          " column on the Prioritization tab. -> \n\t* ",
+          " the listed PSNUs -> \n\t* ",
           paste(invalid_prioritizations_strings, collapse = "\n\t* "),
           "\n")
 
@@ -242,16 +170,22 @@ unPackDataPackSheet <- function(d, sheet) {
       d$info$has_error <- TRUE
     }
 
+    # Convert Prioritization from text to short-number.
+    # d$data$extract %<>%
+    #   dplyr::mutate(
+    #     value = dplyr::case_when(
+    #       stringr::str_detect(indicator_code,"IMPATT.PRIORITY_SNU")
+    #         ~ stringr::str_sub(value, start = 1, end = 2),
+    #       TRUE ~ value
+    #       )
+    #     )
   }
-
-  # TODO: Update this test to drop invalid Prioritizations, or maybe revert to prev yr prioritization
 
   # Drop NAs ####
   d$data$extract %<>%
     tidyr::drop_na(value)
 
   # TEST for non-numeric values ####
-  # TODO: Update to use checkNumericValues instead
   non_numeric <- d$data$extract %>%
     dplyr::mutate(value_numeric = suppressWarnings(as.numeric(value))) %>%
     dplyr::filter(is.na(value_numeric)) %>%
@@ -274,10 +208,7 @@ unPackDataPackSheet <- function(d, sheet) {
       paste0(
         "WARNING! In tab ",
         sheet,
-        ": NON-NUMERIC VALUES found! Please ensure all values entered against",
-        " FY22 Target columns include numeric values only — no letters or punctuation.",
-        " It may be helpful to use an Excel filter to check unique values in a column for",
-        " any non-numeric entries. ->  \n\t* ",
+        ": NON-NUMERIC VALUES found! ->  \n\t* ",
         paste(non_numeric$row_id, collapse = "\n\t* "),
         "\n")
 
@@ -307,8 +238,7 @@ unPackDataPackSheet <- function(d, sheet) {
       paste0(
         "ERROR! In tab ",
         sheet,
-        ": NEGATIVE VALUES found in the following columns! Ensure all values entered",
-        " against FY22 Targets are whole, positive, numeric values. These will be removed. -> \n\t* ",
+        ": NEGATIVE VALUES found in the following columns! These will be removed. -> \n\t* ",
         paste(unique(d$tests$negative_values$indicator_code), collapse = "\n\t* "),
         "\n")
 
@@ -339,9 +269,7 @@ unPackDataPackSheet <- function(d, sheet) {
       paste0(
         "WARNING! In tab ",
         sheet,
-        ": DECIMAL VALUES found in the following columns! Ensure all values entered",
-        " against FY22 Targets are whole, positive, numeric values. (The only exception",
-        " to this rule may be HIV_PREV.) These will be rounded. -> \n\t* ",
+        ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
         paste(unique(decimal_cols$indicator_code), collapse = "\n\t* "),
         "\n")
 

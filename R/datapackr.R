@@ -4,7 +4,7 @@
 #'
 #' datapackr: a grammar of Data Pack manipulation
 #'
-#'
+#' @description
 #' datapackr is the engine behind PEPFAR Data Packs, a tool used annually to
 #' aid PEPFAR Country Teams in setting targets for their annual Country
 #' Operating Plan (COP).

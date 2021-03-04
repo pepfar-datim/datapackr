@@ -8,8 +8,7 @@ getMechList(
   country_uids = NULL,
   include_dedupe = FALSE,
   include_MOH = FALSE,
-  cop_year = NULL,
-  d2_session = dynGet("d2_default_session", inherits = TRUE)
+  cop_year = NULL
 )
 }
 \arguments{

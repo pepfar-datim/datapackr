@@ -4,19 +4,12 @@
 \alias{unPackCountryUIDs}
 \title{Extract country uids from submitted file}
 \usage{
-unPackCountryUIDs(
-  submission_path,
-  tool = "Data Pack",
-  cop_year = getCurrentCOPYear()
-)
+unPackCountryUIDs(submission_path = NA, tool = "Data Pack")
 }
 \arguments{
 \item{submission_path}{Local path to the file to import.}
 
 \item{tool}{What type of tool is the submission file? Default is "Data Pack".}
-
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
 }
 \value{
 Character vector of country_uids.

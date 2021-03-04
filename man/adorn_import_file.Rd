@@ -4,22 +4,10 @@
 \alias{adorn_import_file}
 \title{Convert PSNU-level DATIM import file into analytics-friendly object}
 \usage{
-adorn_import_file(
-  psnu_import_file,
-  cop_year = getCurrentCOPYear(),
-  psnu_prioritizations = NULL,
-  d2_session = dynGet("d2_default_session", inherits = TRUE)
-)
+adorn_import_file(psnu_import_file)
 }
 \arguments{
-\item{psnu_import_file}{DHIS2 import file to convert}
-
-\item{cop_year}{COP Year}
-
-\item{psnu_prioritizations}{List of orgUnit, value containing prioritization
-values for each PSNU. If not included, blank prioritizations shown.}
-
-\item{d2_session}{}
+\item{psnu_import_file}{PSNU-level DATIM import file to convert}
 }
 \value{
 data

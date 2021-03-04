@@ -4,13 +4,10 @@
 \alias{adornMechanisms}
 \title{adornMechanisms(data)}
 \usage{
-adornMechanisms(
-  data,
-  d2_session = dynGet("d2_default_session", inherits = TRUE)
-)
+adornMechanisms(data)
 }
 \arguments{
-\item{data}{Dataset to adorn, typically d$data$analytics}
+\item{data}{Dataset to adorn}
 }
 \value{
 Modified data object

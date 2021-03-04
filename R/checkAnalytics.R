@@ -526,17 +526,13 @@ analyze_indexpos_ratio <- function(data) {
 #' @return d
 #'
 checkAnalytics <- function(d,
-                           model_data_path,
-                           d2_session = dynGet("d2_default_session",
-                                               inherits = TRUE)) {
+                           model_data_path) {
 
   # Start running log of all warning and information messages ####
   d$keychain$model_data_path <- model_data_path
   d$info$analytics_warning_msg <- NULL
   d$info$has_analytics_error <- FALSE
 
-  
-  #TODO: Should this not be using the actual analytics object?
   # Combine MER and SUBNAT data ####
   data <- d$datim$MER %>%
     dplyr::bind_rows(d$datim$subnat_impatt) %>%
@@ -548,7 +544,7 @@ checkAnalytics <- function(d,
     dplyr::ungroup() %>%
 
   # Adorn metadata
-    adorn_import_file(d2_session = d2_session) %>%
+    adorn_import_file() %>%
     dplyr::select(PSNU = dp_psnu, psnuid = psnu_uid,
                   indicator_code, Age, Sex, KeyPop, value) %>%
     dplyr::group_by(

@@ -2,131 +2,84 @@
 #' @importFrom magrittr %>% %<>%
 #' @title createAnalytics(d)
 #'
-#' @description Wrapper function for creation of d$data$analytics object
-#' which is suitable for export to external analytics sytems.
+#' @description Wrapper function for creation of d$data$analtyics object 
+#' which is suitable for export to external analytics sytems. 
 #'
 #' @param d Datapackr object
-#'
-#' @return Modified d object with d$data$analytics
-#'
-#'
-createAnalytics <- function(d,
-                            d2_session = dynGet("d2_default_session",
-                                                inherits = TRUE)) {
-  # Append the distributed MER data and subnat data together
-  if (d$info$tool == "OPU Data Pack") {
-    d$data$analytics <- d$datim$OPU %>% 
-      adorn_import_file(cop_year = d$info$cop_year,
-                        psnu_prioritizations = NULL,
-                        d2_session = d2_session)
-  }
-
-  if (d$info$tool == "Data Pack") {
-    if (d$info$cop_year == 2020) {
-      d$data$analytics <- dplyr::bind_rows(
-        d$data$distributedMER,
-        d$data$SUBNAT_IMPATT %>%
-          dplyr::mutate(
-            mechanism_code = "HllvX50cXC0",
-            support_type = "DSD")
-        )
-    }
-    if (d$info$cop_year == 2021) {
-  # For COP21+, get data from import files for better consistency ####
-      fy22_prioritizations <- d$datim$fy22_prioritizations %>%
-        dplyr::select(orgUnit, value)
-      
-      d$data$analytics <-
-        dplyr::bind_rows(
-          d$datim$MER,
-          d$datim$subnat_impatt) %>%
-        adorn_import_file(cop_year = d$info$cop_year,
-                          psnu_prioritizations = fy22_prioritizations,
-                          d2_session)
-    }
-  }
-
+#' 
+#' @return Modified d object with d$data$analtyics
+#' 
+#' 
+createAnalytics <- function(d) {
+  #Append the distributed MER data and subnat data together
+  d$data$analytics <- dplyr::bind_rows(
+    d$data$distributedMER,
+    dplyr::mutate(
+      d$data$SUBNAT_IMPATT,
+      mechanism_code = "HllvX50cXC0",
+      support_type = "DSD"
+    )
+  )
+  #Adorn organisation units
+  d <- adornPSNUs(d)
+  #Adorn mechanisms
+  d$data$analytics <- adornMechanisms(d$data$analytics)
+  #TODO: Centralize this fix with exportDistributeMERtoDATIM
+  map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
+  map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                       map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- "Male"
+  map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                       map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Female PWID"] <- "Female"
+  map_DataPack_DATIM_DEs_COCs_local$valid_kps.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                     map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- NA_character_
+  map_DataPack_DATIM_DEs_COCs_local$valid_kps.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                     map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Female PWID"] <- NA_character_
   
-  #This has been moved to adorn_import_file :point_up
-  # # Add timestamp and FY ####
-  # d$data$analytics %<>%
-  #   dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"),
-  #                 fiscal_year = paste0("FY", stringr::str_sub(as.integer(d$info$cop_year)+1,-2)))
-
-  #TODO: This seems to no longer be required since it has been 
-  # moved to adorn_import_file
-  # Column names coming out of adorn_import_file
-  # 
-  # if (d$info$tool == "Data Pack") {
-  #   d$data$analytics %<>%
-  #     dplyr::select( ou,
-  #                    ou_id,
-  #                    country_name,
-  #                    country_uid,
-  #                    snu1,
-  #                    snu1_id,
-  #                    psnu,
-  #                    psnu_uid,
-  #                    prioritization,
-  #                    mechanism_code,
-  #                    mechanism_desc,
-  #                    partner_id,
-  #                    partner_desc,
-  #                    funding_agency  = agency,
-  #                    fiscal_year,
-  #                    dataelement_id  = dataElement,
-  #                    dataelement_name = dataelementname,
-  #                    indicator = technical_area,
-  #                    numerator_denominator,
-  #                    support_type,
-  #                    hts_modality,
-  #                    categoryoptioncombo_id = categoryOptionCombo,
-  #                    categoryoptioncombo_name = categoryoptioncomboname,
-  #                    age = Age,
-  #                    sex = Sex,
-  #                    key_population = KeyPop,
-  #                    resultstatus_specific = resultstatus,
-  #                    upload_timestamp,
-  #                    disagg_type,
-  #                    resultstatus_inclusive,
-  #                    top_level,
-  #                    target_value = value,
-  #                    indicator_code)
-  # } else {
-  #   d$data$analytics %<>%
-  #     dplyr::select( ou,
-  #                    ou_id,
-  #                    country_name,
-  #                    country_uid,
-  #                    snu1,
-  #                    snu1_id,
-  #                    psnu,
-  #                    psnu_uid,
-  #                    mechanism_code,
-  #                    mechanism_desc,
-  #                    partner_id,
-  #                    partner_desc,
-  #                    funding_agency  = agency,
-  #                    fiscal_year,
-  #                    dataelement_id  = dataelement,
-  #                    dataelement_name = dataelement.y,
-  #                    indicator = technical_area,
-  #                    numerator_denominator ,
-  #                    support_type ,
-  #                    hts_modality ,
-  #                    categoryoptioncombo_id = categoryoptioncombouid,
-  #                    categoryoptioncombo_name = categoryoptioncombo,
-  #                    age = Age,
-  #                    sex = Sex,
-  #                    key_population = KeyPop,
-  #                    resultstatus_specific = resultstatus,
-  #                    upload_timestamp,
-  #                    disagg_type,
-  #                    resultstatus_inclusive,
-  #                    top_level,
-  #                    target_value = value,
-  #                    indicator_code)
-  # }
-
+  
+  #Adorn data element and category option group sets
+  d$data$analytics %<>%  dplyr::left_join(
+    .,
+    (
+      map_DataPack_DATIM_DEs_COCs_local %>%
+        dplyr::rename(
+          Age = valid_ages.name,
+          Sex = valid_sexes.name,
+          KeyPop = valid_kps.name
+        )
+    ),
+    by = c("Age", "Sex", "KeyPop", "indicator_code", "support_type")
+  ) %>% 
+  dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S"),
+                fiscal_year = "FY21") %>% 
+    dplyr::select( country_name,
+                   country_uid,
+                   psnu,
+                   psnuid,
+                   prioritization,
+                   mechanism_code,
+                   mechanism_desc,
+                   partner_id,
+                   partner_desc,
+                   funding_agency  = agency,
+                   fiscal_year,
+                   dataelement_id  = dataelement,
+                   dataelement_name = dataelement.y,
+                   indicator = technical_area,
+                   numerator_denominator ,
+                   support_type ,
+                   hts_modality ,
+                   categoryoptioncombo_id = categoryoptioncombouid,
+                   categoryoptioncombo_name = categoryoptioncombo,
+                   age = Age,
+                   sex = Sex, 
+                   key_population = KeyPop,
+                   resultstatus_specific = resultstatus,
+                   upload_timestamp,
+                   disagg_type,
+                   resultstatus_inclusive,
+                   top_level,
+                   target_value = value,
+                   indicator_code)
+  
   return(d)
 }
