@@ -103,57 +103,6 @@ getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
 }
 
 
-#' @export
-#' @importFrom magrittr %>% %<>%
-#' @title Pull all _Military nodes from DATIM for all PEPFAR countries
-#'
-#' @description
-#' Queries DATIM (\code{api/organisationUnits}) to retrieve the latest list of
-#' _Military nodes for each PEPFAR country.
-#'
-#' @return Dataframe of _Military names and ids, with associated Operating Units
-#' and Countries.
-#'
-getMilitaryNodes <- function(d2_session = dynGet("d2_default_session",
-                                                 inherits = TRUE)) {
-  #loginToDATIM(getOption("secrets"))
-
-  militaryNodes <- paste0(
-    d2_session$base_url,"api/",datapackr::api_version(),
-      "/organisationUnits.json?paging=false",
-      "&filter=name:$ilike:_Military",
-      #"&filter=organisationUnitGroups.id:eq:nwQbMeALRjL", (New _Mil nodes not here...)
-      "&fields=name,id,level,ancestors[id,name]") %>%
-    httr::GET(httr::timeout(180),
-              handle = d2_session$handle) %>%
-    httr::content(., "text") %>%
-    jsonlite::fromJSON(., flatten = TRUE) %>%
-    do.call(rbind.data.frame, .) %>%
-  # Tag Operating Unit and Country (name & id) - accommodate for eventuality of
-  #    _Military at level 5 in Regional OUs
-    dplyr::mutate(
-      country_uid = dplyr::case_when(
-        level == 4 ~ purrr::map_chr(ancestors,
-                              function(x) magrittr::use_series(x, id) %>%
-                                magrittr::extract(3)),
-        level == 5 ~ purrr::map_chr(ancestors,
-                                    function(x) magrittr::use_series(x, id) %>%
-                                      magrittr::extract(4))),
-      country_name = dplyr::case_when(
-        level == 4 ~ purrr::map_chr(ancestors,
-                                    function(x) magrittr::use_series(x, name) %>%
-                                      magrittr::extract(3)),
-        level == 5 ~ purrr::map_chr(ancestors,
-                                    function(x) magrittr::use_series(x, name) %>%
-                                      magrittr::extract(4))
-      )
-    ) %>%
-    dplyr::select(-ancestors)
-
-  return(militaryNodes)
-}
-
-
 #' @importFrom lazyeval interp
 #' @export
 #' @title Swap columns between dataframes
