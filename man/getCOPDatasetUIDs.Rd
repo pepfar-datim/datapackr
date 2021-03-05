@@ -21,3 +21,7 @@ a character vector with the requested uids respecting the selection in the type 
 \description{
 Pulls all uids for types argument for a specified FY.
 }
+\examples{
+getCOPDatasetUIDs(cop_year = 2020, types = c("MER", "SUBNAT", "IMPATT"))
+
+}

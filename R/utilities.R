@@ -31,33 +31,6 @@ round_trunc <- function(x) {
 
 
 #' @export
-#' @title Use the console to select OU
-#' @importFrom magrittr %>%
-#' @importFrom utils select.list
-#'
-#' @description
-#' In some cases it may be necessary to manually identify the Operating Unit
-#' associated with a submitted Data Pack. This function allows
-#' manual selection of Operating Unit using the R console.
-#'
-#' One case where this is necessarily invoked is when OU name and OU id read
-#' from a submitted Data Pack do not match one another, based on
-#' cross-reference with DATIM organization hierarchies.
-#'
-#' @return An OU name, based on input selection.
-selectOU <- function() {
-  ous <- datapackr::configFile %>%
-    dplyr::select(DataPack_name) %>%
-    dplyr::distinct()
-  promptText<-paste0("Please select the OU this file is associated with [1-",nrow(ous),"]:")
-  interactive_print(promptText)
-  selection <- utils::select.list(ous$DataPack_name,multiple=FALSE)
-  return(selection)
-}
-
-
-
-#' @export
 #' @importFrom magrittr %>% %<>%
 #' @title Pull IMPATT levels from DATIM for all PEPFAR countries
 #'

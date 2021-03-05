@@ -13,7 +13,7 @@
 #'
 #' @return a character vector with the requested uids respecting the selection in the type parameter and FY parameter.
 #'
-#' @example getCOPDatasetUIDs(cop_year = 2020, types = c("MER", "SUBNAT", "IMPATT"))
+#' @examples getCOPDatasetUIDs(cop_year = 2020, types = c("MER", "SUBNAT", "IMPATT"))
 #' 
 getCOPDatasetUIDs <- function(cop_year = getCurrentCOPYear(),
                               types = c("MER", "SUBNAT", "IMPATT"),
@@ -67,8 +67,7 @@ getCOPDatasetUIDs <- function(cop_year = getCurrentCOPYear(),
 #'
 #' @return Raw data in DATIM for a country for the COP data sets for a given COP Year.
 #'
-#' @example getCOPDataFromDATIM(country_uid = d$info$country_uids,
-#'                              cop_year = d$info$cop_year)
+#' @examples getCOPDataFromDATIM(country_uid = d$info$country_uids, cop_year = d$info$cop_year)
 #'
 getCOPDataFromDATIM <- function(country_uids,
                                 cop_year = getCurrentCOPYear(),
