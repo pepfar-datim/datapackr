@@ -126,8 +126,8 @@ compareData_DatapackVsDatim <-
     
 # Get data from DATIM using data value sets
     
-    datim_data <- getCopDataFromDatim(country_uid = d$info$country_uids, 
-                        fiscal_year_yyyy = d$info$cop_year + 1,
+    datim_data <- getCOPDataFromDATIM(country_uid = d$info$country_uids, 
+                        cop_year = d$info$cop_year,
                         d2_session = d2_session) %>%
       dplyr::filter(datim_value != 0) %>% # we don't import 0s up front so we should ignore any here
       dplyr::filter(datim_value != "")
