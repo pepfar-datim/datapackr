@@ -7,7 +7,7 @@ test_that("flattenDataPackModel", {
 # ensure results for just that country come back
 # ensure expected columns are returned
 # ensure result set has expected number of rows  
-  flat_data <- flattenDataPackModel_19(data, "AAAAAAAAAAA")
+  flat_data <- datapackr:::flattenDataPackModel_19(data, "AAAAAAAAAAA")
   testthat::expect_named(flat_data, "AAAAAAAAAAA")
   flat_data$AAAAAAAAAAA %>% testthat::expect_named(c("indicator_code",
                                                      "period",
@@ -21,10 +21,10 @@ test_that("flattenDataPackModel", {
 # call function without specifying a country
 # ensure both countries are returned  
   
-  flat_data <- flattenDataPackModel_19(data)
+  flat_data <- datapackr:::flattenDataPackModel_19(data)
   testthat::expect_named(flat_data, c("AAAAAAAAAAA", "ExtraCntry1"))
   
 # call function with a bad country "uid"
 # ensure we recieve an error
-  testthat::expect_error(flattenDataPackModel_19(data, c("AAAAAAAAAAA", "nonsense")))
+  testthat::expect_error(datapackr:::flattenDataPackModel_19(data, c("AAAAAAAAAAA", "nonsense")))
 })

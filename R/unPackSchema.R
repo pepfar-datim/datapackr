@@ -215,6 +215,17 @@ unPackSchema_datapack <- function(filepath = NULL,
                   valid_kps = valid_kps.options,
                   formula) %>%
     dplyr::arrange(sheet_num, col)
+  
+  # Add FY to identify targets across years (needed to produce import files)
+  schema %<>%
+    dplyr::mutate(
+      FY = dplyr::case_when(
+        stringr::str_detect(indicator_code, "\\.T$") ~ cop_year + 1 ,
+        stringr::str_detect(indicator_code, "\\.T_1$") ~ cop_year,
+        stringr::str_detect(indicator_code, "\\.R$") ~ cop_year - 1,
+        TRUE ~ NA_real_
+      )
+    )
 
   # Pull list of valid disaggs
   # codeList <- DEs_COCs_COs_Cs()
@@ -380,6 +391,8 @@ unPackSchema_datapack <- function(filepath = NULL,
         "\n")
       )
   }
-
+if (cop_year == 2020){
+  schema <- dplyr::select(schema, -FY)
+}
   return(schema)
 }

@@ -390,16 +390,19 @@ packSNUxIM <- function(d,
                      " These have been highlighted green for your reference."),
              "populated your PSNUxIM tab for the first time."),
       " An updated copy of your Data Pack is available for download from this app.",
-      " Please review your PSNUxIM tab and carefully review the Data Pack User Guide
-  for detailed guidance on how to use this tab.
-
-NOTE: DO NOT delete any columns in this tool, and do not add any new columns between
-existing columns.
-
-NOTE: Any external references used in cell formulas will now be corrupt and
-cause '#N/A' errors. Please review your Data Pack for these cases and correct.
-
-If you have any questions, please submit a Help Desk ticket at DATIM.Zendesk.com.",
+      " Please review your PSNUxIM tab and carefully review the Data Pack User Guide",
+      " for detailed guidance on how to use this tab.",
+      "\n\n",
+      "NOTE: Upon opening your updated PSNUxIM tab, please be sure to drag down",
+      " all formulas from column CW to the right.",
+      "\n\n",
+      "NOTE: DO NOT delete any columns in this tool, and do not add any new columns",
+      " between existing columns.",
+      "\n\n",
+      "NOTE: Any external references used in cell formulas will now be corrupt and",
+      " cause '#N/A' errors. Please review your Data Pack for these cases and correct.",
+      "\n\n",
+      "If you have any questions, please submit a Help Desk ticket at DATIM.Zendesk.com.",
       "\n")
 
   d$info$warning_msg <- append(d$info$warning_msg, warning_msg)

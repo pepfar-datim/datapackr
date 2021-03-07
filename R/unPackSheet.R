@@ -82,7 +82,7 @@ unPackDataPackSheet <- function(d, sheet) {
   # List Target Columns ####
   target_cols <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet
-                  & col_type == "target"
+                  & (col_type == "target" | (col_type == "result" & dataset == "subnat"))
   # Filter by what's in submission to avoid unknown column warning messages
                   & indicator_code %in% colnames(d$data$extract)) %>%
     dplyr::pull(indicator_code)

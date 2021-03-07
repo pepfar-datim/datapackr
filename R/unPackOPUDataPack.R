@@ -31,13 +31,14 @@ unPackOPUDataPack <- function(d,
   # Unpack updated PSNUxIM data ####
   d <- unPackOPU_PSNUxIM(d)
   
-  # Prepare data for sharing with other systems ####
-  d <- createAnalytics(d,
-                       d2_session = d2_session)
   
   # Prepare SNU x IM dataset for DATIM import & validation ####
   d <- packForDATIM(d, type = "OPU PSNUxIM")
   
+  # Prepare data for sharing with other systems ####
+  d <- createAnalytics(d, d2_session = d2_session)
+  
+
   return(d)
   
 }

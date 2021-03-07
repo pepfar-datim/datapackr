@@ -10,9 +10,9 @@ createAnalytics(d, d2_session = dynGet("d2_default_session", inherits = TRUE))
 \item{d}{Datapackr object}
 }
 \value{
-Modified d object with d$data$analtyics
+Modified d object with d$data$analytics
 }
 \description{
-Wrapper function for creation of d$data$analtyics object
+Wrapper function for creation of d$data$analytics object
 which is suitable for export to external analytics sytems.
 }

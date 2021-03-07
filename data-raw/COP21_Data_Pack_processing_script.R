@@ -3,9 +3,9 @@ library(magrittr)
 
 datapackr::loginToDATIM("~/.secrets/datim.json")
 
-snuxim_model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/PSNUxIM_20210113_1.rds"
+snuxim_model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/PSNUxIM_20210201_1.rds"
 output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/PSNUxIM Testing/Appended PSNUxIM"
-#model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/model_data_pack_input_21_20210118_1_flat.rds"
+#model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/model_data_pack_input_21_20210202_1_flat.rds"
 
 # Unpack Submitted Data Pack ####
 d <- unPackTool(cop_year = 2021)

@@ -5,7 +5,7 @@ test_that("GetDataValueSets", {
                            password = "district",
                            base_url = "https://play.dhis2.org/2.34.3/",
                            d2_session_name = "play")
-  data <- getDataValueSets(c("dataElementGroup", "orgUnit", "startDate", "endDate", "children", "limit"), 
+  data <- datapackr:::getDataValueSets(c("dataElementGroup", "orgUnit", "startDate", "endDate", "children", "limit"), 
                   c("qfxEYY9xAl6", "O6uvpzGd5pu", "2013-01-01", "2090-01-01","true","25"), 
                   d2_session = play)
   testthat::expect_named(data, c("data_element",

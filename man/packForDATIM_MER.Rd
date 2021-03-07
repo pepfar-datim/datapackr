@@ -2,7 +2,7 @@
 % Please edit documentation in R/packForDATIM_MER.R
 \name{packForDATIM_MER}
 \alias{packForDATIM_MER}
-\title{packForDATIM_OPU(d)}
+\title{packForDATIM_MER(d)}
 \usage{
 packForDATIM_MER(d)
 }
@@ -10,8 +10,8 @@ packForDATIM_MER(d)
 \item{d}{Datapackr object}
 }
 \value{
-Modified d object with a DATIM compatible data frame for import id d$datim$OPU
+Modified d object with a DATIM compatible data frame for import id d$datim$MER
 }
 \description{
-Packs extracted PSNUxIM data from OPU Data Pack for DATIM import.
+Packs extracted PSNUxIM data from COP Data Pack for DATIM import.
 }
