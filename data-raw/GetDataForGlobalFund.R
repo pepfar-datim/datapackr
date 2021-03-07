@@ -81,11 +81,12 @@ sum_over_im <- function(data){
     dplyr::summarise(datim_value = sum(datim_value)) %>%
     dplyr::ungroup()
 }
+?getCopDataFromDatim
 
 # get all 2021 target data in datim by country including dedup
 data <- purrr::map(uids,
-                   datapackr::getCopDataFromDatim,
-                   2021) %>% 
+                   datapackr::getCOPDataFromDATIM,
+                   cop_year = 2020) %>% 
   setNames(names)
 # aggregate over IM including dedup
 data <- purrr::map(names,
