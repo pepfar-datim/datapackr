@@ -62,14 +62,9 @@ unPackDataPack <- function(d,
   # Package SUBNAT/IMPATT DATIM import file ####
   d <- packForDATIM(d, type = "SUBNAT_IMPATT")
 
-  # Combine Targets with SNU x IM for PSNU x IM level targets ####
-  if (d$info$has_psnuxim) {
-    if (d$info$cop_year == 2020 )  {
-      d <- combineMER_SNUxIM(d) }
-
   # Prepare SNUxIM dataset for DATIM import & validation ####
+  if (d$info$has_psnuxim) {
     d <- packForDATIM(d, type = "PSNUxIM")
-
   }
   
   # Create Analytics Function ####
