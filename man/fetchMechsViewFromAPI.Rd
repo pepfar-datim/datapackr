@@ -12,14 +12,13 @@ fetchMechsViewFromAPI(
 )
 }
 \arguments{
-\item{operating_units}{OUs to return data for. If not supplied, returns for all.}
-
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
+\item{cop_year}{Numeric value of COP Fiscal Year to filter mechanism list by.
+Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
+\code{2019}. If a FY is not supplied, returns entire mechanism list.}
 
 \item{uids}{Character vector of uids to filter list by.}
 
-\item{d2_session}{DHIS2 Session id}
+\item{d2_session}{}
 }
 \value{
 Mechanism List

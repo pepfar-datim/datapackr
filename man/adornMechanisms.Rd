@@ -11,8 +11,6 @@ adornMechanisms(
 }
 \arguments{
 \item{data}{Dataset to adorn, typically d$data$analytics}
-
-\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Modified data object
