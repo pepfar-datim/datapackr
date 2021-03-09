@@ -30,8 +30,8 @@ checkInvalidOrgUnits <- function(d, sheet) {
     dplyr::select(PSNU) %>% 
     dplyr::mutate(sheet=sheet)
   
-  d$tests$invalid_orgunits<-dplyr::bind_rows(d$tests$invalid_orgunits,invalid_orgunits)
-  attr(d$tests$invalid_orgunits,"test_name") <- "Invalid orgunits"
+  d$tests$invalid_orgunits<-dplyr::bind_rows(d$tests$ivalid_orgunits,invalid_orgunits)
+  attr(d$tests$invalid_orgunits,"test_name")<-"Invalid orgunits"
   
   if (NROW(invalid_orgunits) > 0) {
     
