@@ -1,0 +1,300 @@
+{
+    "lastUpdated": "2020-03-20T15:05:22.305",
+    "id": "",
+    "created": "2020-03-18T18:38:27.287",
+    "name": "",
+    "displayName": "",
+    "externalAccess": false,
+    "surname": "",
+    "employer": "",
+    "email": "",
+    "lastCheckedInterpretations": "2020-03-18T19:00:09.886",
+    "firstName": "",
+    "phoneNumber": "",
+    "favorite": false,
+    "access": {
+        "read": false,
+        "update": false,
+        "externalize": false,
+        "delete": false,
+        "write": false,
+        "manage": false
+    },
+    "userCredentials": {
+        "lastUpdated": "2020-03-20T15:05:14.082",
+        "id": "",
+        "created": "2020-03-20T15:05:14.082",
+        "name": "",
+        "lastLogin": "2021-03-08T23:41:20.281",
+        "displayName": "",
+        "externalAuth": false,
+        "externalAccess": false,
+        "disabled": false,
+        "twoFA": false,
+        "passwordLastUpdated": "2020-03-20T15:05:14.082",
+        "invitation": false,
+        "selfRegistered": false,
+        "favorite": false,
+        "username": "",
+        "userInfo": {
+            "id": ""
+        },
+        "access": {
+            "read": true,
+            "update": true,
+            "externalize": false,
+            "delete": true,
+            "write": true,
+            "manage": true
+        },
+        "favorites": [
+
+        ],
+        "cogsDimensionConstraints": [
+
+        ],
+        "catDimensionConstraints": [
+
+        ],
+        "translations": [
+
+        ],
+        "userGroupAccesses": [
+
+        ],
+        "attributeValues": [
+
+        ],
+        "userRoles": [
+            {
+                "id": "saSooWeXauJ"
+            },
+            {
+                "id": "b2uHwX9YLhu"
+            },
+            {
+                "id": "NsYYVxduOTM"
+            }
+        ],
+        "userAccesses": [
+
+        ]
+    },
+    "settings": {
+        "keyMessageSmsNotification": true,
+        "keyStyle": "light_blue/light_blue.css",
+        "keyUiLocale": "en",
+        "keyAnalysisDisplayProperty": "shortName",
+        "keyMessageEmailNotification": true
+    },
+    "favorites": [
+
+    ],
+    "teiSearchOrganisationUnits": [
+
+    ],
+    "translations": [
+
+    ],
+    "organisationUnits": [
+        {
+            "id": "ybg3MO3hcf4"
+        }
+    ],
+    "dataViewOrganisationUnits": [
+        {
+            "id": "ybg3MO3hcf4"
+        }
+    ],
+    "userGroupAccesses": [
+
+    ],
+    "attributeValues": [
+
+    ],
+    "userGroups": [
+        {
+            "id": "M9Uer9SioL7"
+        },
+        {
+            "id": "gh9tn4QBbKZ"
+        },
+        {
+            "id": "CwFniyubXbx"
+        },
+        {
+            "id": "OoiLAfMTyMx"
+        },
+        {
+            "id": "BXK6wkXl2RI"
+        },
+        {
+            "id": "iuD8wUFz95X"
+        },
+        {
+            "id": "TRBfaInIiOK"
+        },
+        {
+            "id": "c6hGi8GEZot"
+        }
+    ],
+    "userAccesses": [
+
+    ],
+    "authorities": [
+        "M_dhis-web-interpretation",
+        "M_dhis-web-pivot",
+        "F_ANONYMOUS_DATA_ENTRY",
+        "M_Information",
+        "M_Datim_Support",
+        "F_SINGLE_EVENT_DATA_ENTRY",
+        "M_DATIM_Support",
+        "M_dhis-web-tracker-capture",
+        "M_ERB_Processor",
+        "M_Dashboard_Information",
+        "M_dhis-web-event-capture",
+        "M_dhis-web-maintenance-organisationunit",
+        "M_dhis-web-maps",
+        "M_Dedupe_Dashboard",
+        "M_dhis-web-reporting",
+        "M_dhis-web-event-reports",
+        "F_VIEW_EVENT_ANALYTICS",
+        "M_Approvals_Dashboard",
+        "M_dhis-web-data-visualizer",
+        "M_dhis-web-dashboard",
+        "M_Genie",
+        "M_dhis-web-cache-cleaner",
+        "M_dhis-web-event-visualizer",
+        "M_dhis-web-capture",
+        "M_dhis-web-messaging",
+        "M_dhis-web-reports",
+        "F_UNCOMPLETE_EVENT"
+    ],
+    "programs": [
+        "UvZhKSkpDy2",
+        "Jj5xXLkwqgX",
+        "ao00368haMr",
+        "LrXPO4DTuNf",
+        "P7T9v9Gufqa"
+    ],
+    "dataSets": [
+        "sBv1dj90IX6",
+        "l796jk9SW7q",
+        "nIHNMxuPUOR",
+        "HiJieecLXxN",
+        "IZ71Y2mEBJF",
+        "KwkuZhKulqs",
+        "s1sxJuqXsvV",
+        "J6Bdw3JFQ6t",
+        "O392zMXtwar",
+        "jKdHXpBfWop",
+        "ndp6aR3e1X3",
+        "h4huFdfnhhH",
+        "BWBS39fydnX",
+        "tG2hjDIaYQD",
+        "ovmC3HNi4LN",
+        "Awq346fnVLV",
+        "CS958XpDaUf",
+        "hgOW2BSUDaN",
+        "QSodwF4YG9a",
+        "f78MvV1k0rA",
+        "jTRF4LdklYA",
+        "UZ2PLqSe5Ri",
+        "JxVx2abUluG",
+        "BxIx51zpAjh",
+        "uAuIceYjpAt",
+        "ctKXzmv2CVu",
+        "mbdbMiLZ4AA",
+        "OXs3gB3RqtO",
+        "biO64JF8Ait",
+        "TBcmmtoaCBC",
+        "hIm0HGCKiPv",
+        "zL8TlPVzEBZ",
+        "ey0IaQ5wJ0b",
+        "xiTCzZJ2GPP",
+        "wvnouBMuLuE",
+        "kyZS80bOmTC",
+        "YfZot37BbTm",
+        "dMRA5AEUCxm",
+        "Va7TYyHraRn",
+        "LBSk271pP7J",
+        "EPokgbBzLhq",
+        "cihuwjoY5xP",
+        "tTK9BhvS5t3",
+        "rDAUgkkexU1",
+        "Zn27xns9Fmx",
+        "rnEToFucnJ9",
+        "x5lMwEHWSds",
+        "OzNbT46cSnx",
+        "jxnjnBAb1VD",
+        "j7jzezIhgPj",
+        "i1ajYm6k2yL",
+        "asHh1YkxBU5",
+        "zUoy5hk8r0q",
+        "KWRj80vEfHU",
+        "uN01TT331OP",
+        "j1i6JjOpxEq",
+        "CGoi5wjLHDy",
+        "lbwuIo56YoG",
+        "ePndtmDbOJj",
+        "EbZrNIkuPtc",
+        "K7FMzevlBAp",
+        "FJrq7T5emEh",
+        "gZ1FgiGUlSj",
+        "mByGopCrDvL",
+        "Pmc0yYAIi1t",
+        "j9bKklpTDBZ",
+        "sCar694kKxH",
+        "vvHCWnhULAf",
+        "i29foJcLY9Y",
+        "ZaV4VSLstg7",
+        "kuV7OezWYUj",
+        "ovYEbELCknv",
+        "VWdBdkfYntI",
+        "xJ06pxmxfU6",
+        "dNGGlQyiq9b",
+        "FsYxodZiXyH",
+        "Ir58H3zBKEC",
+        "PyD4x9oFwxJ",
+        "fi9yMqWLWVy",
+        "O3VMNi8EZSV",
+        "asptuHohmHt",
+        "LWE9GdlygD5",
+        "pnlFw2gDGHD",
+        "lvfFcexh1nB",
+        "kkXf2zXqTM0",
+        "iJ4d5HdGiqG",
+        "GiqB9vjbdwb",
+        "gc4KOv8kGlI",
+        "eyI0UOWJnDk",
+        "MqNLEXmzIzr",
+        "WbszaIdCi92",
+        "tCIW2VFd8uu",
+        "PH3bllbLw8W",
+        "N4X89PgW01w",
+        "jcS5GPoHDE0",
+        "XZfmcxHV4ie",
+        "VP0uG6tzB5l",
+        "C2G7IyPPrvD",
+        "qNf7EbhZEDT",
+        "OBhi1PUW3OL",
+        "tz1bQ3ZwUKJ",
+        "sfk9cyQSUyi",
+        "BuRoS9i851o",
+        "IOarm0ctDVL",
+        "X8sn5HE5inC",
+        "aUmlPChIptc",
+        "qzVASYuaIey",
+        "STL4izfLznL",
+        "JXKUYJqmyDd",
+        "jEzgpBt5Icf",
+        "wkdCW3M4zYT",
+        "h16ZXEdqrtn",
+        "qHyrHc4zwx4",
+        "FOSGngdDbZc",
+        "TIFlvgZAaqV",
+        "BPEyzcDb8fT",
+        "em1U5x9hhXh",
+        "e8pCA4xmEw9"
+    ]
+}
