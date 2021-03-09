@@ -2,7 +2,7 @@ devtools::install_github("https://github.com/pepfar-datim/datapackr",
                          "COP-19-Master",
                          upgrade = FALSE)
 
-country_name = "Tanzania"
+country_name = "Honduras"
 
 require(datapackr)
 require(datimvalidation)
@@ -55,6 +55,7 @@ updates <- readxl::read_xlsx(compare_flat, "updates", col_types = "text")
 updates_json <- prep_json(updates)
 
 datapackcommons::DHISLogin("~/.secrets/triage.json")
+datimutils::loginToDATIM("~/.secrets/triage.json")
 triage_base_url <- getOption("baseurl")
 
 
@@ -83,6 +84,8 @@ compare_out <- datapackr::compareData_SiteVsDatim(data,
 
 
 datapackcommons::DHISLogin("~/.secrets/datim.json")
+datimutils::loginToDATIM("~/.secrets/datim.json")
+
 prod_base_url <- getOption("baseurl")
 
 # send imports to DATIM
