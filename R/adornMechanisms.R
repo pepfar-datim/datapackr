@@ -1,12 +1,8 @@
 #' @export
 #' @title fetchMechsViewFromAPI
 #'
-#' @param operating_units
-#' @param cop_year Numeric value of COP Fiscal Year to filter mechanism list by.
-#' Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
-#' \code{2019}. If a FY is not supplied, returns entire mechanism list.
-#' @param uids Character vector of uids to filter list by.
-#' @param d2_session 
+#' @inheritParams unPackTool
+#' @inheritParams getMechanismViewFromDATIM
 #'
 #' @return Mechanism List
 #'
@@ -42,16 +38,10 @@ fetchMechsViewFromAPI <- function(operating_units = NULL,
 #' @export
 #' @title getMechanismViewFromDATIM
 #'
-#' @param operating_units
-#' @param cop_year Numeric value of COP Fiscal Year to filter mechanism list by.
-#' Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
-#' \code{2019}. If a FY is not supplied, returns entire mechanism list.
+#' @param operating_units OUs to return data for. If not supplied, returns for all.
 #' @param uids Character vector of uids to filter list by.
-#' @param include_dedupe Logical. If TRUE will include deduplication mechanisms.
-#' Default is FALSE.
-#' @param include_MOH Logical. If TRUE will include MOH mechanisms. Default is
-#' FALSE.
-#' @param d2_session 
+#' @inheritParams unPackTool
+#' @inheritParams getMechanismView
 #'
 #' @return Mechanism List
 #'
@@ -91,7 +81,13 @@ getMechanismViewFromDATIM <- function(operating_units = NULL,
 
 #' @export
 #' @importFrom magrittr %>% %<>%
-#' @title getMechanismView(d2_session, support_files_path)
+#' @title getMechanismView
+#' 
+#' @description Retrieves a view of mechanisms with partners and agencies
+#' The function will attempt to read from a cached file, if defined in
+#' the support_files_directory option has been set, and the mechs.rds file
+#' is available to be read. Otherwise, if the user is logged in, the view
+#' will be obtained from DATIM. Otherwise, an empty dataframe is returned.
 #' 
 #' @param country_uids Character vector of DATIM country IDs. This can only
 #' include countries. Regional Operating Unit uids will not be accepted. If not
@@ -103,20 +99,12 @@ getMechanismViewFromDATIM <- function(operating_units = NULL,
 #' Default is FALSE.
 #' @param include_MOH Logical. If TRUE will include MOH mechanisms. Default is
 #' FALSE.
-#' @param d2_session datimutils d2Session object
 #' @param cached_mechs_path Local file path to the cached mechanisms file. 
-#'
-#' @description Retrieves a view of mechanisms with partners and agencies
-#' The function will attempt to read from a cached file, if defined in
-#' the support_files_directory option has been set, and the mechs.rds file
-#' is available to be read. Otherwise, if the user is logged in, the view
-#' will be obtained from DATIM. Otherwise, an empty dataframe is returned.
-#'
-#' @param d2_session datimutils d2Session object
 #' @param cached_mechs_path Filepath to an RDS file containing a cached copy of the 
 #' SQL view used defined via a envionment variable.
 #' @param update_stale_cache If the cached_mechs_path file is outdated or unreadable,
 #' should a new cache be saved?
+#' @inheritParams unPackTool
 #' 
 #' @return Mechs
 #'
@@ -257,6 +245,7 @@ getMechanismView <- function(country_uids = NULL,
 #' to partner, agency and mechanism information.
 #'
 #' @param data Dataset to adorn, typically d$data$analytics
+#' @inheritParams unPackTool
 #'
 #' @return Modified data object
 #'
