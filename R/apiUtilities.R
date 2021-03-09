@@ -47,7 +47,7 @@ api_filter <- function(api_call, field, operation, match) {
     ":",
     operation,
     ":",
-    ifelse(operation == "in", paste0("[",match,"]") , match)) %>% #TODO: Accommodate match coming in as character vector instead of string
+    ifelse(operation == "in", paste0("[",paste0(match,collapse = ","),"]") , paste0(match,collapse = ","))) %>%
     utils::URLencode()
   
   return(URL)
@@ -125,6 +125,8 @@ api_sql_call <- function(sqlView, var = NULL,
       ifelse(!is.null(var),paste0("var=dataSets:",var,"&"),""),
       "paging=false") %>%
     utils::URLencode()
+  
+  print(URL)
     
   r <- 
     URL %>%
