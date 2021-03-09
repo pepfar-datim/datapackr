@@ -70,16 +70,16 @@ getCOPDatasetUIDs <- function(cop_year = getCurrentCOPYear(),
 #' @examples getCOPDataFromDATIM(country_uid = d$info$country_uids, cop_year = d$info$cop_year)
 #'
 getCOPDataFromDATIM <- function(country_uids,
-                                cop_year = getCurrentCOPYear(),
+                                cop_year,
+                                streams = c("mer_targets", "subnat_targets", "impatt"),
                                 d2_session = dynGet("d2_default_session",
                                                     inherits = TRUE)) {
   if(cop_year != 2020){
     stop("The COP year provided is not supported by the internal function getCOPDataFromDATIM")
   }
   
-  dataset_uids <- getCOPDatasetUIDs(cop_year,
-                                    d2_session = d2_session)
-  
+  dataset_uids <- datapackr::getDatasetUids(cop_year + 1, streams)
+    
   # package parameters for getDataValueSets function call
   parameters <-
     dplyr::bind_rows(
