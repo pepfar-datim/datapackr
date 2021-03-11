@@ -18,6 +18,8 @@ default_catOptCombo <- function() { "HllvX50cXC0" }
 #' exactly 5, similar to rounding in usual mathematical contexts.
 #'
 #' @param x A number.
+#' @param digits Number of digits to round to. Default is 0
+#' 
 #' @return An integer.
 #' @examples
 #' # If the first digit to be dropped is exactly 5, round_trunc() will round to
@@ -25,8 +27,13 @@ default_catOptCombo <- function() { "HllvX50cXC0" }
 #' round_trunc(0.5)
 #' round_trunc(-0.5)
 #' @export
-round_trunc <- function(x) {
-    trunc(abs(x) + 0.5) * sign(x)
+round_trunc <- function(x, digits = 0) {
+  z <- abs(x) * 10^digits
+  z <- z + 0.5
+  z <- trunc(z)
+  z <- z / 10^digits
+  z * sign(x)
+  
 }
 
 
