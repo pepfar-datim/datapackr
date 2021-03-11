@@ -25,3 +25,7 @@ Raw data in DATIM for a country for the COP data sets for a given COP Year.
 \description{
 Grab all raw data in DATIM for a country for the COP data sets for a given COP Year.
 }
+\examples{
+getCOPDataFromDATIM(country_uid = d$info$country_uids, cop_year = d$info$cop_year)
+
+}
