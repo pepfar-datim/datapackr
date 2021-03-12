@@ -20,13 +20,13 @@ compareData_DatapackVsDatim <-
         datimvalidation::remapDEs(data$dataElement,
                                   mode_in = "id",
                                   mode_out = "shortName",
-                                  d2_session = d2_session)
+                                  d2session = d2_session)
       
       data$disagg <-
         datimvalidation::remapCategoryOptionCombos(data$categoryOptionCombo,
                                                    mode_in = "id",
                                                    mode_out = "name",
-                                                   d2_session = d2_session)
+                                                   d2session = d2_session)
       
       psnus <-
         datapackr::valid_PSNUs %>% dplyr::select(psnu, psnu_uid)
@@ -74,10 +74,10 @@ compareData_DatapackVsDatim <-
 # start main processing
 # start off with dedups included
     
-    if(d$info$cop_year != 2020){
+    if(d$info$cop_year != 2021){
       stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
     }
-    d <- datapackr::exportDistributedDataToDATIM(d, keep_dedup = TRUE)
+    # d <- datapackr::exportDistributedDataToDATIM(d, keep_dedup = TRUE)
     
     d$datim$MER$value <- as.numeric(d$datim$MER$value)
     d$datim$subnat_impatt$value <-
@@ -125,7 +125,8 @@ compareData_DatapackVsDatim <-
                         cop_year = d$info$cop_year,
                         d2_session = d2_session) %>%
       dplyr::filter(value != 0) %>% # we don't import 0s up front so we should ignore any here
-      dplyr::filter(value != "")
+      dplyr::filter(value != "") %>%
+      dplyr::rename(datim_value = value)
     
 # recode dedups to be 99999 to match data pack  
     datim_data$attributeOptionCombo[datim_data$attributeOptionCombo == "00000" |
@@ -137,8 +138,7 @@ compareData_DatapackVsDatim <-
                       dataElement,
                       orgUnit,
                       categoryOptionCombo) %>%
-      dplyr::summarise(value = sum(value)) %>%
-      dplyr::rename(datim_value = value) %>%
+      dplyr::summarise(datim_value = sum(datim_value)) %>%
       dplyr::ungroup()
 
 # get rid of dedups in the data dissagregated by IM        
