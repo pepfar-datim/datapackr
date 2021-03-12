@@ -18,7 +18,7 @@ while(search_item %in% search())
 
 # .libPaths( c( .libPaths(), "~/datapackr/tests/custom_datapackr") )
 # 
-# library(datapackr, lib.loc="~/datapackr/tests/ustom_datapackr/master")
+# library(datapackr, lib.loc="~/datapackr/tests/custom_datapackr/master")
 
 #Alternatively comment out line above and use the plain library call below to test current project
 
