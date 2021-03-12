@@ -42,9 +42,9 @@ httptest::.mockPaths("tests/testthat")
 options(renv.consent = TRUE)
 renv::restore()
 
-d2_session <- list(base_url = "https://datim.org/",
-                handle = httr::handle("https://datim.org/"))
-
+print("logging into datim before tests are run")
+datimutils::loginToDATIM(secrets,
+                         d2_session_name = "d2_session")
 
 d2_default_session <- d2_session
 
