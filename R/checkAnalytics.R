@@ -535,6 +535,8 @@ checkAnalytics <- function(d,
   d$info$analytics_warning_msg <- NULL
   d$info$has_analytics_error <- FALSE
 
+  
+  #TODO: Should this not be using the actual analytics object?
   # Combine MER and SUBNAT data ####
   data <- d$datim$MER %>%
     dplyr::bind_rows(d$datim$subnat_impatt) %>%

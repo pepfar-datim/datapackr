@@ -5,17 +5,37 @@
 \title{getMechanismView(d2_session, support_files_path)}
 \usage{
 getMechanismView(
+  country_uids = NULL,
+  cop_year = NULL,
+  include_dedupe = FALSE,
+  include_MOH = FALSE,
   d2_session = dynGet("d2_default_session", inherits = TRUE),
-  cached_support_file = Sys.getenv("MECHS_SUPPORT_FILE")
+  cached_mechs_path = paste0(Sys.getenv("support_files_directory"), "mechs.rds"),
+  update_stale_cache = FALSE
 )
 }
 \arguments{
+\item{country_uids}{Character vector of DATIM country IDs. This can only
+include countries. Regional Operating Unit uids will not be accepted. If not
+supplied, returns entire mechanism list, trimmed to user's DATIM permissions.}
+
+\item{cop_year}{Numeric value of COP Fiscal Year to filter mechanism list by.
+Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
+\code{2019}. If a FY is not supplied, returns entire mechanism list.}
+
+\item{include_dedupe}{Logical. If TRUE will include deduplication mechanisms.
+Default is FALSE.}
+
+\item{include_MOH}{Logical. If TRUE will include MOH mechanisms. Default is
+FALSE.}
+
 \item{d2_session}{datimutils d2Session object}
 
-\item{cached_support_file}{An RDS file containing a cached copy of the 
+\item{cached_mechs_path}{Filepath to an RDS file containing a cached copy of the
 SQL view used defined via a envionment variable.}
 
-\item{cached_mechs_path}{Local file path to the cached mechanisms file.}
+\item{update_stale_cache}{If the cached_mechs_path file is outdated or unreadable,
+should a new cache be saved?}
 }
 \value{
 Mechs

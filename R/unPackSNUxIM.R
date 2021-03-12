@@ -29,8 +29,22 @@ unPackSNUxIM <- function(d) {
   
   if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1,1]])) {
     d$info$has_psnuxim <- FALSE
+
+    warning_msg <- 
+      paste0(
+        "WARNING! Your Data Pack needs a new PSNUxIM tab. Please select `Regenerate PSNUxIM`",
+        " to receive an updated copy of your Data Pack with new rows added",
+        " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
+        " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack,",
+        " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
+        " all changes to other tabs of your Data Pack are complete.  Once all other updates",
+        " are complete, you may return here to update your PSNUxIM tab at any time.",
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     
     return(d)
+    
   } else {d$info$has_psnuxim <- TRUE}
   
   # TEST: Duplicate Rows; Warn; Combine ####

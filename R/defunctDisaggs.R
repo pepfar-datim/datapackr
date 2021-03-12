@@ -22,7 +22,7 @@ defunctDisaggs <- function(d, sheet) {
   
   valid_disaggs <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet,
-                  col_type == "target") %>%
+                  (col_type == "target"| indicator_code == "TX_CURR_SUBNAT.R")) %>%
     dplyr::select(indicator_code, valid_ages, valid_sexes, valid_kps)
   
   defunct_disaggs <- data %>%
