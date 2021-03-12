@@ -210,7 +210,7 @@ compareData_OpuDatapackVsDatim <-
                                   inherits = TRUE)) {
     
     if(d$info$cop_year != 2020){
-      stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
+      stop("Attempting to use compareData_OpuDatapackVsDatim for unsupported COP year")
     }
     
     datapack_data <- d$datim$OPU
@@ -253,13 +253,17 @@ compareData_OpuDatapackVsDatim <-
         )
       )
     
-    # get data from datim usinfg dataValueSets
+    # get data from datim using dataValueSets
     # rename to standard names
     datim_data <-
       getDataValueSets(parameters$key,
                        parameters$value,
                        d2_session = d2_session) %>%
       dplyr::rename(
+        dataElement = data_element,
+        orgUnit = org_unit,
+        categoryOptionCombo = category_option_combo,
+        attributeOptionCombo = attribute_option_combo,
         datim_value = value) %>% 
       dplyr::select(dataElement,
                     period,
@@ -268,7 +272,7 @@ compareData_OpuDatapackVsDatim <-
                     attributeOptionCombo,
                     datim_value)
 
-# extract dedupes from import file to handle seperatly  
+# extract dedupes from import file to handle seperately  
     dedupes <- dplyr::filter(datapack_data,
                              attributeOptionCombo %in%
                                c("00000", "00001")) %>% 
