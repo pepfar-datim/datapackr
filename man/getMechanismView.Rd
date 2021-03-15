@@ -9,7 +9,7 @@ getMechanismView(
   cop_year = NULL,
   include_dedupe = FALSE,
   include_MOH = FALSE,
-  d2_session = dynGet("d2_default_session", inherits = TRUE),
+  d2_session = d2_default_session,
   cached_mechs_path = paste0(Sys.getenv("support_files_directory"), "mechs.rds"),
   update_stale_cache = FALSE
 )
@@ -31,7 +31,7 @@ FALSE.}
 
 \item{d2_session}{DHIS2 Session id}
 
-\item{cached_mechs_path}{Filepath to an RDS file containing a cached copy of the
+\item{cached_mechs_path}{Filepath to an RDS file containing a cached copy of the 
 SQL view used defined via a envionment variable.}
 
 \item{update_stale_cache}{If the cached_mechs_path file is outdated or unreadable,

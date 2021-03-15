@@ -42,11 +42,14 @@ httptest::.mockPaths("tests/testthat")
 options(renv.consent = TRUE)
 renv::restore()
 
-print("logging into datim before tests are run")
-datimutils::loginToDATIM(secrets,
-                         d2_session_name = "d2_session")
+d2_default_session<- list(base_url = "https://www.datim.org/",
+                handle = httr::handle("https://www.datim.org/"))
 
-d2_default_session <- d2_session
+# print("logging into datim before tests are run")
+# datimutils::loginToDATIM(secrets,
+#                          d2_session_name = "d2_session")
+
+#d2_default_session <- d2_session
 
 batch <- tibble::tribble(
   ~datapack_name, ~country_uids,
