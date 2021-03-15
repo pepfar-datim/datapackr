@@ -1,4 +1,3 @@
-unloadNamespace("datapackr")
 search_item <- paste("package", "datapackr", sep = ":")
 
 while(search_item %in% search())

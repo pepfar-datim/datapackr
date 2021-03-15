@@ -265,7 +265,7 @@
     },
     "datimutils": {
       "Package": "datimutils",
-      "Version": "0.1.1.0.0.0.1609918855",
+      "Version": "0.1.1",
       "Source": "Repository",
       "Repository": "RSPM",
       "RemoteSha": "85195e3386904d8ca37ec9538554549051ea7e7d",
