@@ -15,3 +15,4 @@ Makefile
 ^packrat/
 ^\.Rprofile$
 .github
+^\.circleci$
