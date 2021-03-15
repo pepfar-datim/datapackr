@@ -110,7 +110,6 @@ getMechanismView <- function(country_uids = NULL,
     mechs <-
       getMechanismViewFromDATIM(
                                 d2_session = d2_session)
-    print(can_write_file)
     if (can_write_file) {
       interactive_print(paste0("Overwriting stale mechanisms view to ", cached_mechs_path))
       saveRDS(mechs, file = cached_mechs_path)
@@ -141,7 +140,7 @@ getMechanismView <- function(country_uids = NULL,
     # Include Dedupe or MOH
       if (!include_dedupe ) {
         dedupe <- c("X8hrDf6bLDC","YGT1o7UxfFu")
-        mechs %>%  dplyr::filter( (attributeOptionCombo %in% dedupe ) == FALSE )
+        mechs %<>%  dplyr::filter( (attributeOptionCombo %in% dedupe ) == FALSE )
       }
           
       # Include Dedupe or MOH
