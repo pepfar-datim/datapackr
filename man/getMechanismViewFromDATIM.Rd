@@ -5,28 +5,10 @@
 \title{getMechanismViewFromDATIM}
 \usage{
 getMechanismViewFromDATIM(
-  operating_units = NULL,
-  cop_year = NULL,
-  uids = NULL,
-  include_dedupe = FALSE,
-  include_MOH = FALSE,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{
-\item{operating_units}{OUs to return data for. If not supplied, returns for all.}
-
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
-
-\item{uids}{Character vector of uids to filter list by.}
-
-\item{include_dedupe}{Logical. If TRUE will include deduplication mechanisms.
-Default is FALSE.}
-
-\item{include_MOH}{Logical. If TRUE will include MOH mechanisms. Default is
-FALSE.}
-
 \item{d2_session}{DHIS2 Session id}
 }
 \value{
