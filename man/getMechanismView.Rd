@@ -2,7 +2,7 @@
 % Please edit documentation in R/adornMechanisms.R
 \name{getMechanismView}
 \alias{getMechanismView}
-\title{getMechanismView(d2_session, support_files_path)}
+\title{getMechanismView}
 \usage{
 getMechanismView(
   country_uids = NULL,
@@ -29,7 +29,7 @@ Default is FALSE.}
 \item{include_MOH}{Logical. If TRUE will include MOH mechanisms. Default is
 FALSE.}
 
-\item{d2_session}{datimutils d2Session object}
+\item{d2_session}{DHIS2 Session id}
 
 \item{cached_mechs_path}{Filepath to an RDS file containing a cached copy of the
 SQL view used defined via a envionment variable.}
