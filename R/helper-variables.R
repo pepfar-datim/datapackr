@@ -5,27 +5,6 @@ while(search_item %in% search())
   detach(search_item, unload = TRUE, character.only = TRUE)
 }
 
-##########CHANGE THIS LINE FOR NEW LIBRARY
-
-#Note to update the custom libraries the following pattern needs to be followed:
-#mkdir
-#chmod u+w
-
-# options(install.opts = "--no-staged-install")
-
-#remotes::install_github(repo = "https://github.com/pepfar-datim/datapackr.git", ref = "master", force = T, lib = "custom_datapackr/master")
-
-# .libPaths( c( .libPaths(), "~/datapackr/tests/custom_datapackr") )
-# 
-# library(datapackr, lib.loc="~/datapackr/tests/custom_datapackr/master")
-
-#Alternatively comment out line above and use the plain library call below to test current project
-
-#try(remove.packages("datapackr"), silent = T)
-#utils::install.packages("~/datapackr", repos = NULL, type="source")
-
-#################################################################
-
 print(paste0("USING PACKGE VERSION: ", packageVersion("datapackr")))
 
 secrets <- "~/.secrets/datim.json"
@@ -42,10 +21,6 @@ renv::restore()
 
 d2_default_session<- list(base_url = "https://www.datim.org/",
                 handle = httr::handle("https://www.datim.org/"))
-
-# print("logging into datim before tests are run")
-# datimutils::loginToDATIM(secrets,
-#                          d2_session_name = "d2_session")
 
 d2_session <- d2_default_session 
 
