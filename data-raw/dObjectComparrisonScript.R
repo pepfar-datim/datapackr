@@ -1,5 +1,15 @@
+#Note to update the custom libraries the following pattern needs to be followed:
+#mkdir
+#chmod u+w
+
+# options(install.opts = "--no-staged-install")
+# 
+#remotes::install_github(repo = "https://github.com/pepfar-datim/datapackr.git", ref = "master", force = T, lib = "tests/custom_datapackr/master")
+
+#################################################################
+
 datimutils::loginToDATIM("~/.secrets/datim.json")
-.libPaths( c( .libPaths(), "~/datapackr/custom_datapackr") )
+.libPaths( c( .libPaths(), "~/datapackr/tests/custom_datapackr") )
 analytics_data_path <- "~/datapackr/tests/datapackr_test_files/Testing/With PSNUxIM/Data Pack_Malawi_20210121230425.xlsx"
 model_data_path <- "~/datapackr/tests/datapackr_test_files/Testing/support_files/model_data_pack_input_21_20210208_1_flat.rds"
 
@@ -53,7 +63,7 @@ return(list(b1_d1,b2_d1,b1_d2,b2_d2))
 
 }
 
-objects_view <- create_d_objects("master","4.2.2")
+objects_view <- create_d_objects("master","dev")
 all.equal(objects_view[[1]], objects_view[[2]], use.names=T)
 
 
