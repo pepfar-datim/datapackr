@@ -4,10 +4,12 @@
 \alias{round_trunc}
 \title{Round at 0.5 toward integer with highest absolute value}
 \usage{
-round_trunc(x)
+round_trunc(x, digits = 0)
 }
 \arguments{
 \item{x}{A number.}
+
+\item{digits}{Number of digits to round to. Default is 0}
 }
 \value{
 An integer.
