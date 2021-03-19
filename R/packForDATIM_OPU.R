@@ -13,7 +13,7 @@ packForDATIM_OPU <- function(d) {
     map_DataPack_DATIM_DEs_COCs_local <- 
       datapackr::cop20_map_DataPack_DATIM_DEs_COCs
   } else {
-    stop("The COP year provided is not supported by getOPUDataFromDATIM")
+    stop("The COP year provided is not supported by packForDATIM_OPU")
   }
   
   # Add dataElement & categoryOptionCombo ####
