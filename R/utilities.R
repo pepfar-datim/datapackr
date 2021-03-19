@@ -18,6 +18,8 @@ default_catOptCombo <- function() { "HllvX50cXC0" }
 #' exactly 5, similar to rounding in usual mathematical contexts.
 #'
 #' @param x A number.
+#' @param digits Number of digits to round to. Default is 0
+#' 
 #' @return An integer.
 #' @examples
 #' # If the first digit to be dropped is exactly 5, round_trunc() will round to
@@ -25,8 +27,13 @@ default_catOptCombo <- function() { "HllvX50cXC0" }
 #' round_trunc(0.5)
 #' round_trunc(-0.5)
 #' @export
-round_trunc <- function(x) {
-    trunc(abs(x) + 0.5) * sign(x)
+round_trunc <- function(x, digits = 0) {
+  z <- abs(x) * 10^digits
+  z <- z + 0.5
+  z <- trunc(z)
+  z <- z / 10^digits
+  z * sign(x)
+  
 }
 
 
@@ -316,57 +323,6 @@ isLoggedIn <- function(d2_session = dynGet("d2_default_session",
     }
 }
 
-# #' @export
-# #' @title grab all raw data in DATIM for a country for the COP data sets for a given fiscal year.
-# #'
-# #' @description
-# #' grab all raw data in DATIM for a country for the COP data sets for a given fiscal year.
-# #'
-# #' @param country_uid country_uid
-# #' @param fiscal_year_yyyy fiscal_year
-# #' @param base_url base to append api calls normally defined beforehand
-# #'
-# #' @return raw data in DATIM for a country for the COP data sets for a given fiscal year.
-# #'
-
-# getCopDataFromDatim <- function(country_uid,
-#                                 fiscal_year_yyyy,
-#                                 d2_session = dynGet("d2_default_session",
-#                                                     inherits = TRUE))
-# {
-# 
-#   dataset_uids <- getDatasetUids(fiscal_year_yyyy,
-#                                  c("targets", "subnat", "impatt"))
-# 
-#   # package parameters for getDataValueSets function call
-#   parameters <-
-#     dplyr::bind_rows(
-#       tibble::tibble(key = "dataSet", value = dataset_uids),
-#       tibble::tibble(key = "orgUnit", value = country_uid),
-#       tibble::tribble(~ key, ~ value,
-#                       "children", "true",
-#                       "categoryOptionComboIdScheme", "code",
-#                       "includeDeleted", "false",
-#                       "period", paste0(fiscal_year_yyyy - 1, "Oct")
-#       )
-#     )
-# 
-#   # get data from datim usinfg dataValueSets
-#   # rename to standard names
-#   datim_data <-
-#     getDataValueSets(parameters$key,
-#                      parameters$value,
-#                      d2_session = d2_session) %>%
-#     dplyr::rename(
-#       datim_value = value,
-#       data_element_uid = data_element,
-#       org_unit_uid = org_unit,
-#       category_option_combo_uid = category_option_combo,
-#       attribute_option_combo_code = attribute_option_combo
-#     )
-# 
-#   return(datim_data)
-# }
 
 #' @export
 #' @title getDatasetUids

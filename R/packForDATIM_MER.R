@@ -21,6 +21,7 @@ packForDATIM_MER <- function(d) {
     
   d$datim$MER <- d$data$SNUxIM %>%
     dplyr::bind_rows(agyw_data) %>%
+  
   # Add dataElement & categoryOptionCombo ####
     dplyr::left_join(., (datapackr::map_DataPack_DATIM_DEs_COCs %>%
                            dplyr::rename(Age = valid_ages.name,
@@ -33,10 +34,15 @@ packForDATIM_MER <- function(d) {
   dplyr::mutate(
     period = dplyr::case_when(
       stringr::str_detect(indicator_code, "\\.R$") ~ paste0(FY-1,"Q4" ),
-      TRUE ~ paste0(FY-1,"Oct" ))) %>%
+      TRUE ~ paste0(FY-1,"Oct" )),
+  
+  # Round value ####
+    value =
+      dplyr::case_when(
+        value_type == "integer" ~ datapackr::round_trunc(value),
+        TRUE ~ value),
     
   # Add PSNU uid ####
-    dplyr::mutate(
       psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")
     ) %>%
     
