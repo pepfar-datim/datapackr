@@ -1,0 +1,558 @@
+{
+    "lastUpdated": "2018-12-03T13:24:26.356",
+    "id": "xE7jOejl9FI",
+    "created": "2013-04-18T17:15:08.407",
+    "name": "John Traore",
+    "birthday": "1971-04-08T00:00:00.000",
+    "education": "Master of super using",
+    "gender": "gender_male",
+    "displayName": "John Traore",
+    "jobTitle": "Super user",
+    "externalAccess": false,
+    "skype": "john.traore",
+    "twitter": "john.traore",
+    "surname": "Traore",
+    "employer": "DHIS",
+    "facebookMessenger": "john.traore",
+    "introduction": "I am the super user of DHIS 2",
+    "email": "john.traore@mail.com",
+    "whatsApp": "+123123123123",
+    "languages": "English",
+    "telegram": "john.traore",
+    "lastCheckedInterpretations": "2016-10-13T11:51:34.317",
+    "firstName": "John",
+    "nationality": "Sierra Leone",
+    "interests": "Football, swimming, singing, dancing",
+    "favorite": false,
+    "access": {
+        "read": true,
+        "update": true,
+        "externalize": false,
+        "delete": true,
+        "write": true,
+        "manage": true
+    },
+    "userCredentials": {
+        "code": "admin",
+        "lastUpdated": "2018-03-07T09:46:27.763",
+        "id": "ZyjSDLHGPv4",
+        "created": "2013-04-18T17:15:08.401",
+        "name": "John Traore",
+        "lastLogin": "2021-02-16T20:43:04.953",
+        "displayName": "John Traore",
+        "externalAuth": false,
+        "externalAccess": false,
+        "disabled": false,
+        "twoFA": false,
+        "passwordLastUpdated": "2014-12-18T20:56:05.264",
+        "invitation": false,
+        "selfRegistered": false,
+        "favorite": false,
+        "username": "admin",
+        "userInfo": {
+            "id": "xE7jOejl9FI"
+        },
+        "access": {
+            "read": true,
+            "update": true,
+            "externalize": false,
+            "delete": true,
+            "write": true,
+            "manage": true
+        },
+        "lastUpdatedBy": {
+            "id": "xE7jOejl9FI"
+        },
+        "user": {
+            "id": "xE7jOejl9FI"
+        },
+        "favorites": [
+
+        ],
+        "cogsDimensionConstraints": [
+
+        ],
+        "catDimensionConstraints": [
+
+        ],
+        "translations": [
+
+        ],
+        "userGroupAccesses": [
+
+        ],
+        "attributeValues": [
+
+        ],
+        "userRoles": [
+            {
+                "id": "UYXOT4A7JMI"
+            },
+            {
+                "id": "Ufph3mGRmMo"
+            },
+            {
+                "id": "Euq3XfEIEbx"
+            },
+            {
+                "id": "aNk5AyC7ydy"
+            },
+            {
+                "id": "cUlTcejWree"
+            },
+            {
+                "id": "TMK9CMZ2V98"
+            },
+            {
+                "id": "Ql6Gew7eaX6"
+            },
+            {
+                "id": "Pqoy4DLOdMK"
+            },
+            {
+                "id": "DRdaVRtwmG5"
+            },
+            {
+                "id": "jRWSNIHdKww"
+            },
+            {
+                "id": "txB7vu1w2Pr"
+            },
+            {
+                "id": "XS0dNzuZmfH"
+            },
+            {
+                "id": "xJZBzAHI88H"
+            }
+        ],
+        "userAccesses": [
+
+        ]
+    },
+    "settings": {
+        "keyMessageSmsNotification": false,
+        "keyDbLocale": "en",
+        "keyTrackerDashboardLayout": "{\"IpHINAT79UW\":{\"widgets\":[{\"title\":\"enrollment\",\"view\":\"components/enrollment/enrollment.html\",\"show\":true,\"expand\":true,\"parent\":\"biggerWidget\",\"order\":0},{\"title\":\"indicators\",\"view\":\"components/rulebound/rulebound.html\",\"show\":true,\"expand\":true,\"parent\":\"biggerWidget\",\"order\":1},{\"title\":\"dataentry\",\"view\":\"components/dataentry/dataentry.html\",\"show\":true,\"expand\":true,\"parent\":\"biggerWidget\",\"order\":2},{\"title\":\"report\",\"view\":\"components/report/tei-report.html\",\"show\":false,\"expand\":true,\"parent\":\"biggerWidget\",\"order\":3},{\"title\":\"current_selections\",\"view\":\"components/selected/selected.html\",\"show\":false,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":0},{\"title\":\"feedback\",\"view\":\"components/rulebound/rulebound.html\",\"show\":false,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":1},{\"title\":\"profile\",\"view\":\"components/profile/profile.html\",\"show\":true,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":2},{\"title\":\"relationships\",\"view\":\"components/relationship/relationship.html\",\"show\":true,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":4},{\"title\":\"notes\",\"view\":\"components/notes/notes.html\",\"show\":true,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":5},{\"title\":\"messaging\",\"view\":\"components/messaging/messaging.html\",\"show\":true,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":5},{\"title\":\"dataentryTabular\",\"view\":\"components/dataentry/dataentry-tabular-layout.html\",\"show\":false,\"expand\":true,\"parent\":\"biggerWidget\",\"order\":3}],\"program\":\"IpHINAT79UW\"},\"ur1Edk5Oe2n\":{\"widgets\":[{\"title\":\"enrollment\",\"view\":\"components/enrollment/enrollment.html\",\"show\":true,\"expand\":true,\"parent\":\"biggerWidget\",\"order\":0},{\"title\":\"indicators\",\"view\":\"components/rulebound/rulebound.html\",\"show\":true,\"expand\":true,\"parent\":\"biggerWidget\",\"order\":1},{\"title\":\"dataentry\",\"view\":\"components/dataentry/dataentry.html\",\"show\":false,\"expand\":true,\"parent\":\"biggerWidget\",\"order\":2},{\"title\":\"report\",\"view\":\"components/report/tei-report.html\",\"show\":true,\"expand\":true,\"parent\":\"biggerWidget\",\"order\":3},{\"title\":\"current_selections\",\"view\":\"components/selected/selected.html\",\"show\":false,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":0},{\"title\":\"feedback\",\"view\":\"components/rulebound/rulebound.html\",\"show\":true,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":1},{\"title\":\"profile\",\"view\":\"components/profile/profile.html\",\"show\":true,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":2},{\"title\":\"relationships\",\"view\":\"components/relationship/relationship.html\",\"show\":true,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":3},{\"title\":\"notes\",\"view\":\"components/notes/notes.html\",\"show\":true,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":4},{\"title\":\"messaging\",\"view\":\"components/messaging/messaging.html\",\"show\":true,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":5},{\"title\":\"dataentryTabular\",\"view\":\"components/dataentry/dataentry-tabular-layout.html\",\"show\":true,\"expand\":true,\"parent\":\"biggerWidget\",\"order\":3}],\"topBarSettings\":{},\"program\":\"ur1Edk5Oe2n\",\"programStageTimeLineLayout\":{}},\"S6JUd5tcelX\":{\"widgets\":[{\"title\":\"enrollment\",\"view\":\"components/enrollment/enrollment.html\",\"show\":true,\"expand\":true,\"parent\":\"biggerWidget\",\"order\":0},{\"title\":\"indicators\",\"view\":\"components/rulebound/rulebound.html\",\"show\":true,\"expand\":true,\"parent\":\"biggerWidget\",\"order\":1,\"canBeUsedAsTopBar\":true,\"topBarView\":\"components/rulebound/rulebound-topbar.html#indicators\"},{\"title\":\"dataentry\",\"view\":\"components/dataentry/dataentry.html\",\"show\":false,\"expand\":true,\"parent\":\"biggerWidget\",\"order\":2},{\"title\":\"dataentryTabular\",\"view\":\"components/dataentry/dataentry-tabular-layout.html\",\"show\":true,\"expand\":true,\"parent\":\"biggerWidget\",\"order\":3},{\"title\":\"report\",\"view\":\"components/report/tei-report.html\",\"show\":true,\"expand\":true,\"parent\":\"biggerWidget\",\"order\":4},{\"title\":\"current_selections\",\"view\":\"components/selected/selected.html\",\"show\":false,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":0},{\"title\":\"feedback\",\"view\":\"components/rulebound/rulebound.html\",\"show\":true,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":1,\"canBeUsedAsTopBar\":true,\"topBarView\":\"components/rulebound/rulebound-topbar.html#feedback\"},{\"title\":\"profile\",\"view\":\"components/profile/profile.html\",\"show\":true,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":2,\"canBeUsedAsTopBar\":true,\"topBarView\":\"components/profile/profile-topbar.html\"},{\"title\":\"relationships\",\"view\":\"components/relationship/relationship.html\",\"show\":true,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":3},{\"title\":\"notes\",\"view\":\"components/notes/notes.html\",\"show\":true,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":4},{\"title\":\"messaging\",\"view\":\"components/messaging/messaging.html\",\"show\":false,\"expand\":true,\"parent\":\"smallerWidget\",\"order\":5}],\"topBarSettings\":{},\"program\":\"S6JUd5tcelX\",\"programStageTimeLineLayout\":{}}}",
+        "keyCurrentStyle": "light_blue/light_blue.css",
+        "keyStyle": "light_blue/light_blue.css",
+        "keyUiLocale": "en",
+        "keyAnalysisDisplayProperty": "name",
+        "keyMessageEmailNotification": false
+    },
+    "favorites": [
+
+    ],
+    "teiSearchOrganisationUnits": [
+
+    ],
+    "translations": [
+
+    ],
+    "organisationUnits": [
+        {
+            "id": "ImspTQPwCqd"
+        }
+    ],
+    "dataViewOrganisationUnits": [
+
+    ],
+    "userGroupAccesses": [
+
+    ],
+    "attributeValues": [
+
+    ],
+    "userGroups": [
+        {
+            "id": "Kk12LkEWtXp"
+        },
+        {
+            "id": "M1Qre0247G3"
+        },
+        {
+            "id": "NTC8GjJ7p8P"
+        },
+        {
+            "id": "B6JNeAQ6akX"
+        },
+        {
+            "id": "wl5cDMuUhmF"
+        },
+        {
+            "id": "QYrzIjSfI8z"
+        },
+        {
+            "id": "lFHP5lLkzVr"
+        },
+        {
+            "id": "jvrEwEJ2yZn"
+        },
+        {
+            "id": "w900PX10L7O"
+        },
+        {
+            "id": "vAvEltyXGbD"
+        },
+        {
+            "id": "GogLpGmkL0g"
+        },
+        {
+            "id": "vRoAruMnNpB"
+        },
+        {
+            "id": "z1gNAf2zUxZ"
+        },
+        {
+            "id": "gXpmQO6eEOo"
+        },
+        {
+            "id": "tH0GcNZZ1vW"
+        },
+        {
+            "id": "H9XnHoWRKCg"
+        }
+    ],
+    "userAccesses": [
+
+    ],
+    "authorities": [
+        "F_PROGRAM_INDICATOR_PUBLIC_ADD",
+        "F_SQLVIEW_EXECUTE",
+        "F_USER_VIEW",
+        "F_GENERATE_MIN_MAX_VALUES",
+        "F_VALIDATIONRULE_PUBLIC_ADD",
+        "F_CATEGORY_PRIVATE_ADD",
+        "F_INDICATORGROUPSET_PUBLIC_ADD",
+        "F_DATAVALUE_DELETE",
+        "F_EXTERNAL_MAP_LAYER_PRIVATE_ADD",
+        "F_RELATIONSHIPTYPE_DELETE",
+        "F_CATEGORY_OPTION_PRIVATE_ADD",
+        "F_SINGLE_EVENT_DATA_ENTRY",
+        "F_CATEGORY_OPTION_GROUP_PUBLIC_ADD",
+        "F_GIS_ADMIN",
+        "M_dhis-web-event-capture",
+        "F_SEND_EMAIL",
+        "F_ORGUNITGROUPSET_PRIVATE_ADD",
+        "F_INDICATOR_DELETE",
+        "M_dhis-web-event-reports",
+        "F_VIEW_UNAPPROVED_DATA",
+        "F_USERGROUP_MANAGING_RELATIONSHIPS_VIEW",
+        "F_TRACKED_ENTITY_INSTANCE_CHANGE_LOCATION",
+        "F_OPTIONGROUPSET_DELETE",
+        "F_USERGROUP_PUBLIC_ADD",
+        "F_PROGRAM_INDICATOR_GROUP_PRIVATE_ADD",
+        "F_DOCUMENT_EXTERNAL",
+        "F_PROGRAM_TRACKING_MANAGEMENT",
+        "F_TRACKED_ENTITY_ATTRIBUTE_PUBLIC_ADD",
+        "F_GENERATE_PROGRAM_SUMMARY_REPORT",
+        "F_PROGRAM_INDICATOR_DELETE",
+        "F_MOBILE_SENDSMS",
+        "F_TRACKED_ENTITY_ADD",
+        "F_TRACKED_ENTITY_MANAGEMENT",
+        "F_RELATIONSHIP_DELETE",
+        "F_VALIDATIONRULEGROUP_PUBLIC_ADD",
+        "F_REPORT_EXTERNAL",
+        "F_DOCUMENT_PRIVATE_ADD",
+        "M_dhis-web-reports",
+        "F_TRACKED_ENTITY_DELETE",
+        "F_USERGROUP_DELETE",
+        "F_PROGRAM_PRIVATE_ADD",
+        "F_CATEGORY_COMBO_PRIVATE_ADD",
+        "F_SCHEDULING_SEND_MESSAGE",
+        "F_EXTERNAL_MAP_LAYER_PUBLIC_ADD",
+        "F_PROGRAM_INDICATOR_GROUP_DELETE",
+        "F_ORGANISATIONUNIT_MOVE",
+        "M_dhis-web-usage-analytics",
+        "F_COLOR_DELETE",
+        "F_INDICATORGROUP_DELETE",
+        "F_ORGANISATIONUNIT_DELETE",
+        "F_PROGRAM_RULE_ADD",
+        "M_dhis-web-light",
+        "F_OPTIONGROUPSET_PRIVATE_ADD",
+        "F_DATA_MART_ADMIN",
+        "M_dhis-web-maintenance-mobile",
+        "F_DATASET_PUBLIC_ADD",
+        "F_CATEGORY_COMBO_DELETE",
+        "F_SECTION_DELETE",
+        "F_USER_DELETE",
+        "F_INDICATORGROUPSET_PRIVATE_ADD",
+        "F_PROGRAM_INDICATOR_PRIVATE_ADD",
+        "F_METADATA_IMPORT",
+        "M_dhis-web-maintenance-appmanager",
+        "F_EXPORT_EVENTS",
+        "M_dhis-web-maintenance-settings",
+        "F_SQLVIEW_PUBLIC_ADD",
+        "F_PERFORM_MAINTENANCE",
+        "F_COLOR_SET_ADD",
+        "F_PROGRAM_STAGE_INSTANCE_DELETE",
+        "F_METADATA_EXPORT",
+        "F_MINMAX_DATAELEMENT_ADD",
+        "F_PROGRAMSTAGE_SECTION_ADD",
+        "F_DATAELEMENTGROUP_PRIVATE_ADD",
+        "F_VALIDATIONRULE_PRIVATE_ADD",
+        "F_APPROVE_DATA",
+        "M_dhis-web-mapping",
+        "F_DATAELEMENT_PRIVATE_ADD",
+        "F_VALIDATIONCRITERIA_ADD",
+        "F_TRACKED_ENTITY_INSTANCE_SEARCH_IN_ALL_ORGUNITS",
+        "F_IGNORE_TRACKER_REQUIRED_VALUE_VALIDATION",
+        "F_PROGRAM_PUBLIC_ADD",
+        "F_CATEGORY_OPTION_GROUP_SET_PRIVATE_ADD",
+        "F_CATEGORY_OPTION_GROUP_SET_DELETE",
+        "F_USER_ADD_WITHIN_MANAGED_GROUP",
+        "M_Web_Portal",
+        "F_ORGANISATIONUNIT_ADD",
+        "M_dhis-web-user",
+        "F_LEGEND_SET_PUBLIC_ADD",
+        "F_CONSTANT_ADD",
+        "F_PREDICTORGROUP_DELETE",
+        "F_TRACKED_ENTITY_COMMENT_ADD",
+        "F_TRACKED_ENTITY_INSTANCE_MANAGEMENT",
+        "M_dhis-web-visualizer",
+        "F_INDICATOR_PUBLIC_ADD",
+        "F_INDICATORGROUP_PUBLIC_ADD",
+        "F_TRACKED_ENTITY_ATTRIBUTE_PRIVATE_ADD",
+        "M_dhis-web-maintenance",
+        "M_dhis-web-approval",
+        "F_PROGRAM_RULE_MANAGEMENT",
+        "F_TEI_CASCADE_DELETE",
+        "F_FRED_UPDATE",
+        "F_VISUALIZATION_EXTERNAL",
+        "M_dhis-web-cache-cleaner",
+        "F_EDIT_EXPIRED",
+        "F_ACCESS_TRACKED_ENTITY_ATTRIBUTES",
+        "F_PROGRAM_DASHBOARD_CONFIG_ADMIN",
+        "F_ORGANISATIONUNITLEVEL_UPDATE",
+        "F_CATEGORY_OPTION_PUBLIC_ADD",
+        "M_dhis-web-datastore",
+        "F_CATEGORY_OPTION_DELETE",
+        "M_Data_Table",
+        "M_dhis-web-menu-management",
+        "F_REPORT_PUBLIC_ADD",
+        "F_VALIDATIONRULEGROUP_DELETE",
+        "F_PROGRAM_TRACKED_ENTITY_ATTRIBUTE_GROUP_ADD",
+        "F_RELATIONSHIP_MANAGEMENT",
+        "F_COLOR_ADD",
+        "F_OPTIONSET_PRIVATE_ADD",
+        "F_PROGRAM_RULE_DELETE",
+        "F_GENERATE_STATISTICAL_PROGRAM_REPORT",
+        "F_ORGUNITGROUP_DELETE",
+        "F_DATAELEMENTGROUPSET_PRIVATE_ADD",
+        "M_dhis-web-tracker-capture",
+        "F_LOCALE_ADD",
+        "F_LEGEND_ADD",
+        "F_CATEGORY_OPTION_GROUP_PRIVATE_ADD",
+        "F_PROGRAM_INSTANCE_MANAGEMENT",
+        "M_dhis-web-reporting",
+        "F_CATEGORY_PUBLIC_ADD",
+        "F_SECTION_ADD",
+        "F_CATEGORY_COMBO_PUBLIC_ADD",
+        "M_dhis-web-maintenance-datadictionary",
+        "F_DATASET_DELETE",
+        "F_INDICATORGROUPSET_DELETE",
+        "F_USER_DELETE_WITHIN_MANAGED_GROUP",
+        "F_ADD_TRACKED_ENTITY_FORM",
+        "M_dhis-web-scheduler",
+        "F_OPTIONGROUP_PUBLIC_ADD",
+        "F_USERROLE_PRIVATE_ADD",
+        "M_dhis-web-messaging",
+        "M_dhis-web-maintenance-program",
+        "F_EXTERNALFILERESOURCE_ADD",
+        "F_MAP_EXTERNAL",
+        "M_bna_widget",
+        "F_DATAELEMENTGROUPSET_PUBLIC_ADD",
+        "F_DATAELEMENTGROUP_DELETE",
+        "F_USERGROUP_MANAGING_RELATIONSHIPS_ADD",
+        "F_RELATIONSHIP_ADD",
+        "F_ORGUNITGROUP_PRIVATE_ADD",
+        "F_DATAELEMENTGROUP_PUBLIC_ADD",
+        "F_USER_GROUPS_READ_ONLY_ADD_MEMBERS",
+        "F_LOCALE_DELETE",
+        "F_PREDICTOR_RUN",
+        "F_DATAELEMENT_DELETE",
+        "F_OPTIONGROUP_DELETE",
+        "F_LEGEND_SET_PRIVATE_ADD",
+        "F_PROGRAMSTAGE_DELETE",
+        "F_ATTRIBUTE_PUBLIC_ADD",
+        "F_TRACKED_ENTITY_FORM_DELETE",
+        "F_USERROLE_DELETE",
+        "F_DOCUMENT_DELETE",
+        "F_ORGUNITGROUPSET_DELETE",
+        "M_dhis-web-translations",
+        "M_dhis-web-sms",
+        "F_SCHEDULING_CASE_AGGREGATE_QUERY_BUILDER",
+        "F_PROGRAM_DELETE",
+        "F_VALIDATIONRULE_DELETE",
+        "F_PROGRAMDATAELEMENT_ADD",
+        "M_dhis-web-mobile",
+        "F_ACTIVITY_PLAN",
+        "F_RELATIONSHIPTYPE_PUBLIC_ADD",
+        "F_PREDICTOR_ADD",
+        "F_SQLVIEW_PRIVATE_ADD",
+        "F_EXPORT_DATA",
+        "F_OAUTH2_CLIENT_MANAGE",
+        "F_ORGUNITGROUP_PUBLIC_ADD",
+        "F_APPROVE_DATA_LOWER_LEVELS",
+        "M_Social_Media_Video",
+        "F_OPTIONSET_PUBLIC_ADD",
+        "F_EVENTCHART_EXTERNAL",
+        "M_dhis-web-dataentry",
+        "F_PROGRAM_TRACKING_SEARCH",
+        "M_dhis-web-maintenance-dataset",
+        "F_USERROLE_LIST",
+        "M_dhis-web-import-export",
+        "M_dhis-web-caseentry",
+        "F_USERROLE_PUBLIC_ADD",
+        "M_dhis-web-importexport",
+        "M_InterpretationsTest",
+        "F_ORGUNITGROUPSET_PUBLIC_ADD",
+        "F_SQLVIEW_EXTERNAL",
+        "F_REPORT_DELETE",
+        "F_DASHBOARD_PUBLIC_ADD",
+        "F_CONSTANT_DELETE",
+        "M_dhis-web-maintenance-user",
+        "F_PREDICTOR_DELETE",
+        "M_dhis-web-data-visualizer",
+        "F_DATASET_PRIVATE_ADD",
+        "F_EVENTREPORT_PUBLIC_ADD",
+        "F_PROGRAMSTAGE_SECTION_DELETE",
+        "F_TRACKED_ENTITY_UPDATE",
+        "F_CATEGORY_OPTION_GROUP_SET_PUBLIC_ADD",
+        "F_TRACKED_ENTITY_INSTANCE_DASHBOARD",
+        "F_METADATA_MANAGE",
+        "F_ANALYTICSTABLEHOOK_DELETE",
+        "F_UNCOMPLETE_EVENT",
+        "M_dhis-web-interpretation",
+        "F_LEGEND_DELETE",
+        "M_Custom_Js_Css",
+        "F_PROGRAM_INDICATOR_MANAGEMENT",
+        "F_ANONYMOUS_DATA_ENTRY",
+        "F_MAP_PUBLIC_ADD",
+        "F_PROGRAM_VALIDATION",
+        "F_SCHEDULING_ADMIN",
+        "F_TRACKED_ENTITY_COMMENT_DELETE",
+        "F_DATAELEMENT_MINMAX_DELETE",
+        "F_MOBILE_SETTINGS",
+        "F_PREDICTORGROUP_ADD",
+        "F_REPORT_PRIVATE_ADD",
+        "F_VALIDATIONRULEGROUP_PRIVATE_ADD",
+        "F_PUSH_ANALYSIS_DELETE",
+        "F_REPLICATE_USER",
+        "F_DATAVALUE_ADD",
+        "M_dhis-web-maintenance-organisationunit",
+        "F_INSERT_CUSTOM_JS_CSS",
+        "F_DATAELEMENTGROUPSET_DELETE",
+        "F_SQLVIEW_DELETE",
+        "F_ENROLLMENT_CASCADE_DELETE",
+        "F_PROGRAMDATAELEMENT_DELETE",
+        "F_TRACKED_ENTITY_INSTANCE_LIST",
+        "F_INDICATORTYPE_ADD",
+        "F_LEGEND_SET_DELETE",
+        "F_VIEW_EVENT_ANALYTICS",
+        "F_PROGRAMSTAGE_SECTION_MANAGEMENT",
+        "F_IMPORT_EVENTS",
+        "F_PROGRAM_INSTANCE_DELETE",
+        "F_INDICATOR_PRIVATE_ADD",
+        "F_TRACKED_ENTITY_INSTANCE_HISTORY",
+        "F_FRED_CREATE",
+        "F_EVENTCHART_PUBLIC_ADD",
+        "F_PUSH_ANALYSIS_ADD",
+        "M_dhis-web-event-visualizer",
+        "F_USER_ADD",
+        "F_EXTERNAL_MAP_LAYER_DELETE",
+        "F_SYSTEM_SETTING",
+        "F_ANALYTICSTABLEHOOK_ADD",
+        "F_ATTRIBUTE_PRIVATE_ADD",
+        "F_DOCUMENT_PUBLIC_ADD",
+        "F_TRACKED_ENTITY_ATTRIBUTE_DELETE",
+        "M_Easy_Visualization",
+        "F_VISUALIZATION_PUBLIC_ADD",
+        "F_DATAELEMENT_MINMAX_ADD",
+        "M_dhis-web-data-quality",
+        "M_dhis-web-pivot",
+        "F_EVENTREPORT_EXTERNAL",
+        "F_PROGRAM_RULE_UPDATE",
+        "F_DATAELEMENT_PUBLIC_ADD",
+        "M_dhis-web-validationrule",
+        "F_CONSTANT_MANAGEMENT",
+        "F_RUN_VALIDATION",
+        "F_MANAGE_TICKETS",
+        "F_GENERATE_BENEFICIARY_TABULAR_REPORT",
+        "F_OPTIONGROUP_PRIVATE_ADD",
+        "F_CATEGORY_OPTION_GROUP_DELETE",
+        "M_User_Administration",
+        "M_dhis-web-settings",
+        "F_IMPORT_DATA",
+        "F_VIEW_DATABROWSER",
+        "F_MOBILE_DELETE_SMS",
+        "F_OPTIONSET_MANAGEMENT",
+        "F_SEND_MESSAGE",
+        "F_PROGRAMSTAGE_ADD",
+        "M_dhis-web-maps",
+        "F_MINMAX_DATAELEMENT_DELETE",
+        "F_ATTRIBUTE_DELETE",
+        "F_OPTIONSET_DELETE",
+        "F_PROGRAM_TRACKING_LIST",
+        "M_dhis-web-dashboard",
+        "M_dhis-web-data-administration",
+        "F_ACCEPT_DATA_LOWER_LEVELS",
+        "F_PROGRAM_TRACKED_ENTITY_ATTRIBUTE_GROUP_DELETE",
+        "F_OPTIONGROUPSET_PUBLIC_ADD",
+        "M_dhis-web-capture",
+        "F_PROGRAM_INDICATOR_GROUP_PUBLIC_ADD",
+        "F_CATEGORY_DELETE",
+        "F_COLOR_SET_DELETE",
+        "M_dhis-web-app-management",
+        "F_INDICATORTYPE_DELETE",
+        "F_NAME_BASED_DATA_ENTRY",
+        "F_INDICATORGROUP_PRIVATE_ADD",
+        "F_FRED_DELETE",
+        "F_VALIDATIONCRITERIA_DELETE",
+        "F_PROGRAM_STAGE_INSTANCE_SEARCH"
+    ],
+    "programs": [
+        "IpHINAT79UW",
+        "WSGAb5XwJ3Y",
+        "lxAQ7Zs9VYR",
+        "uy2gU8kT1jF",
+        "fDd25txQckK",
+        "ur1Edk5Oe2n",
+        "eBAyeGv0exc",
+        "kla3mAPgvCH",
+        "MoUd5BTQ3lY",
+        "q04UBOqq3rp",
+        "VBqh0ynB2wv",
+        "qDkgAbB5Jlk",
+        "M3xtLkYBlKI",
+        "S6JUd5tcelX"
+    ],
+    "dataSets": [
+        "aLpVgfXiz0f",
+        "YFTk3VdO9av",
+        "Rl58JxmKJo2",
+        "eZDhcZi6FLP",
+        "N4fIX1HL3TQ",
+        "EDzMBk0RRji",
+        "TuL8IOPzpHh",
+        "ce7DSxx5H2I",
+        "EKWVBc5C0ms",
+        "PLq9sJluXvc",
+        "ULowA8V3ucd",
+        "QX4ZTUbOt3a",
+        "pBOMPrpg1QX",
+        "OsPTWNqq26W",
+        "BfMAe6Itzgt",
+        "V8MHeZHIrcP",
+        "YZhd4nu3mzY",
+        "Y8gAn9DfAGU",
+        "vc6nF5yZsPR",
+        "Lpw6GcnTrmS",
+        "Nyh6laLdBEJ",
+        "j38YW1Am7he",
+        "rsyjyJmYD4J",
+        "VTdjfLXXmoi",
+        "SF8FDSqw30D",
+        "lyLU2wR22tC",
+        "QWoOnLKW1xf"
+    ]
+}

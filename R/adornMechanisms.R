@@ -112,8 +112,7 @@ getMechanismView <- function(country_uids = NULL,
                              cop_year = NULL,
                              include_dedupe = FALSE,
                              include_MOH = FALSE,
-                             d2_session = dynGet("d2_default_session",
-                                                 inherits = TRUE),
+                             d2_session = d2_default_session,
                              cached_mechs_path = paste0(Sys.getenv("support_files_directory"), "mechs.rds"),
                              update_stale_cache = FALSE) {
   

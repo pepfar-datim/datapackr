@@ -7,13 +7,16 @@
 #' 
 #' @param FY Reporting FY for which to filter active code lists.
 #' @param datastream Specify MER, SUBNAT, or IMPATT, or omit to specify all.
+#' @param  d2_session the handle to use
 #' 
 #' @return Combined code list as dataframe.
 #'
 pullFullCodeList <- function(FY = getCurrentCOPYear() + 1, 
                              datastream = c("mer_targets", "mer_results",
                                             "subnat_targets", "subnat_results",
-                                            "impatt")) {
+                                            "impatt"),
+                             d2_session = dynGet("d2_default_session",
+                                                 inherits = TRUE)) {
   
   datasets_list <- character(0)
   
@@ -46,7 +49,7 @@ pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
     lapply(
       datasets_list,
       function(x){
-        cl <- pullDATIMCodeList(x)
+        cl <- pullDATIMCodeList(x, d2_session = d2_session)
         ds <- rbind(ds, cl)
         }) %>%
     do.call(rbind, .) %>%

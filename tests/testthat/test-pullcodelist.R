@@ -1,0 +1,17 @@
+context("pull code list")
+httptest::with_mock_api({
+test_that("pull code list", {
+  
+  datimutils::loginToDATIM(secrets,
+                           d2_session_name = "d2_default_session")
+  
+  datapackr::pullFullCodeList(2021, d2_session = d2_default_session)
+   
+  testthat::expect_equal(1,1)
+  
+  cleanup()
+  
+})
+})
+
+

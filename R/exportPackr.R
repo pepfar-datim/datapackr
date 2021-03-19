@@ -19,8 +19,8 @@
 #' }
 #' @param datapack_name Name you would like associated with this Data Pack.
 #' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
-#'
 exportPackr <- function(data, output_path, type, datapack_name) {
+  
   packName <- function(output_path, type, datapack_name, extension) {
     paste0(
       output_path,
@@ -63,4 +63,5 @@ exportPackr <- function(data, output_path, type, datapack_name) {
   }
 
   print(paste0("Successfully saved ",type," to ", output_file_name))
+  
 }
