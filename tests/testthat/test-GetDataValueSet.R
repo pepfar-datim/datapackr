@@ -3,7 +3,7 @@ context("Test GetDataValueSets")
 test_that("GetDataValueSets", {
   datimutils::loginToDATIM(username = "admin", 
                            password = "district",
-                           base_url = "https://play.dhis2.org/2.34.3/",
+                           base_url = "https://play.dhis2.org/2.34.4/",
                            d2_session_name = "play")
   data <- datapackr:::getDataValueSets(c("dataElementGroup", "orgUnit", "startDate", "endDate", "children", "limit"),
                   c("qfxEYY9xAl6", "O6uvpzGd5pu", "2013-01-01", "2090-01-01","true","25"), 
