@@ -8,7 +8,7 @@
 #' @param FY Reporting FY for which to filter active code lists.
 #' @param datastream Specify MER, SUBNAT, or IMPATT, or omit to specify all.
 #' @param  d2_session the handle to use
-#' 
+#'
 #' @return Combined code list as dataframe.
 #'
 pullFullCodeList <- function(FY = getCurrentCOPYear() + 1, 
