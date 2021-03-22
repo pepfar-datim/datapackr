@@ -29,12 +29,12 @@ while(search_item %in% search())
 print(paste0("USING PACKGE VERSION: ", packageVersion("datapackr")))
 
 secrets <- "~/.secrets/datim.json"
-model_data_path <- "~/datapackr/tests/datapackr_test_files/Testing/support_files/model_data_pack_input_21_20210208_1_flat.rds"
-snuxim_model_data_path <- "~/datapackr/tests/datapackr_test_files/Testing/support_files/PSNUxIM_20210201_1.rds"
+model_data_path <- "~/datapackr/tests/datapackr_test_files/Testing/support_files/model_data_pack_input_21.rds"
+snuxim_model_data_path <- "~/datapackr/tests/datapackr_test_files/Testing/support_files/PSNUxIM.rds"
 output_folder <- "~/datapackr/tests/datapackr_test_files"
-analytics_data_path <- "~/datapackr/tests/datapackr_test_files/Testing/With PSNUxIM/Data Pack_Malawi_20210121230425.xlsx"
-zambia_path <- "~/datapackr/tests/datapackr_test_files/Testing/No PSNUxIM/Data Pack_Zambia_20210121180718.xlsx"
-eswantini_path <- "~/datapackr/tests/datapackr_test_files/Testing/OPU/OPU Data Pack_Eswatini_20201116165741_CDC_USAID_with dedup.xlsx"
+analytics_data_path <- "~/datapackr/tests/datapackr_test_files/Testing/With PSNUxIM/Data_Pack_Malawi.xlsx"
+zambia_path <- "~/datapackr/tests/datapackr_test_files/Testing/No PSNUxIM/Data_Pack_Zambia.xlsx"
+eswantini_path <- "~/datapackr/tests/datapackr_test_files/Testing/OPU/OPU_Data_Pack_Eswatini.xlsx"
 test_directory <- "~/datapackr/tests/datapackr_test_files"
 httptest::.mockPaths("tests/testthat")
 options(renv.consent = TRUE)
