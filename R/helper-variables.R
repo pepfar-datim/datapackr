@@ -26,9 +26,6 @@ while(search_item %in% search())
 
 #################################################################
 
-sourceDir <- utils::getSrcDirectory(function(dummy) {dummy})
-setwd(sourceDir)
-
 print(paste0("USING PACKGE VERSION: ", packageVersion("datapackr")))
 
 secrets <- "~/.secrets/datim.json"
