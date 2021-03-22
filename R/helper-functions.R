@@ -19,7 +19,7 @@ detach_all_instances <- function(pkg, character.only = FALSE)
 
 
 cleanup <- function(){
-  file_list<-list.files("~/datapackr/tests/datapackr_test_files/", full.names = TRUE)
+  file_list<-list.files("datapackr_test_files/", full.names = TRUE)
   file_list <- file_list[grepl(".xlsx|.csv", file_list)]
   do.call(file.remove, list(file_list))
 }
