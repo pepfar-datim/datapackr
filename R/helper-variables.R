@@ -30,13 +30,13 @@ print(paste0("USING PACKGE VERSION: ", packageVersion("datapackr")))
 
 secrets <- "~/.secrets/datim.json"
 model_data_path <- "datapackr_test_files/Testing/support_files/model_data_pack_input_21.rds"
-snuxim_model_data_path <- "datapackr_test_files/Testing/support_files/PSNUxIM.rds"
+snuxim_model_data_path <- "~/datapackr_test_files/support_files/PSNUxIM.rds"
 output_folder <- "datapackr_test_files"
 analytics_data_path <- "datapackr_test_files/Testing/WithPSNUxIM/Data_Pack_Malawi.xlsx"
 zambia_path <- "datapackr_test_files/Testing/NoPSNUxIM/Data_Pack_Zambia.xlsx"
 eswantini_path <- "~/datapackr_test_files/OPU/OPU_Data_Pack_Eswatini.xlsx"
 test_directory <- "datapackr_test_files"
-httptest::.mockPaths("tests/testthat")
+httptest::.mockPaths(c("tests/testthat", "~/datapackr_test_files/mocks"))
 options(renv.consent = TRUE)
 renv::restore()
 
