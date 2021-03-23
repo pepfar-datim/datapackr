@@ -915,7 +915,7 @@
     },
     "testthat": {
       "Package": "testthat",
-      "Version": "3.0.1",
+      "Version": "3.0.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "17826764cb92d8b5aae6619896e5a161"

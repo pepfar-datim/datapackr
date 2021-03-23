@@ -62,8 +62,8 @@ create_play_spectrum_output <- function(country_uids,
                                                d2_session = d2_session) %>%
     dplyr::left_join(
       map_DataPack_DATIM_DEs_COCs_local,
-      by = c("data_element_uid" = "dataelement",
-             "category_option_combo_uid" = "categoryoptioncombouid")) %>%
+      by = c("dataElement" = "dataelement",
+             "categoryOptionCombo" = "categoryoptioncombouid")) %>%
   # Map to renovated indicator_codes
     dplyr::left_join(datapackr::updated_indicator_codes,
                      by = c("indicator_code"))
@@ -83,7 +83,7 @@ create_play_spectrum_output <- function(country_uids,
     dplyr::select(#support_type,
                   #period,
                   psnu = PSNU,
-                  psnu_uid = org_unit_uid,
+                  psnu_uid = orgUnit,
                   indicator_code = indicator_code_updated,
                   #dataelement = dataelement.y,
                   #dataelementuid = data_element_uid,
@@ -93,7 +93,7 @@ create_play_spectrum_output <- function(country_uids,
                   sex_uid = valid_sexes.id,
                   #kp_option_uid = valid_kps.id,
                   #KeyPop = valid_kps.name,
-                  value = datim_value) %>%
+                  value) %>%
     dplyr::mutate(
       indicator_code = 
         stringr::str_replace(indicator_code, "\\.T$", "\\.T_1")

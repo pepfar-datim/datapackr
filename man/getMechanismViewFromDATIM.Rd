@@ -14,9 +14,10 @@ getMechanismViewFromDATIM(
 )
 }
 \arguments{
-\item{cop_year}{Numeric value of COP Fiscal Year to filter mechanism list by.
-Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
-\code{2019}. If a FY is not supplied, returns entire mechanism list.}
+\item{operating_units}{OUs to return data for. If not supplied, returns for all.}
+
+\item{cop_year}{Specifies COP year for dating as well as selection of
+templates.}
 
 \item{uids}{Character vector of uids to filter list by.}
 
@@ -26,7 +27,7 @@ Default is FALSE.}
 \item{include_MOH}{Logical. If TRUE will include MOH mechanisms. Default is
 FALSE.}
 
-\item{d2_session}{}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Mechanism List

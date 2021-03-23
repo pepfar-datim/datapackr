@@ -7,7 +7,7 @@
 getDataValueSets(
   keys,
   values,
-  api_version = "30",
+  api_version = datapackr::api_version(),
   max_attempts = 3,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )

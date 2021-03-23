@@ -51,21 +51,21 @@ beautify <- function(data) {
                            "VMMC_CIRC (N, TA, Age/Sex/HIVStatus) TARGET"	)
   
   data$data_element <-
-    datimvalidation::remapDEs(data$data_element_uid,
+    datimvalidation::remapDEs(data$dataElement,
                               mode_in = "id",
                               mode_out = "shortName")
   
   data <- dplyr::filter(data, data_element %in% included_indicators)
   
   data$disagg <-
-    datimvalidation::remapCategoryOptionCombos(data$category_option_combo_uid,
+    datimvalidation::remapCategoryOptionCombos(data$categoryOptionCombo,
                                                mode_in = "id",
                                                mode_out = "name")
   psnus <-
     datapackr::valid_PSNUs %>% dplyr::select(psnu, psnu_uid)
 
   data %<>%
-    dplyr::left_join(psnus, by = c("org_unit_uid" = "psnu_uid")) %>% 
+    dplyr::left_join(psnus, by = c("orgUnit" = "psnu_uid")) %>% 
     dplyr::filter(!stringr::str_detect(psnu, "_Military"))
 }
 # End Beautify function
@@ -75,17 +75,17 @@ sum_over_im <- function(data){
     return(NULL)
   }  
   dplyr::group_by(data,
-                  data_element_uid,
-                  org_unit_uid,
-                  category_option_combo_uid) %>%
-    dplyr::summarise(datim_value = sum(datim_value)) %>%
+                  dataElement,
+                  orgUnit,
+                  categoryOptionCombo) %>%
+    dplyr::summarise(datim_value = sum(value)) %>%
     dplyr::ungroup()
 }
 
 # get all 2021 target data in datim by country including dedup
 data <- purrr::map(uids,
-                   datapackr::getCopDataFromDatim,
-                   2021) %>% 
+                   datapackr::getCOPDataFromDATIM,
+                   cop_year = 2020) %>% 
   setNames(names)
 # aggregate over IM including dedup
 data <- purrr::map(names,

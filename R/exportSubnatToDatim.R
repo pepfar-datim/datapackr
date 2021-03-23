@@ -30,21 +30,6 @@ exportSubnatToDATIM <- function(d) {
           value_type == "integer" ~ datapackr::round_trunc(value),
           TRUE ~ value))
     
-  # REMOVE after DATIM receives updated metadata for PMTCT SUBNAT from test-mer2 ####
-  pmtct_subnat_indicator_codes <- d$info$schema %>%
-    dplyr::filter(
-      FY %in% c(2021, 2022),
-      dataset == "subnat",
-      col_type == "target",
-      stringr::str_detect(indicator_code, "PMTCT_.*_SUBNAT")
-    ) %>%
-    dplyr::pull(indicator_code)
-  
-  SUBNAT_IMPATT %<>%
-    dplyr::filter(
-      !indicator_code %in% pmtct_subnat_indicator_codes
-    )
-    
   # Form into DATIM import file ####
   SUBNAT_IMPATT %<>%
     dplyr::select(

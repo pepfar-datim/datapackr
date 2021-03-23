@@ -5,6 +5,7 @@
 # altering the contents of data we aren't supposed to alter
 
 
+library(magrittr)
 library(tidyverse)
 original <- file.choose()
 original_sheets <- readxl::excel_sheets(original)

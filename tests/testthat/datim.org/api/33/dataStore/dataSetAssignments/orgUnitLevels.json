@@ -1,0 +1,682 @@
+{
+    "Laos": {
+        "iso3": "XAR",
+        "iso4": "LAO",
+        "name3": "Asia Region",
+        "name4": "Laos",
+        "country": 4,
+        "facility": 7,
+        "community": 5,
+        "prioritization": 5
+    },
+    "Mali": {
+        "iso3": "XWA",
+        "iso4": "MLI",
+        "name3": "West Africa Region",
+        "name4": "Mali",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Togo": {
+        "iso3": "XWA",
+        "iso4": "TGO",
+        "name3": "West Africa Region",
+        "name4": "Togo",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Benin": {
+        "iso3": "XWA",
+        "iso4": "BEN",
+        "name3": "West Africa Region",
+        "name4": "Benin",
+        "country": 4,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 5
+    },
+    "Burma": {
+        "iso3": "XAR",
+        "iso4": "MMR",
+        "name3": "Asia Region",
+        "name4": "Burma",
+        "country": 4,
+        "facility": 8,
+        "community": 7,
+        "prioritization": 7
+    },
+    "China": {
+        "iso3": "XAR",
+        "iso4": "CHN",
+        "name3": "Asia Region",
+        "name4": "China",
+        "country": 4,
+        "facility": 8,
+        "community": 7,
+        "prioritization": 5
+    },
+    "Ghana": {
+        "iso3": "XWA",
+        "iso4": "GHA",
+        "name3": "West Africa Region",
+        "name4": "Ghana",
+        "country": 4,
+        "facility": 8,
+        "community": 6,
+        "prioritization": 6
+    },
+    "Haiti": {
+        "iso3": "HTI",
+        "iso4": "",
+        "name3": "Haiti",
+        "name4": "",
+        "country": 3,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "India": {
+        "iso3": "XAR",
+        "iso4": "IND",
+        "name3": "Asia Region",
+        "name4": "India",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 6
+    },
+    "Kenya": {
+        "iso3": "KEN",
+        "iso4": "",
+        "name3": "Kenya",
+        "name4": "",
+        "country": 3,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 4
+    },
+    "Nepal": {
+        "iso3": "XAR",
+        "iso4": "NPL",
+        "name3": "Asia Region",
+        "name4": "Nepal",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 6
+    },
+    "Angola": {
+        "iso3": "AGO",
+        "iso4": "",
+        "name3": "Angola",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 4
+    },
+    "Belize": {
+        "iso3": "XWH",
+        "iso4": "BLZ",
+        "name3": "Western Hemisphere Region",
+        "name4": "Belize",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Brazil": {
+        "iso3": "XWH",
+        "iso4": "BRA",
+        "name3": "Western Hemisphere Region",
+        "name4": "Brazil",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 6
+    },
+    "Guyana": {
+        "iso3": "XWH",
+        "iso4": "GUY",
+        "name3": "Western Hemisphere Region",
+        "name4": "Guyana",
+        "country": 4,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 4
+    },
+    "Malawi": {
+        "iso3": "MWI",
+        "iso4": "",
+        "name3": "Malawi",
+        "name4": "",
+        "country": 3,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 6
+    },
+    "Panama": {
+        "iso3": "XWH",
+        "iso4": "PAN",
+        "name3": "Western Hemisphere Region",
+        "name4": "Panama",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Rwanda": {
+        "iso3": "RWA",
+        "iso4": "",
+        "name3": "Rwanda",
+        "name4": "",
+        "country": 3,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 4
+    },
+    "Uganda": {
+        "iso3": "UGA",
+        "iso4": "",
+        "name3": "Uganda",
+        "name4": "",
+        "country": 3,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Zambia": {
+        "iso3": "ZMB",
+        "iso4": "",
+        "name3": "Zambia",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 5
+    },
+    "Bahamas": {
+        "iso3": "XWH",
+        "iso4": "BHS",
+        "name3": "Western Hemisphere Region",
+        "name4": "Bahamas",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 4
+    },
+    "Burundi": {
+        "iso3": "BDI",
+        "iso4": "",
+        "name3": "Burundi",
+        "name4": "",
+        "country": 3,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Grenada": {
+        "iso3": "XWH",
+        "iso4": "GRD",
+        "name3": "Western Hemisphere Region",
+        "name4": "Grenada",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 4
+    },
+    "Jamaica": {
+        "iso3": "XWH",
+        "iso4": "JAM",
+        "name3": "Western Hemisphere Region",
+        "name4": "Jamaica",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 4
+    },
+    "Lesotho": {
+        "iso3": "LSO",
+        "iso4": "",
+        "name3": "Lesotho",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 4
+    },
+    "Liberia": {
+        "iso3": "XWA",
+        "iso4": "LBR",
+        "name3": "West Africa Region",
+        "name4": "Liberia",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Namibia": {
+        "iso3": "NAM",
+        "iso4": "",
+        "name3": "Namibia",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 5
+    },
+    "Nigeria": {
+        "iso3": "NGA",
+        "iso4": "",
+        "name3": "Nigeria",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 4
+    },
+    "Senegal": {
+        "iso3": "XWA",
+        "iso4": "SEN",
+        "name3": "West Africa Region",
+        "name4": "Senegal",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Ukraine": {
+        "iso3": "UKR",
+        "iso4": "",
+        "name3": "Ukraine",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 4,
+        "prioritization": 4
+    },
+    "Vietnam": {
+        "iso3": "VNM",
+        "iso4": "",
+        "name3": "Vietnam",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 4
+    },
+    "Barbados": {
+        "iso3": "XWH",
+        "iso4": "BRB",
+        "name3": "Western Hemisphere Region",
+        "name4": "Barbados",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 4
+    },
+    "Botswana": {
+        "iso3": "BWA",
+        "iso4": "",
+        "name3": "Botswana",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 5
+    },
+    "Cambodia": {
+        "iso3": "XAR",
+        "iso4": "KHM",
+        "name3": "Asia Region",
+        "name4": "Cambodia",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Cameroon": {
+        "iso3": "CMR",
+        "iso4": "",
+        "name3": "Cameroon",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 5
+    },
+    "Dominica": {
+        "iso3": "XWH",
+        "iso4": "DMA",
+        "name3": "Western Hemisphere Region",
+        "name4": "Dominica",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 4
+    },
+    "Eswatini": {
+        "iso3": "SWZ",
+        "iso4": "",
+        "name3": "Eswatini",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 4
+    },
+    "Ethiopia": {
+        "iso3": "ETH",
+        "iso4": "",
+        "name3": "Ethiopia",
+        "name4": "",
+        "country": 3,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 6
+    },
+    "Honduras": {
+        "iso3": "XWH",
+        "iso4": "HND",
+        "name3": "Western Hemisphere Region",
+        "name4": "Honduras",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Suriname": {
+        "iso3": "XWH",
+        "iso4": "SUR",
+        "name3": "Western Hemisphere Region",
+        "name4": "Suriname",
+        "country": 4,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 4
+    },
+    "Tanzania": {
+        "iso3": "TZA",
+        "iso4": "",
+        "name3": "Tanzania",
+        "name4": "",
+        "country": 3,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Thailand": {
+        "iso3": "XAR",
+        "iso4": "THA",
+        "name3": "Asia Region",
+        "name4": "Thailand",
+        "country": 4,
+        "facility": 7,
+        "community": 5,
+        "prioritization": 5
+    },
+    "Zimbabwe": {
+        "iso3": "ZWE",
+        "iso4": "",
+        "name3": "Zimbabwe",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 5
+    },
+    "Guatemala": {
+        "iso3": "XWH",
+        "iso4": "GTM",
+        "name3": "Western Hemisphere Region",
+        "name4": "Guatemala",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Indonesia": {
+        "iso3": "XAR",
+        "iso4": "IDN",
+        "name3": "Asia Region",
+        "name4": "Indonesia",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 6
+    },
+    "Nicaragua": {
+        "iso3": "XWH",
+        "iso4": "NIC",
+        "name3": "Western Hemisphere Region",
+        "name4": "Nicaragua",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Costa Rica": {
+        "iso3": "XWH",
+        "iso4": "CRI",
+        "name3": "Western Hemisphere Region",
+        "name4": "Costa Rica",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Kazakhstan": {
+        "iso3": "XAR",
+        "iso4": "KAZ",
+        "name3": "Asia Region",
+        "name4": "Kazakhstan",
+        "country": 4,
+        "facility": 8,
+        "community": 7,
+        "prioritization": 5
+    },
+    "Kyrgyzstan": {
+        "iso3": "XAR",
+        "iso4": "KGZ",
+        "name3": "Asia Region",
+        "name4": "Kyrgyzstan",
+        "country": 4,
+        "facility": 8,
+        "community": 7,
+        "prioritization": 5
+    },
+    "Mozambique": {
+        "iso3": "MOZ",
+        "iso4": "",
+        "name3": "Mozambique",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 5
+    },
+    "Tajikistan": {
+        "iso3": "XAR",
+        "iso4": "TJK",
+        "name3": "Asia Region",
+        "name4": "Tajikistan",
+        "country": 4,
+        "facility": 8,
+        "community": 7,
+        "prioritization": 5
+    },
+    "Uzbekistan": {
+        "iso3": "XAR",
+        "iso4": "UZB",
+        "name3": "Asia Region",
+        "name4": "Uzbekistan",
+        "country": 4,
+        "facility": 8,
+        "community": 7,
+        "prioritization": 5
+    },
+    "El Salvador": {
+        "iso3": "XWH",
+        "iso4": "SLV",
+        "name3": "Western Hemisphere Region",
+        "name4": "El Salvador",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Philippines": {
+        "iso3": "XAR",
+        "iso4": "PHL",
+        "name3": "Asia Region",
+        "name4": "Philippines",
+        "country": 4,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 4
+    },
+    "Saint Lucia": {
+        "iso3": "XWH",
+        "iso4": "LCA",
+        "name3": "Western Hemisphere Region",
+        "name4": "Saint Lucia",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 4
+    },
+    "South Sudan": {
+        "iso3": "SSD",
+        "iso4": "",
+        "name3": "South Sudan",
+        "name4": "",
+        "country": 3,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Burkina Faso": {
+        "iso3": "XWA",
+        "iso4": "BFA",
+        "name3": "West Africa Region",
+        "name4": "Burkina Faso",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Sierra Leone": {
+        "iso3": "XWA",
+        "iso4": "SLE",
+        "name3": "West Africa Region",
+        "name4": "Sierra Leone",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 6
+    },
+    "South Africa": {
+        "iso3": "ZAF",
+        "iso4": "",
+        "name3": "South Africa",
+        "name4": "",
+        "country": 3,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Turkmenistan": {
+        "iso3": "XAR",
+        "iso4": "TKM",
+        "name3": "Asia Region",
+        "name4": "Turkmenistan",
+        "country": 4,
+        "facility": 0,
+        "community": 0,
+        "prioritization": 0
+    },
+    "Cote d'Ivoire": {
+        "iso3": "CIV",
+        "iso4": "",
+        "name3": "Cote d'Ivoire",
+        "name4": "",
+        "country": 3,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Papua New Guinea": {
+        "iso3": "XAR",
+        "iso4": "PNG",
+        "name3": "Asia Region",
+        "name4": "Papua New Guinea",
+        "country": 4,
+        "facility": 8,
+        "community": 7,
+        "prioritization": 5
+    },
+    "Dominican Republic": {
+        "iso3": "DOM",
+        "iso4": "",
+        "name3": "Dominican Republic",
+        "name4": "",
+        "country": 3,
+        "facility": 7,
+        "community": 5,
+        "prioritization": 5
+    },
+    "Antigua and Barbuda": {
+        "iso3": "XWH",
+        "iso4": "ATG",
+        "name3": "Western Hemisphere Region",
+        "name4": "Antigua and Barbuda",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 4
+    },
+    "Trinidad and Tobago": {
+        "iso3": "XWH",
+        "iso4": "TTO",
+        "name3": "Western Hemisphere Region",
+        "name4": "Trinidad and Tobago",
+        "country": 4,
+        "facility": 9,
+        "community": 8,
+        "prioritization": 4
+    },
+    "Saint Kitts and Nevis": {
+        "iso3": "XWH",
+        "iso4": "KNA",
+        "name3": "Western Hemisphere Region",
+        "name4": "Saint Kitts and Nevis",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 4
+    },
+    "Democratic Republic of the Congo": {
+        "iso3": "COD",
+        "iso4": "",
+        "name3": "Democratic Republic of the Congo",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 5
+    },
+    "Saint Vincent and the Grenadines": {
+        "iso3": "XWH",
+        "iso4": "VCT",
+        "name3": "Western Hemisphere Region",
+        "name4": "Saint Vincent and the Grenadines",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 4
+    }
+}
