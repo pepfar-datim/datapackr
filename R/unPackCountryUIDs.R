@@ -139,10 +139,13 @@ unPackCountryUIDs <- function(submission_path,
     dplyr::select(PSNU) %>%
     # Add PSNU uid ####
   dplyr::mutate(
-    psnu_uid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
+    psnu_uid = stringr::str_extract(PSNU, "[A-Za-z][A-Za-z0-9]{10}")) %>%
     dplyr::left_join(datapackr::valid_PSNUs %>%
                        dplyr::select(psnu_uid, country_name, country_uid),
                      by = "psnu_uid")
+  
+  see <- datapackr::valid_PSNUs %>%
+    dplyr::select(psnu_uid, country_name, country_uid)
   
   if (!country_uids %in% unique(PSNUs$country_uid)) {
     stop("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
