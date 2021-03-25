@@ -10,7 +10,7 @@ test_that("Can generate a signature", {
       Sys.sleep(5)
    }
    wb <- xlsx::loadWorkbook("sheets/COP20_Data_Pack_Template_v2.xlsx")
-   df <- data.frame("a" = "e5s0nMiYRt2")
+   df <- data.frame("a" = "IH1kchw86uA")
    xlsx::addDataFrame(df, xlsx::getSheets(wb)$Home, startRow = 25, startColumn = 2, col.names = F, row.names = F)
    xlsx::saveWorkbook(wb, "sheets/COP20_Data_Pack_Template_v2.xlsx")
    while(!(file.exists("sheets/COP20_Data_Pack_Template_v2.xlsx"))){
@@ -44,10 +44,9 @@ test_that("Can generate a signature", {
   
 } )
 
-# test_that("Can get the type and COP year of tool of a COP20 Data Pack",{
-#    
-#    d <- datapackr:::createKeychainInfo(submission_path = test_sheet('COP20_Data_Pack_Template_v2.xlsx'))
-#    expect_equal(d$info$tool, "Data Pack Template")
-#    expect_equal(d$info$cop_year, 2020)
-#    #file.remove("tests/testthat/sheets/COP20_Data_Pack_Template_v2.xlsx")
-# })
+test_that("Can get the type and COP year of tool of a COP20 Data Pack",{
+
+   d <- datapackr:::createKeychainInfo(submission_path = test_sheet('COP20_Data_Pack_Template_v2.xlsx'))
+   expect_equal(d$info$tool, "Data Pack")
+   expect_equal(d$info$cop_year, 2020)
+})

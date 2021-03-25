@@ -144,9 +144,6 @@ unPackCountryUIDs <- function(submission_path,
                        dplyr::select(psnu_uid, country_name, country_uid),
                      by = "psnu_uid")
   
-  see <- datapackr::valid_PSNUs %>%
-    dplyr::select(psnu_uid, country_name, country_uid)
-  
   if (!country_uids %in% unique(PSNUs$country_uid)) {
     stop("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
   }

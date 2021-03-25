@@ -19,9 +19,9 @@ test_that("Can read a Datapack Name and UIDs", {
   foo<-datapackr:::unPackDataPackName(submission_path = template_copy,
                           "Data Pack Template")
   expect_equal(foo,"Demoland")
-  foo<-datapackr:::unPackCountryUIDs(submission_path = template_copy,
+  foo<-datapackr:::unPackCountryUIDs(submission_path = test_sheet("COP20_Data_Pack_Template_v2.xlsx"),
                          tool = "Data Pack")
-  expect_equal(foo,"abc12345678")
+  expect_equal(foo,"IH1kchw86uA")
   unlink(template_copy)
 } )
 
