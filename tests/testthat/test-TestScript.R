@@ -118,7 +118,7 @@ test_that("All", {
      ## don't forget I need to open and save the file
      
      
-     d <- unPackTool("/Users/sam/datapackr_test_files/Testing/No PSNUxIM/Data Pack_Zambia_20210121180718.xlsx"
+     d <- unPackTool("/Users/sam/datapackr_test_files/Testing/Appended PSNUxIM/Data Pack_Zambia_20210208.xlsx"
                      ,d2_session = d2_session
      )
      assign(paste0("d_cop21", branch), d)  
