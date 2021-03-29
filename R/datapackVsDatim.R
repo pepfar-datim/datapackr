@@ -17,16 +17,16 @@ compareData_DatapackVsDatim <-
 # just handles some formatting/ decoding of UIDs
     beautify <- function(data) {
       data$data_element <-
-        datimvalidation::remapDEs(data$data_element_uid,
+        datimvalidation::remapDEs(data$dataElement,
                                   mode_in = "id",
                                   mode_out = "shortName",
-                                  d2_session = d2_session)
+                                  d2session = d2_session)
       
       data$disagg <-
-        datimvalidation::remapCategoryOptionCombos(data$category_option_combo_uid,
+        datimvalidation::remapCategoryOptionCombos(data$categoryOptionCombo,
                                                    mode_in = "id",
                                                    mode_out = "name",
-                                                   d2_session = d2_session)
+                                                   d2session = d2_session)
       
       psnus <-
         datapackr::valid_PSNUs %>% dplyr::select(psnu, psnu_uid)
@@ -36,7 +36,7 @@ compareData_DatapackVsDatim <-
   # add column summarizing the difference
       
       data %<>%
-        dplyr::left_join(psnus, by = c("org_unit_uid" = "psnu_uid")) %>%
+        dplyr::left_join(psnus, by = c("orgUnit" = "psnu_uid")) %>%
         dplyr::mutate(
           difference = dplyr::case_when(
             is.na(datapack_value) ~ -datim_value,
@@ -61,7 +61,7 @@ compareData_DatapackVsDatim <-
           "psnu",
           "data_element",
           "disagg",
-          "attribute_option_combo_code",
+          "attributeOptionCombo",
           "datapack_value",
           "datim_value",
           "difference",
@@ -74,10 +74,10 @@ compareData_DatapackVsDatim <-
 # start main processing
 # start off with dedups included
     
-    if(d$info$cop_year != 2020){
+    if(d$info$cop_year != 2021){
       stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
     }
-    d <- datapackr::exportDistributedDataToDATIM(d, keep_dedup = TRUE)
+    # d <- datapackr::exportDistributedDataToDATIM(d, keep_dedup = TRUE)
     
     d$datim$MER$value <- as.numeric(d$datim$MER$value)
     d$datim$subnat_impatt$value <-
@@ -103,51 +103,52 @@ compareData_DatapackVsDatim <-
     # rename columns to fit standards
     datapack_data <- datapack_data %>%
       dplyr::rename(
-        datapack_value = value,
-        data_element_uid = dataElement,
-        org_unit_uid = orgUnit,
-        category_option_combo_uid = categoryOptionCombo,
-        attribute_option_combo_code = attributeOptionCombo
-      ) %>%
+        datapack_value = value) %>%
       dplyr::filter(datapack_value != 0)
 
 # Sum over IM including dedup    
     datapack_data_psnu_w_dedup <- dplyr::group_by(datapack_data,
-                                                  data_element_uid,
-                                                  org_unit_uid,
-                                                  category_option_combo_uid) %>%
+                                                  dataElement,
+                                                  orgUnit,
+                                                  categoryOptionCombo) %>%
       dplyr::summarise(datapack_value = sum(datapack_value)) %>%
       dplyr::ungroup()
     
 # data pack dedups use code 99999 - implies pure and crosswalk
 # Get rid of dedups in data disaggregated by IM
     datapack_data_psnu_x_im_wo_dedup <- datapack_data %>%
-      dplyr::filter(attribute_option_combo_code != "99999") 
+      dplyr::filter(attributeOptionCombo != "99999") 
     
 # Get data from DATIM using data value sets
     
-    datim_data <- getCOPDataFromDATIM(country_uid = d$info$country_uids, 
-                        cop_year = d$info$cop_year,
-                        d2_session = d2_session) %>%
-      dplyr::filter(datim_value != 0) %>% # we don't import 0s up front so we should ignore any here
-      dplyr::filter(datim_value != "")
+    datim_data <- dplyr::bind_rows(
+      getCOPDataFromDATIM(country_uid = d$info$country_uids, 
+                          cop_year = d$info$cop_year,
+                          d2_session = d2_session),
+      getCOPDataFromDATIM(country_uid = d$info$country_uids, 
+                          cop_year = d$info$cop_year - 1,
+                          streams = c("subnat_targets", "impatt"),
+                          d2_session = d2_session)) %>%
+      dplyr::filter(value != 0) %>% # we don't import 0s up front so we should ignore any here
+      dplyr::filter(value != "") %>%
+      dplyr::rename(datim_value = value)
     
 # recode dedups to be 99999 to match data pack  
-    datim_data$attribute_option_combo_code[datim_data$attribute_option_combo_code == "00000" |
-                                             datim_data$attribute_option_combo_code == "00001"] <- "99999"
+    datim_data$attributeOptionCombo[datim_data$attributeOptionCombo == "00000" |
+                                             datim_data$attributeOptionCombo == "00001"] <- "99999"
     
 # Sum over IM including dedup    
     datim_data_psnu_w_dedup <- 
       dplyr::group_by(datim_data,
-                      data_element_uid,
-                      org_unit_uid,
-                      category_option_combo_uid) %>%
+                      dataElement,
+                      orgUnit,
+                      categoryOptionCombo) %>%
       dplyr::summarise(datim_value = sum(datim_value)) %>%
       dplyr::ungroup()
 
 # get rid of dedups in the data dissagregated by IM        
     datim_data_psnu_x_im_wo_dedup <- datim_data %>%
-      dplyr::filter(attribute_option_combo_code != "99999")
+      dplyr::filter(attributeOptionCombo != "99999")
     
 # join the data pack data and the datim data
     data_psnu_w_dedup <- dplyr::full_join(datim_data_psnu_w_dedup,
@@ -165,11 +166,11 @@ compareData_DatapackVsDatim <-
           is.na(datim_value)
       ) %>%
       dplyr::select(
-        data_element_uid,
+        dataElement,
         period,
-        org_unit_uid,
-        category_option_combo_uid,
-        attribute_option_combo_code,
+        orgUnit,
+        categoryOptionCombo,
+        attributeOptionCombo,
         datapack_value
       )
     
@@ -178,11 +179,11 @@ compareData_DatapackVsDatim <-
       dplyr::filter(data_psnu_x_im_wo_dedup,
                     is.na(datapack_value)) %>%
       dplyr::select(
-        data_element_uid,
+        dataElement,
         period,
-        org_unit_uid,
-        category_option_combo_uid,
-        attribute_option_combo_code,
+        orgUnit,
+        categoryOptionCombo,
+        attributeOptionCombo,
         datim_value
       )
     
@@ -214,7 +215,7 @@ compareData_OpuDatapackVsDatim <-
                                   inherits = TRUE)) {
     
     if(d$info$cop_year != 2020){
-      stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
+      stop("Attempting to use compareData_OpuDatapackVsDatim for unsupported COP year")
     }
     
     datapack_data <- d$datim$OPU
@@ -237,12 +238,7 @@ compareData_OpuDatapackVsDatim <-
     # rename columns to fit standards
     datapack_data <- datapack_data %>%
       dplyr::rename(
-        datapack_value = value,
-        data_element_uid = dataElement,
-        org_unit_uid = orgUnit,
-        category_option_combo_uid = categoryOptionCombo,
-        attribute_option_combo_code = attributeOptionCombo
-      )
+        datapack_value = value)
     
 
     # Get mer target data from DATIM using data value sets
@@ -262,29 +258,28 @@ compareData_OpuDatapackVsDatim <-
         )
       )
     
-    # get data from datim usinfg dataValueSets
+    # get data from datim using dataValueSets
     # rename to standard names
     datim_data <-
       getDataValueSets(parameters$key,
                        parameters$value,
                        d2_session = d2_session) %>%
       dplyr::rename(
-        datim_value = value,
-        data_element_uid = data_element,
-        org_unit_uid = org_unit,
-        category_option_combo_uid = category_option_combo,
-        attribute_option_combo_code = attribute_option_combo
-      ) %>% 
-      dplyr::select(data_element_uid,
+        dataElement = data_element,
+        orgUnit = org_unit,
+        categoryOptionCombo = category_option_combo,
+        attributeOptionCombo = attribute_option_combo,
+        datim_value = value) %>% 
+      dplyr::select(dataElement,
                     period,
-                    org_unit_uid,
-                    category_option_combo_uid,
-                    attribute_option_combo_code,
+                    orgUnit,
+                    categoryOptionCombo,
+                    attributeOptionCombo,
                     datim_value)
 
-# extract dedupes from import file to handle seperatly  
+# extract dedupes from import file to handle seperately  
     dedupes <- dplyr::filter(datapack_data,
-                             attribute_option_combo_code %in%
+                             attributeOptionCombo %in%
                                c("00000", "00001")) %>% 
                                dplyr::rename(value = datapack_value)
 
@@ -293,7 +288,7 @@ compareData_OpuDatapackVsDatim <-
       dplyr::filter(datapack_value != datim_value |
                       is.na(datapack_value) |
                       is.na(datim_value)) %>% 
-      dplyr::filter(!(attribute_option_combo_code %in%
+      dplyr::filter(!(attributeOptionCombo %in%
                       c("00000", "00001")))
 
 # cases in which datim has a value but datapack does not
