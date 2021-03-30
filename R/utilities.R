@@ -18,6 +18,8 @@ default_catOptCombo <- function() { "HllvX50cXC0" }
 #' exactly 5, similar to rounding in usual mathematical contexts.
 #'
 #' @param x A number.
+#' @param digits Number of digits to round to. Default is 0
+#' 
 #' @return An integer.
 #' @examples
 #' # If the first digit to be dropped is exactly 5, round_trunc() will round to
@@ -25,36 +27,14 @@ default_catOptCombo <- function() { "HllvX50cXC0" }
 #' round_trunc(0.5)
 #' round_trunc(-0.5)
 #' @export
-round_trunc <- function(x) {
-    trunc(abs(x) + 0.5) * sign(x)
+round_trunc <- function(x, digits = 0) {
+  z <- abs(x) * 10^digits
+  z <- z + 0.5
+  z <- trunc(z)
+  z <- z / 10^digits
+  z * sign(x)
+  
 }
-
-
-#' @export
-#' @title Use the console to select OU
-#' @importFrom magrittr %>%
-#' @importFrom utils select.list
-#'
-#' @description
-#' In some cases it may be necessary to manually identify the Operating Unit
-#' associated with a submitted Data Pack. This function allows
-#' manual selection of Operating Unit using the R console.
-#'
-#' One case where this is necessarily invoked is when OU name and OU id read
-#' from a submitted Data Pack do not match one another, based on
-#' cross-reference with DATIM organization hierarchies.
-#'
-#' @return An OU name, based on input selection.
-selectOU <- function() {
-  ous <- datapackr::configFile %>%
-    dplyr::select(DataPack_name) %>%
-    dplyr::distinct()
-  promptText<-paste0("Please select the OU this file is associated with [1-",nrow(ous),"]:")
-  interactive_print(promptText)
-  selection <- utils::select.list(ous$DataPack_name,multiple=FALSE)
-  return(selection)
-}
-
 
 
 #' @export
@@ -100,57 +80,6 @@ getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
 
   return(impatt_levels)
 
-}
-
-
-#' @export
-#' @importFrom magrittr %>% %<>%
-#' @title Pull all _Military nodes from DATIM for all PEPFAR countries
-#'
-#' @description
-#' Queries DATIM (\code{api/organisationUnits}) to retrieve the latest list of
-#' _Military nodes for each PEPFAR country.
-#'
-#' @return Dataframe of _Military names and ids, with associated Operating Units
-#' and Countries.
-#'
-getMilitaryNodes <- function(d2_session = dynGet("d2_default_session",
-                                                 inherits = TRUE)) {
-  #loginToDATIM(getOption("secrets"))
-
-  militaryNodes <- paste0(
-    d2_session$base_url,"api/",datapackr::api_version(),
-      "/organisationUnits.json?paging=false",
-      "&filter=name:$ilike:_Military",
-      #"&filter=organisationUnitGroups.id:eq:nwQbMeALRjL", (New _Mil nodes not here...)
-      "&fields=name,id,level,ancestors[id,name]") %>%
-    httr::GET(httr::timeout(180),
-              handle = d2_session$handle) %>%
-    httr::content(., "text") %>%
-    jsonlite::fromJSON(., flatten = TRUE) %>%
-    do.call(rbind.data.frame, .) %>%
-  # Tag Operating Unit and Country (name & id) - accommodate for eventuality of
-  #    _Military at level 5 in Regional OUs
-    dplyr::mutate(
-      country_uid = dplyr::case_when(
-        level == 4 ~ purrr::map_chr(ancestors,
-                              function(x) magrittr::use_series(x, id) %>%
-                                magrittr::extract(3)),
-        level == 5 ~ purrr::map_chr(ancestors,
-                                    function(x) magrittr::use_series(x, id) %>%
-                                      magrittr::extract(4))),
-      country_name = dplyr::case_when(
-        level == 4 ~ purrr::map_chr(ancestors,
-                                    function(x) magrittr::use_series(x, name) %>%
-                                      magrittr::extract(3)),
-        level == 5 ~ purrr::map_chr(ancestors,
-                                    function(x) magrittr::use_series(x, name) %>%
-                                      magrittr::extract(4))
-      )
-    ) %>%
-    dplyr::select(-ancestors)
-
-  return(militaryNodes)
 }
 
 
@@ -394,57 +323,6 @@ isLoggedIn <- function(d2_session = dynGet("d2_default_session",
     }
 }
 
-#' @export
-#' @title grab all raw data in DATIM for a country for the COP data sets for a given fiscal year.
-#'
-#' @description
-#' grab all raw data in DATIM for a country for the COP data sets for a given fiscal year.
-#'
-#' @param country_uid country_uid
-#' @param fiscal_year_yyyy fiscal_year
-#' @param base_url base to append api calls normally defined beforehand
-#'
-#' @return raw data in DATIM for a country for the COP data sets for a given fiscal year.
-#'
-
-getCopDataFromDatim <- function(country_uid,
-                                fiscal_year_yyyy,
-                                d2_session = dynGet("d2_default_session",
-                                                    inherits = TRUE))
-{
-
-  dataset_uids <- getDatasetUids(fiscal_year_yyyy,
-                                 c("targets", "subnat", "impatt"))
-
-  # package parameters for getDataValueSets function call
-  parameters <-
-    dplyr::bind_rows(
-      tibble::tibble(key = "dataSet", value = dataset_uids),
-      tibble::tibble(key = "orgUnit", value = country_uid),
-      tibble::tribble(~ key, ~ value,
-                      "children", "true",
-                      "categoryOptionComboIdScheme", "code",
-                      "includeDeleted", "false",
-                      "period", paste0(fiscal_year_yyyy - 1, "Oct")
-      )
-    )
-
-  # get data from datim usinfg dataValueSets
-  # rename to standard names
-  datim_data <-
-    getDataValueSets(parameters$key,
-                     parameters$value,
-                     d2_session = d2_session) %>%
-    dplyr::rename(
-      datim_value = value,
-      data_element_uid = data_element,
-      org_unit_uid = org_unit,
-      category_option_combo_uid = category_option_combo,
-      attribute_option_combo_code = attribute_option_combo
-    )
-
-  return(datim_data)
-}
 
 #' @export
 #' @title getDatasetUids
