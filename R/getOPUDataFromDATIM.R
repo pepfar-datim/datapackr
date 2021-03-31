@@ -72,8 +72,8 @@ getOPUDataFromDATIM <- function(cop_year,
   
   data_datim %<>%
     dplyr::left_join(map_DataPack_DATIM_DEs_COCs_local,
-                      by = c("data_element_uid" = "dataelement",
-                            "category_option_combo_uid" = "categoryoptioncombouid"))
+                      by = c("dataElement" = "dataelement",
+                            "categoryOptionCombo" = "categoryoptioncombouid"))
   
   if (any(is.na(data_datim$indicator_code))) {
     stop("Problem mapping target data pulled from DATIM to datapack schema")
@@ -84,15 +84,15 @@ getOPUDataFromDATIM <- function(cop_year,
     dplyr::select(indicator_code,
                   support_type,
                   period,
-                  psnu_uid = org_unit_uid,
+                  psnu_uid = orgUnit,
                   age_option_uid = valid_ages.id,
                   Age = valid_ages.name,
                   sex_option_uid = valid_sexes.id,
                   Sex = valid_sexes.name,
                   kp_option_uid = valid_kps.id,
                   KeyPop = valid_kps.name,
-                  attribute_option = attribute_option_combo_code,
-                  value = datim_value)
+                  attribute_option = attributeOptionCombo,
+                  value)
   
   return(data_datim)
 
