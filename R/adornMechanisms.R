@@ -94,7 +94,7 @@ getMechanismView <- function(country_uids = NULL,
     
   if (file.exists(cached_mechs_path) & can_read_file) {
     is_fresh <-
-      lubridate::as.duration(lubridate::interval(Sys.time(), file.info(cached_mechs_path)$mtime)) < lubridate::duration(max_cache_age)
+      lubridate::as.duration(lubridate::interval(file.info(cached_mechs_path)$mtime,Sys.time())) < lubridate::duration(max_cache_age)
   } else{
     is_fresh<-FALSE
   }
