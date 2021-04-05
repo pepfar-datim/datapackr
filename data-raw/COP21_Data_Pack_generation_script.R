@@ -1,11 +1,11 @@
 library(datapackr)
 library(magrittr)
 
-datapackr::loginToDATIM("/Users/scott/.secrets/cop-test.json")
+datapackr::loginToDATIM("~/.secrets/datim.json")
 
-output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/PSNUxIM Testing"
+output_folder <- "/Users/sam"
 
-model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/model_data_pack_input_21_20210202_1_flat.rds"
+model_data_path <- file.choose()
 
 model_data <- readRDS(model_data_path)
 
@@ -48,8 +48,19 @@ batch <- tibble::tribble(
   "Nepal","YlSE5fOVJMa",                   #35
   "Tajikistan","ZtoVYbNCnsj",              #36
   "Philippines","p1E1K4MWGpa",             #37
-  "Caribbean Region",c("RKoVudgb05Y","PeOHqAwdtez","WuxG6jzaypt","zhJINyURZ5Y","WSl5y9jxCpC"), #38
-  "Latin America Region",c("joGQFpKiHl9","QKD4CzBG2GM","N7QAPGSaODP","EXVC4bNtv84","w5NMe34EjPN","aUTsSmqqu9O","oK0gC85xx2f"), #39
+  "Caribbean Region", c("RKoVudgb05Y",
+                        "PeOHqAwdtez",
+                        "WuxG6jzaypt",
+                        "zhJINyURZ5Y",
+                        "WSl5y9jxCpC"), #38
+  "Latin America Region", c("joGQFpKiHl9",
+                            "QKD4CzBG2GM",
+                            "N7QAPGSaODP",
+                            "EXVC4bNtv84",
+                            "w5NMe34EjPN",
+                            "aUTsSmqqu9O",
+                            "oK0gC85xx2f",
+                            "PeOHqAwdtez"), #39
   "Burkina Faso","ZeB2eGmDfGw",            #40
   "Ghana","y3zhsvdXlhN",                   #41
   "Liberia","kH29I939rDQ",                 #42
@@ -57,24 +68,27 @@ batch <- tibble::tribble(
   "Senegal","N5GhQWVpVFs",                 #44
   "Sierra Leone","ODOymOOWyl0",            #45
   "Togo","EIUtrKbw8PQ",                    #46
-  "Benin","QLimmm7UUKT"                    #47
+  "Benin","QLimmm7UUKT",                    #47
+  "Colombia", "yZ0U5wuyirV", #48
+  "Peru", "Y0PDkv3IkGS", #49
+  "Venezuela",  "iiPgv10L3fG" #50
 )
 
 #Beta Pack Countries list ####
-# pick <- batch[c(16,18,20,21,24,25,28,41,42,43,45),]
+# pick <- batch[c(39, 48, 49, 50),]
 
 # Dedupe Testing
-pick <- batch %>%
-  dplyr::filter(
-    datapack_name %in% c(
-      "Cameroon",
-      "Eswatini",
-      "Namibia",
-      "Zambia",
-      "South Sudan",
-      "Malawi"
-    )
-  )
+# pick <- batch %>%
+#   dplyr::filter(
+#     datapack_name %in% c(
+#       "Colombid",
+#       "Eswatini",
+#       "Namibia",
+#       "Zambia",
+#       "South Sudan",
+#       "Malawi"
+#     )
+#   )
 
 # For individual testing ####
 # pick <- batch %>%
