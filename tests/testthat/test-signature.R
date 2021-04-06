@@ -11,9 +11,9 @@ test_that("Can generate a signature", {
    # openxlsx::saveWorkbook(wb, "sheets/COP20_Data_Pack_Template_v2.xlsx", overwrite = T)
    # 
    
-   #the correct way using xlsx
+   # the correct way using xlsx
    # wb <- xlsx::loadWorkbook("sheets/COP20_Data_Pack_Template_vFINAL.xlsx")
-   # df <- data.frame("a" = "e5s0nMiYRt2","b" =1, "c" = 1,"d" = 1,"e" = 1,"f" = 1,"g" = 1,"h" = 1,"i" = 1,"j" = 1,"k" = 1,"l" = '1')
+   # df <- data.frame("a" = "Chiradzuluu District [#SNU] [e5s0nMiYRt2]","b" =1, "c" = 1,"d" = 1,"e" = 1,"f" = 1,"g" = 1,"h" = 1,"i" = 1,"j" = 1,"k" = 1,"l" = '1')
    # xlsx::addDataFrame(df, xlsx::getSheets(wb)$Prioritization, startRow = 15, col.names = F, row.names = F)
    # df <- data.frame("a" = "IH1kchw86uA")
    # xlsx::addDataFrame(df, xlsx::getSheets(wb)$Home, startRow = 25, startColumn = 2, col.names = F, row.names = F)
