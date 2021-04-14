@@ -220,7 +220,11 @@ unPackSchema_datapack <- function(filepath = NULL,
   schema %<>%
     dplyr::mutate(
       FY = dplyr::case_when(
-        stringr::str_detect(indicator_code, "\\.T$") ~ cop_year + 1 ,
+        stringr::str_detect(indicator_code, "\\.T$") ~ cop_year + 1,
+        (stringr::str_detect(indicator_code, "\\.T_1$")
+          & dataset == "impatt"
+          & !stringr::str_detect(indicator_code, "PRIORITY_SNU"))
+         ~ cop_year + 1,
         stringr::str_detect(indicator_code, "\\.T_1$") ~ cop_year,
         stringr::str_detect(indicator_code, "\\.R$") ~ cop_year - 1,
         TRUE ~ NA_real_
@@ -391,8 +395,10 @@ unPackSchema_datapack <- function(filepath = NULL,
         "\n")
       )
   }
-if (cop_year == 2020){
-  schema <- dplyr::select(schema, -FY)
-}
+  if (cop_year == 2020){
+    schema <- dplyr::select(schema, -FY)
+  }
+  
   return(schema)
+  
 }
