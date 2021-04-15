@@ -216,7 +216,7 @@ unPackSchema_datapack <- function(filepath = NULL,
                   formula) %>%
     dplyr::arrange(sheet_num, col)
   
-  # Add FY to identify targets across years (needed to produce import files)
+  # Add FY & period to identify targets across years (needed to produce import files)
   schema %<>%
     dplyr::mutate(
       FY = dplyr::case_when(
@@ -227,7 +227,12 @@ unPackSchema_datapack <- function(filepath = NULL,
          ~ cop_year + 1,
         stringr::str_detect(indicator_code, "\\.T_1$") ~ cop_year,
         stringr::str_detect(indicator_code, "\\.R$") ~ cop_year - 1,
+        dataset == "mer" & col_type == "target" ~ datapackr::getCurrentCOPYear(),
         TRUE ~ NA_real_
+      ),
+      period = dplyr::case_when(
+        col_type == "target" ~ paste0(FY-1, "Oct"),
+        col_type == "result" ~ paste0(FY-1, "Q4")
       )
     )
 
