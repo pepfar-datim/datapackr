@@ -30,7 +30,23 @@ cop_year = getCurrentCOPYear()
       "FY21 IMPATT" = impatt.T_1,
       "FY21 SUBNAT Targets" = subnat.T_1,
       "FY20 SUBNAT Results" = subnat.R),
-    .id = "dataset") %>%
+    .id = "period_dataset") %>%
+    dplyr::mutate(
+      targets_results = dplyr::case_when(
+        stringr::str_detect(period_dataset, "Targets") ~ "targets",
+        stringr::str_detect(period_dataset, "Results") ~ "results",
+        stringr::str_detect(period_dataset, "IMPATT") ~ "targets"
+      ),
+      dataset = dplyr::case_when(
+        stringr::str_detect(period_dataset, "MER") ~ "mer",
+        stringr::str_detect(period_dataset, "SUBNAT") ~ "subnat",
+        stringr::str_detect(period_dataset, "IMPATT") ~ "impatt"
+      ),
+      period = dplyr::case_when(
+        targets_results == "targets" ~ paste0(FY-1, "Oct"),
+        targets_results == "results" ~ paste0(FY-1, "Q4")
+      )
+    ) %>%
     
 # Add metadata for CategoryOptions ####
     dplyr::left_join(categoryoptions, by = c("categoryoptioncombouid" = "id")) %>%
@@ -45,7 +61,7 @@ cop_year = getCurrentCOPYear()
       categoryoptioncomboname = categoryoptioncombo
     )
 
-# Map to Data Pack schema ####
+# Prep Data Pack schema for mapping ####
   map_DataPack_DATIM_DEs_COCs <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter((col_type == "target" & dataset %in% c("mer", "subnat", "impatt"))
                   | dataset == "subnat" & col_type == "result",
@@ -53,7 +69,7 @@ cop_year = getCurrentCOPYear()
     dplyr::select(indicator_code, dataset, col_type, value_type,
                   dataelement_dsd, dataelement_ta,
                   categoryoption_specified, valid_ages, valid_sexes, valid_kps,
-                  FY) %>%
+                  FY, period) %>%
     tidyr::unnest(cols = valid_ages, names_sep  = ".") %>%
     tidyr::unnest(cols = valid_sexes, names_sep  = ".") %>%
     tidyr::unnest(cols = valid_kps, names_sep  = ".") %>%
@@ -139,13 +155,45 @@ cop_year = getCurrentCOPYear()
     dplyr::left_join(getHTSModality(cop_year = cop_year),
                      by = c("dataelementuid" = "dataElement"))
   
+# Accommodate oddities with FY21 PMTCT_SUBNAT ####
+  map_DataPack_DATIM_DEs_COCs %<>%
+    dplyr::mutate(
+      FY = dplyr::case_when(
+        stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~ FY+1,
+        TRUE ~ FY
+      ),
+      period = dplyr::case_when(
+        stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~ paste0(FY-1, "Oct"),
+        TRUE ~ period
+      )
+    )
+  
 # Join Full Code List with Schema ####
   map_DataPack_DATIM_DEs_COCs %<>%
     dplyr::select(-dataset) %>%
     dplyr::full_join(fullCodeList,
                      by = c("dataelementuid" = "dataelementuid",
                             "categoryOptions.ids" = "categoryOptions.ids",
+                            "period" = "period",
                             "FY" = "FY"))
+  
+# Readjust PMTCT SUBNAT ####
+  map_DataPack_DATIM_DEs_COCs %<>%
+    dplyr::mutate(
+      FY = dplyr::case_when(
+        stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~ FY-1,
+        TRUE ~ FY
+      ),
+      period = dplyr::case_when(
+        stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~ paste0(FY-1,"Oct"),
+        TRUE ~ period
+      ),
+      period_dataset = dplyr::case_when(
+        stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~ 
+          stringr::str_replace(period_dataset, "(?<=FY)\\d{2}", stringr::str_sub(FY,-2,-1)),
+        TRUE ~ period_dataset
+      )
+    )
   
 # Add additional metadata for use in analytics ####
 getCOGSMap <- function(uid,
