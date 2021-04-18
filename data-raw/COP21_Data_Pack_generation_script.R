@@ -53,14 +53,13 @@ batch <- tibble::tribble(
                         "WuxG6jzaypt",
                         "zhJINyURZ5Y",
                         "WSl5y9jxCpC"), #38
-  "Latin America Region", c("joGQFpKiHl9",
+  "Central America and Brazil", c("joGQFpKiHl9",
                             "QKD4CzBG2GM",
                             "N7QAPGSaODP",
                             "EXVC4bNtv84",
                             "w5NMe34EjPN",
                             "aUTsSmqqu9O",
-                            "oK0gC85xx2f",
-                            "PeOHqAwdtez"), #39
+                            "oK0gC85xx2f"), #39
   "Burkina Faso","ZeB2eGmDfGw",            #40
   "Ghana","y3zhsvdXlhN",                   #41
   "Liberia","kH29I939rDQ",                 #42
@@ -75,7 +74,7 @@ batch <- tibble::tribble(
 )
 
 #Beta Pack Countries list ####
-# pick <- batch[c(39, 48, 49, 50),]
+# pick <- batch[c(39),]
 
 # Dedupe Testing
 # pick <- batch %>%
