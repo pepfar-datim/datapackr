@@ -44,7 +44,7 @@ cop_year = getCurrentCOPYear()
       ),
       period = dplyr::case_when(
         targets_results == "targets" ~ paste0(FY-1, "Oct"),
-        targets_results == "results" ~ paste0(FY-1, "Q4")
+        targets_results == "results" ~ paste0(FY, "Q3")
       )
     ) %>%
     
