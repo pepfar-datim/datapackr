@@ -232,7 +232,7 @@ unPackSchema_datapack <- function(filepath = NULL,
       ),
       period = dplyr::case_when(
         col_type == "target" ~ paste0(FY-1, "Oct"),
-        col_type == "result" ~ paste0(FY-1, "Q4")
+        col_type == "result" ~ paste0(FY, "Q3")
       )
     )
 
@@ -401,7 +401,7 @@ unPackSchema_datapack <- function(filepath = NULL,
       )
   }
   if (cop_year == 2020){
-    schema <- dplyr::select(schema, -FY)
+    schema <- dplyr::select(schema, -FY, -period)
   }
   
   return(schema)
