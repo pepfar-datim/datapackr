@@ -19,9 +19,6 @@ exportSubnatToDATIM <- function(d) {
                             "Sex" = "valid_sexes.name",
                             "KeyPop" = "valid_kps.name")) %>%
     dplyr::mutate(
-      period = dplyr::case_when(
-        stringr::str_detect(indicator_code, "\\.R$") ~ paste0(FY-1,"Q4" ),
-        TRUE ~ paste0(FY-1,"Oct" )),
       attributeOptionCombo = datapackr::default_catOptCombo()
     ) %>%
     dplyr::mutate(
