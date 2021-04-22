@@ -87,7 +87,7 @@ exportSubnatToDATIM <- function(d) {
   
   d$datim$subnat_fy20 <-  SUBNAT_IMPATT %>%
     dplyr::filter(
-      period == "2019Oct",
+      period == "2020Q3",
       dataElement %in%
         (datapackr::map_DataPack_DATIM_DEs_COCs %>%
            dplyr::filter(period_dataset == "FY20 SUBNAT Results" & !is.na(indicator_code)) %>%
