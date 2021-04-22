@@ -95,8 +95,7 @@ exportSubnatToDATIM <- function(d) {
         (datapackr::map_DataPack_DATIM_DEs_COCs %>%
           dplyr::filter(datastream == "SUBNAT", period == "2020Q3") %>%
           dplyr::pull(dataelementuid) %>%
-          unique())
-    )
+          unique()))
   
   subnat_des <- datapackr::map_DataPack_DATIM_DEs_COCs %>%
     dplyr::filter(datastream == "SUBNAT") %>%
@@ -120,8 +119,7 @@ exportSubnatToDATIM <- function(d) {
         (datapackr::map_DataPack_DATIM_DEs_COCs %>%
            dplyr::filter(datastream == "IMPATT") %>%
            dplyr::pull(dataelementuid) %>%
-          unique())
-    )
+          unique()))
       
   d$datim$fy22_prioritizations <- SUBNAT_IMPATT %>%
     dplyr::filter(
@@ -130,8 +128,7 @@ exportSubnatToDATIM <- function(d) {
         (datapackr::map_DataPack_DATIM_DEs_COCs %>%
            dplyr::filter(indicator_code == "IMPATT.PRIORITY_SNU.T") %>%
            dplyr::pull(dataelementuid) %>%
-           unique())
-    )
+           unique()))
   
   return(d)
 }
