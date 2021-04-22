@@ -52,7 +52,7 @@ Imports:
     rlang (>= 0.4.2),
     assertthat,
     plyr,
-    fuzzyjoin(>=0.1.6)
+    fuzzyjoin(>= 0.1.6)
 Suggests:
     devtools (>= 2.0.1),
     httptest,
