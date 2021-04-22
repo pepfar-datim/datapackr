@@ -35,8 +35,13 @@ createAnalytics <- function(d,
       # For COP21+, get data from import files for better consistency ####
       psnu_prioritizations <- d$datim$fy22_prioritizations %>%
         dplyr::select(orgUnit, value)
+      
+      psnus<-dplyr::filter(valid_PSNUs,psnu_type =="SNU") %>% 
+        dplyr::filter(country_uid %in% d$info$country_uids) %>% 
+        dplyr::select(ancestor_uid = psnu_uid,ancestor_name = psnu)
+        
       #Classify any DREAMS districts the same as their PSNU parents
-      dreams_map<-dplyr::filter(valid_PSNUs, DREAMS == "Y") %>% 
+      dreams_prioritizations<-dplyr::filter(valid_PSNUs, DREAMS == "Y") %>% 
         dplyr::select(psnu_uid,psnu,ancestors) %>% 
         tidyr::unnest("ancestors") %>% 
         dplyr::select(-organisationUnitGroups) %>% 
@@ -44,10 +49,10 @@ createAnalytics <- function(d,
         dplyr::summarise(path = paste(id,sep="",collapse="/")) %>% 
         dplyr::ungroup() %>% 
         fuzzyjoin::regex_inner_join(psnus,by=c("path" = "ancestor_uid")) %>% 
-        dplyr::inner_join(fy22_prioritizations,by=c("ancestor_uid" = "orgUnit")) %>% 
+        dplyr::inner_join(psnu_prioritizations,by=c("ancestor_uid" = "orgUnit")) %>% 
         dplyr::select(orgUnit=psnu_uid,value)
       
-      fy22_prioritizations <- dplyr::bind_rows(fy22_prioritizations,dreams_map)
+      fy22_prioritizations <- dplyr::bind_rows(psnu_prioritizations,dreams_prioritizations)
       d$data$analytics <-
         dplyr::bind_rows(
           d$datim$MER,
