@@ -90,7 +90,7 @@ exportSubnatToDATIM <- function(d) {
       period == "2019Oct",
       dataElement %in%
         (datapackr::map_DataPack_DATIM_DEs_COCs %>%
-           dplyr::filter(dataset == "FY20 SUBNAT Results" & !is.na(indicator_code)) %>%
+           dplyr::filter(period_dataset == "FY20 SUBNAT Results" & !is.na(indicator_code)) %>%
            dplyr::pull(dataelementuid)
         )
     )
@@ -100,7 +100,7 @@ exportSubnatToDATIM <- function(d) {
       period == "2020Oct",
       dataElement %in%
         (datapackr::map_DataPack_DATIM_DEs_COCs %>%
-           dplyr::filter(dataset == "FY21 SUBNAT Targets" & !is.na(indicator_code)) %>%
+           dplyr::filter(period_dataset == "FY21 SUBNAT Targets" & !is.na(indicator_code)) %>%
            dplyr::pull(dataelementuid)
         )
     )
@@ -110,7 +110,7 @@ exportSubnatToDATIM <- function(d) {
       period == "2021Oct",
       dataElement %in%
         (datapackr::map_DataPack_DATIM_DEs_COCs %>%
-           dplyr::filter(dataset == "FY22 SUBNAT Targets" & !is.na(indicator_code)) %>%
+           dplyr::filter(period_dataset == "FY22 SUBNAT Targets" & !is.na(indicator_code)) %>%
            dplyr::pull(dataelementuid)
         )
     )
@@ -120,7 +120,7 @@ exportSubnatToDATIM <- function(d) {
       period == "2020Oct",
       dataElement %in%
         (datapackr::map_DataPack_DATIM_DEs_COCs %>%
-           dplyr::filter(dataset == "FY21 IMPATT" & !is.na(indicator_code)) %>%
+           dplyr::filter(period_dataset == "FY21 IMPATT" & !is.na(indicator_code)) %>%
            dplyr::pull(dataelementuid)
       )
     )
@@ -130,7 +130,7 @@ exportSubnatToDATIM <- function(d) {
       period == "2021Oct",
       dataElement %in%
         (datapackr::map_DataPack_DATIM_DEs_COCs %>%
-           dplyr::filter(dataset == "FY22 IMPATT" & !is.na(indicator_code)) %>%
+           dplyr::filter(period_dataset == "FY22 IMPATT" & indicator_code == "IMPATT.PRIORITY_SNU.T") %>%
            dplyr::pull(dataelementuid)
         )
     )
