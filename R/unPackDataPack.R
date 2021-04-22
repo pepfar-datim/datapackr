@@ -84,7 +84,7 @@ unPackDataPack <- function(d,
 
   if (!all(purrr::map_lgl(observed_country_uids, 
                          ~ .x %in% d$info$country_uids))) {
-    stop("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
+    warning("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
   }
 
   return(d)

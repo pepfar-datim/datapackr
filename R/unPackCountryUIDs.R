@@ -146,7 +146,7 @@ unPackCountryUIDs <- function(submission_path,
   
   if (!all(purrr::map_lgl(unique(PSNUs$country_uid), 
                           ~ .x %in% country_uids))) {
-    stop("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
+    warning("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
   }
   
   return(country_uids)
