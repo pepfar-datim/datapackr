@@ -437,6 +437,105 @@ getDatasetUids <-  function(fiscal_year,
   return(datasets)
 }
 
+
+#' @export
+#' @title map_DATIM_dataset_period
+#'
+#' @description Returns a tibble of dataset uids mapped to valid periods and datastreams
+#' 
+#' @param d2_session DHIS2 Session id
+#' 
+#' @return Returns a tibble of dataset uids mapped to valid periods and datastreams
+#'
+map_DATIM_dataset_period <-  function(d2_session = dynGet("d2_default_session",
+                                                          inherits = TRUE)){
+  
+  ds_pd_map <- tibble::tribble(
+    ~dataset.id,   ~FY, ~datastream, ~targets_results, ~ou_level, ~DOD,
+    
+  # 2022
+    "YfZot37BbTm", 2022, "MER",         "Targets",     "PSNU",       "N",
+    "cihuwjoY5xP", 2022, "MER",         "Targets",     "PSNU",       "Y",
+    "wvnouBMuLuE", 2022, "DREAMS",      "Targets",     "PSNU",       "N",
+    NA_character_, 2022, "MER",         "Results",     "Facility",   "N",
+    NA_character_, 2022, "MER",         "Results",     "Community",  "N",
+    NA_character_, 2022, "MER",         "Results",     "Facility",   "Y",
+    NA_character_, 2022, "MER",         "Results",     "Community",  "Y",
+    NA_character_, 2022, "DREAMS",      "Results",     "Facility",   "N",
+    "Va7TYyHraRn", 2022, "SUBNAT",      "Targets",     "PSNU",       "N",
+    NA_character_, 2022, "SUBNAT",      "Results",     "PSNU",       "N",
+    "Zn27xns9Fmx", 2022, "IMPATT",      "IMPATT",      "PSNU",       "N",
+  
+  # 2021
+    "Pmc0yYAIi1t", 2021, "MER",         "Targets",     "PSNU",       "N",
+    "s1sxJuqXsvV", 2021, "MER",         "Targets",     "PSNU",       "Y",
+    "zL8TlPVzEBZ", 2021, "MER",         "Results",     "Facility",   "N",
+    "TBcmmtoaCBC", 2021, "MER",         "Results",     "Community",  "N",
+    "em1U5x9hhXh", 2021, "MER",         "Results",     "Facility",   "Y",
+    "BPEyzcDb8fT", 2021, "MER",         "Results",     "Community",  "Y",
+    "qHyrHc4zwx4", 2021, "DREAMS",      "Results",     "Facility",   "N",
+    "j7jzezIhgPj", 2021, "SUBNAT",      "Targets",     "PSNU",       "N",
+    "Va7TYyHraRn", 2021, "SUBNAT",      "Targets",     "PSNU",       "N",
+    "xiTCzZJ2GPP", 2021, "SUBNAT",      "Results",     "PSNU",       "N",
+    "jxnjnBAb1VD", 2021, "IMPATT",      "IMPATT",      "PSNU",       "N",
+  
+  # 2020
+    "sBv1dj90IX6", 2020, "MER",         "Targets",     "Facility",   "N",
+    "nIHNMxuPUOR", 2020, "MER",         "Targets",     "Community",  "N",
+    "HiJieecLXxN", 2020, "MER",         "Targets",     "Facility",   "Y",
+    "C2G7IyPPrvD", 2020, "MER",         "Targets",     "Community",  "Y",
+    "jKdHXpBfWop", 2020, "MER",         "Results",     "Facility",   "N",
+    "qzVASYuaIey", 2020, "MER",         "Results",     "Community",  "N",
+    "em1U5x9hhXh", 2020, "MER",         "Results",     "Facility",   "Y",
+    "BPEyzcDb8fT", 2020, "MER",         "Results",     "Community",  "Y",
+    "mbdbMiLZ4AA", 2020, "DREAMS",      "Results",     "Facility",   "N",
+    "N4X89PgW01w", 2020, "SUBNAT",      "Targets",     "PSNU",       "N",
+    "ctKXzmv2CVu", 2020, "SUBNAT",      "Results",     "PSNU",       "N",
+    "pTuDWXzkAkJ", 2020, "IMPATT",      "IMPATT",      "PSNU",       "N",
+  
+  # 2019
+    "eyI0UOWJnDk", 2019, "MER",         "Targets",     "Facility",   "N",
+    "l796jk9SW7q", 2019, "MER",         "Targets",     "Community",  "N",
+    "X8sn5HE5inC", 2019, "MER",         "Targets",     "Facility",   "Y",
+    "BWBS39fydnX", 2019, "MER",         "Targets",     "Community",  "Y",
+    "KWRj80vEfHU", 2019, "MER",         "Results",     "Facility",   "N",
+    "zUoy5hk8r0q", 2019, "MER",         "Results",     "Community",  "N",
+    "fi9yMqWLWVy", 2019, "MER",         "Results",     "Facility",   "Y",
+    "PyD4x9oFwxJ", 2019, "MER",         "Results",     "Community",  "Y",
+    "EbZrNIkuPtc", 2019, "MER",         "Results",     "Facility",   "N",
+    "Ncq22MRC6gd", 2019, "SUBNAT",      "Targets",     "PSNU",       "N",
+    "iJ4d5HdGiqG", 2019, "SUBNAT",      "Results",     "PSNU",       "N",
+    "pTuDWXzkAkJ", 2019, "IMPATT",      "IMPATT",      "PSNU",       "N"
+  )
+  
+  ds_list <- datimutils::getMetadata(dataSets,
+                                     d2_session = d2_session) %>%
+    dplyr::rename(dataset.name = name)
+  
+  ds_pd_map %<>%
+    dplyr::left_join(
+      ds_list,
+      by = c("dataset.id" = "id")
+    )
+  
+  # TEST for invalid dataset ids
+  invalid_ds_ids <- ds_pd_map %>%
+    dplyr::filter(
+      !is.na(dataset.id)
+      & is.na(dataset.name)
+    )
+  
+  if (NROW(invalid_ds_ids) > 0) {
+    stop(paste0("Invalid dataset IDs present in DATIM_dataset_period_map: ",
+                paste(invalid_ds_ids$dataset.id, collapse = ", ")))
+  }
+    
+  return(ds_pd_map)
+  
+}
+
+
+
 #' @export
 #' @title Define prioritization values.
 #'

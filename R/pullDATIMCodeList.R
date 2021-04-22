@@ -11,22 +11,27 @@
 pullDATIMCodeList <- function(dataset,
                               d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
-
+  dataset.id = dataset
+  
   # TEST that dataset is valid
   ds <- datimutils::getMetadata(dataSets,
                                 d2_session = d2_session)
-
-  if (!dataset %in% ds$id) {
+  
+  if (!dataset.id %in% ds$id) {
     stop("Invalid dataset uid provided!")
   }
-
-  interactive_print(ds$name[ds$id == dataset])
-
+  
+  interactive_print(ds$name[ds$id == dataset.id])
+  
   # Pull Code List
   codeList <- api_sql_call(sqlView = "DotdxKrNZxG",
                            var = dataset,
-                           d2_session = d2_session)
-
+                           d2_session = d2_session) %>%
+    dplyr::mutate(
+      dataset.id = dataset.id
+    ) %>%
+    dplyr::select(dataset.id, dplyr::everything())
+  
   return(codeList)
 
 }
