@@ -47,7 +47,7 @@ createAnalytics <- function(d,
   }
 
   
-  #This has been moved to adorn_import_file :point_up
+  #This has been moved to adorn_import_file :point_up:
   # # Add timestamp and FY ####
   # d$data$analytics %<>%
   #   dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"),

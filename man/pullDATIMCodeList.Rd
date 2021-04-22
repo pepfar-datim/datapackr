@@ -11,6 +11,8 @@ pullDATIMCodeList(
 }
 \arguments{
 \item{dataset}{Dataset uid to query.}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Code list as dataframe.

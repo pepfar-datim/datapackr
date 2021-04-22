@@ -80,9 +80,28 @@ adorn_import_file <- function(psnu_import_file,
   
   data <- dplyr::bind_rows(data_codes, data_ids)
   
+  # Add upload_timestamp ####
+  data %<>%
+    dplyr::mutate(
+      upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"))
+  
   # Adorn dataElements & categoryOptionCombos ####
    if (cop_year == 2021) {
     map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
+    
+    data %<>%
+      dplyr::left_join(
+        (map_DataPack_DATIM_DEs_COCs_local %>%
+           dplyr::rename(
+             Age = valid_ages.name,
+             Sex = valid_sexes.name,
+             KeyPop = valid_kps.name)),
+        by = c("dataElement" = "dataelementuid",
+               "categoryOptionCombo" = "categoryoptioncombouid",
+               "period" = "period")
+      ) %>%
+      dplyr::rename(fiscal_year = FY)
+    
   # TODO: Is this munging still required with the map being a function of fiscal year?
    } else if (cop_year == 2020) {
      map_DataPack_DATIM_DEs_COCs_local <- datapackr::cop20_map_DataPack_DATIM_DEs_COCs
@@ -101,29 +120,30 @@ adorn_import_file <- function(psnu_import_file,
                      dataelementname = dataelement.y,
                      categoryoptioncomboname = categoryoptioncombo) %>% 
        dplyr::mutate(FY = 2021)
+     
+     data %<>%
+       dplyr::mutate(
+         fiscal_year = as.numeric(stringr::str_replace(period, "Oct|Q4", "")) + 1 ) %>%
+       dplyr::left_join(
+         (map_DataPack_DATIM_DEs_COCs_local %>%
+            dplyr::rename(
+              Age = valid_ages.name,
+              Sex = valid_sexes.name,
+              KeyPop = valid_kps.name)),
+         by = c("dataElement" = "dataelementuid",
+                "categoryOptionCombo" = "categoryoptioncombouid",
+                "fiscal_year" = "FY")
+       )
 
    } else {
      #TODO: Do we need to throw an error here? 
      stop("That COP Year currently isn't supported for processing by createAnalytics.")
    }
   
-  data %<>%
-    dplyr::mutate(
-      upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"),
-      fiscal_year = as.numeric(stringr::str_replace(period, "Oct|Q4", "")) + 1 ) %>%
-    dplyr::left_join(
-      (map_DataPack_DATIM_DEs_COCs_local %>%
-          dplyr::rename(
-            Age = valid_ages.name,
-            Sex = valid_sexes.name,
-            KeyPop = valid_kps.name)),
-      by = c("dataElement" = "dataelementuid",
-             "categoryOptionCombo" = "categoryoptioncombouid",
-             "fiscal_year" = "FY")
-    )
+  
   
   # Select/order columns ####
-  data %>%
+  data %<>%
     dplyr::select( ou,
                    ou_id,
                    country_name,
@@ -157,5 +177,7 @@ adorn_import_file <- function(psnu_import_file,
                    top_level,
                    target_value = value,
                    indicator_code)
+  
+  return(data)
   
 }

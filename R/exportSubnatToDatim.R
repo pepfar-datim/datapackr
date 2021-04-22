@@ -19,16 +19,17 @@ exportSubnatToDATIM <- function(d) {
                             "Sex" = "valid_sexes.name",
                             "KeyPop" = "valid_kps.name")) %>%
     dplyr::mutate(
-      period = dplyr::case_when(
-        stringr::str_detect(indicator_code, "\\.R$") ~ paste0(FY-1,"Q4" ),
-        TRUE ~ paste0(FY-1,"Oct" )),
-      attributeOptionCombo = datapackr::default_catOptCombo()
-    ) %>%
-    dplyr::mutate(
+      attributeOptionCombo = datapackr::default_catOptCombo(),
       value =
         dplyr::case_when(
           value_type == "integer" ~ datapackr::round_trunc(value),
           TRUE ~ value))
+  
+  # PATCH: Drop TX_CURR_SUBNAT.R for now ####
+  SUBNAT_IMPATT %<>%
+    dplyr::filter(
+      indicator_code != "TX_CURR_SUBNAT.R"
+    )
     
   # Form into DATIM import file ####
   SUBNAT_IMPATT %<>%
@@ -59,13 +60,12 @@ exportSubnatToDATIM <- function(d) {
     d$info$has_error <- TRUE
   }
   
-  
   # TEST: Blank Rows; Error;
   blank_rows <- SUBNAT_IMPATT %>% 
     dplyr::filter_all(dplyr::any_vars(is.na(.)))
   
   # TEST: Whether any NAs in any columns
-  if ( NROW(blank_rows) > 0 ) {
+  if (NROW(blank_rows) > 0) {
     d$tests$blank_rows_datim_subnat_impatt <- blank_rows
     attr(d$tests$blank_rows_datim_subnat_impatt, "test_name") <- "SUBNAT/IMPATT data with blanks"
     warning_msg <-
@@ -90,42 +90,37 @@ exportSubnatToDATIM <- function(d) {
   
   d$datim$subnat_fy20 <-  SUBNAT_IMPATT %>%
     dplyr::filter(
-      period == "2019Oct",
-      dataElement %in%
+      period == "2020Q3",
+      dataElement %in% 
         (datapackr::map_DataPack_DATIM_DEs_COCs %>%
-           dplyr::filter(dataset == "FY20 SUBNAT Results" & !is.na(indicator_code)) %>%
-           dplyr::pull(dataelementuid)
-        )
+          dplyr::filter(datastream == "SUBNAT", period == "2020Q3") %>%
+          dplyr::pull(dataelementuid) %>%
+          unique())
     )
+  
+  subnat_des <- datapackr::map_DataPack_DATIM_DEs_COCs %>%
+    dplyr::filter(datastream == "SUBNAT") %>%
+    dplyr::pull(dataelementuid) %>%
+    unique()
     
   d$datim$subnat_fy21 <-  SUBNAT_IMPATT %>%
     dplyr::filter(
       period == "2020Oct",
-      dataElement %in%
-        (datapackr::map_DataPack_DATIM_DEs_COCs %>%
-           dplyr::filter(dataset == "FY21 SUBNAT Targets" & !is.na(indicator_code)) %>%
-           dplyr::pull(dataelementuid)
-        )
-    )
+      dataElement %in% subnat_des)
     
   d$datim$subnat_fy22 <- SUBNAT_IMPATT %>%
     dplyr::filter(
       period == "2021Oct",
-      dataElement %in%
-        (datapackr::map_DataPack_DATIM_DEs_COCs %>%
-           dplyr::filter(dataset == "FY22 SUBNAT Targets" & !is.na(indicator_code)) %>%
-           dplyr::pull(dataelementuid)
-        )
-    )
+      dataElement %in% subnat_des)
     
-  d$datim$impatt_fy21 <- SUBNAT_IMPATT %>%
+  d$datim$impatt_fy22 <- SUBNAT_IMPATT %>%
     dplyr::filter(
-      period == "2020Oct",
+      period == "2021Oct",
       dataElement %in%
         (datapackr::map_DataPack_DATIM_DEs_COCs %>%
-           dplyr::filter(dataset == "FY21 IMPATT" & !is.na(indicator_code)) %>%
-           dplyr::pull(dataelementuid)
-      )
+           dplyr::filter(datastream == "IMPATT") %>%
+           dplyr::pull(dataelementuid) %>%
+          unique())
     )
       
   d$datim$fy22_prioritizations <- SUBNAT_IMPATT %>%
@@ -133,9 +128,9 @@ exportSubnatToDATIM <- function(d) {
       period == "2021Oct",
       dataElement %in%
         (datapackr::map_DataPack_DATIM_DEs_COCs %>%
-           dplyr::filter(dataset == "FY22 IMPATT" & !is.na(indicator_code)) %>%
-           dplyr::pull(dataelementuid)
-        )
+           dplyr::filter(indicator_code == "IMPATT.PRIORITY_SNU.T") %>%
+           dplyr::pull(dataelementuid) %>%
+           unique())
     )
   
   return(d)
