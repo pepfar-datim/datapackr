@@ -145,7 +145,7 @@ unPackCountryUIDs <- function(submission_path,
                      by = "psnu_uid")
   
   if (!country_uids %in% unique(PSNUs$country_uid)) {
-    stop("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
+    warning("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
   }
   
   return(country_uids)

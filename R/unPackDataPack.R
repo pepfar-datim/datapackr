@@ -83,7 +83,7 @@ unPackDataPack <- function(d,
     unique()
 
   if (!d$info$country_uids %in% unique(observed_country_uids)) {
-    stop("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
+    warning("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
   }
 
   return(d)
