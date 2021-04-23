@@ -6,6 +6,9 @@
 \usage{
 getIMPATTLevels(d2_session = dynGet("d2_default_session", inherits = TRUE))
 }
+\arguments{
+\item{d2_session}{DHIS session id.}
+}
 \value{
 Dataframe of country metadata, including prioritization, planning,
 country, community, and facility levels in DATIM organization hierarchy.
