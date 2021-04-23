@@ -44,6 +44,8 @@ round_trunc <- function(x, digits = 0) {
 #' @description
 #' Queries DATIM to retrieve the latest version of
 #' \code{/api/dataStore/dataSetAssignments/ous}
+#' 
+#' @param d2_session DHIS session id.
 #'
 #' @return Dataframe of country metadata, including prioritization, planning,
 #' country, community, and facility levels in DATIM organization hierarchy.
@@ -65,18 +67,15 @@ getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
 
   # Add country_uids ####
   countries <-
-    datapackr::api_call("organisationUnits", d2_session = d2_session) %>%
-    datapackr::api_filter(field = "organisationUnitGroups.id",
-                          operation = "eq",
-                          match = "cNzfcPWEGSH") %>%
-    datapackr::api_fields(fields = "id,name,level,ancestors[id,name]") %>%
-    datapackr::api_get(d2_session = d2_session)
+    datimutils::getOrgUnitGroups("cNzfcPWEGSH", 
+                                 fields = "organisationUnits[id,name]",
+                                 d2_session = d2_session) %>%
+    dplyr::rename(country_name = name, country_uid = id)
 
   impatt_levels %<>%
-    dplyr::left_join(countries, by = c("country_name" = "name")) %>%
-    dplyr::rename(country_uid = id) %>%
+    dplyr::left_join(countries, by = c("country_name" = "country_name")) %>%
     dplyr::select(operating_unit, country_name, country_uid,
-                  dplyr::everything(), -ancestors, -level)
+                  dplyr::everything())
 
   return(impatt_levels)
 
