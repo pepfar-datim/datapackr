@@ -1,8 +1,8 @@
 Package: datapackr
 Type: Package
 Title: A Package that Packs and Unpacks all Data Packs
-Version: 4.3.8
-Date: 2021-4-22
+Version: 4.4.0
+Date: 2021-4-23
 Authors@R: c(
     person("Scott", "Jackson", email = "sjackson@baosystems.com",
         role = c("aut", "cre")),
@@ -51,7 +51,8 @@ Imports:
     glue (>= 1.3.1),
     rlang (>= 0.4.2),
     assertthat,
-    plyr
+    plyr,
+    fuzzyjoin(>= 0.1.6)
 Suggests:
     devtools (>= 2.0.1),
     httptest,

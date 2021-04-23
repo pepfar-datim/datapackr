@@ -5,10 +5,14 @@
 \title{getMechanismViewFromDATIM}
 \usage{
 getMechanismViewFromDATIM(
+  cop_year = NULL,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{
+\item{cop_year}{Specifies COP year for dating as well as selection of
+templates.}
+
 \item{d2_session}{DHIS2 Session id}
 }
 \value{
