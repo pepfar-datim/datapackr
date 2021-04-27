@@ -123,6 +123,15 @@ unPackSNUxIM <- function(d) {
                   !(stringr::str_detect(col_name, "(\\d){4,6}")
                     & stringr::str_detect(col_name, "DSD|TA")))
   
+  #Test specifically for DSD and TA which have been populated as mechanisms by the user. 
+  improper_dedupe_mechs<-names(d$data$SNUxIM) %>%
+    tibble::tibble(col_name = .) %>%
+    dplyr::filter(!col_name %in% cols_to_keep$indicator_code,
+                  (stringr::str_detect(col_name, "0000[01]")
+                    & stringr::str_detect(col_name, "DSD|TA")))
+  
+  invalid_mech_headers<-dplyr::bind_rows(invalid_mech_headers,improper_dedupe_mechs)
+  
   d$tests$invalid_mech_headers <- data.frame(invalid_mech_headers = invalid_mech_headers$col_name)
   attr(d$tests$invalid_mech_headers,"test_name") <- "Invalid mechanism headers"
   
