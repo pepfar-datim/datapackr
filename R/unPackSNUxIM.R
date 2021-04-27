@@ -150,6 +150,7 @@ unPackSNUxIM <- function(d) {
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
   }
   
   d$data$SNUxIM %<>%
@@ -236,6 +237,7 @@ unPackSNUxIM <- function(d) {
         "\n")
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$has_error <- TRUE
   }
   
   d$data$SNUxIM %<>%
