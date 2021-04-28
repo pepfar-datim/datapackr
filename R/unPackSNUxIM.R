@@ -127,8 +127,7 @@ unPackSNUxIM <- function(d) {
   improper_dedupe_mechs<-names(d$data$SNUxIM) %>%
     tibble::tibble(col_name = .) %>%
     dplyr::filter(!col_name %in% cols_to_keep$indicator_code,
-                  (stringr::str_detect(col_name, "0000[01]")
-                    & stringr::str_detect(col_name, "DSD|TA")))
+                  (stringr::str_detect(col_name, "^0000[01]")))
   
   invalid_mech_headers<-dplyr::bind_rows(invalid_mech_headers,improper_dedupe_mechs)
   
