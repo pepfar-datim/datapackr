@@ -166,14 +166,3 @@
 #' }
 "valid_category_options"
 
-#' @docType data
-#' @title Datapack country groupings
-#'
-#' @description Tibble of data pack names and 
-#'
-#' @format 
-#' \describe{
-#'   \item{datapack_name}{Name on home tab of datapack}
-#'   \item{country_uids}{countries uids listed on home tab}
-#' }
-"COP21_datapacks_countries"
