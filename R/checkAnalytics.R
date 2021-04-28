@@ -1,4 +1,75 @@
 #' @export
+#' @title Check Data Pack for <90\% PMTCT_EID from ≤02 months
+#'
+#' @description Check data gathered from Data Pack to identify cases where
+#' the targeted percent of infants (<1 yr) born to HIV-positive women tested for 
+#' HIV (EID) between 0 and 2 months old is less than 90\%.
+#'
+#' @param data Analytics object to analyze
+#'
+#' @return a
+#'
+analyze_eid_2mo <- function(data) {
+  a <- NULL
+  
+  analysis <- data %>%
+    dplyr::mutate(
+      PMTCT_EID.T = PMTCT_EID.N.12.T + PMTCT_EID.N.2.T,
+      PMTCT_EID.2mo.rate = PMTCT_EID.N.2.T / PMTCT_EID.T
+    ) %>%
+    dplyr::filter(!is.na(PMTCT_EID.2mo.rate)) %>%
+    dplyr::select(
+      psnu, psnu_uid, age, sex, key_population,
+      PMTCT_EID.T,
+      PMTCT_EID.N.2.T,
+      PMTCT_EID.N.12.T,
+      PMTCT_EID.2mo.rate)
+  
+  issues <- analysis %>%
+    dplyr::filter(PMTCT_EID.2mo.rate < 0.9)
+  
+  if (NROW(issues) > 0 ) {
+    
+    a$test_results <- issues
+    attr(a$test_results, "test_name") <- "PMTCT_EID coverage by 2 months issues"
+    
+    national_avg <- analysis %>%
+      dplyr::select(
+        PMTCT_EID.T,
+        PMTCT_EID.N.2.T) %>%
+      dplyr::summarise(
+        PMTCT_EID.T =
+          sum(PMTCT_EID.T, na.rm = T),
+        PMTCT_EID.N.2.T =
+          sum(PMTCT_EID.N.2.T, na.rm = T)) %>%
+      dplyr::mutate(
+        PMTCT_EID.2mo.rate =
+          PMTCT_EID.N.2.T / PMTCT_EID.T)
+    
+    a$msg <- 
+      paste0(
+        "WARNING! PMTCT_EID coverage by 2 months old < 90%: \n\n\t* ",
+        crayon::bold(
+          paste0(
+            length(unique(issues$psnu_uid)), " of ",
+            length(unique(analysis$psnu_uid)))),
+        " PSNUs affected.\n\n\t* ",
+        "Total rate of EID coverage by 2 months across all PSNUs: ",
+        crayon::bold(sprintf("%.1f%%",
+                             100 * national_avg$PMTCT_EID.2mo.rate)),
+        "\n\n\t* ",
+        "Lowest observed rate of EID coverage by 2 months: ",
+        crayon::bold(sprintf("%.1f%%",
+                             100 * min(issues$PMTCT_EID.2mo.rate))),
+        "\n")
+    
+  }
+  
+  return(a)
+}
+
+
+#' @export
 #' @title Check Data Pack data for VMMC_CIRC Indeterminate Rate > 5\%
 #'
 #' @description Check data gathered from Data Pack to identify cases where
@@ -596,6 +667,14 @@ checkAnalytics <- function(d,
   if (!is.null(a)) {
     d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
     d$tests$vmmc_indeterminate_rate <- a$test_results
+  }
+  
+  # TEST: EID coverage by 2 months <90% ####
+  a <- analyze_eid_2mo(data)
+  
+  if (!is.null(a)) {
+    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
+    d$tests$eid_coverage_2mo <- a$test_results
   }
 
   # If warnings, show all grouped by sheet and issue ####
