@@ -110,7 +110,12 @@ adorn_import_file <- function(psnu_import_file,
   data %<>%
     dplyr::mutate(
       upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"),
-      fiscal_year = as.numeric(stringr::str_replace(period, "Oct|Q4", "")) + 1 ) %>%
+      fiscal_year = suppressWarnings(dplyr::if_else(stringr::str_detect(period, "Oct"),
+                                                    as.numeric(stringr::str_replace(period, "Oct", "")) + 1,
+                                                    as.numeric(stringr::str_replace(period, "Q3", ""))
+                                                    )
+                                     )
+      ) %>%
     dplyr::left_join(
       (map_DataPack_DATIM_DEs_COCs_local %>%
           dplyr::rename(

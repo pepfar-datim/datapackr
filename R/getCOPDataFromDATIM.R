@@ -23,6 +23,13 @@ getCOPDataFromDATIM <- function(country_uids,
   }
   
   dataset_uids <- datapackr::getDatasetUids(cop_year + 1, streams)
+  
+  # hack to allow forward compatibility between FY21 subnat dataset in DATIM and 
+  # COP21/FY22 datapack
+  # need to be able to grab dataelements from FY22 subnat targets dataset for FY21 period
+  if (cop_year == 2020 && "subnat_targets" %in% streams){
+    dataset_uids <-  c(dataset_uids, datapackr::getDatasetUids(2022, "subnat_targets") )
+  }
     
   # package parameters for getDataValueSets function call
   parameters <-
