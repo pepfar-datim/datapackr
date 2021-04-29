@@ -39,17 +39,11 @@ createTestDataset <- function(country_uids,
       !is.na(categoryoptioncombouid)) %>%
     dplyr::select(
       dataElement = dataelementuid, categoryOptionCombo = categoryoptioncombouid,
-      FY, col_type, value_type, dataset, indicator_code) %>%
-    dplyr::distinct() %>%
-    dplyr::mutate(
-      period = dplyr::case_when(
-        col_type == "target" ~ paste0(FY - 1, "Oct"),
-        col_type == "result" ~ paste0(FY, "Q4")
-      )
-    )
-
+      FY, col_type, value_type, dataset, indicator_code, period) %>%
+    dplyr::distinct()
+  
   des_cocs.subnat_impatt <- DATIM_map %>%
-    dplyr::filter(stringr::str_detect(dataset, "IMPATT|SUBNAT"),
+    dplyr::filter(stringr::str_detect(dataset, "impatt|subnat"),
                   !stringr::str_detect(indicator_code, "PRIORITY_SNU")) %>%
     dplyr::select(dataElement, categoryOptionCombo, period, value_type)
 
@@ -58,16 +52,20 @@ createTestDataset <- function(country_uids,
     dplyr::select(dataElement, categoryOptionCombo, period, value_type)
 
   des_cocs.MER <- DATIM_map %>%
-    dplyr::filter(!stringr::str_detect(dataset, "IMPATT|SUBNAT"),
+    dplyr::filter(!stringr::str_detect(dataset,"impatt|subnat"),
                   !indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
     dplyr::select(dataElement, categoryOptionCombo, period, value_type)
-
+  
+  des_cocs.DREAMS <- DATIM_map %>%
+    dplyr::filter(indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
+    dplyr::select(dataElement, categoryOptionCombo, period, value_type)
+  
   # Get Mech list ####
   mechs <-
     getMechanismView(
       country_uids = country_uids,
       cop_year = cop_year,
-      include_dedupe = TRUE,
+      include_dedupe = FALSE,
       include_MOH = FALSE,
       d2_session = d2_session) %>%
     dplyr::filter(
@@ -79,10 +77,10 @@ createTestDataset <- function(country_uids,
   test_dataset.MER <- org_units %>%
     tidyr::crossing(des_cocs.MER,
                      mechs) %>%
-    dplyr::mutate(value = as.double(sample(0:1000, dplyr::n(), replace = TRUE))) %>%
+    dplyr::mutate(value = as.double(100)) %>%
     dplyr::mutate(
       value = dplyr::case_when(
-        value_type == "percentage" ~ value / 1000,
+        value_type == "percentage" ~ value / 100,
         attributeOptionCombo %in% c("00000", "00001") ~ value * -1,
         TRUE ~ value
       ))
@@ -91,11 +89,10 @@ createTestDataset <- function(country_uids,
     tidyr::crossing(des_cocs.subnat_impatt) %>%
     dplyr::mutate(
       attributeOptionCombo = datapackr::default_catOptCombo(),
-      value = as.double(sample(0:1000, dplyr::n(), replace = TRUE))) %>%
+      value = as.double(100)) %>%
     dplyr::mutate(
       value = dplyr::case_when(
-        value_type == "percentage" ~ value / 1000,
-        attributeOptionCombo %in% c("00000", "00001") ~ value * -1,
+        value_type == "percentage" ~ value / 100,
         TRUE ~ value
       ))
 
@@ -104,8 +101,23 @@ createTestDataset <- function(country_uids,
     dplyr::mutate(
       attributeOptionCombo = datapackr::default_catOptCombo(),
       value = sample(0:8, dplyr::n(), replace = TRUE))
-
+  
+  DREAMS_org_units <- datapackr::valid_PSNUs %>%
+    dplyr::filter(
+      country_uid %in% country_uids,
+      !is.na(psnu_type),
+      DREAMS == "Y") %>%
+    dplyr::select(orgUnit = psnu_uid) %>%
+    dplyr::distinct()
+  
+  test_dataset.DREAMS <- DREAMS_org_units %>%
+    tidyr::crossing(des_cocs.DREAMS) %>%
+    dplyr::mutate(
+      attributeOptionCombo = datapackr::default_catOptCombo(),
+      value = as.double(100))
+  
   test_dataset <- dplyr::bind_rows(test_dataset.MER,
+                                   test_dataset.DREAMS,
                                    test_dataset.subnat_impatt,
                                    test_dataset.prioritizations)
 
