@@ -83,7 +83,11 @@ exportSubnatToDATIM <- function(d) {
   SUBNAT_IMPATT %<>%
     tidyr::drop_na()
   
-  d$datim$subnat_impatt <- SUBNAT_IMPATT
+  d$datim$subnat_impatt <- SUBNAT_IMPATT %>%
+    # PATCH: Drop TX_CURR_SUBNAT.R for now ####
+    dplyr::filter(
+      dataElement != "MktYDp33kd6"
+    )
   
   d$datim$subnat_fy20 <-  SUBNAT_IMPATT %>%
     dplyr::filter(
