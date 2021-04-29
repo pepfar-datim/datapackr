@@ -588,7 +588,8 @@ checkAnalytics <- function(d,
   }
   
   category_options <- datimutils::getMetadata(end_point = "categoryOptions",
-                                              "categories.id:ne:SH885jaRe0o")
+                                              "categories.id:ne:SH885jaRe0o",
+                                              d2_session = d2_session)
 
   model_data_country <- model_data[d$info$country_uids] %>%
     dplyr::bind_rows() %>%
@@ -621,61 +622,36 @@ checkAnalytics <- function(d,
     dplyr::mutate(dplyr::across(c(-psnu, -psnu_uid, -age, -sex, -key_population),
                      ~tidyr::replace_na(.x, 0)))
 
-  # TEST: Retention Rates ####
-  a <- analyze_retention(data)
 
-  if (!is.null(a)) {
-    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
-    d$tests$retention <- a$test_results
-  }
 
-  # TEST: Linkage rates ####
-  a <- analyze_linkage(data)
-
-  if (!is.null(a)) {
-    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
-    d$tests$linkage <- a$test_results
-  }
-
-  # TEST: HTS_INDEX_POS proportion of HTS_TST_POS ####
-  a <- analyze_indexpos_ratio(data)
-
-  if (!is.null(a)) {
-    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
-    d$tests$index_rate <- a$test_results
-  }
-
-  # TEST: PMTCT KNOWN POS proportion of Total Pos ####
-  a <- analyze_pmtctknownpos(data)
-
-  if (!is.null(a)) {
-    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
-    d$tests$pmtctknownpos_issues <- a$test_results
-  }
-
-  # TEST: TB KNOWN POS proportion of Total Pos ####
-  a <- analyze_tbknownpos(data)
-
-  if (!is.null(a)) {
-    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
-    d$tests$tbknownpos_issues <- a$test_results
-  }
-
-  # TEST: VMMC_CIRC Indeterminate/Not Tested Rate of VMMC_CIRC Total ####
-  a <- analyze_vmmc_indeterminate(data)
-
-  if (!is.null(a)) {
-    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
-    d$tests$vmmc_indeterminate_rate <- a$test_results
-  }
+  #Apply the list of analytics checks functions  
+  funs <- list(
+    retention = analyze_retention,
+    linkage = analyze_linkage,
+    index_rate = analyze_indexpos_ratio,
+    pmtctknownpos_issues = analyze_pmtctknownpos,
+    tbknownpos_issues = analyze_tbknownpos,
+    vmmc_indeterminate_rate = analyze_vmmc_indeterminate,
+    eid_coverage_2mo  = analyze_eid_2mo
+  )
   
-  # TEST: EID coverage by 2 months <90% ####
-  a <- analyze_eid_2mo(data)
+  analytics_checks <-
+    lapply(funs, function(x)
+      purrr::invoke(x, list(data = data)))
   
-  if (!is.null(a)) {
-    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg, a$msg)
-    d$tests$eid_coverage_2mo <- a$test_results
-  }
+  d$info$analytics_warning_msg <-
+    append(
+      d$info$analytics_warning_msg,
+      purrr::map(analytics_checks, function(x)
+        x %>% purrr::pluck("msg"))
+    ) %>%  purrr::discard(is.null)
+    
+
+  d$tests <-
+    append(d$tests,
+           purrr::map(analytics_checks, function(x)
+             x %>% purrr::pluck("test_results"))) %>% 
+    purrr::discard(is.null)
 
   # If warnings, show all grouped by sheet and issue ####
   if (!is.null(d$info$analytics_warning_msg) & interactive()) {
