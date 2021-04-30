@@ -635,9 +635,7 @@ checkAnalytics <- function(d,
     eid_coverage_2mo  = analyze_eid_2mo
   )
   
-  analytics_checks <-
-    lapply(funs, function(x)
-      purrr::invoke(x, list(data = data)))
+  analytics_checks <-  purrr::map(funs,purrr::exec,data)
   
   d$info$analytics_warning_msg <-
     append(
