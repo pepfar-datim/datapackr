@@ -37,12 +37,6 @@ packSNUxIM <- function(d,
   }
 
   # Prepare SNU x IM model dataset ####
-  if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
-    targets_data <- d$data$missingCombos
-  } else {
-    targets_data <- d$data$MER
-  }
-  
     #TODO: Consider preparing this ahead of time for all OUs
   snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path) %>%
     prepare_model_data.PSNUxIM(model_data = .,
@@ -51,10 +45,16 @@ packSNUxIM <- function(d,
   # Filter SNU x IM model dataset to only those data needed in tab ####
   interactive_print("Focusing on patterns relevant to your submitted tool...")
 
+  if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
+    targets_data <- d$data$missingCombos
+  } else {
+    targets_data <- d$data$MER
+  }
+
   # Do not include AGYW_PREV -- These are not allocated to IMs
   targets_data %<>%
     dplyr::filter(!indicator_code %in% c("AGYW_PREV.N.T", "AGYW_PREV.D.T"))
-  
+
   if (NROW(snuxim_model_data) > 0) {
     snuxim_model_data %<>%
       dplyr::right_join(
@@ -123,23 +123,18 @@ packSNUxIM <- function(d,
     dplyr::mutate(
       target_col = openxlsx::int2col(col)
     ) %>%
-    dplyr::select(sheet_name, indicator_code, target_col)
+    dplyr::select(indicator_code, target_col)
 
   snuxim_model_data %<>%
     dplyr::left_join(
       id_cols, by = c("sheet_name" = "sheet_name")) %>%
     dplyr::left_join(
-      target_cols, by = c("indicator_code" = "indicator_code",
-                          "sheet_name" = "sheet_name")) %>%
+      target_cols, by = c("indicator_code" = "indicator_code")) %>%
     dplyr::mutate(
       row = as.integer((1:dplyr::n()) + existing_rows),
-      
-  # Accommodate OGAC request to aggregate OVC_HIVSTAT.T across age/sex ####
       id_col = dplyr::case_when(
         indicator_code == "OVC_HIVSTAT.T" ~ "B",
         TRUE ~ id_col),
-  
-  # Add DataPackTarget column & classify just that col as formula ####
       DataPackTarget = paste0(
         'SUMIF(',
         sheet_name, '!$', id_col, ':$', id_col,
@@ -177,22 +172,19 @@ packSNUxIM <- function(d,
       & stringr::str_detect(
         formula,
         paste0("(?<=[:upper:])", top_rows
-               +1))) %>%
-  # Allow dragging down of right-side formulas
-      #col < (col.im.targets[1])) %>%
+               +1)),
+      col < (col.im.targets[1])) %>%
     dplyr::pull(col)
-  
-  ## TODO: Improve this next piece to be more efficient instead of using str_replace_all
 
   data_structure %<>%
     dplyr::arrange(col) %>%
     dplyr::mutate(
       column_names = dplyr::case_when(
         col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_",col),
-        col >= col.im.targets[1] & col <= col.im.targets[2] ~ paste0("target_col_",col),
+        col >= col.im.targets[1] & col <= (col.im.targets[1]+count.im.datim-1) ~ paste0("target_col_",col),
         TRUE ~ indicator_code)
     ) %>%
-    #dplyr::filter(col < col.im.targets[1]) %>%
+    dplyr::filter(col < col.im.targets[1]) %>%
     tibble::column_to_rownames(var = "column_names") %>%
     dplyr::select(formula) %>%
     t() %>%
