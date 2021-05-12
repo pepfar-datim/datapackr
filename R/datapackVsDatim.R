@@ -107,17 +107,14 @@ compareData_DatapackVsDatim <-
       dplyr::filter(datapack_value != 0)
 
 # Sum over IM including dedup    
-    datapack_data_psnu_w_dedup <- dplyr::group_by(datapack_data,
+    datapack_data_psnu <- dplyr::group_by(datapack_data,
                                                   dataElement,
                                                   orgUnit,
                                                   categoryOptionCombo) %>%
       dplyr::summarise(datapack_value = sum(datapack_value)) %>%
       dplyr::ungroup()
     
-# data pack dedups use code 99999 - implies pure and crosswalk
-# Get rid of dedups in data disaggregated by IM
-    datapack_data_psnu_x_im_wo_dedup <- datapack_data %>%
-      dplyr::filter(attributeOptionCombo != "99999") 
+    datapack_data_psnu_x_im <- datapack_data 
     
 # Get data from DATIM using data value sets
     
@@ -133,12 +130,8 @@ compareData_DatapackVsDatim <-
       dplyr::filter(value != "") %>%
       dplyr::rename(datim_value = value)
     
-# recode dedups to be 99999 to match data pack  
-    datim_data$attributeOptionCombo[datim_data$attributeOptionCombo == "00000" |
-                                             datim_data$attributeOptionCombo == "00001"] <- "99999"
-    
 # Sum over IM including dedup    
-    datim_data_psnu_w_dedup <- 
+    datim_data_psnu <- 
       dplyr::group_by(datim_data,
                       dataElement,
                       orgUnit,
@@ -147,21 +140,20 @@ compareData_DatapackVsDatim <-
       dplyr::ungroup()
 
 # get rid of dedups in the data dissagregated by IM        
-    datim_data_psnu_x_im_wo_dedup <- datim_data %>%
-      dplyr::filter(attributeOptionCombo != "99999")
+    datim_data_psnu_x_im <- datim_data
     
 # join the data pack data and the datim data
-    data_psnu_w_dedup <- dplyr::full_join(datim_data_psnu_w_dedup,
-                                          datapack_data_psnu_w_dedup)
+    data_psnu <- dplyr::full_join(datim_data_psnu,
+                                          datapack_data_psnu)
     
-    data_psnu_x_im_wo_dedup <-
-      dplyr::full_join(datim_data_psnu_x_im_wo_dedup,
-                       datapack_data_psnu_x_im_wo_dedup)
+    data_psnu_x_im <-
+      dplyr::full_join(datim_data_psnu_x_im,
+                       datapack_data_psnu_x_im)
     
 # Find the cases with different values. These should be  imported into DATIM
     data_different_value <-
       dplyr::filter(
-        data_psnu_x_im_wo_dedup,
+        data_psnu_x_im,
         abs(datapack_value - datim_value) > .000001 |
           is.na(datim_value)
       ) %>%
@@ -176,7 +168,7 @@ compareData_DatapackVsDatim <-
     
 # data in datim but not in the data pack
     data_datim_only <- 
-      dplyr::filter(data_psnu_x_im_wo_dedup,
+      dplyr::filter(data_psnu_x_im,
                     is.na(datapack_value)) %>%
       dplyr::select(
         dataElement,
@@ -187,13 +179,13 @@ compareData_DatapackVsDatim <-
         datim_value
       )
     
-    data_psnu_x_im_wo_dedup %<>% beautify()
+    data_psnu_x_im %<>% beautify()
     
-    data_psnu_w_dedup %<>% beautify() %>% dplyr::select(-effect)
+    data_psnu %<>% beautify() %>% dplyr::select(-effect)
     
     list(
-      psnu_x_im_wo_dedup = data_psnu_x_im_wo_dedup,
-      psnu_w_dedup = data_psnu_w_dedup,
+      psnu_x_im = data_psnu_x_im,
+      psnu = data_psnu,
       updates = data_different_value,
       deletes = data_datim_only
     )
