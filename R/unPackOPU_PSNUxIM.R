@@ -38,6 +38,23 @@ unPackOPU_PSNUxIM <- function(d) {
       .name_repair = "minimal"
     )
   
+  if (NROW(d$data$extract) == 1 & is.na(d$data$extract[[1,1]])) {
+    d$info$has_psnuxim <- FALSE
+    d$info$needs_psnuxim <- TRUE
+    d$info$has_error <- TRUE
+    
+    warning_msg <- 
+      paste0(
+        "WARNING! Your OPU Data Pack appears to be missing all data on the `PSNUxIM` tab.",
+        " This is a fatal error. Please contact the Help Desk for guidance.",
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    
+    return(d)
+    
+  } else {d$info$has_psnuxim <- TRUE}
+  
   # TODO: Check column structures ####
     # d <- checkColStructure(d, sheet)
   
