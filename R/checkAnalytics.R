@@ -154,10 +154,10 @@ analyze_vmmc_indeterminate <- function(data) {
 
 
 #' @export
-#' @title Check Data Pack data for PMTCT retention < 98\% or >100\%
+#' @title Check Data Pack data for PMTCT Known Pos > PMTCT Total.
 #'
 #' @description Check data gathered from Data Pack to identify cases where
-#' retention of PMTCT patients is less than the standard of 98\% or >100\%.
+#' PMTCT Known Pos > PMTCT Total.
 #'
 #' @param data Analytics object to analyze
 #'
@@ -211,10 +211,10 @@ analyze_pmtctknownpos <- function(data) {
 
 
 #' @export
-#' @title Check Data Pack data for TB retention < 98\% or >100\%
+#' @title Check Data Pack data for TB Known Pos > TB Total.
 #'
 #' @description Check data gathered from Data Pack to identify cases where
-#' retention of TB patients is less than the standard of 98\% or >100\%.
+#' TB Known Pos > TB Total.
 #'
 #' @param data Analytics object to analyze
 #'
