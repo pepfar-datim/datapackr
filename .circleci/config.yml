@@ -1,10 +1,14 @@
-version: 2
+version: 2.1
+description: Datapackr Test Suite
 jobs:
   build:
     docker:
       - image: rocker/verse:3.5.3
     steps:
       - checkout
+      - run: 
+	  name: Install libsodium
+          command: sudo apt-get install libsodium-dev
       - run:
           name: Install package dependencies
           command: R -e "devtools::install_deps(dep = TRUE)"
