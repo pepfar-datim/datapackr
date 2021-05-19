@@ -5,4 +5,5 @@ test_sheet <-
     #rprojroot::find_package_root_file("inst/extdata",fname)
 
 library(httptest)
+library(tibble)
 test_config <- function(fname) rprojroot::find_testthat_root_file("config", fname)
