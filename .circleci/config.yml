@@ -6,17 +6,16 @@ jobs:
       - image: rocker/verse:3.5.3
     steps:
       - checkout
-      run:
-      name: Install libsodium
-      # source: https://github.com/aeternity/docker-builder/blob/master/Dockerfile#L23
-      command: |
-        LIBSODIUM_DOWNLOAD_URL="https://github.com/jedisct1/libsodium/releases/download/${LIBSODIUM_VERSION}/libsodium-${LIBSODIUM_VERSION}.tar.gz" \
-          && curl -fsSL -o libsodium-src.tar.gz "$LIBSODIUM_DOWNLOAD_URL" \
-          && mkdir libsodium-src \
-          && tar -zxf libsodium-src.tar.gz -C libsodium-src --strip-components=1 \
-          && cd libsodium-src \
-          && ./configure && make -j$(nproc) && sudo make install && sudo ldconfig
- 
+     -run:
+          name: Install libsodium
+          # source: https://github.com/aeternity/docker-builder/blob/master/Dockerfile#L23
+          command: |
+            LIBSODIUM_DOWNLOAD_URL="https://github.com/jedisct1/libsodium/releases/download/${LIBSODIUM_VERSION}/libsodium-${LIBSODIUM_VERSION}.tar.gz" \
+            && curl -fsSL -o libsodium-src.tar.gz "$LIBSODIUM_DOWNLOAD_URL" \
+            && mkdir libsodium-src \
+            && tar -zxf libsodium-src.tar.gz -C libsodium-src --strip-components=1 \
+            && cd libsodium-src \
+            && ./configure && make -j$(nproc) && sudo make install && sudo ldconfig
       - run:
           name: Install package dependencies
           command: R -e "devtools::install_deps(dep = TRUE)"
