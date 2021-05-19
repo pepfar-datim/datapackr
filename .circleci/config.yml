@@ -6,6 +6,9 @@ jobs:
       - image: rocker/verse:3.5.3
     steps:
       - checkout
+      - run: 
+         name: Install curl
+         command: sudo apt-get -qq -y install git curl
       - run:
          name: Install libsodium
           # source: https://github.com/aeternity/docker-builder/blob/master/Dockerfile#L23
