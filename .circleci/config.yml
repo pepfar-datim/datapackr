@@ -18,6 +18,6 @@ jobs:
       - run:
           name: Build package
           command: R CMD build .
-      - run:
-          name: Check package
-          command: R CMD check *tar.gz
+      - run: 
+          name: Test package
+          command: R -e "devtools::test()" 
