@@ -1,3 +1,22 @@
+
+
+htsModalities<-function() {
+c("HTS_INDEX_COM.New.Pos.T",
+          "HTS_INDEX_FAC.New.Pos.T",
+          "HTS_TST.EW.Pos.T",
+          "HTS_TST.Inpat.Pos.T",
+          "HTS_TST.Maln.Pos.T",
+          "HTS_TST.MobileCom.Pos.T",
+          "HTS_TST.OtherCom.Pos.T",
+          "HTS_TST.Other.Pos.T",
+          "HTS_TST.Peds.Pos.T",
+          "HTS_TST.PostANC1.Pos.T",
+          "HTS_TST.STI.Pos.T",
+          "HTS_TST.VCT.Pos.T",
+          "PMTCT_STAT.N.New.Pos.T",
+          "TB_STAT.N.New.Pos.T",
+          "VMMC_CIRC.Pos.T")
+}
 #' @export
 #' @title Check Data Pack for <90\% PMTCT_EID from ≤02 months
 #'
@@ -352,22 +371,7 @@ analyze_linkage <- function(data) {
 
   analysis <- data %>%
     dplyr::mutate(
-      HTS_TST_POS.T =
-        HTS_INDEX_COM.New.Pos.T
-        + HTS_INDEX_FAC.New.Pos.T
-        + HTS_TST.EW.Pos.T
-        + HTS_TST.Inpat.Pos.T
-        + HTS_TST.Maln.Pos.T
-        + HTS_TST.MobileCom.Pos.T
-        + HTS_TST.OtherCom.Pos.T
-        + HTS_TST.Other.Pos.T
-        + HTS_TST.Peds.Pos.T
-        + HTS_TST.PostANC1.Pos.T
-        + HTS_TST.STI.Pos.T
-        + HTS_TST.VCT.Pos.T
-        + PMTCT_STAT.N.New.Pos.T
-        + TB_STAT.N.New.Pos.T
-        + VMMC_CIRC.Pos.T,
+      HTS_TST_POS.T =rowSums(dplyr::select(.,tidyselect::any_of(htsModalities()))),
       HTS_TST.Linkage.T =
         dplyr::case_when(
           HTS_TST_POS.T == 0 ~ NA_real_,
@@ -411,7 +415,7 @@ analyze_linkage <- function(data) {
          TX_NEW.T / HTS_TST_POS.T,
        HTS_TST.KP.Linkage.T =
          TX_NEW.KP.T / HTS_TST.KP.Pos.T
-      )
+      ) 
 
     a$msg <-
       paste0(
@@ -466,22 +470,7 @@ analyze_indexpos_ratio <- function(data) {
     dplyr::summarise(dplyr::across(dplyr::everything(), sum)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(
-      HTS_TST_POS.T =
-        HTS_INDEX_COM.New.Pos.T
-        + HTS_INDEX_FAC.New.Pos.T
-        + HTS_TST.EW.Pos.T
-        + HTS_TST.Inpat.Pos.T
-        + HTS_TST.Maln.Pos.T
-        + HTS_TST.MobileCom.Pos.T
-        + HTS_TST.OtherCom.Pos.T
-        + HTS_TST.Other.Pos.T
-        + HTS_TST.Peds.Pos.T
-        + HTS_TST.PostANC1.Pos.T
-        + HTS_TST.STI.Pos.T
-        + HTS_TST.VCT.Pos.T
-        + PMTCT_STAT.N.New.Pos.T
-        + TB_STAT.N.New.Pos.T
-        + VMMC_CIRC.Pos.T,
+      HTS_TST_POS.T = rowSums(dplyr::select(.,tidyselect::any_of(htsModalities()))),
       HTS_INDEX.total =
         HTS_INDEX_COM.New.Pos.T
         + HTS_INDEX_FAC.New.Pos.T,
