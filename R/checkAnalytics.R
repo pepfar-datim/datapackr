@@ -167,6 +167,7 @@ analyze_pmtctknownpos <- function(data) {
   a <- NULL
 
   issues <- data %>%
+    dplyr::filter(is.na(key_population)) %>%
     dplyr::mutate(
       PMTCT_STAT.N.Total =
         PMTCT_STAT.N.New.Pos.T
@@ -174,7 +175,6 @@ analyze_pmtctknownpos <- function(data) {
         + PMTCT_STAT.N.New.Neg.T,
       knownpos_ratio =
         (PMTCT_STAT.N.KnownPos.T / PMTCT_STAT.N.Total)) %>%
-    dplyr::filter(is.na(key_population)) %>%
     dplyr::select(
       psnu, psnu_uid, age, sex, key_population,
       PMTCT_STAT.N.Total,
@@ -183,6 +183,7 @@ analyze_pmtctknownpos <- function(data) {
       PMTCT_STAT.N.New.Neg.T,
       knownpos_ratio
     ) %>%
+    dplyr::filter(!is.na(knownpos_ratio)) %>% 
     dplyr::filter(
       PMTCT_STAT.N.KnownPos.T > PMTCT_STAT.N.Total
     )
@@ -281,7 +282,8 @@ analyze_retention <- function(data) {
       TX.Retention.T =
         (TX_CURR.T)
       / (TX_CURR.T_1 + TX_NEW.T)
-    )
+    ) %>% 
+    dplyr::filter(!is.na(TX.Retention.T))
 
   issues <- analysis %>%
     dplyr::filter(TX.Retention.T < 0.98 | TX.Retention.T > 1) %>%
