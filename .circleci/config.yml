@@ -7,7 +7,7 @@ jobs:
     steps:
       - checkout
       - run: 
-	  name: Install libsodium
+          name: Install libsodium
           command: sudo apt-get install libsodium-dev
       - run:
           name: Install package dependencies
