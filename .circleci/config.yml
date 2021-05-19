@@ -6,7 +6,7 @@ jobs:
       - image: rocker/verse:3.5.3
     steps:
       - checkout
-      -run:
+      - run:
          name: Install libsodium
           # source: https://github.com/aeternity/docker-builder/blob/master/Dockerfile#L23
          command: |
