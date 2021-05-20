@@ -13,5 +13,8 @@ with_mock_api({
                    "categoryoptioncombo",
                    "categoryoptioncombocode","categoryoptioncombouid")
     expect_true(setequal(test_dataset_names,names(test_dataset)))
+    
+    #Expect error on a faulty dataset UID
+    expect_error(pullDATIMCodeList("foo"))
   })
 })
