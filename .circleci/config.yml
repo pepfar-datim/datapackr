@@ -22,7 +22,7 @@ jobs:
       - save_cache:
           key: deps1-{{ checksum "renv.lock" }}
           paths:
-            - renv
+            - /usr/local/lib/R/site-library
       - run:
           name: Build package
           command: R CMD build --no-build-vignettes --no-manual .
