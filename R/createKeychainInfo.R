@@ -134,7 +134,7 @@ createKeychainInfo <- function(submission_path = NULL,
                                           "Latin America Region",
                                           "Caribbean Region",
                                           datapackr::valid_PSNUs$ou))) {
-    
+    #TODO: This seems to do nothing. Should it?
   }
   
   # Determine country uids ####
