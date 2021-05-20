@@ -239,10 +239,10 @@
     },
     "data.table": {
       "Package": "data.table",
-      "Version": "1.13.6",
+      "Version": "1.14.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "813fa8857aaa949b243e2e0b4abb8592"
+      "Hash": "d1b8b1a821ee564a3515fa6c6d5c52dc"
     },
     "datapackcommons": {
       "Package": "datapackcommons",
