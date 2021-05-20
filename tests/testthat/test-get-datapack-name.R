@@ -1,6 +1,5 @@
 context("test-get-datapack-name")
 
-
 test_that("Can read a Datapack Name and UIDs", {
   template_copy=paste0(tempfile(),".xlsx")
   file.copy(from = test_sheet('COP21_Data_Pack_Template.xlsx'), to=template_copy)
