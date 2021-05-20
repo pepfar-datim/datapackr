@@ -1,7 +1,7 @@
 context("test-signature")
 
 
-test_that("Can generate a signature", {
+test_that("Can generate a key chain", {
   d <- datapackr:::createKeychainInfo(submission_path = test_sheet('COP21_Data_Pack_Template.xlsx'),
                         tool = "Data Pack",
                         country_uids = NULL,
@@ -22,11 +22,18 @@ test_that("Can generate a signature", {
        "missing_DSNUs"
      )
    )
+   expect_equal(d$keychain$submission_path,test_sheet('COP21_Data_Pack_Template.xlsx'))
    expect_null(d$info$warning_msg)
    expect_false(d$info$has_error)
    expect_false(d$info$newSNUxIM)
-
-
+   expect_equal(d$info$country_uids,"qllxzIjjurr")
+   expect_equal(d$info$datapack_name,"Lesotho")
+   expect_false(d$info$newSNUxIM)
+   expect_false(d$info$has_error)
+   expect_false(d$info$missing_DSNUs)
+   expect_false(d$info$missing_psnuxim_combos)
+   expect_equal(d$info$tool, "Data Pack")
+   expect_equal(d$info$cop_year, 2021)
 } )
 
 test_that("Can get the type and COP year of tool of a COP21 Data Pack",{
