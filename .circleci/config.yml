@@ -17,7 +17,7 @@ jobs:
           command: R -e "renv::restore()"
       - run:
           name: Build package
-          command: R CMD build .
+          command: R CMD build --no-build-vignettes --no-manual .
       - run: 
           name: Test package
           command: R -e "devtools::test()" 
