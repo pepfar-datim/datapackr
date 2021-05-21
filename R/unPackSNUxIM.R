@@ -103,6 +103,37 @@ unPackSNUxIM <- function(d) {
 
   d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
   
+  # TEST: Missing right-side formulas; Warn; Continue ####
+  d$tests$psnuxim_missing_rs_fxs <-
+    tidyxl::xlsx_cells(path = d$keychain$submission_path,
+                       sheets = "PSNUxIM",
+                       include_blank_cells = T) %>%
+    dplyr::select(col, row, formula, character) %>%
+    dplyr::filter(row >= header_row,
+                  col %in% cols_to_keep$col) %>%
+    dplyr::filter(!col %in% header_cols$col) %>%
+    dplyr::mutate(formula = dplyr::if_else(is.na(formula),
+                                           character,
+                                           formula)) %>%
+    dplyr::select(-character) %>%
+    dplyr::filter(is.na(formula)) %>%
+    dplyr::mutate(row_letter = openxlsx::int2col(col))
+  
+  attr(d$tests$psnuxim_missing_rs_fxs,"test_name") <- "Missing PSNUxIM R.S. Formulas"
+  
+  if (NROW(d$tests$psnuxim_missing_rs_fxs) > 0) {
+    warning_msg <-
+      paste0(
+        "WARNING! In tab PSNUxIM: MISSING FORMULAS ON RIGHT SIDE.",
+        " Make sure all formulas in the far right section of your PSNUxIM tab",
+        " (section titled 'Target Values') are completely copied to the bottom",
+        " of your data. The following columns are implicated. -> \n\t",
+        paste(sort(unique(d$tests$psnuxim_missing_rs_fxs$row_letter)), collapse = ", "),
+        "\n")
+    
+    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  }
+  
   # Drop rows where entire row is NA ####
   d$data$SNUxIM %<>%
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
