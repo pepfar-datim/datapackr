@@ -2,7 +2,7 @@
 % Please edit documentation in R/checkAnalytics.R
 \name{analyze_tbknownpos}
 \alias{analyze_tbknownpos}
-\title{Check Data Pack data for TB Known Pos > TB Total.}
+\title{Check Data Pack data for TB Known Pos ratio > 75\%.}
 \usage{
 analyze_tbknownpos(data)
 }
@@ -14,5 +14,5 @@ a
 }
 \description{
 Check data gathered from Data Pack to identify cases where
-TB Known Pos > TB Total.
+TB Known Pos ratio > 75\%
 }
