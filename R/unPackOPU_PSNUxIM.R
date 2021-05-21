@@ -40,7 +40,6 @@ unPackOPU_PSNUxIM <- function(d) {
   
   if (NROW(d$data$extract) == 1 & is.na(d$data$extract[[1,1]])) {
     d$info$has_psnuxim <- FALSE
-    d$info$needs_psnuxim <- TRUE
     d$info$has_error <- TRUE
     
     warning_msg <- 
