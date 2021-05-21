@@ -29,6 +29,7 @@ unPackSNUxIM <- function(d) {
   
   if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1,1]])) {
     d$info$has_psnuxim <- FALSE
+    d$info$needs_psnuxim <- TRUE
 
     warning_msg <- 
       paste0(
@@ -430,6 +431,8 @@ unPackSNUxIM <- function(d) {
   d$info$missing_psnuxim_combos <- ( NROW(d$data$missingCombos) > 0 )
   
   if (d$info$missing_psnuxim_combos) {
+    d$info$needs_psnuxim <- TRUE
+    
     warning_msg <- 
       paste0(
         "WARNING! Your Data Pack may need a new PSNUxIM tab. Along with this warning,",
