@@ -173,10 +173,10 @@ analyze_vmmc_indeterminate <- function(data) {
 
 
 #' @export
-#' @title Check Data Pack data for PMTCT Known Pos > PMTCT Total.
+#' @title Check Data Pack data for PMTCT Known Pos Ratio > 75\%.
 #'
 #' @description Check data gathered from Data Pack to identify cases where
-#' PMTCT Known Pos > PMTCT Total.
+#' PMTCT Known Pos Ratio > 75\%.
 #'
 #' @param data Analytics object to analyze
 #'
@@ -204,7 +204,7 @@ analyze_pmtctknownpos <- function(data) {
     ) %>%
     dplyr::filter(!is.na(knownpos_ratio)) %>% 
     dplyr::filter(
-      PMTCT_STAT.N.KnownPos.T > PMTCT_STAT.N.Total
+      knownpos_ratio > 0.75
     )
 
   if (NROW(issues) > 0) {
@@ -214,7 +214,7 @@ analyze_pmtctknownpos <- function(data) {
 
     a$msg <-
       paste0(
-        "WARNING! PMTCT KNOWN POS > TOTAL POS: \n\n\t* ",
+        "WARNING! PMTCT KNOWN POS Ratio > 75%: \n\n\t* ",
         crayon::bold(
           paste0(
             length(unique(issues$psnu_uid)), " of ",
@@ -231,10 +231,10 @@ analyze_pmtctknownpos <- function(data) {
 
 
 #' @export
-#' @title Check Data Pack data for TB Known Pos > TB Total.
+#' @title Check Data Pack data for TB Known Pos ratio > 75\%.
 #'
 #' @description Check data gathered from Data Pack to identify cases where
-#' TB Known Pos > TB Total.
+#' TB Known Pos ratio > 75\%
 #'
 #' @param data Analytics object to analyze
 #'
@@ -257,8 +257,9 @@ analyze_tbknownpos <- function(data) {
       TB_STAT.N.KnownPos.T,
       TB_STAT.N.New.Neg.T,
       knownpos_ratio) %>%
+    dplyr::filter(!is.na(knownpos_ratio)) %>% 
     dplyr::filter(
-      TB_STAT.N.KnownPos.T > TB_STAT.N.Total)
+      knownpos_ratio > 0.75)
 
   if (NROW(issues) > 0) {
 
@@ -267,7 +268,7 @@ analyze_tbknownpos <- function(data) {
 
     a$msg <-
       paste0(
-        "WARNING! TB KNOWN POS > TOTAL POS: \n\n\t* ",
+        "WARNING! TB KNOWN POS Ratio > 75%: \n\n\t* ",
         crayon::bold(
           paste0(
             length(unique(issues$psnu_uid)), " of ",
