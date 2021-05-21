@@ -75,21 +75,80 @@ test_that("VMMC_CIRC Indeterminate Rate all zeros expect NULL" , {
   
 } )
 
-test_that("PMTCT Known Pos > PMTCT Total  expect message" , {
+test_that("PMTCT Known Pos/PMTCT Total >  0.75 expect message" , {
   data<-tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~PMTCT_STAT.N.New.Pos.T,~PMTCT_STAT.N.KnownPos.T,~PMTCT_STAT.N.New.Neg.T,
-    "a",   1,         "<1",  "M",  NA,                         0,        100, 0,
+    "a",   1,         "<1",  "M",  NA,                         10,        100, 10,
     "b",  2,          "<1", "M", NA,                         0,         0, 0
   )
   
   foo<-analyze_pmtctknownpos(data)
-  skip('DP-252')
   testthat::expect_equal(class(foo),"list")
   testthat::expect_setequal(names(foo),c("test_results","msg"))
   testthat::expect_equal(NROW(foo$test_results),1)
-  expect_equal(foo$test_results$knownpos_ratio,1.11,tolerance=1e-3)
+  expect_equal(foo$test_results$knownpos_ratio,0.833,tolerance=1e-3)
   
 
+} )
+
+test_that("PMTCT Known Pos/PMTCT Total <  0.75 expect null" , {
+  data<-tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~PMTCT_STAT.N.New.Pos.T,~PMTCT_STAT.N.KnownPos.T,~PMTCT_STAT.N.New.Neg.T,
+    "a",   1,         "<1",  "M",  NA,                         10,        10, 10,
+    "b",  2,          "<1", "M", NA,                         0,         0, 0
+  )
+  
+  expect_null(analyze_pmtctknownpos(data))
+
+} )
+
+test_that("PMTCT Known Pos/PMTCT Total all zeros expect null" , {
+  data<-tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~PMTCT_STAT.N.New.Pos.T,~PMTCT_STAT.N.KnownPos.T,~PMTCT_STAT.N.New.Neg.T,
+    "a",   1,         "<1",  "M",  NA,                         0,        0, 0,
+    "b",  2,          "<1", "M", NA,                         0,         0, 0
+  )
+  
+  expect_null(analyze_pmtctknownpos(data))
+  
+} )
+
+test_that("TB Known Pos ratio > 75% expect message" , {
+  data<-tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~TB_STAT.N.New.Pos.T,~TB_STAT.N.KnownPos.T,~TB_STAT.N.New.Neg.T,
+    "a",   1,         "<1",  "M",  NA,                         10,        100, 10,
+    "b",  2,          "<1", "M", NA,                         0,         0, 0
+  )
+  
+  foo<-analyze_tbknownpos(data)
+  testthat::expect_equal(class(foo),"list")
+  testthat::expect_setequal(names(foo),c("test_results","msg"))
+  testthat::expect_equal(NROW(foo$test_results),1)
+  expect_equal(foo$test_results$knownpos_ratio,0.833,tolerance=1e-3)
+  
+  
+} )
+
+test_that("TB Known Pos ratio < 75% expect message expect null" , {
+  data<-tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~TB_STAT.N.New.Pos.T,~TB_STAT.N.KnownPos.T,~TB_STAT.N.New.Neg.T,
+    "a",   1,         "<1",  "M",  NA,                         10,        10, 10,
+    "b",  2,          "<1", "M", NA,                         0,         0, 0
+  )
+  
+  expect_null(analyze_tbknownpos(data))
+  
+} )
+
+test_that("PMTCT Known Pos/PMTCT Total all zeros expect null" , {
+  data<-tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~TB_STAT.N.New.Pos.T,~TB_STAT.N.KnownPos.T,~TB_STAT.N.New.Neg.T,
+    "a",   1,         "<1",  "M",  NA,                         0,        0, 0,
+    "b",  2,          "<1", "M", NA,                         0,         0, 0
+  )
+  
+  expect_null(analyze_tbknownpos(data))
+  
 } )
 
 test_that(" Test retention < 98% expect message", {
