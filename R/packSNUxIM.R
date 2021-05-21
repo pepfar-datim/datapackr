@@ -177,9 +177,8 @@ packSNUxIM <- function(d,
       & stringr::str_detect(
         formula,
         paste0("(?<=[:upper:])", top_rows
-               +1))) %>%
-  # Allow dragging down of right-side formulas
-      #col < (col.im.targets[1])) %>%
+               +1)),
+      col < (col.im.targets[1])) %>%
     dplyr::pull(col)
   
   ## TODO: Improve this next piece to be more efficient instead of using str_replace_all
@@ -189,10 +188,11 @@ packSNUxIM <- function(d,
     dplyr::mutate(
       column_names = dplyr::case_when(
         col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_",col),
-        col >= col.im.targets[1] & col <= col.im.targets[2] ~ paste0("target_col_",col),
+        col >= col.im.targets[1] & col <= (col.im.targets[1]+count.im.datim-1) ~ paste0("target_col_",col),
+        #col >= col.im.targets[1] & col <= col.im.targets[2] ~ paste0("target_col_",col),
         TRUE ~ indicator_code)
     ) %>%
-    #dplyr::filter(col < col.im.targets[1]) %>%
+    dplyr::filter(col < col.im.targets[1]) %>%
     tibble::column_to_rownames(var = "column_names") %>%
     dplyr::select(formula) %>%
     t() %>%
