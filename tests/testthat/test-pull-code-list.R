@@ -53,4 +53,17 @@ with_mock_api({
   })
 })
 
-getTechArea
+with_mock_api({
+  test_that("We can fetch a map of HTS modalities from DATIM", {
+    
+    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
+    expect_true(exists("d2_default_session"))
+    test_dataset<-getHTSModality()
+    expect_type(test_dataset,"list")
+    expect_true("data.frame" %in% class(test_dataset))
+    expect_true(NROW(test_dataset) > 0)
+    expect_setequal(names(test_dataset),c("dataElement","hts_modality"))
+    expect_true(all(grepl("FY\\d{2}" , test_dataset$hts_modality) == FALSE))
+    
+  })
+})
