@@ -37,3 +37,20 @@ with_mock_api({
   
   })
 })
+
+with_mock_api({
+  test_that("We can fetch a map of technical areas from DATIM", {
+    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
+    expect_true(exists("d2_default_session"))
+    test_dataset<-getTechArea()
+    expect_type(test_dataset,"list")
+    expect_equal(length(test_dataset),2)
+    expect_setequal(names(test_dataset),c("dataElement","tech_area"))
+    expect_true(length(test_dataset$dataElement) > 0)
+    expect_true(length(test_dataset$tech_area) > 0)
+    expect_true(length(test_dataset$dataElement) == length(test_dataset$tech_area))
+    
+  })
+})
+
+getTechArea
