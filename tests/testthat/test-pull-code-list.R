@@ -82,3 +82,18 @@ with_mock_api({
     
   })
 })
+
+with_mock_api({
+  test_that("We can get valid category options from DATIM", {
+    
+    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
+    expect_true(exists("d2_default_session"))
+    test_dataset<-getValidCOs()
+    expect_type(test_dataset,"list")
+    expect_true("data.frame" %in% class(test_dataset))
+    expect_true(NROW(test_dataset) > 0)
+    expect_setequal(names(test_dataset),c("data_element.name","data_element.id","category_combo.name","category_combo.id","grp","category_option.name","category_option.id"))
+    
+  })
+})
+

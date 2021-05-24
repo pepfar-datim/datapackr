@@ -40,7 +40,7 @@ getValidCOs <- function(data_element_group.id,
       category_combo.id = id1,
       grp,
       category_option.name = name2,
-      category_combo.id = id2)
+      category_option.id = id2)
   
    
 }
