@@ -97,3 +97,36 @@ with_mock_api({
   })
 })
 
+with_mock_api({
+  test_that("We can get a list of PSNUs from DATIM", {
+    
+    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
+    expect_true(exists("d2_default_session"))
+    test_dataset<-getPSNUs(country_uids = "qllxzIjjurr",include_mil = FALSE, include_DREAMS = TRUE)
+    expect_type(test_dataset,"list")
+    expect_true("data.frame" %in% class(test_dataset))
+    expect_true(NROW(test_dataset) > 0)
+    expect_setequal(
+      names(test_dataset),
+      c(
+        "ou",
+        "ou_id",
+        "country_name",
+        "country_uid",
+        "snu1",
+        "snu1_id",
+        "psnu",
+        "psnu_uid",
+        "psnu_type",
+        "ancestors",
+        "organisationUnitGroups",
+        "DREAMS"
+      )
+    )
+    expect_equal(class(test_dataset$ancestors),"list")
+    expect_equal(class(test_dataset$organisationUnitGroups),"list")
+    
+  })
+})
+
+
