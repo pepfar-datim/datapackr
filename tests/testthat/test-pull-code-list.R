@@ -67,3 +67,18 @@ with_mock_api({
     
   })
 })
+
+
+with_mock_api({
+  test_that("We can get dataset assignment levels from DATIM", {
+    
+    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
+    expect_true(exists("d2_default_session"))
+    test_dataset<-getIMPATTLevels()
+    expect_type(test_dataset,"list")
+    expect_true("data.frame" %in% class(test_dataset))
+    expect_true(NROW(test_dataset) > 0)
+    expect_setequal(names(test_dataset),c("operating_unit","country_name","country_uid","iso3","iso4","country","facility","community","prioritization"))
+    
+  })
+})
