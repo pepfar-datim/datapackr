@@ -23,7 +23,7 @@ getValidCOs <- function(data_element_group.id,
       # TODO generate match automatically based on current FY...
     datapackr::api_fields("dataElements[id,name,categoryCombo[categories[id,name,categoryOptions[id,name]]]]") %>%
     datapackr::api_get(d2_session = d2_session) %>%
-    tidyr::unnest() %>%
+    tidyr::unnest() %>% #TODO: unnest requires specific columns to unnest now
     tidyr::unnest() %>%
     tidyr::unnest() %>%
     dplyr::mutate(
