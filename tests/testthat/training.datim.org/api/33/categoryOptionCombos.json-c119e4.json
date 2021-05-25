@@ -1,0 +1,608 @@
+{
+ "categoryOptionCombos": [
+        {
+            "name": "",
+            "id": "Orn0H2cAwRE",
+            "categoryOptions": [
+                {
+                    "name": "Pre-service",
+                    "id": "pMuf6wfCbPq"
+                }
+            ]
+        },
+        {
+            "name": "",
+            "id": "fKURu2GZuYJ",
+            "categoryOptions": [
+                {
+                    "name": "Clinical",
+                    "id": "H5ehNeZrTZS"
+                }
+            ]
+        },
+        {
+            "name": "(1-9)",
+            "id": "IVBFAjELiBr",
+            "categoryOptions": [
+                {
+                    "name": "1-9",
+                    "id": "A9ddhoPWEUn"
+                }
+            ]
+        },
+        {
+            "name": "(15-19)",
+            "id": "o0WINaKMOjY",
+            "categoryOptions": [
+                {
+                    "name": "15-19",
+                    "id": "ttf9eZCHsTU"
+                }
+            ]
+        },
+        {
+            "name": "(15-19, Known Positives)",
+            "id": "SE8AjA4t7Uz",
+            "categoryOptions": [
+                {
+                    "name": "15-19",
+                    "id": "ttf9eZCHsTU"
+                },
+                {
+                    "name": "Known Positives",
+                    "id": "LvheCKbuFJZ"
+                }
+            ]
+        },
+        {
+            "name": "(18+, Female)",
+            "id": "ZNmTNOyaEgy",
+            "categoryOptions": [
+                {
+                    "name": "18+",
+                    "id": "Q6xWcyHDq6e"
+                },
+                {
+                    "name": "Female",
+                    "id": "Z1EnpTPaUfq"
+                }
+            ]
+        },
+        {
+            "name": "(20-24)",
+            "id": "uhknwNmdXwM",
+            "categoryOptions": [
+                {
+                    "name": "20-24",
+                    "id": "GaScV37Kk29"
+                }
+            ]
+        },
+        {
+            "name": "(25-49)",
+            "id": "j24J2l9iegm",
+            "categoryOptions": [
+                {
+                    "name": "25-49",
+                    "id": "j9x36bAer9v"
+                }
+            ]
+        },
+        {
+            "name": "(50+)",
+            "id": "BC5t0D1CpN7",
+            "categoryOptions": [
+                {
+                    "name": "50+",
+                    "id": "TpXlQcoXGZF"
+                }
+            ]
+        },
+        {
+            "name": "(50+, Known Positives)",
+            "id": "LsQaFqmA9cy",
+            "categoryOptions": [
+                {
+                    "name": "Known Positives",
+                    "id": "LvheCKbuFJZ"
+                },
+                {
+                    "name": "50+",
+                    "id": "TpXlQcoXGZF"
+                }
+            ]
+        },
+        {
+            "name": "(<1)",
+            "id": "VJv5d95PH8J",
+            "categoryOptions": [
+                {
+                    "name": "<1",
+                    "id": "sMBMO5xAq5T"
+                }
+            ]
+        },
+        {
+            "name": "(<15)",
+            "id": "sRRaqArhTh2",
+            "categoryOptions": [
+                {
+                    "name": "<15",
+                    "id": "yxu0TxWiJAM"
+                }
+            ]
+        },
+        {
+            "name": "(<15, Known Positives)",
+            "id": "qcyealU4liq",
+            "categoryOptions": [
+                {
+                    "name": "<15",
+                    "id": "yxu0TxWiJAM"
+                },
+                {
+                    "name": "Known Positives",
+                    "id": "LvheCKbuFJZ"
+                }
+            ]
+        },
+        {
+            "name": "(<18, Female)",
+            "id": "vAX2l0ALCjo",
+            "categoryOptions": [
+                {
+                    "name": "<18",
+                    "id": "B94yy8Aa8Ib"
+                },
+                {
+                    "name": "Female",
+                    "id": "Z1EnpTPaUfq"
+                }
+            ]
+        },
+        {
+            "name": "(Female PWID)",
+            "id": "rpwKzAIR5f4",
+            "categoryOptions": [
+                {
+                    "name": "Female PWID",
+                    "id": "G6OYSzplF5a"
+                }
+            ]
+        },
+        {
+            "name": "(Female, 15-19)",
+            "id": "G9ZGjo9ryaB",
+            "categoryOptions": [
+                {
+                    "name": "15-19",
+                    "id": "ttf9eZCHsTU"
+                },
+                {
+                    "name": "Female",
+                    "id": "Z1EnpTPaUfq"
+                }
+            ]
+        },
+        {
+            "name": "(Female, 20-24)",
+            "id": "Be3WOp3biuH",
+            "categoryOptions": [
+                {
+                    "name": "Female",
+                    "id": "Z1EnpTPaUfq"
+                },
+                {
+                    "name": "20-24",
+                    "id": "GaScV37Kk29"
+                }
+            ]
+        },
+        {
+            "name": "(Female, 25-49)",
+            "id": "GFc874ewal1",
+            "categoryOptions": [
+                {
+                    "name": "Female",
+                    "id": "Z1EnpTPaUfq"
+                },
+                {
+                    "name": "25-49",
+                    "id": "j9x36bAer9v"
+                }
+            ]
+        },
+        {
+            "name": "(Female, 50+)",
+            "id": "tO4b23CS9ms",
+            "categoryOptions": [
+                {
+                    "name": "50+",
+                    "id": "TpXlQcoXGZF"
+                },
+                {
+                    "name": "Female",
+                    "id": "Z1EnpTPaUfq"
+                }
+            ]
+        },
+        {
+            "name": "(FSW)",
+            "id": "AkPJat3QJAW",
+            "categoryOptions": [
+                {
+                    "name": "FSW",
+                    "id": "UjruEYjGK4R"
+                }
+            ]
+        },
+        {
+            "name": "(Home-based)",
+            "id": "QbQFtHZ27kY",
+            "categoryOptions": [
+                {
+                    "name": "Home-based",
+                    "id": "v18mqAAqJyg"
+                }
+            ]
+        },
+        {
+            "name": "(Index Testing)",
+            "id": "pWqJsandd8x",
+            "categoryOptions": [
+                {
+                    "name": "Index Testing",
+                    "id": "X94FBmowsSx"
+                }
+            ]
+        },
+        {
+            "name": "(Known Positives, 20-24)",
+            "id": "OoqW9uM7Lz5",
+            "categoryOptions": [
+                {
+                    "name": "Known Positives",
+                    "id": "LvheCKbuFJZ"
+                },
+                {
+                    "name": "20-24",
+                    "id": "GaScV37Kk29"
+                }
+            ]
+        },
+        {
+            "name": "(Known Positives, 25-49)",
+            "id": "JGsJp5weC9I",
+            "categoryOptions": [
+                {
+                    "name": "Known Positives",
+                    "id": "LvheCKbuFJZ"
+                },
+                {
+                    "name": "25-49",
+                    "id": "j9x36bAer9v"
+                }
+            ]
+        },
+        {
+            "name": "(Male PWID)",
+            "id": "S4ixSeMtEoZ",
+            "categoryOptions": [
+                {
+                    "name": "Male PWID",
+                    "id": "wyeCT63FkXB"
+                }
+            ]
+        },
+        {
+            "name": "(Male, 15-19)",
+            "id": "Y8PPJ6vhuhx",
+            "categoryOptions": [
+                {
+                    "name": "15-19",
+                    "id": "ttf9eZCHsTU"
+                },
+                {
+                    "name": "Male",
+                    "id": "Qn0I5FbKQOA"
+                }
+            ]
+        },
+        {
+            "name": "(Male, 18+)",
+            "id": "sc9zQt2HqFo",
+            "categoryOptions": [
+                {
+                    "name": "Male",
+                    "id": "Qn0I5FbKQOA"
+                },
+                {
+                    "name": "18+",
+                    "id": "Q6xWcyHDq6e"
+                }
+            ]
+        },
+        {
+            "name": "(Male, 20-24)",
+            "id": "CYTID5wSTU8",
+            "categoryOptions": [
+                {
+                    "name": "Male",
+                    "id": "Qn0I5FbKQOA"
+                },
+                {
+                    "name": "20-24",
+                    "id": "GaScV37Kk29"
+                }
+            ]
+        },
+        {
+            "name": "(Male, 25-49)",
+            "id": "zkz52vl9Oqc",
+            "categoryOptions": [
+                {
+                    "name": "Male",
+                    "id": "Qn0I5FbKQOA"
+                },
+                {
+                    "name": "25-49",
+                    "id": "j9x36bAer9v"
+                }
+            ]
+        },
+        {
+            "name": "(Male, 50+)",
+            "id": "KTfVVKL9Dq6",
+            "categoryOptions": [
+                {
+                    "name": "50+",
+                    "id": "TpXlQcoXGZF"
+                },
+                {
+                    "name": "Male",
+                    "id": "Qn0I5FbKQOA"
+                }
+            ]
+        },
+        {
+            "name": "(Male, <18)",
+            "id": "wBsP7dIED3Q",
+            "categoryOptions": [
+                {
+                    "name": "Male",
+                    "id": "Qn0I5FbKQOA"
+                },
+                {
+                    "name": "<18",
+                    "id": "B94yy8Aa8Ib"
+                }
+            ]
+        },
+        {
+            "name": "(Mobile)",
+            "id": "CrkfMpAOgXd",
+            "categoryOptions": [
+                {
+                    "name": "Mobile",
+                    "id": "a2KOzUNehAq"
+                }
+            ]
+        },
+        {
+            "name": "(MSM not SW)",
+            "id": "H4zDlK3nU3e",
+            "categoryOptions": [
+                {
+                    "name": "MSM not SW",
+                    "id": "aqmuvVX1H0v"
+                }
+            ]
+        },
+        {
+            "name": "(MSM SW)",
+            "id": "uPSmoMfxrjX",
+            "categoryOptions": [
+                {
+                    "name": "MSM SW",
+                    "id": "Pfw6StSK8Wv"
+                }
+            ]
+        },
+        {
+            "name": "(Newly Tested Positives, 15-19)",
+            "id": "MLnxtEwfwk4",
+            "categoryOptions": [
+                {
+                    "name": "15-19",
+                    "id": "ttf9eZCHsTU"
+                },
+                {
+                    "name": "Newly Tested Positives",
+                    "id": "Vr59uUJBySG"
+                }
+            ]
+        },
+        {
+            "name": "(Newly Tested Positives, 20-24)",
+            "id": "TYAD7pkaFTE",
+            "categoryOptions": [
+                {
+                    "name": "Newly Tested Positives",
+                    "id": "Vr59uUJBySG"
+                },
+                {
+                    "name": "20-24",
+                    "id": "GaScV37Kk29"
+                }
+            ]
+        },
+        {
+            "name": "(Newly Tested Positives, 25-49)",
+            "id": "QZQeu7HDBKl",
+            "categoryOptions": [
+                {
+                    "name": "Newly Tested Positives",
+                    "id": "Vr59uUJBySG"
+                },
+                {
+                    "name": "25-49",
+                    "id": "j9x36bAer9v"
+                }
+            ]
+        },
+        {
+            "name": "(Newly Tested Positives, 50+)",
+            "id": "ylIErBqiooD",
+            "categoryOptions": [
+                {
+                    "name": "Newly Tested Positives",
+                    "id": "Vr59uUJBySG"
+                },
+                {
+                    "name": "50+",
+                    "id": "TpXlQcoXGZF"
+                }
+            ]
+        },
+        {
+            "name": "(Newly Tested Positives, <15)",
+            "id": "dUb4HE05kCe",
+            "categoryOptions": [
+                {
+                    "name": "<15",
+                    "id": "yxu0TxWiJAM"
+                },
+                {
+                    "name": "Newly Tested Positives",
+                    "id": "Vr59uUJBySG"
+                }
+            ]
+        },
+        {
+            "name": "(Other Service Delivery Point)",
+            "id": "KBcSC1URD0n",
+            "categoryOptions": [
+                {
+                    "name": "Other Service Delivery Point",
+                    "id": "TVLzgLivDKO"
+                }
+            ]
+        },
+        {
+            "name": "(People in prisons and other enclosed settings)",
+            "id": "gO96NV54yD4",
+            "categoryOptions": [
+                {
+                    "name": "People in prisons and other enclosed settings",
+                    "id": "pi7naVKPzSM"
+                }
+            ]
+        },
+        {
+            "name": "(TG not SW)",
+            "id": "edBMVgUohvf",
+            "categoryOptions": [
+                {
+                    "name": "TG not SW",
+                    "id": "kgDh0sCkIAN"
+                }
+            ]
+        },
+        {
+            "name": "(TG SW)",
+            "id": "fRj8O5iNQlV",
+            "categoryOptions": [
+                {
+                    "name": "TG SW",
+                    "id": "bEqNZtIA0Jb"
+                }
+            ]
+        },
+        {
+            "name": "0 - 11 months",
+            "id": "jETfTI5riav",
+            "categoryOptions": [
+                {
+                    "name": "0 - 11 months",
+                    "id": "xXju2EWIoVs"
+                }
+            ]
+        },
+        {
+            "name": "0 - 11 months, Female",
+            "id": "DFxrIXxTjhc",
+            "categoryOptions": [
+                {
+                    "name": "0 - 11 months",
+                    "id": "xXju2EWIoVs"
+                },
+                {
+                    "name": "Female",
+                    "id": "Z1EnpTPaUfq"
+                }
+            ]
+        },
+        {
+            "name": "0 - 11 months, Male",
+            "id": "B1GKBOdSM0c",
+            "categoryOptions": [
+                {
+                    "name": "0 - 11 months",
+                    "id": "xXju2EWIoVs"
+                },
+                {
+                    "name": "Male",
+                    "id": "Qn0I5FbKQOA"
+                }
+            ]
+        },
+        {
+            "name": "0-4",
+            "id": "ieO2chor9zJ",
+            "categoryOptions": [
+                {
+                    "name": "0-4",
+                    "id": "ewbCuNIoxfI"
+                }
+            ]
+        },
+        {
+            "name": "0-4, Female",
+            "id": "j5LNTs4RRSf",
+            "categoryOptions": [
+                {
+                    "name": "0-4",
+                    "id": "ewbCuNIoxfI"
+                },
+                {
+                    "name": "Female",
+                    "id": "Z1EnpTPaUfq"
+                }
+            ]
+        },
+        {
+            "name": "0-4, Male",
+            "id": "yReGPFZY1Bd",
+            "categoryOptions": [
+                {
+                    "name": "Male",
+                    "id": "Qn0I5FbKQOA"
+                },
+                {
+                    "name": "0-4",
+                    "id": "ewbCuNIoxfI"
+                }
+            ]
+        },
+        {
+            "name": "0-9",
+            "id": "Cf4vfZDkMq8",
+            "categoryOptions": [
+                {
+                    "name": "0-9",
+                    "id": "swDN9UgTG9H"
+                }
+            ]
+        }
+    ]
+}
