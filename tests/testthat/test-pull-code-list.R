@@ -158,19 +158,9 @@ with_mock_api({
   })
 })
 
-# with_mock_api({
-#   test_that("We can get a map of Cs to COs", {
-#     
-#     datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-#     expect_true(exists("d2_default_session"))
-#     test_dataset <- pullFullCodeList()
-#     expect_type(test_dataset, "list")
-#     expect_setequal(names(test_dataset), c("categoryoptiongroup", "categoryoption", "categoryoptionuid"))
-#   })
-# })
 
 is_uidish<-function(x) {
-  grepl("^[a-zA-Z][a-zA-Z0-9]{10}$",x)
+  grepl("^[[:alpha:]][[:alnum:]]{10}$",x)
 }
 
 test_that("We can get a list of dataset UIDs based on the fiscal year",{
