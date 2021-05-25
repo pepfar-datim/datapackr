@@ -157,3 +157,26 @@ with_mock_api({
     expect_setequal(names(test_dataset), c("categoryoptiongroup", "categoryoption", "categoryoptionuid"))
   })
 })
+
+# with_mock_api({
+#   test_that("We can get a map of Cs to COs", {
+#     
+#     datimutils::loginToDATIM(config_path = test_config("test-config.json"))
+#     expect_true(exists("d2_default_session"))
+#     test_dataset <- pullFullCodeList()
+#     expect_type(test_dataset, "list")
+#     expect_setequal(names(test_dataset), c("categoryoptiongroup", "categoryoption", "categoryoptionuid"))
+#   })
+# })
+
+is_uidish<-function(x) {
+  grepl("^[a-zA-Z][a-zA-Z0-9]{10}$",x)
+}
+
+test_that("We can get a list of dataset UIDs based on the fiscal year",{
+  expect_error(getDatasetUids("foo"))
+  test_dataset<-getDatasetUids(2021)
+  expect_type(test_dataset, "character")
+  expect_true(length(test_dataset)>0)
+  expect_true(all(unlist(lapply(test_dataset,is_uidish))))
+})
