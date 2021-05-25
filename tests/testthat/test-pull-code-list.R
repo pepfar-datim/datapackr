@@ -129,4 +129,21 @@ with_mock_api({
   })
 })
 
+with_mock_api({
+  test_that("We can get a map of COCs to COs", {
+    
+    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
+    expect_true(exists("d2_default_session"))
+    test_dataset <- map_COCs_to_COs()
+    expect_type(test_dataset, "list")
+    expect_setequal(names(test_dataset), c("name", "id", "categoryOptions"))
+    expect_equal(class(test_dataset$name), "character")
+    expect_equal(class(test_dataset$id), "character")
+    expect_true(all(lapply(test_dataset$id, nchar) == 11))
+    expect_equal(class(test_dataset$categoryOptions), "list")
+    expect_true(all(unlist(lapply(test_dataset$categoryOptions, function(x) {
+      all(names(x) %in% c("name", "id"))
+    }))))
+  })
+})
 
