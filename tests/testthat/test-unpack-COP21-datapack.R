@@ -28,3 +28,34 @@ test_that("Can unpack all data pack sheets", {
   d$info$tool<-"FooPack"
   expect_error(d <- unPackSheets(d))
 } ) })
+
+
+with_mock_api({
+  test_that("Can unpack and separate data sets", {
+    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
+    expect_true(exists("d2_default_session"))
+    d <- datapackr:::createKeychainInfo(submission_path = test_sheet('COP21_DP_random_no_psnuxim.xlsx'),
+                                        tool = "Data Pack",
+                                        country_uids = NULL,
+                                        cop_year = NULL)
+    
+    d <- unPackSheets(d)
+    expect_true(!is.null(d$data$targets))
+    expect_setequal(names(d$data$targets),d_data_targets_names)
+    expect_true((NROW(d$data$targets)>0))
+    expect_setequal(class(d$data$targets),c("tbl_df","tbl","data.frame"))
+    expect_identical(unname(sapply(d$data$targets, typeof) ),c(rep("character",7),"double"))
+    d<-separateDataSets(d)
+    expect_null(d$data$targets)
+    expect_null(d$data$extract)
+    expect_true(!is.null(d$data$MER))
+    expect_setequal(class(d$data$MER),c("tbl_df","tbl","data.frame"))
+    expect_identical(unname(sapply(d$data$MER, typeof) ),c(rep("character",7),"double"))
+    skip("Need to add SUBNATT data to this test sheet")
+    expect_true(!is.null(d$data$SUBNATT_IMPATT))
+    expect_setequal(class(d$data$SUBNATT_IMPATT),c("tbl_df","tbl","data.frame"))
+    expect_identical(unname(sapply(d$data$SUBNATT_IMPATT, typeof) ),c(rep("character",7),"double"))
+    
+    
+  } ) })
+
