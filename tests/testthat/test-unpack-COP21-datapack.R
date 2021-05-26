@@ -60,5 +60,18 @@ with_mock_api({
     expect_identical(unname(sapply(d$data$SUBNATT_IMPATT, typeof) ),c(rep("character",7),"double"))
     
     
+    #Package the undistributed data for DATIM
+    d <- packForDATIM(d, type = "Undistributed MER")
+    expect_true(!is.null(d$datim$UndistributedMER))
+    expect_true(NROW(d$datim$UndistributedMER)>0)
+    expect_true(all(unlist(lapply(d$datim$UndistributedMER$dataElement,is_uidish))))
+    expect_true(all(unlist(lapply(d$datim$UndistributedMER$categoryOptionCombo,is_uidish))))
+    expect_true(all(unlist(lapply(d$datim$UndistributedMER$period,function(x) {
+      grepl("^\\d{4}Oct$",x)
+    
+    }))))
+    
+    expect_type(d$datim$UndistributedMER$attributeOptionCombo,"character")
+    expect_type(d$datim$UndistributedMER$attributeOptionCombo,"double")
   } ) })
 

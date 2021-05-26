@@ -159,10 +159,6 @@ with_mock_api({
 })
 
 
-is_uidish<-function(x) {
-  grepl("^[[:alpha:]][[:alnum:]]{10}$",x)
-}
-
 test_that("We can get a list of dataset UIDs based on the fiscal year",{
   expect_error(getDatasetUids("foo"))
   test_dataset<-getDatasetUids(2021)

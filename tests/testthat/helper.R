@@ -1,4 +1,10 @@
 
+is_uidish<-function(x) {
+  grepl("^[[:alpha:]][[:alnum:]]{10}$",x)
+}
+
+
+
 test_sheet <-
   function(fname)
     testthat::test_path("sheets", fname)
