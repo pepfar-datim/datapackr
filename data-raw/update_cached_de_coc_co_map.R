@@ -4,56 +4,64 @@
 
 datapackr::loginToDATIM("~/.secrets/datim.json")
 
-cop_year = getCurrentCOPYear()
+# Select only those datasets relevant for this COP ####
+cop_year = datapackr::getCurrentCOPYear()
 
-# Pull Code Lists for FY22 data (MER Targets, IMPATT, SUBNAT Targets) ####
-  mer.T <- pullFullCodeList(FY = cop_year +1, datastream = c("mer_targets"))
-  subnat.T <- pullFullCodeList(FY = cop_year +1, datastream = c("subnat_targets"))
-  impatt.T <- pullFullCodeList(FY = cop_year +1, datastream = c("impatt"))
+cop_ds_pd <- datapackr::DATIM_ds_pd_map %>%
+  dplyr::filter(
+    (FY == (cop_year+1) & datastream %in% c("MER","DREAMS", "SUBNAT", "IMPATT") & targets_results %in% c("Targets", "IMPATT") & DOD == "N")
+    | (FY == cop_year & datastream %in% c("SUBNAT", "IMPATT") & targets_results %in% c("Targets", "IMPATT"))
+    | (FY == (cop_year-1) & datastream %in% c("SUBNAT") & targets_results == "Results")
+  )
 
-# Pull Code Lists for FY21 data (IMPATT, SUBNAT Targets) ####
-  impatt.T_1 <- pullFullCodeList(FY = cop_year, datastream = c("impatt"))
-  subnat.T_1 <- pullFullCodeList(FY = cop_year, datastream = c("subnat_targets"))
+# Pull Code Lists for all relevant datasets ####
+ds <- data.frame()
 
-# Pull Code Lists for FY20 Results (SUBNAT Results) ####
-  subnat.R <- pullFullCodeList(FY = cop_year -1, datastream = c("subnat_results"))
-  
-# Pull categoryOption metadata ####
-  categoryoptions <- datimutils::getMetadata("categoryOptionCombos", fields = "id, categoryOptions")
+fullCodeList <-
+  purrr::map2(
+    .x = cop_ds_pd$dataset.id, .y = cop_ds_pd$FY,
+    function(.x, .y){
+      cl <- pullDATIMCodeList(.x) %>%
+        dplyr::mutate(FY = .y)
+      ds <- rbind(ds, cl)
+    }) %>%
+  do.call(rbind, .) %>%
+  dplyr::distinct() %>%
+  dplyr::arrange(FY, dataelement, categoryoptioncombo) %>%
+  dplyr::left_join(cop_ds_pd, by = c("FY" = "FY", "dataset.id" = "dataset.id")) %>%
+  dplyr::mutate(
+    period = dplyr::case_when(
+      targets_results %in% c("Targets", "IMPATT") ~ paste0(FY-1, "Oct"),
+      targets_results == "Results" ~ paste0(FY, "Q3")
+  )) %>%
+  dplyr::select(-dataset)
+
+# Add categoryOption metadata ####
+categoryoptions <- datimutils::getMetadata("categoryOptionCombos", fields = "id, categoryOptions")
+
+fullCodeList %<>%
+  dplyr::left_join(categoryoptions, by = c("categoryoptioncombouid" = "id")) %>%
+  dplyr::mutate(categoryOptions = purrr::map_chr(categoryOptions,~.x[["id"]] %>%
+                                                   sort() %>% paste(collapse = ".")))
+
   
 # Combine Code Lists ####
-  fullCodeList <- dplyr::bind_rows(
-    list(
-      "FY22 MER Targets" = mer.T,
-      "FY22 SUBNAT Targets" = subnat.T,
-      "FY22 IMPATT" = impatt.T,
-      "FY21 IMPATT" = impatt.T_1,
-      "FY21 SUBNAT Targets" = subnat.T_1,
-      "FY20 SUBNAT Results" = subnat.R),
-    .id = "period_dataset") %>%
-    dplyr::mutate(
-      targets_results = dplyr::case_when(
-        stringr::str_detect(period_dataset, "Targets") ~ "targets",
-        stringr::str_detect(period_dataset, "Results") ~ "results",
-        stringr::str_detect(period_dataset, "IMPATT") ~ "targets"
-      ),
-      dataset = dplyr::case_when(
-        stringr::str_detect(period_dataset, "MER") ~ "mer",
-        stringr::str_detect(period_dataset, "SUBNAT") ~ "subnat",
-        stringr::str_detect(period_dataset, "IMPATT") ~ "impatt"
-      ),
-      period = dplyr::case_when(
-        targets_results == "targets" ~ paste0(FY-1, "Oct"),
-        targets_results == "results" ~ paste0(FY, "Q3")
-      )
-    ) %>%
-    
-# Add metadata for CategoryOptions ####
-    dplyr::left_join(categoryoptions, by = c("categoryoptioncombouid" = "id")) %>%
-    dplyr::mutate(categoryOptions = purrr::map_chr(categoryOptions,~.x[["id"]] %>%
-                                                     sort() %>% paste(collapse = ".")))
+fullCodeList %<>%
+  dplyr::mutate(
+    period_dataset = dplyr::case_when(
+     FY == 2022 & datastream %in% c("MER","DREAMS") & targets_results == "Targets" & DOD == "N" ~ "FY22 MER Targets",
+     FY == 2022 & datastream == "SUBNAT" & targets_results == "Targets" ~ "FY22 SUBNAT Targets",
+     FY == 2022 & datastream == "IMPATT" ~ "FY22 IMPATT",
+     FY == 2021 & datastream == "IMPATT" ~ "FY21 IMPATT",
+     FY == 2021 & datastream == "SUBNAT" & targets_results == "Targets" ~ "FY21 SUBNAT Targets",
+     FY == 2020 & datastream == "SUBNAT" & targets_results == "Results" ~ "FY20 SUBNAT Results"),
+    dataset = dplyr::case_when(
+      stringr::str_detect(period_dataset, "MER") ~ "mer",
+      stringr::str_detect(period_dataset, "SUBNAT") ~ "subnat",
+      stringr::str_detect(period_dataset, "IMPATT") ~ "impatt")
+  )
   
-# Standardize some column names
+# Standardize column names
   fullCodeList %<>%
     dplyr::rename(
       dataelementname = dataelement,
@@ -155,45 +163,18 @@ cop_year = getCurrentCOPYear()
     dplyr::left_join(getHTSModality(cop_year = cop_year),
                      by = c("dataelementuid" = "dataElement"))
   
-# Accommodate oddities with FY21 PMTCT_SUBNAT ####
-  map_DataPack_DATIM_DEs_COCs %<>%
-    dplyr::mutate(
-      FY = dplyr::case_when(
-        stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~ FY+1,
-        TRUE ~ FY
-      ),
-      period = dplyr::case_when(
-        stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~ paste0(FY-1, "Oct"),
-        TRUE ~ period
-      )
-    )
-  
-# Join Full Code List with Schema ####
+# Translate indicator_code to dataelement + categoryOptionCombo ####
   map_DataPack_DATIM_DEs_COCs %<>%
     dplyr::select(-dataset) %>%
     dplyr::full_join(fullCodeList,
                      by = c("dataelementuid" = "dataelementuid",
                             "categoryOptions.ids" = "categoryOptions.ids",
                             "period" = "period",
-                            "FY" = "FY"))
-  
-# Readjust PMTCT SUBNAT ####
-  map_DataPack_DATIM_DEs_COCs %<>%
-    dplyr::mutate(
-      FY = dplyr::case_when(
-        stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~ FY-1,
-        TRUE ~ FY
-      ),
-      period = dplyr::case_when(
-        stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~ paste0(FY-1,"Oct"),
-        TRUE ~ period
-      ),
-      period_dataset = dplyr::case_when(
-        stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~ 
-          stringr::str_replace(period_dataset, "(?<=FY)\\d{2}", stringr::str_sub(FY,-2,-1)),
-        TRUE ~ period_dataset
-      )
-    )
+                            "FY" = "FY")) %>%
+  dplyr::select(-dataset.id, -dataset.name, -code, -dataelementdesc, -shortname,
+                -categoryoptioncombocode, -DOD) %>%
+  dplyr::distinct() %>%
+  dplyr::filter(!is.na(indicator_code))
   
 # Add additional metadata for use in analytics ####
 getCOGSMap <- function(uid,
@@ -309,18 +290,23 @@ map_DataPack_DATIM_DEs_COCs %<>%
 
 # Compare old and new maps for accuracy ####
 new <- map_DataPack_DATIM_DEs_COCs %>%
-  dplyr::select(-categoryoption_specified)
+  dplyr::select(-categoryoption_specified) %>%
+  dplyr::mutate(new = "Y")
 
 compare_diffs <- datapackr::map_DataPack_DATIM_DEs_COCs %>%
   dplyr::select(-categoryoption_specified) %>%
-  dplyr::full_join(new, by = c("indicator_code",
-                               "dataelementuid",
-                               "categoryoptioncombouid",
-                               "FY",
+  dplyr::mutate(in_pkg = "Y") %>%
+  dplyr::full_join(new, by = c("indicator_code", "col_type", "value_type",
+                               "dataelementuid", "dataelementname",
+                               "categoryoptioncombouid", "categoryoptioncomboname",
+                               "FY", "period", "targets_results",
                                "valid_ages.name","valid_ages.id","valid_sexes.name",
                                "valid_sexes.id","valid_kps.name","valid_kps.id",
-                               "categoryOptions.ids","support_type","resultstatus","resultstatus_inclusive")) %>%
-  dplyr::filter(is.na(indicator_code) | is.na(dataelementname.x) | is.na(dataelementname.y))
+                               "categoryOptions.ids","support_type", "disagg_type",
+                               "technical_area", "top_level", "numerator_denominator",
+                               "resultstatus","resultstatus_inclusive", "hts_modality")) %>%
+  dplyr::filter(is.na(new) | is.na(in_pkg)) %>%
+  dplyr::arrange(dplyr::across(c(-in_pkg, -new, dplyr::everything())))
 
 
 save(map_DataPack_DATIM_DEs_COCs, file = "./data/map_DataPack_DATIM_DEs_COCs.rda", compress = "xz")
