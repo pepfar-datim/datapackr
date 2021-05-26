@@ -23,12 +23,15 @@ test_that("Can unpack all data pack sheets", {
   expect_true(!is.null(d$tests))
   expect_true(all(unlist(lapply(d$tests,function(x) (setequal(class(x),d_data_tests_types))))))
   all(unlist(lapply(d$tests, function(x) !is.null(attr(x,"test_name")))))
+  validation_summary<-validationSummary(d)
+  expect_named(validation_summary,c("test_name","validation_issue_category","count","ou","ou_id","country_name","country_uid"),ignore.order = TRUE)
+  
+  
   
   #Should throw an error if the tool is an unknown type
   d$info$tool<-"FooPack"
   expect_error(d <- unPackSheets(d))
 } ) })
-
 
 with_mock_api({
   test_that("Can unpack and separate data sets", {
