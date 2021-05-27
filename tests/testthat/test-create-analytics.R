@@ -18,13 +18,21 @@ with_mock_api({
       unPackSNUxIM(.) %>%
       packForDATIM(., type = "Undistributed MER") %>%
       packForDATIM(., type = "SUBNAT_IMPATT") %>%
-      packForDATIM(., type = "PSNUxIM") %>%
-      createAnalytics(.)
-    
+      packForDATIM(., type = "PSNUxIM") 
     
     expect_named(d,
                  c("keychain", "info", "tests", "data", "datim"),
                  ignore.order = TRUE)
+    
+    
+    fy22_prioritizations<-getFY22Prioritizations(d)
+    expect_type(fy22_prioritizations,"list")
+    expect_true(NROW(fy22_prioritizations)>0)
+    expect_named(fy22_prioritizations,c("orgUnit","value"),ignore.order = TRUE)
+    
+    d %<>% createAnalytics() 
+    
+
     analytics_column_names <-
       c(
         'ou','ou_id','country_name','country_uid','snu1','snu1_id','psnu',

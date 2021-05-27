@@ -7,6 +7,7 @@
 #' @export
 #'
 getFY22Prioritizations <- function(d) {
+  
   psnu_prioritizations <- d$datim$fy22_prioritizations %>%
     dplyr::select(orgUnit, value)
   
@@ -67,7 +68,6 @@ createAnalytics <- function(d,
     if (d$info$cop_year == 2021) {
       # For COP21+, get data from import files for better consistency ####
       fy22_prioritizations <- getFY22Prioritizations(d)
-      
       
       d$data$analytics <-
         dplyr::bind_rows(
