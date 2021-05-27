@@ -166,3 +166,18 @@ test_that("We can get a list of dataset UIDs based on the fiscal year",{
   expect_true(length(test_dataset)>0)
   expect_true(all(unlist(lapply(test_dataset,is_uidish))))
 })
+
+with_mock_api({
+  test_that("We can get a full code list", {
+    
+    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
+    expect_true(exists("d2_default_session"))
+    test_dataset <- pullFullCodeList(FY = 2021)
+    expect_type(test_dataset, "list")
+    expect_setequal(names(test_dataset), c("dataelement", "dataelementuid", "categoryoptioncombo","categoryoptioncombouid","FY"))
+    skip("FY22 code lists are not working?")
+    test_dataset <- pullFullCodeList(FY = 2022)
+    })
+})
+
+
