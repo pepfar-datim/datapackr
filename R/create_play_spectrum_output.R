@@ -56,6 +56,7 @@ create_play_spectrum_output <- function(country_uids,
     "impatt", "qFyJH6fUPQk" #KP_ESTIMATES.Total.T
   )
   
+
   data_datim <- suppressWarnings(datapackr::getCOPDataFromDATIM(country_uids,
                                                cop_year = (cop_year - 1),
                                                streams = c("subnat_targets", "impatt"),
