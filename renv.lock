@@ -246,15 +246,11 @@
     },
     "datapackcommons": {
       "Package": "datapackcommons",
-      "Version": "0.2.3",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteUsername": "pepfar-datim",
-      "RemoteRepo": "data-pack-commons",
-      "RemoteRef": "master",
-      "RemoteSha": "0bb659133e92615c9f204ba19f393eabe6bfed54",
-      "Hash": "9c6632f7646d5393d60dc77e2405cd91"
+      "Version": "0.2.3.0.0.0.1618495661",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "RemoteSha": "0a37ed3e242db9a240a7e5708f869ba3508cb5d1",
+      "Hash": "93ce6362f8a5077d9f63d35974b4cfa0"
     },
     "datimutils": {
       "Package": "datimutils",
