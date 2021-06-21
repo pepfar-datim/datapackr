@@ -26,10 +26,10 @@ getDataValueSets <- function(keys, values,
   
   data <- httr::GET(api_call,handle = d2_session$handle) %>%
     httr::content(.,"text") %>% 
-    readr::read_csv(.,col_names = TRUE, 
+    {suppressWarnings(readr::read_csv(.,col_names = TRUE, 
                     col_types = readr::cols(.default = "c", 
                                             value = "d", 
-                                            lastupdated = "T")) %>%
+                                            lastupdated = "T"))} %>%
     dplyr::rename(data_element = dataelement, 
                   org_unit = orgunit,
                   category_option_combo = categoryoptioncombo,
