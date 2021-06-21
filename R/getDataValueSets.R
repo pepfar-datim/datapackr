@@ -29,7 +29,7 @@ getDataValueSets <- function(keys, values,
     {suppressWarnings(readr::read_csv(.,col_names = TRUE, 
                     col_types = readr::cols(.default = "c", 
                                             value = "d", 
-                                            lastupdated = "T"))} %>%
+                                            lastupdated = "T")))} %>%
     dplyr::rename(data_element = dataelement, 
                   org_unit = orgunit,
                   category_option_combo = categoryoptioncombo,
