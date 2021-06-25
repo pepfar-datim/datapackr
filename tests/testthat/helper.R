@@ -1,4 +1,5 @@
 
+
 is_uidish<-function(x) {
   grepl("^[[:alpha:]][[:alnum:]]{10}$",x)
 }
@@ -13,3 +14,7 @@ test_sheet <-
 library(httptest)
 library(tibble)
 test_config <- function(fname) rprojroot::find_testthat_root_file("config", fname)
+
+
+play2361 <- list(base_url = "https://play.dhis2.org/2.36.1/",
+                 handle = httr::handle("https://play.dhis2.org/2.36.1/"))
