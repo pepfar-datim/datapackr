@@ -76,6 +76,17 @@ test_that("VMMC_CIRC Indeterminate Rate all zeros expect NULL" , {
   
 } )
 
+test_that("VMMC_CIRC Indeterminate Rate all keypop not NA expect NULL" , {
+  data<-tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~VMMC_CIRC.Pos.T,~VMMC_CIRC.Neg.T,~VMMC_CIRC.Unk.T,
+    "a",   1,         "<1",  "M",  "PWID",                         0,        0, 1
+  )
+  
+  foo<-analyze_vmmc_indeterminate(data)
+  expect_null(foo)
+  
+} )
+
 test_that("PMTCT Known Pos/PMTCT Total >  0.75 expect message" , {
   data<-tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~PMTCT_STAT.N.New.Pos.T,~PMTCT_STAT.N.KnownPos.T,~PMTCT_STAT.N.New.Neg.T,
