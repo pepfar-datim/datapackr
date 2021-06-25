@@ -167,7 +167,7 @@ test_that("PMTCT Known Pos/PMTCT Total all zeros expect null" , {
 test_that(" Test retention < 98% expect message", {
   data<-tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~TX_CURR.T,~TX_CURR.T_1,~TX_NEW.T,
-    "a",   1,         "<1",  "F",  NA,                    10,        10, 10,
+    "a",   1,         "<1",  "F",  NA,                    97,        97, 3,
     "b",  2,          "<1", "M", NA,                         0,         0, 0
   )
   
@@ -175,7 +175,7 @@ test_that(" Test retention < 98% expect message", {
   testthat::expect_equal(class(foo),"list")
   testthat::expect_setequal(names(foo),c("test_results","msg"))
   testthat::expect_equal(NROW(foo$test_results),1)
-  expect_equal(foo$test_results$TX.Retention.T,0.5,tolerance=1e-3)
+  expect_equal(foo$test_results$TX.Retention.T,0.97,tolerance=1e-3)
   
 } )
 
