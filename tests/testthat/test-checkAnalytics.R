@@ -182,7 +182,7 @@ test_that(" Test retention < 98% expect message", {
 test_that(" Test retention > 100% expect message", {
   data<-tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~TX_CURR.T,~TX_CURR.T_1,~TX_NEW.T,
-    "a",   1,         "<1",  "F",  NA,                    100,        10, 10,
+    "a",   1,         "<1",  "F",  NA,                    101,        10, 90,
     "b",  2,          "<1", "M", NA,                         0,         0, 0
   )
   
@@ -190,7 +190,7 @@ test_that(" Test retention > 100% expect message", {
   testthat::expect_equal(class(foo),"list")
   testthat::expect_setequal(names(foo),c("test_results","msg"))
   testthat::expect_equal(NROW(foo$test_results),1)
-  expect_equal(foo$test_results$TX.Retention.T,5,tolerance=1e-3)
+  expect_equal(foo$test_results$TX.Retention.T,1.01,tolerance=1e-3)
   
 } )
 
