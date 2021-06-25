@@ -145,8 +145,8 @@ test_that("TB Known Pos ratio > 75% expect message" , {
 test_that("TB Known Pos ratio < 75% expect message expect null" , {
   data<-tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~TB_STAT.N.New.Pos.T,~TB_STAT.N.KnownPos.T,~TB_STAT.N.New.Neg.T,
-    "a",   1,         "<1",  "M",  NA,                         10,        10, 10,
-    "b",  2,          "<1", "M", NA,                         0,         0, 0
+    "a",   1,         "<1",  "M",  NA,                         25,        150, 25,
+    "b",  2,          "<1", "M", NA,                         0,         0, 0,
   )
   
   expect_null(analyze_tbknownpos(data))
