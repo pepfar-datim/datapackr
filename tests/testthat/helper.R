@@ -15,6 +15,7 @@ library(httptest)
 library(tibble)
 test_config <- function(fname) rprojroot::find_testthat_root_file("config", fname)
 
-
+# login object stubs sufficient for use in mocked api calls
+# one needed for each server with mock calls
 play2361 <- list(base_url = "https://play.dhis2.org/2.36.1/",
                  handle = httr::handle("https://play.dhis2.org/2.36.1/"))
