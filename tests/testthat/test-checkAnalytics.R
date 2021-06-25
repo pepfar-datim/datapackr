@@ -107,7 +107,8 @@ test_that("PMTCT Known Pos/PMTCT Total <  0.75 expect null" , {
   data<-tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~PMTCT_STAT.N.New.Pos.T,~PMTCT_STAT.N.KnownPos.T,~PMTCT_STAT.N.New.Neg.T,
     "a",   1,         "<1",  "M",  NA,                         10,        10, 10,
-    "b",  2,          "<1", "M", NA,                         0,         0, 0
+    "b",  2,          "<1", "M", NA,                         0,         0, 0,
+    "c",  3,          "<1", "M", NA,                         25,         150, 25
   )
   
   expect_null(analyze_pmtctknownpos(data))
