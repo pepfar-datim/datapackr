@@ -3,7 +3,8 @@ context("test-check-analytics")
 test_that("PMTCT_EID coverage by 2 months old < 90% expect message" , {
   data<-tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~PMTCT_EID.N.2.T,~PMTCT_EID.N.12.T,
-    "a",   1,         "<1",  "F",  NA,                         1,        100
+    "a",   1,         "<1",  "F",  NA,                         1,        100,
+    "b",   1,         "<1",  "F",  NA,                         90,        10
   )
   
   foo<-analyze_eid_2mo(data)
