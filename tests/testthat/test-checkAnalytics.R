@@ -219,8 +219,8 @@ test_that(" Test retention all zeros expect NULL", {
 test_that(" Test linkage < 95% expect message", {
   data<-tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~HTS_INDEX_COM.New.Pos.T,~HTS_INDEX_FAC.New.Pos.T,~TX_NEW.T,~HTS_TST.KP.Pos.T,~TX_NEW.KP.T,
-    "a",   1,         "25-49",  "F",  NA,                    95,          5,                                94,                 0,               0,
-    "b",  2,          "25-49", "M",  NA,                         95,           5,                                95,                 0,               0
+    "a",   1,         "25-49",  "F",  NA,                    95,          5,                                94,                 100,               94,
+    "b",  2,          "25-49", "M",  NA,                         95,           5,                                95,                 100,               95,
   )
   
   foo<-analyze_linkage(data)
@@ -228,14 +228,14 @@ test_that(" Test linkage < 95% expect message", {
   testthat::expect_setequal(names(foo),c("test_results","msg"))
   testthat::expect_equal(NROW(foo$test_results),1)
   expect_equal(foo$test_results$HTS_TST.Linkage.T,0.94,tolerance=1e-3)
-  
+  expect_equal(foo$test_results$HTS_TST.KP.Linkage.T,0.94,tolerance=1e-3)
 } )
 
 test_that(" Test linkage > 100% expect message", {
   data<-tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~HTS_INDEX_COM.New.Pos.T,~HTS_INDEX_FAC.New.Pos.T,~TX_NEW.T,~HTS_TST.KP.Pos.T,~TX_NEW.KP.T,
-    "a",   1,         "25-49",  "F",  NA,                    50,          50,                                100,                 0,               0,
-    "b",  2,          "25-49", "M",  NA,                         50,           50,                              101,                 0,               0
+    "a",   1,         "25-49",  "F",  NA,                    50,          50,                                100,                 100,               100,
+    "b",  2,          "25-49", "M",  NA,                         50,           50,                              101,                 100,               101
   )
   
   foo<-analyze_linkage(data)
@@ -243,13 +243,13 @@ test_that(" Test linkage > 100% expect message", {
   testthat::expect_setequal(names(foo),c("test_results","msg"))
   testthat::expect_equal(NROW(foo$test_results),1)
   expect_equal(foo$test_results$HTS_TST.Linkage.T,1.01,tolerance=1e-3)
-  
+  expect_equal(foo$test_results$HTS_TST.KP.Linkage.T,1.01,tolerance=1e-3)
 } )
 
 test_that(" Test linkage = 98% expect NULL", {
   data<-tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~HTS_INDEX_COM.New.Pos.T,~HTS_INDEX_FAC.New.Pos.T,~TX_NEW.T,~HTS_TST.KP.Pos.T,~TX_NEW.KP.T,
-    "a",   1,         "25-49",  "F",  NA,                    20,          20,                                39,                 0,               0,
+    "a",   1,         "25-49",  "F",  NA,                    20,          20,                                39,                 40,               39,
     "b",  2,          "25-49", "M",  NA,                         0,           0,                                0,                 0,               0
   )
   
