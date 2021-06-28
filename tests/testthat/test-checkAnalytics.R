@@ -304,3 +304,17 @@ test_that(" Test linkage all zeros expect NULL", {
   expect_null(analyze_linkage(data))
   
 } )
+
+test_that(" Test linkage with age <1", {
+  data<-tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~HTS_INDEX_COM.New.Pos.T,~HTS_INDEX_FAC.New.Pos.T,~TX_NEW.T,~HTS_TST.KP.Pos.T,~TX_NEW.KP.T,
+    "a",   1,         "<01", "M",  NA,                    50,          50,                                101,                 100,               100,
+    "b",  2,          NA, NA,  "PWID",                         0,           0,                             0,                 100,               101
+  )
+  
+  foo<-analyze_linkage(data)
+  testthat::expect_equal(class(foo),"list")
+  testthat::expect_setequal(names(foo),c("test_results","msg"))
+  testthat::expect_equal(NROW(foo$test_results),1)
+  expect_equal(foo$test_results$HTS_TST.KP.Linkage.T,1.01,tolerance=1e-3)
+} )
