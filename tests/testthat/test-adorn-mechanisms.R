@@ -1,8 +1,6 @@
 
 context("Get a mechanism view when logged into DATIM")
 
-
-
   with_mock_api({
     test_that("We can get a warning when not logged in", {
       skip("Need to simulate a dead handle.")
@@ -28,10 +26,7 @@ context("Get a mechanism view when logged into DATIM")
  
   with_mock_api({
     test_that("We can get a mechanism list when logged in", {
-      datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-      expect_true(exists("d2_default_session"))
-      datasets<-c("MqNLEXmzIzr","kkXf2zXqTM0")
-      test_mech_list<-getMechanismViewFromDATIM(d2_session = d2_default_session)
+      test_mech_list<-getMechanismViewFromDATIM(d2_session = training)
       expect_type(test_mech_list,"list")
       mechs_names<-c("mechanism_desc",
                      "mechanism_code",
