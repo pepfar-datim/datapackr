@@ -20,12 +20,7 @@ getOPUDataFromDATIM <- function(cop_year,
                                 d2_session = dynGet("d2_default_session",
                                                     inherits = TRUE)) {
   
-  if (cop_year == 2020){
-    map_DataPack_DATIM_DEs_COCs_local <- 
-      datapackr::cop20_map_DataPack_DATIM_DEs_COCs
-  } else {
-    stop("The COP year provided is not supported by getOPUDataFromDATIM")
-  }
+  map_DataPack_DATIM_DEs_COCs_local <- datapackr::get_Map_DataPack_DATIM_DEs_COCs(cop_year)
   
   options("scipen" = 999)
   options(warning.length = 8170)
