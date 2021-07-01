@@ -3,8 +3,6 @@ context("Analytics creation tests")
 
 with_mock_api({
   test_that("We can create analytics", {
-    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-    expect_true(exists("d2_default_session"))
     
     d <-
       datapackr:::createKeychainInfo(
@@ -30,7 +28,7 @@ with_mock_api({
     expect_true(NROW(fy22_prioritizations)>0)
     expect_named(fy22_prioritizations,c("orgUnit","value"),ignore.order = TRUE)
     
-    d %<>% createAnalytics() 
+    d %<>% createAnalytics(d2_session = training) 
     
 
     analytics_column_names <-
