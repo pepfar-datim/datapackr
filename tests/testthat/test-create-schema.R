@@ -3,10 +3,9 @@ context("Create a DataPackSchema")
 
 with_mock_api({
   test_that("We can create a datapack schema", {
-    
-    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-    expect_true(exists("d2_default_session"))
-    test_dataset <- unPackSchema_datapack(test_sheet('COP21_Data_Pack_Template.xlsx'))
+
+    test_dataset <- unPackSchema_datapack(test_sheet('COP21_Data_Pack_Template.xlsx'),
+                                          d2_session = training)
     expect_type(test_dataset, "list")
     expect_named(
       test_dataset,
