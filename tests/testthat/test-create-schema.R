@@ -1,5 +1,5 @@
 context("Create a DataPackSchema")
-
+Sys.setlocale(category = "LC_COLLATE", locale = "en_US.UTF-8")
 
 with_mock_api({
   test_that("We can create a datapack schema", {
@@ -48,29 +48,27 @@ with_mock_api({
     expect_type(test_dataset$FY,"double")
     expect_type(test_dataset$period,"character")
   })
-
-  test_that("COP21 template and schema match", {
-      expect_identical(unPackSchema_datapack(
-        filepath = cop21_datapack_template_path,
-        skip = skip_tabs(tool = "Data Pack Template", cop_year = 2021),
-        cop_year = 2021,
-        d2_session = training),
-        datapackr::cop21_data_pack_schema
-        )
-  })
   
-  # test_that("COP20 template and schema match", {
-  #   
-  #   test_dataset <- expect_identical(
-  #     unPackSchema_datapack(cop20_datapack_template_path, d2_session = training),
-  #     cop20_data_pack_schema
-  #   )
-  # })
-  # test_that("COP20 opu template and schema match", {
-  #   
-  #   test_dataset <- expect_identical(
-  #     unPackSchema_datapack(cop20_opu_datapack_template_path, d2_session = training),
-  #     datapackr::cop20OPU_data_pack_schema
-  #   )
-  # })
+  test_that("COP21 template and schema match", {
+    schema <- unPackSchema_datapack(
+      filepath = 
+        system.file("extdata", "COP21_Data_Pack_Template.xlsx", package = "datapackr"),
+      skip = skip_tabs(tool = "Data Pack Template", cop_year = 2021),
+      cop_year = 2021,
+      d2_session = training)
+    
+    expect_identical(schema, cop21_data_pack_schema)
+  })
+
+  test_that("COP20 opu template and schema match", {
+    schema <-
+      datapackr::unPackSchema_datapack(
+        filepath = cop20_opu_datapack_template_path,
+        skip = datapackr::skip_tabs(tool = "OPU Data Pack Template", 
+                                    cop_year = 2020),
+        type = "OPU Data Pack Template",
+        cop_year = 2020,
+        d2_session = training)
+    expect_identical(schema, cop20OPU_data_pack_schema)
+  })
 })

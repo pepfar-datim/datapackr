@@ -26,8 +26,5 @@ training <- list(base_url = "https://training.datim.org/",
 cop21_datapack_template_path <- 
   system.file("extdata", "COP21_Data_Pack_Template.xlsx", package = "datapackr")
 
-cop20_datapack_template_path <- 
-  system.file("extdata", "COP20_Data_Pack_Template_vFINAL.xlsx", package = "datapackr")
-
 cop20_opu_datapack_template_path <- 
   system.file("extdata", "COP20_OPU_Data_Pack_Template.xlsx", package = "datapackr")
