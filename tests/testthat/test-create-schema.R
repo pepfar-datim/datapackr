@@ -1,4 +1,8 @@
 context("Create a DataPackSchema")
+
+#Explicity set the locale to avoid any issues related to ordering within objects
+#when comparing them. 
+
 Sys.setlocale(category = "LC_COLLATE", locale = "en_US.UTF-8")
 
 with_mock_api({
