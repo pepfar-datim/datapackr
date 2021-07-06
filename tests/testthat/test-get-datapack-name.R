@@ -22,7 +22,9 @@ test_that("Can error on an invalid regional DataPack UID", {
                       x="Asia_Regional_Data_Pack",
                       xy = c(home_address$col,home_address$row))
   openxlsx::saveWorkbook(wb = wb,file = template_copy,overwrite = TRUE)
-  expect_warning(datapackr:::unPackCountryUIDs(submission_path = template_copy))
+  expect_warning(datapackr:::unPackCountryUIDs(submission_path = template_copy,
+                                               tool = "Data Pack",
+                                               cop_year = 2021))
   unlink(template_copy)
 } )
 
