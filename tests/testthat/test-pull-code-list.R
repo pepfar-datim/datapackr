@@ -2,9 +2,8 @@ context("pull-code-lists")
 
 with_mock_api({
   test_that("We can fetch a code list from DATIM", {
-    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-    expect_true(exists("d2_default_session"))
-    test_dataset<-pullDATIMCodeList("YfZot37BbTm")
+    test_dataset<-pullDATIMCodeList("YfZot37BbTm",
+                                    d2_session = training)
     expect_type(test_dataset,"list")
     test_dataset_names<-c("dataset",
                    "dataelement",
@@ -23,10 +22,9 @@ with_mock_api({
 
 with_mock_api({
   test_that("We can fetch a COP21 indicator list from DATIM", {
-    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-    expect_true(exists("d2_default_session"))
     #Hard code the year, as this test may break around Ocotber
-    test_dataset<-pull_COPindicators(cop_year=2021)
+    test_dataset<-pull_COPindicators(cop_year=2021,
+                                     d2_session = training)
     expect_type(test_dataset,"list")
     expect_identical(class(test_dataset),"data.frame")
     expect_true(NROW(test_dataset)>0)
@@ -40,9 +38,7 @@ with_mock_api({
 
 with_mock_api({
   test_that("We can fetch a map of technical areas from DATIM", {
-    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-    expect_true(exists("d2_default_session"))
-    test_dataset<-getTechArea()
+    test_dataset<-getTechArea(d2_session = training)
     expect_type(test_dataset,"list")
     expect_equal(length(test_dataset),2)
     expect_setequal(names(test_dataset),c("dataElement","tech_area"))
@@ -56,9 +52,7 @@ with_mock_api({
 with_mock_api({
   test_that("We can fetch a map of HTS modalities from DATIM", {
     
-    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-    expect_true(exists("d2_default_session"))
-    test_dataset<-getHTSModality()
+    test_dataset<-getHTSModality(d2_session = training)
     expect_type(test_dataset,"list")
     expect_true("data.frame" %in% class(test_dataset))
     expect_true(NROW(test_dataset) > 0)
@@ -72,9 +66,7 @@ with_mock_api({
 with_mock_api({
   test_that("We can get dataset assignment levels from DATIM", {
     
-    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-    expect_true(exists("d2_default_session"))
-    test_dataset<-getIMPATTLevels()
+    test_dataset<-getIMPATTLevels(d2_session = training)
     expect_type(test_dataset,"list")
     expect_true("data.frame" %in% class(test_dataset))
     expect_true(NROW(test_dataset) > 0)
@@ -86,9 +78,7 @@ with_mock_api({
 with_mock_api({
   test_that("We can get valid category options from DATIM", {
     
-    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-    expect_true(exists("d2_default_session"))
-    test_dataset<-getValidCOs()
+    test_dataset<-getValidCOs(d2_session = training)
     expect_type(test_dataset,"list")
     expect_true("data.frame" %in% class(test_dataset))
     expect_true(NROW(test_dataset) > 0)
@@ -100,9 +90,9 @@ with_mock_api({
 with_mock_api({
   test_that("We can get a list of PSNUs from DATIM", {
     
-    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-    expect_true(exists("d2_default_session"))
-    test_dataset<-getPSNUs(country_uids = "qllxzIjjurr",include_mil = FALSE, include_DREAMS = TRUE)
+    test_dataset<-getPSNUs(country_uids = "qllxzIjjurr",include_mil = FALSE, 
+                           include_DREAMS = TRUE,
+                           d2_session = training)
     expect_type(test_dataset,"list")
     expect_true("data.frame" %in% class(test_dataset))
     expect_true(NROW(test_dataset) > 0)
@@ -132,9 +122,7 @@ with_mock_api({
 with_mock_api({
   test_that("We can get a map of COCs to COs", {
     
-    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-    expect_true(exists("d2_default_session"))
-    test_dataset <- map_COCs_to_COs()
+    test_dataset <- map_COCs_to_COs(d2_session = training)
     expect_type(test_dataset, "list")
     expect_setequal(names(test_dataset), c("name", "id", "categoryOptions"))
     expect_equal(class(test_dataset$name), "character")
@@ -150,9 +138,7 @@ with_mock_api({
 with_mock_api({
   test_that("We can get a map of Cs to COs", {
     
-    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-    expect_true(exists("d2_default_session"))
-    test_dataset <- map_Cs_to_COs()
+    test_dataset <- map_Cs_to_COs(d2_session = training)
     expect_type(test_dataset, "list")
     expect_setequal(names(test_dataset), c("categoryoptiongroup", "categoryoption", "categoryoptionuid"))
   })
@@ -170,13 +156,11 @@ test_that("We can get a list of dataset UIDs based on the fiscal year",{
 with_mock_api({
   test_that("We can get a full code list", {
     
-    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-    expect_true(exists("d2_default_session"))
-    test_dataset <- pullFullCodeList(FY = 2021)
+    test_dataset <- pullFullCodeList(FY = 2021, d2_session = training)
     expect_type(test_dataset, "list")
     expect_setequal(names(test_dataset), c("dataelement", "dataelementuid", "categoryoptioncombo","categoryoptioncombouid","FY"))
     skip("FY22 code lists are not working?")
-    test_dataset <- pullFullCodeList(FY = 2022)
+    test_dataset <- pullFullCodeList(FY = 2022, d2_session = training)
     })
 })
 
