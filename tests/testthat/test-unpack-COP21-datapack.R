@@ -5,8 +5,6 @@ d_data_tests_types<-c("tbl_df","tbl","data.frame")
 
 with_mock_api({
 test_that("Can unpack all data pack sheets", {
-  datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-  expect_true(exists("d2_default_session"))
   d <- datapackr:::createKeychainInfo(submission_path = test_sheet('COP21_DP_random_no_psnuxim.xlsx'),
                                       tool = "Data Pack",
                                       country_uids = NULL,
@@ -35,8 +33,6 @@ test_that("Can unpack all data pack sheets", {
 
 with_mock_api({
   test_that("Can unpack and separate data sets", {
-    datimutils::loginToDATIM(config_path = test_config("test-config.json"))
-    expect_true(exists("d2_default_session"))
     d <- datapackr:::createKeychainInfo(submission_path = test_sheet('COP21_DP_random_no_psnuxim.xlsx'),
                                         tool = "Data Pack",
                                         country_uids = NULL,
@@ -74,4 +70,3 @@ with_mock_api({
     expect_type(d$datim$UndistributedMER$attributeOptionCombo,"character")
     expect_type(d$datim$UndistributedMER$attributeOptionCombo,"double")
   } ) })
-
