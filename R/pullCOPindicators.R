@@ -12,13 +12,15 @@
 pull_COPindicators <- function(cop_year = datapackr::getCurrentCOPYear(),
                                d2_session = dynGet("d2_default_session",
                                                    inherits = TRUE)) {
-  indicators <- datapackr::api_call("indicators",
+  indicators <- datapackr::api_call("indicatorGroups",
                                     d2_session = d2_session) %>%
-    datapackr::api_filter(field = "indicatorGroups.name",
+    datapackr::api_filter(field = "name",
                           operation = "eq",
-                          match = paste("COP",stringr::str_sub(cop_year,start = -2),"indicators")) %>%
-    datapackr::api_fields("code,id,name,numeratorDescription,numerator,denominatorDescription,denominator,indicatorType[id,name]") %>%
-    datapackr::api_get(d2_session = d2_session)
+                          match = paste("COP",stringr::str_sub(cop_year,start = -2),"DataPack Indicators")) %>%
+    datapackr::api_fields("indicators[code,id,name,numeratorDescription,numerator,denominatorDescription,denominator,indicatorType[id,name]]") %>%
+    datapackr::api_get(d2_session = d2_session) %>% 
+    purrr::pluck("indicators") %>% 
+    purrr::pluck(1)
   
   row.names(indicators) <- NULL
   

@@ -1,0 +1,68 @@
+{
+    "organisationUnits": [
+        {
+            "level": 3,
+            "name": "Lesotho",
+            "id": "qllxzIjjurr",
+            "ancestors": [
+                {
+                    "name": "Global",
+                    "id": "ybg3MO3hcf4"
+                },
+                {
+                    "name": "Africa",
+                    "id": "KSkooYTy8FB"
+                }
+            ]
+        },
+        {
+            "level": 4,
+            "name": "Liberia",
+            "id": "kH29I939rDQ",
+            "ancestors": [
+                {
+                    "name": "Global",
+                    "id": "ybg3MO3hcf4"
+                },
+                {
+                    "name": "Africa",
+                    "id": "KSkooYTy8FB"
+                },
+                {
+                    "name": "West Africa Region",
+                    "id": "G0BT4KrJouu"
+                }
+            ]
+        },
+        {
+            "level": 3,
+            "name": "Malawi",
+            "id": "lZsCb6y0KDX",
+            "ancestors": [
+                {
+                    "name": "Global",
+                    "id": "ybg3MO3hcf4"
+                },
+                {
+                    "name": "Africa",
+                    "id": "KSkooYTy8FB"
+                }
+            ]
+        },
+        {
+            "level": 3,
+            "name": "Namibia",
+            "id": "FFVkaV9Zk1S",
+            "ancestors": [
+                {
+                    "name": "Global",
+                    "id": "ybg3MO3hcf4"
+                },
+                {
+                    "name": "Africa",
+                    "id": "KSkooYTy8FB"
+                }
+            ]
+        }
+    ]
+}
