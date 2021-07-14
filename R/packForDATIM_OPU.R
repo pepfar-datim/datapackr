@@ -9,12 +9,11 @@
 #' @return Modified d object with a DATIM compatible data frame for import id d$datim$OPU
 #'
 packForDATIM_OPU <- function(d) {
-  if (d$info$cop_year == 2020){
-    map_DataPack_DATIM_DEs_COCs_local <- 
-      datapackr::cop20_map_DataPack_DATIM_DEs_COCs
-  } else {
+  if (d$info$cop_year != 2020){
     stop("The COP year provided is not supported by packForDATIM_OPU")
   }
+  
+  map_DataPack_DATIM_DEs_COCs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
   
   # Add dataElement & categoryOptionCombo ####
   d$datim$OPU <- d$data$extract %>%

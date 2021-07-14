@@ -20,12 +20,12 @@ getOPUDataFromDATIM <- function(cop_year,
                                 d2_session = dynGet("d2_default_session",
                                                     inherits = TRUE)) {
   
+  map_DataPack_DATIM_DEs_COCs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
   if (cop_year == 2020){
-    map_DataPack_DATIM_DEs_COCs_local <- 
-      datapackr::cop20_map_DataPack_DATIM_DEs_COCs
-  } else {
-    stop("The COP year provided is not supported by getOPUDataFromDATIM")
-  }
+    map_DataPack_DATIM_DEs_COCs_local <- dplyr::mutate(map_DataPack_DATIM_DEs_COCs_local,
+                                                       dataelementuid = dataelement,
+                                                       period = "2020Oct")
+  }  
   
   options("scipen" = 999)
   options(warning.length = 8170)
@@ -66,15 +66,17 @@ getOPUDataFromDATIM <- function(cop_year,
                                                d2_session = d2_session)
   
   # Filter data by required indicator_codes ####
-  indicator_codes <- datapackr::cop20_data_pack_schema %>% 
+  indicator_codes <- datapackr::getDataPackSchema(cop_year = cop_year) %>% 
     dplyr::filter(dataset == "mer",
                   col_type =="target") %>% 
     .[["indicator_code"]]
   
+
   data_datim %<>%
     dplyr::left_join(map_DataPack_DATIM_DEs_COCs_local,
-                      by = c("dataElement" = "dataelement",
-                            "categoryOptionCombo" = "categoryoptioncombouid"))
+                      by = c("dataElement" = "dataelementuid",
+                            "categoryOptionCombo" = "categoryoptioncombouid",
+                            "period" = "period"))
   
   if (any(is.na(data_datim$indicator_code))) {
     stop("Problem mapping target data pulled from DATIM to datapack schema")

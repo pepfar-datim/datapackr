@@ -500,3 +500,39 @@ rowMax <- function(df, cn, regex) {
   
   return(df)
 }
+
+#' @export
+#' @title get_Map_DataPack_DATIM_DEs_COCs
+#' 
+#' @param cop_year cop year to pull get map for
+#'
+#' @return {cop20, cop21}_map_DataPack_DATIM_DEs_COCs
+#'
+getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
+  if (cop_year == 2020){ 
+      return(datapackr::cop20_map_DataPack_DATIM_DEs_COCs)
+  } else if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs, 
+                                           datapackr::map_DataPack_DATIM_DEs_COCs)) {
+    return(datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
+  } else { # if map_DataPack_DATIM_DEs_COCs has drifted or COP year is invalid this notifies us
+           # when map is updated for COP22 we will want to update support in this function
+    stop("The COP year and configuration provided is not supported by get_Map_DataPack_DATIM_DEs_COCs")
+  }
+}
+
+#' @export
+#' @title getDataPackSchema
+#' 
+#' @param cop_year cop year to pull get schema for
+#'
+#' @return {cop20, cop21}_data_pack_schema
+#'
+getDataPackSchema <- function(cop_year) {
+  if (cop_year == 2020){ 
+    return(datapackr::cop20_data_pack_schema)
+  } else if (cop_year == 2021) {
+    return(datapackr::cop21_data_pack_schema)
+  } else { 
+    stop("Datapack schema not available for the cop year provided")
+  }
+}
