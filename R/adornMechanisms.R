@@ -9,8 +9,8 @@
 getMechanismViewFromDATIM <- function( cop_year = NULL,
                                   d2_session = dynGet("d2_default_session",
                                                       inherits = TRUE)) {
-  paste0(d2_session$base_url, "api/",datapackr::api_version(),
-         "/sqlViews/fgUtV6e9YIX/data.csv?paging=false") %>%
+  paste0(d2_session$base_url, 
+         "api/sqlViews/fgUtV6e9YIX/data.csv?paging=false") %>%
     {if (!is.null(cop_year))
       paste0(., "&filter=startdate:lt:", cop_year+1, "-10-01",
              "&filter=enddate:gt:", cop_year, "-09-30")

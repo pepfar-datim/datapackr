@@ -220,6 +220,7 @@ unPackDataPackSheet <- function(d, sheet) {
 
     if (NROW(invalid_prioritizations) > 0) {
       d$tests$invalid_prioritizations <- invalid_prioritizations
+      attr(d$tests$invalid_prioritizations,"test_name")<-"Invalid prioritizations"
 
       invalid_prioritizations_strings <- invalid_prioritizations %>%
         tidyr::unite(row_id, c(PSNU, value), sep = ":  ") %>%

@@ -1,3 +1,22 @@
+
+
+htsModalities<-function() {
+c("HTS_INDEX_COM.New.Pos.T",
+          "HTS_INDEX_FAC.New.Pos.T",
+          "HTS_TST.EW.Pos.T",
+          "HTS_TST.Inpat.Pos.T",
+          "HTS_TST.Maln.Pos.T",
+          "HTS_TST.MobileCom.Pos.T",
+          "HTS_TST.OtherCom.Pos.T",
+          "HTS_TST.Other.Pos.T",
+          "HTS_TST.Peds.Pos.T",
+          "HTS_TST.PostANC1.Pos.T",
+          "HTS_TST.STI.Pos.T",
+          "HTS_TST.VCT.Pos.T",
+          "PMTCT_STAT.N.New.Pos.T",
+          "TB_STAT.N.New.Pos.T",
+          "VMMC_CIRC.Pos.T")
+}
 #' @export
 #' @title Check Data Pack for <90\% PMTCT_EID from ≤02 months
 #'
@@ -154,10 +173,10 @@ analyze_vmmc_indeterminate <- function(data) {
 
 
 #' @export
-#' @title Check Data Pack data for PMTCT Known Pos > PMTCT Total.
+#' @title Check Data Pack data for PMTCT Known Pos Ratio > 75\%.
 #'
 #' @description Check data gathered from Data Pack to identify cases where
-#' PMTCT Known Pos > PMTCT Total.
+#' PMTCT Known Pos Ratio > 75\%.
 #'
 #' @param data Analytics object to analyze
 #'
@@ -167,6 +186,7 @@ analyze_pmtctknownpos <- function(data) {
   a <- NULL
 
   issues <- data %>%
+    dplyr::filter(is.na(key_population)) %>%
     dplyr::mutate(
       PMTCT_STAT.N.Total =
         PMTCT_STAT.N.New.Pos.T
@@ -174,7 +194,6 @@ analyze_pmtctknownpos <- function(data) {
         + PMTCT_STAT.N.New.Neg.T,
       knownpos_ratio =
         (PMTCT_STAT.N.KnownPos.T / PMTCT_STAT.N.Total)) %>%
-    dplyr::filter(is.na(key_population)) %>%
     dplyr::select(
       psnu, psnu_uid, age, sex, key_population,
       PMTCT_STAT.N.Total,
@@ -183,8 +202,9 @@ analyze_pmtctknownpos <- function(data) {
       PMTCT_STAT.N.New.Neg.T,
       knownpos_ratio
     ) %>%
+    dplyr::filter(!is.na(knownpos_ratio)) %>% 
     dplyr::filter(
-      PMTCT_STAT.N.KnownPos.T > PMTCT_STAT.N.Total
+      knownpos_ratio > 0.75
     )
 
   if (NROW(issues) > 0) {
@@ -194,7 +214,7 @@ analyze_pmtctknownpos <- function(data) {
 
     a$msg <-
       paste0(
-        "WARNING! PMTCT KNOWN POS > TOTAL POS: \n\n\t* ",
+        "WARNING! PMTCT KNOWN POS Ratio > 75%: \n\n\t* ",
         crayon::bold(
           paste0(
             length(unique(issues$psnu_uid)), " of ",
@@ -211,10 +231,10 @@ analyze_pmtctknownpos <- function(data) {
 
 
 #' @export
-#' @title Check Data Pack data for TB Known Pos > TB Total.
+#' @title Check Data Pack data for TB Known Pos ratio > 75\%.
 #'
 #' @description Check data gathered from Data Pack to identify cases where
-#' TB Known Pos > TB Total.
+#' TB Known Pos ratio > 75\%
 #'
 #' @param data Analytics object to analyze
 #'
@@ -237,8 +257,9 @@ analyze_tbknownpos <- function(data) {
       TB_STAT.N.KnownPos.T,
       TB_STAT.N.New.Neg.T,
       knownpos_ratio) %>%
+    dplyr::filter(!is.na(knownpos_ratio)) %>% 
     dplyr::filter(
-      TB_STAT.N.KnownPos.T > TB_STAT.N.Total)
+      knownpos_ratio > 0.75)
 
   if (NROW(issues) > 0) {
 
@@ -247,7 +268,7 @@ analyze_tbknownpos <- function(data) {
 
     a$msg <-
       paste0(
-        "WARNING! TB KNOWN POS > TOTAL POS: \n\n\t* ",
+        "WARNING! TB KNOWN POS Ratio > 75%: \n\n\t* ",
         crayon::bold(
           paste0(
             length(unique(issues$psnu_uid)), " of ",
@@ -281,7 +302,8 @@ analyze_retention <- function(data) {
       TX.Retention.T =
         (TX_CURR.T)
       / (TX_CURR.T_1 + TX_NEW.T)
-    )
+    ) %>% 
+    dplyr::filter(!is.na(TX.Retention.T))
 
   issues <- analysis %>%
     dplyr::filter(TX.Retention.T < 0.98 | TX.Retention.T > 1) %>%
@@ -350,22 +372,7 @@ analyze_linkage <- function(data) {
 
   analysis <- data %>%
     dplyr::mutate(
-      HTS_TST_POS.T =
-        HTS_INDEX_COM.New.Pos.T
-        + HTS_INDEX_FAC.New.Pos.T
-        + HTS_TST.EW.Pos.T
-        + HTS_TST.Inpat.Pos.T
-        + HTS_TST.Maln.Pos.T
-        + HTS_TST.MobileCom.Pos.T
-        + HTS_TST.OtherCom.Pos.T
-        + HTS_TST.Other.Pos.T
-        + HTS_TST.Peds.Pos.T
-        + HTS_TST.PostANC1.Pos.T
-        + HTS_TST.STI.Pos.T
-        + HTS_TST.VCT.Pos.T
-        + PMTCT_STAT.N.New.Pos.T
-        + TB_STAT.N.New.Pos.T
-        + VMMC_CIRC.Pos.T,
+      HTS_TST_POS.T =rowSums(dplyr::select(.,tidyselect::any_of(htsModalities()))),
       HTS_TST.Linkage.T =
         dplyr::case_when(
           HTS_TST_POS.T == 0 ~ NA_real_,
@@ -409,7 +416,7 @@ analyze_linkage <- function(data) {
          TX_NEW.T / HTS_TST_POS.T,
        HTS_TST.KP.Linkage.T =
          TX_NEW.KP.T / HTS_TST.KP.Pos.T
-      )
+      ) 
 
     a$msg <-
       paste0(
@@ -464,22 +471,7 @@ analyze_indexpos_ratio <- function(data) {
     dplyr::summarise(dplyr::across(dplyr::everything(), sum)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(
-      HTS_TST_POS.T =
-        HTS_INDEX_COM.New.Pos.T
-        + HTS_INDEX_FAC.New.Pos.T
-        + HTS_TST.EW.Pos.T
-        + HTS_TST.Inpat.Pos.T
-        + HTS_TST.Maln.Pos.T
-        + HTS_TST.MobileCom.Pos.T
-        + HTS_TST.OtherCom.Pos.T
-        + HTS_TST.Other.Pos.T
-        + HTS_TST.Peds.Pos.T
-        + HTS_TST.PostANC1.Pos.T
-        + HTS_TST.STI.Pos.T
-        + HTS_TST.VCT.Pos.T
-        + PMTCT_STAT.N.New.Pos.T
-        + TB_STAT.N.New.Pos.T
-        + VMMC_CIRC.Pos.T,
+      HTS_TST_POS.T = rowSums(dplyr::select(.,tidyselect::any_of(htsModalities()))),
       HTS_INDEX.total =
         HTS_INDEX_COM.New.Pos.T
         + HTS_INDEX_FAC.New.Pos.T,

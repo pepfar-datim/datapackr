@@ -27,7 +27,8 @@ getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL,
     dplyr::distinct() %>%
     dplyr::select(dataElement = id,
                   hts_modality = name ) %>%
-    dplyr::mutate(hts_modality = stringr::str_remove(hts_modality,"FY\\d{2}R/FY\\d{2}T"))
+    dplyr::mutate(hts_modality = stringr::str_trim(stringr::str_remove(hts_modality,"FY\\d{2},\\d{2}R/FY\\d{2},\\d{2}T")))
+    
 
   if (!is.null(dataElements)) {
     modality_map %<>%
