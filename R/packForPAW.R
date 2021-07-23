@@ -11,7 +11,8 @@
 #' 
 packForPAW <- function(d) {
   
-  datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
+  map_DataPack_DATIM_DEs_COCs_local <- 
+    datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
 
   PSNUs <- datapackr::valid_PSNUs %>%
     dplyr::mutate(
