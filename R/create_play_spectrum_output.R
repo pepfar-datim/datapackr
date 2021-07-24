@@ -21,11 +21,11 @@ create_play_spectrum_output <- function(country_uids,
                                         d2_session = dynGet("d2_default_session",
                                                             inherits = TRUE)) {
   
-  if (cop_year == 2021) {
-    map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
-  } else {
+  if (cop_year != 2021) {
     stop("That COP Year currently isn't supported for processing by create_play_spectrum_output.")
   }
+  
+  map_DataPack_DATIM_DEs_COCs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
   
   # Get PSNU list ####
   PSNUs <- datapackr::valid_PSNUs %>%
