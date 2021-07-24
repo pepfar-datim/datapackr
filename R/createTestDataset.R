@@ -16,13 +16,12 @@ createTestDataset <- function(country_uids,
                               cop_year,
                               d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
-  if (cop_year == 2021) {
-    schema <- datapackr::cop21_data_pack_schema
-    DATIM_map <- datapackr::map_DataPack_DATIM_DEs_COCs
-  } else if (cop_year == 2020) {
-    schema <- datapackr::cop20_data_pack_schema
-    DATIM_map <- datapackr::cop20_map_DataPack_DATIM_DEs_COCs
-  } else {stop("Not yet set up to produce a test dataset for that COP Year.")}
+    if (!(cop_year %in% c(2020, 2021))) {
+    stop("Not yet set up to produce a test dataset for that COP Year.")
+    }
+  
+  schema <- datapackr::getDataPackSchema(cop_year)
+  DATIM_map <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
 
   # Get PSNUs to test against ####
   org_units <- datapackr::valid_PSNUs %>%

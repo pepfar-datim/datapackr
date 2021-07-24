@@ -80,13 +80,11 @@ adorn_import_file <- function(psnu_import_file,
   
   data <- dplyr::bind_rows(data_codes, data_ids)
   
+  map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs(cop_year)
   # Adorn dataElements & categoryOptionCombos ####
-   if (cop_year == 2021) {
-    map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
+   
   # TODO: Is this munging still required with the map being a function of fiscal year?
-   } else if (cop_year == 2020) {
-     map_DataPack_DATIM_DEs_COCs_local <- datapackr::cop20_map_DataPack_DATIM_DEs_COCs
-     
+   if (cop_year == 2020) {
      map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
                                                           map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- "Male"
      map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
@@ -101,11 +99,7 @@ adorn_import_file <- function(psnu_import_file,
                      dataelementname = dataelement.y,
                      categoryoptioncomboname = categoryoptioncombo) %>% 
        dplyr::mutate(FY = 2021)
-
-   } else {
-     #TODO: Do we need to throw an error here? 
-     stop("That COP Year currently isn't supported for processing by createAnalytics.")
-   }
+     } 
   
   data %<>%
     dplyr::mutate(

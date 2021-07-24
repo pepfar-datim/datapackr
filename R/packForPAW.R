@@ -11,14 +11,9 @@
 #' 
 packForPAW <- function(d) {
   
-  if (d$info$cop_year == 2021) {
-    map_DataPack_DATIM_DEs_COCs_local <- datapackr::map_DataPack_DATIM_DEs_COCs
-  } else if (d$info$cop_year == 2020) {
-    map_DataPack_DATIM_DEs_COCs_local <- datapackr::cop20_map_DataPack_DATIM_DEs_COCs
-  } else {
-    stop("That COP Year currently isn't supported for processing by createAnalytics.")
-  }
-  
+  map_DataPack_DATIM_DEs_COCs_local <- 
+    datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
+
   PSNUs <- datapackr::valid_PSNUs %>%
     dplyr::mutate(
       ou_id = purrr::map_chr(ancestors, list("id", 3), .default = NA),
