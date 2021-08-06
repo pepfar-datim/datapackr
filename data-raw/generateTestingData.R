@@ -1,7 +1,8 @@
 ## TO DO add some code to assining dreams orgUnits in sample country only to dreams orgUnits
 ## To Do - do a better job with dedupes
 library(magrittr)
-datapackr::loginToDATIM("/users/sam/.secrets/cop.json")
+library(datimutils)
+datapackr::loginToDATIM("/users/sam/.secrets/datim.json")
 base_url <- getOption("baseurl")
 
 country_uid <- datimutils::getOrgUnits("Rwanda", name)
@@ -9,10 +10,10 @@ country_uid <- datimutils::getOrgUnits("Rwanda", name)
 
 
 global_data <- datapackr::getCOPDataFromDATIM("ybg3MO3hcf4",
-                                               2020,
+                                               2021,
                                                streams = "mer_targets") 
 country_data <-  datapackr::getCOPDataFromDATIM(country_uid, 
-                                                2020,
+                                                2021,
                                                 streams = "mer_targets") 
 
 # global_orgUnit_aoc_st_sets <- dplyr::select(global_data,
@@ -75,6 +76,29 @@ global_aocs <- dplyr::mutate(global_aocs,
   rbind(c("00000")) %>% 
   rbind(c("00001"))
 
+dreams_agyw_data_elements <- datimutils::getMetadata(dataElements, 
+                                                     name %.like% "DREAMS",
+                                                     name %.like% "AGYW",
+                                                     fields = "id")
+dreams_ovc_data_elements <- datimutils::getMetadata(dataElements, 
+                                                    name %.like% "DREAMS",
+                                                    name %.like% "OVC",
+                                                    fields = "id")
+
+dreams_snus <- datimutils::getOrgUnitGroups("DREAMS SNUs", 
+                                            by = name,
+                                            fields = "organisationUnits[id, path]")  
+
+org_units_in_dreams_path <- dreams_snus$path %>% 
+  stringr::str_split("/") %>% 
+  unlist() %>% 
+  unique()
+
+dreams_psnus <- datimutils::getOrgUnitGroups("COP Prioritization SNU", 
+                                            by = name,
+                                            fields = "organisationUnits[id]") %>%
+  .$id %>% 
+  intersect(org_units_in_dreams_path)
 
 random_data <- dplyr::inner_join(global_data,
                                  global_orgUnits,
@@ -92,9 +116,13 @@ random_data <- dplyr::inner_join(global_data,
   dplyr::group_by_at(dplyr::vars(-value)) %>% 
   dplyr::summarise(value = sum(value)) %>% 
   dplyr::ungroup()%>%
-  dplyr::mutate(value = as.character(value))
-
-agyw_data_elements  
+  dplyr::mutate(value = as.character(value)) %>% 
+  dplyr::filter(!(dataElement %in% dreams_agyw_data_elements) |
+                  (dataElement %in% dreams_agyw_data_elements &
+                  orgUnit %in% dreams_snus$id)) %>% 
+  dplyr::filter(!(dataElement %in% dreams_ovc_data_elements) |
+                  (dataElement %in% dreams_ovc_data_elements &
+                     orgUnit %in% dreams_psnus))
 
 
 dedupes_00000 <- dplyr::filter(random_data,
