@@ -1,5 +1,4 @@
-## TO DO add some code to assining dreams orgUnits in sample country only to dreams orgUnits
-## To Do - do a better job with dedupes
+## TO DO only assing military data to military PSNU
 library(magrittr)
 library(datimutils)
 datapackr::loginToDATIM("/users/sam/.secrets/cop.json")
