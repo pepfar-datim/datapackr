@@ -10,10 +10,10 @@ country_uid <- datimutils::getOrgUnits("Rwanda", name)
 
 
 global_data <- datapackr::getCOPDataFromDATIM("ybg3MO3hcf4",
-                                               2021,
+                                               2020,
                                                streams = "mer_targets") 
 country_data <-  datapackr::getCOPDataFromDATIM(country_uid, 
-                                                2021,
+                                                2020,
                                                 streams = "mer_targets") 
 
 # global_orgUnit_aoc_st_sets <- dplyr::select(global_data,
