@@ -1,4 +1,4 @@
-## TO DO only assing military data to military PSNU
+## TO DO only assigning military data to military PSNUs
 library(magrittr)
 library(datimutils)
 datapackr::loginToDATIM("/users/sam/.secrets/cop.json")
@@ -6,21 +6,14 @@ base_url <- getOption("baseurl")
 
 country_uid <- datimutils::getOrgUnits("Rwanda", name)
 
-
-
 global_data <- datapackr::getCOPDataFromDATIM("ybg3MO3hcf4",
-                                               2020,
+                                               2021,
                                                streams = "mer_targets") 
 country_data <-  datapackr::getCOPDataFromDATIM(country_uid, 
-                                                2020,
+                                                2021,
                                                 streams = "mer_targets") 
 
-# global_orgUnit_aoc_st_sets <- dplyr::select(global_data,
-#                                          support_type,
-#                                          orgUnit_uid,
-#                                          attribute_option) %>%
-#   dplyr::distinct()
-
+# extract global org unit and mech lists from data itself
 global_orgUnits <- dplyr::select(global_data,
                                        orgUnit) %>% 
   dplyr::distinct()
@@ -29,43 +22,39 @@ global_aocs <- dplyr::select(global_data,
                              attributeOptionCombo) %>% 
   dplyr::distinct() %>% 
   dplyr::filter(attributeOptionCombo != "00000",
-                attributeOptionCombo != "00001")
+                attributeOptionCombo != "00001",
+                attributeOptionCombo != "HllvX50cXC0")
 
+# extract country org unit and mech lists from data itself
 country_aocs <- dplyr::select(country_data,
                               attributeOptionCombo) %>%
   dplyr::distinct() %>% 
   dplyr::filter(attributeOptionCombo != "00000",
-                attributeOptionCombo != "00001")
+                attributeOptionCombo != "00001",
+                attributeOptionCombo != "HllvX50cXC0")
 
 country_orgUnits <- dplyr::select(country_data,
                                   orgUnit) %>%
   dplyr::distinct()
 
-# 
-# country_orgUnit_aoc_pairs <- dplyr::full_join(country_aocs,
-#                                            country_orgUnits,
-#                                            by = character())
+
+# randomly assign global PSNUs to country level PSNUs   
 
 max = NROW(country_orgUnits)
-
 n = NROW(global_orgUnits)
-
 mix <- runif(n, max = max) %>% ceiling()
 
-
 country_orgUnits <- dplyr::mutate(country_orgUnits,
-                                        index = 1:max)
+                                  index = 1:max)
 global_orgUnits <- dplyr::mutate(global_orgUnits,
-                                       mix = mix) %>% 
+                                 mix = mix) %>% 
   dplyr::inner_join(country_orgUnits, by = c("mix" = "index"))
 
 
+# randomly assign global Mechs to country level Mechs   
 max = NROW(country_aocs)
-
 n = NROW(global_aocs)
-
 mix <- runif(n, max = max) %>% ceiling()
-
 
 country_aocs <- dplyr::mutate(country_aocs,
                                index = 1:max)
@@ -73,7 +62,8 @@ global_aocs <- dplyr::mutate(global_aocs,
                               mix = mix) %>% 
   dplyr::inner_join(country_aocs, by = c("mix" = "index")) %>% 
   rbind(c("00000")) %>% 
-  rbind(c("00001"))
+  rbind(c("00001")) %>%
+  rbind(c("HllvX50cXC0"))
 
 dreams_agyw_data_elements <- datimutils::getMetadata(dataElements, 
                                                      name %.like% "DREAMS",
@@ -120,7 +110,11 @@ random_data <- dplyr::inner_join(global_data,
                   orgUnit %in% dreams_snus$id)) %>% 
   dplyr::filter(!(dataElement %in% dreams_ovc_data_elements) |
                   (dataElement %in% dreams_ovc_data_elements &
-                     orgUnit %in% dreams_psnus))
+                     orgUnit %in% dreams_psnus)) %>% 
+  dplyr::mutate(attributeOptionCombo = 
+                  dplyr::if_else(dataElement %in% dreams_agyw_data_elements,
+                                 "HllvX50cXC0",
+                                 attributeOptionCombo))
 
 
 no_dedupes <- dplyr::group_by_at(random_data,
@@ -131,7 +125,8 @@ no_dedupes <- dplyr::group_by_at(random_data,
   dplyr::filter(!(stringr::str_detect(attributeOptionCombo, "00000") |
                     stringr::str_detect(attributeOptionCombo, "00001")
                   )
-                )
+                ) %>%
+  dplyr::filter(attributeOptionCombo != "HllvX50cXC0")
 
 extra_dedupes <- dplyr::bind_rows(
   dplyr::mutate(no_dedupes, attributeOptionCombo = "00000", value = 0),
@@ -189,19 +184,17 @@ r <- httr::POST(url, body = deletes_json[["raw_file"]],
                 handle = d2_default_session$handle,
                 httr::timeout(600))
 
-# prin import summary
+# print import summary
 httr::content(r)
 
 url <- paste0("https://cop-test.datim.org/", 
               "api/dataValueSets?importStrategy=CREATE_AND_UPDATE&force=true&preheatCache=true&categoryOptionComboIdScheme=code")
 
+# import main data PSNU by PSNU
 r <- purrr::map(random_data_nested[["data"]], ~ {httr::POST(url, body = .x[["raw_file"]],
                                                       httr::content_type_json(),
                                                       handle = d2_default_session$handle)})
-# r <- httr::POST(url, body = random_data_json[["raw_file"]],
-#                 httr::content_type_json(),
-#                 handle = d2_default_session$handle)
-# prin import summary
+
 purrr::map(r, httr::content)
 
 
