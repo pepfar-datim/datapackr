@@ -48,7 +48,8 @@ country_orgUnits <- dplyr::mutate(country_orgUnits,
                                   index = 1:max)
 global_orgUnits <- dplyr::mutate(global_orgUnits,
                                  mix = mix) %>% 
-  dplyr::inner_join(country_orgUnits, by = c("mix" = "index"))
+  dplyr::inner_join(country_orgUnits, by = c("mix" = "index")) %>% 
+  dplyr::mutate(adjustment_factor = runif(NROW(global_orgUnits)))
 
 
 # randomly assign global Mechs to country level Mechs   
@@ -95,7 +96,8 @@ random_data <- dplyr::inner_join(global_data,
   dplyr::inner_join(global_aocs,
                     by = c("attributeOptionCombo" = "attributeOptionCombo.x")) %>%
   dplyr::mutate(orgUnit = orgUnit.y,
-                attributeOptionCombo = attributeOptionCombo.y) %>% 
+                attributeOptionCombo = attributeOptionCombo.y) %>%
+  dplyr::mutate(value = value*adjustment_factor) %>% 
   dplyr::select(dataElement,
                 period,
                 orgUnit,
@@ -103,7 +105,7 @@ random_data <- dplyr::inner_join(global_data,
                 attributeOptionCombo,
                 value) %>% 
   dplyr::group_by_at(dplyr::vars(-value)) %>% 
-  dplyr::summarise(value = sum(value)) %>% 
+  dplyr::summarise(value = round(sum(value))) %>% 
   dplyr::ungroup()  %>% 
   dplyr::filter(!(dataElement %in% dreams_agyw_data_elements) |
                   (dataElement %in% dreams_agyw_data_elements &
@@ -197,9 +199,6 @@ r <- purrr::map(random_data_nested[["data"]], ~ {httr::POST(url, body = .x[["raw
 
 purrr::map(r, httr::content)
 
-
-url <- paste0("https://cop-test.datim.org/", 
-              "api/dataValueSets?importStrategy=CREATE_AND_UPDATE&force=true&preheatCache=true&categoryOptionComboIdScheme=code")
 r <- httr::POST(url, body = dedupes_00000_json[["raw_file"]],
                 httr::content_type_json(),
                 handle = d2_default_session$handle,
@@ -208,9 +207,9 @@ r <- httr::POST(url, body = dedupes_00000_json[["raw_file"]],
 # prin import summary
 httr::content(r)
 
-url <- paste0("https://cop-test.datim.org/", 
-              "api/dataValueSets?importStrategy=CREATE_AND_UPDATE&force=true&preheatCache=true&categoryOptionComboIdScheme=code")
 r <- httr::POST(url, body = dedupes_00001_json[["raw_file"]],
                 httr::content_type_json(),
                 handle = d2_default_session$handle,
                 httr::timeout(600))
+
+httr::content(r)
