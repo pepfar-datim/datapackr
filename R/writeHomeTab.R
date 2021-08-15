@@ -1,7 +1,7 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
 #' @importFrom utils packageVersion
-#' @title writeHomeTab(wb, datapack_uid, type = "Data Pack")
+#' @title writeHomeTab(wb, datapack_uid, tool = "Data Pack")
 #'
 #' @description
 #' Function to write Home tab details into Data Pack as specified.
@@ -12,7 +12,7 @@
 #' @param country_uids Character vector of 11 digit alphanumeric DATIM codes
 #' representing countries.
 #' @param cop_year COP Year in format YYYY.
-#' @param type Defaults to "Data Pack".
+#' @param tool Defaults to "Data Pack".
 #'
 #' @return Openxlsx workbook object with added, styled Home tab.
 #'
@@ -20,7 +20,7 @@ writeHomeTab <- function(wb,
                          datapack_name,
                          country_uids,
                          cop_year = getCurrentCOPYear(),
-                         type = "Data Pack") {
+                         tool = "Data Pack") {
   #TODO: Setup for default to run PEPFARLANDIA version.
 
   # Add Tab ####
@@ -41,7 +41,7 @@ writeHomeTab <- function(wb,
                       x = paste0("COP",
                                  stringr::str_sub(cop_year, -2,-1),
                                  " ",
-                                 type),
+                                 tool),
                       xy = c(2,10),
                       colNames = F)
   openxlsx::addStyle(wb, "Home",

@@ -1,18 +1,18 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
-#' @title writeDataSheet(wb, type = "Data Pack")
+#' @title writeDataSheet(wb, tool = "Data Pack")
 #' @description
 #' Function to write Data sheet structures
 #'
 #' @param wb Openxlsx workbook object.
 #' @param sheet Name of the sheet
-#' @param type Defaults to "Data Pack".
+#' @param tool Defaults to "Data Pack".
 #'
 #' @return Openxlsx workbook object with added, styled Home tab.
 #'
-frameDataSheet <- function(wb, sheet, type = "Data Pack") {
+frameDataSheet <- function(wb, sheet, tool = "Data Pack") {
 # Choose schema ####
-  if (type == "Data Pack") {
+  if (tool == "Data Pack") {
       schema <- datapackr::template_schema
   }
 
@@ -89,11 +89,11 @@ frameDataSheet <- function(wb, sheet, type = "Data Pack") {
 #'
 #' @param datapack_uid A unique ID specifying the PEPFAR Operating Unit
 #' the Tool belongs to.
-#' @param type Defaults to "Data Pack".
+#' @param tool Defaults to "Data Pack".
 #'
 #' @return OpenXLSX workbook object for use in data writing functions.
 #'
-packFrame <- function(datapack_uid, type = "Data Pack") {
+packFrame <- function(datapack_uid, tool = "Data Pack") {
 
 # Create Workbook ####
     wb <- openxlsx::createWorkbook(
@@ -107,10 +107,10 @@ packFrame <- function(datapack_uid, type = "Data Pack") {
     options("openxlsx.numFmt" = "#,##0")
 
 # Write Home Page ####
-   # wb <- writeHomeTab(wb = wb, datapack_uid = datapack_uid, type = type) #TODO: Update parameters
+   # wb <- writeHomeTab(wb = wb, datapack_uid = datapack_uid, tool = tool) #TODO: Update parameters
 
 # Frame data tabs ####
-    if (type == "Data Pack") {
+    if (tool == "Data Pack") {
         schema <- datapackr::template_schema
     }
 
@@ -120,7 +120,7 @@ packFrame <- function(datapack_uid, type = "Data Pack") {
 
     for (i in 1:length(sheet_names)) {
         sheet_name = sheet_names[i]
-        wb <- frameDataSheet(wb = wb, sheet_name, type = type)
+        wb <- frameDataSheet(wb = wb, sheet_name, tool = tool)
     }
 
   return(wb)

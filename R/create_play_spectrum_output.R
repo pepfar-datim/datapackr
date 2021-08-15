@@ -186,7 +186,7 @@ create_play_spectrum_output <- function(country_uids,
                                             d2_session = d2_session)
     exportPackr(data = play_spectrum_output,
                 output_path = output_folder,
-                type = "Spectrum Example",
+                tool = "Spectrum Example",
                 datapack_name = country_name)
   }
   

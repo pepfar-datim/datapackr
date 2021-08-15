@@ -9,7 +9,7 @@
 #'
 #' @param filepath Local filepath for a Data Pack template (XLSX).
 #' @param skip Character vector of Sheet Names to label for skipping in schema.
-#' @param type Type of tool to unpack.
+#' @param tool Type of tool to unpack.
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
 #'
@@ -17,16 +17,16 @@
 #'
 unPackSchema_datapack <- function(filepath = NULL,
                                   skip = NULL,
-                                  type = "Data Pack Template",
+                                  tool = "Data Pack Template",
                                   cop_year = getCurrentCOPYear(),
                                   d2_session = dynGet("d2_default_session",
                                                       inherits = TRUE)) {
 
   # Check the filepath is valid. If NA, request via window. ####
   filepath <- handshakeFile(path = filepath,
-                            tool = type)
+                            tool = tool)
 
-  if (type == "OPU Data Pack Template" & cop_year == 2020) {
+  if (tool == "OPU Data Pack Template" & cop_year %in% c(2020, 2021)) {
     schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = T) %>%
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric, is_array)
   } else {
@@ -38,13 +38,13 @@ unPackSchema_datapack <- function(filepath = NULL,
   data.table::setDT(schema)[,sheet_num:=.GRP, by = c("sheet_name")]
 
   # Skip detail on listed sheets. ####
-  if (is.null(skip)) {skip = skip_tabs(tool = type, cop_year = cop_year)}
+  if (is.null(skip)) {skip = skip_tabs(tool = tool, cop_year = cop_year)}
   sheets <- tidyxl::xlsx_sheet_names(filepath)
   verbose_sheets <- sheets[!sheets %in% skip]
 
   schema %<>%
     dplyr::filter(sheet_name %in% verbose_sheets,
-                  row %in% c(5:(headerRow(type, cop_year)+1)))
+                  row %in% c(5:(headerRow(tool, cop_year)+1)))
     
   # # Correctly enter array formulas ####
   #   dplyr::mutate(
@@ -79,7 +79,7 @@ unPackSchema_datapack <- function(filepath = NULL,
     dplyr::mutate(formula = dplyr::if_else(is.na(formula), value, formula))
     
   # For OPU Data Packs, delete everything in metadata rows/cols
-  if (type == "OPU Data Pack Template") {
+  if (tool == "OPU Data Pack Template") {
     schema %<>%
       dplyr::mutate_at(
         dplyr::vars(
@@ -93,7 +93,7 @@ unPackSchema_datapack <- function(filepath = NULL,
     ~name, ~id,
     NA_character_, NA_character_))
   
-  if (type == "OPU Data Pack Template") {
+  if (tool == "OPU Data Pack Template") {
     disaggs <- list(tibble::tribble(
       ~name, ~id,
       NA_character_, NA_character_))
@@ -379,7 +379,7 @@ unPackSchema_datapack <- function(filepath = NULL,
       formula.test = stringr::str_detect(formula, "#REF")
     ) %>%
     dplyr::select(sheet_name,indicator_code,dplyr::matches("test")) %>%
-    {if (type == "OPU Data Pack Template") dplyr::select(., -dataset.test, -col_type.test, -value_type.test) else .} %>%
+    {if (tool == "OPU Data Pack Template") dplyr::select(., -dataset.test, -col_type.test, -value_type.test) else .} %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("test")), dplyr::any_vars(. == TRUE))
 
   if (NROW(tests) > 0) {
@@ -400,6 +400,7 @@ unPackSchema_datapack <- function(filepath = NULL,
         "\n")
       )
   }
+  
   if (cop_year == 2020){
     schema <- dplyr::select(schema, -FY, -period)
   }

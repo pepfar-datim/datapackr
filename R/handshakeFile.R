@@ -38,8 +38,10 @@ canReadFile <- function(path) {
 #' @return Character vector containing valid filepath for further use.
 #'
 handshakeFile <- function(path,
-                          tool) {
+                          tool = "Data Pack") {
 
+  if (is.null(tool)) {tool = "Data Pack"}
+  
   if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
     extension = "xlsx"
   } else {
@@ -51,8 +53,9 @@ handshakeFile <- function(path,
   if (!canReadFile(path) ) {
 
     if ( interactive() ) {
-    interactive_print("Please choose a file.")
-    path <- file.choose() }
+      interactive_print("Please choose a file.")
+      path <- file.choose()
+    }
 
     if (!canReadFile(path)) {stop("File could not be read!")}
 

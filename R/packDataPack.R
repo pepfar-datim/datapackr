@@ -21,6 +21,7 @@
 #' \code{Working Directory}.
 #' @param results_archive If TRUE, will export compiled results of all tests and
 #' processes to output_folder.
+#' @param d2_session DHIS2 Session id
 #'
 #' @return Exports a Data Pack to Excel within \code{output_folder}.
 #'
@@ -47,7 +48,7 @@ packDataPack <- function(model_data,
     info = list(
       datapack_name = datapack_name,
       country_uids = country_uids,
-      type = "Data Pack",
+      tool = "Data Pack",
       cop_year =  cop_year
     ),
     data = list(
@@ -56,7 +57,7 @@ packDataPack <- function(model_data,
   )
 
   # Open schema ####
-  if (cop_year == 2020) {
+  if (d$info$cop_year == 2020) {
    d$info$schema <-  datapackr::cop20_data_pack_schema
   } else if (d$info$cop_year == 2021) {
     d$info$schema <- datapackr::cop21_data_pack_schema
@@ -102,7 +103,7 @@ packDataPack <- function(model_data,
                             datapack_name = d$info$datapack_name,
                             country_uids = d$info$country_uids,
                             cop_year = cop_year,
-                            type = "Data Pack")
+                            tool = "Data Pack")
 
   # Get PSNU List####
   d$data$PSNUs <- datapackr::valid_PSNUs %>%
@@ -160,14 +161,14 @@ packDataPack <- function(model_data,
   print("Saving...")
   exportPackr(data = d$tool$wb,
               output_path = d$keychain$output_folder,
-              type = d$info$type,
+              tool = d$info$tool,
               datapack_name = d$info$datapack_name)
 
   # Save & Export Archive
   if (results_archive) {
     exportPackr(data = d,
                 output_path = d$keychain$output_folder,
-                type = "Results Archive",
+                tool = "Results Archive",
                 datapack_name = d$info$datapack_name)
   }
 }

@@ -2,16 +2,16 @@
 % Please edit documentation in R/packFrame.R
 \name{frameDataSheet}
 \alias{frameDataSheet}
-\title{writeDataSheet(wb, type = "Data Pack")}
+\title{writeDataSheet(wb, tool = "Data Pack")}
 \usage{
-frameDataSheet(wb, sheet, type = "Data Pack")
+frameDataSheet(wb, sheet, tool = "Data Pack")
 }
 \arguments{
 \item{wb}{Openxlsx workbook object.}
 
 \item{sheet}{Name of the sheet}
 
-\item{type}{Defaults to "Data Pack".}
+\item{tool}{Defaults to "Data Pack".}
 }
 \value{
 Openxlsx workbook object with added, styled Home tab.
