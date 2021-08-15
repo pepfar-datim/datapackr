@@ -83,19 +83,32 @@ getOPUDataFromDATIM <- function(cop_year,
   }
   
   data_datim %<>%
-    dplyr::filter(indicator_code %in% indicator_codes) %>% 
-    dplyr::select(indicator_code,
-                  support_type,
-                  period,
-                  psnu_uid = orgUnit,
-                  age_option_uid = valid_ages.id,
-                  Age = valid_ages.name,
-                  sex_option_uid = valid_sexes.id,
-                  Sex = valid_sexes.name,
-                  kp_option_uid = valid_kps.id,
-                  KeyPop = valid_kps.name,
-                  attribute_option = attributeOptionCombo,
-                  value)
+    dplyr::filter(indicator_code %in% indicator_codes)
+  
+  # COP21+: Output as DHIS2 import file ####
+  if (cop_year %in% c(2019, 2020)) {
+    data_datim %<>%
+      dplyr::select(indicator_code,
+                    support_type,
+                    period,
+                    psnu_uid = orgUnit,
+                    age_option_uid = valid_ages.id,
+                    Age = valid_ages.name,
+                    sex_option_uid = valid_sexes.id,
+                    Sex = valid_sexes.name,
+                    kp_option_uid = valid_kps.id,
+                    KeyPop = valid_kps.name,
+                    attribute_option = attributeOptionCombo,
+                    value)
+  } else {
+    data_datim %<>%
+      dplyr::select(dataElement,
+                    period,
+                    orgUnit,
+                    categoryOptionCombo,
+                    attributeOptionCombo,
+                    value)
+  }
   
   return(data_datim)
 
