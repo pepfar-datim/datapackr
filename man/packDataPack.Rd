@@ -37,6 +37,8 @@ saved upon export. If left as \code{NULL}, will output to
 
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Exports a Data Pack to Excel within \code{output_folder}.
