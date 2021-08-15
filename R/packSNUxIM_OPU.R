@@ -6,6 +6,7 @@
 #' @description Packs SNUxIM tab for OPU Data Packs.
 #'
 #' @param d Datapackr sidecar
+#' @inheritParams packOPUDataPack
 #' 
 #' @return d
 #' 
@@ -19,7 +20,7 @@ packSNUxIM_OPU <- function(d) {
   }
   
   # Map PSNUs ####
-  data <- d$data$model_data %>%
+  data <- d$data$snuxim_model_data %>%
     dplyr::left_join(d$data$PSNUs, by = c("psnu_uid" = "psnu_uid")) %>%
   
   # Pivot wider ####
