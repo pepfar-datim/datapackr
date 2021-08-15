@@ -1,31 +1,17 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
-#' @title Pack a COP20 OPU Data Pack
+#' @title Pack an OPU Data Pack
 #'
 #' @description
-#' Takes a COP20 OPU Data Pack template, combines it with data pulled from DATIM
-#' API, and produces a COP20 OPU Data Pack ready for distribution.
+#' Takes an OPU Data Pack template, combines it with data pulled from DATIM
+#' API, and produces an OPU Data Pack ready for distribution.
 #'
-#' @param model_data Data from DATIM needed to pack into Data Pack
-#' @param datapack_name Name you would like associated with this Data Pack.
-#' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
-#' @param country_uids Unique IDs for countries to include in the Data Pack.
-#' For full list of these IDs, see \code{datapackr::dataPackMap}.
-#' @param template_path Local filepath to Data Pack template Excel (XLSX) file.
-#' This file MUST NOT have any data validation formats present. If left
-#' \code{NULL}, will prompt for file selection via window.
-#' @param  cop_year Specifies COP year for dating as well as selection of
-#' templates.
-#' @param output_folder Local folder where you would like your Data Pack to be
-#' saved upon export. If left as \code{NULL}, will output to
-#' \code{Working Directory}.
-#' @param results_archive If TRUE, will export compiled results of all tests and
-#' processes to output_folder.
-#' @param d2_session DHIS2 Session id
+#' @inheritParams datapackr_params
 #'
-#' @return Exports a COP20 OPU Data Pack to Excel within \code{output_folder}.
+#' @return Exports an OPU Data Pack to Excel within \code{output_folder}.
 #'
-packOPUDataPack <- function(datapack_name,
+packOPUDataPack <- function(snuxim_model_data = NULL,
+                           datapack_name,
                            country_uids,
                            template_path = NULL,
                            cop_year = getCurrentCOPYear(),
@@ -33,10 +19,6 @@ packOPUDataPack <- function(datapack_name,
                            results_archive = TRUE,
                            d2_session = dynGet("d2_default_session",
                                                inherits = TRUE)) {
-  
-  if (cop_year != 2020) {
-    stop("Sorry! We're only set up to run this for COP20 OPUs for right now. Check back later please. Stay safe!")
-  }
   
   # Create data sidecar ####
   d <- list(
@@ -47,77 +29,103 @@ packOPUDataPack <- function(datapack_name,
     info = list(
       datapack_name = datapack_name,
       country_uids = country_uids,
-      type = "OPU Data Pack",
+      tool = "OPU Data Pack",
       cop_year =  cop_year
+    ),
+    data = list(
+      snuxim_model_data = snuxim_model_data
     )
   )
   
-  # Pull data from DATIM ####
-  d$data$model_data <- getOPUDataFromDATIM(cop_year = cop_year,
-                                           country_uids = country_uids,
-                                           d2_session = d2_session)
+  # Start running log of all warning and information messages
+  d$info$warning_msg <- NULL
+  d$info$has_error <- FALSE
   
-  if (NROW(d$data$model_data) == 0) {
-    stop("Model data pull seems to have returned no data. Please check with DATIM.")
+  if (!d$info$cop_year %in% c(2020, 2021)) {
+    stop("Sorry! We're only set up to run this for COP20 or COP21 OPUs.")
+  }
+  
+  # Check if provided model data is empty ####
+  if (!is.null(d$data$snuxim_model_data)) {
+    
+    empty_snuxim_model_data <- d$data$snuxim_model_data %>%
+      dplyr::filter(rowSums(is.na(.)) != ncol(.))
+    
+    if (NROW(empty_snuxim_model_data) == 0) {
+      warning("Provided SNUxIM model data seems empty. Attempting to retrieve data from DATIM instead.")
+      d$data$snuxim_model_data = NULL
+    }
+  }
+  
+  # If empty or unprovided, pull model data from DATIM ####
+  if (is.null(d$data$snuxim_model_data)) {
+    d$data$snuxim_model_data <- getOPUDataFromDATIM(cop_year = d$info$cop_year,
+                                             country_uids = d$info$country_uids,
+                                             d2_session = d2_session)
+    if (NROW(d$data$snuxim_model_data) == 0) {
+      stop("SNUxIM Model data pull seems to have returned no data from DATIM. Please check with DATIM.")
+    }
+  }
+  
+  # Prepare totals data for allocation ####
+  if (d$info$cop_year == 2021) {
+    d$data$UndistributedMER <- d$data$snuxim_model_data %>%
+        dplyr::mutate(attributeOptionCombo = default_catOptCombo()) %>%
+        dplyr::group_by(dplyr::across(c(-value))) %>%
+        dplyr::summarise(value = sum(value)) %>%
+        dplyr::ungroup() %>%
+        dplyr::filter(value != 0)
   }
   
   # Open schema ####
-  d$info$schema <-  datapackr::cop20OPU_data_pack_schema
+  d$info$schema <- pick_schema(cop_year, "OPU Data Pack")
  
   # Open template ####
     # Grab correct schema
-    if (is.null(d$keychain$template_path)) {
-      d$keychain$template_path <- system.file("extdata",
-                                              "COP20_OPU_Data_Pack_Template.xlsx",
-                                              package = "datapackr",
-                                              mustWork = TRUE)
-    }
-    
-    d$keychain$template_path <- handshakeFile(path = d$keychain$template_path,
-                                              tool = "OPU Data Pack Template") 
+  d$keychain$template_path <- pick_template_path(cop_year, "OPU Data Pack")
     
     # Test template against schema ####
-    print("Checking template against schema and DATIM...")
-    schema <-
-      unPackSchema_datapack(
-        filepath = d$keychain$template,
-        skip = skip_tabs(tool = "OPU Data Pack Template", cop_year = cop_year),
-        type = "OPU Data Pack Template",
-        cop_year = cop_year,
-        d2_session = d2_session)
-    
-    if (!identical(d$info$schema, schema)) {
-      stop("Ruh roh. Template provided does not match archived schema.")
-    }
+  compareTemplateToSchema(template_path = d$keychain$template_path,
+                          cop_year = d$info$cop_year,
+                          tool = d$info$tool,
+                          d2_session = d2_session)
     
     # Place Workbook into play ####
-    d$tool$wb <- openxlsx::loadWorkbook(d$keychain$template_path)
-    
-    # Set global numeric format ####
-    options("openxlsx.numFmt" = "#,##0")
-    
-    # Write Home Sheet info ####
-    d$tool$wb <- writeHomeTab(wb = d$tool$wb,
-                              datapack_name = d$info$datapack_name,
-                              country_uids = d$info$country_uids,
-                              cop_year = cop_year,
-                              type = "OPU Data Pack")
+    d$tool$wb <- datapackr::createWorkbook(datapack_name = d$info$datapack_name,
+                                           country_uids = d$info$country_uids,
+                                           template_path = d$keychain$template_path,
+                                           cop_year = d$info$cop_year,
+                                           tool = d$info$tool,
+                                           d2_session = d2_session)
     
     # Get PSNU List####
     d$data$PSNUs <- datapackr::valid_PSNUs %>%
-      dplyr::filter(country_uid %in% country_uids) %>%
+      dplyr::filter(country_uid %in% d$info$country_uids) %>%
       add_dp_psnu(.) %>%
       dplyr::arrange(dp_psnu) %>%
       dplyr::select(PSNU = dp_psnu, psnu_uid)
     
     # Write PSNUxIM tab ####
-    d <- packSNUxIM_OPU(d)
+    if (d$info$cop_year == 2020) {
+      d$tool$wb <- packSNUxIM_OPU(d)
+    } else {
+      r <- packPSNUxIM(wb = d$tool$wb,
+                          data = d$data$UndistributedMER,
+                          snuxim_model_data = d$data$snuxim_model_data,
+                          cop_year = d$info$cop_year,
+                          tool = d$info$tool,
+                          schema = d$info$schema,
+                          d2_session = d2_session)
+      
+      d$tool$wb <- r$wb
+      d$info$warning_msg %<>% append(r$messages)
+    }
     
     # Save & Export Workbook
     print("Saving...")
     exportPackr(data = d$tool$wb,
                 output_path = d$keychain$output_folder,
-                type = d$info$type,
+                tool = d$info$tool,
                 datapack_name = d$info$datapack_name)
     
     # Save & Export Archive
@@ -125,8 +133,34 @@ packOPUDataPack <- function(datapack_name,
       print("Archiving...")
       exportPackr(data = d,
                   output_path = d$keychain$output_folder,
-                  type = "Results Archive",
+                  tool = "Results Archive",
                   datapack_name = d$info$datapack_name)
+    }
+    
+    # If warnings, show all grouped by sheet and issue
+    if (!is.null(d$info$warning_msg) & interactive()) {
+      options(warning.length = 8170)
+      
+      messages <-
+        paste(
+          paste(
+            seq_along(d$info$warning_msg),
+            ": " , d$info$warning_msg
+            #stringr::str_squish(gsub("\n", "", d$info$warning_msg))
+          ),
+          sep = "",
+          collapse = "\r\n")
+      
+      key = paste0(
+        "*********************\r\n",
+        "KEY:\r\n",
+        "- WARNING!: Problematic, but doesn't stop us from processing your tool. May waive with approval from PPM and DUIT.\r\n",
+        "- ERROR!: You MUST address these issues and resubmit your tool.\r\n",
+        "*********************\r\n\r\n")
+      
+      cat(crayon::red(crayon::bold("VALIDATION ISSUES: \r\n\r\n")))
+      cat(crayon::red(key))
+      cat(crayon::red(messages))
     }
     
 }
