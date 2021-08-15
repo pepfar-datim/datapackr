@@ -8,6 +8,7 @@ adorn_import_file(
   psnu_import_file,
   cop_year = getCurrentCOPYear(),
   psnu_prioritizations = NULL,
+  filter_rename_output = TRUE,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
@@ -18,6 +19,9 @@ adorn_import_file(
 
 \item{psnu_prioritizations}{List of orgUnit, value containing prioritization
 values for each PSNU. If not included, blank prioritizations shown.}
+
+\item{filter_rename_output}{T/F Should this function output the final data in
+the new, more complete format?}
 
 \item{d2_session}{}
 }
