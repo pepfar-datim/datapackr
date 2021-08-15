@@ -45,7 +45,7 @@ packSNUxIM <- function(d,
   
     #TODO: Consider preparing this ahead of time for all OUs
   snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path) %>%
-    prepare_model_data.PSNUxIM(model_data = .,
+    prepare_model_data.PSNUxIM(snuxim_model_data = .,
                                country_uids = d$info$country_uids)
 
   # Filter SNU x IM model dataset to only those data needed in tab ####
