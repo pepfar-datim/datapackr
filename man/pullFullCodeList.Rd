@@ -7,7 +7,8 @@
 pullFullCodeList(
   FY = getCurrentCOPYear() + 1,
   datastream = c("mer_targets", "mer_results", "subnat_targets", "subnat_results",
-    "impatt")
+    "impatt"),
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{

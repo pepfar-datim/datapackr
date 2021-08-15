@@ -4,10 +4,14 @@
 \alias{prepare_model_data.PSNUxIM}
 \title{packSNUxIM(data)}
 \usage{
-prepare_model_data.PSNUxIM(model_data, country_uids)
+prepare_model_data.PSNUxIM(snuxim_model_data, country_uids)
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{snuxim_model_data}{Export from DATIM needed to allocate data across
+mechanisms in the PSNUxIM tab}
+
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 }
 \value{
 d

@@ -536,3 +536,107 @@ getDataPackSchema <- function(cop_year) {
     stop("Datapack schema not available for the cop year provided")
   }
 }
+
+
+#' @export
+#' @title Create a clean Data Pack Workbook shell
+#' 
+#' @param tool Either "Data Pack" or "OPU Data Pack"? Default is "Data Pack". 
+#' @inheritParams datapackr_params
+#'
+#' @return wb Data Pack Workbook shell
+#'
+createWorkbook <- function(datapack_name = NULL,
+                           country_uids,
+                           template_path = NULL,
+                           cop_year = getCurrentCOPYear(),
+                           tool = "Data Pack",
+                           d2_session = dynGet("d2_default_session",
+                                               inherits = TRUE)) {
+  
+  output_type <- tool
+  input_type <- paste0(output_type, " Template")
+  
+  if (is.null(datapack_name)) {
+    datapack_name <- datapackr::valid_PSNUs %>%
+      dplyr::select(country_name, country_uid) %>%
+      dplyr::distinct() %>%
+      dplyr::filter(country_uid %in% country_uids) %>%
+      dplyr::pull(country_name) %>%
+      paste(collapse = ", ")
+  }
+  
+  if (is.null(template_path)) {
+    template_path <- pick_template_path(cop_year, output_type)
+  }
+  
+  template_path %<>%
+    handshakeFile(input_type)
+  
+  print("Checking template against schema and DATIM...")
+  schema <- pick_schema(cop_year, output_type)
+  
+  schema_check <-
+    unPackSchema_datapack(
+      filepath = template_path,
+      skip = skip_tabs(tool = input_type, cop_year = cop_year),
+      tool = input_type,
+      cop_year = cop_year,
+      d2_session = d2_session)
+  
+  if (!identical(schema, schema_check)) {
+    stop("Template provided does not match archived schema.")
+  }
+  
+  wb <- openxlsx::loadWorkbook(template_path)
+  
+  options("openxlsx.numFmt" = "#,##0")
+  
+  # Write Home Sheet info ####
+  wb <- writeHomeTab(wb = wb,
+                    datapack_name = datapack_name,
+                    country_uids = country_uids,
+                    cop_year = cop_year,
+                    tool = output_type)
+  
+  return(wb)
+}
+
+
+#' @export
+#' @title Compare Data Pack template against schema
+#' 
+#' @param tool Either "Data Pack" or "OPU Data Pack"? Default is "Data Pack". 
+#' @inheritParams datapackr_params
+#'
+#' @return Message indicating comparison failure or success.
+#'
+compareTemplateToSchema <- function(template_path = NULL,
+                                   cop_year = getCurrentCOPYear(),
+                                   tool = "Data Pack",
+                                   d2_session = dynGet("d2_default_session",
+                                                       inherits = TRUE)) {
+
+  print("Checking template against schema and DATIM...")
+  
+  if (is.null(template_path)) {
+    template_path <- pick_template_path(cop_year, tool)
+  }
+  
+  template_schema <-
+    unPackSchema_datapack(
+      filepath = template_path,
+      skip = skip_tabs(tool = paste0(tool," Template"), cop_year = cop_year),
+      tool = paste0(tool," Template"),
+      cop_year = cop_year,
+      d2_session = d2_session)
+  
+  package_schema <- pick_schema(cop_year, tool)
+  
+  if (!identical(package_schema, template_schema)) {
+    stop("Template provided does not match published schema.")
+  } else {
+    print("Template provided matches published schema.")
+  }
+
+}
