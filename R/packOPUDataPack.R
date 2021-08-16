@@ -107,7 +107,7 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
     
     # Write PSNUxIM tab ####
     if (d$info$cop_year == 2020) {
-      d$tool$wb <- packSNUxIM_OPU(d)
+      d <- packSNUxIM_OPU(d)
     } else {
       r <- packPSNUxIM(wb = d$tool$wb,
                           data = d$data$UndistributedMER,

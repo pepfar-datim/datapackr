@@ -6,7 +6,6 @@
 #' @description Packs SNUxIM tab for OPU Data Packs.
 #'
 #' @param d Datapackr sidecar
-#' @inheritParams packOPUDataPack
 #' 
 #' @return d
 #' 
@@ -15,8 +14,8 @@ packSNUxIM_OPU <- function(d) {
     stop("Sorry! We're only set up to run this for COP20 OPUs for right now. Check back later please. Stay safe!")
   }
   
-  if (NROW(d$data$model_data) == 0) {
-    warning("No model data supplied.")
+  if (NROW(d$data$snuxim_model_data) == 0) {
+    warning("No SNUxIM model data supplied.")
   }
   
   # Map PSNUs ####
