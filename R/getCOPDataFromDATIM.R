@@ -11,7 +11,8 @@
 #'
 #' @return Raw data in DATIM for a country for the COP data sets for a given COP Year.
 #'
-#' @examples getCOPDataFromDATIM(country_uid = d$info$country_uids, cop_year = d$info$cop_year)
+#' @examples 
+#' \dontrun{getCOPDataFromDATIM(country_uid = d$info$country_uids, cop_year = d$info$cop_year)}
 #'
 getCOPDataFromDATIM <- function(country_uids,
                                 cop_year,
