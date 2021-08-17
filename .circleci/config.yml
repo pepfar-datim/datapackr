@@ -28,5 +28,4 @@ jobs:
           command: R CMD build --no-build-vignettes --no-manual .
       - run: 
           name: Test package
-          command: R -e "devtools::test()"  
-                   echo $?
+          command: Rscript -e 'stopifnot(length(devtools::check()$errors) == 0L)' 
