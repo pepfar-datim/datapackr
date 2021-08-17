@@ -75,7 +75,7 @@ createAnalytics <- function(d,
           d$datim$subnat_impatt) %>%
         adorn_import_file(cop_year = d$info$cop_year,
                           psnu_prioritizations = fy22_prioritizations,
-                          d2_session)
+                          d2_session = d2_session)
     }
   }
 
