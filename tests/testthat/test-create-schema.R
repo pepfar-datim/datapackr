@@ -70,7 +70,7 @@ with_mock_api({
         filepath = cop20_opu_datapack_template_path,
         skip = datapackr::skip_tabs(tool = "OPU Data Pack Template", 
                                     cop_year = 2020),
-        type = "OPU Data Pack Template",
+        tool = "OPU Data Pack Template",
         cop_year = 2020,
         d2_session = training)
     expect_identical(schema, cop20OPU_data_pack_schema)
