@@ -28,4 +28,5 @@ jobs:
           command: R CMD build --no-build-vignettes --no-manual .
       - run: 
           name: Test package
-          command: Rscript -e 'stopifnot(length(devtools::check()$errors) == 0L)' 
+          command: R CMD check "${PKG_TARBALL}" --as-cran --no-tests
+Rscript -e 'res=devtools::test(reporter="summary");df=as.data.frame(res);if(sum(df$failed) > 0 || any(df$error)) {q(status=1)}'
