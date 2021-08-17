@@ -29,5 +29,4 @@ jobs:
       - run: 
           name: Test package
           command: | 
-               R -e "devtools::test()"
-               echo $?
+               R -e "devtools::check(error_on='error')"
