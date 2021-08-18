@@ -9,7 +9,7 @@
 #' @param snuxim_model_data_path Filepath where SNU x IM distribution model is stored.
 #' @param output_folder Local folder where you would like your Data Pack to be
 #' saved upon export.
-#'
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @return d
 #'
 writePSNUxIM <- function(d,
@@ -67,7 +67,7 @@ writePSNUxIM <- function(d,
       exportPackr(
         data = d$tool$wb,
         output_path = d$keychain$output_folder,
-        type = "Data Pack",
+        tool = "Data Pack",
         datapack_name = d$info$datapack_name)
     }
 

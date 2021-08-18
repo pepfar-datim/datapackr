@@ -10,7 +10,7 @@
 #' this or Country Names.
 #' @param country_names Names of Countries to return data for. Can supply either this
 #' or DATIM Country UIDs.
-#' @param d2_session DHIS2 Session id
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #'
 #' @return Returns dataset needed for use in \code{\link{packOPUDataPack}}.
 #'

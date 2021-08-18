@@ -18,7 +18,7 @@ getDataValueSets(
 
 \item{api_version}{- api version to use when calling DHIS2}
 
-\item{base_url}{string - base address of instance (text before api/ in URL)}
+\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
 }
 \value{
 tibble with the data requested

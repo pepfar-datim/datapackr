@@ -6,7 +6,7 @@
 #' @description Packs SNUxIM data prepared from unPackSNUxIM for import to DATIM.
 #'
 #' @param d Datapackr object
-#'
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @return d
 #'
 packSNUxIM <- function(d,

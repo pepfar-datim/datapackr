@@ -542,6 +542,7 @@ analyze_indexpos_ratio <- function(data) {
 #' @param d datapackr object
 #' @param model_data_path Filepath to model data produced from most recent DATIM
 #' sync.
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #'
 #' @return d
 #'

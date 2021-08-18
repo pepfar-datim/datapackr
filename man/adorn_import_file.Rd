@@ -23,7 +23,7 @@ values for each PSNU. If not included, blank prioritizations shown.}
 \item{filter_rename_output}{T/F Should this function output the final data in
 the new, more complete format?}
 
-\item{d2_session}{}
+\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
 }
 \value{
 data
