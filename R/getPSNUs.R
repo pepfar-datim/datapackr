@@ -12,6 +12,7 @@
 #' @param additional_fields Character string of any fields to return from DATIM
 #' API other than those returned by default: \code{name}, \code{id}, \code{ancestors},
 #' & \code{organisationUnitGroups}.
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' 
 #' @return Data frame of PSNUs
 #' 

@@ -10,7 +10,7 @@
 #' values for each PSNU. If not included, blank prioritizations shown.
 #' @param filter_rename_output T/F Should this function output the final data in
 #' the new, more complete format?
-#' @param d2_session
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' 
 #' @return data
 #'

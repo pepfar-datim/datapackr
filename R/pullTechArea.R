@@ -5,7 +5,7 @@
 #' Map Tech Area to dataElement id
 #' 
 #' @param dataElements List of dataElements to filter against. (Optional)
-#' 
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @return Dataframe of Tech Areas mapped to dataElements
 #' 
 getTechArea <- function(dataElements = NULL,

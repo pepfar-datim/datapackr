@@ -12,12 +12,15 @@ getCOPDataFromDATIM(
 )
 }
 \arguments{
+\item{country_uids}{country_uids}
+
 \item{cop_year}{Specifies COP year for dating as well as selection of
 templates.}
 
-\item{d2_session}{DHIS2 Session id}
+\item{streams}{data stream or streams. One or more of "mer_targets","subnat_targets","impatt". 
+If not specified, then all data streams are returned.}
 
-\item{country_uid}{country_uid}
+\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
 }
 \value{
 Raw data in DATIM for a country for the COP data sets for a given COP Year.

@@ -4,10 +4,12 @@
 #' @description
 #' Grab all raw data in DATIM for a country for the COP data sets for a given COP Year.
 #'
-#' @param country_uid country_uid
+#' @param country_uids country_uids
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
-#' @param d2_session DHIS2 Session id
+#' @param streams data stream or streams. One or more of "mer_targets","subnat_targets","impatt". 
+#' If not specified, then all data streams are returned.
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #'
 #' @return Raw data in DATIM for a country for the COP data sets for a given COP Year.
 #'

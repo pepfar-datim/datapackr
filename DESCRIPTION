@@ -56,7 +56,9 @@ Imports:
 Suggests:
     devtools (>= 2.0.1),
     httptest,
-    testthat
+    testthat,
+    cellranger,
+    rprojroot
 Remotes: jason-p-pickering/datim-validation,
           pepfar-datim/data-pack-commons
 License: GPL-2

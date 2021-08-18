@@ -18,7 +18,7 @@
 #' @param cop_year Numeric value of COP Fiscal Year to filter mechanism list by.
 #' Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
 #' \code{2019}. If a FY is not supplied, returns entire mechanism list.
-#' 
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @return A dataframe of mechanisms, including start and end dates, mechanism
 #' code, partner name, funding agency, and related OU.
 #'
