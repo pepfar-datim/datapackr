@@ -16,3 +16,4 @@ Makefile
 ^\.Rprofile$
 \.github
 \.circleci
+\data-raw
