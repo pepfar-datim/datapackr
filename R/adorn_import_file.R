@@ -70,7 +70,7 @@ adorn_import_file <- function(psnu_import_file,
   # Allow mapping of either numeric codes or alphanumeric uids
   data_codes <- data %>%
     dplyr::filter(stringr::str_detect(attributeOptionCombo, "\\d{4,}")) %>%
-    dplyr:::rename(mechanism_code = attributeOptionCombo) %>%
+    dplyr::rename(mechanism_code = attributeOptionCombo) %>%
     dplyr::left_join(mechs, by = c("mechanism_code" = "mechanism_code"))
 
   data_ids <- data %>%
