@@ -1,11 +1,11 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
-#' @importFrom stats complete.cases
 #' @title packSNUxIM(data)
 #'
 #' @description Packs SNUxIM data prepared from unPackSNUxIM for import to DATIM.
 #'
-#' @inheritParams packSNUxIM_OPU
+#' @param snuxim_model_data SNUxIM model data. 
+#' @param country_uids One or more country UIDS.
 #' 
 #' @return d
 #' 

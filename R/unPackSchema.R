@@ -12,7 +12,7 @@
 #' @param tool Type of tool to unpack.
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
-#'
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @return Data Pack schema.
 #'
 unPackSchema_datapack <- function(filepath = NULL,

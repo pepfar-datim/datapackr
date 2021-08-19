@@ -9,6 +9,8 @@ api_get(api_call, d2_session = dynGet("d2_default_session", inherits = TRUE))
 \arguments{
 \item{api_call}{Base DATIM API query, specifying API table and setting paging
 as false.}
+
+\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
 }
 \value{
 Result of DATIM API query returned as dataframe.

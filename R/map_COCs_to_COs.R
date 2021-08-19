@@ -3,7 +3,7 @@
 #' 
 #' @description
 #' maps categoryoptioncombos to underlying categoryoptions.
-#' 
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @return dataframe of categoryoptioncombos mapped to underlying category
 #' options
 #'

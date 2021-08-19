@@ -11,6 +11,8 @@ getNumeratorDenominator(
 }
 \arguments{
 \item{dataElements}{List of dataElements to filter against. (Optional)}
+
+\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
 }
 \value{
 Dataframe of Numerator and Denominators mapped to dataElements

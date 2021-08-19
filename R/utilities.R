@@ -44,7 +44,7 @@ round_trunc <- function(x, digits = 0) {
 #' @description
 #' Queries DATIM to retrieve the latest version of
 #' \code{/api/dataStore/dataSetAssignments/ous}
-#'
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @return Dataframe of country metadata, including prioritization, planning,
 #' country, community, and facility levels in DATIM organization hierarchy.
 #'
@@ -299,7 +299,7 @@ currentFY <- function() {
 
 #' @export
 #' @title Determine whether the user is logged into DATIM or not.
-#'
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @return TRUE or FALSE
 #'
 isLoggedIn <- function(d2_session = dynGet("d2_default_session",

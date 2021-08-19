@@ -26,6 +26,8 @@ FALSE}
 \item{cop_year}{Numeric value of COP Fiscal Year to filter mechanism list by.
 Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
 \code{2019}. If a FY is not supplied, returns entire mechanism list.}
+
+\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
 }
 \value{
 A dataframe of mechanisms, including start and end dates, mechanism

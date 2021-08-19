@@ -12,6 +12,7 @@
 #' templates.
 #' @param output_folder Local folder where you would like your Data Pack to be
 #' saved upon export. If left as \code{NULL}, will not output externally.
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #'
 #' @return Fake Spectrum dataset
 #'

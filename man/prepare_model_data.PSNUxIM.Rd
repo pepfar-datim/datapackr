@@ -6,6 +6,11 @@
 \usage{
 prepare_model_data.PSNUxIM(snuxim_model_data, country_uids)
 }
+\arguments{
+\item{snuxim_model_data}{SNUxIM model data.}
+
+\item{country_uids}{One or more country UIDS.}
+}
 \value{
 d
 }

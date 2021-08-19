@@ -40,7 +40,7 @@ getFY22Prioritizations <- function(d) {
 #' which is suitable for export to external analytics sytems.
 #'
 #' @param d Datapackr object
-#'
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @return Modified d object with d$data$analytics
 #'
 #'

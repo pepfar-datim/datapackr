@@ -3,7 +3,7 @@
 #'
 #' @description Compares the data in a parsed data pack that would be destined for DATIM with target data in in DATIM.
 #' @param d list object - parsed data pack object
-#' @param base_url string - base address of instance (text before api/ in URL)
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @return  list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,
 #' $updates (import to bring DATIM up to date with datapack), $deletes
 #' (import to bring DATIM up to date with datapack)
@@ -197,7 +197,7 @@ compareData_DatapackVsDatim <-
 #'
 #' @description Compares the data in a parsed data pack that would be destined for DATIM with target data in in DATIM.
 #' @param d list object - parsed data pack object
-#' @param base_url string - base address of instance (text before api/ in URL)
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @return  list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,
 #' $updates (import to bring DATIM up to date with datapack), $deletes
 #' (import to bring DATIM up to date with datapack)

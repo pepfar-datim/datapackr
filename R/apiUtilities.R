@@ -5,7 +5,7 @@
 #' Constructs URL for DATIM API query against specified table without paging.
 #' 
 #' @param endpoint Character. DATIM API endpoint to query.
-#' 
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @return Web-encoded URL for DATIM API query.
 #' 
 api_call <- function(endpoint,
@@ -83,7 +83,7 @@ api_fields <- function(api_call, fields) {
 #' 
 #' @param api_call Base DATIM API query, specifying API table and setting paging
 #' as false.
-#' 
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @return Result of DATIM API query returned as dataframe.
 #' 
 api_get <- function(api_call,
@@ -109,6 +109,7 @@ api_get <- function(api_call,
 #' @param sqlView uid of sqlView table to query.
 #' @param var Variable to substitute into SQL query. Only supply if SQL view is
 #' of type query.
+#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' 
 #' @return Web-encoded URL for DATIM API query.
 #' 

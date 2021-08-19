@@ -11,6 +11,8 @@ getValidCOs(
 }
 \arguments{
 \item{data_element_group.id}{DATIM dataElementGroup id to filter against.}
+
+\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
 }
 \value{
 validCategoryOptions
