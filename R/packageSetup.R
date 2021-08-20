@@ -85,9 +85,7 @@ headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
 #'
 #' @return Schema file for given cop_year and tool type
 #'
-pick_schema <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack") {
-  if (is.null(cop_year)) {cop_year = getCurrentCOPYear()}
-  if (is.null(tool)) {tool = "Data Pack"}
+pick_schema <- function(cop_year, tool) {
   
   if (tool == "OPU Data Pack") {
     if (cop_year == 2020) {
