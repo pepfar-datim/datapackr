@@ -8,9 +8,7 @@ output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing
 model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/Model Data/model_data_pack_input_21_20210407_1_flat.rds"
 
 # Unpack Submitted Data Pack ####
-d <- unPackTool(cop_year = 2021)
-
-datim_import_file <- dplyr::bind_rows(d$datim$MER, d$datim$subnat_impatt)
+d <- unPackTool(tool = "OPU Data Pack", cop_year = 2021)
 
 # d <- checkAnalytics(d,
 #                    model_data_path)
