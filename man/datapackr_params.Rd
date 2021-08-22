@@ -13,6 +13,7 @@ datapackr_params(
   datapack_name,
   country_uids,
   template_path,
+  submission_path,
   cop_year,
   output_folder,
   results_archive,
@@ -47,6 +48,8 @@ For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 \item{template_path}{Local filepath to Data Pack template Excel (XLSX) file.
 This file MUST NOT have any data validation formats present. If left
 \code{NULL}, will select the default based on \code{cop_year} and \code{tool}.}
+
+\item{submission_path}{Local path to the file to import.}
 
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}

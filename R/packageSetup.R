@@ -164,6 +164,7 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
 #' @param template_path Local filepath to Data Pack template Excel (XLSX) file.
 #' This file MUST NOT have any data validation formats present. If left
 #' \code{NULL}, will select the default based on \code{cop_year} and \code{tool}.
+#' @param submission_path Local path to the file to import.
 #' @param cop_year COP Year to use for tailoring functions. Remember,
 #' FY22 targets = COP21.
 #' @param output_folder Local folder where you would like your Data Pack to be
@@ -190,6 +191,7 @@ datapackr_params <- function(model_data,
                              datapack_name,
                              country_uids,
                              template_path,
+                             submission_path,
                              cop_year,
                              output_folder,
                              results_archive,
