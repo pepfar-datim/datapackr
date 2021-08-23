@@ -90,6 +90,8 @@ dreams_psnus <- datimutils::getOrgUnitGroups("COP Prioritization SNU",
   .$id %>% 
   intersect(org_units_in_dreams_path)
 
+dreams_below_psnu <- dplyr::setdiff(dreams_snus$id, dreams_psnus)
+
 random_data <- dplyr::inner_join(global_data,
                                  global_orgUnits,
                                  by = c("orgUnit" = "orgUnit.x")) %>%
@@ -113,6 +115,8 @@ random_data <- dplyr::inner_join(global_data,
   dplyr::filter(!(dataElement %in% dreams_ovc_data_elements) |
                   (dataElement %in% dreams_ovc_data_elements &
                      orgUnit %in% dreams_psnus)) %>% 
+  dplyr::filter(!(orgUnit %in% dreams_below_psnu &
+                  !(dataElement %in% dreams_agyw_data_elements))) %>% 
   dplyr::mutate(attributeOptionCombo = 
                   dplyr::if_else(dataElement %in% dreams_agyw_data_elements,
                                  "HllvX50cXC0",
