@@ -125,6 +125,7 @@ pick_schema <- function(cop_year, tool) {
 #'
 pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack") {
 
+  template_filename<-NULL
   
   if (tool == "OPU Data Pack") {
     if (cop_year == 2020) {
@@ -138,6 +139,10 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
       template_filename <- "COP20_Data_Pack_Template_vFINAL.xlsx"
     } else if (cop_year == 2021) {
       template_filename <- "COP21_Data_Pack_Template.xlsx"}
+  }
+  
+  if (is.null(template_filename)) {
+    stop("Could not find any template for the provided paramaters")
   }
   
   template_path <- system.file("extdata",
