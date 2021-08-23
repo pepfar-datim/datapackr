@@ -22,7 +22,7 @@ test_that("We can pick a schema", {
   testthat::expect_identical(test_schema,  datapackr::data_pack_schema)
   
   
-  #Thrown an error for garbage inputs
+  #Throw an error for garbage inputs
   expect_error(pick_schema(1999,"Foo Pack"))
   expect_error(pick_schema(NA,NA))
   
@@ -31,17 +31,16 @@ test_that("We can pick a schema", {
 
 test_that("We can pick template file", {
   
-  test_template<-pick_template_path(2020,"OPU Data
-                                    Pack")
+  test_template<-pick_template_path(2020,"OPU Data Pack")
   expect_true(grepl("COP20_OPU_Data_Pack_Template.xlsx",
                     test_template))
-  test_template<-pick_template_path(2021,"OPU Data
-                                    Pack")
+  expect_true(file.exists(test_template))
+  test_template<-pick_template_path(2021,"OPU Data Pack")
   expect_true(grepl("COP21_OPU_Data_Pack_Template.xlsx",
                     test_template))
+  expect_true(file.exists(test_template))
   
-  
-  #Thrown an error for garbage inputs
+  #Throw an error for garbage inputs
   expect_error(pick_template_path(1999,"Foo Pack"))
   expect_error(pick_template_path(NA,NA))
   
