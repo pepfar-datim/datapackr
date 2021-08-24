@@ -40,6 +40,17 @@ test_that("We can pick template file", {
                     test_template))
   expect_true(file.exists(test_template))
   
+  test_template<-pick_template_path(2021,"Data Pack")
+  expect_true(grepl("COP21_Data_Pack_Template.xlsx",
+                    test_template))
+  expect_true(file.exists(test_template))
+  
+  test_template<-pick_template_path(2020,"Data Pack")
+  expect_true(grepl("COP20_Data_Pack_Template_vFINAL.xlsx",
+                    test_template))
+  expect_true(file.exists(test_template))
+  
+  
   #Throw an error for garbage inputs
   expect_error(pick_template_path(1999,"Foo Pack"))
   expect_error(pick_template_path(NA,NA))
@@ -72,6 +83,12 @@ test_that("We can check datapack paramaters", {
   expect_type(test_params,"list")
   expect_equal(test_params$cop_year,2020)
   
+  #When supplied NULL, return the current COP year
+  #Are we sure about this?
+  test_params<-check_params(cop_year = NULL)
+  expect_type(test_params,"list")
+  expect_equal(test_params$cop_year,datapackr::getCurrentCOPYear())
+  
   #Error on a bogus COP year
   expect_error(check_params(cop_year = 1999))
 
@@ -90,6 +107,23 @@ test_that("We can check datapack paramaters", {
   
   #Can error on a bogus tool
   expect_error(check_params(season = "The Long Winter"))
+  
+  #Return the season automatically if a DataPack and season is 
+  #explicit set to NULL
+  test_params<-check_params(tool="Data Pack",season = NULL)
+  expect_type(test_params,"list")
+  expect_named(test_params,c("tool","season"))
+  expect_equal(test_params$season,"COP")
+  expect_equal(test_params$tool,"Data Pack")
+  
+  #Return the season automatically if an OPU DataPack and season is 
+  #explicit set to NULL
+  test_params<-check_params(tool="OPU Data Pack",season = NULL)
+  expect_type(test_params,"list")
+  expect_named(test_params,c("tool","season"))
+  expect_equal(test_params$season,"OPU")
+  expect_equal(test_params$tool,"OPU Data Pack")
+  
   
   #Can check a valid schema
   test_params <-
@@ -111,6 +145,28 @@ test_that("We can check datapack paramaters", {
   #       season = "COP"
   #     )
   # )
+  
+  
+  
+  
+  #This will return a handled error, but will NOT return "Global"
+  expect_error(test_params <-
+    check_params(datapack_name = NULL, country_uids = NULL
+    ), "Must supply country_uids.")
+  
+  test_args<-list(datapack_name = "Zambia",country_uids = "f5RoebaDLMx")
+  test_params<-do.call(check_params,test_args)
+  expect_true(identical(sort(unlist(test_params)),sort(unlist(test_args))))
+  
+  #Expect an error here but there is not one?
+  # test_args<-list(datapack_name = "Demoland",country_uids = "f5RoebaDLMx")
+  # expect_error(do.call(check_params,test_args))
+  
+  #Expect an error here but there is not one?
+  #Only get a command line message
+  # test_args<-list(datapack_name = "Zambia",country_uids = "abc12345678")
+  # expect_error(do.call(check_params,test_args))
+  
   
   }
   
