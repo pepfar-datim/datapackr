@@ -112,6 +112,8 @@ createKeychainInfo <- function(submission_path = NULL,
   } else if (d$info$tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
     if (d$info$cop_year == 2020) {
       d$info$schema <- datapackr::cop20OPU_data_pack_schema
+    } else if (d$info$cop_year == 2021) {
+      d$info$schema <- cop21OPU_data_pack_schema
     } else {stop(paste0("Unable to process OPU Data Packs from COP ", d$info$cop_year))}
   } else {stop("Unable to process that type of Data Pack.")}
   
