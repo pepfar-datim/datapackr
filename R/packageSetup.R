@@ -159,7 +159,7 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
 
 
 
-#' @export
+
 #' @title Standardized package function parameter definitions
 #' 
 #' @param model_data Data from DATIM needed to pack into a COP Data Pack.
@@ -195,6 +195,7 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
 #' \code{OPU Data Pack} or \code{Data Pack}
 #' @param season Either \code{COP} or \code{OPU}.
 #'
+#' @return list of all paramaters of this constructor function
 datapackr_params <- function(model_data,
                              snuxim_model_data,
                              SNUxIM,
@@ -215,6 +216,11 @@ datapackr_params <- function(model_data,
                              tool,
                              season) {
   
+  # This function should return something
+  #Return its own argument names
+  #rlang::fn_fmls_names(fn = datapackr_params)
+  #or explicitly return 
+  #NULL
 }
 
 #' @export
