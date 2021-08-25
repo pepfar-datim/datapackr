@@ -4,7 +4,7 @@
 \alias{pick_schema}
 \title{Pick correct schema}
 \usage{
-pick_schema(cop_year = getCurrentCOPYear(), tool = "Data Pack")
+pick_schema(cop_year, tool)
 }
 \arguments{
 \item{cop_year}{Specifies COP year for dating as well as selection of
