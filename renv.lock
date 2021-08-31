@@ -16,6 +16,13 @@
       "Repository": "CRAN",
       "Hash": "030aaec5bc6553f35347cbb1e70b1a17"
     },
+    "ISOweek": {
+      "Package": "ISOweek",
+      "Version": "0.6-2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "ad7e2b013b9379cb560caa9b168202f0"
+    },
     "MASS": {
       "Package": "MASS",
       "Version": "7.3-54",
@@ -43,6 +50,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "e031418365a7f7a766181ab5a41a5716"
+    },
+    "Rcpp": {
+      "Package": "Rcpp",
+      "Version": "1.0.7",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "dab19adae4440ae55aa8a9d238b246bb"
     },
     "XML": {
       "Package": "XML",
@@ -219,6 +233,43 @@
       "Repository": "CRAN",
       "Hash": "d1b8b1a821ee564a3515fa6c6d5c52dc"
     },
+    "datapackcommons": {
+      "Package": "datapackcommons",
+      "Version": "0.2.3",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "pepfar-datim",
+      "RemoteRepo": "data-pack-commons",
+      "RemoteRef": "master",
+      "RemoteSha": "fae6b115351dc21a4df2aabdec213475e44dc1fb",
+      "Hash": "23125777b3c9ed46a32cfc41e5f71a12"
+    },
+    "datimutils": {
+      "Package": "datimutils",
+      "Version": "0.1.1",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "pepfar-datim",
+      "RemoteRepo": "datimutils",
+      "RemoteRef": "master",
+      "RemoteSha": "85195e3386904d8ca37ec9538554549051ea7e7d",
+      "Hash": "9724b1f17093e9ec571eda22a195a7d6"
+    },
+    "datimvalidation": {
+      "Package": "datimvalidation",
+      "Version": "1.1.2",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "jason-p-pickering",
+      "RemoteRepo": "datim-validation",
+      "RemoteRef": "master",
+      "RemoteSha": "bc550850e5f767c23e9cc72938438ff7207dba54",
+      "Remotes": "pepfar-datim/datimutils",
+      "Hash": "5e0d47b0c08d2cef7654b87c1a7eb592"
+    },
     "dbplyr": {
       "Package": "dbplyr",
       "Version": "2.1.1",
@@ -302,6 +353,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "77bd60a6157420d4ffa93b27cf6a58b8"
+    },
+    "filelock": {
+      "Package": "filelock",
+      "Version": "1.0.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "38ec653c2613bed60052ba3787bd8a2c"
     },
     "forcats": {
       "Package": "forcats",
@@ -491,6 +549,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "98138e0994d41508c7a6b84a0600cfcb"
+    },
+    "keyring": {
+      "Package": "keyring",
+      "Version": "1.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "dec373d855af8247fd5e24c0ebe14472"
     },
     "knitr": {
       "Package": "knitr",
@@ -751,6 +816,13 @@
       "Repository": "CRAN",
       "Hash": "911d101becedc0fde495bd910984bdc8"
     },
+    "reshape2": {
+      "Package": "reshape2",
+      "Version": "1.4.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "bb5996d0bd962d214a11140d77589917"
+    },
     "rlang": {
       "Package": "rlang",
       "Version": "0.4.11",
@@ -827,6 +899,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "308013098befe37484df72c39cf90d6e"
+    },
+    "sodium": {
+      "Package": "sodium",
+      "Version": "1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "9f07fda8802e9a2ed7e91f20f2d814ce"
     },
     "sp": {
       "Package": "sp",
