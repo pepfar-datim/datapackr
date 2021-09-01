@@ -47,27 +47,9 @@ unPackTool <- function(submission_path = NULL,
   # If warnings, show all grouped by sheet and issue
   if (NROW(d$info$warning_msg$msg_frame) > 0 & interactive()) {
     options(warning.length = 8170)
-
-    messages <-
-      paste(
-        paste(
-          seq_along(d$info$warning_msg$msg_frame),
-          ": " , d$info$warning_msg$msg_frame$message
-          #stringr::str_squish(gsub("\n", "", d$info$warning_msg))
-        ),
-        sep = "",
-        collapse = "\r\n")
-
-    key = paste0(
-      "*********************\r\n",
-      "KEY:\r\n",
-      "- WARNING!: Problematic, but doesn't stop us from processing your tool. May waive with approval from PPM and DUIT.\r\n",
-      "- ERROR!: You MUST address these issues and resubmit your tool.\r\n",
-      "*********************\r\n\r\n")
-
-    cat(crayon::red(crayon::bold("VALIDATION ISSUES: \r\n\r\n")))
-    cat(crayon::red(key))
-    cat(crayon::red(messages))
+    #Print the messages
+    d$info$warning_msg$print()
+   
   }
 
   return(d)
