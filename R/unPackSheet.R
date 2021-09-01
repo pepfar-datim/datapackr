@@ -75,7 +75,7 @@ unPackDataPackSheet <- function(d, sheet) {
           " MER Guidance recommends all testing for <01 year olds be performed through EID rather than HTS",
           "\n")
 
-      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+      d$info$warning_msg$append(warning_msg,"WARNING")
     }
   }
 
@@ -148,7 +148,7 @@ unPackDataPackSheet <- function(d, sheet) {
         paste(missing_DSNUs$PSNU.y, collapse = "\n\t* "),
         "\n")
 
-      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+      d$info$warning_msg$append(warning_msg,"WARNING")
       d$info$missing_DSNUs <- TRUE
     }
 
@@ -163,7 +163,7 @@ unPackDataPackSheet <- function(d, sheet) {
         paste(invalid_DSNUs$PSNU.x, collapse = "\n\t* "),
         "\n")
 
-      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+      d$info$warning_msg$append(warning_msg,"WARNING")
     }
 
   }
@@ -208,7 +208,7 @@ unPackDataPackSheet <- function(d, sheet) {
           paste(blank_prioritizations$PSNU, collapse = "\n\t* "),
           "\n")
 
-      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+      d$info$warning_msg$append(warning_msg,"WARNING")
       d$info$has_error <- TRUE
 
     }
@@ -239,7 +239,7 @@ unPackDataPackSheet <- function(d, sheet) {
           paste(invalid_prioritizations_strings, collapse = "\n\t* "),
           "\n")
 
-      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+      d$info$warning_msg$append(warning_msg, "ERROR")
       d$info$has_error <- TRUE
     }
 
@@ -282,7 +282,7 @@ unPackDataPackSheet <- function(d, sheet) {
         paste(non_numeric$row_id, collapse = "\n\t* "),
         "\n")
 
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$warning_msg$append(warning_msg,"WARNING")
   }
 
   # Now that non-numeric cases noted, convert all to numeric & drop non-numeric ####
@@ -313,7 +313,7 @@ unPackDataPackSheet <- function(d, sheet) {
         paste(unique(d$tests$negative_values$indicator_code), collapse = "\n\t* "),
         "\n")
 
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$warning_msg$append(warning_msg,"WARNING")
     d$info$has_error <- TRUE
   }
 
@@ -346,7 +346,7 @@ unPackDataPackSheet <- function(d, sheet) {
         paste(unique(decimal_cols$indicator_code), collapse = "\n\t* "),
         "\n")
 
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$warning_msg$append(warning_msg,"WARNING")
   }
 
   # TEST for duplicates ####

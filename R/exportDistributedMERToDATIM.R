@@ -26,7 +26,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
         "/n"
       )
     
-    d$info$warning_msg <- append(d$info$warning_msg,msg)
+    d$info$warning_msg$append(msg, "INFO")
   }
 
   auto_resolve_pure_dupes <- pure_duplicates %>%
@@ -75,7 +75,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
             "/n"
           )
        
-        d$info$warning_msg <- append(d$info$warning_msg,msg)
+        d$info$warning_msg$append(msg,"INFO")
       }
 
       crosswalk_dupes_auto_resolved <- crosswalk_dupes %>%
@@ -122,7 +122,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
     msg<-paste0("INFO! ", NROW(auto_resolve_pure_dupes), " zero-valued pure deduplication adjustments will be added to your DATIM import.
                   Please consult the DataPack wiki section on deduplication for more information. ")
 
-    d$info$warning_msg<-append(d$info$warning_msg,msg)
+    d$info$warning_msg$append(msg,"INFO")
   }
 
   #Bind crosswalk dupes
@@ -131,7 +131,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
     msg<-paste0("INFO! ", NROW(crosswalk_dupes_auto_resolved), " zero-valued crosswalk deduplication adjustments will be added to your DATIM import.
                   Please consult the DataPack wiki section on deduplication for more information. ")
 
-    d$info$warning_msg<-append(d$info$warning_msg,msg)
+    d$info$warning_msg$append(msg,"INFO")
   }
 
   d

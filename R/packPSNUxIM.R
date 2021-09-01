@@ -41,7 +41,7 @@ packPSNUxIM <- function(wb,
   # Create data sidecar to eventually compile and return ####
   r <- list(
     wb = wb,
-    messages = list()
+    messages = Messages$new()
   )
   
   #TODO: Test/write this part to be compatible with COP Data Pack
@@ -578,7 +578,7 @@ packPSNUxIM <- function(wb,
   interactive_print("Compiling alert messages...")
   warning_msg <-
     paste0(
-      "NOTE: Based on your submission, we have ",
+      "INFO: Based on your submission, we have ",
       # ifelse(d$info$has_psnuxim,
       #        paste0("added ", NROW(data_structure), " rows to your PSNUxIM tab.",
       #               " These have been highlighted green for your reference."),
@@ -600,7 +600,7 @@ packPSNUxIM <- function(wb,
       "If you have any questions, please submit a Help Desk ticket at DATIM.Zendesk.com.",
       "\n")
   
-  r$messages <- append(r$messages, warning_msg)
+  r$messages$append(warning_msg,"INFO")
   
   return(r)
   

@@ -32,7 +32,7 @@ checkComments <-   function(d) {
         threaded comments and notes, see: https://support.office.com/en-us/article/the-difference-between-threaded-comments-and-notes-75a51eec-4092-42ab-abf8-7669077b7be3",
         "\n")
     
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$warning_msg$append(warning_msg,"ERROR")
     d$info$has_error <- TRUE
   }
   

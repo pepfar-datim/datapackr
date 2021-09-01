@@ -20,11 +20,12 @@ test_that("Can generate a key chain", {
        "has_psnuxim",
        "missing_psnuxim_combos",
        "missing_DSNUs",
-       "needs_psnuxim"
+       "needs_psnuxim",
+       "warning_msg"
      )
    )
    expect_equal(d$keychain$submission_path,test_sheet('COP21_Data_Pack_Template.xlsx'))
-   expect_null(d$info$warning_msg)
+   expect_setequal(class(d$info$warning_msg),c("R6","Messages"))
    expect_false(d$info$has_error)
    expect_false(d$info$newSNUxIM)
    expect_equal(d$info$country_uids,"qllxzIjjurr")

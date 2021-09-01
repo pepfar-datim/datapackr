@@ -45,14 +45,14 @@ unPackTool <- function(submission_path = NULL,
   } else {stop("Selected tool not currently supported.")}
 
   # If warnings, show all grouped by sheet and issue
-  if (!is.null(d$info$warning_msg) & interactive()) {
+  if (NROW(d$info$warning_msg$msg_frame) > 0 & interactive()) {
     options(warning.length = 8170)
 
     messages <-
       paste(
         paste(
-          seq_along(d$info$warning_msg),
-          ": " , d$info$warning_msg
+          seq_along(d$info$warning_msg$msg_frame),
+          ": " , d$info$warning_msg$msg_frame$message
           #stringr::str_squish(gsub("\n", "", d$info$warning_msg))
         ),
         sep = "",

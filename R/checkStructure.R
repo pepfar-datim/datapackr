@@ -39,7 +39,7 @@ checkStructure <- function(d) {
         " been deleted or renamed in your Data Pack. -> \n  * ",
         paste0(d$tests$missing_sheets$sheet_name, collapse = "\n  * "),
         "\n")
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$warning_msg$append(warning_msg,"WARNING")
   }
   
   return(d)

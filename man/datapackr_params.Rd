@@ -78,6 +78,9 @@ processes to output_folder.}
 
 \item{season}{Either \code{COP} or \code{OPU}.}
 }
+\value{
+list of all paramaters of this constructor function
+}
 \description{
 Standardized package function parameter definitions
 }

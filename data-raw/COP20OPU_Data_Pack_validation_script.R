@@ -76,7 +76,7 @@ modalitySummaryTable<-function(d, yield_age_filter = "All Ages"){
 
 messages_file <- file(paste("DataPack_Validation_Messages_",
                             Sys.Date(), ".txt", sep = ""))
-writeLines(d$info$warning_msg, messages_filename)
+writeLines(d$info$warning_msg$msg_frame$message, messages_filename)
 close(messages_file)
 
 # Generate Validation Results ==================================================

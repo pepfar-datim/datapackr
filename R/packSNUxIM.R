@@ -392,7 +392,7 @@ packSNUxIM <- function(d,
   interactive_print("Compiling alert messages...")
   warning_msg <-
     paste0(
-      "NOTE: Based on your submission, we have ",
+      "INFO: Based on your submission, we have ",
       ifelse(d$info$has_psnuxim,
              paste0("added ", NROW(data_structure), " rows to your PSNUxIM tab.",
                      " These have been highlighted green for your reference."),
@@ -413,7 +413,7 @@ packSNUxIM <- function(d,
       "If you have any questions, please submit a Help Desk ticket at DATIM.Zendesk.com.",
       "\n")
 
-  d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+  d$info$warning_msg$append(warning_msg,"INFO")
 
   return(d)
 

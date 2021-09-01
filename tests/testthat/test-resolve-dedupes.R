@@ -3,8 +3,8 @@ context("dedupe")
 
 
 test_that("No modifications on if there are no duplicates", {
-  foo<-list(data=list())
-  
+  foo<-list(data=list(), info=list())
+  foo$info$warning_msg<-Messages$new()
   
   foo$data$distributedMER<-tibble::tribble(
     ~PSNU,~psnuid,~sheet_name,~indicator_code,~Age,~Sex,~KeyPop,~mechanism_code,~support_type,~value,
@@ -24,13 +24,14 @@ test_that("No modifications on if there are no duplicates", {
   
   expect_true(sum(grepl("00000",foo$datim$MER$mechanism_code)) == 0)
   
-  expect_null(foo$info$warning_msg)
+  expect_equal(NROW(foo$info$warning_msg$msg_frame),0L)
 } )
 
 
 
 test_that("Can resolve non-overallocated  pure dupes", {
-  foo<-list(data=list())
+  foo<-list(data=list(), info=list())
+  foo$info$warning_msg<-Messages$new()
   
   
   foo$data$distributedMER<-tibble::tribble(
@@ -51,13 +52,15 @@ test_that("Can resolve non-overallocated  pure dupes", {
   
   expect_true(sum(grepl("00000",foo$datim$MER$mechanism_code)) == 1)
   
-  expect_true(grepl("1 zero-valued pure deduplication adjustments",foo$info$warning_msg))
+  expect_true(grepl("1 zero-valued pure deduplication adjustments",foo$info$warning_msg$msg_frame$message))
 } )
 
 
 
 test_that("Provide info only for  over-allocated pure dupes", {
-  foo<-list(data=list())
+  foo<-list(data=list(), info=list())
+  foo$info$warning_msg<-Messages$new()
+  
   
   foo$data$distributedMER<-tibble::tribble(
     ~PSNU,~psnuid,~sheet_name,~indicator_code,~Age,~Sex,~KeyPop,~mechanism_code,~support_type,~value,
@@ -77,12 +80,13 @@ test_that("Provide info only for  over-allocated pure dupes", {
   
   expect_true(sum(grepl("00000",foo$datim$MER$mechanism_code)) == 0)
   
-  expect_true(grepl("duplicates with allocation greater than 100% were identified",foo$info$warning_msg))
+  expect_true(grepl("duplicates with allocation greater than 100% were identified",foo$info$warning_msg$msg_frame$message))
 } )
 
 
 test_that("Can resolve non-overallocated crosswalk dupes", {
-  foo<-list(data=list())
+  foo<-list(data=list(), info=list())
+  foo$info$warning_msg<-Messages$new()
   
   
   foo$data$distributedMER<-tibble::tribble(
@@ -103,12 +107,13 @@ test_that("Can resolve non-overallocated crosswalk dupes", {
   
   expect_true(sum(grepl("00001",foo$datim$MER$mechanism_code)) == 1)
   
-  expect_true(grepl("1 zero-valued crosswalk deduplication adjustments will be added to your DATIM import",foo$info$warning_msg))
+  expect_true(grepl("1 zero-valued crosswalk deduplication adjustments will be added to your DATIM import",foo$info$warning_msg$msg_frame$message))
 } )
 
 
 test_that("Provide info only for over-allocated crosswalk dupes", {
-  foo<-list(data=list())
+  foo<-list(data=list(), info=list())
+  foo$info$warning_msg<-Messages$new()
   
   
   foo$data$distributedMER<-tibble::tribble(
@@ -135,13 +140,14 @@ test_that("Provide info only for over-allocated crosswalk dupes", {
   
   expect_true(sum(grepl("00001",foo$datim$MER$mechanism_code)) == 0)
   
-  expect_true(grepl("crosswalk duplicates with allocation greater than 100% were identified",foo$info$warning_msg))
+  expect_true(grepl("crosswalk duplicates with allocation greater than 100% were identified",foo$info$warning_msg$msg_frame$message))
 } )
 
 
 
 test_that("Preserve non-deduplicated data when having over-allocated crosswalk dupes", {
-  foo<-list(data=list())
+  foo<-list(data=list(), info=list())
+  foo$info$warning_msg<-Messages$new()
   
   
   foo$data$distributedMER<-tibble::tribble(
@@ -164,5 +170,5 @@ test_that("Preserve non-deduplicated data when having over-allocated crosswalk d
   
   expect_true(sum(grepl("00001",foo$datim$MER$mechanism_code)) == 0)
   
-  expect_true(grepl("crosswalk duplicates with allocation greater than 100% were identified",foo$info$warning_msg))
+  expect_true(grepl("crosswalk duplicates with allocation greater than 100% were identified",foo$info$warning_msg$msg_frame$message))
 } )

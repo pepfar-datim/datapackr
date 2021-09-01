@@ -38,7 +38,7 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
   )
   
   # Start running log of all warning and information messages
-  d$info$warning_msg <- NULL
+  d$info$warning_msg <- Messages$new()
   d$info$has_error <- FALSE
   
   if (!d$info$cop_year %in% c(2020, 2021)) {
@@ -118,7 +118,7 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
                           d2_session = d2_session)
       
       d$tool$wb <- r$wb
-      d$info$warning_msg %<>% append(r$messages)
+      d$info$warning_msg$append(r$messages$msg_frame$message,r$messages$msg_frame$level)
     }
     
     # Save & Export Workbook
@@ -138,14 +138,14 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
     }
     
     # If warnings, show all grouped by sheet and issue
-    if (!is.null(d$info$warning_msg) & interactive()) {
+    if (!is.null(d$info$warning_msg$msg_frame) & interactive()) {
       options(warning.length = 8170)
       
       messages <-
         paste(
           paste(
-            seq_along(d$info$warning_msg),
-            ": " , d$info$warning_msg
+            seq_along(d$info$warning_msg$msg_frame),
+            ": " , d$info$warning_msg$msg_frame$message
             #stringr::str_squish(gsub("\n", "", d$info$warning_msg))
           ),
           sep = "",
