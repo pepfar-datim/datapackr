@@ -30,7 +30,7 @@ Messages<-R6::R6Class("Messages",
       "- WARNING!: Problematic, but doesn't stop us from processing your tool. May waive with approval from PPM and DUIT.\r\n",
       "- INFO: Provided for your information and action only. Does not indicate an problem with your tool.\r\n",
       "*********************\r\n\r\n")
-    messages<-paste(seq_along(self$msg_frame),self$msg_frame$message,sep="",collapse="\r\n")
+    messages<-paste(seq_along(self$msg_frame$message),self$msg_frame$message,sep=" ",collapse="\r\n")
     cat(crayon::red(crayon::bold("VALIDATION ISSUES: \r\n\r\n")))
     cat(crayon::red(key))
     cat(crayon::red(messages))
