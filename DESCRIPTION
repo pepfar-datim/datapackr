@@ -57,7 +57,7 @@ Suggests:
     devtools (>= 2.0.1),
     httptest,
     testthat
-Remotes: jason-p-pickering/datim-validation,
+Remotes: pepfar-datim/datim-validation,
           pepfar-datim/data-pack-commons
 License: GPL-2
 Encoding: UTF-8
