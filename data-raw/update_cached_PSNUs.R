@@ -6,7 +6,12 @@ secrets <- "~/.secrets/datim.json"
 
 datapackr::loginToDATIM(secrets)
 
-valid_PSNUs <- getPSNUs(additional_fields = "lastUpdated")
+valid_PSNUs <- getPSNUs(additional_fields = "lastUpdated") %>%
+  dplyr::bind_rows(
+    dplyr::filter(datapackr::valid_PSNUs,
+                  psnu %in% c("Sierra Leone", "Burkina Faso")
+                  )
+    )
 
 compare_diffs <- datapackr::valid_PSNUs %>%
   dplyr::full_join(valid_PSNUs, by = "psnu_uid") %>%
