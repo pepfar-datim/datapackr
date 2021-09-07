@@ -44,7 +44,7 @@ combineMER_SNUxIM <- function(d) {
         paste(unique(no_targets_inds$indicator_code), collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
     
   }
 
@@ -90,7 +90,7 @@ combineMER_SNUxIM <- function(d) {
         paste(imbalanced_distribution_inds, collapse = "\n\t* "),
       "\n")
   
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
     d$info$has_error <- TRUE
   }
   
@@ -129,7 +129,7 @@ combineMER_SNUxIM <- function(d) {
         "\n"
       )
     
-    d$info$warning_msg$append(warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
   }
   
   # TEST for positives against dedupes ####
@@ -148,7 +148,7 @@ combineMER_SNUxIM <- function(d) {
         "\n"
       )
     
-    d$info$warning_msg$ppend(warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
   }
   
   # TEST for negatives against non-dedupes ####
@@ -168,7 +168,7 @@ combineMER_SNUxIM <- function(d) {
         paste(unique(d$tests$negative_distributed_targets$mechanism_code), collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
   }
   
   # Prepare for Export ####
@@ -208,7 +208,7 @@ combineMER_SNUxIM <- function(d) {
         "Ensure that all mechanism column headers in the PSNUxIM tab clearly denote either DSD or TA.",
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
   }
   
   return(d)

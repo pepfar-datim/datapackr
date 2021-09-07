@@ -28,7 +28,7 @@ createKeychainInfo <- function(submission_path = NULL,
   )
   
   # Start running log of all warning and information messages
-  d$info$warning_msg <- Messages$new()
+  d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
   
   # If path is NULL or has issues, prompt user to select file from window. ####

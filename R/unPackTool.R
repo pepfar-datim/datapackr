@@ -44,13 +44,7 @@ unPackTool <- function(submission_path = NULL,
                            d2_session = d2_session)
   } else {stop("Selected tool not currently supported.")}
 
-  # If warnings, show all grouped by sheet and issue
-  if (NROW(d$info$warning_msg$msg_frame) > 0 & interactive()) {
-    options(warning.length = 8170)
-    #Print the messages
-    d$info$warning_msg$print()
-   
-  }
+  print(d$info$messages)
 
   return(d)
 }

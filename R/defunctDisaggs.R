@@ -55,7 +55,7 @@ defunctDisaggs <- function(d, sheet) {
         paste(defunct_msg, collapse = "\n\t"),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages<-appendMessage(d$info$messages, warning_msg,"ERROR")
     d$info$has_error <- TRUE
   }
   

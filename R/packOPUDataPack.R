@@ -38,7 +38,7 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
   )
   
   # Start running log of all warning and information messages
-  d$info$warning_msg <- Messages$new()
+  d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
   
   if (!d$info$cop_year %in% c(2020, 2021)) {
@@ -118,7 +118,7 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
                           d2_session = d2_session)
       
       d$tool$wb <- r$wb
-      d$info$warning_msg$append(r$messages$msg_frame$message,r$messages$msg_frame$level)
+      d$info$messages <- appendMessage(d$info$messages, r$message,r$level)
     }
     
     # Save & Export Workbook
@@ -137,30 +137,7 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
                   datapack_name = d$info$datapack_name)
     }
     
-    # If warnings, show all grouped by sheet and issue
-    if (!is.null(d$info$warning_msg$msg_frame) & interactive()) {
-      options(warning.length = 8170)
-      
-      messages <-
-        paste(
-          paste(
-            seq_along(d$info$warning_msg$msg_frame),
-            ": " , d$info$warning_msg$msg_frame$message
-            #stringr::str_squish(gsub("\n", "", d$info$warning_msg))
-          ),
-          sep = "",
-          collapse = "\r\n")
-      
-      key = paste0(
-        "*********************\r\n",
-        "KEY:\r\n",
-        "- WARNING!: Problematic, but doesn't stop us from processing your tool. May waive with approval from PPM and DUIT.\r\n",
-        "- ERROR!: You MUST address these issues and resubmit your tool.\r\n",
-        "*********************\r\n\r\n")
-      
-      cat(crayon::red(crayon::bold("VALIDATION ISSUES: \r\n\r\n")))
-      cat(crayon::red(key))
-      cat(crayon::red(messages))
-    }
+
+    print(d$info$messages)
     
 }

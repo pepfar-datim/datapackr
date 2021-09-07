@@ -23,12 +23,12 @@ test_that("Can write a home tab", {
       "missing_psnuxim_combos",
       "missing_DSNUs",
       "needs_psnuxim",
-      "warning_msg"
+      "messages"
     )
   )
   expect_equal(d$keychain$submission_path,template_copy)
-  expect_setequal(class(d$info$warning_msg),c("R6","Messages"))
-  expect_equal(NROW(d$info$warning_msg$msg_frame$message),0L)
+  expect_setequal(class(d$info$messages),c("data.frame","MessageQueue"))
+  expect_equal(NROW(d$info$messages),0L)
   expect_false(d$info$has_error)
   expect_false(d$info$newSNUxIM)
   expect_equal(d$info$country_uids,"qllxzIjjurr")

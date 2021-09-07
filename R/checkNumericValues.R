@@ -78,7 +78,7 @@ checkNumericValues <- function(d, sheet, header_cols = NULL){
         paste(non_numeric$row_id, collapse = "\n\t* "),
         "\n")
 
-    d$info$warning_msg$append(warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
 
   }
 

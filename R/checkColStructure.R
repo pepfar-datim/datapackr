@@ -60,7 +60,7 @@ checkColStructure <- function(d, sheet) {
         paste(missing_cols$indicator_code, collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
   }
   
   # Alert to duplicate columns ####
@@ -90,7 +90,7 @@ checkColStructure <- function(d, sheet) {
         paste(duplicate_columns$indicator_code, collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append( warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
     d$info$has_error <- TRUE
   }
   
@@ -120,7 +120,7 @@ checkColStructure <- function(d, sheet) {
         paste(columns_out_of_order$columns_out_of_order, collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
   }
  
   return(d)

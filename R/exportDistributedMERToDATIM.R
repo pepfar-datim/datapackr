@@ -16,7 +16,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
     dplyr::filter(distribution > 1.0)
 
   if (NROW(over_allocated) > 0) {
-    msg <- 
+    warning_msg <- 
       paste0(
         "INFO! ",
         NROW(over_allocated),
@@ -26,7 +26,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
         "/n"
       )
     
-    d$info$warning_msg$append(msg, "INFO")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"INFO")
   }
 
   auto_resolve_pure_dupes <- pure_duplicates %>%
@@ -65,7 +65,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
         dplyr::filter(distribution_diff > 1e-3)
 
       if (NROW(over_allocated) > 0) {
-        msg <-
+        warning_msg <-
           paste0(
             "INFO! ",
             NROW(over_allocated),
@@ -75,7 +75,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
             "/n"
           )
        
-        d$info$warning_msg$append(msg,"INFO")
+        d$info$messages <- appendMessage(d$info$messages, warning_msg,"INFO")
       }
 
       crosswalk_dupes_auto_resolved <- crosswalk_dupes %>%
@@ -119,19 +119,19 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
 
   if ( exists_with_rows(auto_resolve_pure_dupes) ) {
     d$datim$MER<-dplyr::bind_rows(d$datim$MER,auto_resolve_pure_dupes)
-    msg<-paste0("INFO! ", NROW(auto_resolve_pure_dupes), " zero-valued pure deduplication adjustments will be added to your DATIM import.
+    warning_msg<-paste0("INFO! ", NROW(auto_resolve_pure_dupes), " zero-valued pure deduplication adjustments will be added to your DATIM import.
                   Please consult the DataPack wiki section on deduplication for more information. ")
 
-    d$info$warning_msg$append(msg,"INFO")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"INFO")
   }
 
   #Bind crosswalk dupes
   if ( exists_with_rows(crosswalk_dupes_auto_resolved)  ) {
     d$datim$MER<-dplyr::bind_rows(d$datim$MER,crosswalk_dupes_auto_resolved)
-    msg<-paste0("INFO! ", NROW(crosswalk_dupes_auto_resolved), " zero-valued crosswalk deduplication adjustments will be added to your DATIM import.
+    warning_msg<-paste0("INFO! ", NROW(crosswalk_dupes_auto_resolved), " zero-valued crosswalk deduplication adjustments will be added to your DATIM import.
                   Please consult the DataPack wiki section on deduplication for more information. ")
 
-    d$info$warning_msg$append(msg,"INFO")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"INFO")
   }
 
   d

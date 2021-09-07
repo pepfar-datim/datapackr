@@ -135,7 +135,7 @@ checkFormulas <- function(d, sheet) {
         paste(cols_affected$fx_violations, collapse = "\n\t* "),
         "\n")
 
-    d$info$warning_msg$append(warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
 
   }
 

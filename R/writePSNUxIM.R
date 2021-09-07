@@ -22,7 +22,7 @@ writePSNUxIM <- function(d,
   d$keychain$output_folder = output_folder
 
   # Start running log of all warning and information messages ####
-  d$info$warning_msg <- Messages$new()
+  d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
 
   if (d$info$has_comments_issue) {
@@ -34,12 +34,13 @@ writePSNUxIM <- function(d,
 
         https://support.office.com/en-us/article/the-difference-between-threaded-comments-and-notes-75a51eec-4092-42ab-abf8-7669077b7be3")
 
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
     d$info$has_error <- TRUE
 
-    if (interactive()) {
+    #TODO: Replace this with a centralized method
+    if (NROW(d$info$messages) > 0 & interactive()) {
       options(warning.length = 8170)
-      cat(crayon::red(d$info$warning_msg$msg_frame$message))
+      cat(crayon::red(d$info$messages$message))
     }
 
     return(d)
@@ -74,10 +75,7 @@ writePSNUxIM <- function(d,
   }
 
   # If warnings, show all grouped by issue ####
-  if ((NROW(d$info$warning_msg$msg_frame) > 0) & interactive()) {
-    options(warning.length = 8170)
-    cat(crayon::red(d$info$warning_msg$msg_frame$message))
-  }
+  print(d$info$messages)
 
   return(d)
 

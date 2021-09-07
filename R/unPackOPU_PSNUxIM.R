@@ -48,7 +48,7 @@ unPackOPU_PSNUxIM <- function(d) {
         " This is a fatal error. Please contact the Help Desk for guidance.",
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
     
     return(d)
     
@@ -76,7 +76,7 @@ unPackOPU_PSNUxIM <- function(d) {
         " columns with data, but no column header. For IM columns, please add a column header of the form 12345_DSD.",
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
   }
   
   d$data$extract <- d$data$extract[!(names(d$data$extract) %in% c(""))]
@@ -108,7 +108,7 @@ unPackOPU_PSNUxIM <- function(d) {
         paste(d$tests$invalid_mech_headers$invalid_mech_headers, collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
   }
 
   d$data$extract %<>%
@@ -156,7 +156,7 @@ unPackOPU_PSNUxIM <- function(d) {
         paste(d$tests$duplicate_cols, collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
   }
   
   names(d$data$extract) <- col_names$col_name_new
@@ -201,7 +201,7 @@ unPackOPU_PSNUxIM <- function(d) {
         paste(missing_cols_fatal, collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
   }
   
   d$data$extract %<>%
@@ -308,7 +308,7 @@ unPackOPU_PSNUxIM <- function(d) {
           collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
     d$info$has_error<-TRUE
   }
   
@@ -333,7 +333,7 @@ unPackOPU_PSNUxIM <- function(d) {
         paste(unique(d$tests$negative_IM_targets$mechCode_supportType), collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
     d$info$has_error<-TRUE
   }
   
@@ -378,7 +378,7 @@ unPackOPU_PSNUxIM <- function(d) {
         paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
   }
   
   d$data$extract %<>%
@@ -400,7 +400,7 @@ unPackOPU_PSNUxIM <- function(d) {
         " You can find these by filtering to positive values in the `DSD Dedupe`,",
         " `TA Dedupe`, and `Crosswalk Dedupe` columns (columns CX, CY, and CZ) in the PSNUxIM tab.")
 
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
   }
   
   d$data$extract %<>%

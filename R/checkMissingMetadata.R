@@ -46,7 +46,7 @@ checkMissingMetadata <- function(d, sheet) {
         paste(missing_metadata$row, collapse = ", "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
     d$info$has_error <- TRUE
   }
   

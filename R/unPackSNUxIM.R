@@ -49,7 +49,7 @@ unPackSNUxIM <- function(d) {
       )
     }
     
-    d$info$warning_msg$append( warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
     
     return(d)
     
@@ -89,7 +89,7 @@ unPackSNUxIM <- function(d) {
         paste(dupes_msg, collapse = "\n\t"),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
     d$info$has_error <- TRUE
     
   }
@@ -158,7 +158,7 @@ unPackSNUxIM <- function(d) {
         paste(sort(unique(d$tests$psnuxim_missing_rs_fxs$row_letter)), collapse = ", "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
   }
   
   # Drop rows where entire row is NA ####
@@ -209,7 +209,7 @@ unPackSNUxIM <- function(d) {
         paste(d$tests$invalid_mech_headers$invalid_mech_headers, collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
     d$info$has_error <- TRUE
   }
   
@@ -258,7 +258,7 @@ unPackSNUxIM <- function(d) {
         paste(d$tests$duplicate_cols, collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
   }
   
   names(d$data$SNUxIM) <- col_names$col_name_new
@@ -299,7 +299,7 @@ unPackSNUxIM <- function(d) {
         paste(missing_cols_fatal, collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
     d$info$has_error <- TRUE
   }
   
@@ -395,7 +395,7 @@ unPackSNUxIM <- function(d) {
           collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
   }
   
   # TEST: Negative IM Targets; Error; Drop ####
@@ -420,7 +420,7 @@ unPackSNUxIM <- function(d) {
         paste(unique(d$tests$negative_IM_targets$mechCode_supportType), collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
   }
   
   d$data$SNUxIM %<>%
@@ -477,7 +477,7 @@ unPackSNUxIM <- function(d) {
           " are complete, you may return here to update your PSNUxIM tab at any time.",
           "\n")
       
-      d$info$warning_msg$append( warning_msg,"WARNING")
+      d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
       
     }
   }
@@ -510,7 +510,7 @@ unPackSNUxIM <- function(d) {
         paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
   }
   
   d$data$SNUxIM %<>%
@@ -533,7 +533,7 @@ unPackSNUxIM <- function(d) {
         " `TA Dedupe`, and `Crosswalk Dedupe` columns (columns CX, CY, and CZ) in the PSNUxIM tab.",
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
   }
   
   d$data$SNUxIM %<>%
@@ -647,7 +647,7 @@ unPackSNUxIM <- function(d) {
         "\n"
       )
     
-    d$info$warning_msg$append(warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
   }
   
   # TEST: Data Pack total not fully distributed to IM ####
@@ -676,7 +676,7 @@ unPackSNUxIM <- function(d) {
         paste(imbalanced_distribution_inds, collapse = "\n\t* "),
         "\n")
     
-    d$info$warning_msg$append(warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
     d$info$has_error <- TRUE
   }
   

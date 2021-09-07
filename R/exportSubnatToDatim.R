@@ -52,7 +52,7 @@ exportSubnatToDATIM <- function(d) {
     warning_msg <-
       paste0(
         "ERROR! In tab SUBNATT/IMPATT. Duplicate rows. Contact support.")
-    d$info$warning_msg$append( warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
     d$info$has_error <- TRUE
   }
   
@@ -68,14 +68,14 @@ exportSubnatToDATIM <- function(d) {
     warning_msg <-
       paste0(
         "ERROR! In tab SUBNATT/IMPATT. DATIM Export has blank rows. Contact support.")
-    d$info$warning_msg$append( warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
     d$info$has_error <- TRUE
   }
   
   # TEST: Negative values; Error; 
   if (any(SUBNAT_IMPATT$value < 0)) {
     warning_msg <- "ERROR occurred. Negative values present in SUBNAT/IMPATT data."
-    d$info$warning_msg$append(warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
     d$info$has_error <- TRUE
   }
   

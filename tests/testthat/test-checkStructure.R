@@ -24,7 +24,7 @@ test_that("Can warn on missing COP21 DP sheet" , {
                                       cop_year = NULL)
   expect_silent(foo<-checkStructure(d))
   expect_equal(NROW(foo$tests$missing_sheets),1L)
-  expect_true(grepl("MISSING SHEETS",foo$info$warning_msg$msg_frame$message)) 
+  expect_true(grepl("MISSING SHEETS",foo$info$messages$message)) 
 })
 
 test_that("Can pass a COP20 OPU Template", {

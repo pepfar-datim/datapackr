@@ -413,7 +413,7 @@ packSNUxIM <- function(d,
       "If you have any questions, please submit a Help Desk ticket at DATIM.Zendesk.com.",
       "\n")
 
-  d$info$warning_msg$append(warning_msg,"INFO")
+  d$info$messages <- appendMessage(d$info$messages, warning_msg,"INFO")
 
   return(d)
 
