@@ -75,7 +75,7 @@ writePSNUxIM <- function(d,
   }
 
   # If warnings, show all grouped by issue ####
-  print(d$info$messages)
+  printMessages(d$info$messages)
 
   return(d)
 

@@ -44,7 +44,7 @@ unPackTool <- function(submission_path = NULL,
                            d2_session = d2_session)
   } else {stop("Selected tool not currently supported.")}
 
-  print(d$info$messages)
+  printMessages(d$info$messages)
 
   return(d)
 }

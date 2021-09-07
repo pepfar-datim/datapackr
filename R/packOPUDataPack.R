@@ -138,6 +138,6 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
     }
     
 
-    print(d$info$messages)
+    printMessages(d$info$messages)
     
 }
