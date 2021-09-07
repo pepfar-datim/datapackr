@@ -12,7 +12,7 @@ MessageQueue <- function(message=character(),level=character())
   
   me <- data.frame(
     message = message,
-    level = level
+    level = level, stringsAsFactors = FALSE
   )
   
   ## Set the name for the class
@@ -38,30 +38,33 @@ appendMessage.MessageQueue<-function(x, message=NA,level=NA) {
     level[is.na(level)]<-"UNKNOWN"
   }
   
-  new_me<-rbind(x,list(message=message,level=level))
+  new_me<-rbind.data.frame(x,list(message=message,level=level),
+                           stringsAsFactors = FALSE)
   class(new_me)<-c("data.frame","MessageQueue")
   return(new_me)
 }
 
-printMessages<-function(x) {
+printMessages.MessageQueue<-function(x) {
   UseMethod("print",x)
 }
 
-print.MessageQueue <- function(x) {
+printMessages <- function(x) {
   # If warnings, show all grouped by sheet and issue
   if (NROW(d$info$messages) > 0 & interactive()) {
     options(warning.length = 8170)
     
     levels<-c("ERROR","WARNING","INFO")
-    
-    d$info$messages <- d$info$messages %>% 
+    messages <- d$info$messages
+    class(messages)<-"data.frame"
+    messages <- messages %>% 
       dplyr::mutate(level = factor((level),levels = levels)) %>% 
-      dplyr::arrange(level,message)
+      dplyr::arrange(level,message) %>% 
+      dplyr::select(message)
     
     messages <-
       paste(
         paste(
-          seq_along(d$info$messages),
+          seq_along(d$info$messages$message),
           ": " , d$info$messages$message
           #stringr::str_squish(gsub("\n", "", d$info$messages))
         ),
