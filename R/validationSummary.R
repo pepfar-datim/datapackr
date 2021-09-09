@@ -13,11 +13,11 @@
 validationSummary<-function(d) {
   
   tests_rows<-purrr::map(d$tests,NROW) %>% 
-    plyr::ldply (., data.frame) %>% 
+    plyr::ldply(., data.frame) %>% 
     `colnames<-`(c("test_name","count"))
   
   tests_names<-purrr::map(d$tests,function(x) attr(x,"test_name"))%>% 
-    plyr::ldply (., data.frame) %>% 
+    plyr::ldply(., data.frame) %>% 
     `colnames<-`(c("test_name","validation_issue_category"))
   
   

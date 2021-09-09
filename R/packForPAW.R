@@ -61,5 +61,5 @@ packForPAW <- function(d) {
         categoryoptioncombo_id, categoryoptioncombo_name, age = Age, sex = Sex,
         result_value, target_value = value)
   
-  return (d)
+  return(d)
 }
