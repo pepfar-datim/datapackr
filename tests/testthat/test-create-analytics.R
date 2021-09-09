@@ -11,12 +11,13 @@ with_mock_api({
         country_uids = NULL,
         cop_year = NULL
       )
-    d <-  d %>% unPackSheets(.) %>%
+    d <-  d %>%
+      unPackSheets(.) %>%
       separateDataSets(.) %>%
       unPackSNUxIM(.) %>%
       packForDATIM(., type = "Undistributed MER") %>%
       packForDATIM(., type = "SUBNAT_IMPATT") %>%
-      packForDATIM(., type = "PSNUxIM") 
+      packForDATIM(., type = "PSNUxIM")
     
     expect_named(d,
                  c("keychain", "info", "tests", "data", "datim"),
