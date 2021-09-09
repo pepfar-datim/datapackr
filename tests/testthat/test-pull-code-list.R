@@ -144,7 +144,6 @@ with_mock_api({
   })
 })
 
-
 test_that("We can get a list of dataset UIDs based on the fiscal year",{
   expect_error(getDatasetUids("foo"))
   test_dataset<-getDatasetUids(2021)
@@ -163,5 +162,3 @@ with_mock_api({
     test_dataset <- pullFullCodeList(FY = 2022, d2_session = training)
     })
 })
-
-

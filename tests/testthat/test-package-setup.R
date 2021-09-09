@@ -145,10 +145,6 @@ test_that("We can check datapack paramaters", {
   #       season = "COP"
   #     )
   # )
-  
-  
-  
-  
   #This will return a handled error, but will NOT return "Global"
   expect_error(test_params <-
     check_params(datapack_name = NULL, country_uids = NULL
@@ -166,12 +162,5 @@ test_that("We can check datapack paramaters", {
   #Only get a command line message
   # test_args<-list(datapack_name = "Zambia",country_uids = "abc12345678")
   # expect_error(do.call(check_params,test_args))
-  
-  
   }
-  
-
-  
-
 )
-

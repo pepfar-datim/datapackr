@@ -15,7 +15,6 @@ linters: with_defaults(
     paren_brace_linter = NULL, # 20
     seq_linter = NULL, # 19
     object_length_linter = NULL, # 9
-    trailing_blank_lines_linter = NULL, # 9
     cyclocomp_linter = NULL, # 7
     dummy_linter = NULL
   )

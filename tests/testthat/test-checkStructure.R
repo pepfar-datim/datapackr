@@ -35,4 +35,3 @@ test_that("Can pass a COP20 OPU Template", {
   expect_silent(foo<-checkStructure(d))
   expect_equal(NROW(foo$tests$missing_sheets),0L)
 } )
-

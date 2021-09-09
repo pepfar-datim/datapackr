@@ -27,6 +27,3 @@ test_that("Can error on an invalid regional DataPack UID", {
                                                cop_year = 2021))
   unlink(template_copy)
 } )
-
-
-
