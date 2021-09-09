@@ -50,7 +50,7 @@ pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
   fullCodeList <-
     lapply(
       datasets_list,
-      function(x){
+      function(x) {
         cl <- pullDATIMCodeList(x, d2_session = d2_session)
         ds <- rbind(ds, cl)
         }) %>%

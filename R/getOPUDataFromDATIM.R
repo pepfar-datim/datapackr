@@ -21,7 +21,7 @@ getOPUDataFromDATIM <- function(cop_year,
                                                     inherits = TRUE)) {
   
   map_DataPack_DATIM_DEs_COCs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
-  if (cop_year == 2020){
+  if (cop_year == 2020) {
     map_DataPack_DATIM_DEs_COCs_local <- dplyr::mutate(map_DataPack_DATIM_DEs_COCs_local,
                                                        dataelementuid = dataelement,
                                                        period = "2020Oct")

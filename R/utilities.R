@@ -49,7 +49,7 @@ round_trunc <- function(x, digits = 0) {
 #' country, community, and facility levels in DATIM organization hierarchy.
 #'
 getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
-                                                inherits = TRUE)){
+                                                inherits = TRUE)) {
   impatt_levels <-
     paste0(d2_session$base_url,"api/",datapackr::api_version(),
            "/dataStore/dataSetAssignments/orgUnitLevels") %>%
@@ -336,7 +336,7 @@ isLoggedIn <- function(d2_session = dynGet("d2_default_session",
 getDatasetUids <-  function(fiscal_year,
                             type = c("mer_targets", "mer_results",
                                      "subnat_targets", "subnat_results",
-                                     "impatt")){
+                                     "impatt")) {
 
   datasets = character(0)
   if (fiscal_year == "2022") {
@@ -397,7 +397,7 @@ getDatasetUids <-  function(fiscal_year,
                     "C2G7IyPPrvD", # MER Targets: Community Based - DoD ONLY FY2020
                     "HiJieecLXxN") # MER Targets: Facility Based - DoD ONLY FY2020
     }
-    if ("mer_results" %in% type){
+    if ("mer_results" %in% type) {
       datasets <- c(datasets,
                     "qzVASYuaIey", # MER Results: Community Based FY2020Q4
                     "BPEyzcDb8fT", # MER Results: Community Based - DoD ONLY
@@ -509,7 +509,7 @@ rowMax <- function(df, cn, regex) {
 #' @return {cop20, cop21}_map_DataPack_DATIM_DEs_COCs
 #'
 getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
-  if (cop_year == 2020){ 
+  if (cop_year == 2020) { 
       return(datapackr::cop20_map_DataPack_DATIM_DEs_COCs)
   } else if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs, 
                                            datapackr::map_DataPack_DATIM_DEs_COCs)) {
@@ -528,7 +528,7 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
 #' @return {cop20, cop21}_data_pack_schema
 #'
 getDataPackSchema <- function(cop_year) {
-  if (cop_year == 2020){ 
+  if (cop_year == 2020) { 
     return(datapackr::cop20_data_pack_schema)
   } else if (cop_year == 2021) {
     return(datapackr::cop21_data_pack_schema)

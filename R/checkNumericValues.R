@@ -12,7 +12,7 @@
 #' @return d
 #' 
 
-checkNumericValues <- function(d, sheet, header_cols = NULL){
+checkNumericValues <- function(d, sheet, header_cols = NULL) {
   if (sheet %in% c("SNU x IM","PSNUxIM") & d$info$tool == "Data Pack") {
     data = d$data$SNUxIM
   } else {

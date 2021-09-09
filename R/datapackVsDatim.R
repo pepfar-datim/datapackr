@@ -74,7 +74,7 @@ compareData_DatapackVsDatim <-
 # start main processing
 # start off with dedups included
     
-    if(d$info$cop_year != 2021){
+    if(d$info$cop_year != 2021) {
       stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
     }
     # d <- datapackr::exportDistributedDataToDATIM(d, keep_dedup = TRUE)
@@ -206,7 +206,7 @@ compareData_OpuDatapackVsDatim <-
   function(d, d2_session = dynGet("d2_default_session",
                                   inherits = TRUE)) {
     
-    if(d$info$cop_year != 2020){
+    if(d$info$cop_year != 2020) {
       stop("Attempting to use compareData_OpuDatapackVsDatim for unsupported COP year")
     }
     

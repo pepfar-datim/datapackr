@@ -91,7 +91,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
   crosswalk_dupes_auto_resolved<-data.frame(foo=character())
   }
 
-  if( keep_dedup == TRUE ){
+  if( keep_dedup == TRUE ) {
     d$datim$MER <- d$data$distributedMER
   } else {
     #Filter the pseudo-dedupe mechanism data out

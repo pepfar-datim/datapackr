@@ -11,7 +11,7 @@
 getDataValueSets <- function(keys, values,  
                             api_version = datapackr::api_version(),
                             d2_session = dynGet("d2_default_session",
-                                                inherits = TRUE)){
+                                                inherits = TRUE)) {
   
   # concatenate and format the keys and values provided for the api call 
   parameters <- stringr::str_c(keys, 
