@@ -48,9 +48,9 @@ printMessages.MessageQueue<-function(x) {
   UseMethod("print",x)
 }
 
-printMessages <- function(x) {
+printMessages <- function(d) {
   # If warnings, show all grouped by sheet and issue
-  if (NROW(d$info$messages) > 0 & interactive()) {
+  if ( NROW(d$info$messages) > 0 & interactive() ) {
     options(warning.length = 8170)
     
     levels<-c("ERROR","WARNING","INFO")
@@ -64,8 +64,8 @@ printMessages <- function(x) {
     messages <-
       paste(
         paste(
-          seq_along(d$info$messages$message),
-          ": " , d$info$messages$message
+          seq_along(messages$message),
+          ": " , messages$message
           #stringr::str_squish(gsub("\n", "", d$info$messages))
         ),
         sep = "",
