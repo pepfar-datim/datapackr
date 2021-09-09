@@ -42,9 +42,11 @@ unPackTool <- function(submission_path = NULL,
   } else if (d$info$tool == "OPU Data Pack") {
     d <- unPackOPUDataPack(d,
                            d2_session = d2_session)
-  } else {stop("Selected tool not currently supported.")}
-
-  printMessages(d$info$messages)
+  } else {
+    stop("Selected tool not currently supported.")
+  }
+  
+  printMessages(d)
 
   return(d)
 }
