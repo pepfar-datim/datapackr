@@ -13,9 +13,9 @@ test_that("Can pass a COP21 DP Template", {
 test_that("Can warn on missing COP21 DP sheet" , {
   
   
-  template_copy=paste0(tempfile(),".xlsx")
+  template_copy <- paste0(tempfile(),".xlsx")
   file.copy(from = test_sheet("COP21_Data_Pack_Template.xlsx"), to=template_copy)
-  wb = openxlsx::loadWorkbook(template_copy)
+  wb <- openxlsx::loadWorkbook(template_copy)
   openxlsx::removeWorksheet(wb,"PMTCT")
   openxlsx::saveWorkbook(wb,file=template_copy,overwrite = TRUE)
   d <- datapackr:::createKeychainInfo(submission_path = template_copy,

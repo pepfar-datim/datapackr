@@ -326,7 +326,7 @@ packSNUxIM <- function(d,
                   value_type == "percentage") %>%
     dplyr::pull(col)
 
-  percentStyle = openxlsx::createStyle(numFmt = "0%")
+  percentStyle <- openxlsx::createStyle(numFmt = "0%")
 
   openxlsx::addStyle(wb = d$tool$wb,
                     sheet = "PSNUxIM",

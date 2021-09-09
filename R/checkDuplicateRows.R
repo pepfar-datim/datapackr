@@ -12,9 +12,9 @@
 #' 
 checkDuplicateRows <- function(d, sheet) {
   if (sheet %in% c("SNU x IM","PSNUxIM") & d$info$tool == "Data Pack") {
-    data = d$data$SNUxIM
+    data <- d$data$SNUxIM
   } else {
-    data = d$data$extract
+    data <- d$data$extract
   }
   
   if (d$info$tool == "OPU Data Pack") {

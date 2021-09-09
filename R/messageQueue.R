@@ -71,7 +71,7 @@ printMessages <- function(d) {
         sep = "",
         collapse = "\r\n")
     
-    key = paste0(
+    key <- paste0(
       "*********************\r\n",
       "KEY:\r\n",
       "- WARNING!: Problematic, but doesn't stop us from processing your tool. May waive with approval from PPM and DUIT.\r\n",

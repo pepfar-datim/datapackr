@@ -39,7 +39,7 @@ prepareSheetData <- function(sheet,
                     Sex = valid_sexes.name,
                     KeyPop = valid_kps.name) %>%
       dplyr::arrange(Age, Sex, KeyPop)
-  } else {valid_disaggs = tibble::tribble(
+  } else {valid_disaggs <- tibble::tribble(
     ~Age, ~Sex, ~KeyPop, ~valid_ages.id, ~valid_sexes.id, ~valid_kps.id,
     NA_character_, NA_character_, NA_character_, NA_character_, NA_character_, NA_character_)}
 
@@ -141,7 +141,7 @@ prepareSheetData <- function(sheet,
           DREAMS_FLAG, by = c("psnu_uid" = "psnu_uid"))
     }
 
-  } else {combined = row_headers}
+  } else {combined <- row_headers}
 
   dataStructure %<>%
     swapColumns(., combined) %>%

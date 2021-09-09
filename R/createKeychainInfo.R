@@ -75,10 +75,10 @@ createKeychainInfo <- function(submission_path = NULL,
     dplyr::select(PSNU)
   
   if (NROW(is_template$PSNU) == 0) {
-    is_template = TRUE
+    is_template <- TRUE
   } else if (all(is.na(is_template$PSNU))) {
-    is_template = TRUE
-  } else {is_template = FALSE}
+    is_template <- TRUE
+  } else {is_template  <- FALSE}
   
   if (is_template) {
     tool_name_type %<>% dplyr::mutate(type = paste0(type, " Template"))

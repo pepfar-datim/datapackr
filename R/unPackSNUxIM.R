@@ -14,7 +14,11 @@
 #' 
 unPackSNUxIM <- function(d) {
   
-  if (d$info$cop_year %in% c(2020,2021)) {sheet = "PSNUxIM"} else {sheet = "SNU x IM"}
+  if (d$info$cop_year %in% c(2020, 2021)) {
+    sheet <- "PSNUxIM"
+  } else {
+    sheet <- "SNU x IM"
+  }
   
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
   

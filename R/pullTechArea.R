@@ -12,7 +12,7 @@ getTechArea <- function(dataElements = NULL,
                         d2_session = dynGet("d2_default_session",
                                             inherits = TRUE)) {
   
-  groupSet = "LxhLO68FcXm"
+  groupSet <- "LxhLO68FcXm"
   
   tech_areas <- api_call(paste0("dataElementGroupSets/",
                                 groupSet),

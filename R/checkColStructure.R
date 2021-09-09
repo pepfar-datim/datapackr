@@ -12,9 +12,9 @@
 #' 
 checkColStructure <- function(d, sheet) {
   if (sheet %in% c("SNU x IM","PSNUxIM")) {
-    data = d$data$SNUxIM
+    data <- d$data$SNUxIM
   } else {
-    data = d$data$extract
+    data <- d$data$extract
   }
   
   submission_cols <- names(data) %>%

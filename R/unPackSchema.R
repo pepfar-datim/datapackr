@@ -38,7 +38,7 @@ unPackSchema_datapack <- function(filepath = NULL,
   data.table::setDT(schema)[,sheet_num:=.GRP, by = c("sheet_name")]
 
   # Skip detail on listed sheets. ####
-  if (is.null(skip)) {skip = skip_tabs(tool = tool, cop_year = cop_year)}
+  if (is.null(skip)) {skip <- skip_tabs(tool = tool, cop_year = cop_year)}
   sheets <- tidyxl::xlsx_sheet_names(filepath)
   verbose_sheets <- sheets[!sheets %in% skip]
 
@@ -85,7 +85,7 @@ unPackSchema_datapack <- function(filepath = NULL,
         dplyr::vars(
           c("dataelement_dsd","dataelement_ta","categoryoption_specified",
             "valid_ages","valid_sexes","valid_kps")),
-            ~ (. = NA_character_))
+            ~ (. <- NA_character_))
   }
 
   # Translate valid disaggs ####

@@ -1,7 +1,7 @@
 context("test-get-datapack-name")
 
 test_that("Can read a Datapack Name and UIDs", {
-  template_copy=paste0(tempfile(),".xlsx")
+  template_copy <- paste0(tempfile(),".xlsx")
   file.copy(from = test_sheet('COP21_Data_Pack_Template.xlsx'), to=template_copy)
   foo<-unPackDataPackName(submission_path = template_copy,
                           "Data Pack")
@@ -13,9 +13,9 @@ test_that("Can read a Datapack Name and UIDs", {
 } )
 
 test_that("Can error on an invalid regional DataPack UID", {
-  template_copy=paste0(tempfile(),".xlsx")
+  template_copy <- paste0(tempfile(),".xlsx")
   file.copy(from = test_sheet('COP21_Data_Pack_Template.xlsx'), to=template_copy)
-  wb = openxlsx::loadWorkbook(template_copy)
+  wb <- openxlsx::loadWorkbook(template_copy)
 
   home_address<-cellranger::as.cell_addr(countryUIDs_homeCell(), strict = FALSE)
   openxlsx::writeData(wb = wb,sheet="Home",

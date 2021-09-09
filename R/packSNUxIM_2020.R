@@ -324,7 +324,7 @@ packSNUxIM_2020 <- function(d) {
     names()
   
   percentCols <- c(grep("Rollup", final_snuxim_cols):length(final_snuxim_cols))
-  percentStyle = openxlsx::createStyle(numFmt = "0%")
+  percentStyle <- openxlsx::createStyle(numFmt = "0%")
   
   openxlsx::addStyle(
     wb = d$tool$wb,
@@ -337,7 +337,7 @@ packSNUxIM_2020 <- function(d) {
   
   # Format integers ####
   integerCols <- grep("DataPackTarget", final_snuxim_cols)
-  integerStyle = openxlsx::createStyle(numFmt = "#,##0")
+  integerStyle <- openxlsx::createStyle(numFmt = "#,##0")
   
   openxlsx::addStyle(
     wb = d$tool$wb,

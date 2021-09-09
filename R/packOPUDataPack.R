@@ -53,7 +53,7 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
     
     if (NROW(empty_snuxim_model_data) == 0) {
       warning("Provided SNUxIM model data seems empty. Attempting to retrieve data from DATIM instead.")
-      d$data$snuxim_model_data = NULL
+      d$data$snuxim_model_data <- NULL
     }
   }
   

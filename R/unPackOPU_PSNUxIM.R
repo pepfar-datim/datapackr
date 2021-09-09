@@ -17,7 +17,7 @@ unPackOPU_PSNUxIM <- function(d) {
   }
   
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
-  sheet = "PSNUxIM"
+  sheet <- "PSNUxIM"
   
   cols_to_keep <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet,

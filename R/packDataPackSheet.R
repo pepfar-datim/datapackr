@@ -44,7 +44,7 @@ packDataPackSheet <- function(wb,
                   value_type == "percentage") %>%
     dplyr::pull(col)
 
-  percentStyle = openxlsx::createStyle(numFmt = "0%")
+  percentStyle <- openxlsx::createStyle(numFmt = "0%")
 
   if (length(percentCols) > 0) {
     openxlsx::addStyle(wb,
@@ -63,7 +63,7 @@ packDataPackSheet <- function(wb,
                     indicator_code %in% c("HIV_PREV.NA.Age/Sex/HIVStatus.T","HIV_PREV.T_1")) %>%
       dplyr::pull(col)
     
-    percentDecimalStyle = openxlsx::createStyle(numFmt = "0.00%")
+    percentDecimalStyle <- openxlsx::createStyle(numFmt = "0.00%")
     
     openxlsx::addStyle(wb,
                        sheet = sheet,
@@ -80,7 +80,7 @@ packDataPackSheet <- function(wb,
                   value_type == "integer") %>%
     dplyr::pull(col)
 
-  integerStyle = openxlsx::createStyle(numFmt = "#,##0")
+  integerStyle <- openxlsx::createStyle(numFmt = "#,##0")
 
   if (length(integerCols) > 0) {
     openxlsx::addStyle(wb,
@@ -98,7 +98,7 @@ packDataPackSheet <- function(wb,
                   col_type == "target") %>%
     dplyr::pull(col)
 
-  targetStyle = openxlsx::createStyle(textDecoration = "bold")
+  targetStyle <- openxlsx::createStyle(textDecoration = "bold")
 
   if (length(targetCols) > 0) {
     openxlsx::addStyle(wb,

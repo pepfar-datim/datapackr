@@ -40,10 +40,10 @@ canReadFile <- function(path) {
 handshakeFile <- function(path,
                           tool = "Data Pack") {
 
-  if (is.null(tool)) {tool = "Data Pack"}
+  if (is.null(tool)) {tool <- "Data Pack"}
   
   if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
-    extension = "xlsx"
+    extension <- "xlsx"
   } else {
     stop(
       "Please specify correct file type: Data Pack, Data Pack Template, OPU Data Pack Template, OPU Data Pack.")

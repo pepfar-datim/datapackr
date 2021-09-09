@@ -9,7 +9,6 @@ linters: with_defaults(
     commented_code_linter = NULL, # 88
     object_usage_linter = NULL, # 84
     open_curly_linter = NULL, # 77
-    assignment_linter = NULL, # 76
     closed_curly_linter = NULL, # 65
     spaces_left_parentheses_linter = NULL, # 27
     object_length_linter = NULL, # 9

@@ -119,7 +119,7 @@ packFrame <- function(datapack_uid, tool = "Data Pack") {
       unique()
 
     for (i in seq_along(sheet_names)) {
-        sheet_name = sheet_names[i]
+        sheet_name <- sheet_names[i]
         wb <- frameDataSheet(wb = wb, sheet_name, tool = tool)
     }
 

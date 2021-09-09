@@ -97,7 +97,7 @@ getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
 #'
 swapColumns <- function(to, from) {
   # Grab column names from `from`
-    cols = colnames(from)
+    cols <- colnames(from)
 
   # If `from` is a null dataframe, skip and return `to`
     if (length(cols) != 0) {
@@ -105,7 +105,7 @@ swapColumns <- function(to, from) {
   # Loop through `from` columns and if there's a match in `to`, copy and paste
   #   it into `to`
       for (i in seq_along(cols)) {
-        col = cols[i]
+        col <- cols[i]
         if (col %in% colnames(to)) {
           dots <-
             stats::setNames(list(lazyeval::interp(
@@ -338,7 +338,7 @@ getDatasetUids <-  function(fiscal_year,
                                      "subnat_targets", "subnat_results",
                                      "impatt")) {
 
-  datasets = character(0)
+  datasets <- character(0)
   if (fiscal_year == "2022") {
     if ("mer_targets" %in% type) {
       datasets <- c(datasets,

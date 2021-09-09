@@ -43,15 +43,18 @@ dataPackName_homeCell <- function() { "B20" }
 skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
   if (tool %in% c("Data Pack", "Data Pack Template")) {
     if (cop_year == 2020) {
-      skip = c("Home", "Instructions", "Summary", "Spectrum", "Spectrum IDs")
+      skip <- c("Home", "Instructions", "Summary", "Spectrum", "Spectrum IDs")
     } else if (cop_year == 2021) {
-      skip = c("Home", "Summary", "Spectrum")
+      skip <- c("Home", "Summary", "Spectrum")
     }
   }
-  else if (tool == "OPU Data Pack Template" & cop_year %in% c(2020,2021)) {
-    skip = c("Home")
-  } else {skip = c(NA_character_)}
-
+  else if (tool == "OPU Data Pack Template" &
+           cop_year %in% c(2020, 2021)) {
+    skip <- c("Home")
+  } else {
+    skip <- c(NA_character_)
+  }
+  
   return(skip)
 }
 
@@ -308,7 +311,7 @@ check_params <- function(country_uids,
 
   # Check cop_year ####
   check_cop_year <- function(cop_year = getCurrentCOPYear()) {
-    if (is.null(cop_year)) {cop_year = getCurrentCOPYear()}
+    if (is.null(cop_year)) {cop_year <- getCurrentCOPYear()}
     if (!cop_year %in% c(2020, 2021)) {
       stop("Sorry, datapackr only supports COP20 and COP21 Data Packs.")
     }
@@ -322,7 +325,7 @@ check_params <- function(country_uids,
   # Check Tool ####
   check_tool <- function(tool = NULL) {
     if (is.null(tool)) {
-      tool = "Data Pack"
+      tool <- "Data Pack"
     } else {
       if (!tool %in% c("Data Pack", "OPU Data Pack")) {
         stop("Cannot support any tools other than `Data Pack` or `OPU Data Pack`")
@@ -340,8 +343,8 @@ check_params <- function(country_uids,
     tool <- check_tool(tool)
     if (is.null(season)) {
       if (tool == "OPU Data Pack") {
-        season = "OPU"
-      } else {season = "COP"}
+        season <- "OPU"
+      } else {season <- "COP"}
     } else {
       if (!season %in% c("COP", "OPU")) {
         stop("Cannot support any tools other than `COP` or `OPU`")
@@ -401,8 +404,8 @@ check_params <- function(country_uids,
   check_template_path <- function(template_path = NULL,
                                   cop_year = NULL,
                                   tool = NULL) {
-    cop_year = check_cop_year(cop_year)
-    tool = check_tool(tool)
+    cop_year <- check_cop_year(cop_year)
+    tool <- check_tool(tool)
     
     if (is.null(template_path)) {
       template_path <- pick_template_path(cop_year, tool)
@@ -443,10 +446,10 @@ check_params <- function(country_uids,
                        template_path = NULL,
                        d2_session) {
     country_uids <- check_country_uids(country_uids)
-    cop_year = check_cop_year(cop_year)
-    tool = check_tool(tool)
-    datapack_name = check_datapack_name(datapack_name, country_uids)
-    template_path = check_template_path(template_path, cop_year, tool)
+    cop_year <- check_cop_year(cop_year)
+    tool <- check_tool(tool)
+    datapack_name <- check_datapack_name(datapack_name, country_uids)
+    template_path <- check_template_path(template_path, cop_year, tool)
     
       if (is.null(wb)) {
         wb <- createWorkbook(datapack_name = datapack_name,
