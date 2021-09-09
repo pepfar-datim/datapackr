@@ -118,7 +118,7 @@ packFrame <- function(datapack_uid, tool = "Data Pack") {
       dplyr::pull(sheet_name) %>%
       unique()
 
-    for (i in 1:length(sheet_names)) {
+    for (i in seq_along(sheet_names)) {
         sheet_name = sheet_names[i]
         wb <- frameDataSheet(wb = wb, sheet_name, tool = tool)
     }

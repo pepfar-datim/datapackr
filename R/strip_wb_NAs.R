@@ -18,7 +18,7 @@ strip_wb_NAs <- function(d) {
   
   if (length(NA_sharedString) > 0) {
   
-   for (i in 1:length(d$tool$wb$worksheets)) {
+   for (i in seq_along(d$tool$wb$worksheets)) {
      
      might_be_NA <- d$tool$wb$worksheets[[i]]$sheet_data$v %in% NA_sharedString
      

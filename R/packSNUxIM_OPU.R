@@ -146,13 +146,13 @@ packSNUxIM_OPU <- function(d) {
       pattern = paste0("(?<=[:upper:])", headerRow(tool = "OPU Data Pack Template",
                                                    cop_year = d$info$cop_year)
                        +1),
-      replacement = as.character(1:NROW(data)
+      replacement = as.character(seq_along(data)
                                  + headerRow(tool = "OPU Data Pack Template",
                                              cop_year = d$info$cop_year)))
   
   # Classify formula columns as formulas ####
   ## TODO: Improve approach - Use apply form instead
-  for (i in 1:length(fx_cols)) {
+  for (i in seq_along(fx_cols)) {
     if (!all(any(is.na(fx_cols[[i]])))) {
       class(fx_cols[[i]]) <- c(class(fx_cols[[i]]), "formula")
     }
@@ -281,8 +281,8 @@ packSNUxIM_OPU <- function(d) {
   openxlsx::addStyle(wb = d$tool$wb,
                      sheet = "PSNUxIM",
                      style = datapackr::styleGuide$cop21_opu$numeric_format,
-                     rows = (1:NROW(data_original))+headerRow("OPU Data Pack Template", d$info$cop_year),
-                     cols = 6:178,
+                     rows = (seq_along(data_original))+headerRow("OPU Data Pack Template", d$info$cop_year),
+                     cols = 6:178, #TODO: Review this hard coded sequence
                      gridExpand = TRUE,
                      stack = TRUE)
   

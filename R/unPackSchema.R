@@ -292,7 +292,7 @@ unPackSchema_datapack <- function(filepath = NULL,
   skipped_schema[] <- mapply(FUN = as, skipped_schema, sapply(schema, class), SIMPLIFY = FALSE)
 
   skipped_schema %<>%
-    tibble::add_row(sheet_name = skip, sheet_num = 1:length(skip)) %>%
+    tibble::add_row(sheet_name = skip, sheet_num = seq_along(skip)) %>%
     dplyr::mutate(valid_ages = empty, valid_sexes = empty, valid_kps = empty)
 
   schema %<>%
@@ -317,7 +317,7 @@ unPackSchema_datapack <- function(filepath = NULL,
     dplyr::left_join(
       data.frame(
         "sheet_name" = tidyxl::xlsx_sheet_names(filepath),
-        "sheet_num.test" = 1:length(tidyxl::xlsx_sheet_names(filepath)),
+        "sheet_num.test" = seq_along(tidyxl::xlsx_sheet_names(filepath)),
         stringsAsFactors = FALSE),
       by = "sheet_name") %>%
     dplyr::mutate(

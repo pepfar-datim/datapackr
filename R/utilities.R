@@ -104,7 +104,7 @@ swapColumns <- function(to, from) {
 
   # Loop through `from` columns and if there's a match in `to`, copy and paste
   #   it into `to`
-      for (i in 1:length(cols)) {
+      for (i in seq_along(cols)) {
         col = cols[i]
         if (col %in% colnames(to)) {
           dots <-
@@ -145,7 +145,7 @@ writeFxColumnwise <- function(wb, sheet, x, xy) {
     as.data.frame() %>%
     dplyr::mutate_all(as.character)
 
-  for (i in 1:length(fx)) {
+  for (i in seq_along(fx)) {
     class(fx[[i]]) <- c(class(fx[[i]]), "formula")
   }
 
