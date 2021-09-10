@@ -33,4 +33,5 @@ jobs:
       - run: 
           name: Lint packages
           command: |
-               - Rscript -e 'lintr::lint_package()'
+                R -e "install.packages('renv')"
+                R -e "lintr::lint_package()"
