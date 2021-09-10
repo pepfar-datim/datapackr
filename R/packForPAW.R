@@ -11,7 +11,7 @@
 #' 
 packForPAW <- function(d) {
   
-  map_DataPack_DATIM_DEs_COCs_local <- 
+  map_des_cocs_local <- 
     datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
 
   PSNUs <- datapackr::valid_PSNUs %>%
@@ -38,7 +38,7 @@ packForPAW <- function(d) {
             indicator_code %in% c("PMTCT_EID.N.Age.T.2mo","PMTCT_EID.N.Age.T.2to12mo") ~ NA_character_,
             TRUE ~ Age
           )) %>%
-      dplyr::left_join(map_DataPack_DATIM_DEs_COCs_local,
+      dplyr::left_join(map_des_cocs_local,
                        by = c("indicator_code" = "indicator_code",
                               "Age" = "valid_ages.name",
                               "Sex" = "valid_sexes.name",

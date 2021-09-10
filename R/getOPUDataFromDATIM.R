@@ -20,9 +20,9 @@ getOPUDataFromDATIM <- function(cop_year,
                                 d2_session = dynGet("d2_default_session",
                                                     inherits = TRUE)) {
   
-  map_DataPack_DATIM_DEs_COCs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
+  map_des_cocs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
   if (cop_year == 2020) {
-    map_DataPack_DATIM_DEs_COCs_local <- dplyr::mutate(map_DataPack_DATIM_DEs_COCs_local,
+    map_des_cocs_local <- dplyr::mutate(map_des_cocs_local,
                                                        dataelementuid = dataelement,
                                                        period = "2020Oct")
   }  
@@ -73,7 +73,7 @@ getOPUDataFromDATIM <- function(cop_year,
   
 
   data_datim %<>%
-    dplyr::left_join(map_DataPack_DATIM_DEs_COCs_local,
+    dplyr::left_join(map_des_cocs_local,
                       by = c("dataElement" = "dataelementuid",
                             "categoryOptionCombo" = "categoryoptioncombouid",
                             "period" = "period"))

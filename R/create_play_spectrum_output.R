@@ -26,7 +26,7 @@ create_play_spectrum_output <- function(country_uids,
     stop("That COP Year currently isn't supported for processing by create_play_spectrum_output.")
   }
   
-  map_DataPack_DATIM_DEs_COCs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
+  map_des_cocs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
   
   # Get PSNU list ####
   PSNUs <- datapackr::valid_PSNUs %>%
@@ -75,7 +75,7 @@ create_play_spectrum_output <- function(country_uids,
         )
     ) %>%
     dplyr::left_join(
-      map_DataPack_DATIM_DEs_COCs_local,
+      map_des_cocs_local,
       by = c("dataElement" = "dataelementuid",
              "categoryOptionCombo" = "categoryoptioncombouid",
              "period" = "period")) %>%
@@ -111,7 +111,7 @@ create_play_spectrum_output <- function(country_uids,
   )
   
   # Get PMTCT ages/sexes
-  pmtct_subnat_cos <- map_DataPack_DATIM_DEs_COCs_local %>%
+  pmtct_subnat_cos <- map_des_cocs_local %>%
     dplyr::filter(indicator_code == "PMTCT_STAT.D.Age_Sex.T") %>%
     dplyr::select(
       age = valid_ages.name,

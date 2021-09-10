@@ -181,12 +181,15 @@ unPackSNUxIM <- function(d) {
   d$data$SNUxIM %<>%
     tidyr::drop_na(PSNU, indicator_code)
   
+  # nolint
+  # nolint start
   # TEST: Improper Col Names; Error; Drop ####
   invalid_mech_headers <- names(d$data$SNUxIM) %>%
     tibble::tibble(col_name = .) %>%
     dplyr::filter(!col_name %in% cols_to_keep$indicator_code,
                   !(stringr::str_detect(col_name, "(\\d){4,6}")
                     & stringr::str_detect(col_name, "DSD|TA")))
+  # nolint end
   
   #Test specifically for DSD and TA which have been populated as mechanisms by the user. 
   improper_dedupe_mechs<-names(d$data$SNUxIM) %>%

@@ -82,22 +82,22 @@ adorn_import_file <- function(psnu_import_file,
   
   data <- dplyr::bind_rows(data_codes, data_ids)
   
-  map_DataPack_DATIM_DEs_COCs_local <- getMapDataPack_DATIM_DEs_COCs(cop_year)
+  map_des_cocs_local <- getMapDataPack_DATIM_DEs_COCs(cop_year)
 
   # Adorn dataElements & categoryOptionCombos ####
    
   # TODO: Is this munging still required with the map being a function of fiscal year?
    if (cop_year == 2020) {
-     map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                          map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- "Male"
-     map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                          map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Female PWID"] <- "Female"
-     map_DataPack_DATIM_DEs_COCs_local$valid_kps.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                        map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- NA_character_
-     map_DataPack_DATIM_DEs_COCs_local$valid_kps.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                        map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Female PWID"] <- NA_character_
+     map_des_cocs_local$valid_sexes.name[map_des_cocs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                          map_des_cocs_local$valid_kps.name == "Male PWID"] <- "Male"
+     map_des_cocs_local$valid_sexes.name[map_des_cocs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                          map_des_cocs_local$valid_kps.name == "Female PWID"] <- "Female"
+     map_des_cocs_local$valid_kps.name[map_des_cocs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                        map_des_cocs_local$valid_kps.name == "Male PWID"] <- NA_character_
+     map_des_cocs_local$valid_kps.name[map_des_cocs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                        map_des_cocs_local$valid_kps.name == "Female PWID"] <- NA_character_
      #TODO: Fix inconsistent naming of dataelement/dataelementuid
-     map_DataPack_DATIM_DEs_COCs_local %<>% 
+     map_des_cocs_local %<>% 
        dplyr::rename(dataelementuid = dataelement,
                      dataelementname = dataelement.y,
                      categoryoptioncomboname = categoryoptioncombo) %>% 
@@ -115,7 +115,7 @@ adorn_import_file <- function(psnu_import_file,
                                      )
       ) %>%
     dplyr::left_join(
-      (map_DataPack_DATIM_DEs_COCs_local %>%
+      (map_des_cocs_local %>%
           dplyr::rename(
             Age = valid_ages.name,
             Sex = valid_sexes.name,
