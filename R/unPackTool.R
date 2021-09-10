@@ -30,9 +30,9 @@ unPackTool <- function(submission_path = NULL,
                            tool,
                            country_uids,
                            cop_year)
-  
-  #TODO: Are we sure we want to make this change ? If so, the object must be cloned. 
-  
+
+  #TODO: Are we sure we want to make this change ? If so, the object must be cloned.
+
   #d$keychain$d2_session <- d2_session$clone()
 
   # unPack file based on type
@@ -45,7 +45,7 @@ unPackTool <- function(submission_path = NULL,
   } else {
     stop("Selected tool not currently supported.")
   }
-  
+
   printMessages(d)
 
   return(d)

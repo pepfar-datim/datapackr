@@ -66,11 +66,11 @@ unPackDataPack <- function(d,
   if (d$info$has_psnuxim) {
     d <- packForDATIM(d, type = "PSNUxIM")
   }
-  
+
   # Create Analytics Function ####
   interactive_print("Creating analytics...")
   d <- createAnalytics(d, d2_session = d2_session )
-  
+
   # TEST: Check that country_uids matches observed data
   observed_country_uids <-
     dplyr::bind_rows(d$datim) %>%
@@ -82,7 +82,7 @@ unPackDataPack <- function(d,
     dplyr::pull(country_uid) %>%
     unique()
 
-  if (!all(purrr::map_lgl(observed_country_uids, 
+  if (!all(purrr::map_lgl(observed_country_uids,
                          ~ .x %in% d$info$country_uids))) {
     warning("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
   }

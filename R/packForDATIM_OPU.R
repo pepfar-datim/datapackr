@@ -12,13 +12,13 @@ packForDATIM_OPU <- function(d) {
   if (!d$info$cop_year %in% c(2020, 2021)) {
     stop("The COP year provided is not supported by packForDATIM_OPU")
   }
-  
-  map_des_cocs_local <- 
+
+  map_des_cocs_local <-
     datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
-  
+
   if (d$info$cop_year == 2020) {
     data <- d$data$extract
-    
+
     map_des_cocs_local %<>%
       dplyr::rename(dataelementuid = dataelement) %>%
       dplyr::mutate(
@@ -26,7 +26,7 @@ packForDATIM_OPU <- function(d) {
   } else {
     data <- d$data$SNUxIM
   }
-  
+
   # Add dataElement & categoryOptionCombo ####
   d$datim$OPU <- data %>%
     dplyr::left_join(., (map_des_cocs_local %>%
@@ -44,7 +44,7 @@ packForDATIM_OPU <- function(d) {
       categoryOptionCombo = categoryoptioncombouid,
       attributeOptionCombo = mech_code,
       value)
-  
+
   return(d)
-  
+
 }

@@ -114,7 +114,7 @@ packDataPackSheets <- function(wb,
     } else {
       sheet_data <- NULL
     }
-    
+
     if (sheet == "AGYW") {
       org_units_sheet <- datapackr::valid_PSNUs %>%
         dplyr::filter(country_uid %in% country_uids) %>%
@@ -122,7 +122,7 @@ packDataPackSheets <- function(wb,
         dplyr::arrange(dp_psnu) %>%
         dplyr::filter(!is.na(DREAMS)) %>%
         dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)
-      
+
       if (NROW(org_units_sheet) == 0) {
         next
       }

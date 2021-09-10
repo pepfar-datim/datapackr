@@ -19,7 +19,7 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
                            results_archive = TRUE,
                            d2_session = dynGet("d2_default_session",
                                                inherits = TRUE)) {
-  
+
   # Create data sidecar ####
   d <- list(
     keychain = list(
@@ -36,27 +36,27 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
       snuxim_model_data = snuxim_model_data
     )
   )
-  
+
   # Start running log of all warning and information messages
   d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
-  
+
   if (!d$info$cop_year %in% c(2020, 2021)) {
     stop("Sorry! We're only set up to run this for COP20 or COP21 OPUs.")
   }
-  
+
   # Check if provided model data is empty ####
   if (!is.null(d$data$snuxim_model_data)) {
-    
+
     empty_snuxim_model_data <- d$data$snuxim_model_data %>%
       dplyr::filter(rowSums(is.na(.)) != ncol(.))
-    
+
     if (NROW(empty_snuxim_model_data) == 0) {
       warning("Provided SNUxIM model data seems empty. Attempting to retrieve data from DATIM instead.")
       d$data$snuxim_model_data <- NULL
     }
   }
-  
+
   # If empty or unprovided, pull model data from DATIM ####
   if (is.null(d$data$snuxim_model_data)) {
     d$data$snuxim_model_data <- getOPUDataFromDATIM(cop_year = d$info$cop_year,
@@ -66,7 +66,7 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
       stop("SNUxIM Model data pull seems to have returned no data from DATIM. Please check with DATIM.")
     }
   }
-  
+
   # Prepare totals data for allocation ####
   if (d$info$cop_year == 2021) {
     d$data$UndistributedMER <- d$data$snuxim_model_data %>%
@@ -76,20 +76,20 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
         dplyr::ungroup() %>%
         dplyr::filter(value != 0)
   }
-  
+
   # Open schema ####
   d$info$schema <- pick_schema(cop_year, "OPU Data Pack")
- 
+
   # Open template ####
     # Grab correct schema
   d$keychain$template_path <- pick_template_path(cop_year, "OPU Data Pack")
-    
+
     # Test template against schema ####
   compareTemplateToSchema(template_path = d$keychain$template_path,
                           cop_year = d$info$cop_year,
                           tool = d$info$tool,
                           d2_session = d2_session)
-    
+
     # Place Workbook into play ####
     d$tool$wb <- datapackr::createWorkbook(datapack_name = d$info$datapack_name,
                                            country_uids = d$info$country_uids,
@@ -97,14 +97,14 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
                                            cop_year = d$info$cop_year,
                                            tool = d$info$tool,
                                            d2_session = d2_session)
-    
+
     # Get PSNU List####
     d$data$PSNUs <- datapackr::valid_PSNUs %>%
       dplyr::filter(country_uid %in% d$info$country_uids) %>%
       add_dp_psnu(.) %>%
       dplyr::arrange(dp_psnu) %>%
       dplyr::select(PSNU = dp_psnu, psnu_uid)
-    
+
     # Write PSNUxIM tab ####
     if (d$info$cop_year == 2020) {
       d <- packSNUxIM_OPU(d)
@@ -116,18 +116,18 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
                           tool = d$info$tool,
                           schema = d$info$schema,
                           d2_session = d2_session)
-      
+
       d$tool$wb <- r$wb
       d$info$messages <- appendMessage(d$info$messages, r$message,r$level)
     }
-    
+
     # Save & Export Workbook
     print("Saving...")
     exportPackr(data = d$tool$wb,
                 output_path = d$keychain$output_folder,
                 tool = d$info$tool,
                 datapack_name = d$info$datapack_name)
-    
+
     # Save & Export Archive
     if (results_archive) {
       print("Archiving...")
@@ -136,8 +136,8 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
                   tool = "Results Archive",
                   datapack_name = d$info$datapack_name)
     }
-    
+
 
     printMessages(d$info$messages)
-    
+
 }

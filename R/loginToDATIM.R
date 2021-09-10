@@ -59,7 +59,7 @@ ValidateConfig <- function(dhis_config) {
   is.missing <- function(x) {
     is.na(x) || missing(x) || x == ""
   }
-  
+
   if (is.missing(dhis_config$dhis$username)) {
     stop("Username cannot by blank.")
   }

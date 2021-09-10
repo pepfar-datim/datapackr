@@ -21,7 +21,7 @@ default_catOptCombo <- function() {
 #'
 #' @param x A number.
 #' @param digits Number of digits to round to. Default is 0
-#' 
+#'
 #' @return An integer.
 #' @examples
 #' # If the first digit to be dropped is exactly 5, round_trunc() will round to
@@ -35,7 +35,7 @@ round_trunc <- function(x, digits = 0) {
   z <- trunc(z)
   z <- z / 10^digits
   z * sign(x)
-  
+
 }
 
 
@@ -270,7 +270,7 @@ getCountries <- function(datapack_uid = NA) {
 #'
 addcols <- function(data, cnames, type = "character") {
   add <- cnames[!cnames %in% names(data)]
-  
+
   if (length(add) != 0) {
     if (type == "character") {
       data[add] <- NA_character_
@@ -280,9 +280,9 @@ addcols <- function(data, cnames, type = "character") {
       data[add] <- NA
     }
   }
-  
+
   return(data)
-  
+
 }
 
 #' @export
@@ -486,7 +486,7 @@ prioritization_dict <- function() {
 
 #' @export
 #' @title Take Max along row among columns matching regex
-#' 
+#'
 #' @param df Dataframe
 #' @param cn Name (character string) of Max column to create
 #' @param regex String of regex to use in identifying columns.
@@ -496,30 +496,30 @@ prioritization_dict <- function() {
 rowMax <- function(df, cn, regex) {
   df_filtered <- df %>%
     dplyr::select(tidyselect::matches(match = regex))
-  
+
   if (NCOL(df_filtered) == 0) {
     df[[cn]] <- NA_integer_
     return(df)
   }
-  
+
   df[[cn]] <- df_filtered %>%
     purrr::pmap(pmax, na.rm = T) %>%
     as.numeric
-  
+
   return(df)
 }
 
 #' @export
 #' @title get_Map_DataPack_DATIM_DEs_COCs
-#' 
+#'
 #' @param cop_year cop year to pull get map for
 #'
 #' @return {cop20, cop21}_map_DataPack_DATIM_DEs_COCs
 #'
 getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
-  if (cop_year == 2020) { 
+  if (cop_year == 2020) {
       return(datapackr::cop20_map_DataPack_DATIM_DEs_COCs)
-  } else if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs, 
+  } else if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
                                            datapackr::map_DataPack_DATIM_DEs_COCs)) {
     return(datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
   } else { # if map_DataPack_DATIM_DEs_COCs has drifted or COP year is invalid this notifies us
@@ -530,17 +530,17 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
 
 #' @export
 #' @title getDataPackSchema
-#' 
+#'
 #' @param cop_year cop year to pull get schema for
 #'
 #' @return {cop20, cop21}_data_pack_schema
 #'
 getDataPackSchema <- function(cop_year) {
-  if (cop_year == 2020) { 
+  if (cop_year == 2020) {
     return(datapackr::cop20_data_pack_schema)
   } else if (cop_year == 2021) {
     return(datapackr::cop21_data_pack_schema)
-  } else { 
+  } else {
     stop("Datapack schema not available for the cop year provided")
   }
 
@@ -549,8 +549,8 @@ getDataPackSchema <- function(cop_year) {
 
 #' @export
 #' @title Create a clean Data Pack Workbook shell
-#' 
-#' @param tool Either "Data Pack" or "OPU Data Pack"? Default is "Data Pack". 
+#'
+#' @param tool Either "Data Pack" or "OPU Data Pack"? Default is "Data Pack".
 #' @inheritParams datapackr_params
 #'
 #' @return wb Data Pack Workbook shell
@@ -562,10 +562,10 @@ createWorkbook <- function(datapack_name = NULL,
                            tool = "Data Pack",
                            d2_session = dynGet("d2_default_session",
                                                inherits = TRUE)) {
-  
+
   output_type <- tool
   input_type <- paste0(output_type, " Template")
-  
+
   if (is.null(datapack_name)) {
     datapack_name <- datapackr::valid_PSNUs %>%
       dplyr::select(country_name, country_uid) %>%
@@ -574,17 +574,17 @@ createWorkbook <- function(datapack_name = NULL,
       dplyr::pull(country_name) %>%
       paste(collapse = ", ")
   }
-  
+
   if (is.null(template_path)) {
     template_path <- pick_template_path(cop_year, output_type)
   }
-  
+
   template_path %<>%
     handshakeFile(input_type)
-  
+
   print("Checking template against schema and DATIM...")
   schema <- pick_schema(cop_year, output_type)
-  
+
   schema_check <-
     unPackSchema_datapack(
       filepath = template_path,
@@ -592,30 +592,30 @@ createWorkbook <- function(datapack_name = NULL,
       tool = input_type,
       cop_year = cop_year,
       d2_session = d2_session)
-  
+
   if (!identical(schema, schema_check)) {
     stop("Template provided does not match archived schema.")
   }
-  
+
   wb <- openxlsx::loadWorkbook(template_path)
-  
+
   options("openxlsx.numFmt" = "#,##0")
-  
+
   # Write Home Sheet info ####
   wb <- writeHomeTab(wb = wb,
                     datapack_name = datapack_name,
                     country_uids = country_uids,
                     cop_year = cop_year,
                     tool = output_type)
-  
+
   return(wb)
 }
 
 
 #' @export
 #' @title Compare Data Pack template against schema
-#' 
-#' @param tool Either "Data Pack" or "OPU Data Pack"? Default is "Data Pack". 
+#'
+#' @param tool Either "Data Pack" or "OPU Data Pack"? Default is "Data Pack".
 #' @inheritParams datapackr_params
 #'
 #' @return Message indicating comparison failure or success.
@@ -627,11 +627,11 @@ compareTemplateToSchema <- function(template_path = NULL,
                                                        inherits = TRUE)) {
 
   print("Checking template against schema and DATIM...")
-  
+
   if (is.null(template_path)) {
     template_path <- pick_template_path(cop_year, tool)
   }
-  
+
   template_schema <-
     unPackSchema_datapack(
       filepath = template_path,
@@ -639,9 +639,9 @@ compareTemplateToSchema <- function(template_path = NULL,
       tool = paste0(tool," Template"),
       cop_year = cop_year,
       d2_session = d2_session)
-  
+
   package_schema <- pick_schema(cop_year, tool)
-  
+
   if (!identical(package_schema, template_schema)) {
     stop("Template provided does not match published schema.")
   } else {

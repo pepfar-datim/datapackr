@@ -1,9 +1,9 @@
-context("Analytics creation tests") 
+context("Analytics creation tests")
 
 
 with_mock_api({
   test_that("We can create analytics", {
-    
+
     d <-
       datapackr:::createKeychainInfo(
         submission_path = test_sheet('COP21_DP_random_with_psnuxim.xlsx'),
@@ -18,19 +18,19 @@ with_mock_api({
       packForDATIM(., type = "Undistributed MER") %>%
       packForDATIM(., type = "SUBNAT_IMPATT") %>%
       packForDATIM(., type = "PSNUxIM")
-    
+
     expect_named(d,
                  c("keychain", "info", "tests", "data", "datim"),
                  ignore.order = TRUE)
-    
-    
+
+
     fy22_prioritizations<-getFY22Prioritizations(d)
     expect_type(fy22_prioritizations,"list")
     expect_true(NROW(fy22_prioritizations)>0)
     expect_named(fy22_prioritizations,c("orgUnit","value"),ignore.order = TRUE)
-    
-    d %<>% createAnalytics(d2_session = training) 
-    
+
+    d %<>% createAnalytics(d2_session = training)
+
 
     analytics_column_names <-
       c(

@@ -62,7 +62,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
   } else {
     skip <- c(NA_character_)
   }
-  
+
   return(skip)
 }
 
@@ -89,7 +89,7 @@ headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
 
 #' @export
 #' @title Pick correct schema
-#' 
+#'
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
 #' @param tool Either Data Pack or OPU Data Pack
@@ -127,7 +127,7 @@ pick_schema <- function(cop_year, tool) {
 
 #' @export
 #' @title Pick correct template filepath
-#' 
+#'
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
 #' @param tool Either Data Pack or OPU Data Pack
@@ -137,7 +137,7 @@ pick_schema <- function(cop_year, tool) {
 pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack") {
 
   template_filename<-NULL
-  
+
   if (tool == "OPU Data Pack") {
     if (cop_year == 2020) {
       template_filename <- "COP20_OPU_Data_Pack_Template.xlsx"
@@ -145,7 +145,7 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
       template_filename <- "COP21_OPU_Data_Pack_Template.xlsx"
     }
   }
-  
+
   if (tool == "Data Pack") {
     if (cop_year == 2020) {
       template_filename <- "COP20_Data_Pack_Template_vFINAL.xlsx"
@@ -153,28 +153,28 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
       template_filename <- "COP21_Data_Pack_Template.xlsx"
     }
   }
-  
+
   if (is.null(template_filename)) {
     stop("Could not find any template for the provided paramaters")
   }
-  
+
   template_path <- system.file("extdata",
                                template_filename,
                                package = "datapackr",
                                mustWork = TRUE)
-  
+
   template_path <- handshakeFile(path = template_path,
                                  tool = tool)
-  
+
   return(template_path)
-  
+
 }
 
 
 
 
 #' @title Standardized package function parameter definitions
-#' 
+#'
 #' @param model_data Data from DATIM needed to pack into a COP Data Pack.
 #' @param snuxim_model_data Export from DATIM needed to allocate data across
 #' mechanisms in the PSNUxIM tab
@@ -228,17 +228,17 @@ datapackr_params <- function(model_data,
                              PSNUs,
                              tool,
                              season) {
-  
+
   # This function should return something
   #Return its own argument names
   #rlang::fn_fmls_names(fn = datapackr_params)
-  #or explicitly return 
+  #or explicitly return
   #NULL
 }
 
 #' @export
 #' @title Standardized package function parameter definitions
-#' 
+#'
 #' @inheritParams datapackr_params
 #'
 #' @return params List of valid parameters to use in functions.
@@ -258,9 +258,9 @@ check_params <- function(country_uids,
                          results_archive,
                          d2_session = dynGet("d2_default_session",
                                              inherits = TRUE)) {
-  
+
   params <- list()
-  
+
   # Check Country UIDs ####
   check_country_uids <- function(country_uids = NULL, force = TRUE) {
     if (is.null(country_uids)) {
@@ -268,7 +268,7 @@ check_params <- function(country_uids,
         stop("Must supply country_uids.")
       } else {
         country_uids <- valid_PSNUs$country_uid %>%
-          unique()        
+          unique()
       }
     } else {
       if (any(!country_uids %in% valid_PSNUs$country_uid)) {
@@ -282,16 +282,16 @@ check_params <- function(country_uids,
     }
     return(country_uids)
   }
-  
+
   if (!missing(country_uids)) {
     params$country_uids <- check_country_uids(country_uids)
   }
-  
+
   # Check PSNUs ####
   check_PSNUs <- function(PSNUs = NULL, country_uids = NULL) {
     # If no country_uids provided, return PSNUs across all country_uids.
     country_uids <- check_country_uids(country_uids, force = FALSE)
-    
+
     # FILL
     if (is.null(PSNUs)) { # PSNUs is NULL
       PSNUs <- datapackr::valid_PSNUs %>%
@@ -314,7 +314,7 @@ check_params <- function(country_uids,
     }
     return(PSNUs)
   }
-  
+
   if (!missing(PSNUs)) {
     params$PSNUs <- check_PSNUs(PSNUs, country_uids)
   }
@@ -329,7 +329,7 @@ check_params <- function(country_uids,
     }
     return(cop_year)
   }
-  
+
   if (!missing(cop_year)) {
     params$cop_year <- check_cop_year(cop_year)
   }
@@ -345,11 +345,11 @@ check_params <- function(country_uids,
     }
     return(tool)
   }
-  
+
   if (!missing(tool)) {
     params$tool <- check_tool(tool)
   }
-  
+
   # Check season ####
   check_season <- function(season = NULL, tool = NULL) {
     tool <- check_tool(tool)
@@ -366,19 +366,19 @@ check_params <- function(country_uids,
     }
     return(season)
   }
-  
+
   if (!missing(season)) {
     if (missing(tool)) {
       tool <- check_tool()
     }
     params$season <- check_season(season, tool = tool)
   }
-  
+
   # Check schema ####
   check_schema <- function(schema = NULL, cop_year = NULL, tool = NULL) {
     cop_year <- check_cop_year(cop_year)
     tool <- check_tool(tool)
-    
+
     if (is.null(schema)) {
       schema <- pick_schema(cop_year, tool)
     } else {
@@ -389,11 +389,11 @@ check_params <- function(country_uids,
     }
     return(schema)
   }
-  
+
   if (!missing(schema)) {
     params$schema <- check_schema(schema, cop_year, tool)
   }
-  
+
   # Check datapack_name ####
   check_datapack_name <- function(datapack_name = NULL, country_uids = NULL) {
     if (is.null(datapack_name)) {
@@ -411,7 +411,7 @@ check_params <- function(country_uids,
     }
     return(datapack_name)
   }
-  
+
   if (!missing(datapack_name)) {
     params$datapack_name <- check_datapack_name(datapack_name, country_uids)
   }
@@ -422,17 +422,17 @@ check_params <- function(country_uids,
                                   tool = NULL) {
     cop_year <- check_cop_year(cop_year)
     tool <- check_tool(tool)
-    
+
     if (is.null(template_path)) {
       template_path <- pick_template_path(cop_year, tool)
     } else {
       template_path %<>%
         handshakeFile(tool)
     }
-    
+
     interactive_print("Checking template against schema and DATIM...")
     schema <- pick_schema(cop_year, tool)
-    
+
     input_tool <- paste0(tool, " Template")
     schema_check <-
       unPackSchema_datapack(
@@ -441,18 +441,18 @@ check_params <- function(country_uids,
         tool = input_tool,
         cop_year = cop_year,
         d2_session = d2_session)
-    
+
     if (!identical(schema, schema_check)) {
       stop("Template provided does not match archived schema.")
     }
     return(template_path)
   }
-  
+
   if (!missing(template_path)) {
     params$template_path <- check_template_path(template_path, cop_year, tool)
   }
 
-  
+
   # Check wb ####
   check_wb <- function(wb = NULL,
                        country_uids = NULL,
@@ -466,7 +466,7 @@ check_params <- function(country_uids,
     tool <- check_tool(tool)
     datapack_name <- check_datapack_name(datapack_name, country_uids)
     template_path <- check_template_path(template_path, cop_year, tool)
-    
+
       if (is.null(wb)) {
         wb <- createWorkbook(datapack_name = datapack_name,
                              country_uids = country_uids,
@@ -477,7 +477,7 @@ check_params <- function(country_uids,
       }
     return(wb)
   }
-  
+
   if (!missing(wb)) {
     params$wb <- check_wb(wb = wb,
                           country_uids = country_uids,
@@ -487,48 +487,48 @@ check_params <- function(country_uids,
                           template_path = template_path,
                           d2_session = d2_session)
   }
-  
+
   # Check model_data ####
-  
-  
+
+
   # Check snuxim_model_data ####
   # check_snuxim_model_data <- function(snuxim_model_data = NULL,
   #                                     cop_year = NULL,
   #                                     country_uids = NULL,
   #                                     d2_session) {
-  #   
+  #
   #   cop_year = check_cop_year(cop_year)
   #   country_uids = check_country_uids(country_uids)
-  #   
+  #
   #   if (is.null(snuxim_model_data)) {
-  #     
+  #
   #   }
   #   return(snuxim_model_data)
   # }
-  # 
+  #
   # if (!missing(snuxim_model_data)) {
   #   params$snuxim_model_data <- check_snuxim_model_data(snuxim_model_data = snuxim_model_data,
   #                                                       cop_year = cop_year,
   #                                                       country_uids = country_uids,
   #                                                       d2_session = d2_session)
   # }
-  
+
   # Check output_folder ####
-  
-  
+
+
   # Check results_archive ####
   check_results_archive <- function(results_archive = FALSE) {
-    
+
     if (!isTRUE(results_archive) & !isFALSE(results_archive)) {
       stop("results_archive must be either TRUE or FALSE.")
     }
     return(results_archive)
   }
-  
+
   if (!missing(results_archive)) {
     params$results_archive <- check_results_archive(results_archive)
   }
-  
-  
+
+
   return(params)
 }

@@ -21,7 +21,7 @@ c("HTS_INDEX_COM.New.Pos.T",
 #' @title Check Data Pack for <90\% PMTCT_EID from ≤02 months
 #'
 #' @description Check data gathered from Data Pack to identify cases where
-#' the targeted percent of infants (<1 yr) born to HIV-positive women tested for 
+#' the targeted percent of infants (<1 yr) born to HIV-positive women tested for
 #' HIV (EID) between 0 and 2 months old is less than 90\%.
 #'
 #' @param data Analytics object to analyze
@@ -30,7 +30,7 @@ c("HTS_INDEX_COM.New.Pos.T",
 #'
 analyze_eid_2mo <- function(data) {
   a <- NULL
-  
+
   analysis <- data %>%
     dplyr::mutate(
       PMTCT_EID.T = PMTCT_EID.N.12.T + PMTCT_EID.N.2.T,
@@ -43,15 +43,15 @@ analyze_eid_2mo <- function(data) {
       PMTCT_EID.N.2.T,
       PMTCT_EID.N.12.T,
       PMTCT_EID.2mo.rate)
-  
+
   issues <- analysis %>%
     dplyr::filter(PMTCT_EID.2mo.rate < 0.9)
-  
+
   if (NROW(issues) > 0 ) {
-    
+
     a$test_results <- issues
     attr(a$test_results, "test_name") <- "PMTCT_EID coverage by 2 months issues"
-    
+
     national_avg <- analysis %>%
       dplyr::select(
         PMTCT_EID.T,
@@ -64,8 +64,8 @@ analyze_eid_2mo <- function(data) {
       dplyr::mutate(
         PMTCT_EID.2mo.rate =
           PMTCT_EID.N.2.T / PMTCT_EID.T)
-    
-    a$msg <- 
+
+    a$msg <-
       paste0(
         "WARNING! PMTCT_EID coverage by 2 months old < 90%: \n\n\t* ",
         crayon::bold(
@@ -81,9 +81,9 @@ analyze_eid_2mo <- function(data) {
         crayon::bold(sprintf("%.1f%%",
                              100 * min(issues$PMTCT_EID.2mo.rate))),
         "\n")
-    
+
   }
-  
+
   return(a)
 }
 
@@ -104,7 +104,7 @@ analyze_vmmc_indeterminate <- function(data) {
 
   issues <- data %>%
     dplyr::mutate(
-      VMMC_CIRC.T = 
+      VMMC_CIRC.T =
         (VMMC_CIRC.Pos.T
          + VMMC_CIRC.Neg.T
          + VMMC_CIRC.Unk.T),
@@ -121,7 +121,7 @@ analyze_vmmc_indeterminate <- function(data) {
       VMMC_CIRC.indeterminateRate)
 
   if (NROW(issues) > 0 ) {
-  
+
     a$test_results <- issues
     attr(a$test_results, "test_name") <- "VMMC Indeterminate rate issues"
 
@@ -145,7 +145,7 @@ analyze_vmmc_indeterminate <- function(data) {
            + VMMC_CIRC.Unk.T)
       )
 
-    a$msg <- 
+    a$msg <-
       paste0(
         "WARNING! VMMC_CIRC Indeterminate > 5% : \n\n\t* ",
         crayon::bold(
@@ -165,7 +165,7 @@ analyze_vmmc_indeterminate <- function(data) {
                                national_avg$VMMC_CIRC.indeterminateRate
                              ))),
         "\n")
-  
+
   }
 
   return(a)
@@ -202,7 +202,7 @@ analyze_pmtctknownpos <- function(data) {
       PMTCT_STAT.N.New.Neg.T,
       knownpos_ratio
     ) %>%
-    dplyr::filter(!is.na(knownpos_ratio)) %>% 
+    dplyr::filter(!is.na(knownpos_ratio)) %>%
     dplyr::filter(
       knownpos_ratio > 0.75
     )
@@ -257,7 +257,7 @@ analyze_tbknownpos <- function(data) {
       TB_STAT.N.KnownPos.T,
       TB_STAT.N.New.Neg.T,
       knownpos_ratio) %>%
-    dplyr::filter(!is.na(knownpos_ratio)) %>% 
+    dplyr::filter(!is.na(knownpos_ratio)) %>%
     dplyr::filter(
       knownpos_ratio > 0.75)
 
@@ -302,7 +302,7 @@ analyze_retention <- function(data) {
       TX.Retention.T =
         (TX_CURR.T)
       / (TX_CURR.T_1 + TX_NEW.T)
-    ) %>% 
+    ) %>%
     dplyr::filter(!is.na(TX.Retention.T))
 
   issues <- analysis %>%
@@ -380,7 +380,7 @@ analyze_linkage <- function(data) {
             TX_NEW.T
           / HTS_TST_POS.T
         ),
-      HTS_TST.KP.Linkage.T = 
+      HTS_TST.KP.Linkage.T =
         dplyr::case_when(
           HTS_TST.KP.Pos.T == 0 ~ NA_real_,
           TRUE ~
@@ -416,7 +416,7 @@ analyze_linkage <- function(data) {
          TX_NEW.T / HTS_TST_POS.T,
        HTS_TST.KP.Linkage.T =
          TX_NEW.KP.T / HTS_TST.KP.Pos.T
-      ) 
+      )
 
     a$msg <-
       paste0(
@@ -563,7 +563,7 @@ checkAnalytics <- function(d,
     dplyr::group_by(dplyr::across(-value)) %>%
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup()
-  
+
   # Prepare model data ####
   #TODO: Generalize this as function
   model_data <- readRDS(d$keychain$model_data_path)
@@ -579,7 +579,7 @@ checkAnalytics <- function(d,
     d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg,
                                            analytics_warning_msg)
   }
-  
+
   category_options <- datimutils::getMetadata(end_point = "categoryOptions",
                                               "categories.id:ne:SH885jaRe0o",
                                               d2_session = d2_session)
@@ -600,7 +600,7 @@ checkAnalytics <- function(d,
     dplyr::left_join(dplyr::rename(category_options, key_population = name),
                      by = c("kp_option_uid" = "id")) %>%
     dplyr::select(names(data))
-  
+
   # Add model_data to analytics dataset ####
   data %<>%
     dplyr::bind_rows(model_data_country) %>%
@@ -617,7 +617,7 @@ checkAnalytics <- function(d,
 
 
 
-  #Apply the list of analytics checks functions  
+  #Apply the list of analytics checks functions
   funs <- list(
     retention = analyze_retention,
     linkage = analyze_linkage,
@@ -627,21 +627,21 @@ checkAnalytics <- function(d,
     vmmc_indeterminate_rate = analyze_vmmc_indeterminate,
     eid_coverage_2mo  = analyze_eid_2mo
   )
-  
+
   analytics_checks <-  purrr::map(funs,purrr::exec,data)
-  
+
   d$info$analytics_warning_msg <-
     append(
       d$info$analytics_warning_msg,
-      purrr::map(analytics_checks, 
+      purrr::map(analytics_checks,
                  function(x)purrr::pluck(x,"msg"))) %>%
     purrr::discard(is.null)
-    
+
 
   d$tests <-
     append(d$tests,
-           purrr::map(analytics_checks, 
-                      function(x) purrr::pluck(x,"test_results"))) %>% 
+           purrr::map(analytics_checks,
+                      function(x) purrr::pluck(x,"test_results"))) %>%
     purrr::discard(is.null)
 
   # If warnings, show all grouped by sheet and issue ####

@@ -43,7 +43,7 @@ handshakeFile <- function(path,
   if (is.null(tool)) {
     tool <- "Data Pack"
   }
-  
+
   if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
     extension <- "xlsx"
   } else {

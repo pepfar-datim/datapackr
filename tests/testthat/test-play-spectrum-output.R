@@ -1,11 +1,11 @@
-context("Test Spectrum data generation") 
+context("Test Spectrum data generation")
 
 with_mock_api({
   test_that("We can generate play Spectrum data", {
     test_dataset <- create_play_spectrum_output(country_uids = "qllxzIjjurr",
                                                 cop_year = 2021,
                                                 d2_session = training)
-    
+
     expect_named(
       test_dataset,
       c(
@@ -24,7 +24,7 @@ with_mock_api({
         "district_rse"
       )
     )
-    
+
     types<-c(rep("character",10),"double","integer","integer")
     expect_identical(unname(unlist(lapply(test_dataset,typeof))),types)
     expect_true(all(sapply(test_dataset$psnu_uid,is_uidish)))

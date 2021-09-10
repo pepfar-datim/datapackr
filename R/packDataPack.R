@@ -64,7 +64,7 @@ packDataPack <- function(model_data,
   } else {
     d$info$schema <- datapackr::data_pack_schema
   }
-  
+
   # Open template ####
   # Grab correct schema
   if (is.null(d$keychain$template_path)) {
@@ -73,7 +73,7 @@ packDataPack <- function(model_data,
     } else {
       d$info$template_filename <-  "COP20_Data_Pack_Template_vFINAL.xlsx"
     }
-    
+
     d$keychain$template_path <- system.file("extdata",
                                  d$info$template_filename,
                                  package = "datapackr",
@@ -117,7 +117,7 @@ packDataPack <- function(model_data,
     ## Remove DSNUs
     dplyr::filter(!is.na(psnu_type)) %>%
     dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)
-  
+
   # TODO: Separate PSNUs as parameter for this function, allowing you to include
   # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
 

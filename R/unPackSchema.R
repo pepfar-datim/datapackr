@@ -47,7 +47,7 @@ unPackSchema_datapack <- function(filepath = NULL,
   schema %<>%
     dplyr::filter(sheet_name %in% verbose_sheets,
                   row %in% c(5:(headerRow(tool, cop_year)+1)))
-    
+
   # # Correctly enter array formulas ####
   #   dplyr::mutate(
   #     formula = dplyr::case_when(
@@ -79,7 +79,7 @@ unPackSchema_datapack <- function(filepath = NULL,
   # When formula is empty, pull from value (Assumed value) ####
   schema %<>%
     dplyr::mutate(formula = dplyr::if_else(is.na(formula), value, formula))
-    
+
   # For OPU Data Packs, delete everything in metadata rows/cols
   if (tool == "OPU Data Pack Template") {
     schema %<>%
@@ -94,24 +94,24 @@ unPackSchema_datapack <- function(filepath = NULL,
   empty <- list(tibble::tribble(
     ~name, ~id,
     NA_character_, NA_character_))
-  
+
   if (tool == "OPU Data Pack Template") {
     disaggs <- list(tibble::tribble(
       ~name, ~id,
       NA_character_, NA_character_))
-    
+
     schema %<>%
       dplyr::mutate(
         valid_ages.options = empty,
         valid_sexes.options = empty,
         valid_kps.options = empty
       )
-    
+
   } else {
-    
+
     if (cop_year == 2020) {
       valid_COs <- getValidCategoryOptions(cop_year = cop_year)
-      
+
       disaggs <- valid_COs %>%
         dplyr::select(name = datapack_disagg, id, group = datapack_schema_group) %>%
         dplyr::filter(group != "") %>%
@@ -120,7 +120,7 @@ unPackSchema_datapack <- function(filepath = NULL,
         dplyr::group_by(group) %>%
         tidyr::nest(options = c(name,id)) %>%
         tibble::deframe()
-      
+
       schema %<>%
         dplyr::mutate(
           valid_ages.options = dplyr::case_when(
@@ -147,17 +147,17 @@ unPackSchema_datapack <- function(filepath = NULL,
             TRUE ~ empty)
         )
     } else if (cop_year == 2021) {
-      map_datapack_cogs <- 
+      map_datapack_cogs <-
         datimutils::getMetadata(categoryOptionGroups,
                                 fields = "id,name,categoryOptions[id,name]",
                                 "groupSets.name:like:COP 21 Data Pack",
                                 d2_session = d2_session)
-      
+
     # Left-Pad digits with zeros
       pad <- function(digit) {
         padded <- paste0("0", digit)
       }
-      
+
       map_datapack_cogs %<>%
         dplyr::mutate(
           categoryOptions = purrr::map(
@@ -167,7 +167,7 @@ unPackSchema_datapack <- function(filepath = NULL,
                 name = stringr::str_replace_all(name, "(?<!\\d)\\d(?!\\d)", pad))
           )
         )
-      
+
     # Add disagg lists to schema ####
       map_datapack_cogs %<>%
         dplyr::select(-id) %>%
@@ -177,9 +177,9 @@ unPackSchema_datapack <- function(filepath = NULL,
         dplyr::arrange(datapack_cog, name) %>%
         dplyr::group_by(datapack_cog) %>%
         tidyr::nest(options = c(name,id))
-      
+
       # TODO: Add test to make sure Data Pack COGs match the above list
-      
+
       schema %<>%
         dplyr::left_join(
           map_datapack_cogs %>% dplyr::rename(valid_ages.options = options),
@@ -193,7 +193,7 @@ unPackSchema_datapack <- function(filepath = NULL,
           map_datapack_cogs %>% dplyr::rename(valid_kps.options = options),
           by = c("valid_kps" = "datapack_cog")
         )
-      
+
       schema %<>%
         dplyr::mutate(
           valid_ages.options = dplyr::case_when(
@@ -206,12 +206,12 @@ unPackSchema_datapack <- function(filepath = NULL,
             !is.na(valid_kps) ~ valid_kps.options,
             TRUE ~ empty),
         )
-      
+
     } else {
       stop("Cannot map valid disaggregates for that COP Year")
     }
   }
-  
+
   schema %<>%
     dplyr::select(sheet_num, sheet_name, col, indicator_code,
                   dataset, col_type, value_type,
@@ -221,7 +221,7 @@ unPackSchema_datapack <- function(filepath = NULL,
                   valid_kps = valid_kps.options,
                   formula) %>%
     dplyr::arrange(sheet_num, col)
-  
+
   # Add FY & period to identify targets across years (needed to produce import files)
   schema %<>%
     dplyr::mutate(
@@ -371,16 +371,16 @@ unPackSchema_datapack <- function(filepath = NULL,
   ## Test valid_ages ####
   #     valid_ages.test =
   #      !(valid_ages %in% map_datapack_cogs$options | valid_ages %in% empty),
-  # 
+  #
   # ## Test valid_sexes ####
   #     valid_sexes.test =
   #       !valid_sexes %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog %in% c("Females","Males","M/F")],
   #                           empty),
-  # 
+  #
   # ## Test valid_kps
   #     valid_kps.test =
   #       !valid_kps %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog == "Coarse KPs"],empty),
-  
+
   ## Test formulas
       formula.test = stringr::str_detect(formula, "#REF")
     ) %>%
@@ -411,11 +411,11 @@ unPackSchema_datapack <- function(filepath = NULL,
         "\n")
       )
   }
-  
+
   if (cop_year == 2020) {
     schema <- dplyr::select(schema, -FY, -period)
   }
-  
+
   return(schema)
-  
+
 }

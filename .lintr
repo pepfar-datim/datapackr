@@ -1,5 +1,4 @@
 linters: with_defaults(
-    trailing_whitespace_linter = NULL, # 1769
     commas_linter = NULL, # 1373
     line_length_linter = NULL, # 846
     infix_spaces_linter = NULL, # 320
@@ -157,5 +156,35 @@ exclusions: list(
     "man/validationSummary.Rd",
     "man/writeFxColumnwise.Rd",
     "man/writeHomeTab.Rd",
-    "man/writePSNUxIM.Rd"
+    "man/writePSNUxIM.Rd",
+    "tests/testthat/training.datim.org/api/33/categories.json-6b391d.json",
+    "tests/testthat/training.datim.org/api/33/categoryOptionCombos.json-c119e4.json",
+    "tests/testthat/training.datim.org/api/33/dataElementGroups.json-b17d06.json",
+    "tests/testthat/training.datim.org/api/33/dataElementGroupSets/lD2x0c8kywj.json-25a82e.json",
+    "tests/testthat/training.datim.org/api/33/dataElementGroupSets/LxhLO68FcXm.json-25a82e.json",
+    "tests/testthat/training.datim.org/api/33/dataElementGroupSets/ra9ZqrTtSQn.json-25a82e.json",
+    "tests/testthat/training.datim.org/api/33/dataStore/dataSetAssignments/orgUnitLevels.json",
+    "tests/testthat/training.datim.org/api/33/dataValueSets.csv-1a73cf.json",
+    "tests/testthat/training.datim.org/api/33/indicatorGroups.json-62e0b2.json",
+    "tests/testthat/training.datim.org/api/33/organisationUnits.json-6d090e.json",
+    "tests/testthat/training.datim.org/api/33/organisationUnits.json-7cdd11.json",
+    "tests/testthat/training.datim.org/api/33/sqlViews/DotdxKrNZxG/data.csv-0ee060.json",
+    "tests/testthat/training.datim.org/api/33/sqlViews/DotdxKrNZxG/data.csv-174897.json",
+    "tests/testthat/training.datim.org/api/33/sqlViews/DotdxKrNZxG/data.csv-27f4f5.json",
+    "tests/testthat/training.datim.org/api/33/sqlViews/DotdxKrNZxG/data.csv-50a4b7.json",
+    "tests/testthat/training.datim.org/api/33/sqlViews/DotdxKrNZxG/data.csv-72e8e2.json",
+    "tests/testthat/training.datim.org/api/33/sqlViews/DotdxKrNZxG/data.csv-8c3191.json",
+    "tests/testthat/training.datim.org/api/33/sqlViews/DotdxKrNZxG/data.csv-8cf726.json",
+    "tests/testthat/training.datim.org/api/33/sqlViews/DotdxKrNZxG/data.csv-e4e0c3.json",
+    "tests/testthat/training.datim.org/api/33/sqlViews/DotdxKrNZxG/data.csv-f316bf.json",
+    "tests/testthat/training.datim.org/api/categoryOptionGroups.json-53e429.json",
+    "tests/testthat/training.datim.org/api/dataSets.json-440100.json",
+    "tests/testthat/training.datim.org/api/me.json",
+    "tests/testthat/training.datim.org/api/sqlViews/fgUtV6e9YIX/data.csv-3b3c4f.json",
+    "tests/testthat/sheets/COP20_Data_Pack_Template_vFINAL.xlsx",
+    "tests/testthat/sheets/COP20_OPU_Data_Pack_Template.xlsx",
+    "tests/testthat/sheets/COP21_Data_Pack_Template.xlsx",
+    "tests/testthat/sheets/COP21_DP_random_no_psnuxim.xlsx",
+    "tests/testthat/sheets/COP21_DP_random_with_psnuxim.xlsx",
+    "tests/testthat/sheets/datapack_model_data.rds"
   )

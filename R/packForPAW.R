@@ -1,17 +1,17 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
 #' @title packForPAW
-#'  
-#' @description 
+#'
+#' @description
 #' Prepare dataset for use in PAW.
-#' 
+#'
 #' @param d Datapackr object.
-#' 
+#'
 #' @return Data frame ready for use in PAW
-#' 
+#'
 packForPAW <- function(d) {
-  
-  map_des_cocs_local <- 
+
+  map_des_cocs_local <-
     datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
 
   PSNUs <- datapackr::valid_PSNUs %>%
@@ -28,7 +28,7 @@ packForPAW <- function(d) {
         false = purrr::map_chr(ancestors, list("name",4), .default = NA))
     ) %>%
     dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id, psnu, psnu_uid)
-  
+
     d$data$PAW <- d$data$SNUxIM %>%
       dplyr::bind_rows(d$data$SUBNAT_IMPATT) %>%
       dplyr::left_join(PSNUs, by = c("psnuid" = "psnu_uid")) %>%
@@ -60,6 +60,6 @@ packForPAW <- function(d) {
         indicator = tech_area, numerator_denominator, support_type, hts_modality,
         categoryoptioncombo_id, categoryoptioncombo_name, age = Age, sex = Sex,
         result_value, target_value = value)
-  
+
   return(d)
 }

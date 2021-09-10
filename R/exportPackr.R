@@ -27,7 +27,7 @@ exportPackr <- function(data, output_path, tool, datapack_name) {
       if (is.na(stringr::str_extract(output_path, "/$"))) {
         "/"
       } else {
-      }, 
+      },
       tool,"_",
       datapack_name,"_",
       format(Sys.time(), "%Y%m%d%H%M%S"),

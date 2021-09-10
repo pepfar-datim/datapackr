@@ -8,9 +8,9 @@
 #'     necessary (\code{targets}, \code{extract}, and \code{sheet})
 #'
 #' @param d Datapackr object.
-#' 
+#'
 #' @return d
-#' 
+#'
 separateDataSets <- function(d) {
   d$data$MER <- d$data$targets %>%
     dplyr::filter(
@@ -21,7 +21,7 @@ separateDataSets <- function(d) {
           dplyr::pull(indicator_code)
       )
     )
-  
+
   d$data$SUBNAT_IMPATT <- d$data$targets %>%
     dplyr::filter(
       indicator_code %in% (
@@ -32,9 +32,9 @@ separateDataSets <- function(d) {
           dplyr::pull(indicator_code)
       )
     )
-  
+
   d$data <-
     rlist::list.remove(d$data, c("targets", "extract"))
-  
+
   return(d)
 }

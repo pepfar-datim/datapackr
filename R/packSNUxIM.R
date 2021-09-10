@@ -44,7 +44,7 @@ packSNUxIM <- function(d,
   } else {
     targets_data <- d$data$MER
   }
-  
+
     #TODO: Consider preparing this ahead of time for all OUs
   snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path) %>%
     prepare_model_data.PSNUxIM(snuxim_model_data = .,
@@ -56,7 +56,7 @@ packSNUxIM <- function(d,
   # Do not include AGYW_PREV -- These are not allocated to IMs
   targets_data %<>%
     dplyr::filter(!indicator_code %in% c("AGYW_PREV.N.T", "AGYW_PREV.D.T"))
-  
+
   if (NROW(snuxim_model_data) > 0) {
     snuxim_model_data %<>%
       dplyr::right_join(
@@ -136,12 +136,12 @@ packSNUxIM <- function(d,
                           "sheet_name" = "sheet_name")) %>%
     dplyr::mutate(
       row = as.integer((1:dplyr::n()) + existing_rows),
-      
+
   # Accommodate OGAC request to aggregate OVC_HIVSTAT.T across age/sex ####
       id_col = dplyr::case_when(
         indicator_code == "OVC_HIVSTAT.T" ~ "B",
         TRUE ~ id_col),
-  
+
   # Add DataPackTarget column & classify just that col as formula ####
       DataPackTarget = paste0(
         'SUMIF(',
@@ -183,7 +183,7 @@ packSNUxIM <- function(d,
                +1)),
       col < (col.im.targets[1])) %>%
     dplyr::pull(col)
-  
+
   ## TODO: Improve this next piece to be more efficient instead of using str_replace_all
 
   data_structure %<>%

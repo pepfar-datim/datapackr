@@ -23,7 +23,7 @@ packDataPackSheet <- function(wb,
                               schema = datapackr::data_pack_schema,
                               sheet_data,
                               cop_year = getCurrentCOPYear()) { #TODO: Could we load a play dataset here?
-  
+
   # Prepare data for writing to sheet ####
   sheet_data <- prepareSheetData(sheet = sheet,
                                  org_units = org_units,
@@ -55,16 +55,16 @@ packDataPackSheet <- function(wb,
                        gridExpand = TRUE,
                        stack = TRUE)
   }
-  
+
   # Format HIV_PREV ####
   if (sheet %in% c("Epi Cascade I","Cascade")) {
     percentDecimalCols <- schema %>%
       dplyr::filter(sheet_name == sheet,
                     indicator_code %in% c("HIV_PREV.NA.Age/Sex/HIVStatus.T","HIV_PREV.T_1")) %>%
       dplyr::pull(col)
-    
+
     percentDecimalStyle <- openxlsx::createStyle(numFmt = "0.00%")
-    
+
     openxlsx::addStyle(wb,
                        sheet = sheet,
                        percentDecimalStyle,

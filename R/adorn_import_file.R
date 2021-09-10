@@ -11,7 +11,7 @@
 #' @param filter_rename_output T/F Should this function output the final data in
 #' the new, more complete format?
 #' @param d2_session R6 datimutils object which handles authentication with DATIM
-#' 
+#'
 #' @return data
 #'
 adorn_import_file <- function(psnu_import_file,
@@ -20,10 +20,10 @@ adorn_import_file <- function(psnu_import_file,
                               filter_rename_output = TRUE,
                               d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
-  
+
   # TODO: Generalize this outside the context of COP
   data <- psnu_import_file %>%
-    
+
   # Adorn PSNUs
     dplyr::left_join(
       (valid_PSNUs %>%
@@ -31,7 +31,7 @@ adorn_import_file <- function(psnu_import_file,
         dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id,
                       psnu, psnu_uid, dp_psnu, psnu_type, DREAMS)),
       by = c("orgUnit" = "psnu_uid"))
-  
+
   # Add Prioritizations ####
   if (is.null(psnu_prioritizations)) {
     data %<>%
@@ -41,12 +41,12 @@ adorn_import_file <- function(psnu_import_file,
   } else {
     prio_defined <- prioritization_dict() %>%
       dplyr::select(value, prioritization = name)
-    
+
     prio <- psnu_prioritizations %>%
       dplyr::select(orgUnit, value) %>%
       dplyr::left_join(prio_defined, by = "value") %>%
       dplyr::select(-value)
-    
+
     data %<>%
       dplyr::left_join(prio, by = "orgUnit") %>%
       dplyr::mutate(
@@ -54,10 +54,10 @@ adorn_import_file <- function(psnu_import_file,
           dplyr::case_when(is.na(prioritization) ~ "No Prioritization",
                            TRUE ~ prioritization))
   }
-  
+
   # Adorn Mechanisms ####
   country_uids <- unique(data$country_uid)
-  
+
   mechs <-
     getMechanismView(
       country_uids = country_uids,
@@ -66,7 +66,7 @@ adorn_import_file <- function(psnu_import_file,
       include_MOH = TRUE,
       d2_session = d2_session) %>%
     dplyr::select(-ou, -startdate, -enddate)
-  
+
   # Allow mapping of either numeric codes or alphanumeric uids
   data_codes <- data %>%
     dplyr::filter(stringr::str_detect(attributeOptionCombo, "\\d{4,}")) %>%
@@ -79,13 +79,13 @@ adorn_import_file <- function(psnu_import_file,
         attributeOptionCombo,
         "[A-Za-z][A-Za-z0-9]{10}")) %>%
     dplyr::left_join(mechs, by = c("attributeOptionCombo" = "attributeOptionCombo"))
-  
+
   data <- dplyr::bind_rows(data_codes, data_ids)
-  
+
   map_des_cocs_local <- getMapDataPack_DATIM_DEs_COCs(cop_year)
 
   # Adorn dataElements & categoryOptionCombos ####
-   
+
   # TODO: Is this munging still required with the map being a function of fiscal year?
    if (cop_year == 2020) {
      map_des_cocs_local$valid_sexes.name[map_des_cocs_local$indicator_code == "KP_MAT.N.Sex.T" &
@@ -97,14 +97,14 @@ adorn_import_file <- function(psnu_import_file,
      map_des_cocs_local$valid_kps.name[map_des_cocs_local$indicator_code == "KP_MAT.N.Sex.T" &
                                                         map_des_cocs_local$valid_kps.name == "Female PWID"] <- NA_character_
      #TODO: Fix inconsistent naming of dataelement/dataelementuid
-     map_des_cocs_local %<>% 
+     map_des_cocs_local %<>%
        dplyr::rename(dataelementuid = dataelement,
                      dataelementname = dataelement.y,
-                     categoryoptioncomboname = categoryoptioncombo) %>% 
+                     categoryoptioncomboname = categoryoptioncombo) %>%
        dplyr::mutate(FY = 2021,
                        period = paste0(cop_year,"Oct"))
-     } 
-  
+     }
+
   data %<>%
     dplyr::mutate(
       upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"),
@@ -125,7 +125,7 @@ adorn_import_file <- function(psnu_import_file,
              "fiscal_year" = "FY",
              "period" = "period")
     )
-  
+
   # Select/order columns ####
   if (filter_rename_output) {
     data %<>%
@@ -163,7 +163,7 @@ adorn_import_file <- function(psnu_import_file,
                      target_value = value,
                      indicator_code)
   }
-  
+
   return(data)
-  
+
 }
