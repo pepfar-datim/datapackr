@@ -283,7 +283,7 @@ check_params <- function(country_uids,
     country_uids <- check_country_uids(country_uids, force = FALSE)
     
     # FILL
-    if(is.null(PSNUs)) { # PSNUs is NULL
+    if (is.null(PSNUs)) { # PSNUs is NULL
       PSNUs <- datapackr::valid_PSNUs %>%
         dplyr::filter(., country_uid %in% country_uids) %>%
         add_dp_psnu(.) %>%

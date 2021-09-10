@@ -360,13 +360,13 @@ getDatasetUids <-  function(fiscal_year,
       datasets <- c(datasets,
                     "Zn27xns9Fmx") #Planning Attributes: COP Prioritization SNU
     }
-  } else if(fiscal_year == "2021") {
-    if("mer_targets" %in% type) {
+  } else if (fiscal_year == "2021") {
+    if ("mer_targets" %in% type) {
       datasets <- c(datasets,
                     "Pmc0yYAIi1t", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2021
                     "s1sxJuqXsvV")  # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY) FY2021
     }
-    if("mer_results" %in% type) {
+    if ("mer_results" %in% type) {
       datasets <- c(datasets,
                     "zL8TlPVzEBZ", # MER Results: Facility Based
                     #"",  # MER Results: Facility Based - DoD ONLY
@@ -374,23 +374,23 @@ getDatasetUids <-  function(fiscal_year,
                     "TBcmmtoaCBC", # MER Results: Community Based
                     "qHyrHc4zwx4") # Host Country Results: DREAMS (USG)
     }
-    if("subnat_targets" %in% type) {
+    if ("subnat_targets" %in% type) {
       datasets <- c(datasets,
                     "j7jzezIhgPj") #Host Country Targets: COP Prioritization SNU (USG) FY2021
 
     }
-    if("subnat_results" %in% type) {
+    if ("subnat_results" %in% type) {
       datasets <- c(datasets,
                     "xiTCzZJ2GPP") #Host Country Results: COP Prioritization SNU (USG)
 
     }
-    if("impatt" %in% type) {
+    if ("impatt" %in% type) {
       datasets <- c(datasets,
                     "jxnjnBAb1VD") # Planning Attributes: COP Prioritization SNU FY2021
 
     }
   } else if (fiscal_year == "2020") {
-    if("mer_targets" %in% type) {
+    if ("mer_targets" %in% type) {
       datasets <- c(datasets,
                     "sBv1dj90IX6", # MER Targets: Facility Based FY2020
                     "nIHNMxuPUOR", # MER Targets: Community Based FY2020
@@ -405,27 +405,27 @@ getDatasetUids <-  function(fiscal_year,
                     "em1U5x9hhXh", # MER Results: Facility Based - DoD ONLY
                     "mbdbMiLZ4AA") # Host Country Results: DREAMS (USG) FY2020Q4
     }
-    if("subnat_targets" %in% type) {
+    if ("subnat_targets" %in% type) {
       datasets <- c(datasets,
                     "N4X89PgW01w") # Host Country Targets: COP Prioritization SNU (USG) FY2020
     }
-    if("subnat_results" %in% type) {
+    if ("subnat_results" %in% type) {
       datasets <- c(datasets,
                     "ctKXzmv2CVu") # Host Country Results: COP Prioritization SNU (USG) FY2020Q4
     }
-    if("impatt" %in% type) {
+    if ("impatt" %in% type) {
       datasets <- c(datasets,
                     "pTuDWXzkAkJ") # Planning Attributes: COP Prioritization SNU FY2020
     }
   } else if (fiscal_year == "2019") {
-    if("mer_targets" %in% type) {
+    if ("mer_targets" %in% type) {
       datasets <- c(datasets,
                     "BWBS39fydnX", # MER Targets: Community Based - DoD ONLY FY2019
                     "l796jk9SW7q", # MER Targets: Community Based FY2019
                     "X8sn5HE5inC", # MER Targets: Facility Based - DoD ONLY FY2019
                     "eyI0UOWJnDk") # MER Targets: Facility Based FY2019)
     }
-    if("mer_results" %in% type) {
+    if ("mer_results" %in% type) {
       datasets <- c(datasets,
                     "KWRj80vEfHU", # MER Results: Facility Based FY2019Q4
                     "fi9yMqWLWVy", # MER Results: Facility Based - DoD ONLY FY2019Q4
@@ -433,15 +433,15 @@ getDatasetUids <-  function(fiscal_year,
                     "PyD4x9oFwxJ", # MER Results: Community Based - DoD ONLY FY2019Q4
                     "EbZrNIkuPtc") # Host Country Results: DREAMS (USG) FY2019Q4
     }
-    if("subnat_targets" %in% type) {
+    if ("subnat_targets" %in% type) {
       datasets <- c(datasets,
                     "Ncq22MRC6gd") # Host Country Targets: COP Prioritization SNU (USG) FY2019
     }
-    if("subnat_results" %in% type) {
+    if ("subnat_results" %in% type) {
       datasets <- c(datasets,
                     "iJ4d5HdGiqG") # Host Country Results: COP Prioritization SNU (USG) FY2019Q4
     }
-    if("impatt" %in% type) {
+    if ("impatt" %in% type) {
       datasets <- c(datasets,
                     "pTuDWXzkAkJ") # Planning Attributes: COP Prioritization SNU FY2020 - last used FY2020 also valid for FY2019
 

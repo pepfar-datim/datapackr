@@ -21,7 +21,7 @@ deriveTargets <- function(data, type) {
       )
     )
   
-  if(NROW(derived) > 0) {
+  if (NROW(derived) > 0) {
     derived %<>%
       dplyr::mutate(
         indicatorCode =

@@ -21,7 +21,7 @@ getCOPDataFromDATIM <- function(country_uids,
                                 streams = c("mer_targets", "subnat_targets", "impatt"),
                                 d2_session = dynGet("d2_default_session",
                                                     inherits = TRUE)) {
-  if(!cop_year %in% c(2020, 2021)) {
+  if (!cop_year %in% c(2020, 2021)) {
     stop("The COP year provided is not supported by the internal function getCOPDataFromDATIM")
   }
   

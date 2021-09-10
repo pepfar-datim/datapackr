@@ -107,7 +107,7 @@ unPackSchema_datapack <- function(filepath = NULL,
     
   } else {
     
-    if(cop_year == 2020) {
+    if (cop_year == 2020) {
       valid_COs <- getValidCategoryOptions(cop_year = cop_year)
       
       disaggs <- valid_COs %>%

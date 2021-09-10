@@ -58,8 +58,8 @@ unPackOPU_PSNUxIM <- function(d) {
     # d <- checkColStructure(d, sheet)
   
   # Pare down to updated targets only ####
-  d$data$extract <- 
-    d$data$extract[c(cols_to_keep$col,(max(cols_to_keep$col)+1):NCOL(d$data$extract))]
+  d$data$extract <-
+    d$data$extract[c(cols_to_keep$col, (max(cols_to_keep$col) + 1):NCOL(d$data$extract))]
   
   # TEST: Blank Col Names; Error; Drop ####
   blank_col_headers <- names(d$data$extract)[which(nchar(names(d$data$extract))==0)]

@@ -273,7 +273,7 @@ unPackSNUxIM <- function(d) {
   
   # TEST: Non-numeric data; Warn; Convert & Drop ####
   # TODO: Make compatible for OPUs
-  if(d$info$tool == "Data Pack") {
+  if (d$info$tool == "Data Pack") {
     d <- checkNumericValues(d, sheet, header_cols)
   }
   

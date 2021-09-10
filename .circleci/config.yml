@@ -30,3 +30,7 @@ jobs:
           name: Test package
           command: | 
                R -e "devtools::check(error_on='error')"
+       - run: 
+          name: Lint packages
+          command: |
+               - Rscript -e 'lintr::lint_package()'

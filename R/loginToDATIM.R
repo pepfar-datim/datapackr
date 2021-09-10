@@ -73,7 +73,7 @@ DHISLogin<-function(dhis_config) {
   r <- httr::GET(url ,
                  httr::authenticate(dhis_config$dhis$username, dhis_config$dhis$password),
                  httr::timeout(60))
-  if(!isLoggedIn()) {
+  if (!isLoggedIn()) {
     stop("Could not authenticate you with the server!")
   } else {
     me <- jsonlite::fromJSON(httr::content(r,as = "text"))

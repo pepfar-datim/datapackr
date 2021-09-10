@@ -22,5 +22,3 @@ play2361 <- list(base_url = "https://play.dhis2.org/2.36.1/",
 
 training <- list(base_url = "https://training.datim.org/",
                  handle = httr::handle("https://training.datim.org/"))
-
-

@@ -269,7 +269,7 @@ unPackDataPackSheet <- function(d, sheet) {
   d$tests$non_numeric<-dplyr::bind_rows(d$tests$non_numeric,non_numeric)
   attr(d$tests$non_numeric,"test_name")<-"Non-numeric values"
 
-  if(NROW(non_numeric) > 0) {
+  if (NROW(non_numeric) > 0) {
 
     warning_msg <-
       paste0(
