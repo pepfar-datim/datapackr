@@ -34,4 +34,4 @@ jobs:
           name: Lint packages
           command: |
                 R -e "install.packages('lintr')"
-                R -e "lintr::lint_package()"
+                R -e "if ( NROW(lintr::lint_package()) > 0 ) stop('Linting failed')"
