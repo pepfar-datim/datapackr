@@ -21,8 +21,9 @@ MessageQueue <- function(message=character(),level=character())
 }
 
 
-appendMessage<-function(x,message,level) {
-  UseMethod("appendMessage",x) }
+appendMessage <- function(x, message, level) {
+  UseMethod("appendMessage", x)
+}
 
 appendMessage.MessageQueue<-function(x, message=NA,level=NA) {
   

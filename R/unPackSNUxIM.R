@@ -57,7 +57,9 @@ unPackSNUxIM <- function(d) {
     
     return(d)
     
-  } else {d$info$has_psnuxim <- TRUE}
+  } else {
+    d$info$has_psnuxim <- TRUE
+  }
   
   # TEST: Duplicate Rows; Warn; Combine ####
   duplicates <- d$data$SNUxIM %>%

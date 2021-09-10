@@ -19,7 +19,9 @@ packSNUxIM_2020 <- function(d) {
   # Check if SNUxIM data already exists ####
   if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM$PSNU[1])) {
     d$info$has_psnuxim <- FALSE
-  } else {d$info$has_psnuxim <- TRUE}
+  } else {
+    d$info$has_psnuxim <- TRUE
+  }
   
   # If does exist, check what combos are missing ####
   if (d$info$has_psnuxim) {

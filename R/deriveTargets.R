@@ -43,6 +43,8 @@ deriveTargets <- function(data, type) {
     
     return(combined)
     
-  } else {return(data)}
+  } else {
+    return(data)
+    }
   
 }

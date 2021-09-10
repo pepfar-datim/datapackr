@@ -22,7 +22,9 @@ getValidCategoryOptions <- function(cop_year = getCurrentCOPYear()) {
     dplyr::filter(id %in% unique(fullCodeList$categoryoptioncombouid))
 
   ## All valid COs for COP FY grouped by category ####
-  pad <- function(digit) {padded <- paste0("0", digit)}
+  pad <- function(digit) {
+    padded <- paste0("0", digit)
+  }
 
   five_year_age_names <- c("<01","01-04","05-09","10-14","15-19","20-24",
                            "25-29","30-34","35-39","40-44","45-49","50+")

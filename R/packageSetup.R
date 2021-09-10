@@ -5,7 +5,9 @@
 #'
 #' @return Current COP Year. (e.g., for COP19, returns 2019)
 #'
-getCurrentCOPYear <- function() { 2021 }
+getCurrentCOPYear <- function() {
+  2021
+}
 
 
 #' @export
@@ -13,14 +15,18 @@ getCurrentCOPYear <- function() { 2021 }
 #'
 #' @return Cell reference where the name of the tool is located.
 #'
-toolName_homeCell<-function() {"B10"}
+toolName_homeCell <- function() {
+  "B10"
+}
 
 #' @export
 #' @title Location of Country UIDs on Home tab.
 #'
 #' @return Cell reference where the name of the DataPack is located.
 #'
-countryUIDs_homeCell <- function() { "B25" }
+countryUIDs_homeCell <- function() {
+  "B25"
+}
 
 
 #' @export
@@ -28,7 +34,9 @@ countryUIDs_homeCell <- function() { "B25" }
 #'
 #' @return Cell reference where the name of the datapack can be found.
 #'
-dataPackName_homeCell <- function() { "B20" }
+dataPackName_homeCell <- function() {
+  "B20"
+}
 
 
 #' @export
@@ -134,14 +142,16 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
     if (cop_year == 2020) {
       template_filename <- "COP20_OPU_Data_Pack_Template.xlsx"
     } else if (cop_year == 2021) {
-      template_filename <- "COP21_OPU_Data_Pack_Template.xlsx"}  
+      template_filename <- "COP21_OPU_Data_Pack_Template.xlsx"
+    }
   }
   
   if (tool == "Data Pack") {
     if (cop_year == 2020) {
       template_filename <- "COP20_Data_Pack_Template_vFINAL.xlsx"
     } else if (cop_year == 2021) {
-      template_filename <- "COP21_Data_Pack_Template.xlsx"}
+      template_filename <- "COP21_Data_Pack_Template.xlsx"
+    }
   }
   
   if (is.null(template_filename)) {
@@ -311,7 +321,9 @@ check_params <- function(country_uids,
 
   # Check cop_year ####
   check_cop_year <- function(cop_year = getCurrentCOPYear()) {
-    if (is.null(cop_year)) {cop_year <- getCurrentCOPYear()}
+    if (is.null(cop_year)) {
+      cop_year <- getCurrentCOPYear()
+    }
     if (!cop_year %in% c(2020, 2021)) {
       stop("Sorry, datapackr only supports COP20 and COP21 Data Packs.")
     }
@@ -344,7 +356,9 @@ check_params <- function(country_uids,
     if (is.null(season)) {
       if (tool == "OPU Data Pack") {
         season <- "OPU"
-      } else {season <- "COP"}
+      } else {
+        season <- "COP"
+      }
     } else {
       if (!season %in% c("COP", "OPU")) {
         stop("Cannot support any tools other than `COP` or `OPU`")
@@ -354,7 +368,9 @@ check_params <- function(country_uids,
   }
   
   if (!missing(season)) {
-    if (missing(tool)) {tool <- check_tool()}
+    if (missing(tool)) {
+      tool <- check_tool()
+    }
     params$season <- check_season(season, tool = tool)
   }
   

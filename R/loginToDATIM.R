@@ -30,7 +30,8 @@ LoadConfigFile <- function(config_path = NULL) {
       stringi::stri_reverse(gsub("^/+", "/", paste0("/",stringi::stri_reverse(dhis_config$dhis$baseurl))))
     return(dhis_config)
   } else {
-    stop("You must specify a credentials file!") }
+    stop("You must specify a credentials file!")
+  }
 }
 
 #' @export
@@ -38,8 +39,9 @@ LoadConfigFile <- function(config_path = NULL) {
 #'
 #' @return Version of the API
 #'
-api_version <- function() { "33" }
-
+api_version <- function() {
+  "33"
+}
 
 #' @title Check login credentials
 #'
@@ -49,14 +51,24 @@ api_version <- function() { "33" }
 #' @param dhis_config List of DATIM login credentials, including username,
 #' password, and login URL.
 #'
-ValidateConfig<-function(dhis_config) {
-
-  is.baseurl <- function(x) { grepl("^http(?:[s])?://.+datim.org/$", x)}
-  is.missing <- function(x) { is.na(x) || missing(x) || x == "" }
-
-  if (is.missing(dhis_config$dhis$username)) {stop("Username cannot by blank.")}
-  if (is.missing(dhis_config$dhis$password)) {stop("Password cannot by blank.")}
-  if (!is.baseurl(dhis_config$dhis$baseurl)) {stop("The base URL does not appear to be valid. It should end in /")}
+ValidateConfig <- function(dhis_config) {
+  is.baseurl <-
+    function(x) {
+      grepl("^http(?:[s])?://.+datim.org/$", x)
+    }
+  is.missing <- function(x) {
+    is.na(x) || missing(x) || x == ""
+  }
+  
+  if (is.missing(dhis_config$dhis$username)) {
+    stop("Username cannot by blank.")
+  }
+  if (is.missing(dhis_config$dhis$password)) {
+    stop("Password cannot by blank.")
+  }
+  if (!is.baseurl(dhis_config$dhis$baseurl)) {
+    stop("The base URL does not appear to be valid. It should end in /")
+  }
 }
 
 

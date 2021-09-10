@@ -52,7 +52,8 @@ prepare_model_data.PSNUxIM <- function(snuxim_model_data,
     dplyr::ungroup()
   
   if (NROW(percents) != NROW(values)) {
-    stop("Aggregating values and percents led to different row counts!")}
+    stop("Aggregating values and percents led to different row counts!")
+  }
   
   snuxim_model_data <- values %>%
     dplyr::left_join(percents,

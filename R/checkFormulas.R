@@ -93,7 +93,8 @@ checkFormulas <- function(d, sheet) {
       by = 
         {if (sheet == "PSNUxIM" & d$info$tool == "Data Pack") {
           c("col" = "col")
-          } else {c("indicator_code" = "indicator_code")}
+        } else {c("indicator_code" = "indicator_code")
+            }
         }
     ) %>%
     dplyr::filter(formula.x != formula.y) %>%

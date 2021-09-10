@@ -14,7 +14,8 @@ getMechanismViewFromDATIM <- function( cop_year = NULL,
     {if (!is.null(cop_year))
       paste0(., "&filter=startdate:lt:", cop_year+1, "-10-01",
              "&filter=enddate:gt:", cop_year, "-09-30")
-      else . } %>%
+      else . 
+      } %>%
     utils::URLencode() %>%
     httr::GET(httr::timeout(180), handle = d2_session$handle) %>%
     httr::content(., "text") %>%

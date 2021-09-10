@@ -30,7 +30,9 @@ unPackSheets <- function(d) {
     
     if (d$info$tool == "Data Pack") {
       d <- unPackDataPackSheet(d, sheet = sheet)
-    } else {stop("Cannot process that kind of tool. :(")}
+    } else {
+      stop("Cannot process that kind of tool. :(")
+    }
     
     if (!is.null(d$data$extract)) {
       d$data$targets <- dplyr::bind_rows(d$data$targets, d$data$extract)

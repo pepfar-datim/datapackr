@@ -38,7 +38,9 @@ unPackSchema_datapack <- function(filepath = NULL,
   data.table::setDT(schema)[,sheet_num:=.GRP, by = c("sheet_name")]
 
   # Skip detail on listed sheets. ####
-  if (is.null(skip)) {skip <- skip_tabs(tool = tool, cop_year = cop_year)}
+  if (is.null(skip)) {
+    skip <- skip_tabs(tool = tool, cop_year = cop_year)
+  }
   sheets <- tidyxl::xlsx_sheet_names(filepath)
   verbose_sheets <- sheets[!sheets %in% skip]
 
@@ -152,7 +154,9 @@ unPackSchema_datapack <- function(filepath = NULL,
                                 d2_session = d2_session)
       
     # Left-Pad digits with zeros
-      pad <- function(digit) {padded <- paste0("0", digit)}
+      pad <- function(digit) {
+        padded <- paste0("0", digit)
+      }
       
       map_datapack_cogs %<>%
         dplyr::mutate(
@@ -203,7 +207,9 @@ unPackSchema_datapack <- function(filepath = NULL,
             TRUE ~ empty),
         )
       
-    } else {stop("Cannot map valid disaggregates for that COP Year")}
+    } else {
+      stop("Cannot map valid disaggregates for that COP Year")
+    }
   }
   
   schema %<>%
@@ -378,8 +384,13 @@ unPackSchema_datapack <- function(filepath = NULL,
   ## Test formulas
       formula.test = stringr::str_detect(formula, "#REF")
     ) %>%
-    dplyr::select(sheet_name,indicator_code,dplyr::matches("test")) %>%
-    {if (tool == "OPU Data Pack Template") dplyr::select(., -dataset.test, -col_type.test, -value_type.test) else .} %>%
+    dplyr::select(sheet_name, indicator_code, dplyr::matches("test")) %>%
+    {
+      if (tool == "OPU Data Pack Template")
+        dplyr::select(.,-dataset.test,-col_type.test,-value_type.test)
+      else
+        .
+    } %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("test")), dplyr::any_vars(. == TRUE))
 
   if (NROW(tests) > 0) {

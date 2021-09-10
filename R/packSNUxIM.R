@@ -20,7 +20,9 @@ packSNUxIM <- function(d,
   # Check if SNUxIM data already exists ####
   if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM$PSNU[1])) {
     d$info$has_psnuxim <- FALSE
-  } else {d$info$has_psnuxim <- TRUE}
+  } else {
+    d$info$has_psnuxim <- TRUE
+  }
 
   # If does exist, extract missing combos ####
   if (d$info$has_psnuxim) {
@@ -102,7 +104,8 @@ packSNUxIM <- function(d,
 
     if (NROW(col_letter) == 0) {
       col_letter <- data %>%
-        dplyr::filter(indicator_code == "PSNU")}
+        dplyr::filter(indicator_code == "PSNU")
+    }
 
     col_letter %<>%
       dplyr::pull(submission_order) %>%

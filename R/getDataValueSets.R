@@ -24,12 +24,19 @@ getDataValueSets <- function(keys, values,
   #  row col   expected     actual         file
   #  1  -- 11 columns 10 columns literal data
   
-  data <- httr::GET(api_call,handle = d2_session$handle) %>%
-    httr::content(.,"text") %>% 
-    {suppressWarnings(readr::read_csv(.,col_names = TRUE, 
-                    col_types = readr::cols(.default = "c", 
-                                            value = "d", 
-                                            lastupdated = "T")))} %>%
+  data <- httr::GET(api_call, handle = d2_session$handle) %>%
+    httr::content(., "text") %>%
+    {
+      suppressWarnings(readr::read_csv(
+        .,
+        col_names = TRUE,
+        col_types = readr::cols(
+          .default = "c",
+          value = "d",
+          lastupdated = "T"
+        )
+      ))
+    } %>% 
     dplyr::rename(data_element = dataelement, 
                   org_unit = orgunit,
                   category_option_combo = categoryoptioncombo,

@@ -24,7 +24,10 @@ exportPackr <- function(data, output_path, tool, datapack_name) {
   packName <- function(output_path, tool, datapack_name, extension) {
     paste0(
       output_path,
-      if (is.na(stringr::str_extract(output_path,"/$"))) {"/"} else {},
+      if (is.na(stringr::str_extract(output_path, "/$"))) {
+        "/"
+      } else {
+      }, 
       tool,"_",
       datapack_name,"_",
       format(Sys.time(), "%Y%m%d%H%M%S"),

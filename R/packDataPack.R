@@ -58,17 +58,21 @@ packDataPack <- function(model_data,
 
   # Open schema ####
   if (d$info$cop_year == 2020) {
-   d$info$schema <-  datapackr::cop20_data_pack_schema
+    d$info$schema <-  datapackr::cop20_data_pack_schema
   } else if (d$info$cop_year == 2021) {
     d$info$schema <- datapackr::cop21_data_pack_schema
-  } else {d$info$schema <- datapackr::data_pack_schema}
-
+  } else {
+    d$info$schema <- datapackr::data_pack_schema
+  }
+  
   # Open template ####
   # Grab correct schema
   if (is.null(d$keychain$template_path)) {
     if (cop_year == 2021) {
       d$info$template_filename <- "COP21_Data_Pack_Template.xlsx"
-    } else {d$info$template_filename <-  "COP20_Data_Pack_Template_vFINAL.xlsx"}
+    } else {
+      d$info$template_filename <-  "COP20_Data_Pack_Template_vFINAL.xlsx"
+    }
     
     d$keychain$template_path <- system.file("extdata",
                                  d$info$template_filename,

@@ -3,7 +3,9 @@
 #'
 #' @return `Default` categoryOptionCombo uid.
 #'
-default_catOptCombo <- function() { "HllvX50cXC0" }
+default_catOptCombo <- function() {
+  "HllvX50cXC0"
+}
 
 
 #' @title Round at 0.5 toward integer with highest absolute value
@@ -166,7 +168,9 @@ writeFxColumnwise <- function(wb, sheet, x, xy) {
 #' @return Printed message, \code{x}.
 #'
 interactive_print <- function(x) {
-  if (interactive()) { print(x) }
+  if (interactive()) {
+    print(x)
+  }
 }
 
 
@@ -266,15 +270,19 @@ getCountries <- function(datapack_uid = NA) {
 #'
 addcols <- function(data, cnames, type = "character") {
   add <- cnames[!cnames %in% names(data)]
-
+  
   if (length(add) != 0) {
-    if (type == "character") {data[add] <- NA_character_
-    } else if (type == "numeric") {data[add] <- NA_real_
-    } else if (type == "logical") {data[add] <- NA}
+    if (type == "character") {
+      data[add] <- NA_character_
+    } else if (type == "numeric") {
+      data[add] <- NA_real_
+    } else if (type == "logical") {
+      data[add] <- NA
+    }
   }
-
+  
   return(data)
-
+  
 }
 
 #' @export
@@ -307,20 +315,20 @@ isLoggedIn <- function(d2_session = dynGet("d2_default_session",
   baseurl <- d2_session$base_url
 
   if (is.null(baseurl)) {
-    return(FALSE)} else {
-      httr::set_config(httr::config(http_version = 0))
-      url <- URLencode(URL = paste0(baseurl, "api/me"))
-      #Logging in here will give us a cookie to reuse
-      r <- httr::GET(url,
-                     httr::timeout(180),
-                     handle = d2_session$handle)
-      if (r$status != 200L) {
-        return(FALSE)
-      } else {
-
-        return(TRUE)
-      }
+    return(FALSE)
+  } else {
+    httr::set_config(httr::config(http_version = 0))
+    url <- URLencode(URL = paste0(baseurl, "api/me"))
+    #Logging in here will give us a cookie to reuse
+    r <- httr::GET(url,
+                   httr::timeout(180),
+                   handle = d2_session$handle)
+    if (r$status != 200L) {
+      return(FALSE)
+    } else {
+      return(TRUE)
     }
+  }
 }
 
 

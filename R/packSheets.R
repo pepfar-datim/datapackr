@@ -91,7 +91,9 @@ packDataPackSheets <- function(wb,
 
     sheets <- wb_sheets[wb_sheets %in% schema_sheets]
 
-    if (length(sheets) == 0) {stop("This template file does not appear to be normal.")}
+    if (length(sheets) == 0) {
+      stop("This template file does not appear to be normal.")
+    }
   }
 
   # Loop through sheets ####

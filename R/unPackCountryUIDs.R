@@ -65,7 +65,9 @@ unPackCountryUIDs <- function(submission_path,
       blank_psnus <- TRUE
     } else if (all(is.na(PSNUs$PSNU))) {
       blank_psnus <- TRUE
-    } else {blank_psnus <- FALSE}
+    } else {
+      blank_psnus <- FALSE
+    }
     
     if (!blank_psnus) {
       country_uids <- unique(PSNUs$country_uid)

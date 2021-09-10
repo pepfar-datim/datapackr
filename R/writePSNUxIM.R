@@ -56,7 +56,9 @@ writePSNUxIM <- function(d,
     } else {
       stop(paste0("Packing SNU x IM tabs is not supported for COP ",d$info$cop_year," Data Packs."))
     }
-  } else {stop("Cannot update PSNUxIM tab without model data.")}
+  } else {
+    stop("Cannot update PSNUxIM tab without model data.")
+  }
 
   # If new information added to SNU x IM tab, reexport Data Pack for user ####
   if (d$info$newSNUxIM) {

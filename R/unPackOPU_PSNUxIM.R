@@ -52,7 +52,9 @@ unPackOPU_PSNUxIM <- function(d) {
     
     return(d)
     
-  } else {d$info$has_psnuxim <- TRUE}
+  } else {
+    d$info$has_psnuxim <- TRUE
+  }
   
   # TODO: Check column structures ####
     # d <- checkColStructure(d, sheet)
