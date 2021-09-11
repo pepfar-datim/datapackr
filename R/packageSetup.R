@@ -86,24 +86,32 @@ headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
 #' @return Schema file for given cop_year and tool type
 #'
 pick_schema <- function(cop_year, tool) {
-  
+  supported_tools <- c("Data Pack", "OPU Data Pack")
+  if (!(tool %in% supported_tools)) {
+    stop("The specified tool type is not supported")
+  }
+
   if (tool == "OPU Data Pack") {
     if (cop_year == 2020) {
-      schema <- datapackr::cop20OPU_data_pack_schema
+      return(datapackr::cop20OPU_data_pack_schema)
     } else if (cop_year == 2021) {
-      schema <- datapackr::cop21OPU_data_pack_schema}  
+      return(datapackr::cop21OPU_data_pack_schema)
+    } else {
+      stop("The specified OPU year is not supported")
+    }
   }
-  
+
   if (tool == "Data Pack") {
     if (cop_year == 2020) {
-      schema <- datapackr::cop20_data_pack_schema
+      return(datapackr::cop20_data_pack_schema)
     } else if (cop_year == 2021) {
-      schema <- datapackr::cop21_data_pack_schema
-    } else {schema <- datapackr::data_pack_schema}
+      return(datapackr::cop21_data_pack_schema)
+    } else {
+      return(datapackr::data_pack_schema)
+    }
   }
-  
-  return(schema)
 
+  stop("Could not find any schema for you.")
 }
 
 #' @export
@@ -116,8 +124,8 @@ pick_schema <- function(cop_year, tool) {
 #' @return Template filepath for given cop_year and tool.
 #'
 pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack") {
-  if (is.null(cop_year)) {cop_year = getCurrentCOPYear()}
-  if (is.null(tool)) {tool = "Data Pack"}
+
+  template_filename<-NULL
   
   if (tool == "OPU Data Pack") {
     if (cop_year == 2020) {
@@ -131,6 +139,10 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
       template_filename <- "COP20_Data_Pack_Template_vFINAL.xlsx"
     } else if (cop_year == 2021) {
       template_filename <- "COP21_Data_Pack_Template.xlsx"}
+  }
+  
+  if (is.null(template_filename)) {
+    stop("Could not find any template for the provided paramaters")
   }
   
   template_path <- system.file("extdata",
@@ -164,6 +176,7 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
 #' @param template_path Local filepath to Data Pack template Excel (XLSX) file.
 #' This file MUST NOT have any data validation formats present. If left
 #' \code{NULL}, will select the default based on \code{cop_year} and \code{tool}.
+#' @param submission_path Local path to the file to import.
 #' @param cop_year COP Year to use for tailoring functions. Remember,
 #' FY22 targets = COP21.
 #' @param output_folder Local folder where you would like your Data Pack to be
@@ -190,6 +203,7 @@ datapackr_params <- function(model_data,
                              datapack_name,
                              country_uids,
                              template_path,
+                             submission_path,
                              cop_year,
                              output_folder,
                              results_archive,

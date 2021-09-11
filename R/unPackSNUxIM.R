@@ -29,18 +29,25 @@ unPackSNUxIM <- function(d) {
   
   if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1,1]])) {
     d$info$has_psnuxim <- FALSE
-    d$info$needs_psnuxim <- TRUE
 
-    warning_msg <- 
-      paste0(
-        "WARNING! Your Data Pack needs a new PSNUxIM tab. Please select `Regenerate PSNUxIM`",
-        " to receive an updated copy of your Data Pack with new rows added",
-        " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
-        " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack,",
-        " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
-        " all changes to other tabs of your Data Pack are complete.  Once all other updates",
-        " are complete, you may return here to update your PSNUxIM tab at any time.",
-        "\n")
+    if (d$info$tool == "Data Pack") {
+      d$info$needs_psnuxim <- TRUE
+      warning_msg <- 
+        paste0(
+          "WARNING! Your Data Pack needs a new PSNUxIM tab. Please select `Regenerate PSNUxIM`",
+          " to receive an updated copy of your Data Pack with new rows added",
+          " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
+          " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack,",
+          " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
+          " all changes to other tabs of your Data Pack are complete.  Once all other updates",
+          " are complete, you may return here to update your PSNUxIM tab at any time.",
+          "\n")
+    } else if (d$info$tool == "OPU Data Pack") {
+      warning_msg <- paste0(
+        "WARNING! Your OPU Data Pack's PSNUxIM tab appears to be empty. Please",
+        " investigate and resubmit."
+      )
+    }
     
     d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
     
@@ -90,7 +97,7 @@ unPackSNUxIM <- function(d) {
   # Run structural checks ####
   d <- checkColStructure(d, sheet)
   
-  # Pare down to populated, updated targets only ####
+  # Save snapshot of original targets ####
   cols_to_keep <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet,
                   !is.na(indicator_code),
@@ -100,6 +107,25 @@ unPackSNUxIM <- function(d) {
   header_cols <- cols_to_keep %>%
     dplyr::filter(col_type == "row_header")
   
+  if (d$info$tool == "Data Pack") {
+    original_targets <- d$data$MER
+  } else {
+    original_targets <- d$data$SNUxIM %>%
+      dplyr::select(header_cols$indicator_code, "DataPackTarget") %>%
+      {suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)),
+                                         as.numeric))
+      } %>%
+      dplyr::group_by(dplyr::across(header_cols$indicator_code)) %>%
+      dplyr::summarise(DataPackTarget = sum(DataPackTarget)) %>%
+      dplyr::mutate(
+        psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)"),
+        sheet_name = sheet
+      ) %>%
+      dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop,
+                    value = DataPackTarget)
+  }
+  
+  # Pare down to populated, updated targets only ####
   d$data$SNUxIM <- d$data$SNUxIM[,cols_to_keep$col]
 
   d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
@@ -140,7 +166,10 @@ unPackSNUxIM <- function(d) {
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
   
   # TEST: Missing key metadata; Error; Drop ####
-  d <- checkMissingMetadata(d, sheet)
+  # TODO: Make compatible for OPUs
+  if (d$info$tool == "Data Pack") {
+    d <- checkMissingMetadata(d, sheet)
+  }
   
   # d$data$SNUxIM %<>%
   #   dplyr::filter_at(dplyr::vars(PSNU, indicator_code), dplyr::any_vars(!is.na(.)))
@@ -236,7 +265,10 @@ unPackSNUxIM <- function(d) {
   # --> This also removes non-essential text from IM name to leave only 12345_DSD format.
   
   # TEST: Non-numeric data; Warn; Convert & Drop ####
-  d <- checkNumericValues(d, sheet, header_cols)
+  # TODO: Make compatible for OPUs
+  if(d$info$tool == "Data Pack") {
+    d <- checkNumericValues(d, sheet, header_cols)
+  }
   
   #sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
   
@@ -420,32 +452,34 @@ unPackSNUxIM <- function(d) {
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
     dplyr::distinct()
   
-  d$data$missingCombos <- d$data$MER %>%
-    dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
-    dplyr::anti_join(d$data$PSNUxIM_combos,
-                     by =  c("PSNU", "psnuid", "indicator_code", "Age", "Sex", "KeyPop"))
-  
-  d$tests$missing_combos <- d$data$missingCombos
-  attr(d$tests$missing_combos,"test_name") <- "Missing target combinations"
-  
-  d$info$missing_psnuxim_combos <- ( NROW(d$data$missingCombos) > 0 )
-  
-  if (d$info$missing_psnuxim_combos) {
-    d$info$needs_psnuxim <- TRUE
+  if (d$info$tool == "Data Pack") {
+    d$data$missingCombos <- d$data$MER %>%
+      dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
+      dplyr::anti_join(d$data$PSNUxIM_combos,
+                       by =  c("PSNU", "psnuid", "indicator_code", "Age", "Sex", "KeyPop"))
     
-    warning_msg <- 
-      paste0(
-        "WARNING! Your Data Pack may need a new PSNUxIM tab. Along with this warning,",
-        " you should also receive an updated copy of your Data Pack with new rows added",
-        " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
-        " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack,",
-        " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
-        " all changes to other tabs of your Data Pack are complete.  Once all other updates",
-        " are complete, you may return here to update your PSNUxIM tab at any time.",
-        "\n")
+    d$tests$missing_combos <- d$data$missingCombos
+    attr(d$tests$missing_combos,"test_name") <- "Missing target combinations"
     
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$missing_psnuxim_combos <- ( NROW(d$data$missingCombos) > 0 )
     
+    if (d$info$missing_psnuxim_combos) {
+      d$info$needs_psnuxim <- TRUE
+      
+      warning_msg <- 
+        paste0(
+          "WARNING! Your Data Pack may need a new PSNUxIM tab. Along with this warning,",
+          " you should also receive an updated copy of your Data Pack with new rows added",
+          " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
+          " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack,",
+          " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
+          " all changes to other tabs of your Data Pack are complete.  Once all other updates",
+          " are complete, you may return here to update your PSNUxIM tab at any time.",
+          "\n")
+      
+      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+      
+    }
   }
   
   # Gather all values in single column ####
@@ -515,6 +549,7 @@ unPackSNUxIM <- function(d) {
                       stringr::str_extract(mechCode_supportType, "DSD|TA"))
       )
     )
+  
   d$data$SNUxIM %<>%
     dplyr::group_by(
       dplyr::across(c(header_cols$indicator_code, "psnuid", "mechCode_supportType"))) %>%
@@ -575,12 +610,14 @@ unPackSNUxIM <- function(d) {
                   mechCode_supportType, value)
   
   # TEST: Rounding Errors; Warn; Continue ####
+  #TODO: For OPUs, create d$data$MER from DataPackTarget col? Use above for missing_combos step?
+  
   comparison <- d$data$SNUxIM %>%
     dplyr::select(-mechCode_supportType, PSNUxIM_value = value) %>%
     dplyr::group_by(dplyr::across(c(tidyselect::everything(), -PSNUxIM_value))) %>%
     dplyr::summarise(PSNUxIM_value = sum(PSNUxIM_value, na.rm = TRUE), .groups = "drop") %>%
     dplyr::full_join(.,
-      d$data$MER %>%
+      original_targets %>%
         dplyr::select(-sheet_name, DataPackTarget = value) %>%
         dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T"))
     ) %>%
