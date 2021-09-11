@@ -16,7 +16,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
     dplyr::filter(distribution > 1.0)
 
   if (NROW(over_allocated) > 0) {
-    warning_msg <- 
+    warning_msg <-
       paste0(
         "INFO! ",
         NROW(over_allocated),
@@ -25,7 +25,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
         " 100% addressed. Please consult the Data Pack User Guide for more information.",
         "/n"
       )
-    
+
     d$info$messages <- appendMessage(d$info$messages, warning_msg,"INFO")
   }
 
@@ -74,7 +74,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
             " deduplication values are 100% addressed. Please consult the Data Pack User Guide for more information.",
             "/n"
           )
-       
+
         d$info$messages <- appendMessage(d$info$messages, warning_msg,"INFO")
       }
 
@@ -91,7 +91,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
   crosswalk_dupes_auto_resolved<-data.frame(foo=character())
   }
 
-  if( keep_dedup == TRUE ){
+  if ( keep_dedup == TRUE ) {
     d$datim$MER <- d$data$distributedMER
   } else {
     #Filter the pseudo-dedupe mechanism data out
@@ -156,17 +156,17 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
   d<-autoResolveDuplicates(d,keep_dedup)
 
   # align   map_DataPack_DATIM_DEs_COCs with  d$datim$MER/d$data$distributedMER for KP_MAT
-  
-  map_DataPack_DATIM_DEs_COCs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
-  
-  map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                       map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- "Male"
-  map_DataPack_DATIM_DEs_COCs_local$valid_sexes.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                       map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Female PWID"] <- "Female"
-  map_DataPack_DATIM_DEs_COCs_local$valid_kps.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                     map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Male PWID"] <- NA_character_
-  map_DataPack_DATIM_DEs_COCs_local$valid_kps.name[map_DataPack_DATIM_DEs_COCs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                     map_DataPack_DATIM_DEs_COCs_local$valid_kps.name == "Female PWID"] <- NA_character_
+
+  map_des_cocs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
+
+  map_des_cocs_local$valid_sexes.name[map_des_cocs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                       map_des_cocs_local$valid_kps.name == "Male PWID"] <- "Male"
+  map_des_cocs_local$valid_sexes.name[map_des_cocs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                       map_des_cocs_local$valid_kps.name == "Female PWID"] <- "Female"
+  map_des_cocs_local$valid_kps.name[map_des_cocs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                     map_des_cocs_local$valid_kps.name == "Male PWID"] <- NA_character_
+  map_des_cocs_local$valid_kps.name[map_des_cocs_local$indicator_code == "KP_MAT.N.Sex.T" &
+                                                     map_des_cocs_local$valid_kps.name == "Female PWID"] <- NA_character_
 
   # Readjust for PMTCT_EID
   d$datim$MER %<>% dplyr::mutate(
@@ -178,7 +178,7 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
     ) %>%
 
   # Pull in all dataElements and categoryOptionCombos
-    dplyr::left_join(., ( map_DataPack_DATIM_DEs_COCs_local %>%
+    dplyr::left_join(., ( map_des_cocs_local %>%
                             dplyr::rename(Age = valid_ages.name,
                                           Sex = valid_sexes.name,
                                           KeyPop = valid_kps.name) )) %>%

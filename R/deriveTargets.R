@@ -1,27 +1,27 @@
 #' @title Derive non-Data Pack targets from others in the Data Pack
-#' 
+#'
 #' @description
 #' Takes Data Pack data and derives other targets not explicitly
 #' set during COP.
-#' 
+#'
 #' @param data Dataframe with either Data Pack data.
 #' @param type Type of data, either \code{Data Pack}.
-#' 
+#'
 #' @return Dataframe with added, derived targets.
-#' 
+#'
 deriveTargets <- function(data, type) {
   derived <- data %>%
     dplyr::filter(
       stringr::str_detect(
-        indicatorCode, 
+        indicatorCode,
         paste0(
           "VMMC_CIRC\\.N\\.Age/Sex/HIVStatus\\.20T"
           # If we derive the SUBNAT/IMPATT ones, paste0 here
         )
       )
     )
-  
-  if(NROW(derived) > 0) {
+
+  if (NROW(derived) > 0) {
     derived %<>%
       dplyr::mutate(
         indicatorCode =
@@ -37,12 +37,14 @@ deriveTargets <- function(data, type) {
       dplyr::group_by_at(dplyr::vars(-value)) %>%
       dplyr::summarise(value = sum(value)) %>%
       dplyr::ungroup()
-    
+
     combined <- data %>%
       dplyr::bind_rows(derived)
-    
+
     return(combined)
-    
-  } else {return(data)}
-  
+
+  } else {
+    return(data)
+    }
+
 }

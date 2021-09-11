@@ -30,3 +30,8 @@ jobs:
           name: Test package
           command: | 
                R -e "devtools::check(error_on='error')"
+      - run: 
+          name: Lint packages
+          command: |
+                R -e "install.packages('lintr')"
+                R -e "if ( NROW(lintr::lint_package()) > 0 ) stop('Linting failed')"

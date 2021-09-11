@@ -9,7 +9,7 @@ test_that("Can unpack all data pack sheets", {
                                       tool = "Data Pack",
                                       country_uids = NULL,
                                       cop_year = NULL)
-  
+
   d <- unPackSheets(d)
   expect_true(!is.null(d$data$targets))
   expect_setequal(names(d$data$targets),d_data_targets_names)
@@ -23,9 +23,9 @@ test_that("Can unpack all data pack sheets", {
   all(unlist(lapply(d$tests, function(x) !is.null(attr(x,"test_name")))))
   validation_summary<-validationSummary(d)
   expect_named(validation_summary,c("test_name","validation_issue_category","count","ou","ou_id","country_name","country_uid"),ignore.order = TRUE)
-  
-  
-  
+
+
+
   #Should throw an error if the tool is an unknown type
   d$info$tool<-"FooPack"
   expect_error(d <- unPackSheets(d))
@@ -37,7 +37,7 @@ with_mock_api({
                                         tool = "Data Pack",
                                         country_uids = NULL,
                                         cop_year = NULL)
-    
+
     d <- unPackSheets(d)
     expect_true(!is.null(d$data$targets))
     expect_setequal(names(d$data$targets),d_data_targets_names)
@@ -54,19 +54,25 @@ with_mock_api({
     expect_true(!is.null(d$data$SUBNATT_IMPATT))
     expect_setequal(class(d$data$SUBNATT_IMPATT),c("tbl_df","tbl","data.frame"))
     expect_identical(unname(sapply(d$data$SUBNATT_IMPATT, typeof) ),c(rep("character",7),"double"))
-    
-    
+
+
     #Package the undistributed data for DATIM
     d <- packForDATIM(d, type = "Undistributed MER")
     expect_true(!is.null(d$datim$UndistributedMER))
-    expect_true(NROW(d$datim$UndistributedMER)>0)
-    expect_true(all(unlist(lapply(d$datim$UndistributedMER$dataElement,is_uidish))))
-    expect_true(all(unlist(lapply(d$datim$UndistributedMER$categoryOptionCombo,is_uidish))))
-    expect_true(all(unlist(lapply(d$datim$UndistributedMER$period,function(x) {
-      grepl("^\\d{4}Oct$",x)
-    
-    }))))
-    
-    expect_type(d$datim$UndistributedMER$attributeOptionCombo,"character")
-    expect_type(d$datim$UndistributedMER$attributeOptionCombo,"double")
+    expect_true(NROW(d$datim$UndistributedMER) > 0)
+    expect_true(all(unlist(
+      lapply(d$datim$UndistributedMER$dataElement, is_uidish)
+    )))
+    expect_true(all(unlist(
+      lapply(d$datim$UndistributedMER$categoryOptionCombo, is_uidish)
+    )))
+    expect_true(all(unlist(
+      lapply(d$datim$UndistributedMER$period, function(x) {
+        grepl("^\\d{4}Oct$", x)
+
+      })
+    )))
+
+    expect_type(d$datim$UndistributedMER$attributeOptionCombo, "character")
+    expect_type(d$datim$UndistributedMER$attributeOptionCombo, "double")
   } ) })

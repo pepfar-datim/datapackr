@@ -11,11 +11,11 @@
 #'
 checkFormulas <- function(d, sheet) {
   if (sheet %in% c("SNU x IM","PSNUxIM") & d$info$tool == "Data Pack") {
-    data = d$data$SNUxIM
+    data <- d$data$SNUxIM
   } else {
-    data = d$data$extract
+    data <- d$data$extract
   }
-  
+
   header_row <- headerRow(tool = "Data Pack", cop_year = d$info$cop_year)
 
   # Pull in formulas from schema ###
@@ -64,7 +64,7 @@ checkFormulas <- function(d, sheet) {
       by = c("col" = "col")) %>%
     dplyr::select(row, col, indicator_code, formula) %>%
     dplyr::filter(row != header_row) %>%
-  
+
   # Handle duplicate column headers ####
     {if (sheet == "PSNUxIM" & d$info$tool == "Data Pack") {
       (.)
@@ -90,10 +90,11 @@ checkFormulas <- function(d, sheet) {
   altered_formulas <- formulas_schema %>%
     dplyr::left_join(
       formulas_datapack,
-      by = 
+      by =
         {if (sheet == "PSNUxIM" & d$info$tool == "Data Pack") {
           c("col" = "col")
-          } else {c("indicator_code" = "indicator_code")}
+        } else {c("indicator_code" = "indicator_code")
+            }
         }
     ) %>%
     dplyr::filter(formula.x != formula.y) %>%

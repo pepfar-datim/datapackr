@@ -20,7 +20,9 @@ packSNUxIM <- function(d,
   # Check if SNUxIM data already exists ####
   if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM$PSNU[1])) {
     d$info$has_psnuxim <- FALSE
-  } else {d$info$has_psnuxim <- TRUE}
+  } else {
+    d$info$has_psnuxim <- TRUE
+  }
 
   # If does exist, extract missing combos ####
   if (d$info$has_psnuxim) {
@@ -42,7 +44,7 @@ packSNUxIM <- function(d,
   } else {
     targets_data <- d$data$MER
   }
-  
+
     #TODO: Consider preparing this ahead of time for all OUs
   snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path) %>%
     prepare_model_data.PSNUxIM(snuxim_model_data = .,
@@ -54,7 +56,7 @@ packSNUxIM <- function(d,
   # Do not include AGYW_PREV -- These are not allocated to IMs
   targets_data %<>%
     dplyr::filter(!indicator_code %in% c("AGYW_PREV.N.T", "AGYW_PREV.D.T"))
-  
+
   if (NROW(snuxim_model_data) > 0) {
     snuxim_model_data %<>%
       dplyr::right_join(
@@ -102,7 +104,8 @@ packSNUxIM <- function(d,
 
     if (NROW(col_letter) == 0) {
       col_letter <- data %>%
-        dplyr::filter(indicator_code == "PSNU")}
+        dplyr::filter(indicator_code == "PSNU")
+    }
 
     col_letter %<>%
       dplyr::pull(submission_order) %>%
@@ -133,12 +136,12 @@ packSNUxIM <- function(d,
                           "sheet_name" = "sheet_name")) %>%
     dplyr::mutate(
       row = as.integer((1:dplyr::n()) + existing_rows),
-      
+
   # Accommodate OGAC request to aggregate OVC_HIVSTAT.T across age/sex ####
       id_col = dplyr::case_when(
         indicator_code == "OVC_HIVSTAT.T" ~ "B",
         TRUE ~ id_col),
-  
+
   # Add DataPackTarget column & classify just that col as formula ####
       DataPackTarget = paste0(
         'SUMIF(',
@@ -180,7 +183,7 @@ packSNUxIM <- function(d,
                +1)),
       col < (col.im.targets[1])) %>%
     dplyr::pull(col)
-  
+
   ## TODO: Improve this next piece to be more efficient instead of using str_replace_all
 
   data_structure %<>%
@@ -205,14 +208,14 @@ packSNUxIM <- function(d,
           .,
           pattern = paste0("(?<=[:upper:])", top_rows
                            +1),
-          replacement = as.character(1:NROW(snuxim_model_data) + existing_rows)
+          replacement = as.character(seq_along(snuxim_model_data) + existing_rows)
           )
         )
       )
 
   # Classify formula columns as formulas
   ## TODO: Improve approach
-  for (i in 1:length(data_structure)) {
+  for (i in seq_along(data_structure)) {
     if (!all(any(is.na(data_structure[[i]])))) {
       class(data_structure[[i]]) <- c(class(data_structure[[i]]), "formula")
     }
@@ -326,7 +329,7 @@ packSNUxIM <- function(d,
                   value_type == "percentage") %>%
     dplyr::pull(col)
 
-  percentStyle = openxlsx::createStyle(numFmt = "0%")
+  percentStyle <- openxlsx::createStyle(numFmt = "0%")
 
   openxlsx::addStyle(wb = d$tool$wb,
                     sheet = "PSNUxIM",

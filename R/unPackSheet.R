@@ -222,7 +222,7 @@ unPackDataPackSheet <- function(d, sheet) {
       d$tests$invalid_prioritizations <- invalid_prioritizations
       attr(d$tests$invalid_prioritizations,"test_name")<-"Invalid prioritizations"
 
-      invalid_prioritizations_strings <- invalid_prioritizations %>%
+      invalid_prio_strings <- invalid_prioritizations %>%
         tidyr::unite(row_id, c(PSNU, value), sep = ":  ") %>%
         dplyr::arrange(row_id) %>%
         dplyr::pull(row_id)
@@ -236,7 +236,7 @@ unPackDataPackSheet <- function(d, sheet) {
           " Data Pack User Guide to understand valid prioritization options. Refer to those",
           " PSNUs flagged by this check and correct their validation values in the 'SNU Prioritization'",
           " column on the Prioritization tab. -> \n\t* ",
-          paste(invalid_prioritizations_strings, collapse = "\n\t* "),
+          paste(invalid_prio_strings, collapse = "\n\t* "),
           "\n")
 
       d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
@@ -269,7 +269,7 @@ unPackDataPackSheet <- function(d, sheet) {
   d$tests$non_numeric<-dplyr::bind_rows(d$tests$non_numeric,non_numeric)
   attr(d$tests$non_numeric,"test_name")<-"Non-numeric values"
 
-  if(NROW(non_numeric) > 0) {
+  if (NROW(non_numeric) > 0) {
 
     warning_msg <-
       paste0(

@@ -18,8 +18,8 @@ writePSNUxIM <- function(d,
                         d2_session = dynGet("d2_default_session",
                                             inherits = TRUE)) {
 
-  d$keychain$snuxim_model_data_path = snuxim_model_data_path
-  d$keychain$output_folder = output_folder
+  d$keychain$snuxim_model_data_path <- snuxim_model_data_path
+  d$keychain$output_folder <- output_folder
 
   # Start running log of all warning and information messages ####
   d$info$messages <- MessageQueue()
@@ -56,7 +56,9 @@ writePSNUxIM <- function(d,
     } else {
       stop(paste0("Packing SNU x IM tabs is not supported for COP ",d$info$cop_year," Data Packs."))
     }
-  } else {stop("Cannot update PSNUxIM tab without model data.")}
+  } else {
+    stop("Cannot update PSNUxIM tab without model data.")
+  }
 
   # If new information added to SNU x IM tab, reexport Data Pack for user ####
   if (d$info$newSNUxIM) {

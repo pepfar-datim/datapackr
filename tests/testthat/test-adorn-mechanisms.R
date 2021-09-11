@@ -22,8 +22,8 @@ context("Get a mechanism view when logged into DATIM")
       expect_true(setequal(mechs_names,names(test_mech_list)))
     })
   })
- 
- 
+
+
   with_mock_api({
     test_that("We can get a mechanism list when logged in", {
       test_mech_list<-getMechanismViewFromDATIM(d2_session = training)

@@ -1,10 +1,10 @@
 #' @importFrom magrittr %>% %<>%
 #' @importFrom utils URLencode
 #' @title Compile valid categoryOptions for a given dataset
-#' 
+#'
 #' @description
 #' Queries DATIM API against the dataElementGroups endpoint and returns list of
-#' all dataElements associated with a provided dataSet, as well as all valid 
+#' all dataElements associated with a provided dataSet, as well as all valid
 #' categoryOptions associated with that dataElement.
 #'
 #' @param data_element_group.id DATIM dataElementGroup id to filter against.
@@ -14,9 +14,9 @@
 getValidCOs <- function(data_element_group.id = NULL,
                         d2_session = dynGet("d2_default_session",
                                             inherits = TRUE)) {
-  
 
-    #TODO: Replace this with equivalent 
+
+    #TODO: Replace this with equivalent
     de_groups<-datapackr::api_call("dataElementGroups", d2_session = d2_session) %>%
     # Filter to include only the dataElementGroup specified
     datapackr::api_filter(field = "id",
@@ -32,7 +32,7 @@ getValidCOs <- function(data_element_group.id = NULL,
                   data_element.id = "id") %>%
     tidyr::unnest(cols = "categoryCombo.categories") %>%
     dplyr::rename(category_combo.name = "name",
-                  category_combo.id  = "id") %>% 
+                  category_combo.id  = "id") %>%
   tidyr::unnest(cols = "categoryOptions") %>%
     dplyr::rename(category_option.name = "name",
                   category_option.id  = "id") %>%
@@ -53,11 +53,11 @@ getValidCOs <- function(data_element_group.id = NULL,
       grp,
       category_option.name ,
       category_option.id )
-  
+
   if (!is.null(data_element_group.id )) {
     return(dplyr::filter(de_groups, data_element_group.id %in% data_element_group.id ))
   } else {
     return(de_groups)
   }
-  
+
 }

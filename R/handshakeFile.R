@@ -40,10 +40,12 @@ canReadFile <- function(path) {
 handshakeFile <- function(path,
                           tool = "Data Pack") {
 
-  if (is.null(tool)) {tool = "Data Pack"}
-  
+  if (is.null(tool)) {
+    tool <- "Data Pack"
+  }
+
   if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
-    extension = "xlsx"
+    extension <- "xlsx"
   } else {
     stop(
       "Please specify correct file type: Data Pack, Data Pack Template, OPU Data Pack Template, OPU Data Pack.")
@@ -57,14 +59,20 @@ handshakeFile <- function(path,
       path <- file.choose()
     }
 
-    if (!canReadFile(path)) {stop("File could not be read!")}
+    if (!canReadFile(path)) {
+      stop("File could not be read!")
+    }
 
   }
 
   # Check the file has correct extension
   if (tools::file_ext(path) != extension) {
-    stop(paste0("File is not the correct format! File must have extension .",
-                extension))
-  } else {return(path)}
+    stop(paste0(
+      "File is not the correct format! File must have extension .",
+      extension
+    ))
+  } else {
+    return(path)
+  }
 
 }

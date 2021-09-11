@@ -3,7 +3,9 @@
 #'
 #' @return `Default` categoryOptionCombo uid.
 #'
-default_catOptCombo <- function() { "HllvX50cXC0" }
+default_catOptCombo <- function() {
+  "HllvX50cXC0"
+}
 
 
 #' @title Round at 0.5 toward integer with highest absolute value
@@ -19,7 +21,7 @@ default_catOptCombo <- function() { "HllvX50cXC0" }
 #'
 #' @param x A number.
 #' @param digits Number of digits to round to. Default is 0
-#' 
+#'
 #' @return An integer.
 #' @examples
 #' # If the first digit to be dropped is exactly 5, round_trunc() will round to
@@ -33,7 +35,7 @@ round_trunc <- function(x, digits = 0) {
   z <- trunc(z)
   z <- z / 10^digits
   z * sign(x)
-  
+
 }
 
 
@@ -49,7 +51,7 @@ round_trunc <- function(x, digits = 0) {
 #' country, community, and facility levels in DATIM organization hierarchy.
 #'
 getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
-                                                inherits = TRUE)){
+                                                inherits = TRUE)) {
   impatt_levels <-
     paste0(d2_session$base_url,"api/",datapackr::api_version(),
            "/dataStore/dataSetAssignments/orgUnitLevels") %>%
@@ -97,15 +99,15 @@ getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
 #'
 swapColumns <- function(to, from) {
   # Grab column names from `from`
-    cols = colnames(from)
+    cols <- colnames(from)
 
   # If `from` is a null dataframe, skip and return `to`
     if (length(cols) != 0) {
 
   # Loop through `from` columns and if there's a match in `to`, copy and paste
   #   it into `to`
-      for (i in 1:length(cols)) {
-        col = cols[i]
+      for (i in seq_along(cols)) {
+        col <- cols[i]
         if (col %in% colnames(to)) {
           dots <-
             stats::setNames(list(lazyeval::interp(
@@ -145,7 +147,7 @@ writeFxColumnwise <- function(wb, sheet, x, xy) {
     as.data.frame() %>%
     dplyr::mutate_all(as.character)
 
-  for (i in 1:length(fx)) {
+  for (i in seq_along(fx)) {
     class(fx[[i]]) <- c(class(fx[[i]]), "formula")
   }
 
@@ -166,7 +168,9 @@ writeFxColumnwise <- function(wb, sheet, x, xy) {
 #' @return Printed message, \code{x}.
 #'
 interactive_print <- function(x) {
-  if (interactive()) { print(x) }
+  if (interactive()) {
+    print(x)
+  }
 }
 
 
@@ -268,9 +272,13 @@ addcols <- function(data, cnames, type = "character") {
   add <- cnames[!cnames %in% names(data)]
 
   if (length(add) != 0) {
-    if (type == "character") {data[add] <- NA_character_
-    } else if (type == "numeric") {data[add] <- NA_real_
-    } else if (type == "logical") {data[add] <- NA}
+    if (type == "character") {
+      data[add] <- NA_character_
+    } else if (type == "numeric") {
+      data[add] <- NA_real_
+    } else if (type == "logical") {
+      data[add] <- NA
+    }
   }
 
   return(data)
@@ -307,20 +315,20 @@ isLoggedIn <- function(d2_session = dynGet("d2_default_session",
   baseurl <- d2_session$base_url
 
   if (is.null(baseurl)) {
-    return(FALSE)} else {
-      httr::set_config(httr::config(http_version = 0))
-      url <- URLencode(URL = paste0(baseurl, "api/me"))
-      #Logging in here will give us a cookie to reuse
-      r <- httr::GET(url,
-                     httr::timeout(180),
-                     handle = d2_session$handle)
-      if (r$status != 200L) {
-        return(FALSE)
-      } else {
-
-        return(TRUE)
-      }
+    return(FALSE)
+  } else {
+    httr::set_config(httr::config(http_version = 0))
+    url <- URLencode(URL = paste0(baseurl, "api/me"))
+    #Logging in here will give us a cookie to reuse
+    r <- httr::GET(url,
+                   httr::timeout(180),
+                   handle = d2_session$handle)
+    if (r$status != 200L) {
+      return(FALSE)
+    } else {
+      return(TRUE)
     }
+  }
 }
 
 
@@ -336,9 +344,9 @@ isLoggedIn <- function(d2_session = dynGet("d2_default_session",
 getDatasetUids <-  function(fiscal_year,
                             type = c("mer_targets", "mer_results",
                                      "subnat_targets", "subnat_results",
-                                     "impatt")){
+                                     "impatt")) {
 
-  datasets = character(0)
+  datasets <- character(0)
   if (fiscal_year == "2022") {
     if ("mer_targets" %in% type) {
       datasets <- c(datasets,
@@ -360,13 +368,13 @@ getDatasetUids <-  function(fiscal_year,
       datasets <- c(datasets,
                     "Zn27xns9Fmx") #Planning Attributes: COP Prioritization SNU
     }
-  } else if(fiscal_year == "2021") {
-    if("mer_targets" %in% type) {
+  } else if (fiscal_year == "2021") {
+    if ("mer_targets" %in% type) {
       datasets <- c(datasets,
                     "Pmc0yYAIi1t", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2021
                     "s1sxJuqXsvV")  # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY) FY2021
     }
-    if("mer_results" %in% type) {
+    if ("mer_results" %in% type) {
       datasets <- c(datasets,
                     "zL8TlPVzEBZ", # MER Results: Facility Based
                     #"",  # MER Results: Facility Based - DoD ONLY
@@ -374,30 +382,30 @@ getDatasetUids <-  function(fiscal_year,
                     "TBcmmtoaCBC", # MER Results: Community Based
                     "qHyrHc4zwx4") # Host Country Results: DREAMS (USG)
     }
-    if("subnat_targets" %in% type) {
+    if ("subnat_targets" %in% type) {
       datasets <- c(datasets,
                     "j7jzezIhgPj") #Host Country Targets: COP Prioritization SNU (USG) FY2021
 
     }
-    if("subnat_results" %in% type) {
+    if ("subnat_results" %in% type) {
       datasets <- c(datasets,
                     "xiTCzZJ2GPP") #Host Country Results: COP Prioritization SNU (USG)
 
     }
-    if("impatt" %in% type) {
+    if ("impatt" %in% type) {
       datasets <- c(datasets,
                     "jxnjnBAb1VD") # Planning Attributes: COP Prioritization SNU FY2021
 
     }
   } else if (fiscal_year == "2020") {
-    if("mer_targets" %in% type) {
+    if ("mer_targets" %in% type) {
       datasets <- c(datasets,
                     "sBv1dj90IX6", # MER Targets: Facility Based FY2020
                     "nIHNMxuPUOR", # MER Targets: Community Based FY2020
                     "C2G7IyPPrvD", # MER Targets: Community Based - DoD ONLY FY2020
                     "HiJieecLXxN") # MER Targets: Facility Based - DoD ONLY FY2020
     }
-    if ("mer_results" %in% type){
+    if ("mer_results" %in% type) {
       datasets <- c(datasets,
                     "qzVASYuaIey", # MER Results: Community Based FY2020Q4
                     "BPEyzcDb8fT", # MER Results: Community Based - DoD ONLY
@@ -405,27 +413,27 @@ getDatasetUids <-  function(fiscal_year,
                     "em1U5x9hhXh", # MER Results: Facility Based - DoD ONLY
                     "mbdbMiLZ4AA") # Host Country Results: DREAMS (USG) FY2020Q4
     }
-    if("subnat_targets" %in% type) {
+    if ("subnat_targets" %in% type) {
       datasets <- c(datasets,
                     "N4X89PgW01w") # Host Country Targets: COP Prioritization SNU (USG) FY2020
     }
-    if("subnat_results" %in% type) {
+    if ("subnat_results" %in% type) {
       datasets <- c(datasets,
                     "ctKXzmv2CVu") # Host Country Results: COP Prioritization SNU (USG) FY2020Q4
     }
-    if("impatt" %in% type) {
+    if ("impatt" %in% type) {
       datasets <- c(datasets,
                     "pTuDWXzkAkJ") # Planning Attributes: COP Prioritization SNU FY2020
     }
   } else if (fiscal_year == "2019") {
-    if("mer_targets" %in% type) {
+    if ("mer_targets" %in% type) {
       datasets <- c(datasets,
                     "BWBS39fydnX", # MER Targets: Community Based - DoD ONLY FY2019
                     "l796jk9SW7q", # MER Targets: Community Based FY2019
                     "X8sn5HE5inC", # MER Targets: Facility Based - DoD ONLY FY2019
                     "eyI0UOWJnDk") # MER Targets: Facility Based FY2019)
     }
-    if("mer_results" %in% type) {
+    if ("mer_results" %in% type) {
       datasets <- c(datasets,
                     "KWRj80vEfHU", # MER Results: Facility Based FY2019Q4
                     "fi9yMqWLWVy", # MER Results: Facility Based - DoD ONLY FY2019Q4
@@ -433,15 +441,15 @@ getDatasetUids <-  function(fiscal_year,
                     "PyD4x9oFwxJ", # MER Results: Community Based - DoD ONLY FY2019Q4
                     "EbZrNIkuPtc") # Host Country Results: DREAMS (USG) FY2019Q4
     }
-    if("subnat_targets" %in% type) {
+    if ("subnat_targets" %in% type) {
       datasets <- c(datasets,
                     "Ncq22MRC6gd") # Host Country Targets: COP Prioritization SNU (USG) FY2019
     }
-    if("subnat_results" %in% type) {
+    if ("subnat_results" %in% type) {
       datasets <- c(datasets,
                     "iJ4d5HdGiqG") # Host Country Results: COP Prioritization SNU (USG) FY2019Q4
     }
-    if("impatt" %in% type) {
+    if ("impatt" %in% type) {
       datasets <- c(datasets,
                     "pTuDWXzkAkJ") # Planning Attributes: COP Prioritization SNU FY2020 - last used FY2020 also valid for FY2019
 
@@ -478,7 +486,7 @@ prioritization_dict <- function() {
 
 #' @export
 #' @title Take Max along row among columns matching regex
-#' 
+#'
 #' @param df Dataframe
 #' @param cn Name (character string) of Max column to create
 #' @param regex String of regex to use in identifying columns.
@@ -488,30 +496,30 @@ prioritization_dict <- function() {
 rowMax <- function(df, cn, regex) {
   df_filtered <- df %>%
     dplyr::select(tidyselect::matches(match = regex))
-  
+
   if (NCOL(df_filtered) == 0) {
     df[[cn]] <- NA_integer_
     return(df)
   }
-  
+
   df[[cn]] <- df_filtered %>%
     purrr::pmap(pmax, na.rm = T) %>%
     as.numeric
-  
+
   return(df)
 }
 
 #' @export
 #' @title get_Map_DataPack_DATIM_DEs_COCs
-#' 
+#'
 #' @param cop_year cop year to pull get map for
 #'
 #' @return {cop20, cop21}_map_DataPack_DATIM_DEs_COCs
 #'
 getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
-  if (cop_year == 2020){ 
+  if (cop_year == 2020) {
       return(datapackr::cop20_map_DataPack_DATIM_DEs_COCs)
-  } else if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs, 
+  } else if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
                                            datapackr::map_DataPack_DATIM_DEs_COCs)) {
     return(datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
   } else { # if map_DataPack_DATIM_DEs_COCs has drifted or COP year is invalid this notifies us
@@ -522,17 +530,17 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
 
 #' @export
 #' @title getDataPackSchema
-#' 
+#'
 #' @param cop_year cop year to pull get schema for
 #'
 #' @return {cop20, cop21}_data_pack_schema
 #'
 getDataPackSchema <- function(cop_year) {
-  if (cop_year == 2020){ 
+  if (cop_year == 2020) {
     return(datapackr::cop20_data_pack_schema)
   } else if (cop_year == 2021) {
     return(datapackr::cop21_data_pack_schema)
-  } else { 
+  } else {
     stop("Datapack schema not available for the cop year provided")
   }
 
@@ -541,8 +549,8 @@ getDataPackSchema <- function(cop_year) {
 
 #' @export
 #' @title Create a clean Data Pack Workbook shell
-#' 
-#' @param tool Either "Data Pack" or "OPU Data Pack"? Default is "Data Pack". 
+#'
+#' @param tool Either "Data Pack" or "OPU Data Pack"? Default is "Data Pack".
 #' @inheritParams datapackr_params
 #'
 #' @return wb Data Pack Workbook shell
@@ -554,10 +562,10 @@ createWorkbook <- function(datapack_name = NULL,
                            tool = "Data Pack",
                            d2_session = dynGet("d2_default_session",
                                                inherits = TRUE)) {
-  
+
   output_type <- tool
   input_type <- paste0(output_type, " Template")
-  
+
   if (is.null(datapack_name)) {
     datapack_name <- datapackr::valid_PSNUs %>%
       dplyr::select(country_name, country_uid) %>%
@@ -566,17 +574,17 @@ createWorkbook <- function(datapack_name = NULL,
       dplyr::pull(country_name) %>%
       paste(collapse = ", ")
   }
-  
+
   if (is.null(template_path)) {
     template_path <- pick_template_path(cop_year, output_type)
   }
-  
+
   template_path %<>%
     handshakeFile(input_type)
-  
+
   print("Checking template against schema and DATIM...")
   schema <- pick_schema(cop_year, output_type)
-  
+
   schema_check <-
     unPackSchema_datapack(
       filepath = template_path,
@@ -584,30 +592,30 @@ createWorkbook <- function(datapack_name = NULL,
       tool = input_type,
       cop_year = cop_year,
       d2_session = d2_session)
-  
+
   if (!identical(schema, schema_check)) {
     stop("Template provided does not match archived schema.")
   }
-  
+
   wb <- openxlsx::loadWorkbook(template_path)
-  
+
   options("openxlsx.numFmt" = "#,##0")
-  
+
   # Write Home Sheet info ####
   wb <- writeHomeTab(wb = wb,
                     datapack_name = datapack_name,
                     country_uids = country_uids,
                     cop_year = cop_year,
                     tool = output_type)
-  
+
   return(wb)
 }
 
 
 #' @export
 #' @title Compare Data Pack template against schema
-#' 
-#' @param tool Either "Data Pack" or "OPU Data Pack"? Default is "Data Pack". 
+#'
+#' @param tool Either "Data Pack" or "OPU Data Pack"? Default is "Data Pack".
 #' @inheritParams datapackr_params
 #'
 #' @return Message indicating comparison failure or success.
@@ -619,11 +627,11 @@ compareTemplateToSchema <- function(template_path = NULL,
                                                        inherits = TRUE)) {
 
   print("Checking template against schema and DATIM...")
-  
+
   if (is.null(template_path)) {
     template_path <- pick_template_path(cop_year, tool)
   }
-  
+
   template_schema <-
     unPackSchema_datapack(
       filepath = template_path,
@@ -631,9 +639,9 @@ compareTemplateToSchema <- function(template_path = NULL,
       tool = paste0(tool," Template"),
       cop_year = cop_year,
       d2_session = d2_session)
-  
+
   package_schema <- pick_schema(cop_year, tool)
-  
+
   if (!identical(package_schema, template_schema)) {
     stop("Template provided does not match published schema.")
   } else {

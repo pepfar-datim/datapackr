@@ -19,38 +19,38 @@ getOPUDataFromDATIM <- function(cop_year,
                                 country_names = NULL,
                                 d2_session = dynGet("d2_default_session",
                                                     inherits = TRUE)) {
-  
-  map_DataPack_DATIM_DEs_COCs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
-  if (cop_year == 2020){
-    map_DataPack_DATIM_DEs_COCs_local <- dplyr::mutate(map_DataPack_DATIM_DEs_COCs_local,
+
+  map_des_cocs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
+  if (cop_year == 2020) {
+    map_des_cocs_local <- dplyr::mutate(map_des_cocs_local,
                                                        dataelementuid = dataelement,
                                                        period = "2020Oct")
-  }  
-  
+  }
+
   options("scipen" = 999)
   options(warning.length = 8170)
-  
+
   # Select Countries to pull data for ####
   if (is.null(country_names) & is.null(country_uids)) {
     stop("ERROR! Must provide either country_uids or country_names.")
   }
-  
+
   if (is.null(country_uids)) {
-    all_country_uids <- 
+    all_country_uids <-
       datimutils::getOrgUnitGroups("Country",
                                    by = name,
                                    fields = "organisationUnits[name,id]",
                                    d2_session = d2_session) %>%
       dplyr::arrange(name)
-    
+
     mapped_country_uids <- all_country_uids %>%
       dplyr::right_join(
         tibble::tibble(country_names), by = c("name" = "country_names"))
-    
+
       country_uids <- mapped_country_uids %>%
         dplyr::filter(!is.na(id)) %>%
         dplyr::pull(id)
-    
+
     if (any(is.na(mapped_country_uids))) {
       stop("The following Country Names either are not supported by PEPFAR or do not match DATIM syntax:\r\n\r\n  - ",
             paste0(mapped_country_uids$name[is.na(mapped_country_uids$id)], collapse = "\r\n  - "),
@@ -58,33 +58,33 @@ getOPUDataFromDATIM <- function(cop_year,
            paste0(all_country_uids$name, collapse = "\r\n  - "))
     }
   }
-  
+
   # Pull data from DATIM ####
   data_datim <- datapackr::getCOPDataFromDATIM(country_uids,
                                                cop_year,
                                                streams = "mer_targets",
                                                d2_session = d2_session)
-  
+
   # Filter data by required indicator_codes ####
-  indicator_codes <- datapackr::getDataPackSchema(cop_year = cop_year) %>% 
+  indicator_codes <- datapackr::getDataPackSchema(cop_year = cop_year) %>%
     dplyr::filter(dataset == "mer",
-                  col_type =="target") %>% 
+                  col_type =="target") %>%
     .[["indicator_code"]]
-  
+
 
   data_datim %<>%
-    dplyr::left_join(map_DataPack_DATIM_DEs_COCs_local,
+    dplyr::left_join(map_des_cocs_local,
                       by = c("dataElement" = "dataelementuid",
                             "categoryOptionCombo" = "categoryoptioncombouid",
                             "period" = "period"))
-  
+
   if (any(is.na(data_datim$indicator_code))) {
     stop("Problem mapping target data pulled from DATIM to datapack schema")
   }
-  
+
   data_datim %<>%
     dplyr::filter(indicator_code %in% indicator_codes)
-  
+
   # COP21+: Output as DHIS2 import file ####
   if (cop_year %in% c(2019, 2020)) {
     data_datim %<>%
@@ -109,7 +109,7 @@ getOPUDataFromDATIM <- function(cop_year,
                     attributeOptionCombo,
                     value)
   }
-  
+
   return(data_datim)
 
 }

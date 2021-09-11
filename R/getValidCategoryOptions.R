@@ -22,7 +22,9 @@ getValidCategoryOptions <- function(cop_year = getCurrentCOPYear()) {
     dplyr::filter(id %in% unique(fullCodeList$categoryoptioncombouid))
 
   ## All valid COs for COP FY grouped by category ####
-  pad <- function(digit) {padded <- paste0("0", digit)}
+  pad <- function(digit) {
+    padded <- paste0("0", digit)
+  }
 
   five_year_age_names <- c("<01","01-04","05-09","10-14","15-19","20-24",
                            "25-29","30-34","35-39","40-44","45-49","50+")
@@ -86,7 +88,7 @@ getValidCategoryOptions <- function(cop_year = getCurrentCOPYear()) {
           & datapack_disagg != "50+",
         yes = paste(datapack_schema_group,"25-49",sep = ","),
         no =  datapack_schema_group),
-    
+
     ## 10-29 ####
       datapack_schema_group = ifelse(
         test = stringr::str_detect(datapack_schema_group,"5yr")
@@ -101,7 +103,7 @@ getValidCategoryOptions <- function(cop_year = getCurrentCOPYear()) {
       & datapack_disagg %in% c(five_year_age_names[1:4],"15-17","18+","18-20"),
       yes = paste(datapack_schema_group,"ovc_serv",sep = ","),
       no =  datapack_schema_group),
-    
+
     ## ovcHIVStatAges ####
       datapack_schema_group = ifelse(
         test = stringr::str_detect(datapack_schema_group, "ovc_serv")
@@ -109,7 +111,7 @@ getValidCategoryOptions <- function(cop_year = getCurrentCOPYear()) {
         yes = paste(datapack_schema_group,"ovc_hiv_stat",sep = ","),
         no =  datapack_schema_group),
 
-    
+
 
     ## coarseAges ####
       datapack_schema_group = ifelse(

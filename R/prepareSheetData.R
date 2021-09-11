@@ -39,9 +39,22 @@ prepareSheetData <- function(sheet,
                     Sex = valid_sexes.name,
                     KeyPop = valid_kps.name) %>%
       dplyr::arrange(Age, Sex, KeyPop)
-  } else {valid_disaggs = tibble::tribble(
-    ~Age, ~Sex, ~KeyPop, ~valid_ages.id, ~valid_sexes.id, ~valid_kps.id,
-    NA_character_, NA_character_, NA_character_, NA_character_, NA_character_, NA_character_)}
+  } else {
+    valid_disaggs <- tibble::tribble(
+      ~ Age,
+      ~ Sex,
+      ~ KeyPop,
+      ~ valid_ages.id,
+      ~ valid_sexes.id,
+      ~ valid_kps.id,
+      NA_character_,
+      NA_character_,
+      NA_character_,
+      NA_character_,
+      NA_character_,
+      NA_character_
+    )
+  }
 
   # Cross PSNUs and disaggs ####
   row_headers <- org_units %>%
@@ -77,13 +90,13 @@ prepareSheetData <- function(sheet,
       pattern = paste0("(?<=[:upper:])", headerRow(tool = "Data Pack Template",
                                                    cop_year = cop_year)
                                         +1),
-      replacement = as.character(1:NROW(row_headers)
+      replacement = as.character(seq_along(row_headers)
                                  + headerRow(tool = "Data Pack Template",
                                              cop_year = cop_year)))
 
   # Classify formula columns as formulas
   ## TODO: Improve approach
-  for (i in 1:length(dataStructure)) {
+  for (i in seq_along(dataStructure)) {
     if (!all(any(is.na(dataStructure[[i]])))) {
       class(dataStructure[[i]]) <- c(class(dataStructure[[i]]), "formula")
     }
@@ -141,7 +154,9 @@ prepareSheetData <- function(sheet,
           DREAMS_FLAG, by = c("psnu_uid" = "psnu_uid"))
     }
 
-  } else {combined = row_headers}
+  } else {
+    combined <- row_headers
+  }
 
   dataStructure %<>%
     swapColumns(., combined) %>%

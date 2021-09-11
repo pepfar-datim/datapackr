@@ -24,7 +24,7 @@ writeHomeTab <- function(wb,
   #TODO: Setup for default to run PEPFARLANDIA version.
 
   # Add Tab ####
-  if(!any(stringr::str_detect(names(wb), "Home"))) {
+  if (!any(stringr::str_detect(names(wb), "Home"))) {
     openxlsx::addWorksheet(wb,
                            sheetName = "Home",
                            gridLines = FALSE)

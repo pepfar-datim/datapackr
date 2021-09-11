@@ -6,7 +6,7 @@ test_that("PMTCT_EID coverage by 2 months old < 90% expect message" , {
     "a",   1,         "<1",  "F",  NA,                         1,        100,
     "b",   1,         "<1",  "F",  NA,                         90,        10
   )
-  
+
   foo<-analyze_eid_2mo(data)
   testthat::expect_equal(class(foo),"list")
   testthat::expect_setequal(names(foo),c("test_results","msg"))
@@ -20,10 +20,10 @@ test_that("PMTCT_EID coverage by 2 months old < 90% all zeros expect NULL", {
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~PMTCT_EID.N.2.T,~PMTCT_EID.N.12.T,
     "a",   1,         "<1",  "F",  NA,                         0,        0
   )
-  
+
   foo<-analyze_eid_2mo(data)
   expect_null(foo)
-  
+
 } )
 
 test_that("PMTCT_EID coverage by 2 months old > 90% expect NULL", {
@@ -31,10 +31,10 @@ test_that("PMTCT_EID coverage by 2 months old > 90% expect NULL", {
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~PMTCT_EID.N.2.T,~PMTCT_EID.N.12.T,
     "a",   1,         "<1",  "F",  NA,                         100,        1
   )
-  
+
   foo<-analyze_eid_2mo(data)
   expect_null(foo)
-  
+
 } )
 
 test_that("VMMC_CIRC Indeterminate Rate < 5% expect message" , {
@@ -43,13 +43,13 @@ test_that("VMMC_CIRC Indeterminate Rate < 5% expect message" , {
     "a",   1,         "<1",  "M",  NA,                         1,        100, 100,
     "b",  2,          "<1", "M", NA,                         0,         0, 0
   )
-  
+
   foo<-analyze_vmmc_indeterminate(data)
   testthat::expect_equal(class(foo),"list")
   testthat::expect_setequal(names(foo),c("test_results","msg"))
   testthat::expect_equal(NROW(foo$test_results),1)
   expect_equal(foo$test_results$VMMC_CIRC.indeterminateRate,0.498,tolerance=1e-3)
-  
+
 } )
 
 test_that("VMMC_CIRC Indeterminate Rate > 5% expect NULL" , {
@@ -58,10 +58,10 @@ test_that("VMMC_CIRC Indeterminate Rate > 5% expect NULL" , {
     "a",   1,         "<1",  "M",  NA,                         1,        100, 1,
     "b",  2,          "<1", "M", NA,                         0,         0, 0
   )
-  
+
   foo<-analyze_vmmc_indeterminate(data)
   expect_null(foo)
-  
+
 } )
 
 test_that("VMMC_CIRC Indeterminate Rate all zeros expect NULL" , {
@@ -70,10 +70,10 @@ test_that("VMMC_CIRC Indeterminate Rate all zeros expect NULL" , {
     "a",   1,         "<1",  "M",  NA,                         0,        0, 0,
     "b",  2,          "<1", "M", NA,                         0,         0, 0
   )
-  
+
   foo<-analyze_vmmc_indeterminate(data)
   expect_null(foo)
-  
+
 } )
 
 test_that("VMMC_CIRC Indeterminate Rate all keypop not NA expect NULL" , {
@@ -81,10 +81,10 @@ test_that("VMMC_CIRC Indeterminate Rate all keypop not NA expect NULL" , {
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,~VMMC_CIRC.Pos.T,~VMMC_CIRC.Neg.T,~VMMC_CIRC.Unk.T,
     "a",   1,         "<1",  "M",  "PWID",                         0,        0, 1
   )
-  
+
   foo<-analyze_vmmc_indeterminate(data)
   expect_null(foo)
-  
+
 } )
 
 test_that("PMTCT Known Pos/PMTCT Total >  0.75 expect message" , {
@@ -93,13 +93,13 @@ test_that("PMTCT Known Pos/PMTCT Total >  0.75 expect message" , {
     "a",   1,         "<1",  "M",  NA,                         10,        100, 10,
     "b",  2,          "<1", "M", NA,                         0,         0, 0
   )
-  
+
   foo<-analyze_pmtctknownpos(data)
   testthat::expect_equal(class(foo),"list")
   testthat::expect_setequal(names(foo),c("test_results","msg"))
   testthat::expect_equal(NROW(foo$test_results),1)
   expect_equal(foo$test_results$knownpos_ratio,0.833,tolerance=1e-3)
-  
+
 
 } )
 
@@ -110,7 +110,7 @@ test_that("PMTCT Known Pos/PMTCT Total <  0.75 expect null" , {
     "b",  2,          "<1", "M", NA,                         0,         0, 0,
     "c",  3,          "<1", "M", NA,                         25,         150, 25
   )
-  
+
   expect_null(analyze_pmtctknownpos(data))
 
 } )
@@ -121,9 +121,9 @@ test_that("PMTCT Known Pos/PMTCT Total all zeros expect null" , {
     "a",   1,         "<1",  "M",  NA,                         0,        0, 0,
     "b",  2,          "<1", "M", NA,                         0,         0, 0
   )
-  
+
   expect_null(analyze_pmtctknownpos(data))
-  
+
 } )
 
 test_that("TB Known Pos ratio > 75% expect message" , {
@@ -132,14 +132,14 @@ test_that("TB Known Pos ratio > 75% expect message" , {
     "a",   1,         "<1",  "M",  NA,                         25,        151, 25,
     "b",  2,          "<1", "M", NA,                         0,         0, 0
   )
-  
+
   foo<-analyze_tbknownpos(data)
   testthat::expect_equal(class(foo),"list")
   testthat::expect_setequal(names(foo),c("test_results","msg"))
   testthat::expect_equal(NROW(foo$test_results),1)
   expect_equal(foo$test_results$knownpos_ratio,0.751,tolerance=1e-3)
-  
-  
+
+
 } )
 
 test_that("TB Known Pos ratio < 75% expect message expect null" , {
@@ -148,9 +148,9 @@ test_that("TB Known Pos ratio < 75% expect message expect null" , {
     "a",   1,         "<1",  "M",  NA,                         25,        150, 25,
     "b",  2,          "<1", "M", NA,                         0,         0, 0,
   )
-  
+
   expect_null(analyze_tbknownpos(data))
-  
+
 } )
 
 test_that("PMTCT Known Pos/PMTCT Total all zeros expect null" , {
@@ -159,9 +159,9 @@ test_that("PMTCT Known Pos/PMTCT Total all zeros expect null" , {
     "a",   1,         "<1",  "M",  NA,                         0,        0, 0,
     "b",  2,          "<1", "M", NA,                         0,         0, 0
   )
-  
+
   expect_null(analyze_tbknownpos(data))
-  
+
 } )
 
 test_that(" Test retention < 98% expect message", {
@@ -170,13 +170,13 @@ test_that(" Test retention < 98% expect message", {
     "a",   1,         "<1",  "F",  NA,                    97,        97, 3,
     "b",  2,          "<1", "M", NA,                         0,         0, 0
   )
-  
+
   foo<-analyze_retention(data)
   testthat::expect_equal(class(foo),"list")
   testthat::expect_setequal(names(foo),c("test_results","msg"))
   testthat::expect_equal(NROW(foo$test_results),1)
   expect_equal(foo$test_results$TX.Retention.T,0.97,tolerance=1e-3)
-  
+
 } )
 
 test_that(" Test retention > 100% expect message", {
@@ -185,13 +185,13 @@ test_that(" Test retention > 100% expect message", {
     "a",   1,         "<1",  "F",  NA,                    101,        10, 90,
     "b",  2,          "<1", "M", NA,                      100,        10, 90
   )
-  
+
   foo<-analyze_retention(data)
   testthat::expect_equal(class(foo),"list")
   testthat::expect_setequal(names(foo),c("test_results","msg"))
   testthat::expect_equal(NROW(foo$test_results),1)
   expect_equal(foo$test_results$TX.Retention.T,1.01,tolerance=1e-3)
-  
+
 } )
 
 test_that(" Test retention = 99% expect NULL", {
@@ -200,9 +200,9 @@ test_that(" Test retention = 99% expect NULL", {
     "a",   1,         "<1",  "F",  NA,                    99,        100, 0,
     "b",  2,          "<1", "M", NA,                         0,         0, 0
   )
-  
+
   expect_null(analyze_retention(data))
-  
+
 } )
 
 test_that(" Test retention all zeros expect NULL", {
@@ -211,9 +211,9 @@ test_that(" Test retention all zeros expect NULL", {
     "a",   1,         "<1",  "F",  NA,                    0,        0, 0,
     "b",  2,          "<1", "M", NA,                         0,         0, 0
   )
-  
+
   expect_null(analyze_retention(data))
-  
+
 } )
 
 test_that(" Test linkage < 95% expect message", {
@@ -222,7 +222,7 @@ test_that(" Test linkage < 95% expect message", {
     "a",   1,         "25-49",  "F",  NA,                    95,          5,                                94,                 0,               0,
     "b",  2,          "25-49", "M",  NA,                         95,           5,                                95,                 0,               0
   )
-  
+
   foo<-analyze_linkage(data)
   testthat::expect_equal(class(foo),"list")
   testthat::expect_setequal(names(foo),c("test_results","msg"))
@@ -236,7 +236,7 @@ test_that(" Test KP linkage < 95% expect message", {
     "a",   1,         NA,  NA,  "PWID",                    0,          0,                                0,                 100,               94,
     "b",  2,          NA, NA, "PWID",                         0,           0,                                0,                 100,               95
   )
-  
+
   foo<-analyze_linkage(data)
   testthat::expect_equal(class(foo),"list")
   testthat::expect_setequal(names(foo),c("test_results","msg"))
@@ -250,7 +250,7 @@ test_that(" Test linkage > 100% expect message", {
     "a",   1,         "25-49",  "F",  NA,                    50,          50,                                100,                 0,               0,
     "b",  2,          "25-49", "M",  NA,                         50,           50,                              101,                 0,               0
   )
-  
+
   foo<-analyze_linkage(data)
   testthat::expect_equal(class(foo),"list")
   testthat::expect_setequal(names(foo),c("test_results","msg"))
@@ -264,7 +264,7 @@ test_that(" Test KP linkage > 100% expect message", {
     "a",   1,         NA, NA,  "PWID",                    0,          0,                                0,                 100,               100,
     "b",  2,          NA, NA,  "PWID",                         0,           0,                             0,                 100,               101
   )
-  
+
   foo<-analyze_linkage(data)
   testthat::expect_equal(class(foo),"list")
   testthat::expect_setequal(names(foo),c("test_results","msg"))
@@ -278,9 +278,9 @@ test_that(" Test linkage = 98% expect NULL", {
     "a",   1,         "25-49",  "F",  NA,                    20,          20,                                39,                 0,               0,
     "b",  2,          "25-49", "M",  NA,                         0,           0,                                0,                 0,               0
   )
-  
+
   expect_null(analyze_linkage(data))
-  
+
 } )
 
 test_that(" Test KP linkage = 98% expect NULL", {
@@ -289,9 +289,9 @@ test_that(" Test KP linkage = 98% expect NULL", {
     "a",   1,         NA, NA,  "PWID",                    0,          0,                                0,                 100,               98,
     "b",  2,          NA, NA,  "PWID",                         0,           0,                             0,                 0,               0
   )
-  
+
   expect_null(analyze_linkage(data))
-  
+
 } )
 
 test_that(" Test linkage all zeros expect NULL", {
@@ -300,9 +300,9 @@ test_that(" Test linkage all zeros expect NULL", {
     "a",   1,         "25-49",  "F",  NA,                    0,          0,                                0,                 0,               0,
     "b",  2,          "25-49", "M",  NA,                         0,           0,                                0,                 0,               0
   )
-  
+
   expect_null(analyze_linkage(data))
-  
+
 } )
 
 test_that(" Test linkage with age <1", {
@@ -311,7 +311,7 @@ test_that(" Test linkage with age <1", {
     "a",   1,         "<01", "M",  NA,                    50,          50,                                101,                 100,               100,
     "b",  2,          NA, NA,  "PWID",                         0,           0,                             0,                 100,               101
   )
-  
+
   foo<-analyze_linkage(data)
   testthat::expect_equal(class(foo),"list")
   testthat::expect_setequal(names(foo),c("test_results","msg"))
