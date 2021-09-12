@@ -165,6 +165,7 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
 #' This file MUST NOT have any data validation formats present. If left
 #' \code{NULL}, will select the default based on \code{cop_year} and \code{tool}.
 #' @param submission_path Local path to the file to import.
+#' @param file Filepath to read from.
 #' @param cop_year COP Year to use for tailoring functions. Remember,
 #' FY22 targets = COP21.
 #' @param output_folder Local folder where you would like your Data Pack to be
@@ -225,17 +226,21 @@ check_params <- function(country_uids,
                          snuxim_model_data,
                          output_folder,
                          results_archive,
+                         ...,
                          d2_session = dynGet("d2_default_session",
                                              inherits = TRUE)) {
+  
+  
   
   params <- list()
   
   # Check Country UIDs ####
-  check_country_uids <- function(country_uids = NULL, force = TRUE) {
+  check_country_uids <- function(country_uids = NULL, force_country_uids = TRUE) {
     if (is.null(country_uids)) {
-      if (force) {
+      if (force_country_uids) {
         stop("Must supply country_uids.")
       } else {
+        # Use entire Global list if not provided and not forced
         country_uids <- valid_PSNUs$country_uid %>%
           unique()        
       }
@@ -249,11 +254,12 @@ check_params <- function(country_uids,
         country_uids <- country_uids[country_uids %in% valid_PSNUs$country_uid]
       }
     }
-    return(country_uids)
+    country_uids
   }
   
   if (!missing(country_uids)) {
-    params$country_uids <- check_country_uids(country_uids)
+    params$country_uids <- check_country_uids(country_uids,
+                                              force_country_uids = ...)
   }
   
   # Check PSNUs ####
@@ -291,10 +297,23 @@ check_params <- function(country_uids,
   # Check cop_year ####
   check_cop_year <- function(cop_year = getCurrentCOPYear()) {
     if (is.null(cop_year)) {cop_year = getCurrentCOPYear()}
-    if (!cop_year %in% c(2020, 2021)) {
-      stop("Sorry, datapackr only supports COP20 and COP21 Data Packs.")
+    
+    valid_cop_years <- c(2020:(getCurrentCOPYear()))
+    
+    if (!cop_year %in% valid_cop_years) {
+      valid_cops <- valid_cop_years %>%
+        stringr::str_remove("^20") %>%
+        paste0("COP", .)
+      
+      stop(
+        paste0("Sorry, datapackr only supports ",
+        paste_oxford(valid_cops,
+                     final = "&",
+                     oxford = dplyr::if_else(length(valid_cops) <= 2, FALSE, TRUE)),
+        " Data Packs.")
+      )
     }
-    return(cop_year)
+    cop_year
   }
   
   if (!missing(cop_year)) {
@@ -306,11 +325,22 @@ check_params <- function(country_uids,
     if (is.null(tool)) {
       tool = "Data Pack"
     } else {
-      if (!tool %in% c("Data Pack", "OPU Data Pack")) {
-        stop("Cannot support any tools other than `Data Pack` or `OPU Data Pack`")
+      accepted_tools <- 
+        c("Data Pack",
+          "OPU Data Pack",
+          "PSNUxIM Tool") %>%
+        c(., paste0(., " Template"))
+      
+      if (!tool %in% accepted_tools) {
+        stop(
+          paste0(
+            "Cannot support any tools other than: ",
+            paste_oxford(accepted_tools),
+            ".")
+          )
       }
     }
-    return(tool)
+    tool
   }
   
   if (!missing(tool)) {
@@ -350,7 +380,7 @@ check_params <- function(country_uids,
         interactive_print("Schema provided does not match archived schema. Are you using a custom schema on purpose?")
       }
     }
-    return(schema)
+    schema
   }
   
   if (!missing(schema)) {
@@ -358,21 +388,47 @@ check_params <- function(country_uids,
   }
   
   # Check datapack_name ####
-  check_datapack_name <- function(datapack_name = NULL, country_uids = NULL) {
+  check_datapack_name <- function(datapack_name = NULL,
+                                  country_uids = NULL,
+                                  force_datapack_name = TRUE) {
+    if (!is.null(country_uids)) {
+      expected_datapack_name <- valid_PSNUs %>%
+        dplyr::filter(country_uid %in% country_uids) %>%
+        dplyr::pull(country_name) %>%
+        unique() %>%
+        sort() %>%
+        paste_oxford(final = "&")
+    }
+    
     if (is.null(datapack_name)) {
       if (is.null(country_uids)) {
-        datapack_name <- "Global"
+        if (force_datapack_name) {
+          stop("Must provide either a datapack_name, or country_uids to deduce datapack_name.")
+        } else {
+          datapack_name <- "Global"
+        }
       } else {
         country_uids <- check_country_uids(country_uids)
-        datapack_name <- valid_PSNUs %>%
-          dplyr::filter(country_uid %in% country_uids) %>%
-          dplyr::pull(country_name) %>%
-          unique() %>%
-          sort() %>%
-          paste(collapse = ", ")
+        datapack_name <- expected_datapack_name
+      }
+    } else {
+      if (is.null(country_uids)){
+        if (force_datapack_name) {
+          stop("Must supply country_uids to  validate validate datapack_name.")
+        }
+      } else {
+        if (datapack_name != expected_datapack_name) {
+          warning(
+            paste0(
+              "Supplied datapack_name seems to not match country_uids. Was expecting something more like: ",
+              expected_datapack_name
+            )
+          )
+        }
       }
     }
-    return(datapack_name)
+    
+    datapack_name
   }
   
   if (!missing(datapack_name)) {
@@ -493,5 +549,5 @@ check_params <- function(country_uids,
   }
   
   
-  return(params)
+  params
 }

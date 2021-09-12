@@ -8,20 +8,31 @@ createKeychainInfo(
   submission_path = NULL,
   tool = NULL,
   country_uids = NULL,
-  cop_year = NULL
+  cop_year = NULL,
+  schema = NULL,
+  datapack_name = NULL
 )
 }
 \arguments{
 \item{submission_path}{Local path to the file to import.}
 
-\item{tool}{What type of tool is the submission file? Default is "Data Pack".}
+\item{tool}{Type of tool this function will create or interact with. Either
+\code{OPU Data Pack} or \code{Data Pack}}
 
-\item{country_uids}{List of 11 digit alphanumeric DATIM codes representing
-countries. If not provided, will check file for these codes. If not in file,
-will flag error.}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
+
+\item{schema}{Which datapackr schema to use in guiding this function. If left
+\code{NULL} will select the default based on \code{cop_year} and \code{tool}.}
+
+\item{datapack_name}{Name you would like associated with this Data Pack.
+(Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
+}
+\value{
+d datapackr sidecar object
 }
 \description{
 Creates Keychain info needed for use across most datapackr unPack functions.

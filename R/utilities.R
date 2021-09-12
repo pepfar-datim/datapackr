@@ -641,3 +641,33 @@ compareTemplateToSchema <- function(template_path = NULL,
   }
 
 }
+
+#' @export
+#' @title Compile a list ending with different final collapse
+#' 
+#' @param ... - one or more R objects, to be converted to character vectors
+#' @param final - conjunction to use before serial list item (usually 'and' or 'or')
+#' @param oxford - TRUE/FALSE indicating whether to use the Oxford (i.e., serial) comma
+#'
+#' @return A character vector of the concatenated values.
+#'
+paste_oxford <- function(..., final = "and", oxford = TRUE){
+  to_paste <- unlist(list(...))
+  
+  if (length(to_paste) == 1) {
+    to_paste
+  } else {
+    first_bits <- to_paste[1:(length(to_paste)-1)]
+    last <- to_paste[length(to_paste)]
+    
+    start <- paste(first_bits, collapse = ", ")
+    serial <- paste0(final, " ", last)
+    
+    if (oxford) {
+      start = paste0(start, ", ")
+    } else if (length(to_paste) <= 2) {
+      start = paste0(start, " ")
+    }
+      paste0(start, serial)
+  }
+}

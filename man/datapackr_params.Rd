@@ -77,6 +77,8 @@ processes to output_folder.}
 \code{OPU Data Pack} or \code{Data Pack}}
 
 \item{season}{Either \code{COP} or \code{OPU}.}
+
+\item{file}{Filepath to read from.}
 }
 \description{
 Standardized package function parameter definitions

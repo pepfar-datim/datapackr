@@ -18,6 +18,7 @@ check_params(
   snuxim_model_data,
   output_folder,
   results_archive,
+  ...,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
