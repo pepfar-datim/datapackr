@@ -23,18 +23,15 @@ checkColStructure <- function(d, sheet) {
     dplyr::mutate(
       sheet = sheet,
       submission_order = as.integer(1:(dplyr::n()))) %>%
-    {if (sheet == "PSNUxIM") {
-      dplyr::filter(.,
-        !stringr::str_detect(indicator_code, "\\d{4,}_(DSD|TA)|^$"))
-      } else {.}}
+      purrr::when(sheet == "PSNUxIM" ~ dplyr::filter(.,
+        !stringr::str_detect(indicator_code, "\\d{4,}_(DSD|TA)|^$")),
+        ~ .)
 
   col_check <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet) %>%
     dplyr::select(indicator_code, template_order = col) %>%
-    {if (sheet == "PSNUxIM") {
-      dplyr::filter(.,
-                    !stringr::str_detect(indicator_code, "\\d{4,}_(DSD|TA)|^$"))
-    } else {.}} %>%
+    purrr::when(sheet == "PSNUxIM" ~ dplyr::filter(., !stringr::str_detect(indicator_code, "\\d{4,}_(DSD|TA)|^$")),
+    ~ .) %>%
     dplyr::left_join(submission_cols, by = c("indicator_code" = "indicator_code")) %>%
     dplyr::mutate(order_check = template_order == submission_order)
 
@@ -104,7 +101,7 @@ checkColStructure <- function(d, sheet) {
                   columns_out_of_order = indicator_code)
 
 
-  if ( NROW(columns_out_of_order) > 0 ) {
+  if (NROW(columns_out_of_order) > 0) {
 
     d$tests$columns_out_of_order <- dplyr::bind_rows(columns_out_of_order, d$tests$columns_out_of_order)
     attr(d$tests$columns_out_of_order, "test_name") <- "Columns out of order"
