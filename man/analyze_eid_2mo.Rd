@@ -14,6 +14,6 @@ a
 }
 \description{
 Check data gathered from Data Pack to identify cases where
-the targeted percent of infants (<1 yr) born to HIV-positive women tested for 
+the targeted percent of infants (<1 yr) born to HIV-positive women tested for
 HIV (EID) between 0 and 2 months old is less than 90\%.
 }

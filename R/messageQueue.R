@@ -21,9 +21,27 @@ MessageQueue <- function(message=character(), level=character())
 }
 
 
+#' Title appendMessage 
+#' @description Generic function to handle appending messages to a MessageQueue
+#'
+#' @param x 
+#' @param message A string or vector of strings of messages. 
+#' @param level A string or vector of strings of 
+#' message levels (ERROR, WARNING, INFO)
+#' @return A MessageQueue class. 
+
 appendMessage <- function(x, message, level) {
   UseMethod("appendMessage", x)
 }
+
+#' Title appendMessage.MessageQueue
+#' @description Internal S3 method to deal with appending messages
+#' to a MessageQueue
+#'
+#' @param x A MessageQueue object
+#' @param message  A message of vector of messages.
+#' @param level  A string of vector of message levels (ERROR, WARNING, INFO)
+#' @return A MessageQueue object
 
 appendMessage.MessageQueue<-function(x, message=NA, level=NA) {
 
@@ -45,17 +63,34 @@ appendMessage.MessageQueue<-function(x, message=NA, level=NA) {
   return(new_me)
 }
 
-printMessages.MessageQueue<-function(x) {
-  UseMethod("print", x)
+#' Title printMessages 
+#' @description Generic function to handle printing messages of a MessageQueue
+#'
+#' @param x A MessageQueue object
+#'
+#' @return Returns a formatted output to the console
+#' @export
+#' 
+printMessages<-function(x) {
+  UseMethod("printMessages", x)
 }
 
-printMessages <- function(d) {
+
+#' Title printMessage.MessageQueue
+#' @description Internal S3 method to deal with printing messages
+#' of a Datapack Object
+#' @param x A MessageQueue object
+#' @param message  A message of vector of messages.
+#' @param level  A string of vector of message levels (ERROR, WARNING, INFO)
+#' @return Returns a formatted output to the console
+ 
+printMessages.MessageQueue <- function(x) {
   # If warnings, show all grouped by sheet and issue
-  if ( NROW(d$info$messages) > 0 & interactive() ) {
+  if ( NROW(x) > 0 & interactive() ) {
     options(warning.length = 8170)
 
     levels<-c("ERROR", "WARNING", "INFO")
-    messages <- d$info$messages
+    messages <- x
     class(messages)<-"data.frame"
     messages <- messages %>%
       dplyr::mutate(level = factor((level), levels = levels)) %>%

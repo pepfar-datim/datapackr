@@ -10,7 +10,7 @@ validationSummary(d)
 \item{d}{Datapackr object}
 }
 \value{
-Data frame consisting of ou, ou_id,country_name,country_uid,validation_issue_category,count
+Data frame consisting of ou, ou_id, country_name, country_uid, validation_issue_category, count
 }
 \description{
 Produce an output of tests.
