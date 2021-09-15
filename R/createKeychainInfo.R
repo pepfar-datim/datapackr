@@ -39,7 +39,8 @@ createKeychainInfo <- function(submission_path = NULL,
       d$keychain$submission_path <- file.choose()
     }
 
-    if (!canReadFile(d$keychain$submission_path)) {stop("File could not be read!")
+    if (!canReadFile(d$keychain$submission_path)) {
+      stop("File could not be read!")
       }
   }
 
@@ -111,14 +112,16 @@ createKeychainInfo <- function(submission_path = NULL,
       d$info$schema <- datapackr::cop20_data_pack_schema
     } else if (d$info$cop_year == 2019) {
       d$info$schema <- datapackr::data_pack_schema
-    } else {stop(paste0("Unable to process Data Packs from COP ", d$info$cop_year))
+    } else {
+      stop(paste0("Unable to process Data Packs from COP ", d$info$cop_year))
       }
   } else if (d$info$tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
     if (d$info$cop_year == 2020) {
       d$info$schema <- datapackr::cop20OPU_data_pack_schema
     } else if (d$info$cop_year == 2021) {
       d$info$schema <- cop21OPU_data_pack_schema
-    } else {stop(paste0("Unable to process OPU Data Packs from COP ", d$info$cop_year))
+    } else {
+      stop(paste0("Unable to process OPU Data Packs from COP ", d$info$cop_year))
       }
   } else {
     stop("Unable to process that type of Data Pack.")
