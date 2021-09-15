@@ -64,20 +64,16 @@ checkFormulas <- function(d, sheet) {
       by = c("col" = "col")) %>%
     dplyr::select(row, col, indicator_code, formula) %>%
     dplyr::filter(row != header_row) %>%
-
-  # Handle duplicate column headers ####
-    {if (sheet == "PSNUxIM" & d$info$tool == "Data Pack") {
-      (.)
-    } else {
-      dplyr::group_by(., row) %>%
+    purrr::when(
+      sheet == "PSNUxIM" & d$info$tool == "Data Pack" ~ .,
+      ~  dplyr::group_by(., row) %>%
         dplyr::mutate(occurrence = duplicated(indicator_code)) %>%
         dplyr::ungroup() %>%
         dplyr::filter(occurrence == FALSE) %>%
         dplyr::select(-occurrence) %>%
         # Limit to only columns that DUIT cares about
         dplyr::filter(indicator_code %in% formulas_schema$indicator_code)
-        }
-      } %>%
+    ) %>%
     dplyr::mutate(
       formula = stringr::str_replace_all(
         formula,
@@ -90,17 +86,13 @@ checkFormulas <- function(d, sheet) {
   altered_formulas <- formulas_schema %>%
     dplyr::left_join(
       formulas_datapack,
-      by =
-        {if (sheet == "PSNUxIM" & d$info$tool == "Data Pack") {
-          c("col" = "col")
-        } else {c("indicator_code" = "indicator_code")
-            }
-        }
-    ) %>%
+      by = ifelse(sheet == "PSNUxIM" & d$info$tool == "Data Pack",
+      c("col" = "col"),
+      c("indicator_code" = "indicator_code")
+      )) %>%
     dplyr::filter(formula.x != formula.y) %>%
-    {if (sheet == "PSNUxIM" & d$info$tool == "Data Pack") {
-      dplyr::rename(., indicator_code = indicator_code.y)
-      } else {.}} %>%
+    purrr::when(sheet == "PSNUxIM" & d$info$tool == "Data Pack" ~ dplyr::rename(., indicator_code = indicator_code.y),
+    ~ .) %>%
     dplyr::select(
       indicator_code, correct_fx = formula.x, submitted_fx = formula.y, row) %>%
     dplyr::group_by(indicator_code, correct_fx, submitted_fx) %>%
