@@ -70,7 +70,7 @@ getMechanismView <- function(country_uids = NULL,
                              update_stale_cache = FALSE) {
 
   empty_mechs_view <- tibble::tibble(
-    "mechanism_desc" = character() ,
+    "mechanism_desc" = character(),
     "mechanism_code"= character(),
     "attributeOptionCombo" = character(),
     "partner_desc" = character(),
@@ -95,7 +95,7 @@ getMechanismView <- function(country_uids = NULL,
 
   if (file.exists(cached_mechs_path) & can_read_file) {
     is_fresh <-
-      lubridate::as.duration(lubridate::interval(file.info(cached_mechs_path)$mtime,Sys.time())) < lubridate::duration(max_cache_age)
+      lubridate::as.duration(lubridate::interval(file.info(cached_mechs_path)$mtime, Sys.time())) < lubridate::duration(max_cache_age)
   } else{
     is_fresh<-FALSE
   }
@@ -122,7 +122,7 @@ getMechanismView <- function(country_uids = NULL,
   if (!is.null(country_uids)) {
 
     ous<-datapackr::valid_PSNUs %>%
-      dplyr::select(ou,ou_id,country_uid) %>%
+      dplyr::select(ou, ou_id, country_uid) %>%
       dplyr::distinct() %>%
       dplyr::filter(country_uid %in% country_uids) %>%
       dplyr::pull(ou) %>%
@@ -134,19 +134,19 @@ getMechanismView <- function(country_uids = NULL,
   if (!is.null(cop_year)) {
     mechs %<>%
         dplyr::filter(
-                      startdate < paste0(cop_year+1,"-10-01"),
-                      enddate > paste0(cop_year,"-09-30"))
+                      startdate < paste0(cop_year+1, "-10-01"),
+                      enddate > paste0(cop_year, "-09-30"))
   }
 
     # Include Dedupe or MOH
       if (!include_dedupe ) {
-        dedupe <- c("X8hrDf6bLDC","YGT1o7UxfFu")
+        dedupe <- c("X8hrDf6bLDC", "YGT1o7UxfFu")
         mechs %<>%  dplyr::filter( (attributeOptionCombo %in% dedupe ) == FALSE )
       }
 
       # Include Dedupe or MOH
       if (!include_MOH ) {
-        MOH <- c("QCJpv5aDCJU","TRX0yuTsJA9")
+        MOH <- c("QCJpv5aDCJU", "TRX0yuTsJA9")
         mechs %<>%  dplyr::filter( (attributeOptionCombo %in% MOH ) == FALSE )
       }
 

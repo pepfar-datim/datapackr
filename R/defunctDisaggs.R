@@ -14,7 +14,7 @@
 #'
 defunctDisaggs <- function(d, sheet) {
 
-  if (sheet %in% c("SNU x IM","PSNUxIM")) {
+  if (sheet %in% c("SNU x IM", "PSNUxIM")) {
     stop("Sorry! Can't check the SNU x IM tab with this function.")
   } else {
     data <- d$data$extract
@@ -33,8 +33,8 @@ defunctDisaggs <- function(d, sheet) {
     dplyr::select(indicator_code, Age, Sex, KeyPop) %>%
     dplyr::distinct()
 
-  d$tests$defunct_disaggs<-dplyr::bind_rows(d$tests$defunct_disaggs,defunct_disaggs)
-  attr(d$tests$defunct_disaggs,"test_name")<-"Defunct disaggs"
+  d$tests$defunct_disaggs<-dplyr::bind_rows(d$tests$defunct_disaggs, defunct_disaggs)
+  attr(d$tests$defunct_disaggs, "test_name")<-"Defunct disaggs"
 
   if (NROW(defunct_disaggs) > 0) {
 
@@ -49,13 +49,13 @@ defunctDisaggs <- function(d, sheet) {
         sheet,
         ": INVALID DISAGGS. Please review all tabs flagged by this test to ensure",
         " no Age, Sex, or Key Population disaggregates have been inadvertently or",
-        " incorrectly altered. If you believe this has been flagged in error,",
+        " incorrectly altered. If you believe this has been flagged in error, ",
         " please first refer to MER Guidance to confirm valid disaggregates for",
         " the data element flagged. (Check MER Guidance for correct alternatives) -> \n\t",
         paste(defunct_msg, collapse = "\n\t"),
         "\n")
 
-    d$info$messages<-appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages<-appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 

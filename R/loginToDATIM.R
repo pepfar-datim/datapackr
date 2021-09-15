@@ -21,13 +21,13 @@ LoadConfigFile <- function(config_path = NULL) {
   #Load from a file
   if (!is.null(config_path)) {
     if (file.access(config_path, mode = 4) == -1) {
-      stop(paste("Cannot read configuration located at",config_path))
+      stop(paste("Cannot read configuration located at", config_path))
     }
     dhis_config <- jsonlite::fromJSON(config_path)
     #Mangle the config to be sure it always ends with a single forward slash.
     #All other URIs should thus NOT begin with a /
     dhis_config$dhis$baseurl <-
-      stringi::stri_reverse(gsub("^/+", "/", paste0("/",stringi::stri_reverse(dhis_config$dhis$baseurl))))
+      stringi::stri_reverse(gsub("^/+", "/", paste0("/", stringi::stri_reverse(dhis_config$dhis$baseurl))))
     return(dhis_config)
   } else {
     stop("You must specify a credentials file!")
@@ -80,15 +80,15 @@ ValidateConfig <- function(dhis_config) {
 #'
 DHISLogin<-function(dhis_config) {
 
-  url <- URLencode(URL = paste0(getOption("baseurl"), "api/",api_version(),"/me"))
+  url <- URLencode(URL = paste0(getOption("baseurl"), "api/", api_version(), "/me"))
   #Logging in here will give us a cookie to reuse
-  r <- httr::GET(url ,
+  r <- httr::GET(url,
                  httr::authenticate(dhis_config$dhis$username, dhis_config$dhis$password),
                  httr::timeout(60))
   if (!isLoggedIn()) {
     stop("Could not authenticate you with the server!")
   } else {
-    me <- jsonlite::fromJSON(httr::content(r,as = "text"))
+    me <- jsonlite::fromJSON(httr::content(r, as = "text"))
     options("organisationUnit" = me$organisationUnits$id)
     return("Successfully logged into DATIM")
   }

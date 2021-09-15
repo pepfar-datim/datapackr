@@ -30,7 +30,7 @@ unPackCountryUIDs <- function(submission_path,
       range = countryUIDs_homeCell()) %>%
     names() %>%
     stringr::str_remove_all("\\s") %>%
-    stringr::str_split(",") %>%
+    stringr::str_split(", ") %>%
     unlist()
 
   country_uids <- country_uids[grep("[A-Za-z][A-Za-z0-9]{10}", country_uids)]
@@ -84,9 +84,9 @@ unPackCountryUIDs <- function(submission_path,
           tool = tool)
 
       if (datapack_name == "Latin America Region") {
-        country_uids <- c("joGQFpKiHl9","QKD4CzBG2GM","N7QAPGSaODP","EXVC4bNtv84","w5NMe34EjPN","aUTsSmqqu9O","oK0gC85xx2f")
+        country_uids <- c("joGQFpKiHl9", "QKD4CzBG2GM", "N7QAPGSaODP", "EXVC4bNtv84", "w5NMe34EjPN", "aUTsSmqqu9O", "oK0gC85xx2f")
       } else if (datapack_name == "Caribbean Region") {
-        country_uids <- c("RKoVudgb05Y","PeOHqAwdtez","WuxG6jzaypt","zhJINyURZ5Y","WSl5y9jxCpC")
+        country_uids <- c("RKoVudgb05Y", "PeOHqAwdtez", "WuxG6jzaypt", "zhJINyURZ5Y", "WSl5y9jxCpC")
       } else if (datapack_name %in% unique(valid_PSNUs$country_name)) {
         country_uids <- unique(valid_PSNUs$country_uid[valid_PSNUs$country_name == datapack_name])
       } else if (datapack_name %in% unique(valid_PSNUs$ou)) {
@@ -114,7 +114,7 @@ unPackCountryUIDs <- function(submission_path,
   if (length(invalid_uids) > 0) {
     msg <-
       paste0(
-        "Cell ",countryUIDs_homeCell()," in the Home tab of your ",
+        "Cell ", countryUIDs_homeCell(), " in the Home tab of your ",
         tool,
         " contains the following Regional OU uids: \n\n  * ",
         paste(invalid_uids, collapse = "\n  * "),

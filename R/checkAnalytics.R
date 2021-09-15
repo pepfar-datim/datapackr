@@ -372,7 +372,7 @@ analyze_linkage <- function(data) {
 
   analysis <- data %>%
     dplyr::mutate(
-      HTS_TST_POS.T =rowSums(dplyr::select(.,tidyselect::any_of(htsModalities()))),
+      HTS_TST_POS.T =rowSums(dplyr::select(., tidyselect::any_of(htsModalities()))),
       HTS_TST.Linkage.T =
         dplyr::case_when(
           HTS_TST_POS.T == 0 ~ NA_real_,
@@ -471,7 +471,7 @@ analyze_indexpos_ratio <- function(data) {
     dplyr::summarise(dplyr::across(dplyr::everything(), sum)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(
-      HTS_TST_POS.T = rowSums(dplyr::select(.,tidyselect::any_of(htsModalities()))),
+      HTS_TST_POS.T = rowSums(dplyr::select(., tidyselect::any_of(htsModalities()))),
       HTS_INDEX.total =
         HTS_INDEX_COM.New.Pos.T
         + HTS_INDEX_FAC.New.Pos.T,
@@ -628,20 +628,20 @@ checkAnalytics <- function(d,
     eid_coverage_2mo  = analyze_eid_2mo
   )
 
-  analytics_checks <-  purrr::map(funs,purrr::exec,data)
+  analytics_checks <-  purrr::map(funs, purrr::exec, data)
 
   d$info$analytics_warning_msg <-
     append(
       d$info$analytics_warning_msg,
       purrr::map(analytics_checks,
-                 function(x)purrr::pluck(x,"msg"))) %>%
+                 function(x)purrr::pluck(x, "msg"))) %>%
     purrr::discard(is.null)
 
 
   d$tests <-
     append(d$tests,
            purrr::map(analytics_checks,
-                      function(x) purrr::pluck(x,"test_results"))) %>%
+                      function(x) purrr::pluck(x, "test_results"))) %>%
     purrr::discard(is.null)
 
   # If warnings, show all grouped by sheet and issue ####

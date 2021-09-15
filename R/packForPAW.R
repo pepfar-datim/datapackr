@@ -19,13 +19,13 @@ packForPAW <- function(d) {
       ou_id = purrr::map_chr(ancestors, list("id", 3), .default = NA),
       ou = purrr::map_chr(ancestors, list("name", 3), .default = NA),
       snu1_id = dplyr::if_else(
-        condition = is.na(purrr::map_chr(ancestors, list("id",4), .default = NA)),
+        condition = is.na(purrr::map_chr(ancestors, list("id", 4), .default = NA)),
         true = psnu_uid,
-        false = purrr::map_chr(ancestors, list("id",4), .default = NA)),
+        false = purrr::map_chr(ancestors, list("id", 4), .default = NA)),
       snu1 = dplyr::if_else(
-        condition = is.na(purrr::map_chr(ancestors, list("name",4), .default = NA)),
+        condition = is.na(purrr::map_chr(ancestors, list("name", 4), .default = NA)),
         true = psnu,
-        false = purrr::map_chr(ancestors, list("name",4), .default = NA))
+        false = purrr::map_chr(ancestors, list("name", 4), .default = NA))
     ) %>%
     dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id, psnu, psnu_uid)
 
@@ -35,7 +35,7 @@ packForPAW <- function(d) {
       dplyr::mutate(
         Age =
           dplyr::case_when(
-            indicator_code %in% c("PMTCT_EID.N.Age.T.2mo","PMTCT_EID.N.Age.T.2to12mo") ~ NA_character_,
+            indicator_code %in% c("PMTCT_EID.N.Age.T.2mo", "PMTCT_EID.N.Age.T.2to12mo") ~ NA_character_,
             TRUE ~ Age
           )) %>%
       dplyr::left_join(map_des_cocs_local,

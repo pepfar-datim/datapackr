@@ -59,7 +59,7 @@ createKeychainInfo <- function(submission_path = NULL,
     )
 
   if (!tool_name_type$cop_year[1] %in% c(2018:2030)
-        | !tool_name_type$type[1] %in% c("Data Pack","OPU Data Pack")) {
+        | !tool_name_type$type[1] %in% c("Data Pack", "OPU Data Pack")) {
     stop("Please correct cell B10 on the Home tab. This should read 'COP21 Data Pack', or similar")
   }
 

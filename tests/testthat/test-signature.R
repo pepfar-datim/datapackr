@@ -24,12 +24,12 @@ test_that("Can generate a key chain", {
        "messages"
      )
    )
-   expect_equal(d$keychain$submission_path,test_sheet('COP21_Data_Pack_Template.xlsx'))
-   expect_setequal(class(d$info$messages),c("data.frame","MessageQueue"))
+   expect_equal(d$keychain$submission_path, test_sheet('COP21_Data_Pack_Template.xlsx'))
+   expect_setequal(class(d$info$messages), c("data.frame", "MessageQueue"))
    expect_false(d$info$has_error)
    expect_false(d$info$newSNUxIM)
-   expect_equal(d$info$country_uids,"qllxzIjjurr")
-   expect_equal(d$info$datapack_name,"Lesotho")
+   expect_equal(d$info$country_uids, "qllxzIjjurr")
+   expect_equal(d$info$datapack_name, "Lesotho")
    expect_false(d$info$newSNUxIM)
    expect_false(d$info$has_error)
    expect_false(d$info$missing_DSNUs)
@@ -39,7 +39,7 @@ test_that("Can generate a key chain", {
    expect_false(d$info$needs_psnuxim)
 } )
 
-test_that("Can get the type and COP year of tool of a COP21 Data Pack",{
+test_that("Can get the type and COP year of tool of a COP21 Data Pack", {
 
    d <- datapackr:::createKeychainInfo(submission_path = test_sheet('COP21_Data_Pack_Template.xlsx'))
    expect_equal(d$info$tool, "Data Pack")

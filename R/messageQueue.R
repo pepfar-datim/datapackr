@@ -7,7 +7,7 @@
 #' @return Object of class data.frame and Message queue.
 #'
 
-MessageQueue <- function(message=character(),level=character())
+MessageQueue <- function(message=character(), level=character())
 {
 
   me <- data.frame(
@@ -16,7 +16,7 @@ MessageQueue <- function(message=character(),level=character())
   )
 
   ## Set the name for the class
-  class(me)<-c("data.frame","MessageQueue")
+  class(me)<-c("data.frame", "MessageQueue")
   return(me)
 }
 
@@ -25,7 +25,7 @@ appendMessage <- function(x, message, level) {
   UseMethod("appendMessage", x)
 }
 
-appendMessage.MessageQueue<-function(x, message=NA,level=NA) {
+appendMessage.MessageQueue<-function(x, message=NA, level=NA) {
 
   if (length(message) != length(level)) {
     stop("Messages and warnings must be of the same length")
@@ -39,14 +39,14 @@ appendMessage.MessageQueue<-function(x, message=NA,level=NA) {
     level[is.na(level)]<-"UNKNOWN"
   }
 
-  new_me<-rbind.data.frame(x,list(message=message,level=level),
+  new_me<-rbind.data.frame(x, list(message=message, level=level),
                            stringsAsFactors = FALSE)
-  class(new_me)<-c("data.frame","MessageQueue")
+  class(new_me)<-c("data.frame", "MessageQueue")
   return(new_me)
 }
 
 printMessages.MessageQueue<-function(x) {
-  UseMethod("print",x)
+  UseMethod("print", x)
 }
 
 printMessages <- function(d) {
@@ -54,19 +54,19 @@ printMessages <- function(d) {
   if ( NROW(d$info$messages) > 0 & interactive() ) {
     options(warning.length = 8170)
 
-    levels<-c("ERROR","WARNING","INFO")
+    levels<-c("ERROR", "WARNING", "INFO")
     messages <- d$info$messages
     class(messages)<-"data.frame"
     messages <- messages %>%
-      dplyr::mutate(level = factor((level),levels = levels)) %>%
-      dplyr::arrange(level,message) %>%
+      dplyr::mutate(level = factor((level), levels = levels)) %>%
+      dplyr::arrange(level, message) %>%
       dplyr::select(message)
 
     messages <-
       paste(
         paste(
           seq_along(messages$message),
-          ": " , messages$message
+          ": ", messages$message
           #stringr::str_squish(gsub("\n", "", d$info$messages))
         ),
         sep = "",

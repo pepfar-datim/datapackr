@@ -17,7 +17,7 @@ unPackSheets <- function(d) {
     dplyr::distinct() %>%
     dplyr::filter(
       !sheet_name %in% skip_tabs(tool = d$info$tool, cop_year = d$info$cop_year)
-        & !sheet_name %in% c("SNU x IM","PSNUxIM")) %>%
+        & !sheet_name %in% c("SNU x IM", "PSNUxIM")) %>%
     dplyr::pull(sheet_name)
 
   actual_sheets <- readxl::excel_sheets(d$keychain$submission_path)

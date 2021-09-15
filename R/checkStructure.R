@@ -30,7 +30,7 @@ checkStructure <- function(d) {
   d$tests$missing_sheets <- sheets_check %>%
     dplyr::filter(is.na(submission_order))
 
-  attr(d$tests$missing_sheets,"test_name") <- "Missing sheets"
+  attr(d$tests$missing_sheets, "test_name") <- "Missing sheets"
 
   if (any(is.na(sheets_check$submission_order))) {
     warning_msg <-
@@ -39,7 +39,7 @@ checkStructure <- function(d) {
         " been deleted or renamed in your Data Pack. -> \n  * ",
         paste0(d$tests$missing_sheets$sheet_name, collapse = "\n  * "),
         "\n")
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
 
   return(d)

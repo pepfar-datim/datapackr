@@ -32,18 +32,18 @@ getPSNUs <- function(country_uids = NULL,
       "in",
       paste0(
         "AVy8gJXym2D",
-        dplyr::if_else(include_mil, ",nwQbMeALRjL", ""),
-        dplyr::if_else(include_DREAMS, ",mRRlkbZolDR", "")
+        dplyr::if_else(include_mil, ",nwQbMeALRjL",""), # nolint
+        dplyr::if_else(include_DREAMS, ",mRRlkbZolDR","") # nolint
       )
     ) %>%
     {
       if (all(!is.null(country_uids)))
-        api_filter(., "ancestors.id", "in", match = paste(country_uids, collapse = ","))
+        api_filter(., "ancestors.id", "in", match = paste(country_uids, collapse = ",")) # nolint
       else
         .
     } %>%
     datapackr::api_fields(
-      "id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]"
+      "id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]" # nolint
     ) %>%
     {
       if (!is.null(additional_fields))
@@ -66,7 +66,7 @@ getPSNUs <- function(country_uids = NULL,
         dplyr::case_when(
           stringr::str_detect(as.character(organisationUnitGroups), "mRRlkbZolDR") ~ "Y"
         ),
-      level_4_type = purrr::map(ancestors, list("organisationUnitGroups",4), .default = NA),
+      level_4_type = purrr::map(ancestors, list("organisationUnitGroups", 4), .default = NA),
       country_name = dplyr::case_when(
         psnu_type == "Country" ~ psnu,
         stringr::str_detect(as.character(level_4_type), "cNzfcPWEGSH") ~
@@ -82,13 +82,13 @@ getPSNUs <- function(country_uids = NULL,
       ou_id = purrr::map_chr(ancestors, list("id", 3), .default = NA),
       ou = purrr::map_chr(ancestors, list("name", 3), .default = NA),
       snu1_id = dplyr::if_else(
-        condition = is.na(purrr::map_chr(ancestors, list("id",4), .default = NA)),
+        condition = is.na(purrr::map_chr(ancestors, list("id", 4), .default = NA)),
         true = psnu_uid,
-        false = purrr::map_chr(ancestors, list("id",4), .default = NA)),
+        false = purrr::map_chr(ancestors, list("id", 4), .default = NA)),
       snu1 = dplyr::if_else(
-        condition = is.na(purrr::map_chr(ancestors, list("name",4), .default = NA)),
+        condition = is.na(purrr::map_chr(ancestors, list("name", 4), .default = NA)),
         true = psnu,
-        false = purrr::map_chr(ancestors, list("name",4), .default = NA))
+        false = purrr::map_chr(ancestors, list("name", 4), .default = NA))
     ) %>%
     dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id,
                   psnu, psnu_uid, psnu_type,
@@ -120,9 +120,9 @@ add_dp_psnu <- function(PSNUs) {
           paste0(country_name, " > "),
           ""),
         psnu,
-        dplyr::if_else(!is.na(psnu_type), paste0(" [#", psnu_type,"]"), ""),
+        dplyr::if_else(!is.na(psnu_type), paste0(" [#", psnu_type, "]"), ""),
         dplyr::if_else(!is.na(DREAMS), " [#DREAMS]", ""),
-        " [", psnu_uid,"]")
+        " [", psnu_uid, "]")
     )
 
   return(PSNUs)

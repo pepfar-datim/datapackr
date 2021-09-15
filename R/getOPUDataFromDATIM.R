@@ -39,7 +39,7 @@ getOPUDataFromDATIM <- function(cop_year,
     all_country_uids <-
       datimutils::getOrgUnitGroups("Country",
                                    by = name,
-                                   fields = "organisationUnits[name,id]",
+                                   fields = "organisationUnits[name, id]",
                                    d2_session = d2_session) %>%
       dplyr::arrange(name)
 

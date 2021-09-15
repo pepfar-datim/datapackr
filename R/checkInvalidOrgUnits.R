@@ -11,7 +11,7 @@
 #' @return d
 #'
 checkInvalidOrgUnits <- function(d, sheet) {
-  if (sheet %in% c("SNU x IM","PSNUxIM")) {
+  if (sheet %in% c("SNU x IM", "PSNUxIM")) {
     data <- d$data$SNUxIM
   } else {
     data <- d$data$extract
@@ -30,8 +30,8 @@ checkInvalidOrgUnits <- function(d, sheet) {
     dplyr::select(PSNU) %>%
     dplyr::mutate(sheet=sheet)
 
-  d$tests$invalid_orgunits<-dplyr::bind_rows(d$tests$invalid_orgunits,invalid_orgunits)
-  attr(d$tests$invalid_orgunits,"test_name") <- "Invalid orgunits"
+  d$tests$invalid_orgunits<-dplyr::bind_rows(d$tests$invalid_orgunits, invalid_orgunits)
+  attr(d$tests$invalid_orgunits, "test_name") <- "Invalid orgunits"
 
   if (NROW(invalid_orgunits) > 0) {
 
@@ -47,7 +47,7 @@ checkInvalidOrgUnits <- function(d, sheet) {
         paste(invalid_orgunits$PSNU, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 

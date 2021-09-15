@@ -16,8 +16,8 @@ pull_COPindicators <- function(cop_year = datapackr::getCurrentCOPYear(),
                                     d2_session = d2_session) %>%
     datapackr::api_filter(field = "name",
                           operation = "eq",
-                          match = paste("COP",stringr::str_sub(cop_year,start = -2),"DataPack Indicators")) %>%
-    datapackr::api_fields("indicators[code,id,name,numeratorDescription,numerator,denominatorDescription,denominator,indicatorType[id,name]]") %>%
+                          match = paste("COP", stringr::str_sub(cop_year, start = -2), "DataPack Indicators")) %>%
+    datapackr::api_fields("indicators[code,id,name,numeratorDescription,numerator,denominatorDescription,denominator,indicatorType[id,name]]") %>% # nolint
     datapackr::api_get(d2_session = d2_session) %>%
     purrr::pluck("indicators") %>%
     purrr::pluck(1)

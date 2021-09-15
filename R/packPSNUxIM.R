@@ -31,7 +31,7 @@ packPSNUxIM <- function(wb,
   }
 
   if (!cop_year %in% c(2021)) {
-    stop(paste0("Packing PSNU x IM tabs is not supported for COP",cop_year," Data Packs."))
+    stop(paste0("Packing PSNU x IM tabs is not supported for COP", cop_year, " Data Packs."))
   }
 
   if (tool != "OPU Data Pack") {
@@ -41,8 +41,8 @@ packPSNUxIM <- function(wb,
   # Create data sidecar to eventually compile and return ####
   r <- list(
     wb = wb,
-    messages = Messages$new()
-  )
+    info = list(messages = MessageQueue(),
+    has_error = FALSE))
 
   #TODO: Test/write this part to be compatible with COP Data Pack
 
@@ -151,18 +151,18 @@ packPSNUxIM <- function(wb,
   # Create Deduplicated Rollups
   snuxim_model_data %<>%
     dplyr::mutate(
-      `Total Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}|HllvX50cXC0")), na.rm = TRUE),
-      `DSD Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_DSD")), na.rm = TRUE),
-      `TA Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_TA")), na.rm = TRUE))
+      `Total Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}|HllvX50cXC0")), na.rm = TRUE), # nolint
+      `DSD Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_DSD")), na.rm = TRUE), # nolint
+      `TA Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_TA")), na.rm = TRUE)) # nolint
 
   # Create Duplicated Rollups
   snuxim_model_data %<>%
     dplyr::mutate(
       `Deduplicated DSD Rollup` =
-        rowSums(dplyr::select(., tidyselect::all_of(c("DSD Duplicated Rollup","DSD Dedupe"))),
+        rowSums(dplyr::select(., tidyselect::all_of(c("DSD Duplicated Rollup", "DSD Dedupe"))),
                 na.rm = T),
       `Deduplicated TA Rollup` =
-        rowSums(dplyr::select(., tidyselect::all_of(c("TA Duplicated Rollup","TA Dedupe"))),
+        rowSums(dplyr::select(., tidyselect::all_of(c("TA Duplicated Rollup", "TA Dedupe"))),
                 na.rm = T)) %>%
       dplyr::mutate(
         `Total Deduplicated Rollup` =
@@ -177,8 +177,8 @@ packPSNUxIM <- function(wb,
 
   # Create Max columns
   snuxim_model_data %<>%
-    datapackr::rowMax(cn = "Max_TA.T_1", regex = "\\d{4,}_TA") %>%
-    datapackr::rowMax(cn = "Max_DSD.T_1", regex = "\\d{4,}_DSD") %>%
+    datapackr::rowMax(cn = "Max_TA.T_1", regex = "\\d{4,}_TA") %>% # nolint
+    datapackr::rowMax(cn = "Max_DSD.T_1", regex = "\\d{4,}_DSD") %>% # nolint
     dplyr::mutate(
       `Max_Crosswalk.T_1` =
         pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = T))
@@ -188,8 +188,8 @@ packPSNUxIM <- function(wb,
 
   snuxim_model_data %<>%
     dplyr::rowwise() %>%
-    dplyr::mutate(ta_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_TA")))),
-                  dsd_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_DSD"))))) %>%
+    dplyr::mutate(ta_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_TA")))), # nolint
+                  dsd_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_DSD"))))) %>% # nolint
     dplyr::ungroup() %>%
     dplyr::mutate(
       `TA Dedupe Resolution (FY22)` = dplyr::case_when(
@@ -214,7 +214,7 @@ packPSNUxIM <- function(wb,
       `Custom Crosswalk Dedupe Allocation (FY22) (% of DataPackTarget)` = `Crosswalk Dedupe`
     ) %>%
     dplyr::select(psnu_uid, indicator_code, Age, Sex, KeyPop,
-                  tidyselect::matches("\\d{4,}"),
+                  tidyselect::matches("\\d{4,}"), # nolint
                   `Custom DSD Dedupe Allocation (FY22) (% of DataPackTarget)`,
                   `Custom TA Dedupe Allocation (FY22) (% of DataPackTarget)`,
                   `Custom Crosswalk Dedupe Allocation (FY22) (% of DataPackTarget)`,
@@ -271,7 +271,7 @@ packPSNUxIM <- function(wb,
     #     readxl::read_excel(
     #       path = d$keychain$submission_path,
     #       sheet = "PSNUxIM",
-    #       range = readxl::cell_limits(c(1,2), c(NA,2)),
+    #       range = readxl::cell_limits(c(1, 2), c(NA, 2)),
     #       col_names = F,
     #       .name_repair = "minimal"
     #     ) %>%
@@ -329,8 +329,8 @@ packPSNUxIM <- function(wb,
   #       DataPackTarget = paste0(
   #         'SUMIF(',
   #         sheet_name, '!$', id_col, ':$', id_col,
-  #         ',$F', row,
-  #         ',', sheet_name, '!$', target_col, ':$', target_col, ')')
+  #         ', $F', row,
+  #         ', ', sheet_name, '!$', target_col, ':$', target_col, ')')
   #     ) %>%
   #     dplyr::select(-id_col, -sheet_name, -target_col, -row)
   #
@@ -344,7 +344,7 @@ packPSNUxIM <- function(wb,
     dplyr::filter(sheet_name == "PSNUxIM")
 
   col.im.targets <- data_structure %>%
-    dplyr::filter(col_type == "target" & indicator_code %in% c("12345_DSD","")) %>%
+    dplyr::filter(col_type == "target" & indicator_code %in% c("12345_DSD", "")) %>%
     dplyr::filter(
       indicator_code == "12345_DSD" | col == max(col)) %>%
     dplyr::pull(col)
@@ -355,7 +355,7 @@ packPSNUxIM <- function(wb,
       indicator_code == "12345_DSD" | col == max(col)) %>%
     dplyr::pull(col)
 
-  count.im.datim <- names(snuxim_model_data)[stringr::str_detect(names(snuxim_model_data), "\\d{4,}_(DSD|TA)")] %>%
+  count.im.datim <- names(snuxim_model_data)[stringr::str_detect(names(snuxim_model_data), "\\d{4,}_(DSD|TA)")] %>% # nolint
     length()
 
   col.formulas <- data_structure %>%
@@ -370,9 +370,9 @@ packPSNUxIM <- function(wb,
     dplyr::arrange(col) %>%
     dplyr::mutate(
       column_names = dplyr::case_when(
-        col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_",col),
-        col >= col.im.targets[1] & col <= (col.im.targets[1]+count.im.datim-1) ~ paste0("target_col_",col),
-        #col >= col.im.targets[1] & col <= col.im.targets[2] ~ paste0("target_col_",col),
+        col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_", col),
+        col >= col.im.targets[1] & col <= (col.im.targets[1]+count.im.datim-1) ~ paste0("target_col_", col),
+        #col >= col.im.targets[1] & col <= col.im.targets[2] ~ paste0("target_col_", col),
         TRUE ~ indicator_code)
     ) %>%
     dplyr::filter(col < col.im.targets[1]) %>%
@@ -384,14 +384,8 @@ packPSNUxIM <- function(wb,
     dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
     dplyr::mutate(
       dplyr::across(dplyr::all_of(col.formulas),
-                    ~stringr::str_replace_all(
-                      .,
-                      pattern = paste0("(?<=[:upper:])", top_rows
-                                       +1),
-                      replacement = as.character(seq_along(snuxim_model_data) + existing_rows)
-                    )
-      )
-    )
+                    ~stringr::str_replace_all(., pattern = paste0("(?<=[:upper:])", top_rows +1),
+                      replacement = as.character(seq_along(snuxim_model_data) + existing_rows))))
 
   # Classify formula columns as formulas
   ## TODO: Improve approach
@@ -402,11 +396,12 @@ packPSNUxIM <- function(wb,
   }
 
   # Combine schema with SNU x IM model dataset ####
-  #TODO: Fix this to not re-add mechanisms removed by the Country Team (filter snuxim_model_data to only columns with not all NA related to data in missing combos)
+  #TODO: Fix this to not re-add mechanisms removed by the Country Team
+  #(filter snuxim_model_data to only columns with not all NA related to data in missing combos)
   data_structure <- datapackr::swapColumns(data_structure, snuxim_model_data) %>%
     dplyr::bind_cols(
       snuxim_model_data %>%
-        dplyr::select(tidyselect::matches("\\d{4,}"))
+        dplyr::select(tidyselect::matches("\\d{4,}")) # nolint
     )
 
   header_cols <- schema %>%
@@ -415,7 +410,7 @@ packPSNUxIM <- function(wb,
     dplyr::pull(indicator_code)
 
   IM_cols <- data_structure %>%
-    dplyr::select(tidyselect::matches("\\d{4,}")) %>%
+    dplyr::select(tidyselect::matches("\\d{4,}")) %>% # nolint
     names() %>%
     sort()
 
@@ -428,7 +423,7 @@ packPSNUxIM <- function(wb,
   right_side <- data_structure %>%
     dplyr::select(
       -tidyselect::all_of(names(left_side)),
-      -tidyselect::matches("percent_col_\\d{1,3}")
+      -tidyselect::matches("percent_col_\\d{1,3}") # nolint
     )
 
   # Write data to sheet ####
@@ -523,10 +518,10 @@ packPSNUxIM <- function(wb,
                      stack = FALSE)
 
     # Format integers
-  # integerStyle = openxlsx::createStyle(numFmt = "#,##0")
+  # integerStyle = openxlsx::createStyle(numFmt = "#,##0") # nolint
   #
   # integerCols <- grep("DataPackTarget", final_snuxim_cols)
-  #
+  #q
   # openxlsx::addStyle(
   #   wb = d$tool$wb,
   #   sheet = "PSNUxIM",
@@ -565,14 +560,14 @@ packPSNUxIM <- function(wb,
   # Tab generation date ####
   openxlsx::writeData(r$wb, "PSNUxIM",
                       paste("Last Updated on:", Sys.time()),
-                      xy = c(1,2),
+                      xy = c(1, 2),
                       colNames = F)
 
   # Package Version ####
   openxlsx::writeData(r$wb, "PSNUxIM",
                       paste("Package version:",
                             as.character(utils::packageVersion("datapackr"))),
-                      xy = c(2,2),
+                      xy = c(2, 2),
                       colNames = F)
 
   # Warning Messages ####
@@ -601,7 +596,7 @@ packPSNUxIM <- function(wb,
       "If you have any questions, please submit a Help Desk ticket at DATIM.Zendesk.com.",
       "\n")
 
-  r$messages$append(warning_msg,"INFO")
+  r$info$messages <- appendMessage(r$info$messages, warning_msg, "INFO")
 
   return(r)
 

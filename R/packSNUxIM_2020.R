@@ -13,7 +13,7 @@
 packSNUxIM_2020 <- function(d) {
 
   if (!d$info$cop_year %in% c(2020)) {
-    stop(paste0("Packing SNU x IM tabs is not supported for COP ",d$info$cop_year," Data Packs."))
+    stop(paste0("Packing SNU x IM tabs is not supported for COP ", d$info$cop_year, " Data Packs."))
   }
 
   # Check if SNUxIM data already exists ####
@@ -80,10 +80,10 @@ packSNUxIM_2020 <- function(d) {
 
   d$data$SNUxIM_combined %<>%
     dplyr::arrange(mechanism_code, type) %>%
-    dplyr::filter(!mechanism_code %in% c('00000','00001')) %>%
+    dplyr::filter(!mechanism_code %in% c('00000', '00001')) %>%
     tidyr::pivot_wider(names_from = c(mechanism_code, type),
                        values_from = percent) %>%
-    dplyr::select_at(dplyr::vars(-tidyselect::one_of("NA_TA","NA_DSD"),
+    dplyr::select_at(dplyr::vars(-tidyselect::one_of("NA_TA", "NA_DSD"),
                                  -psnuid, -sheet_name))
 
   # Allow DataPackTarget formula to lookup KP_MAT correctly ####
@@ -103,7 +103,7 @@ packSNUxIM_2020 <- function(d) {
   header_cols <- d$info$schema %>%
     dplyr::filter(sheet_name == "PSNUxIM"
                   & (col_type == "row_header"
-                     | indicator_code %in% c("DataPackTarget","Rollup","Dedupe"))) %>%
+                     | indicator_code %in% c("DataPackTarget", "Rollup", "Dedupe"))) %>%
     dplyr::pull(indicator_code)
 
   if (d$info$has_psnuxim) {
@@ -119,7 +119,7 @@ packSNUxIM_2020 <- function(d) {
       readxl::read_excel(
         path = d$keychain$submission_path,
         sheet = "PSNUxIM",
-        range = readxl::cell_limits(c(1,1), c(NA,1)),
+        range = readxl::cell_limits(c(1, 1), c(NA, 1)),
         col_names = F
       ) %>%
       NROW()
@@ -130,7 +130,7 @@ packSNUxIM_2020 <- function(d) {
   } else {
     SNUxIM_cols <- d$info$schema %>%
       dplyr::filter(sheet_name == "PSNUxIM",
-                    !indicator_code %in% c("12345_DSD","12345_TA")) %>%
+                    !indicator_code %in% c("12345_DSD", "12345_TA")) %>%
       dplyr::select(indicator_code) %>%
       `row.names<-`(.[, 1]) %>%
       t() %>%
@@ -149,8 +149,8 @@ packSNUxIM_2020 <- function(d) {
     dplyr::arrange(PSNU, sheet_num, col, Age, Sex, KeyPop) %>%
     dplyr::mutate(
       row = as.integer((1:dplyr::n()) + existing_rows),
-      ID = paste0('$A',row,'&IF($C',row,'<>"","|"&$C',row,',"")&IF($D',row,
-                  '<>"","|"&$D',row,',"")&IF($E',row,'<>"","|"&$E',row,',"")'),
+      ID = paste0('$A', row, '&IF($C', row, '<>"","|"&$C', row, ',"")&IF($D', row,
+                  '<>"", "|"&$D', row, ',"")&IF($E', row, '<>"", "|"&$E', row, ',"")'),
       sheet_num = dplyr::case_when(
         indicator_code == "OVC_HIVSTAT.N.total.T" ~ 15,
         TRUE ~ sheet_num - 8))
@@ -189,17 +189,17 @@ packSNUxIM_2020 <- function(d) {
   formula_refs_compiled <- lapply(names(d$info$col_check), compile_formula_ref) %>%
     unlist() %>%
     paste(collapse = "") %>%
-    paste0(., "OVC!$",OVC_HIVSTAT_col_letter,":$",OVC_HIVSTAT_col_letter)
+    paste0(., "OVC!$", OVC_HIVSTAT_col_letter, ":$", OVC_HIVSTAT_col_letter)
 
   d$data$SNUxIM_combined %<>%
     dplyr::mutate(
       DataPackTarget = paste0(
-        'ROUND(SUMIF(CHOOSE($G',row,
-        ',',formula_refs_compiled,'),$F',row,
-        ',INDIRECT($B',row,')),0)'),
+        'ROUND(SUMIF(CHOOSE($G', row,
+        ', ', formula_refs_compiled, '),$F', row,
+        ', INDIRECT($B', row, ')),0)'),
 
       # Add Dedupe formula ####
-      Dedupe = paste0('IF($I',row,'>100%,1-$I',row,',0)'),
+      Dedupe = paste0('IF($I', row, '>100%,1-$I', row, ',0)'),
 
       # Add Rollup check formula
       Rollup = NA_character_
@@ -221,13 +221,13 @@ packSNUxIM_2020 <- function(d) {
               first_new_mech_col - 1 + length(new_mech_cols)
           )
         ),
-        row,')')) %>%
+        row, ')')) %>%
     dplyr::select(-row) %>%
 
     # Alter Ages and Sexes as needed ####
   dplyr::mutate(
     Age = dplyr::case_when(
-      indicator_code %in% c("PMTCT_EID.N.Age.T.2mo","PMTCT_EID.N.Age.T.2to12mo") ~ NA_character_,
+      indicator_code %in% c("PMTCT_EID.N.Age.T.2mo", "PMTCT_EID.N.Age.T.2to12mo") ~ NA_character_,
       TRUE ~ Age)
   ) %>%
     {if (length(non_appended_mech_cols) > 0) {
@@ -414,14 +414,14 @@ packSNUxIM_2020 <- function(d) {
   # Tab generation date ####
   openxlsx::writeData(d$tool$wb, "PSNUxIM",
                       paste("Generated on:", Sys.time()),
-                      xy = c(1,2),
+                      xy = c(1, 2),
                       colNames = F)
 
   # Package Version ####
   openxlsx::writeData(d$tool$wb, "PSNUxIM",
                       paste("Package version:",
                             as.character(utils::packageVersion("datapackr"))),
-                      xy = c(2,2),
+                      xy = c(2, 2),
                       colNames = F)
 
   warning_msg <-
@@ -453,7 +453,7 @@ packSNUxIM_2020 <- function(d) {
 If you have any questions, please submit a Help Desk ticket at DATIM.Zendesk.com.",
       "\n")
 
-  d$info$messages <- appendMessage(d$info$messages, warning_msg,"INFO")
+  d$info$messages <- appendMessage(d$info$messages, warning_msg, "INFO")
 
   return(d)
 

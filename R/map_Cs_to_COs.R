@@ -20,11 +20,11 @@ map_Cs_to_COs <- function(d2_session = dynGet("d2_default_session",
 
   Cs_to_COs <- api_call("categories",
                         d2_session = d2_session) %>%
-    api_fields("id,name,categoryOptions[id,name]") %>%
+    api_fields("id,name,categoryOptions[id,name]") %>% # nolint
     api_get(d2_session = d2_session) %>%
     dplyr::mutate(
       categoryoptiongroup = stringr::str_extract(name, str),
-      categoryoptiongroup = ifelse(is.na(categoryoptiongroup),name,categoryoptiongroup)) %>%
+      categoryoptiongroup = ifelse(is.na(categoryoptiongroup), name, categoryoptiongroup)) %>%
     dplyr::select(categoryoptiongroup, categoryOptions) %>%
     dplyr::filter(!is.na(categoryoptiongroup)) %>%
     tidyr::unnest(categoryOptions) %>%

@@ -86,10 +86,10 @@ prepare_model_data.PSNUxIM <- function(snuxim_model_data,
   # Create Duplicated Rollups ####
     dplyr::mutate(
       `Deduplicated DSD Rollup` =
-        rowSums(dplyr::select(., tidyselect::all_of(c("DSD Duplicated Rollup","DSD Dedupe"))),
+        rowSums(dplyr::select(., tidyselect::all_of(c("DSD Duplicated Rollup", "DSD Dedupe"))),
                 na.rm = T),
       `Deduplicated TA Rollup` =
-        rowSums(dplyr::select(., tidyselect::all_of(c("TA Duplicated Rollup","TA Dedupe"))),
+        rowSums(dplyr::select(., tidyselect::all_of(c("TA Duplicated Rollup", "TA Dedupe"))),
                 na.rm = T)) %>%
     dplyr::mutate(
       `Total Deduplicated Rollup` =

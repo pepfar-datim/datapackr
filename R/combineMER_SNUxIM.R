@@ -20,7 +20,7 @@ combineMER_SNUxIM <- function(d) {
     dplyr::filter((is.na(value) | value == 0)
                   & !is.na(distribution)
                   & distribution != 0)
-  attr(d$tests$no_targets ,"test_name") <- "Distribution with no targets"
+  attr(d$tests$no_targets, "test_name") <- "Distribution with no targets"
 
 
   if (NROW(d$tests$no_targets) > 0) {
@@ -44,7 +44,7 @@ combineMER_SNUxIM <- function(d) {
         paste(unique(no_targets_inds$indicator_code), collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
 
   }
 
@@ -66,7 +66,7 @@ combineMER_SNUxIM <- function(d) {
     dplyr::ungroup() %>%
     dplyr::filter(round_trunc(value) != round_trunc(distributed_value_total))
 
-  attr(d$tests$imbalanced_distribution,"test_name")<-"Imbalanced distribution"
+  attr(d$tests$imbalanced_distribution, "test_name")<-"Imbalanced distribution"
 
 
   if (NROW(d$tests$imbalanced_distribution) > 0) {
@@ -90,7 +90,7 @@ combineMER_SNUxIM <- function(d) {
         paste(imbalanced_distribution_inds, collapse = "\n\t* "),
       "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 
@@ -110,7 +110,7 @@ combineMER_SNUxIM <- function(d) {
                   distributed_value_rounded_total, diff) %>%
     dplyr::distinct()
 
-  attr(d$tests$PSNUxIM_rounding_diffs,"test_name")<-"PSNUxIM Rounding diffs"
+  attr(d$tests$PSNUxIM_rounding_diffs, "test_name")<-"PSNUxIM Rounding diffs"
 
   if (NROW(d$tests$PSNUxIM_rounding_diffs) > 0) {
     warning_msg <-
@@ -129,13 +129,13 @@ combineMER_SNUxIM <- function(d) {
         "\n"
       )
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
   # TEST for positives against dedupes ####
   d$tests$invalid_dedupes <- d$data$distributedMER %>%
     dplyr::filter(mechanism_code == "99999" & distribution > 0)
-  attr(d$tests$invalid_dedupes,"test_name")<-"Invalid dedupes"
+  attr(d$tests$invalid_dedupes, "test_name")<-"Invalid dedupes"
 
   if (NROW(d$tests$invalid_dedupes) > 0) {
     warning_msg <-
@@ -148,13 +148,13 @@ combineMER_SNUxIM <- function(d) {
         "\n"
       )
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
   # TEST for negatives against non-dedupes ####
   d$tests$negative_distributed_targets <- d$data$distributedMER %>%
     dplyr::filter(mechanism_code != "99999" & distribution < 0)
-  attr(d$tests$negative_distributed_targets,"test_name")<-"Negative distributed targets"
+  attr(d$tests$negative_distributed_targets, "test_name")<-"Negative distributed targets"
 
   if (NROW(d$tests$negative_distributed_targets) > 0) {
     warning_msg <-
@@ -168,7 +168,7 @@ combineMER_SNUxIM <- function(d) {
         paste(unique(d$tests$negative_distributed_targets$mechanism_code), collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
   # Prepare for Export ####
@@ -178,7 +178,7 @@ combineMER_SNUxIM <- function(d) {
     dplyr::mutate(
       Age =
         dplyr::case_when(
-          indicator_code %in% c("PMTCT_EID.N.Age.T.2mo","PMTCT_EID.N.Age.T.2to12mo")
+          indicator_code %in% c("PMTCT_EID.N.Age.T.2mo", "PMTCT_EID.N.Age.T.2to12mo")
           ~ NA_character_,
           TRUE ~ Age)
     ) %>%
@@ -196,7 +196,7 @@ combineMER_SNUxIM <- function(d) {
   # TEST for invalid DSD TA ####
   d$tests$invalid_DSDTA <- d$data$distributedMER %>%
     dplyr::filter(mechanism_code != "99999" & is.na(support_type))
-  attr(d$tests$invalid_DSDTA,"test_name")<-"Invalid DSD/TA"
+  attr(d$tests$invalid_DSDTA, "test_name")<-"Invalid DSD/TA"
 
   if (NROW(d$tests$invalid_DSDTA) > 0) {
     warning_msg <-
@@ -208,7 +208,7 @@ combineMER_SNUxIM <- function(d) {
         "Ensure that all mechanism column headers in the PSNUxIM tab clearly denote either DSD or TA.",
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
   return(d)

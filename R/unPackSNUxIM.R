@@ -26,12 +26,12 @@ unPackSNUxIM <- function(d) {
     readxl::read_excel(
       path = d$keychain$submission_path,
       sheet = sheet,
-      range = readxl::cell_limits(c(header_row,1), c(NA, NA)),
+      range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
       col_types = "text",
       .name_repair = "minimal"
     )
 
-  if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1,1]])) {
+  if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1, 1]])) {
     d$info$has_psnuxim <- FALSE
 
     if (d$info$tool == "Data Pack") {
@@ -41,7 +41,7 @@ unPackSNUxIM <- function(d) {
           "WARNING! Your Data Pack needs a new PSNUxIM tab. Please select `Regenerate PSNUxIM`",
           " to receive an updated copy of your Data Pack with new rows added",
           " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
-          " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack,",
+          " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack, ",
           " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
           " all changes to other tabs of your Data Pack are complete.  Once all other updates",
           " are complete, you may return here to update your PSNUxIM tab at any time.",
@@ -53,7 +53,7 @@ unPackSNUxIM <- function(d) {
       )
     }
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
 
     return(d)
 
@@ -95,7 +95,7 @@ unPackSNUxIM <- function(d) {
         paste(dupes_msg, collapse = "\n\t"),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
 
   }
@@ -132,7 +132,7 @@ unPackSNUxIM <- function(d) {
   }
 
   # Pare down to populated, updated targets only ####
-  d$data$SNUxIM <- d$data$SNUxIM[,cols_to_keep$col]
+  d$data$SNUxIM <- d$data$SNUxIM[, cols_to_keep$col]
 
   d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
 
@@ -152,7 +152,7 @@ unPackSNUxIM <- function(d) {
     dplyr::filter(is.na(formula)) %>%
     dplyr::mutate(row_letter = openxlsx::int2col(col))
 
-  attr(d$tests$psnuxim_missing_rs_fxs,"test_name") <- "Missing PSNUxIM R.S. Formulas"
+  attr(d$tests$psnuxim_missing_rs_fxs, "test_name") <- "Missing PSNUxIM R.S. Formulas"
 
   if (NROW(d$tests$psnuxim_missing_rs_fxs) > 0) {
     warning_msg <-
@@ -164,7 +164,7 @@ unPackSNUxIM <- function(d) {
         paste(sort(unique(d$tests$psnuxim_missing_rs_fxs$row_letter)), collapse = ", "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
   # Drop rows where entire row is NA ####
@@ -199,10 +199,10 @@ unPackSNUxIM <- function(d) {
     dplyr::filter(!col_name %in% cols_to_keep$indicator_code,
                   (stringr::str_detect(col_name, "^0000[01]")))
 
-  invalid_mech_headers<-dplyr::bind_rows(invalid_mech_headers,improper_dedupe_mechs)
+  invalid_mech_headers<-dplyr::bind_rows(invalid_mech_headers, improper_dedupe_mechs)
 
   d$tests$invalid_mech_headers <- data.frame(invalid_mech_headers = invalid_mech_headers$col_name)
-  attr(d$tests$invalid_mech_headers,"test_name") <- "Invalid mechanism headers"
+  attr(d$tests$invalid_mech_headers, "test_name") <- "Invalid mechanism headers"
 
   if (NROW(d$tests$invalid_mech_headers) > 0) {
     d$info$has_error <- TRUE
@@ -218,7 +218,7 @@ unPackSNUxIM <- function(d) {
         paste(d$tests$invalid_mech_headers$invalid_mech_headers, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 
@@ -267,7 +267,7 @@ unPackSNUxIM <- function(d) {
         paste(d$tests$duplicate_cols, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
   names(d$data$SNUxIM) <- col_names$col_name_new
@@ -288,7 +288,7 @@ unPackSNUxIM <- function(d) {
 
   # TEST: Missing Dedupe Rollup cols; Error; Add ####
   dedupe_rollup_cols <- cols_to_keep %>%
-    dplyr::filter(dataset == "mer" & col_type == "target" & !indicator_code %in% c("","12345_DSD")) %>%
+    dplyr::filter(dataset == "mer" & col_type == "target" & !indicator_code %in% c("", "12345_DSD")) %>%
     dplyr::pull(indicator_code)
 
   missing_cols_fatal <- dedupe_rollup_cols[!dedupe_rollup_cols %in% names(d$data$SNUxIM)]
@@ -308,7 +308,7 @@ unPackSNUxIM <- function(d) {
         paste(missing_cols_fatal, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
     d$info$has_error <- TRUE
   }
 
@@ -404,7 +404,7 @@ unPackSNUxIM <- function(d) {
           collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
 
   # TEST: Negative IM Targets; Error; Drop ####
@@ -415,7 +415,7 @@ unPackSNUxIM <- function(d) {
     dplyr::filter(stringr::str_detect(mechCode_supportType, "\\d{4,}_(DSD|TA)")
                   & value < 0)
 
-  attr(d$tests$negative_IM_targets,"test_name") <- "Negative Mechanism Targets"
+  attr(d$tests$negative_IM_targets, "test_name") <- "Negative Mechanism Targets"
 
   if (NROW(d$tests$negative_IM_targets) > 0) {
     d$info$has_error <- TRUE
@@ -429,7 +429,7 @@ unPackSNUxIM <- function(d) {
         paste(unique(d$tests$negative_IM_targets$mechCode_supportType), collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
 
   d$data$SNUxIM %<>%
@@ -468,7 +468,7 @@ unPackSNUxIM <- function(d) {
                        by =  c("PSNU", "psnuid", "indicator_code", "Age", "Sex", "KeyPop"))
 
     d$tests$missing_combos <- d$data$missingCombos
-    attr(d$tests$missing_combos,"test_name") <- "Missing target combinations"
+    attr(d$tests$missing_combos, "test_name") <- "Missing target combinations"
 
     d$info$missing_psnuxim_combos <- ( NROW(d$data$missingCombos) > 0 )
 
@@ -477,16 +477,16 @@ unPackSNUxIM <- function(d) {
 
       warning_msg <-
         paste0(
-          "WARNING! Your Data Pack may need a new PSNUxIM tab. Along with this warning,",
+          "WARNING! Your Data Pack may need a new PSNUxIM tab. Along with this warning, ",
           " you should also receive an updated copy of your Data Pack with new rows added",
           " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
-          " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack,",
+          " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack, ",
           " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
           " all changes to other tabs of your Data Pack are complete.  Once all other updates",
           " are complete, you may return here to update your PSNUxIM tab at any time.",
           "\n")
 
-      d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
 
     }
   }
@@ -506,7 +506,7 @@ unPackSNUxIM <- function(d) {
   d$tests$decimals <- d$data$SNUxIM %>%
     dplyr::filter(value %% 1 != 0)
 
-  attr(d$tests$decimals,"test_name") <- "Decimal values"
+  attr(d$tests$decimals, "test_name") <- "Decimal values"
 
   if (NROW(d$tests$decimals) > 0) {
     d$info$has_error <- TRUE
@@ -519,7 +519,7 @@ unPackSNUxIM <- function(d) {
         paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
   d$data$SNUxIM %<>%
@@ -528,7 +528,7 @@ unPackSNUxIM <- function(d) {
   # TEST: Positive Dedupes; Error; Drop ####
   d$tests$positive_dedupes <- d$data$SNUxIM %>%
     dplyr::filter(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0)
-  attr(d$tests$positive_dedupes,"test_name") <- "Positive dedupes"
+  attr(d$tests$positive_dedupes, "test_name") <- "Positive dedupes"
 
   if (NROW(d$tests$positive_dedupes) > 0) {
     d$info$has_error <- TRUE
@@ -538,11 +538,11 @@ unPackSNUxIM <- function(d) {
         "ERROR!: ",
         NROW(d$tests$positive_dedupes),
         " cases where Deduplicated Rollups are greater than allowed maximum.",
-        " You can find these by filtering to positive values in the `DSD Dedupe`,",
+        " You can find these by filtering to positive values in the `DSD Dedupe`, ",
         " `TA Dedupe`, and `Crosswalk Dedupe` columns (columns CX, CY, and CZ) in the PSNUxIM tab.",
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
 
   d$data$SNUxIM %<>%
@@ -637,7 +637,7 @@ unPackSNUxIM <- function(d) {
     tidyr::drop_na(PSNUxIM_value, DataPackTarget) %>%
     dplyr::filter(abs(diff) <= 2)
 
-  attr(d$tests$PSNUxIM_rounding_diffs,"test_name") <- "PSNUxIM Rounding diffs"
+  attr(d$tests$PSNUxIM_rounding_diffs, "test_name") <- "PSNUxIM Rounding diffs"
 
   if (NROW(d$tests$PSNUxIM_rounding_diffs) > 0) {
     warning_msg <-
@@ -656,7 +656,7 @@ unPackSNUxIM <- function(d) {
         "\n"
       )
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
   # TEST: Data Pack total not fully distributed to IM ####
@@ -685,7 +685,7 @@ unPackSNUxIM <- function(d) {
         paste(imbalanced_distribution_inds, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
     d$info$has_error <- TRUE
   }
 
@@ -708,7 +708,7 @@ unPackSNUxIM <- function(d) {
       remove = TRUE,
       extra = "drop"
     ) %>%
-    dplyr::select(dplyr::all_of(header_cols$indicator_code),psnuid,
+    dplyr::select(dplyr::all_of(header_cols$indicator_code), psnuid,
                   mech_code, support_type, value)
 
   return(d)

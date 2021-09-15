@@ -7,7 +7,7 @@
 #'
 #' @param FY Reporting FY for which to filter active code lists.
 #' @param datastream At least one
-#' of "mer_targets","mer_results","subnat_targets","subnat_results" or "impatt".
+#' of "mer_targets", "mer_results", "subnat_targets", "subnat_results" or "impatt".
 #' If left will return a code list for the specified COP Year of all streams
 #' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @return Combined code list as dataframe.

@@ -7,7 +7,7 @@
 #' @param country_uids country_uids
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
-#' @param streams data stream or streams. One or more of "mer_targets","subnat_targets","impatt".
+#' @param streams data stream or streams. One or more of "mer_targets", "subnat_targets", "impatt".
 #' If not specified, then all data streams are returned.
 #' @param d2_session R6 datimutils object which handles authentication with DATIM
 #'

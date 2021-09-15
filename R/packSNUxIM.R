@@ -14,7 +14,7 @@ packSNUxIM <- function(d,
                                            inherits = TRUE)) {
 
   if (!d$info$cop_year %in% c(2021)) {
-    stop(paste0("Packing SNU x IM tabs is not supported for COP ",d$info$cop_year," Data Packs."))
+    stop(paste0("Packing SNU x IM tabs is not supported for COP ", d$info$cop_year, " Data Packs."))
   }
 
   # Check if SNUxIM data already exists ####
@@ -89,7 +89,7 @@ packSNUxIM <- function(d,
       readxl::read_excel(
         path = d$keychain$submission_path,
         sheet = "PSNUxIM",
-        range = readxl::cell_limits(c(1,2), c(NA,2)),
+        range = readxl::cell_limits(c(1, 2), c(NA, 2)),
         col_names = F,
         .name_repair = "minimal"
       ) %>%
@@ -146,8 +146,8 @@ packSNUxIM <- function(d,
       DataPackTarget = paste0(
         'SUMIF(',
         sheet_name, '!$', id_col, ':$', id_col,
-        ',$F', row,
-        ',', sheet_name, '!$', target_col, ':$', target_col, ')')
+        ', $F', row,
+        ', ', sheet_name, '!$', target_col, ':$', target_col, ')')
     ) %>%
     dplyr::select(-id_col, -sheet_name, -target_col, -row)
 
@@ -160,7 +160,7 @@ packSNUxIM <- function(d,
     dplyr::filter(sheet_name == "PSNUxIM")
 
   col.im.targets <- data_structure %>%
-    dplyr::filter(col_type == "target" & indicator_code %in% c("12345_DSD","")) %>%
+    dplyr::filter(col_type == "target" & indicator_code %in% c("12345_DSD", "")) %>%
     dplyr::filter(
       indicator_code == "12345_DSD" | col == max(col)) %>%
     dplyr::pull(col)
@@ -190,9 +190,9 @@ packSNUxIM <- function(d,
     dplyr::arrange(col) %>%
     dplyr::mutate(
       column_names = dplyr::case_when(
-        col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_",col),
-        col >= col.im.targets[1] & col <= (col.im.targets[1]+count.im.datim-1) ~ paste0("target_col_",col),
-        #col >= col.im.targets[1] & col <= col.im.targets[2] ~ paste0("target_col_",col),
+        col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_", col),
+        col >= col.im.targets[1] & col <= (col.im.targets[1]+count.im.datim-1) ~ paste0("target_col_", col),
+        #col >= col.im.targets[1] & col <= col.im.targets[2] ~ paste0("target_col_", col),
         TRUE ~ indicator_code)
     ) %>%
     dplyr::filter(col < col.im.targets[1]) %>%
@@ -222,7 +222,8 @@ packSNUxIM <- function(d,
   }
 
   # Combine schema with SNU x IM model dataset ####
-  #TODO: Fix this to not re-add mechanisms removed by the Country Team (filter snuxim_model_data to only columns with not all NA related to data in missing combos)
+  #TODO: Fix this to not re-add mechanisms removed by the Country Team (filter snuxim_model_data
+  #to only columns with not all NA related to data in missing combos)
   data_structure <- datapackr::swapColumns(data_structure, snuxim_model_data) %>%
     dplyr::bind_cols(
       snuxim_model_data %>%
@@ -248,7 +249,7 @@ packSNUxIM <- function(d,
   right_side <- data_structure %>%
     dplyr::select(
       -tidyselect::all_of(names(left_side)),
-      -tidyselect::matches("percent_col_\\d{1,3}")
+      -tidyselect::matches("percent_col_\\d{1, 3}")
     )
 
   # Write data to sheet ####
@@ -340,7 +341,7 @@ packSNUxIM <- function(d,
                     stack = FALSE)
 
   # Format integers ####
-  # integerStyle = openxlsx::createStyle(numFmt = "#,##0")
+  # integerStyle = openxlsx::createStyle(numFmt = "#, ##0")
   #
   # integerCols <- grep("DataPackTarget", final_snuxim_cols)
   #
@@ -381,14 +382,14 @@ packSNUxIM <- function(d,
   # Tab generation date ####
   openxlsx::writeData(d$tool$wb, "PSNUxIM",
                       paste("Last Updated on:", Sys.time()),
-                      xy = c(1,2),
+                      xy = c(1, 2),
                       colNames = F)
 
   # Package Version ####
   openxlsx::writeData(d$tool$wb, "PSNUxIM",
                       paste("Package version:",
                             as.character(utils::packageVersion("datapackr"))),
-                      xy = c(2,2),
+                      xy = c(2, 2),
                       colNames = F)
 
   # Warning Messages ####
@@ -416,7 +417,7 @@ packSNUxIM <- function(d,
       "If you have any questions, please submit a Help Desk ticket at DATIM.Zendesk.com.",
       "\n")
 
-  d$info$messages <- appendMessage(d$info$messages, warning_msg,"INFO")
+  d$info$messages <- appendMessage(d$info$messages, warning_msg, "INFO")
 
   return(d)
 

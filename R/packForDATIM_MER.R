@@ -12,7 +12,7 @@ packForDATIM_MER <- function(d) {
 
   # Combine PSNUxIM distributed data with undistributed AGYW_PREV
   agyw_data <- d$data$MER %>%
-    dplyr::filter(stringr::str_detect(indicator_code,"^AGYW_PREV")) %>%
+    dplyr::filter(stringr::str_detect(indicator_code, "^AGYW_PREV")) %>%
     dplyr::mutate(
       support_type = "No Support Type",
       mech_code = datapackr::default_catOptCombo()
@@ -33,8 +33,8 @@ packForDATIM_MER <- function(d) {
   # Add period ####
   dplyr::mutate(
     period = dplyr::case_when(
-      stringr::str_detect(indicator_code, "\\.R$") ~ paste0(FY-1,"Q4" ),
-      TRUE ~ paste0(FY-1,"Oct" )),
+      stringr::str_detect(indicator_code, "\\.R$") ~ paste0(FY-1, "Q4" ),
+      TRUE ~ paste0(FY-1, "Oct" )),
 
   # Round value ####
     value =

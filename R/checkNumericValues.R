@@ -13,7 +13,7 @@
 #'
 
 checkNumericValues <- function(d, sheet, header_cols = NULL) {
-  if (sheet %in% c("SNU x IM","PSNUxIM") & d$info$tool == "Data Pack") {
+  if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
     data <- d$data$SNUxIM
   } else {
     data <- d$data$extract
@@ -78,7 +78,7 @@ checkNumericValues <- function(d, sheet, header_cols = NULL) {
         paste(non_numeric$row_id, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
 
   }
 

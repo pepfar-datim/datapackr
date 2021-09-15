@@ -48,7 +48,7 @@ compareData_DatapackVsDatim <-
           effect = dplyr::case_when(
             is.na(difference) & is.na(datapack_value) ~ "Delete",
             is.na(difference) &
-              is.na(datim_value) ~ "Create",!is.na(difference) &
+              is.na(datim_value) ~ "Create", !is.na(difference) &
               difference != 0 ~ "Update",
             difference == 0 ~ "No Change"
           )

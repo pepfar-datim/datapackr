@@ -11,7 +11,7 @@
 #' @return d
 #'
 checkMissingMetadata <- function(d, sheet) {
-  if (sheet %in% c("SNU x IM","PSNUxIM") & d$info$tool == "Data Pack") {
+  if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
     data <- d$data$SNUxIM
   } else {
     data <- d$data$extract
@@ -30,7 +30,7 @@ checkMissingMetadata <- function(d, sheet) {
 
     d$tests$missing_metadata <- dplyr::bind_rows(d$tests$missing_metadata, missing_metadata)
 
-    attr(d$tests$missing_metadata,"test_name") <- "Missing metadata"
+    attr(d$tests$missing_metadata, "test_name") <- "Missing metadata"
 
     warning_msg <-
       paste0(
@@ -46,7 +46,7 @@ checkMissingMetadata <- function(d, sheet) {
         paste(missing_metadata$row, collapse = ", "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 

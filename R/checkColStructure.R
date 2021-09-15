@@ -11,7 +11,7 @@
 #' @return d
 #'
 checkColStructure <- function(d, sheet) {
-  if (sheet %in% c("SNU x IM","PSNUxIM")) {
+  if (sheet %in% c("SNU x IM", "PSNUxIM")) {
     data <- d$data$SNUxIM
   } else {
     data <- d$data$extract
@@ -46,10 +46,10 @@ checkColStructure <- function(d, sheet) {
 
     missing_cols <- col_check %>%
       dplyr::filter(is.na(submission_order)) %>%
-      dplyr::select(sheet,indicator_code)
+      dplyr::select(sheet, indicator_code)
 
-    d$tests$missing_cols<-dplyr::bind_rows(d$tests$missing_cols,missing_cols)
-    attr(d$tests$missing_cols,"test_name")<-"Missing columns"
+    d$tests$missing_cols<-dplyr::bind_rows(d$tests$missing_cols, missing_cols)
+    attr(d$tests$missing_cols, "test_name")<-"Missing columns"
 
     warning_msg <-
       paste0(
@@ -60,13 +60,13 @@ checkColStructure <- function(d, sheet) {
         paste(missing_cols$indicator_code, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
   # Alert to duplicate columns ####
   submission_cols_no_blanks <- submission_cols %>%
     dplyr::filter(indicator_code != "") %>%
-    dplyr::select(sheet,indicator_code)
+    dplyr::select(sheet, indicator_code)
 
   duplicate_columns <- submission_cols_no_blanks %>%
     dplyr::mutate(duplicated_cols=duplicated(indicator_code)) %>%
@@ -77,7 +77,7 @@ checkColStructure <- function(d, sheet) {
 
     d$tests$duplicate_columns <-
       dplyr::bind_rows(duplicate_columns, d$tests$duplicate_columns)
-    attr(d$tests$duplicate_columns,"test_name")<-"Duplicated columns"
+    attr(d$tests$duplicate_columns, "test_name")<-"Duplicated columns"
 
     warning_msg <-
       paste0(
@@ -90,7 +90,7 @@ checkColStructure <- function(d, sheet) {
         paste(duplicate_columns$indicator_code, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 
@@ -106,8 +106,8 @@ checkColStructure <- function(d, sheet) {
 
   if ( NROW(columns_out_of_order) > 0 ) {
 
-    d$tests$columns_out_of_order <- dplyr::bind_rows(columns_out_of_order,d$tests$columns_out_of_order)
-    attr(d$tests$columns_out_of_order,"test_name") <- "Columns out of order"
+    d$tests$columns_out_of_order <- dplyr::bind_rows(columns_out_of_order, d$tests$columns_out_of_order)
+    attr(d$tests$columns_out_of_order, "test_name") <- "Columns out of order"
 
     warning_msg <-
       paste0(
@@ -120,7 +120,7 @@ checkColStructure <- function(d, sheet) {
         paste(columns_out_of_order$columns_out_of_order, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
   return(d)

@@ -19,30 +19,30 @@ frameDataSheet <- function(wb, sheet, tool = "Data Pack") {
   schema %<>%
 # Filter to current sheet ####
     dplyr::filter(sheet_name == sheet) %>%
-    dplyr::select(-sheet_num,-sheet_name)
+    dplyr::select(-sheet_num, -sheet_name)
 
-  row_header_cols <- NROW(schema[schema$col_type == "Row Header",])
+  row_header_cols <- NROW(schema[schema$col_type == "Row Header", ])
 
 # Transpose to look like Tool rows ####
   schema %<>%
     t() %>%
     as.data.frame(stringsAsFactors = FALSE) %>%
-    dplyr::slice(-1,-2) %>%
+    dplyr::slice(-1, -2) %>%
 # Add sum rows ####
-    tibble::add_row(V1 = rep(NA_character_,2), .before = 3)
+    tibble::add_row(V1 = rep(NA_character_, 2), .before = 3)
 
-  schema[3,row_header_cols] <- "Data Pack Total"
-  schema[4,row_header_cols] <- "Site Subtotal"
+  schema[3, row_header_cols] <- "Data Pack Total"
+  schema[4, row_header_cols] <- "Site Subtotal"
 
 
 # Write rows into Pack sheet ####
   openxlsx::addWorksheet(wb = wb, sheetName = sheet, zoom = 90)
   openxlsx::writeData(wb = wb, sheet = sheet, x = schema,
-                      xy = c(1,1), colNames = FALSE)
+                      xy = c(1, 1), colNames = FALSE)
 
 # Write title into Pack sheet ####
   openxlsx::writeData(wb = wb, sheet = sheet, x = sheet,
-                      xy = c(1,1), colNames = FALSE)
+                      xy = c(1, 1), colNames = FALSE)
 
 # Add styles ####
   ## Title

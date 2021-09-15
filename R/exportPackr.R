@@ -28,8 +28,8 @@ exportPackr <- function(data, output_path, tool, datapack_name) {
         "/"
       } else {
       },
-      tool,"_",
-      datapack_name,"_",
+      tool, "_",
+      datapack_name, "_",
       format(Sys.time(), "%Y%m%d%H%M%S"),
       extension
     )
@@ -45,7 +45,7 @@ exportPackr <- function(data, output_path, tool, datapack_name) {
     openxlsx::saveWorkbook(wb = data, file = output_file_name, overwrite = TRUE)
   }
 
-  else if (tool %in% c("FAST Export","SUBNAT IMPATT", "Spectrum Example", "DATIM Export File")) {
+  else if (tool %in% c("FAST Export", "SUBNAT IMPATT", "Spectrum Example", "DATIM Export File")) {
     if (!any(stringr::str_detect(class(data), "data\\.frame|tbl_df"))) {
       stop("Output type and data do not match!")
     }
@@ -65,5 +65,5 @@ exportPackr <- function(data, output_path, tool, datapack_name) {
     saveRDS(data, output_file_name)
   }
 
-  print(paste0("Successfully saved ",tool," to ", output_file_name))
+  print(paste0("Successfully saved ", tool, " to ", output_file_name))
 }

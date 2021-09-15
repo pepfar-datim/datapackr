@@ -35,7 +35,7 @@ unPackSchema_datapack <- function(filepath = NULL,
   }
 
   # Add sheet number based on order of occurrence in workbook, rather than A-Z ####
-  data.table::setDT(schema)[,sheet_num:=.GRP, by = c("sheet_name")]
+  data.table::setDT(schema)[, sheet_num:=.GRP, by = c("sheet_name")]
 
   # Skip detail on listed sheets. ####
   if (is.null(skip)) {
@@ -51,16 +51,16 @@ unPackSchema_datapack <- function(filepath = NULL,
   # # Correctly enter array formulas ####
   #   dplyr::mutate(
   #     formula = dplyr::case_when(
-  #       is_array == "TRUE" ~ paste0("{",formula,"}"),
+  #       is_array == "TRUE" ~ paste0("{", formula, "}"),
   #       TRUE ~ formula
   #     )
   #   ) %>%
 
   # Gather and Spread to get formula, value, and indicator_code in separate cols ####
   schema %<>%
-    tidyr::gather(key,value,-sheet_num,-sheet_name,-col,-row) %>%
-    tidyr::unite(new.col, c(key,row)) %>%
-    tidyr::spread(new.col,value) %>%
+    tidyr::gather(key, value, -sheet_num, -sheet_name, -col, -row) %>%
+    tidyr::unite(new.col, c(key, row)) %>%
+    tidyr::spread(new.col, value) %>%
     #TODO: How to avoid hardcoding these numbers??
     dplyr::select(sheet_num, sheet_name, col,
                   dataset = character_5,
@@ -85,8 +85,8 @@ unPackSchema_datapack <- function(filepath = NULL,
     schema %<>%
       dplyr::mutate_at(
         dplyr::vars(
-          c("dataelement_dsd","dataelement_ta","categoryoption_specified",
-            "valid_ages","valid_sexes","valid_kps")),
+          c("dataelement_dsd", "dataelement_ta", "categoryoption_specified",
+            "valid_ages", "valid_sexes", "valid_kps")),
             ~ (. <- NA_character_))
   }
 
@@ -118,7 +118,7 @@ unPackSchema_datapack <- function(filepath = NULL,
         tidyr::separate_rows(group, sep = ",") %>%
         dplyr::arrange(group, name) %>%
         dplyr::group_by(group) %>%
-        tidyr::nest(options = c(name,id)) %>%
+        tidyr::nest(options = c(name, id)) %>%
         tibble::deframe()
 
       schema %<>%
@@ -137,8 +137,8 @@ unPackSchema_datapack <- function(filepath = NULL,
             TRUE ~ empty),
           valid_sexes.options = dplyr::case_when(
             valid_sexes == "M/F" ~ list(disaggs$`M/F`),
-            valid_sexes == "M" ~ list(disaggs$`M/F`[disaggs$`M/F`$name == "Male",]),
-            valid_sexes == "F" ~ list(disaggs$`M/F`[disaggs$`M/F`$name == "Female",]),
+            valid_sexes == "M" ~ list(disaggs$`M/F`[disaggs$`M/F`$name == "Male", ]),
+            valid_sexes == "F" ~ list(disaggs$`M/F`[disaggs$`M/F`$name == "Female", ]),
             TRUE ~ empty),
           valid_kps.options = dplyr::case_when(
             valid_kps == "coarseKPs" ~ list(disaggs$coarseKPs),
@@ -149,7 +149,7 @@ unPackSchema_datapack <- function(filepath = NULL,
     } else if (cop_year == 2021) {
       map_datapack_cogs <-
         datimutils::getMetadata(categoryOptionGroups,
-                                fields = "id,name,categoryOptions[id,name]",
+                                fields = "id,name,categoryOptions[id,name]", # nolint
                                 "groupSets.name:like:COP 21 Data Pack",
                                 d2_session = d2_session)
 
@@ -176,7 +176,7 @@ unPackSchema_datapack <- function(filepath = NULL,
         dplyr::distinct() %>%
         dplyr::arrange(datapack_cog, name) %>%
         dplyr::group_by(datapack_cog) %>%
-        tidyr::nest(options = c(name,id))
+        tidyr::nest(options = c(name, id))
 
       # TODO: Add test to make sure Data Pack COGs match the above list
 
@@ -279,10 +279,10 @@ unPackSchema_datapack <- function(filepath = NULL,
   #
   # fullCodeList <- purrr::map2(.x = match, .y = key,
   #                    ~ fullCodeList %>%
-  #                      dplyr::select("dataelement","dataelementuid",dplyr::matches(.x)) %>%
+  #                      dplyr::select("dataelement", "dataelementuid", dplyr::matches(.x)) %>%
   #                      tidyr::nest(.key = !! rlang::sym(.y))) %>%
   #   dplyr::bind_cols() %>%
-  #   dplyr::select(-dataelement1,-dataelementuid1, -dataelement)
+  #   dplyr::select(-dataelement1, -dataelementuid1, -dataelement)
   #
   # # Add valid disaggs to schema
   # schema %<>%
@@ -334,15 +334,17 @@ unPackSchema_datapack <- function(filepath = NULL,
 
   ## Test Data Elements ####
       dataelement_dsd.test =
-        dplyr::if_else(sheet_name == "PSNUxIM",dataelement_dsd != "NA",
-                       !stringr::str_detect(dataelement_dsd, "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$")),
+        dplyr::if_else(sheet_name == "PSNUxIM", dataelement_dsd != "NA",
+                       !stringr::str_detect(dataelement_dsd, 
+                       "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$")),
       dataelement_ta.test =
-        dplyr::if_else(sheet_name == "PSNUxIM",dataelement_ta != "NA",
-                      !stringr::str_detect(dataelement_ta, "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$")),
+        dplyr::if_else(sheet_name == "PSNUxIM", dataelement_ta != "NA",
+                      !stringr::str_detect(dataelement_ta, 
+                      "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$")),
 
   ## Test categoryOptions
       categoryoption.test =
-        dplyr::if_else(sheet_name == "PSNUxIM",categoryoption_specified != "NA",
+        dplyr::if_else(sheet_name == "PSNUxIM", categoryoption_specified != "NA",
                         !stringr::str_detect(
                           categoryoption_specified,
                           "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$")),
@@ -350,21 +352,21 @@ unPackSchema_datapack <- function(filepath = NULL,
   ## Test datasets ####
       dataset.test =
         dplyr::case_when(
-          col_type %in% c("reference","assumption","calculation","row_header","allocation")
+          col_type %in% c("reference", "assumption", "calculation", "row_header", "allocation")
             ~ !dataset == c("datapack"),
-          col_type %in% c("target","past","result") ~ !dataset %in% c("mer","impatt","subnat"),
+          col_type %in% c("target", "past", "result") ~ !dataset %in% c("mer", "impatt", "subnat"),
           sheet_num %in% skip_sheets_num ~ !is.na(dataset),
           TRUE ~ TRUE),
 
   ## Test col_type ####
       col_type.test =
-        (!col_type %in% c("target","reference","assumption","calculation", "past",
-                        "row_header","allocation","result"))
+        (!col_type %in% c("target", "reference", "assumption", "calculation", "past",
+                        "row_header", "allocation", "result"))
         & (sheet_num %in% skip_sheets_num & !is.na(col_type)),
 
   ## Test value_type ####
       value_type.test =
-        (!value_type %in% c("integer","percentage","string"))
+        (!value_type %in% c("integer", "percentage", "string"))
         & (sheet_num %in% skip_sheets_num & !is.na(value_type)),
 
   # TODO: Update
@@ -374,12 +376,12 @@ unPackSchema_datapack <- function(filepath = NULL,
   #
   # ## Test valid_sexes ####
   #     valid_sexes.test =
-  #       !valid_sexes %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog %in% c("Females","Males","M/F")],
+  #       !valid_sexes %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog %in% c("Females", "Males", "M/F")],
   #                           empty),
   #
   # ## Test valid_kps
   #     valid_kps.test =
-  #       !valid_kps %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog == "Coarse KPs"],empty),
+  #       !valid_kps %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog == "Coarse KPs"], empty),
 
   ## Test formulas
       formula.test = stringr::str_detect(formula, "#REF")
@@ -387,7 +389,7 @@ unPackSchema_datapack <- function(filepath = NULL,
     dplyr::select(sheet_name, indicator_code, dplyr::matches("test")) %>%
     {
       if (tool == "OPU Data Pack Template")
-        dplyr::select(.,-dataset.test,-col_type.test,-value_type.test)
+        dplyr::select(., -dataset.test, -col_type.test, -value_type.test)
       else
         .
     } %>%

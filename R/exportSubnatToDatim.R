@@ -40,7 +40,7 @@ exportSubnatToDATIM <- function(d) {
 
  # TEST: Duplicate Rows; Error; Continue ####
   duplicated_rows <- SUBNAT_IMPATT %>%
-    dplyr::group_by(dataElement,orgUnit,categoryOptionCombo,attributeOptionCombo,period) %>%
+    dplyr::group_by(dataElement, orgUnit, categoryOptionCombo, attributeOptionCombo, period) %>%
     dplyr::tally() %>%
     dplyr::filter(n > 1)
 
@@ -52,7 +52,7 @@ exportSubnatToDATIM <- function(d) {
     warning_msg <-
       paste0(
         "ERROR! In tab SUBNATT/IMPATT. Duplicate rows. Contact support.")
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 
@@ -68,14 +68,14 @@ exportSubnatToDATIM <- function(d) {
     warning_msg <-
       paste0(
         "ERROR! In tab SUBNATT/IMPATT. DATIM Export has blank rows. Contact support.")
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 
   # TEST: Negative values; Error;
   if (any(SUBNAT_IMPATT$value < 0)) {
     warning_msg <- "ERROR occurred. Negative values present in SUBNAT/IMPATT data."
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 

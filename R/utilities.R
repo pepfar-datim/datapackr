@@ -53,7 +53,7 @@ round_trunc <- function(x, digits = 0) {
 getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
                                                 inherits = TRUE)) {
   impatt_levels <-
-    paste0(d2_session$base_url,"api/",datapackr::api_version(),
+    paste0(d2_session$base_url, "api/", datapackr::api_version(),
            "/dataStore/dataSetAssignments/orgUnitLevels") %>%
     httr::GET(httr::timeout(180), handle = d2_session$handle) %>%
     httr::content(., "text") %>%
@@ -71,7 +71,7 @@ getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
     datapackr::api_filter(field = "organisationUnitGroups.id",
                           operation = "eq",
                           match = "cNzfcPWEGSH") %>%
-    datapackr::api_fields(fields = "id,name,level,ancestors[id,name]") %>%
+    datapackr::api_fields(fields = "id,name,level,ancestors[id,name]") %>% # nolint
     datapackr::api_get(d2_session = d2_session)
 
   impatt_levels %<>%
@@ -196,31 +196,31 @@ getCountries <- function(datapack_uid = NA) {
       datapackr::api_filter(field = "organisationUnitGroups.id",
                             operation = "eq",
                             match = "cNzfcPWEGSH") %>%
-      datapackr::api_fields(fields = "id,name,level,ancestors[id,name]") %>%
+      datapackr::api_fields(fields = "id, name, level, ancestors[id, name]") %>%
       datapackr::api_get() %>%
 
   # Remove countries no longer supported
       dplyr::filter(
         !name %in%
-          c("Antigua & Barbuda","Bahamas","Belize","China","Dominica","Grenada",
-            "Saint Kitts & Nevis","Saint Lucia","Saint Vincent & the Grenadines",
-            "Turkmenistan","Uzbekistan")) %>%
+          c("Antigua & Barbuda", "Bahamas", "Belize", "China", "Dominica", "Grenada",
+            "Saint Kitts & Nevis", "Saint Lucia", "Saint Vincent & the Grenadines",
+            "Turkmenistan", "Uzbekistan")) %>%
       dplyr::select(country_name = name, country_uid = id, dplyr::everything()) %>%
 
   # Add metadata
       dplyr::mutate(
         data_pack_name = dplyr::case_when(
-          country_name %in% c("Burma","Cambodia","India","Indonesia",
-                              "Kazakhstan","Kyrgyzstan","Laos",
-                              "Nepal","Papua New Guinea","Tajikistan",
+          country_name %in% c("Burma", "Cambodia", "India", "Indonesia",
+                              "Kazakhstan", "Kyrgyzstan", "Laos",
+                              "Nepal", "Papua New Guinea", "Tajikistan",
                               "Thailand") ~ "Asia Region",
-          country_name %in% c("Barbados","Guyana","Jamaica","Suriname",
+          country_name %in% c("Barbados", "Guyana", "Jamaica", "Suriname",
                               "Trinidad & Tobago") ~ "Caribbean Region",
-          country_name %in% c("Brazil","Costa Rica","El Salvador",
-                              "Guatemala","Honduras","Nicaragua",
+          country_name %in% c("Brazil", "Costa Rica", "El Salvador",
+                              "Guatemala", "Honduras", "Nicaragua",
                               "Panama") ~ "Central America Region",
-          country_name %in% c("Burkina Faso","Ghana","Liberia","Mali",
-                              "Senegal","Sierra Leone","Togo")
+          country_name %in% c("Burkina Faso", "Ghana", "Liberia", "Mali",
+                              "Senegal", "Sierra Leone", "Togo")
                               ~ "West Africa Region",
           TRUE ~ country_name),
         model_uid = dplyr::case_when(
@@ -336,7 +336,7 @@ isLoggedIn <- function(d2_session = dynGet("d2_default_session",
 #' @title getDatasetUids
 #'
 #' @description returns character vector of dataset uids for a given FY {"2019", "2020", "2021"}
-#' and type {"targets", "results","subnat_impatt"}
+#' and type {"targets", "results", "subnat_impatt"}
 #' @param fiscal_year character - one of {"2019", "2020", "2021"}
 #' @param type character vector - one or more of {"targets", "results", "subnat_impatt"}
 #' @return returns a character vector of the related dataset uids
@@ -377,7 +377,7 @@ getDatasetUids <-  function(fiscal_year,
     if ("mer_results" %in% type) {
       datasets <- c(datasets,
                     "zL8TlPVzEBZ", # MER Results: Facility Based
-                    #"",  # MER Results: Facility Based - DoD ONLY
+                    #"", # MER Results: Facility Based - DoD ONLY
                     #"", # MER Results: Community Based - DoD ONLY FY2020Q4
                     "TBcmmtoaCBC", # MER Results: Community Based
                     "qHyrHc4zwx4") # Host Country Results: DREAMS (USG)
@@ -599,7 +599,7 @@ createWorkbook <- function(datapack_name = NULL,
 
   wb <- openxlsx::loadWorkbook(template_path)
 
-  options("openxlsx.numFmt" = "#,##0")
+  options("openxlsx.numFmt" = "#, ##0")
 
   # Write Home Sheet info ####
   wb <- writeHomeTab(wb = wb,
@@ -635,8 +635,8 @@ compareTemplateToSchema <- function(template_path = NULL,
   template_schema <-
     unPackSchema_datapack(
       filepath = template_path,
-      skip = skip_tabs(tool = paste0(tool," Template"), cop_year = cop_year),
-      tool = paste0(tool," Template"),
+      skip = skip_tabs(tool = paste0(tool, " Template"), cop_year = cop_year),
+      tool = paste0(tool, " Template"),
       cop_year = cop_year,
       d2_session = d2_session)
 

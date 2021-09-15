@@ -84,7 +84,7 @@ packDataPackSheets <- function(wb,
     wb_sheets <- names(wb)
     schema_sheets <- schema %>%
       dplyr::filter(data_structure == "normal"
-                    & !(sheet_name %in% c("SNU x IM","PSNUxIM"))
+                    & !(sheet_name %in% c("SNU x IM", "PSNUxIM"))
                     & sheet_name %in% names(wb)) %>%
       dplyr::pull(sheet_name) %>%
       unique()
@@ -104,7 +104,7 @@ packDataPackSheets <- function(wb,
     org_units_sheet <- org_units
     sheet_codes <- schema %>%
       dplyr::filter(sheet_name == sheet
-                    & col_type %in% c("past","calculation")) %>%
+                    & col_type %in% c("past", "calculation")) %>%
       dplyr::pull(indicator_code)
 
     ## If no model data needed for a sheet, forward a NULL dataset to prevent errors

@@ -24,7 +24,7 @@ getValidCOs <- function(data_element_group.id = NULL,
                           match = "XUA8pDYjPsw") %>%
     # TODO generate match automatically based on current FY...
     datapackr::api_fields(
-      "dataElements[id,name,categoryCombo[categories[id,name,categoryOptions[id,name]]]]"
+      "dataElements[id,name,categoryCombo[categories[id,name,categoryOptions[id,name]]]]" # nolint
     ) %>%
     datapackr::api_get(d2_session = d2_session) %>%
     tidyr::unnest(cols = "dataElements") %>% #TODO: unnest requires specific columns to unnest now
@@ -46,12 +46,12 @@ getValidCOs <- function(data_element_group.id = NULL,
   # Keep only Age, Sex, KP categoryOptions
     tidyr::drop_na(grp) %>%
     dplyr::select(
-      data_element.name ,
-      data_element.id ,
-      category_combo.name ,
-      category_combo.id ,
+      data_element.name,
+      data_element.id,
+      category_combo.name,
+      category_combo.id,
       grp,
-      category_option.name ,
+      category_option.name,
       category_option.id )
 
   if (!is.null(data_element_group.id )) {

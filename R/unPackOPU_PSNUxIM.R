@@ -22,7 +22,7 @@ unPackOPU_PSNUxIM <- function(d) {
   cols_to_keep <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet,
                   !is.na(indicator_code),
-                  !indicator_code %in% c("12345_DSD","12345_TA"),
+                  !indicator_code %in% c("12345_DSD", "12345_TA"),
                   col_type %in% c("row_header", "target"))
 
   header_cols <- cols_to_keep %>%
@@ -38,7 +38,7 @@ unPackOPU_PSNUxIM <- function(d) {
       .name_repair = "minimal"
     )
 
-  if (NROW(d$data$extract) == 1 & is.na(d$data$extract[[1,1]])) {
+  if (NROW(d$data$extract) == 1 & is.na(d$data$extract[[1, 1]])) {
     d$info$has_psnuxim <- FALSE
     d$info$has_error <- TRUE
 
@@ -48,7 +48,7 @@ unPackOPU_PSNUxIM <- function(d) {
         " This is a fatal error. Please contact the Help Desk for guidance.",
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
 
     return(d)
 
@@ -78,7 +78,7 @@ unPackOPU_PSNUxIM <- function(d) {
         " columns with data, but no column header. For IM columns, please add a column header of the form 12345_DSD.",
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
 
   d$data$extract <- d$data$extract[!(names(d$data$extract) %in% c(""))]
@@ -96,7 +96,7 @@ unPackOPU_PSNUxIM <- function(d) {
                     & stringr::str_detect(col_name, "DSD|TA")))
 
   d$tests$invalid_mech_headers <- data.frame(invalid_mech_headers = invalid_mech_headers$col_name)
-  attr(d$tests$invalid_mech_headers,"test_name") <- "Invalid mechanism headers"
+  attr(d$tests$invalid_mech_headers, "test_name") <- "Invalid mechanism headers"
 
   if (NROW(d$tests$invalid_mech_headers) > 0) {
     d$info$has_error <- TRUE
@@ -110,7 +110,7 @@ unPackOPU_PSNUxIM <- function(d) {
         paste(d$tests$invalid_mech_headers$invalid_mech_headers, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
 
   d$data$extract %<>%
@@ -158,7 +158,7 @@ unPackOPU_PSNUxIM <- function(d) {
         paste(d$tests$duplicate_cols, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
   names(d$data$extract) <- col_names$col_name_new
@@ -203,7 +203,7 @@ unPackOPU_PSNUxIM <- function(d) {
         paste(missing_cols_fatal, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
 
   d$data$extract %<>%
@@ -310,7 +310,7 @@ unPackOPU_PSNUxIM <- function(d) {
           collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error<-TRUE
   }
 
@@ -321,7 +321,7 @@ unPackOPU_PSNUxIM <- function(d) {
                   -tidyselect::all_of(header_cols$indicator_code)) %>%
     dplyr::filter(stringr::str_detect(mechCode_supportType, "\\d{4,6}_(DSD|TA)")
                   & value < 0)
-  attr(d$tests$negative_IM_targets,"test_name") <- "Negative Mechanism Targets"
+  attr(d$tests$negative_IM_targets, "test_name") <- "Negative Mechanism Targets"
 
   if (NROW(d$tests$negative_IM_targets) > 0) {
     d$info$has_error <- TRUE
@@ -335,7 +335,7 @@ unPackOPU_PSNUxIM <- function(d) {
         paste(unique(d$tests$negative_IM_targets$mechCode_supportType), collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error<-TRUE
   }
 
@@ -367,7 +367,7 @@ unPackOPU_PSNUxIM <- function(d) {
   d$tests$decimals <- d$data$extract %>%
     dplyr::filter(value %% 1 != 0)
 
-  attr(d$tests$decimals,"test_name") <- "Decimal values"
+  attr(d$tests$decimals, "test_name") <- "Decimal values"
 
   if (NROW(d$tests$decimals) > 0) {
     d$info$has_error <- TRUE
@@ -380,7 +380,7 @@ unPackOPU_PSNUxIM <- function(d) {
         paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
 
   d$data$extract %<>%
@@ -389,7 +389,7 @@ unPackOPU_PSNUxIM <- function(d) {
   # TEST: Positive Dedupes; Error; Drop ####
   d$tests$positive_dedupes <- d$data$extract %>%
     dplyr::filter(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0)
-  attr(d$tests$positive_dedupes,"test_name") <- "Positive dedupes"
+  attr(d$tests$positive_dedupes, "test_name") <- "Positive dedupes"
 
   if (NROW(d$tests$positive_dedupes) > 0) {
     d$info$has_error <- TRUE
@@ -399,10 +399,10 @@ unPackOPU_PSNUxIM <- function(d) {
         "ERROR!: ",
         NROW(d$tests$positive_dedupes),
         " cases where Deduplicated Rollups are greater than allowed maximum.",
-        " You can find these by filtering to positive values in the `DSD Dedupe`,",
+        " You can find these by filtering to positive values in the `DSD Dedupe`, ",
         " `TA Dedupe`, and `Crosswalk Dedupe` columns (columns CX, CY, and CZ) in the PSNUxIM tab.")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
 
   d$data$extract %<>%

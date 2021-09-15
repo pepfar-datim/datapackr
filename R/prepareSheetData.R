@@ -62,11 +62,11 @@ prepareSheetData <- function(sheet,
     dplyr::mutate(
       AgeCoarse = dplyr::case_when(
         sheet == "OVC" ~ dplyr::case_when(
-          Age %in% c("<01","01-04","05-09","10-14","15-17","<18") ~ "<18",
-          Age %in% c("18-24","25+","18+", "18-20") ~ "18+"),
+          Age %in% c("<01", "01-04", "05-09", "10-14", "15-17", "<18") ~ "<18",
+          Age %in% c("18-24", "25+", "18+", "18-20") ~ "18+"),
         TRUE ~ dplyr::case_when(
-          Age %in% c("<01","01-04","05-09","10-14","<15") ~ "<15",
-          Age %in% c("15-19","20-24","25-29","30-34","35-39","40-44","45-49","50+","15+") ~ "15+")
+          Age %in% c("<01", "01-04", "05-09", "10-14", "<15") ~ "<15",
+          Age %in% c("15-19", "20-24", "25-29", "30-34", "35-39", "40-44", "45-49", "50+", "15+") ~ "15+")
       )
     ) %>%
     dplyr::select(
@@ -127,7 +127,7 @@ prepareSheetData <- function(sheet,
       DREAMS_FLAG <-
         dplyr::mutate(DREAMS_FLAG,
                       DREAMS_SNU.Flag = as.character(DREAMS_SNU.Flag),
-                      DREAMS_SNU.Flag = stringr::str_replace(DREAMS_SNU.Flag,"1","Y"))
+                      DREAMS_SNU.Flag = stringr::str_replace(DREAMS_SNU.Flag, "1", "Y"))
     }
 
     sheet_data %<>%

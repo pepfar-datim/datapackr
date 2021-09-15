@@ -11,23 +11,23 @@ getFY22Prioritizations <- function(d) {
   psnu_prioritizations <- d$datim$fy22_prioritizations %>%
     dplyr::select(orgUnit, value)
 
-  psnus<-dplyr::filter(datapackr::valid_PSNUs,psnu_type =="SNU") %>%
+  psnus<-dplyr::filter(datapackr::valid_PSNUs, psnu_type =="SNU") %>%
     dplyr::filter(country_uid %in% d$info$country_uids) %>%
-    dplyr::select(ancestor_uid = psnu_uid,ancestor_name = psnu)
+    dplyr::select(ancestor_uid = psnu_uid, ancestor_name = psnu)
 
   #Classify any DREAMS districts the same as their PSNU parents
   dreams_prioritizations<-dplyr::filter(valid_PSNUs, DREAMS == "Y") %>%
-    dplyr::select(psnu_uid,psnu,ancestors) %>%
+    dplyr::select(psnu_uid, psnu, ancestors) %>%
     tidyr::unnest("ancestors") %>%
     dplyr::select(-organisationUnitGroups) %>%
-    dplyr::group_by(psnu_uid,psnu) %>%
-    dplyr::summarise(path = paste(id,sep="",collapse="/")) %>%
+    dplyr::group_by(psnu_uid, psnu) %>%
+    dplyr::summarise(path = paste(id, sep="", collapse="/")) %>%
     dplyr::ungroup() %>%
-    fuzzyjoin::regex_inner_join(psnus,by=c("path" = "ancestor_uid")) %>%
-    dplyr::inner_join(psnu_prioritizations,by=c("ancestor_uid" = "orgUnit")) %>%
-    dplyr::select(orgUnit=psnu_uid,value)
+    fuzzyjoin::regex_inner_join(psnus, by=c("path" = "ancestor_uid")) %>%
+    dplyr::inner_join(psnu_prioritizations, by=c("ancestor_uid" = "orgUnit")) %>%
+    dplyr::select(orgUnit=psnu_uid, value)
 
-  dplyr::bind_rows(psnu_prioritizations,dreams_prioritizations)
+  dplyr::bind_rows(psnu_prioritizations, dreams_prioritizations)
 
 }
 
@@ -83,8 +83,8 @@ createAnalytics <- function(d,
   #This has been moved to adorn_import_file :point_up
   # # Add timestamp and FY ####
   # d$data$analytics %<>%
-  #   dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"),
-  #                 fiscal_year = paste0("FY", stringr::str_sub(as.integer(d$info$cop_year)+1,-2)))
+  #   dplyr::mutate(upload_timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+  #                 fiscal_year = paste0("FY", stringr::str_sub(as.integer(d$info$cop_year)+1, -2)))
 
   #TODO: This seems to no longer be required since it has been
   # moved to adorn_import_file

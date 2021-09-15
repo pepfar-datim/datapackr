@@ -102,12 +102,12 @@ adorn_import_file <- function(psnu_import_file,
                      dataelementname = dataelement.y,
                      categoryoptioncomboname = categoryoptioncombo) %>%
        dplyr::mutate(FY = 2021,
-                       period = paste0(cop_year,"Oct"))
+                       period = paste0(cop_year, "Oct"))
      }
 
   data %<>%
     dplyr::mutate(
-      upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"),
+      upload_timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S", tz = "UTC"),
       fiscal_year = suppressWarnings(dplyr::if_else(stringr::str_detect(period, "Oct"),
                                                     as.numeric(stringr::str_replace(period, "Oct", "")) + 1,
                                                     as.numeric(stringr::str_replace(period, "Q3", ""))

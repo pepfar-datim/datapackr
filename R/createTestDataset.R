@@ -43,23 +43,23 @@ createTestDataset <- function(country_uids,
     dplyr::distinct() %>%
     dplyr::mutate(
       period = dplyr::case_when(
-        col_type == "target" ~ paste0(FY-1,"Oct"),
-        col_type == "result" ~ paste0(FY,"Q4")
+        col_type == "target" ~ paste0(FY-1, "Oct"),
+        col_type == "result" ~ paste0(FY, "Q4")
       )
     )
 
   des_cocs.subnat_impatt <- DATIM_map %>%
-    dplyr::filter(stringr::str_detect(dataset,"IMPATT|SUBNAT"),
-                  !stringr::str_detect(indicator_code,"PRIORITY_SNU")) %>%
+    dplyr::filter(stringr::str_detect(dataset, "IMPATT|SUBNAT"),
+                  !stringr::str_detect(indicator_code, "PRIORITY_SNU")) %>%
     dplyr::select(dataElement, categoryOptionCombo, period, value_type)
 
   des_cocs.prioritization <- DATIM_map %>%
-    dplyr::filter(stringr::str_detect(indicator_code,"PRIORITY_SNU")) %>%
+    dplyr::filter(stringr::str_detect(indicator_code, "PRIORITY_SNU")) %>%
     dplyr::select(dataElement, categoryOptionCombo, period, value_type)
 
   des_cocs.MER <- DATIM_map %>%
-    dplyr::filter(!stringr::str_detect(dataset,"IMPATT|SUBNAT"),
-                  !indicator_code %in% c("AGYW_PREV.D.T","AGYW_PREV.N.T")) %>%
+    dplyr::filter(!stringr::str_detect(dataset, "IMPATT|SUBNAT"),
+                  !indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
     dplyr::select(dataElement, categoryOptionCombo, period, value_type)
 
   # Get Mech list ####
@@ -83,7 +83,7 @@ createTestDataset <- function(country_uids,
     dplyr::mutate(
       value = dplyr::case_when(
         value_type == "percentage" ~ value/1000,
-        attributeOptionCombo %in% c("00000","00001") ~ value*-1,
+        attributeOptionCombo %in% c("00000", "00001") ~ value*-1,
         TRUE ~ value
       ))
 
@@ -95,7 +95,7 @@ createTestDataset <- function(country_uids,
     dplyr::mutate(
       value = dplyr::case_when(
         value_type == "percentage" ~ value/1000,
-        attributeOptionCombo %in% c("00000","00001") ~ value*-1,
+        attributeOptionCombo %in% c("00000", "00001") ~ value*-1,
         TRUE ~ value
       ))
 

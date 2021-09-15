@@ -14,9 +14,9 @@ getNumeratorDenominator <- function(dataElements = NULL,
 
   groupSet <- "lD2x0c8kywj"
 
-  num_den <- api_call(paste0("dataElementGroupSets/",groupSet),
+  num_den <- api_call(paste0("dataElementGroupSets/", groupSet),
                       d2_session = d2_session) %>%
-    api_fields("dataElementGroups[name,dataElements[id]]") %>%
+    api_fields("dataElementGroups[name,dataElements[id]]") %>% # nolint
     api_get(d2_session = d2_session) %>%
     tidyr::unnest(cols = dataElements) %>%
     dplyr::distinct() %>%

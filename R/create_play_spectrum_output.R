@@ -90,8 +90,8 @@ create_play_spectrum_output <- function(country_uids,
     dplyr::mutate(area_id = NA_character_,
                   calendar_quarter =
                     dplyr::if_else(indicator_code == "TX_CURR_SUBNAT.R",
-                                   paste0("CY",cop_year-1,"Q4"),
-                                   paste0("CY",cop_year,"Q3"))) %>%
+                                   paste0("CY", cop_year-1, "Q4"),
+                                   paste0("CY", cop_year, "Q3"))) %>%
     dplyr::select(psnu = PSNU,
                   psnu_uid = orgUnit,
                   area_id,

@@ -6,7 +6,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
   pure_duplicates<-d$data$SNUxIM %>%
     dplyr::filter(mechanism_code != '99999') %>%
     dplyr::filter(distribution != 0) %>%
-    dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type) %>%
+    dplyr::group_by(PSNU, psnuid, indicator_code, Age, Sex, KeyPop, support_type) %>%
     dplyr::summarize(distribution = sum(distribution),
                      n = dplyr::n()) %>%
     dplyr::filter(n > 1 ) %>%
@@ -26,7 +26,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
         "/n"
       )
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"INFO")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "INFO")
   }
 
   auto_resolve_pure_dupes <- pure_duplicates %>%
@@ -37,17 +37,17 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
     dplyr::select(names(d$data$distributedMER))
 
   #DSD_TA Crosswalk dupes which should be autoresolved
-  if ( setequal(unique(d$data$SNUxIM$support_type),c("DSD","TA")) ) {
+  if ( setequal(unique(d$data$SNUxIM$support_type), c("DSD", "TA")) ) {
     crosswalk_dupes_ids <- d$data$SNUxIM %>%
       dplyr::filter(mechanism_code != '99999') %>%
       dplyr::filter(distribution != 0) %>%
-      dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop,support_type) %>%
+      dplyr::group_by(PSNU, psnuid, indicator_code, Age, Sex, KeyPop, support_type) %>%
       dplyr::summarize(n = dplyr::n()) %>%
       tidyr::pivot_wider(names_from = support_type,
                          values_from = n) %>%
-      tidyr::drop_na(DSD,TA) %>%
+      tidyr::drop_na(DSD, TA) %>%
       dplyr::filter(TA >=1 & DSD >=1 ) %>%
-      dplyr::select(-TA,-DSD)
+      dplyr::select(-TA, -DSD)
 
     crosswalk_dupes <- d$data$SNUxIM %>%
       dplyr::filter(mechanism_code != '99999') %>%
@@ -56,8 +56,8 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
 
     if ( NROW(crosswalk_dupes) > 0  ) {
       crosswalk_dupes %<>%
-        dplyr::group_by(PSNU,psnuid,indicator_code,Age,Sex,KeyPop) %>%
-        dplyr::summarise(total_distribution = sum(distribution,na.rm=TRUE)) %>%
+        dplyr::group_by(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
+        dplyr::summarise(total_distribution = sum(distribution, na.rm=TRUE)) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(distribution_diff = abs(total_distribution - 1.0))
 
@@ -75,12 +75,12 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
             "/n"
           )
 
-        d$info$messages <- appendMessage(d$info$messages, warning_msg,"INFO")
+        d$info$messages <- appendMessage(d$info$messages, warning_msg, "INFO")
       }
 
       crosswalk_dupes_auto_resolved <- crosswalk_dupes %>%
         dplyr::filter(distribution_diff <= 1e-3 ) %>%
-        dplyr::select(PSNU,psnuid,indicator_code,Age,Sex,KeyPop) %>%
+        dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
         dplyr::mutate(support_type = 'TA',
                       sheet_name = NA,
                       mechanism_code = '00001',
@@ -118,20 +118,20 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
   #Bind pure dupes
 
   if ( exists_with_rows(auto_resolve_pure_dupes) ) {
-    d$datim$MER<-dplyr::bind_rows(d$datim$MER,auto_resolve_pure_dupes)
+    d$datim$MER<-dplyr::bind_rows(d$datim$MER, auto_resolve_pure_dupes)
     warning_msg<-paste0("INFO! ", NROW(auto_resolve_pure_dupes), " zero-valued pure deduplication adjustments will be added to your DATIM import.
                   Please consult the DataPack wiki section on deduplication for more information. ")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"INFO")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "INFO")
   }
 
   #Bind crosswalk dupes
   if ( exists_with_rows(crosswalk_dupes_auto_resolved)  ) {
-    d$datim$MER<-dplyr::bind_rows(d$datim$MER,crosswalk_dupes_auto_resolved)
+    d$datim$MER<-dplyr::bind_rows(d$datim$MER, crosswalk_dupes_auto_resolved)
     warning_msg<-paste0("INFO! ", NROW(crosswalk_dupes_auto_resolved), " zero-valued crosswalk deduplication adjustments will be added to your DATIM import.
                   Please consult the DataPack wiki section on deduplication for more information. ")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"INFO")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "INFO")
   }
 
   d
@@ -153,7 +153,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
 #'
 exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
 
-  d<-autoResolveDuplicates(d,keep_dedup)
+  d<-autoResolveDuplicates(d, keep_dedup)
 
   # align   map_DataPack_DATIM_DEs_COCs with  d$datim$MER/d$data$distributedMER for KP_MAT
 
@@ -172,7 +172,7 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
   d$datim$MER %<>% dplyr::mutate(
       Age =
         dplyr::case_when(
-          indicator_code %in% c("PMTCT_EID.N.Age.T.2mo","PMTCT_EID.N.Age.T.2to12mo")
+          indicator_code %in% c("PMTCT_EID.N.Age.T.2mo", "PMTCT_EID.N.Age.T.2to12mo")
             ~ NA_character_,
           TRUE ~ Age)
     ) %>%
@@ -185,7 +185,7 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
 
     # Add period
     dplyr::mutate(
-      period = paste0(d$info$cop_year,"Oct") ) %>%
+      period = paste0(d$info$cop_year, "Oct") ) %>%
     # Under COP19 requirements, after this join, TX_PVLS N will remain NA for dataelementuid and categoryoptioncombouid
     # Select and rename based on DATIM protocol
     dplyr::select(
@@ -197,7 +197,7 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
       value) %>%
 
     # Make sure no duplicates
-    dplyr::group_by(dataElement, period, orgUnit,categoryOptionCombo,
+    dplyr::group_by(dataElement, period, orgUnit, categoryOptionCombo,
                     attributeOptionCombo) %>% #TODO: Coordinate with self-service on this name change
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup() %>%

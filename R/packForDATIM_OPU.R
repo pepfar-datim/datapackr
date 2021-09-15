@@ -22,7 +22,7 @@ packForDATIM_OPU <- function(d) {
     map_des_cocs_local %<>%
       dplyr::rename(dataelementuid = dataelement) %>%
       dplyr::mutate(
-        period = paste0(d$info$cop_year,"Oct"))
+        period = paste0(d$info$cop_year, "Oct"))
   } else {
     data <- d$data$SNUxIM
   }

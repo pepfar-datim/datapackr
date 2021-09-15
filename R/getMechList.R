@@ -34,11 +34,11 @@ getMechList <- function(country_uids = NULL,
                                                inherits = TRUE)) {
 
 
-    paste0( d2_session$base_url, "api/",datapackr::api_version(),
+    paste0( d2_session$base_url, "api/", datapackr::api_version(),
            "/sqlViews/fgUtV6e9YIX/data.csv") %>%
       { if (filter)
-        paste0(., "?filter=",field,":",operation,":",
-               ifelse(operation == "in", paste0("[",paste0(match, collapse=","),"]"), match))
+        paste0(., "?filter=", field, ":", operation, ":",
+               ifelse(operation == "in", paste0("[", paste0(match, collapse=", "), "]"), match))
         else .
         } %>%
       utils::URLencode() %>%
@@ -55,7 +55,7 @@ getMechList <- function(country_uids = NULL,
   }
 
   empty_mechs_view <- tibble::tibble(
-    "mechanism_desc" = character() ,
+    "mechanism_desc" = character(),
     "mechanism_code"= character(),
     "attributeOptionCombo" = character(),
     "partner_desc" = character(),
@@ -75,8 +75,8 @@ getMechList <- function(country_uids = NULL,
   if (!is.null(country_uids)) {
     ous <- api_call("organisationUnits",
                     d2_session = d2_session) %>%
-      api_filter("id", "in", match = paste(country_uids, collapse = ",")) %>%
-      datapackr::api_fields("id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]") %>%
+      api_filter("id", "in", match = paste(country_uids, collapse = ", ")) %>%
+      datapackr::api_fields("id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]") %>% # nolint
       datapackr::api_get(d2_session = d2_session) %>%
       dplyr::mutate(
         ou = purrr::map_chr(ancestors, list("name", 3), .default = NA),
@@ -95,15 +95,15 @@ getMechList <- function(country_uids = NULL,
   # Filter by Fiscal Year ####
     if (!is.null(cop_year)) {
       mechs %<>%
-        dplyr::filter((startdate < paste0(cop_year+1,"-10-01") &
-                         enddate > paste0(cop_year,"-09-30"))
-                      | mechanism_code %in% c("00000","00001","00100","00200"))
+        dplyr::filter((startdate < paste0(cop_year+1, "-10-01") &
+                         enddate > paste0(cop_year, "-09-30"))
+                      | mechanism_code %in% c("00000", "00001", "00100", "00200"))
     }
 
   # Handle Dedupes ####
     if (!include_dedupe) {
       mechs %<>%
-        dplyr::filter(!mechanism_code %in% c("00000","00001"))
+        dplyr::filter(!mechanism_code %in% c("00000", "00001"))
     }
 
     if (include_dedupe & !is.null(country_uids)) {
@@ -111,7 +111,7 @@ getMechList <- function(country_uids = NULL,
         getMechsView(filter = TRUE,
                      field = "uid",
                      operation = "in",
-                     match = c("X8hrDf6bLDC","YGT1o7UxfFu"),
+                     match = c("X8hrDf6bLDC", "YGT1o7UxfFu"),
                      d2_session = d2_session)
 
       mechs %<>%
@@ -121,7 +121,7 @@ getMechList <- function(country_uids = NULL,
   # Handle MOH mechs ####
     if (!include_MOH) {
       mechs %<>%
-        dplyr::filter(!mechanism_code %in% c("00100","00200"))
+        dplyr::filter(!mechanism_code %in% c("00100", "00200"))
     }
 
     if (include_MOH & !is.null(country_uids)) {
@@ -129,7 +129,7 @@ getMechList <- function(country_uids = NULL,
         getMechsView(filter = TRUE,
                      field = "uid",
                      operation = "in",
-                     match = c("QCJpv5aDCJU","TRX0yuTsJA9"),
+                     match = c("QCJpv5aDCJU", "TRX0yuTsJA9"),
                      d2_session = d2_session)
 
       mechs %<>%

@@ -31,7 +31,7 @@ writeHomeTab <- function(wb,
   }
 
   # PEPFAR banner ####
-  openxlsx::writeData(wb, "Home", "PEPFAR", xy = c(2,2), colNames = F)
+  openxlsx::writeData(wb, "Home", "PEPFAR", xy = c(2, 2), colNames = F)
   openxlsx::addStyle(wb, "Home",
                      styleGuide$home$pepfar,
                      rows = 2, cols = 2)
@@ -39,17 +39,17 @@ writeHomeTab <- function(wb,
   # Title ####
   openxlsx::writeData(wb, "Home",
                       x = paste0("COP",
-                                 stringr::str_sub(cop_year, -2,-1),
+                                 stringr::str_sub(cop_year, -2, -1),
                                  " ",
                                  tool),
-                      xy = c(2,10),
+                      xy = c(2, 10),
                       colNames = F)
   openxlsx::addStyle(wb, "Home",
                      styleGuide$home$title,
                      rows = 10, cols = 2)
 
   # datapack_name ####
-  openxlsx::writeData(wb, "Home", datapack_name, xy = c(2,20), colNames = F)
+  openxlsx::writeData(wb, "Home", datapack_name, xy = c(2, 20), colNames = F)
   openxlsx::addStyle(wb, "Home",
                      styleGuide$home$datapack_name,
                      rows = 20, cols = 2)
@@ -60,7 +60,7 @@ writeHomeTab <- function(wb,
     openxlsx::convertFromExcelRef() %>%
     as.numeric()
   row <- countryUIDs_homeCell() %>%
-    stringr::str_sub(2,3) %>%
+    stringr::str_sub(2, 3) %>%
     as.numeric()
 
   countries <- paste(country_uids, collapse = ", ")

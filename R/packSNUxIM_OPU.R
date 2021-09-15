@@ -50,10 +50,10 @@ packSNUxIM_OPU <- function(d) {
       `TA Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_TA")), na.rm = TRUE)) %>%
     dplyr::mutate(
       `Deduplicated DSD Rollup` =
-        rowSums(dplyr::select(., tidyselect::all_of(c("DSD Duplicated Rollup","DSD Dedupe"))),
+        rowSums(dplyr::select(., tidyselect::all_of(c("DSD Duplicated Rollup", "DSD Dedupe"))),
                 na.rm = T),
       `Deduplicated TA Rollup` =
-        rowSums(dplyr::select(., tidyselect::all_of(c("TA Duplicated Rollup","TA Dedupe"))),
+        rowSums(dplyr::select(., tidyselect::all_of(c("TA Duplicated Rollup", "TA Dedupe"))),
                 na.rm = T)) %>%
     dplyr::mutate(
       `Total Deduplicated Rollup` =
@@ -125,7 +125,7 @@ packSNUxIM_OPU <- function(d) {
     dplyr::filter(!is.na(indicator_code) & indicator_code != "12345_DSD") %>%
     dplyr::mutate(
       column_names = dplyr::case_when(
-        is.na(indicator_code) ~ paste0("col_",col),
+        is.na(indicator_code) ~ paste0("col_", col),
         col < 90 & col_type != "row_header" ~ paste0(indicator_code, ".original"),
         col >= 90 ~ paste0(indicator_code, ".updated"),
         TRUE ~ indicator_code
@@ -260,7 +260,7 @@ packSNUxIM_OPU <- function(d) {
   unused_mech_cols.original <- (length(data_original)+1):89
 
   dedupe_cols <- schema_plus %>%
-    dplyr::filter(stringr::str_detect(column_names,"(DSD|TA|Crosswalk) Dedupe\\.")) %>%
+    dplyr::filter(stringr::str_detect(column_names, "(DSD|TA|Crosswalk) Dedupe\\.")) %>%
     dplyr::pull(col)
 
   cols_to_hide <- sort(c(dedupe_cols, unused_mech_cols.original))
@@ -269,7 +269,7 @@ packSNUxIM_OPU <- function(d) {
                          sheet = "PSNUxIM",
                          cols = c(cols_to_hide),
                          widths = 8.17,
-                         hidden = rep(TRUE,length(cols_to_hide)))
+                         hidden = rep(TRUE, length(cols_to_hide)))
 
   # Hide rows ####
   openxlsx::setRowHeights(d$tool$wb,

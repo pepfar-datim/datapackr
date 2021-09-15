@@ -34,7 +34,7 @@ writePSNUxIM <- function(d,
 
         https://support.office.com/en-us/article/the-difference-between-threaded-comments-and-notes-75a51eec-4092-42ab-abf8-7669077b7be3")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg,"ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
 
     #TODO: Replace this with a centralized method
@@ -54,7 +54,7 @@ writePSNUxIM <- function(d,
       d <- packSNUxIM(d,
                       d2_session = d2_session)
     } else {
-      stop(paste0("Packing SNU x IM tabs is not supported for COP ",d$info$cop_year," Data Packs."))
+      stop(paste0("Packing SNU x IM tabs is not supported for COP ", d$info$cop_year, " Data Packs."))
     }
   } else {
     stop("Cannot update PSNUxIM tab without model data.")
