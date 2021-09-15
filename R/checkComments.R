@@ -9,7 +9,7 @@
 #'
 #' @return Logical whether there exists a comments issue in specified Excel file
 #'
-checkComments <-   function(d) {
+checkComments <- function(d) {
 
   wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
 
@@ -29,7 +29,8 @@ checkComments <-   function(d) {
         corruption issues when this app attempts to update your PSNUxIM tab.
         Prior to submitting for an updated PSNUxIM tab, you MUST remove all
         threaded comments. For more information about the differences between
-        threaded comments and notes, see: https://support.office.com/en-us/article/the-difference-between-threaded-comments-and-notes-75a51eec-4092-42ab-abf8-7669077b7be3",
+        threaded comments and notes,",
+        "see: https://support.office.com/en-us/article/the-difference-between-threaded-comments-and-notes-75a51eec-4092-42ab-abf8-7669077b7be3",
         "\n")
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")

@@ -129,7 +129,7 @@ adorn_import_file <- function(psnu_import_file,
   # Select/order columns ####
   if (filter_rename_output) {
     data %<>%
-      dplyr::select( ou,
+      dplyr::select(ou,
                      ou_id,
                      country_name,
                      country_uid,

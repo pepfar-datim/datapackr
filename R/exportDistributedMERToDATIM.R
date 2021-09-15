@@ -1,5 +1,5 @@
 
-autoResolveDuplicates <- function(d, keep_dedup ) {
+autoResolveDuplicates <- function(d, keep_dedup) {
 
   #We need to now indentify any cases where there was exactly 100% distribution, but there was a dedupe.
   #This is the section for pure duplicates.
@@ -9,7 +9,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
     dplyr::group_by(PSNU, psnuid, indicator_code, Age, Sex, KeyPop, support_type) %>%
     dplyr::summarize(distribution = sum(distribution),
                      n = dplyr::n()) %>%
-    dplyr::filter(n > 1 ) %>%
+    dplyr::filter(n > 1) %>%
     dplyr::mutate(distribution_diff = abs(distribution - 1.0))
 
   over_allocated <- pure_duplicates %>%
@@ -24,7 +24,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
         " need to be deduplicated in DATIM. Ensure all necessary deduplication values are",
         " 100% addressed. Please consult the Data Pack User Guide for more information.",
         "/n"
-      )
+)
 
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "INFO")
@@ -32,14 +32,14 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
   }
 
   auto_resolve_pure_dupes <- pure_duplicates %>%
-    dplyr::filter(distribution_diff < 1e-3 ) %>%
+    dplyr::filter(distribution_diff < 1e-3) %>%
     dplyr::mutate(mechanism_code ='00000',
                   value = 0,
                   sheet_name = NA) %>%
     dplyr::select(names(d$data$distributedMER))
 
   #DSD_TA Crosswalk dupes which should be autoresolved
-  if ( setequal(unique(d$data$SNUxIM$support_type), c("DSD", "TA")) ) {
+  if (setequal(unique(d$data$SNUxIM$support_type), c("DSD", "TA"))) {
     crosswalk_dupes_ids <- d$data$SNUxIM %>%
       dplyr::filter(mechanism_code != '99999') %>%
       dplyr::filter(distribution != 0) %>%
@@ -48,7 +48,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
       tidyr::pivot_wider(names_from = support_type,
                          values_from = n) %>%
       tidyr::drop_na(DSD, TA) %>%
-      dplyr::filter(TA >=1 & DSD >=1 ) %>%
+      dplyr::filter(TA >=1 & DSD >=1) %>%
       dplyr::select(-TA, -DSD)
 
     crosswalk_dupes <- d$data$SNUxIM %>%
@@ -56,7 +56,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
       dplyr::filter(distribution != 0) %>%
       dplyr::inner_join(crosswalk_dupes_ids)
 
-    if ( NROW(crosswalk_dupes) > 0  ) {
+    if (NROW(crosswalk_dupes) > 0) {
       crosswalk_dupes %<>%
         dplyr::group_by(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
         dplyr::summarise(total_distribution = sum(distribution, na.rm=TRUE)) %>%
@@ -74,16 +74,14 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
             " crosswalk duplicates with allocation greater than 100% were identified. These",
             " will need to be deduplicated in DATIM. Ensure all necessary crosswalk",
             " deduplication values are 100% addressed. Please consult the Data Pack User Guide for more information.",
-            "/n"
-          )
-
+            "/n")
 
         d$info$messages <- appendMessage(d$info$messages, warning_msg, "INFO")
 
       }
 
       crosswalk_dupes_auto_resolved <- crosswalk_dupes %>%
-        dplyr::filter(distribution_diff <= 1e-3 ) %>%
+        dplyr::filter(distribution_diff <= 1e-3) %>%
         dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
         dplyr::mutate(support_type = 'TA',
                       sheet_name = NA,
@@ -95,7 +93,7 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
   crosswalk_dupes_auto_resolved<-data.frame(foo=character())
   }
 
-  if ( keep_dedup == TRUE ) {
+  if (keep_dedup == TRUE) {
     d$datim$MER <- d$data$distributedMER
   } else {
     #Filter the pseudo-dedupe mechanism data out
@@ -113,24 +111,24 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
     } else
       if (NROW(x) > 0) {
         return(TRUE)
-      } else
-      {
+      } else {
         FALSE
       }
   }
 
   #Bind pure dupes
 
-  if ( exists_with_rows(auto_resolve_pure_dupes) ) {
+  if (exists_with_rows(auto_resolve_pure_dupes)) {
     d$datim$MER<-dplyr::bind_rows(d$datim$MER, auto_resolve_pure_dupes)
-    warning_msg<-paste0("INFO! ", NROW(auto_resolve_pure_dupes), " zero-valued pure deduplication adjustments will be added to your DATIM import.
-                  Please consult the DataPack wiki section on deduplication for more information. ")
+    warning_msg<-paste0("INFO! ", NROW(auto_resolve_pure_dupes),
+    " zero-valued pure deduplication adjustments will be added to your DATIM import.",
+     "Please consult the DataPack wiki section on deduplication for more information. ")
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "INFO")
   }
 
   #Bind crosswalk dupes
-  if ( exists_with_rows(crosswalk_dupes_auto_resolved)  ) {
+  if (exists_with_rows(crosswalk_dupes_auto_resolved)) {
     d$datim$MER<-dplyr::bind_rows(d$datim$MER, crosswalk_dupes_auto_resolved)
     warning_msg<-paste0("INFO! ", NROW(crosswalk_dupes_auto_resolved), " zero-valued crosswalk deduplication adjustments will be added to your DATIM import.
                   Please consult the DataPack wiki section on deduplication for more information. ")
@@ -179,17 +177,17 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
           indicator_code %in% c("PMTCT_EID.N.Age.T.2mo", "PMTCT_EID.N.Age.T.2to12mo")
             ~ NA_character_,
           TRUE ~ Age)
-    ) %>%
+) %>%
 
   # Pull in all dataElements and categoryOptionCombos
-    dplyr::left_join(., ( map_des_cocs_local %>%
+    dplyr::left_join(., (map_des_cocs_local %>%
                             dplyr::rename(Age = valid_ages.name,
                                           Sex = valid_sexes.name,
-                                          KeyPop = valid_kps.name) )) %>%
+                                          KeyPop = valid_kps.name))) %>%
 
     # Add period
     dplyr::mutate(
-      period = paste0(d$info$cop_year, "Oct") ) %>%
+      period = paste0(d$info$cop_year, "Oct")) %>%
     # Under COP19 requirements, after this join, TX_PVLS N will remain NA for dataelementuid and categoryoptioncombouid
     # Select and rename based on DATIM protocol
     dplyr::select(

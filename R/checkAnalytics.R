@@ -47,7 +47,7 @@ analyze_eid_2mo <- function(data) {
   issues <- analysis %>%
     dplyr::filter(PMTCT_EID.2mo.rate < 0.9)
 
-  if (NROW(issues) > 0 ) {
+  if (NROW(issues) > 0) {
 
     a$test_results <- issues
     attr(a$test_results, "test_name") <- "PMTCT_EID coverage by 2 months issues"
@@ -120,7 +120,7 @@ analyze_vmmc_indeterminate <- function(data) {
       VMMC_CIRC.Unk.T,
       VMMC_CIRC.indeterminateRate)
 
-  if (NROW(issues) > 0 ) {
+  if (NROW(issues) > 0) {
 
     a$test_results <- issues
     attr(a$test_results, "test_name") <- "VMMC Indeterminate rate issues"

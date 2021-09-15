@@ -28,7 +28,7 @@ with_mock_api({
     expect_type(test_dataset,"list")
     expect_identical(class(test_dataset),"data.frame")
     expect_true(NROW(test_dataset)>0)
-    test_dataset_names<-c( "name","id","denominatorDescription",
+    test_dataset_names<-c("name","id","denominatorDescription",
     "numeratorDescription","numerator","denominator",
                            "code","indicatorType.name","indicatorType.id")
     expect_true(setequal(test_dataset_names,names(test_dataset)))

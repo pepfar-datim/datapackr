@@ -8,7 +8,7 @@ test_that("Can pass a COP21 DP Template", {
                                       cop_year = NULL)
   expect_silent(foo<-checkStructure(d))
   expect_equal(NROW(foo$tests$missing_sheets), 0L)
-} )
+})
 
 test_that("Can warn on missing COP21 DP sheet", {
 
@@ -34,4 +34,4 @@ test_that("Can pass a COP20 OPU Template", {
                                       cop_year = NULL))
   expect_silent(foo<-checkStructure(d))
   expect_equal(NROW(foo$tests$missing_sheets), 0L)
-} )
+})

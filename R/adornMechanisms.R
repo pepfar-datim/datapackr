@@ -6,16 +6,16 @@
 #'
 #' @return Mechanism List
 #'
-getMechanismViewFromDATIM <- function( cop_year = NULL,
+getMechanismViewFromDATIM <- function(cop_year = NULL,
                                   d2_session = dynGet("d2_default_session",
                                                       inherits = TRUE)) {
+
+  url_filter <-  ifelse(is.null(cop_year),"",
+  paste0("&filter=startdate:lt:", cop_year+1, "-10-01",
+             "&filter=enddate:gt:", cop_year, "-09-30"))
+
   paste0(d2_session$base_url,
-         "api/sqlViews/fgUtV6e9YIX/data.csv?paging=false") %>%
-    {if (!is.null(cop_year))
-      paste0(., "&filter=startdate:lt:", cop_year+1, "-10-01",
-             "&filter=enddate:gt:", cop_year, "-09-30")
-      else .
-      } %>%
+         "api/sqlViews/fgUtV6e9YIX/data.csv?paging=false", url_filter) %>%
     utils::URLencode() %>%
     httr::GET(httr::timeout(180), handle = d2_session$handle) %>%
     httr::content(., "text") %>%
@@ -139,15 +139,15 @@ getMechanismView <- function(country_uids = NULL,
   }
 
     # Include Dedupe or MOH
-      if (!include_dedupe ) {
+      if (!include_dedupe) {
         dedupe <- c("X8hrDf6bLDC", "YGT1o7UxfFu")
-        mechs %<>%  dplyr::filter( (attributeOptionCombo %in% dedupe ) == FALSE )
+        mechs %<>%  dplyr::filter((attributeOptionCombo %in% dedupe) == FALSE)
       }
 
       # Include Dedupe or MOH
-      if (!include_MOH ) {
+      if (!include_MOH) {
         MOH <- c("QCJpv5aDCJU", "TRX0yuTsJA9")
-        mechs %<>%  dplyr::filter( (attributeOptionCombo %in% MOH ) == FALSE )
+        mechs %<>%  dplyr::filter((attributeOptionCombo %in% MOH) == FALSE)
       }
 
   structure_ok <- dplyr::setequal(names(empty_mechs_view), names(mechs))

@@ -37,7 +37,7 @@ test_that("Can generate a key chain", {
    expect_equal(d$info$tool, "Data Pack")
    expect_equal(d$info$cop_year, 2021)
    expect_false(d$info$needs_psnuxim)
-} )
+})
 
 test_that("Can get the type and COP year of tool of a COP21 Data Pack", {
 

@@ -13,7 +13,7 @@ test_that("PMTCT_EID coverage by 2 months old < 90% expect message", {
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$PMTCT_EID.2mo.rate, 0.0099, tolerance=1e-3)
 
-} )
+})
 
 test_that("PMTCT_EID coverage by 2 months old < 90% all zeros expect NULL", {
   data<-tribble(
@@ -24,7 +24,7 @@ test_that("PMTCT_EID coverage by 2 months old < 90% all zeros expect NULL", {
   foo<-analyze_eid_2mo(data)
   expect_null(foo)
 
-} )
+})
 
 test_that("PMTCT_EID coverage by 2 months old > 90% expect NULL", {
   data<-tribble(
@@ -35,7 +35,7 @@ test_that("PMTCT_EID coverage by 2 months old > 90% expect NULL", {
   foo<-analyze_eid_2mo(data)
   expect_null(foo)
 
-} )
+})
 
 test_that("VMMC_CIRC Indeterminate Rate < 5% expect message", {
   data<-tribble(
@@ -50,7 +50,7 @@ test_that("VMMC_CIRC Indeterminate Rate < 5% expect message", {
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$VMMC_CIRC.indeterminateRate, 0.498, tolerance=1e-3)
 
-} )
+})
 
 test_that("VMMC_CIRC Indeterminate Rate > 5% expect NULL", {
   data<-tribble(
@@ -62,7 +62,7 @@ test_that("VMMC_CIRC Indeterminate Rate > 5% expect NULL", {
   foo<-analyze_vmmc_indeterminate(data)
   expect_null(foo)
 
-} )
+})
 
 test_that("VMMC_CIRC Indeterminate Rate all zeros expect NULL", {
   data<-tribble(
@@ -74,7 +74,7 @@ test_that("VMMC_CIRC Indeterminate Rate all zeros expect NULL", {
   foo<-analyze_vmmc_indeterminate(data)
   expect_null(foo)
 
-} )
+})
 
 test_that("VMMC_CIRC Indeterminate Rate all keypop not NA expect NULL", {
   data<-tribble(
@@ -85,7 +85,7 @@ test_that("VMMC_CIRC Indeterminate Rate all keypop not NA expect NULL", {
   foo<-analyze_vmmc_indeterminate(data)
   expect_null(foo)
 
-} )
+})
 
 test_that("PMTCT Known Pos/PMTCT Total >  0.75 expect message", {
   data<-tribble(
@@ -101,7 +101,7 @@ test_that("PMTCT Known Pos/PMTCT Total >  0.75 expect message", {
   expect_equal(foo$test_results$knownpos_ratio, 0.833, tolerance=1e-3)
 
 
-} )
+})
 
 test_that("PMTCT Known Pos/PMTCT Total <  0.75 expect null", {
   data<-tribble(
@@ -113,7 +113,7 @@ test_that("PMTCT Known Pos/PMTCT Total <  0.75 expect null", {
 
   expect_null(analyze_pmtctknownpos(data))
 
-} )
+})
 
 test_that("PMTCT Known Pos/PMTCT Total all zeros expect null", {
   data<-tribble(
@@ -124,7 +124,7 @@ test_that("PMTCT Known Pos/PMTCT Total all zeros expect null", {
 
   expect_null(analyze_pmtctknownpos(data))
 
-} )
+})
 
 test_that("TB Known Pos ratio > 75% expect message", {
   data<-tribble(
@@ -140,7 +140,7 @@ test_that("TB Known Pos ratio > 75% expect message", {
   expect_equal(foo$test_results$knownpos_ratio, 0.751, tolerance=1e-3)
 
 
-} )
+})
 
 test_that("TB Known Pos ratio < 75% expect message expect null", {
   data<-tribble(
@@ -151,7 +151,7 @@ test_that("TB Known Pos ratio < 75% expect message expect null", {
 
   expect_null(analyze_tbknownpos(data))
 
-} )
+})
 
 test_that("PMTCT Known Pos/PMTCT Total all zeros expect null", {
   data<-tribble(
@@ -162,7 +162,7 @@ test_that("PMTCT Known Pos/PMTCT Total all zeros expect null", {
 
   expect_null(analyze_tbknownpos(data))
 
-} )
+})
 
 test_that(" Test retention < 98% expect message", {
   data<-tribble(
@@ -177,7 +177,7 @@ test_that(" Test retention < 98% expect message", {
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$TX.Retention.T, 0.97, tolerance=1e-3)
 
-} )
+})
 
 test_that(" Test retention > 100% expect message", {
   data<-tribble(
@@ -192,7 +192,7 @@ test_that(" Test retention > 100% expect message", {
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$TX.Retention.T, 1.01, tolerance=1e-3)
 
-} )
+})
 
 test_that(" Test retention = 99% expect NULL", {
   data<-tribble(
@@ -203,7 +203,7 @@ test_that(" Test retention = 99% expect NULL", {
 
   expect_null(analyze_retention(data))
 
-} )
+})
 
 test_that(" Test retention all zeros expect NULL", {
   data<-tribble(
@@ -214,7 +214,7 @@ test_that(" Test retention all zeros expect NULL", {
 
   expect_null(analyze_retention(data))
 
-} )
+})
 
 test_that(" Test linkage < 95% expect message", {
   data<-tribble(
@@ -228,7 +228,7 @@ test_that(" Test linkage < 95% expect message", {
   testthat::expect_setequal(names(foo), c("test_results", "msg"))
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$HTS_TST.Linkage.T, 0.94, tolerance=1e-3)
-} )
+})
 
 test_that(" Test KP linkage < 95% expect message", {
   data<-tribble(
@@ -242,7 +242,7 @@ test_that(" Test KP linkage < 95% expect message", {
   testthat::expect_setequal(names(foo), c("test_results", "msg"))
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$HTS_TST.KP.Linkage.T, 0.94, tolerance=1e-3)
-} )
+})
 
 test_that(" Test linkage > 100% expect message", {
   data<-tribble(
@@ -256,7 +256,7 @@ test_that(" Test linkage > 100% expect message", {
   testthat::expect_setequal(names(foo), c("test_results", "msg"))
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$HTS_TST.Linkage.T, 1.01, tolerance=1e-3)
-} )
+})
 
 test_that(" Test KP linkage > 100% expect message", {
   data<-tribble(
@@ -270,7 +270,7 @@ test_that(" Test KP linkage > 100% expect message", {
   testthat::expect_setequal(names(foo), c("test_results", "msg"))
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$HTS_TST.KP.Linkage.T, 1.01, tolerance=1e-3)
-} )
+})
 
 test_that(" Test linkage = 98% expect NULL", {
   data<-tribble(
@@ -281,7 +281,7 @@ test_that(" Test linkage = 98% expect NULL", {
 
   expect_null(analyze_linkage(data))
 
-} )
+})
 
 test_that(" Test KP linkage = 98% expect NULL", {
   data<-tribble(
@@ -292,7 +292,7 @@ test_that(" Test KP linkage = 98% expect NULL", {
 
   expect_null(analyze_linkage(data))
 
-} )
+})
 
 test_that(" Test linkage all zeros expect NULL", {
   data<-tribble(
@@ -303,7 +303,7 @@ test_that(" Test linkage all zeros expect NULL", {
 
   expect_null(analyze_linkage(data))
 
-} )
+})
 
 test_that(" Test linkage with age <1", {
   data<-tribble(
@@ -317,4 +317,4 @@ test_that(" Test linkage with age <1", {
   testthat::expect_setequal(names(foo), c("test_results", "msg"))
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$HTS_TST.KP.Linkage.T, 1.01, tolerance=1e-3)
-} )
+})

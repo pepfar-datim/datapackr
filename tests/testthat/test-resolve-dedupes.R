@@ -25,7 +25,7 @@ test_that("No modifications on if there are no duplicates", {
   expect_true(sum(grepl("00000", foo$datim$MER$mechanism_code)) == 0)
 
   expect_equal(NROW(foo$info$messages), 0L)
-} )
+})
 
 
 
@@ -53,7 +53,7 @@ test_that("Can resolve non-overallocated  pure dupes", {
   expect_true(sum(grepl("00000", foo$datim$MER$mechanism_code)) == 1)
 
   expect_true(grepl("1 zero-valued pure deduplication adjustments", foo$info$messages$message))
-} )
+})
 
 
 
@@ -81,7 +81,7 @@ test_that("Provide info only for  over-allocated pure dupes", {
   expect_true(sum(grepl("00000", foo$datim$MER$mechanism_code)) == 0)
 
   expect_true(grepl("duplicates with allocation greater than 100% were identified", foo$info$messages$message))
-} )
+})
 
 
 test_that("Can resolve non-overallocated crosswalk dupes", {
@@ -108,7 +108,7 @@ test_that("Can resolve non-overallocated crosswalk dupes", {
   expect_true(sum(grepl("00001", foo$datim$MER$mechanism_code)) == 1)
 
   expect_true(grepl("1 zero-valued crosswalk deduplication adjustments will be added to your DATIM import", foo$info$messages$message))
-} )
+})
 
 
 test_that("Provide info only for over-allocated crosswalk dupes", {
@@ -141,7 +141,7 @@ test_that("Provide info only for over-allocated crosswalk dupes", {
   expect_true(sum(grepl("00001", foo$datim$MER$mechanism_code)) == 0)
 
   expect_true(grepl("crosswalk duplicates with allocation greater than 100% were identified", foo$info$messages$message))
-} )
+})
 
 
 
@@ -171,4 +171,4 @@ test_that("Preserve non-deduplicated data when having over-allocated crosswalk d
   expect_true(sum(grepl("00001", foo$datim$MER$mechanism_code)) == 0)
 
   expect_true(grepl("crosswalk duplicates with allocation greater than 100% were identified", foo$info$messages$message))
-} )
+})

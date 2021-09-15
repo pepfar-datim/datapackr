@@ -10,7 +10,7 @@ test_that("Can read a Datapack Name and UIDs", {
                          tool = "Data Pack")
   expect_equal(foo, "qllxzIjjurr")
   unlink(template_copy)
-} )
+})
 
 test_that("Can error on an invalid regional DataPack UID", {
   template_copy <- paste0(tempfile(), ".xlsx")
@@ -26,4 +26,4 @@ test_that("Can error on an invalid regional DataPack UID", {
                                                tool = "Data Pack",
                                                cop_year = 2021))
   unlink(template_copy)
-} )
+})

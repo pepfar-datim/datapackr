@@ -41,4 +41,4 @@ test_that("Can write a home tab", {
   expect_equal(d$info$cop_year, 2021)
   expect_false(d$info$needs_psnuxim)
   unlink(template_copy)
-} )
+})

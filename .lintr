@@ -4,10 +4,8 @@ linters: with_defaults(
     infix_spaces_linter = NULL, # 320
     object_name_linter = NULL, # 270
     single_quotes_linter = NULL, # 106
-    spaces_inside_linter = NULL, # 106
     commented_code_linter = NULL, # 88
     object_usage_linter = NULL, # 84
-    open_curly_linter = NULL, # 77
     cyclocomp_linter = NULL, # 7
     dummy_linter = NULL
   )
