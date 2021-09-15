@@ -32,18 +32,18 @@ getPSNUs <- function(country_uids = NULL,
       "in",
       paste0(
         "AVy8gJXym2D",
-        dplyr::if_else(include_mil, ",nwQbMeALRjL",""), # nolint
-        dplyr::if_else(include_DREAMS, ",mRRlkbZolDR","") # nolint
+        dplyr::if_else(include_mil, ",nwQbMeALRjL",""),
+        dplyr::if_else(include_DREAMS, ",mRRlkbZolDR","")
       )
     ) %>%
     {
       if (all(!is.null(country_uids)))
-        api_filter(., "ancestors.id", "in", match = paste(country_uids, collapse = ",")) # nolint
+        api_filter(., "ancestors.id", "in", match = paste(country_uids, collapse = ","))
       else
         .
     } %>%
     datapackr::api_fields(
-      "id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]" # nolint
+      "id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]"
     ) %>%
     {
       if (!is.null(additional_fields))

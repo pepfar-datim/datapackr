@@ -194,12 +194,12 @@ packSNUxIM_2020 <- function(d) {
   d$data$SNUxIM_combined %<>%
     dplyr::mutate(
       DataPackTarget = paste0(
-        'ROUND(SUMIF(CHOOSE($G', row,
-        ', ', formula_refs_compiled, '),$F', row,
-        ', INDIRECT($B', row, ')),0)'),
+        'ROUND(SUMIF(CHOOSE($G',row,
+        ',',formula_refs_compiled,'),$F',row,
+        ',INDIRECT($B',row,')),0)'),
 
       # Add Dedupe formula ####
-      Dedupe = paste0('IF($I', row, '>100%,1-$I', row, ',0)'),
+      Dedupe = paste0('IF($I',row,'>100%,1-$I',row,',0)'),
 
       # Add Rollup check formula
       Rollup = NA_character_

@@ -599,7 +599,7 @@ createWorkbook <- function(datapack_name = NULL,
 
   wb <- openxlsx::loadWorkbook(template_path)
 
-  options("openxlsx.numFmt" = "#, ##0")
+  options("openxlsx.numFmt" = "#,##0")
 
   # Write Home Sheet info ####
   wb <- writeHomeTab(wb = wb,

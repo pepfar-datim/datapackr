@@ -335,11 +335,11 @@ unPackSchema_datapack <- function(filepath = NULL,
   ## Test Data Elements ####
       dataelement_dsd.test =
         dplyr::if_else(sheet_name == "PSNUxIM", dataelement_dsd != "NA",
-                       !stringr::str_detect(dataelement_dsd, 
+                       !stringr::str_detect(dataelement_dsd,
                        "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$")),
       dataelement_ta.test =
         dplyr::if_else(sheet_name == "PSNUxIM", dataelement_ta != "NA",
-                      !stringr::str_detect(dataelement_ta, 
+                      !stringr::str_detect(dataelement_ta,
                       "^([A-Za-z][A-Za-z0-9]{10})(\\.(([A-Za-z][A-Za-z0-9]{10})))*$")),
 
   ## Test categoryOptions

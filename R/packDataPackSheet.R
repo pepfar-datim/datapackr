@@ -80,7 +80,7 @@ packDataPackSheet <- function(wb,
                   value_type == "integer") %>%
     dplyr::pull(col)
 
-  integerStyle <- openxlsx::createStyle(numFmt = "#, ##0")
+  integerStyle <- openxlsx::createStyle(numFmt = "#,##0")
 
   if (length(integerCols) > 0) {
     openxlsx::addStyle(wb,

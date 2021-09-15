@@ -14,6 +14,7 @@ getNumeratorDenominator <- function(dataElements = NULL,
 
   groupSet <- "lD2x0c8kywj"
 
+
   num_den <- api_call(paste0("dataElementGroupSets/", groupSet),
                       d2_session = d2_session) %>%
     api_fields("dataElementGroups[name,dataElements[id]]") %>% # nolint

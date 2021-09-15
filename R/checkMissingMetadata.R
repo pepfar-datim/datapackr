@@ -11,7 +11,9 @@
 #' @return d
 #'
 checkMissingMetadata <- function(d, sheet) {
+
   if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
+
     data <- d$data$SNUxIM
   } else {
     data <- d$data$extract
@@ -32,6 +34,7 @@ checkMissingMetadata <- function(d, sheet) {
 
     attr(d$tests$missing_metadata, "test_name") <- "Missing metadata"
 
+
     warning_msg <-
       paste0(
         "ERROR! In tab ",
@@ -46,7 +49,9 @@ checkMissingMetadata <- function(d, sheet) {
         paste(missing_metadata$row, collapse = ", "),
         "\n")
 
+
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+
     d$info$has_error <- TRUE
   }
 

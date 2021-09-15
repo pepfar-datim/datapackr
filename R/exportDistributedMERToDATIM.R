@@ -26,7 +26,9 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
         "/n"
       )
 
+
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "INFO")
+
   }
 
   auto_resolve_pure_dupes <- pure_duplicates %>%
@@ -75,7 +77,9 @@ autoResolveDuplicates <- function(d, keep_dedup ) {
             "/n"
           )
 
+
         d$info$messages <- appendMessage(d$info$messages, warning_msg, "INFO")
+
       }
 
       crosswalk_dupes_auto_resolved <- crosswalk_dupes %>%

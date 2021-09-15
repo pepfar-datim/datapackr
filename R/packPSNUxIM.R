@@ -151,9 +151,9 @@ packPSNUxIM <- function(wb,
   # Create Deduplicated Rollups
   snuxim_model_data %<>%
     dplyr::mutate(
-      `Total Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}|HllvX50cXC0")), na.rm = TRUE), # nolint
-      `DSD Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_DSD")), na.rm = TRUE), # nolint
-      `TA Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_TA")), na.rm = TRUE)) # nolint
+      `Total Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}|HllvX50cXC0")), na.rm = TRUE),
+      `DSD Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_DSD")), na.rm = TRUE),
+      `TA Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_TA")), na.rm = TRUE))
 
   # Create Duplicated Rollups
   snuxim_model_data %<>%
@@ -355,7 +355,7 @@ packPSNUxIM <- function(wb,
       indicator_code == "12345_DSD" | col == max(col)) %>%
     dplyr::pull(col)
 
-  count.im.datim <- names(snuxim_model_data)[stringr::str_detect(names(snuxim_model_data), "\\d{4,}_(DSD|TA)")] %>% # nolint
+  count.im.datim <- names(snuxim_model_data)[stringr::str_detect(names(snuxim_model_data), "\\d{4,}_(DSD|TA)")] %>%
     length()
 
   col.formulas <- data_structure %>%

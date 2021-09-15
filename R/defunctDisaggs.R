@@ -15,6 +15,7 @@
 defunctDisaggs <- function(d, sheet) {
 
   if (sheet %in% c("SNU x IM", "PSNUxIM")) {
+
     stop("Sorry! Can't check the SNU x IM tab with this function.")
   } else {
     data <- d$data$extract
@@ -33,8 +34,10 @@ defunctDisaggs <- function(d, sheet) {
     dplyr::select(indicator_code, Age, Sex, KeyPop) %>%
     dplyr::distinct()
 
+
   d$tests$defunct_disaggs<-dplyr::bind_rows(d$tests$defunct_disaggs, defunct_disaggs)
   attr(d$tests$defunct_disaggs, "test_name")<-"Defunct disaggs"
+
 
   if (NROW(defunct_disaggs) > 0) {
 
@@ -55,7 +58,9 @@ defunctDisaggs <- function(d, sheet) {
         paste(defunct_msg, collapse = "\n\t"),
         "\n")
 
+
     d$info$messages<-appendMessage(d$info$messages, warning_msg, "ERROR")
+
     d$info$has_error <- TRUE
   }
 

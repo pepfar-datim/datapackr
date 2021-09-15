@@ -11,6 +11,7 @@ getFY22Prioritizations <- function(d) {
   psnu_prioritizations <- d$datim$fy22_prioritizations %>%
     dplyr::select(orgUnit, value)
 
+
   psnus<-dplyr::filter(datapackr::valid_PSNUs, psnu_type =="SNU") %>%
     dplyr::filter(country_uid %in% d$info$country_uids) %>%
     dplyr::select(ancestor_uid = psnu_uid, ancestor_name = psnu)
@@ -28,6 +29,7 @@ getFY22Prioritizations <- function(d) {
     dplyr::select(orgUnit=psnu_uid, value)
 
   dplyr::bind_rows(psnu_prioritizations, dreams_prioritizations)
+
 
 }
 
