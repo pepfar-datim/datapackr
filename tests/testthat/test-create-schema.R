@@ -8,29 +8,29 @@ Sys.setlocale(category = "LC_COLLATE", locale = "en_US.UTF-8")
 with_mock_api({
   test_that("We can create a datapack schema", {
 
-    test_dataset <- unPackSchema_datapack(test_sheet('COP21_Data_Pack_Template.xlsx'),
+    test_dataset <- unPackSchema_datapack(test_sheet("COP21_Data_Pack_Template.xlsx"),
                                           d2_session = training)
     expect_type(test_dataset, "list")
     expect_named(
       test_dataset,
       c(
-        'sheet_num',
-        'sheet_name',
-        'data_structure',
-        'col',
-        'indicator_code',
-        'dataset',
-        'col_type',
-        'value_type',
-        'dataelement_dsd',
-        'dataelement_ta',
-        'categoryoption_specified',
-        'valid_ages',
-        'valid_sexes',
-        'valid_kps',
-        'formula',
-        'FY',
-        'period'
+        "sheet_num",
+        "sheet_name",
+        "data_structure",
+        "col",
+        "indicator_code",
+        "dataset",
+        "col_type",
+        "value_type",
+        "dataelement_dsd",
+        "dataelement_ta",
+        "categoryoption_specified",
+        "valid_ages",
+        "valid_sexes",
+        "valid_kps",
+        "formula",
+        "FY",
+        "period"
       ),
       ignore.order = TRUE
     )

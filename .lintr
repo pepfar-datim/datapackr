@@ -3,7 +3,6 @@ linters: with_defaults(
     line_length_linter = NULL, # 846
     infix_spaces_linter = NULL, # 320
     object_name_linter = NULL, # 270
-    single_quotes_linter = NULL, # 106
     commented_code_linter = NULL, # 88
     object_usage_linter = NULL, # 84
     cyclocomp_linter = NULL, # 7

@@ -2,7 +2,7 @@ context("test-write-home-tab")
 
 test_that("Can write a home tab", {
   template_copy <- paste0(tempfile(), ".xlsx")
-  file.copy(from = test_sheet('COP21_Data_Pack_Template.xlsx'), to=template_copy)
+  file.copy(from = test_sheet("COP21_Data_Pack_Template.xlsx"), to=template_copy)
   wb<-openxlsx::loadWorkbook(template_copy)
   openxlsx::removeWorksheet(wb, "Home")
   datapackr::writeHomeTab(wb, datapack_name = "Lesotho", country_uids = "qllxzIjjurr", cop_year = 2021)

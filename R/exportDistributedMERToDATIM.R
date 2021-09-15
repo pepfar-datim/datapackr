@@ -4,7 +4,7 @@ autoResolveDuplicates <- function(d, keep_dedup) {
   #We need to now indentify any cases where there was exactly 100% distribution, but there was a dedupe.
   #This is the section for pure duplicates.
   pure_duplicates<-d$data$SNUxIM %>%
-    dplyr::filter(mechanism_code != '99999') %>%
+    dplyr::filter(mechanism_code != "99999") %>%
     dplyr::filter(distribution != 0) %>%
     dplyr::group_by(PSNU, psnuid, indicator_code, Age, Sex, KeyPop, support_type) %>%
     dplyr::summarize(distribution = sum(distribution),
@@ -33,7 +33,7 @@ autoResolveDuplicates <- function(d, keep_dedup) {
 
   auto_resolve_pure_dupes <- pure_duplicates %>%
     dplyr::filter(distribution_diff < 1e-3) %>%
-    dplyr::mutate(mechanism_code ='00000',
+    dplyr::mutate(mechanism_code ="00000",
                   value = 0,
                   sheet_name = NA) %>%
     dplyr::select(names(d$data$distributedMER))
@@ -41,7 +41,7 @@ autoResolveDuplicates <- function(d, keep_dedup) {
   #DSD_TA Crosswalk dupes which should be autoresolved
   if (setequal(unique(d$data$SNUxIM$support_type), c("DSD", "TA"))) {
     crosswalk_dupes_ids <- d$data$SNUxIM %>%
-      dplyr::filter(mechanism_code != '99999') %>%
+      dplyr::filter(mechanism_code != "99999") %>%
       dplyr::filter(distribution != 0) %>%
       dplyr::group_by(PSNU, psnuid, indicator_code, Age, Sex, KeyPop, support_type) %>%
       dplyr::summarize(n = dplyr::n()) %>%
@@ -52,7 +52,7 @@ autoResolveDuplicates <- function(d, keep_dedup) {
       dplyr::select(-TA, -DSD)
 
     crosswalk_dupes <- d$data$SNUxIM %>%
-      dplyr::filter(mechanism_code != '99999') %>%
+      dplyr::filter(mechanism_code != "99999") %>%
       dplyr::filter(distribution != 0) %>%
       dplyr::inner_join(crosswalk_dupes_ids)
 
@@ -83,9 +83,9 @@ autoResolveDuplicates <- function(d, keep_dedup) {
       crosswalk_dupes_auto_resolved <- crosswalk_dupes %>%
         dplyr::filter(distribution_diff <= 1e-3) %>%
         dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
-        dplyr::mutate(support_type = 'TA',
+        dplyr::mutate(support_type = "TA",
                       sheet_name = NA,
-                      mechanism_code = '00001',
+                      mechanism_code = "00001",
                       value = 0) %>%
         dplyr::select(names(d$data$distributedMER))
     }
@@ -98,7 +98,7 @@ autoResolveDuplicates <- function(d, keep_dedup) {
   } else {
     #Filter the pseudo-dedupe mechanism data out
     d$datim$MER <- d$data$distributedMER %>%
-      dplyr::filter(mechanism_code != '99999')
+      dplyr::filter(mechanism_code != "99999")
   }
 
 

@@ -144,10 +144,10 @@ packSNUxIM <- function(d,
 
   # Add DataPackTarget column & classify just that col as formula ####
       DataPackTarget = paste0(
-        'SUMIF(',
-        sheet_name, '!$', id_col, ':$', id_col,
-        ', $F', row,
-        ', ', sheet_name, '!$', target_col, ':$', target_col, ')')
+        "SUMIF(",
+        sheet_name, "!$", id_col, ":$", id_col,
+        ", $F", row,
+        ", ", sheet_name, "!$", target_col, ":$", target_col, ")")
     ) %>%
     dplyr::select(-id_col, -sheet_name, -target_col, -row)
 

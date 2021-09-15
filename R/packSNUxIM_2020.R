@@ -80,7 +80,7 @@ packSNUxIM_2020 <- function(d) {
 
   d$data$SNUxIM_combined %<>%
     dplyr::arrange(mechanism_code, type) %>%
-    dplyr::filter(!mechanism_code %in% c('00000', '00001')) %>%
+    dplyr::filter(!mechanism_code %in% c("00000", "00001")) %>%
     tidyr::pivot_wider(names_from = c(mechanism_code, type),
                        values_from = percent) %>%
     dplyr::select_at(dplyr::vars(-tidyselect::one_of("NA_TA", "NA_DSD"),
@@ -149,8 +149,8 @@ packSNUxIM_2020 <- function(d) {
     dplyr::arrange(PSNU, sheet_num, col, Age, Sex, KeyPop) %>%
     dplyr::mutate(
       row = as.integer((1:dplyr::n()) + existing_rows),
-      ID = paste0('$A', row, '&IF($C', row, '<>"","|"&$C', row, ',"")&IF($D', row,
-                  '<>"", "|"&$D', row, ',"")&IF($E', row, '<>"", "|"&$E', row, ',"")'),
+      ID = paste0('$A', row, '&IF($C', row, '<>"","|"&$C', row, ',"")&IF($D', row, # nolint
+                  '<>"", "|"&$D', row, ',"")&IF($E', row, '<>"", "|"&$E', row, ',"")'), # nolint
       sheet_num = dplyr::case_when(
         indicator_code == "OVC_HIVSTAT.N.total.T" ~ 15,
         TRUE ~ sheet_num - 8))
@@ -194,12 +194,12 @@ packSNUxIM_2020 <- function(d) {
   d$data$SNUxIM_combined %<>%
     dplyr::mutate(
       DataPackTarget = paste0(
-        'ROUND(SUMIF(CHOOSE($G',row,
-        ',',formula_refs_compiled,'),$F',row,
-        ',INDIRECT($B',row,')),0)'),
+        "ROUND(SUMIF(CHOOSE($G",row,
+        ",",formula_refs_compiled,"),$F",row,
+        ",INDIRECT($B",row,")),0)"),
 
       # Add Dedupe formula ####
-      Dedupe = paste0('IF($I',row,'>100%,1-$I',row,',0)'),
+      Dedupe = paste0("IF($I",row,">100%,1-$I",row,",0)"),
 
       # Add Rollup check formula
       Rollup = NA_character_
@@ -214,14 +214,14 @@ packSNUxIM_2020 <- function(d) {
   d$data$SNUxIM_combined %<>%
     dplyr::mutate(
       Rollup = paste0(
-        'SUM($', openxlsx::int2col(length(header_cols) + 1), row,
-        ':$',
+        "SUM($", openxlsx::int2col(length(header_cols) + 1), row,
+        ":$",
         openxlsx::int2col(
           max(12,
               first_new_mech_col - 1 + length(new_mech_cols)
           )
         ),
-        row, ')')) %>%
+        row, ")")) %>%
     dplyr::select(-row) %>%
 
     # Alter Ages and Sexes as needed ####

@@ -6,7 +6,7 @@ with_mock_api({
 
     d <-
       datapackr:::createKeychainInfo(
-        submission_path = test_sheet('COP21_DP_random_with_psnuxim.xlsx'),
+        submission_path = test_sheet("COP21_DP_random_with_psnuxim.xlsx"),
         tool = "Data Pack",
         country_uids = NULL,
         cop_year = NULL
@@ -34,15 +34,15 @@ with_mock_api({
 
     analytics_column_names <-
       c(
-        'ou', 'ou_id', 'country_name', 'country_uid', 'snu1', 'snu1_id', 'psnu',
-        'psnu_uid', 'prioritization', 'mechanism_code', 'mechanism_desc', 'partner_id',
-        'partner_desc', 'funding_agency', 'fiscal_year', 'dataelement_id', 'dataelement_name',
-        'indicator', 'numerator_denominator', 'support_type', 'hts_modality',
-        'categoryoptioncombo_id', 'categoryoptioncombo_name', 'age', 'sex',
-        'key_population', 'resultstatus_specific', 'upload_timestamp',
-        'disagg_type', 'resultstatus_inclusive', 'top_level',
-        'target_value',
-        'indicator_code'
+        "ou", "ou_id", "country_name", "country_uid", "snu1", "snu1_id", "psnu",
+        "psnu_uid", "prioritization", "mechanism_code", "mechanism_desc", "partner_id",
+        "partner_desc", "funding_agency", "fiscal_year", "dataelement_id", "dataelement_name",
+        "indicator", "numerator_denominator", "support_type", "hts_modality",
+        "categoryoptioncombo_id", "categoryoptioncombo_name", "age", "sex",
+        "key_population", "resultstatus_specific", "upload_timestamp",
+        "disagg_type", "resultstatus_inclusive", "top_level",
+        "target_value",
+        "indicator_code"
       )
     expect_true(!is.null(d$data$analytics))
     expect_true(NROW(d$data$analytics) > 0)

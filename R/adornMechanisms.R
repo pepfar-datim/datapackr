@@ -187,13 +187,13 @@ adornMechanisms <- function(data,
   data %<>%
     dplyr::left_join(mechs, by = "mechanism_code") %>%
     dplyr::mutate(
-      mechanism_desc = dplyr::case_when(mechanism_code == "99999" ~ 'Dedupe approximation',
+      mechanism_desc = dplyr::case_when(mechanism_code == "99999" ~ "Dedupe approximation",
                                         TRUE ~ mechanism_desc),
-      partner_desc = dplyr::case_when(mechanism_code == "99999" ~ 'Dedupe approximation',
+      partner_desc = dplyr::case_when(mechanism_code == "99999" ~ "Dedupe approximation",
                                       TRUE ~ partner_desc),
-      partner_id = dplyr::case_when(mechanism_code == "99999" ~ '99999',
+      partner_id = dplyr::case_when(mechanism_code == "99999" ~ "99999",
                                     TRUE ~ partner_id),
-      agency = dplyr::case_when(mechanism_code == "99999" ~ 'Dedupe approximation',
+      agency = dplyr::case_when(mechanism_code == "99999" ~ "Dedupe approximation",
                                 TRUE ~ agency))
 
   data
