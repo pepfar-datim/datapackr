@@ -36,21 +36,14 @@ getPSNUs <- function(country_uids = NULL,
         dplyr::if_else(include_DREAMS, ",mRRlkbZolDR","")
       )
     ) %>%
-    {
-      if (all(!is.null(country_uids)))
-        api_filter(., "ancestors.id", "in", match = paste(country_uids, collapse = ","))
-      else
-        .
-    } %>%
+    purrr::when(all(!is.null(country_uids)) ~ api_filter(., "ancestors.id", "in",
+    match = paste(country_uids, collapse = ",")),
+    ~ .) %>%
     datapackr::api_fields(
       "id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]"
     ) %>%
-    {
-      if (!is.null(additional_fields))
-        datapackr::api_fields(., additional_fields)
-      else
-        .
-    } %>%
+    purrr::when(!is.null(additional_fields) ~ datapackr::api_fields(., additional_fields),
+    ~ .) %>%
     datapackr::api_get(d2_session = d2_session)
 
   # Extract metadata ####

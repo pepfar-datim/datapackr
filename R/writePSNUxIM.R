@@ -47,7 +47,7 @@ writePSNUxIM <- function(d,
   }
 
   # Check whether to write anything into SNU x IM tab and write if needed ####
-  if ( !is.null(d$keychain$snuxim_model_data_path ) ) {
+  if (!is.null(d$keychain$snuxim_model_data_path)) {
     if (d$info$cop_year == 2020) {
       d <- packSNUxIM_2020(d)
     } else if (d$info$cop_year == 2021) {

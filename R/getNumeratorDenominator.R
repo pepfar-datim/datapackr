@@ -22,7 +22,7 @@ getNumeratorDenominator <- function(dataElements = NULL,
     tidyr::unnest(cols = dataElements) %>%
     dplyr::distinct() %>%
     dplyr::select(dataElement = id,
-                  numerator_denominator = name )
+                  numerator_denominator = name)
 
   if (!is.null(dataElements)) {
     num_den %<>%

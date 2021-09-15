@@ -25,7 +25,7 @@ validationSummary<-function(d) {
     dplyr::mutate(ou = d$info$datapack_name,
                   ou_id = d$info$country_uids,
                   country_name = d$info$datapack_name,
-                  country_uid = d$info$country_uids ) %>%
+                  country_uid = d$info$country_uids) %>%
     dplyr::filter(count > 0)
 
 }

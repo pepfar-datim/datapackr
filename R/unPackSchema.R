@@ -387,12 +387,8 @@ unPackSchema_datapack <- function(filepath = NULL,
       formula.test = stringr::str_detect(formula, "#REF")
     ) %>%
     dplyr::select(sheet_name, indicator_code, dplyr::matches("test")) %>%
-    {
-      if (tool == "OPU Data Pack Template")
-        dplyr::select(., -dataset.test, -col_type.test, -value_type.test)
-      else
-        .
-    } %>%
+    purrr::when(tool == "OPU Data Pack Template" ~ dplyr::select(., -dataset.test, -col_type.test, -value_type.test),
+    ~ .) %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("test")), dplyr::any_vars(. == TRUE))
 
   if (NROW(tests) > 0) {

@@ -22,7 +22,7 @@ getTechArea <- function(dataElements = NULL,
     tidyr::unnest(cols = dataElements) %>%
     dplyr::distinct() %>%
     dplyr::select(dataElement = id,
-                  tech_area = name )
+                  tech_area = name)
 
   if (!is.null(dataElements)) {
     tech_areas %<>%

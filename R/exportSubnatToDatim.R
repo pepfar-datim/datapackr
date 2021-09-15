@@ -48,7 +48,7 @@ exportSubnatToDATIM <- function(d) {
   attr(d$tests$duplicated_subnat_impatt, "test_name") <- "Duplicated SUBNAT/IMPATT data"
 
   # TEST: Whether any NAs in any columns
-  if ( NROW(duplicated_rows) > 0 ) {
+  if (NROW(duplicated_rows) > 0) {
     warning_msg <-
       paste0(
         "ERROR! In tab SUBNATT/IMPATT. Duplicate rows. Contact support.")
@@ -62,7 +62,7 @@ exportSubnatToDATIM <- function(d) {
     dplyr::filter_all(dplyr::any_vars(is.na(.)))
 
   # TEST: Whether any NAs in any columns
-  if ( NROW(blank_rows) > 0 ) {
+  if (NROW(blank_rows) > 0) {
     d$tests$blank_rows_datim_subnat_impatt <- blank_rows
     attr(d$tests$blank_rows_datim_subnat_impatt, "test_name") <- "SUBNAT/IMPATT data with blanks"
     warning_msg <-

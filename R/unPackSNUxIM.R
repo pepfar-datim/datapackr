@@ -118,7 +118,7 @@ unPackSNUxIM <- function(d) {
   } else {
     original_targets <- d$data$SNUxIM %>%
       dplyr::select(header_cols$indicator_code, "DataPackTarget") %>%
-      {suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)),
+      { suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)), # nolint
                                          as.numeric))
       } %>%
       dplyr::group_by(dplyr::across(header_cols$indicator_code)) %>%
@@ -282,7 +282,7 @@ unPackSNUxIM <- function(d) {
   #sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
 
   d$data$SNUxIM %<>%
-    {suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)),
+    { suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)), #nolint
                                        as.numeric))
     }
 
@@ -470,7 +470,7 @@ unPackSNUxIM <- function(d) {
     d$tests$missing_combos <- d$data$missingCombos
     attr(d$tests$missing_combos, "test_name") <- "Missing target combinations"
 
-    d$info$missing_psnuxim_combos <- ( NROW(d$data$missingCombos) > 0 )
+    d$info$missing_psnuxim_combos <- (NROW(d$data$missingCombos) > 0)
 
     if (d$info$missing_psnuxim_combos) {
       d$info$needs_psnuxim <- TRUE

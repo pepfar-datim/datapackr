@@ -26,7 +26,7 @@ getDataValueSets <- function(keys, values,
 
   data <- httr::GET(api_call, handle = d2_session$handle) %>%
     httr::content(., "text") %>%
-    {
+{ # nolint
       suppressWarnings(readr::read_csv(
         .,
         col_names = TRUE,

@@ -228,11 +228,13 @@ packSNUxIM_2020 <- function(d) {
   dplyr::mutate(
     Age = dplyr::case_when(
       indicator_code %in% c("PMTCT_EID.N.Age.T.2mo", "PMTCT_EID.N.Age.T.2to12mo") ~ NA_character_,
-      TRUE ~ Age)
+      TRUE ~ Age
+    )
   ) %>%
-    {if (length(non_appended_mech_cols) > 0) {
-      (.) %>% addcols(non_appended_mech_cols)
-    } else {.}} %>%
+    purrr::when(
+      length(non_appended_mech_cols) > 0 ~ addcols(non_appended_mech_cols),
+      ~.
+    ) %>%
     dplyr::select(names(SNUxIM_cols), tidyselect::all_of(new_mech_cols))
 
   # Format formula columns ####

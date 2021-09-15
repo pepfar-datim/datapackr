@@ -52,10 +52,10 @@ getValidCOs <- function(data_element_group.id = NULL,
       category_combo.id,
       grp,
       category_option.name,
-      category_option.id )
+      category_option.id)
 
-  if (!is.null(data_element_group.id )) {
-    return(dplyr::filter(de_groups, data_element_group.id %in% data_element_group.id ))
+  if (!is.null(data_element_group.id)) {
+    return(dplyr::filter(de_groups, data_element_group.id %in% data_element_group.id))
   } else {
     return(de_groups)
   }

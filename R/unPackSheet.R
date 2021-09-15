@@ -215,7 +215,7 @@ unPackDataPackSheet <- function(d, sheet) {
 
     # Test for valid priortization values
     invalid_prioritizations <- d$data$extract %>%
-      dplyr::filter(!(value %in% c("1", "2", "4", "5", "6", "7", "8")) )
+      dplyr::filter(!(value %in% c("1", "2", "4", "5", "6", "7", "8")))
 
 
     if (NROW(invalid_prioritizations) > 0) {
@@ -302,7 +302,7 @@ unPackDataPackSheet <- function(d, sheet) {
   d$tests$negative_values<-dplyr::bind_rows(d$test$negative_values, negative_values)
   attr(d$tests$negative_values, "test_name")<-"Negative values"
 
-  if ( NROW(negative_values) > 0  ) {
+  if (NROW(negative_values) > 0) {
 
     warning_msg <-
       paste0(

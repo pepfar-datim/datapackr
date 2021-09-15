@@ -33,14 +33,11 @@ getMechList <- function(country_uids = NULL,
                            d2_session = dynGet("d2_default_session",
                                                inherits = TRUE)) {
 
-    paste0( d2_session$base_url, "api/", datapackr::api_version(),
+    paste0(d2_session$base_url, "api/", datapackr::api_version(),
            "/sqlViews/fgUtV6e9YIX/data.csv") %>%
-      { if (filter)
-        paste0(., "?filter=", field, ":", operation, ":",
-               ifelse(operation == "in", paste0("[", paste0(match, collapse=", "), "]"), match))
-
-        else .
-        } %>%
+           purrr::when(filter == TRUE ~ paste0(., "?filter=", field, ":", operation, ":",
+               ifelse(operation == "in", paste0("[", paste0(match, collapse=", "), "]"), match)) ,
+               ~ .) %>%
       utils::URLencode() %>%
       httr::GET(httr::timeout(180), handle = d2_session$handle) %>%
       httr::content(., "text") %>%
