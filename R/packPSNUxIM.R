@@ -84,7 +84,7 @@ packPSNUxIM <- function(wb,
                   value) %>%
     dplyr::group_by(dplyr::across(c(-mechanism_code, -type, -value))) %>%
     dplyr::mutate(
-      percent = value/sum(value)
+      percent = value / sum(value)
     ) %>%
     dplyr::ungroup() %>%
     dplyr::arrange(indicator_code, psnu_uid, age_option_name, sex_option_name,
@@ -350,7 +350,7 @@ packPSNUxIM <- function(wb,
     dplyr::pull(col)
 
   col.im.percents <- data_structure %>%
-    dplyr::filter(col_type == "allocation" & (indicator_code =="12345_DSD" | is.na(indicator_code))) %>%
+    dplyr::filter(col_type == "allocation" & (indicator_code == "12345_DSD" | is.na(indicator_code))) %>%
     dplyr::filter(
       indicator_code == "12345_DSD" | col == max(col)) %>%
     dplyr::pull(col)
@@ -371,7 +371,7 @@ packPSNUxIM <- function(wb,
     dplyr::mutate(
       column_names = dplyr::case_when(
         col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_", col),
-        col >= col.im.targets[1] & col <= (col.im.targets[1]+count.im.datim-1) ~ paste0("target_col_", col),
+        col >= col.im.targets[1] & col <= (col.im.targets[1] + count.im.datim - 1) ~ paste0("target_col_", col),
         #col >= col.im.targets[1] & col <= col.im.targets[2] ~ paste0("target_col_", col),
         TRUE ~ indicator_code)
     ) %>%
@@ -384,7 +384,7 @@ packPSNUxIM <- function(wb,
     dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
     dplyr::mutate(
       dplyr::across(dplyr::all_of(col.formulas),
-                    ~stringr::str_replace_all(., pattern = paste0("(?<=[:upper:])", top_rows +1),
+                    ~stringr::str_replace_all(., pattern = paste0("(?<=[:upper:])", top_rows + 1),
                       replacement = as.character(seq_along(snuxim_model_data) + existing_rows))))
 
   # Classify formula columns as formulas
@@ -434,7 +434,7 @@ packPSNUxIM <- function(wb,
   openxlsx::writeData(wb = r$wb,
                       sheet = "PSNUxIM",
                       x = right_side,
-                      xy = c(col.im.percents[2]+1, existing_rows + 1),
+                      xy = c(col.im.percents[2] + 1, existing_rows + 1),
                       colNames = F, rowNames = F, withFilter = FALSE)
 
   # if (!d$info$has_psnuxim) {
@@ -541,7 +541,7 @@ packPSNUxIM <- function(wb,
   interactive_print("Tidying up...")
   openxlsx::setRowHeights(wb = r$wb,
                           sheet = "PSNUxIM",
-                          rows = 4:(top_rows-1),
+                          rows = 4:(top_rows - 1),
                           heights = 0)
 
   # Hide columns

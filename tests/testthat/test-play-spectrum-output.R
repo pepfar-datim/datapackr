@@ -25,7 +25,7 @@ with_mock_api({
       )
     )
 
-    types<-c(rep("character", 10), "double", "integer", "integer")
+    types <- c(rep("character", 10), "double", "integer", "integer")
     expect_identical(unname(unlist(lapply(test_dataset, typeof))), types)
     expect_true(all(sapply(test_dataset$psnu_uid, is_uidish)))
     expect_true(all(sapply(test_dataset$dataelementuid, is_uidish)))

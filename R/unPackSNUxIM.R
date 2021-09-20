@@ -194,12 +194,12 @@ unPackSNUxIM <- function(d) {
   # nolint end
 
   #Test specifically for DSD and TA which have been populated as mechanisms by the user.
-  improper_dedupe_mechs<-names(d$data$SNUxIM) %>%
+  improper_dedupe_mechs <- names(d$data$SNUxIM) %>%
     tibble::tibble(col_name = .) %>%
     dplyr::filter(!col_name %in% cols_to_keep$indicator_code,
                   (stringr::str_detect(col_name, "^0000[01]")))
 
-  invalid_mech_headers<-dplyr::bind_rows(invalid_mech_headers, improper_dedupe_mechs)
+  invalid_mech_headers <- dplyr::bind_rows(invalid_mech_headers, improper_dedupe_mechs)
 
   d$tests$invalid_mech_headers <- data.frame(invalid_mech_headers = invalid_mech_headers$col_name)
   attr(d$tests$invalid_mech_headers, "test_name") <- "Invalid mechanism headers"
@@ -667,7 +667,7 @@ unPackSNUxIM <- function(d) {
 
   if (NROW(d$tests$imbalanced_distribution) > 0) {
 
-    imbalanced_distribution_inds <-  d$tests$imbalanced_distribution%>%
+    imbalanced_distribution_inds <-  d$tests$imbalanced_distribution %>%
       dplyr::pull(indicator_code) %>%
       unique() %>%
       sort()

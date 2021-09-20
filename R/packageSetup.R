@@ -136,7 +136,7 @@ pick_schema <- function(cop_year, tool) {
 #'
 pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack") {
 
-  template_filename<-NULL
+  template_filename <- NULL
 
   if (tool == "OPU Data Pack") {
     if (cop_year == 2020) {

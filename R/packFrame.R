@@ -52,17 +52,17 @@ frameDataSheet <- function(wb, sheet, tool = "Data Pack") {
   ## Header Row
       openxlsx::addStyle(wb, sheet,
                          style = datapackr::styleGuide$data$header,
-                         rows = 1, cols = (row_header_cols+1):length(schema),
+                         rows = 1, cols = (row_header_cols + 1):length(schema),
                          gridExpand = TRUE, stack = TRUE)
   ## Labels
       openxlsx::addStyle(wb, sheet,
                          style = datapackr::styleGuide$data$label,
-                         rows = 2, cols = (row_header_cols+1):length(schema),
+                         rows = 2, cols = (row_header_cols + 1):length(schema),
                          gridExpand = TRUE, stack = TRUE)
   ## UIDs
       openxlsx::addStyle(wb, sheet,
                          style = datapackr::styleGuide$data$uid,
-                         rows = 5, cols = (row_header_cols+1):length(schema),
+                         rows = 5, cols = (row_header_cols + 1):length(schema),
                          gridExpand = TRUE, stack = TRUE)
   ## Row Headers
       openxlsx::addStyle(wb, sheet,

@@ -29,9 +29,9 @@ checkInvalidOrgUnits <- function(d, sheet) {
     dplyr::filter(is.na(psnu)
                   | is.na(psnuid)) %>%
     dplyr::select(PSNU) %>%
-    dplyr::mutate(sheet=sheet)
+    dplyr::mutate(sheet = sheet)
 
-  d$tests$invalid_orgunits<-dplyr::bind_rows(d$tests$invalid_orgunits, invalid_orgunits)
+  d$tests$invalid_orgunits <- dplyr::bind_rows(d$tests$invalid_orgunits, invalid_orgunits)
   attr(d$tests$invalid_orgunits, "test_name") <- "Invalid orgunits"
 
 

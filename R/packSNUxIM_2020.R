@@ -363,21 +363,21 @@ packSNUxIM_2020 <- function(d) {
   openxlsx::conditionalFormatting(wb = d$tool$wb,
                                   sheet = "PSNUxIM",
                                   cols = grep("Rollup", final_snuxim_cols),
-                                  rows = (top_rows+1):(existing_rows + NROW(d$data$SNUxIM_combined)),
+                                  rows = (top_rows + 1):(existing_rows + NROW(d$data$SNUxIM_combined)),
                                   rule = "AND(ISNUMBER($I15),ROUND($I15,2)<>1)",
                                   style = errorStyle)
 
   openxlsx::conditionalFormatting(wb = d$tool$wb,
                                   sheet = "PSNUxIM",
                                   cols = grep("Dedupe", final_snuxim_cols),
-                                  rows = (top_rows+1):(existing_rows + NROW(d$data$SNUxIM_combined)),
+                                  rows = (top_rows + 1):(existing_rows + NROW(d$data$SNUxIM_combined)),
                                   rule = "AND(ISNUMBER($J15),ROUND($J15,2)<>0)",
                                   style = warningStyle)
 
   openxlsx::conditionalFormatting(wb = d$tool$wb,
                                   sheet = "PSNUxIM",
                                   cols = grep("Dedupe", final_snuxim_cols),
-                                  rows = (top_rows+1):(existing_rows + NROW(d$data$SNUxIM_combined)),
+                                  rows = (top_rows + 1):(existing_rows + NROW(d$data$SNUxIM_combined)),
                                   rule = "AND(ISNUMBER($J15),ROUND($J15,2)=0)",
                                   style = normalStyle)
 
@@ -395,14 +395,14 @@ packSNUxIM_2020 <- function(d) {
                      sheet = "PSNUxIM",
                      style = mechColHeaders,
                      rows = top_rows,
-                     cols = (length(header_cols)+1):colCount,
+                     cols = (length(header_cols) + 1):colCount,
                      gridExpand = TRUE,
                      stack = FALSE)
 
   # Hide rows 5-13 ####
   openxlsx::setRowHeights(wb = d$tool$wb,
                           sheet = "PSNUxIM",
-                          rows = 5:(top_rows-1),
+                          rows = 5:(top_rows - 1),
                           heights = 0)
 
   # Hide ID and sheet_num columns ####

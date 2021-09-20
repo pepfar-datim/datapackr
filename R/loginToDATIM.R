@@ -4,7 +4,7 @@
 #'
 GetCredentialsFromConsole <- function() {
 
-  s <- list(dhis=list())
+  s <- list(dhis = list())
   s$dhis$username <- readline("Username: ")
   s$dhis$password <- getPass::getPass()
   s$dhis$baseurl <- readline("Server URL (ends with /): ")
@@ -78,7 +78,7 @@ ValidateConfig <- function(dhis_config) {
 #'
 #' @return TRUE if you are able to login to the server.
 #'
-DHISLogin<-function(dhis_config) {
+DHISLogin <- function(dhis_config) {
 
   url <- URLencode(URL = paste0(getOption("baseurl"), "api/", api_version(), "/me"))
   #Logging in here will give us a cookie to reuse

@@ -8,12 +8,12 @@ context("Get a mechanism view when logged into DATIM")
       expect_true(exists("d2_default_session"))
       #Kill the handle to simulate a dead one
       #TODO: Not clear why the method expects a blank URL....
-      d2_default_session$base_url<-NULL
-      test_mech_list<-expect_warning(getMechanismViewFromDATIM(d2_session = d2_default_session))
+      d2_default_session$base_url <- NULL
+      test_mech_list <- expect_warning(getMechanismViewFromDATIM(d2_session = d2_default_session))
       expect_type(test_mech_list, "list")
       #Should return an empty mechs list
       expect_equal(NROW(test_mech_list), 0)
-      mechs_names<-c("mechanism_desc",
+      mechs_names <- c("mechanism_desc",
                      "mechanism_code",
                      "attributeOptionCombo",
                      "partner_desc", "partner_id",
@@ -26,9 +26,9 @@ context("Get a mechanism view when logged into DATIM")
 
   with_mock_api({
     test_that("We can get a mechanism list when logged in", {
-      test_mech_list<-getMechanismViewFromDATIM(d2_session = training)
+      test_mech_list <- getMechanismViewFromDATIM(d2_session = training)
       expect_type(test_mech_list, "list")
-      mechs_names<-c("mechanism_desc",
+      mechs_names <- c("mechanism_desc",
                      "mechanism_code",
                      "attributeOptionCombo",
                      "partner_desc", "partner_id",

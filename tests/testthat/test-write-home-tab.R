@@ -2,12 +2,12 @@ context("test-write-home-tab")
 
 test_that("Can write a home tab", {
   template_copy <- paste0(tempfile(), ".xlsx")
-  file.copy(from = test_sheet("COP21_Data_Pack_Template.xlsx"), to=template_copy)
-  wb<-openxlsx::loadWorkbook(template_copy)
+  file.copy(from = test_sheet("COP21_Data_Pack_Template.xlsx"), to = template_copy)
+  wb <- openxlsx::loadWorkbook(template_copy)
   openxlsx::removeWorksheet(wb, "Home")
   datapackr::writeHomeTab(wb, datapack_name = "Lesotho", country_uids = "qllxzIjjurr", cop_year = 2021)
-  openxlsx::saveWorkbook(wb, file=template_copy, overwrite = TRUE)
-  d<-datapackr::createKeychainInfo(template_copy)
+  openxlsx::saveWorkbook(wb, file = template_copy, overwrite = TRUE)
+  d <- datapackr::createKeychainInfo(template_copy)
   testthat::expect_setequal(names(d), c("info", "keychain"))
   testthat::expect_setequal(
     names(d$info),

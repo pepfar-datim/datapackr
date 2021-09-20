@@ -15,7 +15,7 @@ MessageQueue <- function(message=character(), level=character()) {
   )
 
   ## Set the name for the class
-  class(me)<-c("data.frame", "MessageQueue")
+  class(me) <- c("data.frame", "MessageQueue")
   return(me)
 }
 
@@ -42,7 +42,7 @@ appendMessage <- function(x, message, level) {
 #' @param level  A string of vector of message levels (ERROR, WARNING, INFO)
 #' @return A MessageQueue object
 
-appendMessage.MessageQueue<-function(x, message=NA, level=NA) {
+appendMessage.MessageQueue <- function(x, message=NA, level=NA) {
 
   if (length(message) != length(level)) {
     stop("Messages and warnings must be of the same length")
@@ -53,12 +53,12 @@ appendMessage.MessageQueue<-function(x, message=NA, level=NA) {
   }
 
   if (any(is.na(level))) {
-    level[is.na(level)]<-"UNKNOWN"
+    level[is.na(level)] <- "UNKNOWN"
   }
 
-  new_me<-rbind.data.frame(x, list(message=message, level=level),
+  new_me <- rbind.data.frame(x, list(message = message, level = level),
                            stringsAsFactors = FALSE)
-  class(new_me)<-c("data.frame", "MessageQueue")
+  class(new_me) <- c("data.frame", "MessageQueue")
   return(new_me)
 }
 
@@ -70,7 +70,7 @@ appendMessage.MessageQueue<-function(x, message=NA, level=NA) {
 #' @return Returns a formatted output to the console
 #' @export
 #'
-printMessages<-function(x) {
+printMessages <- function(x) {
   UseMethod("printMessages", x)
 }
 
@@ -88,9 +88,9 @@ printMessages.MessageQueue <- function(x) {
   if (NROW(x) > 0 & interactive()) {
     options(warning.length = 8170)
 
-    levels<-c("ERROR", "WARNING", "INFO")
+    levels <- c("ERROR", "WARNING", "INFO")
     messages <- x
-    class(messages)<-"data.frame"
+    class(messages) <- "data.frame"
     messages <- messages %>%
       dplyr::mutate(level = factor((level), levels = levels)) %>%
       dplyr::arrange(level, message) %>%

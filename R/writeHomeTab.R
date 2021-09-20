@@ -72,14 +72,14 @@ writeHomeTab <- function(wb,
   # Generated: ####
   openxlsx::writeData(wb, "Home",
                       paste("Generated on:", Sys.time()),
-                      xy = c(2, row+2),
+                      xy = c(2, row + 2),
                       colNames = F)
 
   # Package version ####
   openxlsx::writeData(wb, "Home",
                       paste("Package version:",
                             as.character(utils::packageVersion("datapackr"))),
-                      xy = c(2, row+4))
+                      xy = c(2, row + 4))
 
   return(wb)
 }

@@ -64,7 +64,7 @@ unPackOPU_PSNUxIM <- function(d) {
     d$data$extract[c(cols_to_keep$col, (max(cols_to_keep$col) + 1):NCOL(d$data$extract))]
 
   # TEST: Blank Col Names; Error; Drop ####
-  blank_col_headers <- names(d$data$extract)[which(nchar(names(d$data$extract))==0)]
+  blank_col_headers <- names(d$data$extract)[which(nchar(names(d$data$extract)) == 0)]
 
   if (length(blank_col_headers) > 0) {
     d$info$has_error <- TRUE
@@ -311,7 +311,7 @@ unPackOPU_PSNUxIM <- function(d) {
         "\n")
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-    d$info$has_error<-TRUE
+    d$info$has_error <- TRUE
   }
 
   # TEST: Negative IM Targets; Error; Drop ####
@@ -336,7 +336,7 @@ unPackOPU_PSNUxIM <- function(d) {
         "\n")
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-    d$info$has_error<-TRUE
+    d$info$has_error <- TRUE
   }
 
   d$data$extract %<>%

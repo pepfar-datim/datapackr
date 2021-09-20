@@ -33,8 +33,8 @@ packForDATIM_MER <- function(d) {
   # Add period ####
   dplyr::mutate(
     period = dplyr::case_when(
-      stringr::str_detect(indicator_code, "\\.R$") ~ paste0(FY-1, "Q4"),
-      TRUE ~ paste0(FY-1, "Oct")),
+      stringr::str_detect(indicator_code, "\\.R$") ~ paste0(FY - 1, "Q4"),
+      TRUE ~ paste0(FY - 1, "Oct")),
 
   # Round value ####
     value =

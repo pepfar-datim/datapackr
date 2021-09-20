@@ -24,7 +24,7 @@ test_that("Can error on bad file location", {
 
 test_that("Can error on bad file exstention", {
 
-  foo_file<-tempfile(fileext = ".xlsb")
+  foo_file <- tempfile(fileext = ".xlsb")
   file.create(foo_file)
   expect_error(datapackr:::handshakeFile(foo_file,
                                          tool = "Data Pack"),

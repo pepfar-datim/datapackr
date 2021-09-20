@@ -1,6 +1,6 @@
 
 
-is_uidish<-function(x) {
+is_uidish <- function(x) {
   grepl("^[[:alpha:]][[:alnum:]]{10}$", x)
 }
 

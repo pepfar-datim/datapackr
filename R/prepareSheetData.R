@@ -87,12 +87,8 @@ prepareSheetData <- function(sheet,
     dplyr::mutate_if(
       is.character,
       stringr::str_replace_all,
-      pattern = paste0("(?<=[:upper:])", headerRow(tool = "Data Pack Template",
-                                                   cop_year = cop_year)
-                                        +1),
-      replacement = as.character(seq_along(row_headers)
-                                 + headerRow(tool = "Data Pack Template",
-                                             cop_year = cop_year)))
+      pattern = paste0("(?<=[:upper:])", headerRow(tool = "Data Pack Template", cop_year = cop_year) + 1),
+      replacement = as.character(seq_along(row_headers) + headerRow(tool = "Data Pack Template", cop_year = cop_year)))
 
   # Classify formula columns as formulas
   ## TODO: Improve approach

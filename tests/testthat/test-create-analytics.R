@@ -24,9 +24,9 @@ with_mock_api({
                  ignore.order = TRUE)
 
 
-    fy22_prioritizations<-getFY22Prioritizations(d)
+    fy22_prioritizations <- getFY22Prioritizations(d)
     expect_type(fy22_prioritizations, "list")
-    expect_true(NROW(fy22_prioritizations)>0)
+    expect_true(NROW(fy22_prioritizations) > 0)
     expect_named(fy22_prioritizations, c("orgUnit", "value"), ignore.order = TRUE)
 
     d %<>% createAnalytics(d2_session = training)
@@ -47,8 +47,8 @@ with_mock_api({
     expect_true(!is.null(d$data$analytics))
     expect_true(NROW(d$data$analytics) > 0)
     expect_named(d$data$analytics, analytics_column_names)
-   numeric_columns<-c("fiscal_year", "target_value")
-   foo<-sapply(d$data$analytics, typeof)
+   numeric_columns <- c("fiscal_year", "target_value")
+   foo <- sapply(d$data$analytics, typeof)
    expect_true(all(foo[!(names(d$data$analytics) %in%  numeric_columns)] == "character"))
    expect_true(all(foo[(names(d$data$analytics) %in%  numeric_columns)] == "double"))
    expect_true(all(sapply(d$data$analytics$ou_id, is_uidish)))

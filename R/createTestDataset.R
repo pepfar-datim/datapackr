@@ -43,7 +43,7 @@ createTestDataset <- function(country_uids,
     dplyr::distinct() %>%
     dplyr::mutate(
       period = dplyr::case_when(
-        col_type == "target" ~ paste0(FY-1, "Oct"),
+        col_type == "target" ~ paste0(FY - 1, "Oct"),
         col_type == "result" ~ paste0(FY, "Q4")
       )
     )
@@ -82,8 +82,8 @@ createTestDataset <- function(country_uids,
     dplyr::mutate(value = as.double(sample(0:1000, dplyr::n(), replace = TRUE))) %>%
     dplyr::mutate(
       value = dplyr::case_when(
-        value_type == "percentage" ~ value/1000,
-        attributeOptionCombo %in% c("00000", "00001") ~ value*-1,
+        value_type == "percentage" ~ value / 1000,
+        attributeOptionCombo %in% c("00000", "00001") ~ value * -1,
         TRUE ~ value
       ))
 
@@ -94,8 +94,8 @@ createTestDataset <- function(country_uids,
       value = as.double(sample(0:1000, dplyr::n(), replace = TRUE))) %>%
     dplyr::mutate(
       value = dplyr::case_when(
-        value_type == "percentage" ~ value/1000,
-        attributeOptionCombo %in% c("00000", "00001") ~ value*-1,
+        value_type == "percentage" ~ value / 1000,
+        attributeOptionCombo %in% c("00000", "00001") ~ value * -1,
         TRUE ~ value
       ))
 

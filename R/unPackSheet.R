@@ -63,8 +63,8 @@ unPackDataPackSheet <- function(d, sheet) {
                     TX_NEW.N.Age_Sex_HIVStatus.T > 0) %>%
       dplyr::filter_at(dplyr::vars(-PSNU, -Age, -Sex, -TX_NEW.N.EIDRate,
                                    -TX_NEW.N.Age_Sex_HIVStatus.T),
-                       dplyr::any_vars(.>0))
-    attr(d$tests$tx_new_invalid_lt1_sources, "test_name")<-"Invalid TX <01 data source"
+                       dplyr::any_vars(. > 0))
+    attr(d$tests$tx_new_invalid_lt1_sources, "test_name") <- "Invalid TX <01 data source"
 
 
     if (NROW(d$tests$tx_new_invalid_lt1_sources) > 0) {
@@ -220,7 +220,7 @@ unPackDataPackSheet <- function(d, sheet) {
 
     if (NROW(invalid_prioritizations) > 0) {
       d$tests$invalid_prioritizations <- invalid_prioritizations
-      attr(d$tests$invalid_prioritizations, "test_name")<-"Invalid prioritizations"
+      attr(d$tests$invalid_prioritizations, "test_name") <- "Invalid prioritizations"
 
       invalid_prio_strings <- invalid_prioritizations %>%
         tidyr::unite(row_id, c(PSNU, value), sep = ":  ") %>%
@@ -264,10 +264,10 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::mutate(row_id = paste(indicator_code, values, sep = ":  ")) %>%
     dplyr::arrange(row_id) %>%
     dplyr::select(row_id) %>%
-    dplyr::mutate(sheet=sheet)
+    dplyr::mutate(sheet = sheet)
 
-  d$tests$non_numeric<-dplyr::bind_rows(d$tests$non_numeric, non_numeric)
-  attr(d$tests$non_numeric, "test_name")<-"Non-numeric values"
+  d$tests$non_numeric <- dplyr::bind_rows(d$tests$non_numeric, non_numeric)
+  attr(d$tests$non_numeric, "test_name") <- "Non-numeric values"
 
   if (NROW(non_numeric) > 0) {
 
@@ -299,8 +299,8 @@ unPackDataPackSheet <- function(d, sheet) {
   negative_values <- d$data$extract %>%
     dplyr::filter(value < 0)
 
-  d$tests$negative_values<-dplyr::bind_rows(d$test$negative_values, negative_values)
-  attr(d$tests$negative_values, "test_name")<-"Negative values"
+  d$tests$negative_values <- dplyr::bind_rows(d$test$negative_values, negative_values)
+  attr(d$tests$negative_values, "test_name") <- "Negative values"
 
   if (NROW(negative_values) > 0) {
 
@@ -331,8 +331,8 @@ unPackDataPackSheet <- function(d, sheet) {
                   & !indicator_code %in% decimals_allowed) %>%
     dplyr::rename(sheet = sheet_name)
 
-    d$tests$decimal_values<-dplyr::bind_rows(d$tests$decimal_cols, decimal_cols)
-    attr(d$tests$decimal_values, "test_name")<-"Decimal values"
+    d$tests$decimal_values <- dplyr::bind_rows(d$tests$decimal_cols, decimal_cols)
+    attr(d$tests$decimal_values, "test_name") <- "Decimal values"
 
   if (NROW(decimal_cols) > 0) {
 

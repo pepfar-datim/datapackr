@@ -1,6 +1,6 @@
 
 
-htsModalities<-function() {
+htsModalities <- function() {
 c("HTS_INDEX_COM.New.Pos.T",
           "HTS_INDEX_FAC.New.Pos.T",
           "HTS_TST.EW.Pos.T",
@@ -372,7 +372,7 @@ analyze_linkage <- function(data) {
 
   analysis <- data %>%
     dplyr::mutate(
-      HTS_TST_POS.T =rowSums(dplyr::select(., tidyselect::any_of(htsModalities()))),
+      HTS_TST_POS.T  = rowSums(dplyr::select(., tidyselect::any_of(htsModalities()))),
       HTS_TST.Linkage.T =
         dplyr::case_when(
           HTS_TST_POS.T == 0 ~ NA_real_,

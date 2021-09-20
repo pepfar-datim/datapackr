@@ -45,8 +45,8 @@ checkColStructure <- function(d, sheet) {
       dplyr::filter(is.na(submission_order)) %>%
       dplyr::select(sheet, indicator_code)
 
-    d$tests$missing_cols<-dplyr::bind_rows(d$tests$missing_cols, missing_cols)
-    attr(d$tests$missing_cols, "test_name")<-"Missing columns"
+    d$tests$missing_cols <- dplyr::bind_rows(d$tests$missing_cols, missing_cols)
+    attr(d$tests$missing_cols, "test_name") <- "Missing columns"
 
     warning_msg <-
       paste0(
@@ -66,7 +66,7 @@ checkColStructure <- function(d, sheet) {
     dplyr::select(sheet, indicator_code)
 
   duplicate_columns <- submission_cols_no_blanks %>%
-    dplyr::mutate(duplicated_cols=duplicated(indicator_code)) %>%
+    dplyr::mutate(duplicated_cols = duplicated(indicator_code)) %>%
     dplyr::filter(duplicated_cols)
 
 
@@ -74,7 +74,7 @@ checkColStructure <- function(d, sheet) {
 
     d$tests$duplicate_columns <-
       dplyr::bind_rows(duplicate_columns, d$tests$duplicate_columns)
-    attr(d$tests$duplicate_columns, "test_name")<-"Duplicated columns"
+    attr(d$tests$duplicate_columns, "test_name") <- "Duplicated columns"
 
     warning_msg <-
       paste0(

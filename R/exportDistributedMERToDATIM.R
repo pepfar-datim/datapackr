@@ -3,7 +3,7 @@ autoResolveDuplicates <- function(d, keep_dedup) {
 
   #We need to now indentify any cases where there was exactly 100% distribution, but there was a dedupe.
   #This is the section for pure duplicates.
-  pure_duplicates<-d$data$SNUxIM %>%
+  pure_duplicates <- d$data$SNUxIM %>%
     dplyr::filter(mechanism_code != "99999") %>%
     dplyr::filter(distribution != 0) %>%
     dplyr::group_by(PSNU, psnuid, indicator_code, Age, Sex, KeyPop, support_type) %>%
@@ -33,7 +33,7 @@ autoResolveDuplicates <- function(d, keep_dedup) {
 
   auto_resolve_pure_dupes <- pure_duplicates %>%
     dplyr::filter(distribution_diff < 1e-3) %>%
-    dplyr::mutate(mechanism_code ="00000",
+    dplyr::mutate(mechanism_code = "00000",
                   value = 0,
                   sheet_name = NA) %>%
     dplyr::select(names(d$data$distributedMER))
@@ -48,7 +48,7 @@ autoResolveDuplicates <- function(d, keep_dedup) {
       tidyr::pivot_wider(names_from = support_type,
                          values_from = n) %>%
       tidyr::drop_na(DSD, TA) %>%
-      dplyr::filter(TA >=1 & DSD >=1) %>%
+      dplyr::filter(TA >= 1 & DSD >= 1) %>%
       dplyr::select(-TA, -DSD)
 
     crosswalk_dupes <- d$data$SNUxIM %>%
@@ -59,7 +59,7 @@ autoResolveDuplicates <- function(d, keep_dedup) {
     if (NROW(crosswalk_dupes) > 0) {
       crosswalk_dupes %<>%
         dplyr::group_by(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
-        dplyr::summarise(total_distribution = sum(distribution, na.rm=TRUE)) %>%
+        dplyr::summarise(total_distribution = sum(distribution, na.rm = TRUE)) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(distribution_diff = abs(total_distribution - 1.0))
 
@@ -90,7 +90,7 @@ autoResolveDuplicates <- function(d, keep_dedup) {
         dplyr::select(names(d$data$distributedMER))
     }
 } else {
-  crosswalk_dupes_auto_resolved<-data.frame(foo=character())
+  crosswalk_dupes_auto_resolved <- data.frame(foo = character())
   }
 
   if (keep_dedup == TRUE) {
@@ -119,8 +119,8 @@ autoResolveDuplicates <- function(d, keep_dedup) {
   #Bind pure dupes
 
   if (exists_with_rows(auto_resolve_pure_dupes)) {
-    d$datim$MER<-dplyr::bind_rows(d$datim$MER, auto_resolve_pure_dupes)
-    warning_msg<-paste0("INFO! ", NROW(auto_resolve_pure_dupes),
+    d$datim$MER <- dplyr::bind_rows(d$datim$MER, auto_resolve_pure_dupes)
+    warning_msg <- paste0("INFO! ", NROW(auto_resolve_pure_dupes),
     " zero-valued pure deduplication adjustments will be added to your DATIM import.",
      "Please consult the DataPack wiki section on deduplication for more information. ")
 
@@ -129,8 +129,8 @@ autoResolveDuplicates <- function(d, keep_dedup) {
 
   #Bind crosswalk dupes
   if (exists_with_rows(crosswalk_dupes_auto_resolved)) {
-    d$datim$MER<-dplyr::bind_rows(d$datim$MER, crosswalk_dupes_auto_resolved)
-    warning_msg<-paste0("INFO! ", NROW(crosswalk_dupes_auto_resolved), " zero-valued crosswalk deduplication adjustments will be added to your DATIM import.
+    d$datim$MER <- dplyr::bind_rows(d$datim$MER, crosswalk_dupes_auto_resolved)
+    warning_msg <- paste0("INFO! ", NROW(crosswalk_dupes_auto_resolved), " zero-valued crosswalk deduplication adjustments will be added to your DATIM import.
                   Please consult the DataPack wiki section on deduplication for more information. ")
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "INFO")
@@ -155,7 +155,7 @@ autoResolveDuplicates <- function(d, keep_dedup) {
 #'
 exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
 
-  d<-autoResolveDuplicates(d, keep_dedup)
+  d <- autoResolveDuplicates(d, keep_dedup)
 
   # align   map_DataPack_DATIM_DEs_COCs with  d$datim$MER/d$data$distributedMER for KP_MAT
 

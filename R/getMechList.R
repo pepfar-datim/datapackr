@@ -36,7 +36,7 @@ getMechList <- function(country_uids = NULL,
     paste0(d2_session$base_url, "api/", datapackr::api_version(),
            "/sqlViews/fgUtV6e9YIX/data.csv") %>%
            purrr::when(filter == TRUE ~ paste0(., "?filter=", field, ":", operation, ":",
-               ifelse(operation == "in", paste0("[", paste0(match, collapse=", "), "]"), match)) ,
+               ifelse(operation == "in", paste0("[", paste0(match, collapse = ", "), "]"), match)) ,
                ~ .) %>%
       utils::URLencode() %>%
       httr::GET(httr::timeout(180), handle = d2_session$handle) %>%
@@ -53,7 +53,7 @@ getMechList <- function(country_uids = NULL,
 
   empty_mechs_view <- tibble::tibble(
     "mechanism_desc" = character(),
-    "mechanism_code"= character(),
+    "mechanism_code" = character(),
     "attributeOptionCombo" = character(),
     "partner_desc" = character(),
     "partner_id" = character(),
@@ -92,7 +92,7 @@ getMechList <- function(country_uids = NULL,
   # Filter by Fiscal Year ####
     if (!is.null(cop_year)) {
       mechs %<>%
-        dplyr::filter((startdate < paste0(cop_year+1, "-10-01") &
+        dplyr::filter((startdate < paste0(cop_year + 1, "-10-01") &
                          enddate > paste0(cop_year, "-09-30"))
                       | mechanism_code %in% c("00000", "00001", "00100", "00200"))
     }

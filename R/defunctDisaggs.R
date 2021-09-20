@@ -23,7 +23,7 @@ defunctDisaggs <- function(d, sheet) {
 
   valid_disaggs <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet,
-                  (col_type == "target"| indicator_code == "TX_CURR_SUBNAT.R")) %>%
+                  (col_type == "target" | indicator_code == "TX_CURR_SUBNAT.R")) %>%
     dplyr::select(indicator_code, valid_ages, valid_sexes, valid_kps)
 
   defunct_disaggs <- data %>%
@@ -35,8 +35,8 @@ defunctDisaggs <- function(d, sheet) {
     dplyr::distinct()
 
 
-  d$tests$defunct_disaggs<-dplyr::bind_rows(d$tests$defunct_disaggs, defunct_disaggs)
-  attr(d$tests$defunct_disaggs, "test_name")<-"Defunct disaggs"
+  d$tests$defunct_disaggs <- dplyr::bind_rows(d$tests$defunct_disaggs, defunct_disaggs)
+  attr(d$tests$defunct_disaggs, "test_name") <- "Defunct disaggs"
 
 
   if (NROW(defunct_disaggs) > 0) {
@@ -59,7 +59,7 @@ defunctDisaggs <- function(d, sheet) {
         "\n")
 
 
-    d$info$messages<-appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
 
     d$info$has_error <- TRUE
   }

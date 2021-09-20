@@ -166,7 +166,7 @@ packSNUxIM <- function(d,
     dplyr::pull(col)
 
   col.im.percents <- data_structure %>%
-    dplyr::filter(col_type == "allocation" & (indicator_code =="12345_DSD" | is.na(indicator_code))) %>%
+    dplyr::filter(col_type == "allocation" & (indicator_code == "12345_DSD" | is.na(indicator_code))) %>%
     dplyr::filter(
       indicator_code == "12345_DSD" | col == max(col)) %>%
     dplyr::pull(col)
@@ -179,8 +179,7 @@ packSNUxIM <- function(d,
       !is.na(formula)
       & stringr::str_detect(
         formula,
-        paste0("(?<=[:upper:])", top_rows
-               +1)),
+        paste0("(?<=[:upper:])", top_rows + 1)),
       col < (col.im.targets[1])) %>%
     dplyr::pull(col)
 
@@ -191,7 +190,7 @@ packSNUxIM <- function(d,
     dplyr::mutate(
       column_names = dplyr::case_when(
         col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_", col),
-        col >= col.im.targets[1] & col <= (col.im.targets[1]+count.im.datim-1) ~ paste0("target_col_", col),
+        col >= col.im.targets[1] & col <= (col.im.targets[1] + count.im.datim - 1) ~ paste0("target_col_", col),
         #col >= col.im.targets[1] & col <= col.im.targets[2] ~ paste0("target_col_", col),
         TRUE ~ indicator_code)
     ) %>%
@@ -206,8 +205,7 @@ packSNUxIM <- function(d,
       dplyr::across(dplyr::all_of(col.formulas),
         ~stringr::str_replace_all(
           .,
-          pattern = paste0("(?<=[:upper:])", top_rows
-                           +1),
+          pattern = paste0("(?<=[:upper:])", top_rows + 1),
           replacement = as.character(seq_along(snuxim_model_data) + existing_rows)
           )
         )
@@ -261,7 +259,7 @@ packSNUxIM <- function(d,
   openxlsx::writeData(wb = d$tool$wb,
                       sheet = "PSNUxIM",
                       x = right_side,
-                      xy = c(col.im.percents[2]+1, existing_rows + 1),
+                      xy = c(col.im.percents[2] + 1, existing_rows + 1),
                       colNames = F, rowNames = F, withFilter = FALSE)
 
   if (!d$info$has_psnuxim) {
@@ -292,7 +290,7 @@ packSNUxIM <- function(d,
     openxlsx::writeData(wb = d$tool$wb,
                         sheet = "PSNUxIM",
                         x = left_side,
-                        xy = c(1, existing_rows+1),
+                        xy = c(1, existing_rows + 1),
                         colNames = F, rowNames = F, withFilter = FALSE)
 
   # Add additional col_names if any
@@ -301,7 +299,7 @@ packSNUxIM <- function(d,
       openxlsx::writeData(wb = d$tool$wb,
                           sheet = "PSNUxIM",
                           x = new_mech_cols %>% as.matrix() %>% t(),
-                          xy = c(8+length(SNUxIM_cols)+1, top_rows),
+                          xy = c(8 + length(SNUxIM_cols) + 1, top_rows),
                           colNames = F, rowNames = F, withFilter = FALSE)
     }
 
@@ -364,7 +362,7 @@ packSNUxIM <- function(d,
   interactive_print("Tidying up...")
   openxlsx::setRowHeights(wb = d$tool$wb,
                           sheet = "PSNUxIM",
-                          rows = 4:(top_rows-1),
+                          rows = 4:(top_rows - 1),
                           heights = 0)
 
   # Hide columns ####

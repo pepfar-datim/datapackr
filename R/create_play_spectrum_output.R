@@ -90,7 +90,7 @@ create_play_spectrum_output <- function(country_uids,
     dplyr::mutate(area_id = NA_character_,
                   calendar_quarter =
                     dplyr::if_else(indicator_code == "TX_CURR_SUBNAT.R",
-                                   paste0("CY", cop_year-1, "Q4"),
+                                   paste0("CY", cop_year - 1, "Q4"),
                                    paste0("CY", cop_year, "Q3"))) %>%
     dplyr::select(psnu = PSNU,
                   psnu_uid = orgUnit,
@@ -151,9 +151,9 @@ create_play_spectrum_output <- function(country_uids,
     dplyr::group_by(psnu, psnu_uid, area_id,
                     indicator_code, dataelementuid, calendar_quarter) %>%
     dplyr::mutate(
-      pop_dist = pop/sum(pop, na.rm = T),
-      plhiv_dist = plhiv/sum(plhiv, na.rm = T),
-      tx_curr_dist = tx_curr/sum(tx_curr, na.rm = T),
+      pop_dist = pop / sum(pop, na.rm = T),
+      plhiv_dist = plhiv / sum(plhiv, na.rm = T),
+      tx_curr_dist = tx_curr / sum(tx_curr, na.rm = T),
       value = dplyr::case_when(
         stringr::str_detect(indicator_code, "PMTCT_STAT_SUBNAT\\.D")
           ~ round_trunc(value * pop_dist),

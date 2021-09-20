@@ -35,7 +35,7 @@ unPackSchema_datapack <- function(filepath = NULL,
   }
 
   # Add sheet number based on order of occurrence in workbook, rather than A-Z ####
-  data.table::setDT(schema)[, sheet_num:=.GRP, by = c("sheet_name")]
+  data.table::setDT(schema)[, sheet_num := .GRP, by = c("sheet_name")]
 
   # Skip detail on listed sheets. ####
   if (is.null(skip)) {
@@ -46,7 +46,7 @@ unPackSchema_datapack <- function(filepath = NULL,
 
   schema %<>%
     dplyr::filter(sheet_name %in% verbose_sheets,
-                  row %in% c(5:(headerRow(tool, cop_year)+1)))
+                  row %in% c(5:(headerRow(tool, cop_year) + 1)))
 
   # # Correctly enter array formulas ####
   #   dplyr::mutate(
@@ -237,7 +237,7 @@ unPackSchema_datapack <- function(filepath = NULL,
         TRUE ~ NA_real_
       ),
       period = dplyr::case_when(
-        col_type == "target" ~ paste0(FY-1, "Oct"),
+        col_type == "target" ~ paste0(FY - 1, "Oct"),
         col_type == "result" ~ paste0(FY, "Q3")
       )
     )

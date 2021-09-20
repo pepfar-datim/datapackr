@@ -11,7 +11,7 @@ getMechanismViewFromDATIM <- function(cop_year = NULL,
                                                       inherits = TRUE)) {
 
   url_filter <-  ifelse(is.null(cop_year),"",
-  paste0("&filter=startdate:lt:", cop_year+1, "-10-01",
+  paste0("&filter=startdate:lt:", cop_year + 1, "-10-01",
              "&filter=enddate:gt:", cop_year, "-09-30"))
 
   paste0(d2_session$base_url,
@@ -71,7 +71,7 @@ getMechanismView <- function(country_uids = NULL,
 
   empty_mechs_view <- tibble::tibble(
     "mechanism_desc" = character(),
-    "mechanism_code"= character(),
+    "mechanism_code" = character(),
     "attributeOptionCombo" = character(),
     "partner_desc" = character(),
     "partner_id" = character(),
@@ -84,7 +84,7 @@ getMechanismView <- function(country_uids = NULL,
   # If Cached Mech list is available and fresh, use this to save processing time
   print(cached_mechs_path)
   can_read_file <- file.access(cached_mechs_path, 4) == 0
-  can_write_file <-file.access(dirname(cached_mechs_path), 2) == 0
+  can_write_file <- file.access(dirname(cached_mechs_path), 2) == 0
 
     # Check whether Cached Mech List is stale
     if (is.null(d2_session$max_cache_age)) {
@@ -97,7 +97,7 @@ getMechanismView <- function(country_uids = NULL,
     is_fresh <-
       lubridate::as.duration(lubridate::interval(file.info(cached_mechs_path)$mtime, Sys.time())) < lubridate::duration(max_cache_age)
   } else{
-    is_fresh<-FALSE
+    is_fresh <- FALSE
   }
 
 
@@ -121,7 +121,7 @@ getMechanismView <- function(country_uids = NULL,
   # Filter by OU from a vector of country UIDs
   if (!is.null(country_uids)) {
 
-    ous<-datapackr::valid_PSNUs %>%
+    ous <- datapackr::valid_PSNUs %>%
       dplyr::select(ou, ou_id, country_uid) %>%
       dplyr::distinct() %>%
       dplyr::filter(country_uid %in% country_uids) %>%
@@ -134,7 +134,7 @@ getMechanismView <- function(country_uids = NULL,
   if (!is.null(cop_year)) {
     mechs %<>%
         dplyr::filter(
-                      startdate < paste0(cop_year+1, "-10-01"),
+                      startdate < paste0(cop_year + 1, "-10-01"),
                       enddate > paste0(cop_year, "-09-30"))
   }
 

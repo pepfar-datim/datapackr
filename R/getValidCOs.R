@@ -17,7 +17,7 @@ getValidCOs <- function(data_element_group.id = NULL,
 
 
     #TODO: Replace this with equivalent
-    de_groups<-datapackr::api_call("dataElementGroups", d2_session = d2_session) %>%
+    de_groups <- datapackr::api_call("dataElementGroups", d2_session = d2_session) %>%
     # Filter to include only the dataElementGroup specified
     datapackr::api_filter(field = "id",
                           operation = "eq",

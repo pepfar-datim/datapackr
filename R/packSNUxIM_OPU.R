@@ -134,7 +134,7 @@ packSNUxIM_OPU <- function(d) {
     dplyr::select(col, indicator_code, column_names, formula)
 
   fx_cols <- schema_plus %>%
-    `row.names<-`(.[, "column_names"]) %>%
+    `row.names <- `(.[, "column_names"]) %>%
     dplyr::filter(!is.na(formula)) %>%
     dplyr::select(formula) %>%
     t() %>%
@@ -144,8 +144,7 @@ packSNUxIM_OPU <- function(d) {
       is.character,
       stringr::str_replace_all,
       pattern = paste0("(?<=[:upper:])", headerRow(tool = "OPU Data Pack Template",
-                                                   cop_year = d$info$cop_year)
-                       +1),
+                        cop_year = d$info$cop_year) + 1),
       replacement = as.character(seq_along(data)
                                  + headerRow(tool = "OPU Data Pack Template",
                                              cop_year = d$info$cop_year)))
@@ -180,7 +179,7 @@ packSNUxIM_OPU <- function(d) {
   openxlsx::writeData(wb = d$tool$wb,
                       sheet = "PSNUxIM",
                       x = data_original,
-                      xy = c(1, headerRow("OPU Data Pack Template", d$info$cop_year)+1),
+                      xy = c(1, headerRow("OPU Data Pack Template", d$info$cop_year) + 1),
                       colNames = F, rowNames = F, withFilter = FALSE)
 
   openxlsx::writeData(wb = d$tool$wb,
@@ -213,7 +212,7 @@ packSNUxIM_OPU <- function(d) {
   openxlsx::writeData(wb = d$tool$wb,
                       sheet = "PSNUxIM",
                       x = data_updated,
-                      xy = c(90, headerRow("OPU Data Pack Template", d$info$cop_year)+1),
+                      xy = c(90, headerRow("OPU Data Pack Template", d$info$cop_year) + 1),
                       colNames = F, rowNames = F, withFilter = FALSE)
 
   openxlsx::writeData(wb = d$tool$wb,
@@ -229,7 +228,7 @@ packSNUxIM_OPU <- function(d) {
   openxlsx::addStyle(wb = d$tool$wb,
                      sheet = "PSNUxIM",
                      style = datapackr::styleGuide$cop21_opu$thin_border,
-                     rows = 1:(headerRow("OPU Data Pack Template", d$info$cop_year)+NROW(data_original)),
+                     rows = 1:(headerRow("OPU Data Pack Template", d$info$cop_year) + NROW(data_original)),
                      cols = thin_border_cols,
                      gridExpand = TRUE,
                      stack = TRUE)
@@ -237,7 +236,7 @@ packSNUxIM_OPU <- function(d) {
   openxlsx::addStyle(wb = d$tool$wb,
                      sheet = "PSNUxIM",
                      style = datapackr::styleGuide$cop21_opu$thick_border,
-                     rows = 1:(headerRow("OPU Data Pack Template", d$info$cop_year)+NROW(data_original)),
+                     rows = 1:(headerRow("OPU Data Pack Template", d$info$cop_year) + NROW(data_original)),
                      cols = 90,
                      gridExpand = TRUE,
                      stack = TRUE)
@@ -245,19 +244,19 @@ packSNUxIM_OPU <- function(d) {
   # Confirm no hidden cols by default ####
   openxlsx::setColWidths(wb = d$tool$wb,
                          sheet = "PSNUxIM",
-                         cols = (length(original_cols_order)+1):89,
+                         cols = (length(original_cols_order) + 1):89,
                          widths = 8.17)
 
   # Confirm all Col widths as expected
   openxlsx::setColWidths(wb = d$tool$wb,
                          sheet = "PSNUxIM",
-                         cols = (length(original_cols_order)+1):89,
+                         cols = (length(original_cols_order) + 1):89,
                          widths = 8.17)
 
   #TODO: Also check for other columns
 
   # Then hide cols ####
-  unused_mech_cols.original <- (length(data_original)+1):89
+  unused_mech_cols.original <- (length(data_original) + 1):89
 
   dedupe_cols <- schema_plus %>%
     dplyr::filter(stringr::str_detect(column_names, "(DSD|TA|Crosswalk) Dedupe\\.")) %>%
@@ -274,14 +273,14 @@ packSNUxIM_OPU <- function(d) {
   # Hide rows ####
   openxlsx::setRowHeights(d$tool$wb,
                           sheet = "PSNUxIM",
-                          rows = 4:headerRow("OPU Data Pack Template", d$info$cop_year)-1,
+                          rows = 4:headerRow("OPU Data Pack Template", d$info$cop_year) - 1,
                           heights = 0)
 
   # Make sure number formats are consistent ####
   openxlsx::addStyle(wb = d$tool$wb,
                      sheet = "PSNUxIM",
                      style = datapackr::styleGuide$cop21_opu$numeric_format,
-                     rows = (seq_along(data_original))+headerRow("OPU Data Pack Template", d$info$cop_year),
+                     rows = (seq_along(data_original)) + headerRow("OPU Data Pack Template", d$info$cop_year),
                      cols = 6:178, #TODO: Review this hard coded sequence
                      gridExpand = TRUE,
                      stack = TRUE)

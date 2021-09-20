@@ -1,7 +1,7 @@
 context("can-unpack-COP21-datapack")
 
-d_data_targets_names<-c("PSNU", "psnuid", "sheet_name", "indicator_code", "Age", "Sex", "KeyPop", "value")
-d_data_tests_types<-c("tbl_df", "tbl", "data.frame")
+d_data_targets_names <- c("PSNU", "psnuid", "sheet_name", "indicator_code", "Age", "Sex", "KeyPop", "value")
+d_data_tests_types <- c("tbl_df", "tbl", "data.frame")
 
 with_mock_api({
   test_that("Can unpack all data pack sheets", {
