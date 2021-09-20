@@ -68,12 +68,12 @@ autoResolveDuplicates <- function(d, keep_dedup) {
 
       if (NROW(over_allocated) > 0) {
         warning_msg <-
-          paste0(
+          paste(
             "INFO! ",
             NROW(over_allocated),
-            " crosswalk duplicates with allocation greater than 100% were identified. These",
-            " will need to be deduplicated in DATIM. Ensure all necessary crosswalk",
-            " deduplication values are 100% addressed. Please consult the Data Pack User Guide for more information.",
+            "crosswalk duplicates with allocation greater than 100% were identified. These",
+            "will need to be deduplicated in DATIM. Ensure all necessary crosswalk",
+            "deduplication values are 100% addressed. Please consult the Data Pack User Guide for more information.",
             "/n")
 
         d$info$messages <- appendMessage(d$info$messages, warning_msg, "INFO")
