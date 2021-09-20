@@ -376,7 +376,8 @@ unPackSchema_datapack <- function(filepath = NULL,
   #
   # ## Test valid_sexes ####
   #     valid_sexes.test =
-  #       !valid_sexes %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog %in% c("Females", "Males", "M/F")],
+  #       !valid_sexes %in%
+  # c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog %in% c("Females", "Males", "M/F")],
   #                           empty),
   #
   # ## Test valid_kps

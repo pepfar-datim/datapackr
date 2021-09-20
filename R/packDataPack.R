@@ -143,17 +143,31 @@ packDataPack <- function(model_data,
   ## TODO: Address this in Data Pack?
   #   ## Add styles to Summary tab
   # summaryStyle = openxlsx::createStyle(fgFill = "#404040")
-  # openxlsx::addStyle(d$tool$wb, sheet = "Summary", summaryStyle, cols = 1:2, rows = 1:62, gridExpand = TRUE, stack = TRUE)
+  # openxlsx::addStyle(d$tool$wb, sheet = "Summary",
+  #summaryStyle, cols = 1:2, rows = 1:62, gridExpand = TRUE, stack = TRUE)
 
     ## Add styles to Spectrum tab
   #TODO: See if new openxlsx release addresses this issue
   spectrumStyle1 <- openxlsx::createStyle(fgFill = "#9CBEBD")
   spectrumStyle2 <- openxlsx::createStyle(fgFill = "#FFEB84")
-  openxlsx::addStyle(d$tool$wb, sheet = "Spectrum", spectrumStyle1, cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
-  openxlsx::addStyle(d$tool$wb, sheet = "Spectrum", spectrumStyle2, cols = 2, rows = 2, gridExpand = TRUE, stack = TRUE)
+
+  openxlsx::addStyle(d$tool$wb,
+  sheet = "Spectrum",
+  spectrumStyle1,
+  cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
+
+  openxlsx::addStyle(d$tool$wb,
+  sheet = "Spectrum",
+  spectrumStyle2, cols = 2, rows = 2, gridExpand = TRUE, stack = TRUE)
+
   if (cop_year == 2020) {
-    openxlsx::addStyle(d$tool$wb, sheet = "Spectrum IDs", spectrumStyle1, cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
-    openxlsx::addStyle(d$tool$wb, sheet = "Spectrum IDs", spectrumStyle2, cols = 2, rows = 2, gridExpand = TRUE, stack = TRUE)
+    openxlsx::addStyle(d$tool$wb,
+    sheet = "Spectrum IDs",
+    spectrumStyle1, cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
+
+    openxlsx::addStyle(d$tool$wb,
+    sheet = "Spectrum IDs",
+    spectrumStyle2, cols = 2, rows = 2, gridExpand = TRUE, stack = TRUE)
   }
 
   # Add validations

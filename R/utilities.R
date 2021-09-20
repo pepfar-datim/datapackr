@@ -446,13 +446,12 @@ getDatasetUids <-  function(fiscal_year,
                     "Ncq22MRC6gd") # Host Country Targets: COP Prioritization SNU (USG) FY2019
     }
     if ("subnat_results" %in% type) {
-      datasets <- c(datasets,
-                    "iJ4d5HdGiqG") # Host Country Results: COP Prioritization SNU (USG) FY2019Q4
+      # Host Country Results: COP Prioritization SNU (USG) FY2019Q4
+      datasets <- c(datasets, "iJ4d5HdGiqG")
     }
     if ("impatt" %in% type) {
-      datasets <- c(datasets,
-                    "pTuDWXzkAkJ") # Planning Attributes: COP Prioritization SNU FY2020 - last used FY2020 also valid for FY2019
-
+      # Planning Attributes: COP Prioritization SNU FY2020 - last used FY2020 also valid for FY2019
+      datasets <- c(datasets, "pTuDWXzkAkJ")
     }
   } else {
     stop(paste("FY", fiscal_year, "input not supported by getDatasetUids"))

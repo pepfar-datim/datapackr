@@ -84,7 +84,11 @@ unPackCountryUIDs <- function(submission_path,
           tool = tool)
 
       if (datapack_name == "Latin America Region") {
-        country_uids <- c("joGQFpKiHl9", "QKD4CzBG2GM", "N7QAPGSaODP", "EXVC4bNtv84", "w5NMe34EjPN", "aUTsSmqqu9O", "oK0gC85xx2f")
+
+        country_uids <- c("joGQFpKiHl9", "QKD4CzBG2GM",
+        "N7QAPGSaODP", "EXVC4bNtv84", "w5NMe34EjPN",
+        "aUTsSmqqu9O", "oK0gC85xx2f")
+
       } else if (datapack_name == "Caribbean Region") {
         country_uids <- c("RKoVudgb05Y", "PeOHqAwdtez", "WuxG6jzaypt", "zhJINyURZ5Y", "WSl5y9jxCpC")
       } else if (datapack_name %in% unique(valid_PSNUs$country_name)) {

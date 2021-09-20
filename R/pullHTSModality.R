@@ -20,6 +20,8 @@ getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL,
     groupSet <- "CKTkg8dLlr7"
   }
 
+  fy_pattern <- "FY\\d{2},\\d{2}R/FY\\d{2},\\d{2}T"
+
   modality_map <- api_call(paste0("dataElementGroupSets/", groupSet),
                            d2_session = d2_session) %>%
     api_fields("dataElementGroups[name,dataElements[id]]") %>% #nolint
@@ -28,7 +30,7 @@ getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL,
     dplyr::distinct() %>%
     dplyr::select(dataElement = id,
                   hts_modality = name) %>%
-    dplyr::mutate(hts_modality = stringr::str_trim(stringr::str_remove(hts_modality,"FY\\d{2},\\d{2}R/FY\\d{2},\\d{2}T")))
+    dplyr::mutate(hts_modality = stringr::str_trim(stringr::str_remove(hts_modality, fy_pattern)))
 
 
   if (!is.null(dataElements)) {

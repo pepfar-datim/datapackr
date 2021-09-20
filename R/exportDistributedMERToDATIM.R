@@ -130,8 +130,9 @@ autoResolveDuplicates <- function(d, keep_dedup) {
   #Bind crosswalk dupes
   if (exists_with_rows(crosswalk_dupes_auto_resolved)) {
     d$datim$MER <- dplyr::bind_rows(d$datim$MER, crosswalk_dupes_auto_resolved)
-    warning_msg <- paste0("INFO! ", NROW(crosswalk_dupes_auto_resolved), " zero-valued crosswalk deduplication adjustments will be added to your DATIM import.
-                  Please consult the DataPack wiki section on deduplication for more information. ")
+    warning_msg <- paste0("INFO! ", NROW(crosswalk_dupes_auto_resolved), " zero-valued crosswalk deduplication",
+    "adjustments will be added to your DATIM import.Please consult the DataPack wiki section",
+    "on deduplication for more information. ")
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "INFO")
   }
@@ -159,16 +160,16 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
 
   # align   map_DataPack_DATIM_DEs_COCs with  d$datim$MER/d$data$distributedMER for KP_MAT
 
-  map_des_cocs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
+  map_des_cocs <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
 
-  map_des_cocs_local$valid_sexes.name[map_des_cocs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                       map_des_cocs_local$valid_kps.name == "Male PWID"] <- "Male"
-  map_des_cocs_local$valid_sexes.name[map_des_cocs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                       map_des_cocs_local$valid_kps.name == "Female PWID"] <- "Female"
-  map_des_cocs_local$valid_kps.name[map_des_cocs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                     map_des_cocs_local$valid_kps.name == "Male PWID"] <- NA_character_
-  map_des_cocs_local$valid_kps.name[map_des_cocs_local$indicator_code == "KP_MAT.N.Sex.T" &
-                                                     map_des_cocs_local$valid_kps.name == "Female PWID"] <- NA_character_
+  map_des_cocs$valid_sexes.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
+                                                       map_des_cocs$valid_kps.name == "Male PWID"] <- "Male"
+  map_des_cocs$valid_sexes.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
+                                                       map_des_cocs$valid_kps.name == "Female PWID"] <- "Female"
+  map_des_cocs$valid_kps.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
+                                                     map_des_cocs$valid_kps.name == "Male PWID"] <- NA_character_
+  map_des_cocs$valid_kps.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
+                                                     map_des_cocs$valid_kps.name == "Female PWID"] <- NA_character_
 
   # Readjust for PMTCT_EID
   d$datim$MER %<>% dplyr::mutate(
@@ -180,7 +181,7 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
 ) %>%
 
   # Pull in all dataElements and categoryOptionCombos
-    dplyr::left_join(., (map_des_cocs_local %>%
+    dplyr::left_join(., (map_des_cocs %>%
                             dplyr::rename(Age = valid_ages.name,
                                           Sex = valid_sexes.name,
                                           KeyPop = valid_kps.name))) %>%
@@ -204,7 +205,8 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup() %>%
 
-    # Remove anything which is NA here. Under COP19 guidance, this will include only TX_PVLS.N.Age/Sex/Indication/HIVStatus.20T.Routine
+    # Remove anything which is NA here. Under COP19 guidance,
+    #this will include only TX_PVLS.N.Age/Sex/Indication/HIVStatus.20T.Routine
     dplyr::filter(complete.cases(.))
 
 

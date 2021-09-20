@@ -30,7 +30,7 @@ checkComments <- function(d) {
         Prior to submitting for an updated PSNUxIM tab, you MUST remove all
         threaded comments. For more information about the differences between
         threaded comments and notes,",
-        "see: https://support.office.com/en-us/article/the-difference-between-threaded-comments-and-notes-75a51eec-4092-42ab-abf8-7669077b7be3",
+        "see: https://support.office.com/en-us/article/the-difference-between-threaded-comments-and-notes-75a51eec-4092-42ab-abf8-7669077b7be3", # nolint
         "\n")
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")

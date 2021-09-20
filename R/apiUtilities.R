@@ -47,7 +47,7 @@ api_filter <- function(api_call, field, operation, match) {
     ":",
     operation,
     ":",
-    ifelse(operation == "in", paste0("[", match, "]"), match)) %>% #TODO: Accommodate match coming in as character vector instead of string
+    ifelse(operation == "in", paste0("[", match, "]"), match)) %>%
     utils::URLencode()
 
   return(URL)
