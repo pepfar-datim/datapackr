@@ -112,7 +112,7 @@ unPackSNUxIM <- function(d) {
                   col_type %in% c("row_header", "target"))
 
   header_cols <- cols_to_keep %>%
-    dplyr::filter(col_type == "row_header")=
+    dplyr::filter(col_type == "row_header")
 
   if (d$info$tool == "Data Pack") {
     original_targets <- d$data$MER
