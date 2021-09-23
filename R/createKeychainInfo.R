@@ -126,7 +126,7 @@ createKeychainInfo <- function(submission_path = NULL,
   } else {
     stop("Unable to process that type of Data Pack.")
   }
-  
+
 
   # TEST to make sure tool type matches what we see in the submitted file's structure ####
   # TODO: Improve to use checkColStructure
