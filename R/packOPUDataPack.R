@@ -74,7 +74,7 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
     d$data$UndistributedMER <- d$data$snuxim_model_data %>%
         dplyr::mutate(attributeOptionCombo = default_catOptCombo()) %>%
         dplyr::group_by(dplyr::across(c(-value))) %>%
-        dplyr::summarise(value = sum(value)) %>%
+        dplyr::summarise(value = sum(value), na.rm = TRUE) %>%
         dplyr::ungroup() %>%
         dplyr::filter(value != 0)
   }
