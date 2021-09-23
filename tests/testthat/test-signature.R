@@ -25,7 +25,7 @@ test_that("Can generate a key chain", {
      )
    )
    expect_equal(d$keychain$submission_path, test_sheet("COP21_Data_Pack_Template.xlsx"))
-   expect_setequal(class(d$info$messages), c("data.frame", "MessageQueue"))
+   expect_setequal(class(d$info$messages), c("MessageQueue"))
    expect_false(d$info$has_error)
    expect_false(d$info$newSNUxIM)
    expect_equal(d$info$country_uids, "qllxzIjjurr")

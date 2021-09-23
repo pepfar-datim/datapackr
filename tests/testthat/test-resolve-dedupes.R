@@ -24,7 +24,7 @@ test_that("No modifications on if there are no duplicates", {
 
   expect_true(sum(grepl("00000", foo$datim$MER$mechanism_code)) == 0)
 
-  expect_equal(NROW(foo$info$messages), 0L)
+  expect_equal(length(foo$info$messages$message), 0L)
 })
 
 
@@ -140,7 +140,7 @@ test_that("Provide info only for over-allocated crosswalk dupes", {
 
   expect_true(sum(grepl("00001", foo$datim$MER$mechanism_code)) == 0)
 
-  #expect_true(grepl("crosswalk duplicates with allocation greater than 100% were identified", foo$info$messages$message))
+  expect_true(grepl("crosswalk duplicates with allocation greater than 100% were identified", foo$info$messages$message))
 })
 
 
