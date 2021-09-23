@@ -27,20 +27,20 @@ unPackOPUDataPack <- function(d,
 
   # Check integrity of Workbook tabs ####
   d <- checkStructure(d)
-  
+
   # Unpack updated PSNUxIM data ####
   if (d$info$cop_year == 2020) {
     d <- unPackOPU_PSNUxIM(d)
   } else {
     d <- unPackSNUxIM(d)
   }
-  
+
   # Prepare SNU x IM dataset for DATIM import & validation ####
   d <- packForDATIM(d, type = "OPU PSNUxIM")
-  
+
   # Prepare data for sharing with other systems ####
   d <- createAnalytics(d, d2_session = d2_session)
 
   return(d)
-  
+
 }

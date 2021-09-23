@@ -21,13 +21,13 @@ create_play_spectrum_output <- function(country_uids,
                                         output_folder = NULL,
                                         d2_session = dynGet("d2_default_session",
                                                             inherits = TRUE)) {
-  
+
   if (cop_year != 2021) {
     stop("That COP Year currently isn't supported for processing by create_play_spectrum_output.")
   }
-  
-  map_DataPack_DATIM_DEs_COCs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
-  
+
+  map_des_cocs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
+
   # Get PSNU list ####
   PSNUs <- datapackr::valid_PSNUs %>%
     dplyr::filter(country_uid %in% country_uids,
@@ -35,7 +35,7 @@ create_play_spectrum_output <- function(country_uids,
     datapackr::add_dp_psnu(.) %>%
     dplyr::arrange(dp_psnu) %>%
     dplyr::select(PSNU = dp_psnu, psnu_uid)
-  
+
   # Get some real data from DATIM ####
   spectrum_des <- tibble::tribble(
     ~dataset, ~dataelementuid,
@@ -56,7 +56,7 @@ create_play_spectrum_output <- function(country_uids,
     "impatt", "P3AT3zcyRhU", #KP_ESTIMATES.Prev.T
     "impatt", "qFyJH6fUPQk" #KP_ESTIMATES.Total.T
   )
-  
+
 
   data_datim <- suppressWarnings(datapackr::getCOPDataFromDATIM(country_uids,
                                                cop_year = (cop_year - 1),
@@ -64,9 +64,9 @@ create_play_spectrum_output <- function(country_uids,
                                                d2_session = d2_session)) %>%
   # Accommodate DUIT decision to map IMPATT to cop_year+1 ####
     dplyr::mutate(
-      period = 
+      period =
         dplyr::case_when(
-          dataElement %in% 
+          dataElement %in%
             (spectrum_des %>%
               dplyr::filter(dataset == "impatt") %>%
                dplyr::pull(dataelementuid))
@@ -75,23 +75,23 @@ create_play_spectrum_output <- function(country_uids,
         )
     ) %>%
     dplyr::left_join(
-      map_DataPack_DATIM_DEs_COCs_local,
+      map_des_cocs_local,
       by = c("dataElement" = "dataelementuid",
              "categoryOptionCombo" = "categoryoptioncombouid",
              "period" = "period")) %>%
     dplyr::filter(dataElement %in% spectrum_des$dataelementuid)
-  
+
   if (any(is.na(data_datim$indicator_code))) {
     stop("Problem mapping target data pulled from DATIM to datapack schema")
   }
-  
+
   play_spectrum_output <- data_datim %>%
     dplyr::left_join(PSNUs, by = c("orgUnit" = "psnu_uid")) %>%
     dplyr::mutate(area_id = NA_character_,
-                  calendar_quarter = 
+                  calendar_quarter =
                     dplyr::if_else(indicator_code == "TX_CURR_SUBNAT.R",
-                                   paste0("CY",cop_year-1,"Q4"),
-                                   paste0("CY",cop_year,"Q3"))) %>%
+                                   paste0("CY", cop_year - 1, "Q4"),
+                                   paste0("CY", cop_year, "Q3"))) %>%
     dplyr::select(psnu = PSNU,
                   psnu_uid = orgUnit,
                   area_id,
@@ -103,15 +103,15 @@ create_play_spectrum_output <- function(country_uids,
                   sex_uid = valid_sexes.id,
                   calendar_quarter,
                   value)
-  
+
   # Adjust for PMTCT ####
   pmtct_data <- play_spectrum_output %>%
     dplyr::filter(
       stringr::str_detect(indicator_code, "^PMTCT")
   )
-  
+
   # Get PMTCT ages/sexes
-  pmtct_subnat_cos <- map_DataPack_DATIM_DEs_COCs_local %>%
+  pmtct_subnat_cos <- map_des_cocs_local %>%
     dplyr::filter(indicator_code == "PMTCT_STAT.D.Age_Sex.T") %>%
     dplyr::select(
       age = valid_ages.name,
@@ -120,11 +120,11 @@ create_play_spectrum_output <- function(country_uids,
       sex_uid = valid_sexes.id
     ) %>%
     dplyr::distinct()
-  
+
   pmtct_data %<>%
     dplyr::select(-age, -age_uid, -sex, -sex_uid) %>%
     tidyr::crossing(pmtct_subnat_cos)
-  
+
   # Pull in Host Country data to aid in distribution
   host_country_data <- play_spectrum_output %>%
     dplyr::filter(
@@ -139,21 +139,21 @@ create_play_spectrum_output <- function(country_uids,
                   pop = `POP_EST.T_1`,
                   plhiv = `PLHIV.T_1`,
                   tx_curr = `TX_CURR_SUBNAT.T_1`)
-  
+
   pmtct_data %<>%
     dplyr::left_join(
       host_country_data,
       by = c("psnu_uid", "age_uid", "sex_uid")
     )
-  
+
   # Distribute PMTCT data
   pmtct_data %<>%
     dplyr::group_by(psnu, psnu_uid, area_id,
                     indicator_code, dataelementuid, calendar_quarter) %>%
     dplyr::mutate(
-      pop_dist = pop/sum(pop, na.rm = T),
-      plhiv_dist = plhiv/sum(plhiv, na.rm = T),
-      tx_curr_dist = tx_curr/sum(tx_curr, na.rm = T),
+      pop_dist = pop / sum(pop, na.rm = T),
+      plhiv_dist = plhiv / sum(plhiv, na.rm = T),
+      tx_curr_dist = tx_curr / sum(tx_curr, na.rm = T),
       value = dplyr::case_when(
         stringr::str_detect(indicator_code, "PMTCT_STAT_SUBNAT\\.D")
           ~ round_trunc(value * pop_dist),
@@ -165,14 +165,14 @@ create_play_spectrum_output <- function(country_uids,
     ) %>%
     dplyr::ungroup() %>%
     dplyr::select(names(play_spectrum_output))
-  
+
   # Add PMTCT data back to other data
   play_spectrum_output %<>%
     dplyr::filter(
       !stringr::str_detect(indicator_code, "PMTCT_(STAT|ART)_SUBNAT\\.(D|N)")
     ) %>%
     dplyr::bind_rows(pmtct_data)
-  
+
   # Add randomized RSEs ####
   play_spectrum_output %<>%
     dplyr::mutate(
@@ -190,6 +190,6 @@ create_play_spectrum_output <- function(country_uids,
                 tool = "Spectrum Example",
                 datapack_name = country_name)
   }
-  
-  return(play_spectrum_output)  
+
+  return(play_spectrum_output)
 }

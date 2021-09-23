@@ -6,9 +6,9 @@ jobs:
       - image: rocker/verse:3.6.3
     steps:
       - checkout
-      - restore_cache: 
+      - restore_cache:
           key: deps1-{{ checksum "renv.lock" }}
-      - run: 
+      - run:
          name: Install curl sytem deps
          command: |
              sudo apt-get update
@@ -26,7 +26,12 @@ jobs:
       - run:
           name: Build package
           command: R CMD build --no-build-vignettes --no-manual .
-      - run: 
+      - run:
           name: Test package
-          command: | 
+          command: |
                R -e "devtools::check(error_on='error')"
+      - run:
+          name: Lint packages
+          command: |
+                R -e "install.packages('lintr')"
+                R -e "if ( NROW(lintr::lint_dir('R')) > 0 ) stop('Linting failed')"

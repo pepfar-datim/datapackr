@@ -22,7 +22,7 @@ Authors@R: c(
 Description: Generates and processes PEPFAR Data Packs and Site Tools.
 URL: https://github.com/pepfar-datim/datapackr
 BugReports: https://github.com/pepfar-datim/datapackr
-Depends: R (>= 3.6.0)
+Depends: R (>= 3.6.3)
 Imports:
     dplyr (>= 0.8.3),
     tidyr (>= 1.0.0),
@@ -52,7 +52,8 @@ Imports:
     rlang (>= 0.4.2),
     assertthat,
     plyr,
-    fuzzyjoin(>= 0.1.6)
+    fuzzyjoin (>= 0.1.6),
+    R6
 Suggests:
     devtools (>= 2.0.1),
     httptest,

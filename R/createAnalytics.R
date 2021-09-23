@@ -7,28 +7,30 @@
 #' @export
 #'
 getFY22Prioritizations <- function(d) {
-  
+
   psnu_prioritizations <- d$datim$fy22_prioritizations %>%
     dplyr::select(orgUnit, value)
-  
-  psnus<-dplyr::filter(datapackr::valid_PSNUs,psnu_type =="SNU") %>% 
-    dplyr::filter(country_uid %in% d$info$country_uids) %>% 
-    dplyr::select(ancestor_uid = psnu_uid,ancestor_name = psnu)
-  
+
+
+  psnus <- dplyr::filter(datapackr::valid_PSNUs, psnu_type == "SNU") %>%
+    dplyr::filter(country_uid %in% d$info$country_uids) %>%
+    dplyr::select(ancestor_uid = psnu_uid, ancestor_name = psnu)
+
   #Classify any DREAMS districts the same as their PSNU parents
-  dreams_prioritizations<-dplyr::filter(valid_PSNUs, DREAMS == "Y") %>% 
-    dplyr::select(psnu_uid,psnu,ancestors) %>% 
-    tidyr::unnest("ancestors") %>% 
-    dplyr::select(-organisationUnitGroups) %>% 
-    dplyr::group_by(psnu_uid,psnu) %>% 
-    dplyr::summarise(path = paste(id,sep="",collapse="/")) %>% 
-    dplyr::ungroup() %>% 
-    fuzzyjoin::regex_inner_join(psnus,by=c("path" = "ancestor_uid")) %>% 
-    dplyr::inner_join(psnu_prioritizations,by=c("ancestor_uid" = "orgUnit")) %>% 
-    dplyr::select(orgUnit=psnu_uid,value)
-  
-  dplyr::bind_rows(psnu_prioritizations,dreams_prioritizations)
-  
+  dreams_prioritizations <- dplyr::filter(valid_PSNUs, DREAMS == "Y") %>%
+    dplyr::select(psnu_uid, psnu, ancestors) %>%
+    tidyr::unnest("ancestors") %>%
+    dplyr::select(-organisationUnitGroups) %>%
+    dplyr::group_by(psnu_uid, psnu) %>%
+    dplyr::summarise(path = paste(id, sep = "", collapse = "/")) %>%
+    dplyr::ungroup() %>%
+    fuzzyjoin::regex_inner_join(psnus, by = c("path" = "ancestor_uid")) %>%
+    dplyr::inner_join(psnu_prioritizations, by = c("ancestor_uid" = "orgUnit")) %>%
+    dplyr::select(orgUnit = psnu_uid, value)
+
+  dplyr::bind_rows(psnu_prioritizations, dreams_prioritizations)
+
+
 }
 
 
@@ -49,7 +51,7 @@ createAnalytics <- function(d,
                                                 inherits = TRUE)) {
   # Append the distributed MER data and subnat data together
   if (d$info$tool == "OPU Data Pack") {
-    d$data$analytics <- d$datim$OPU %>% 
+    d$data$analytics <- d$datim$OPU %>%
       adorn_import_file(cop_year = d$info$cop_year,
                         psnu_prioritizations = NULL,
                         d2_session = d2_session)
@@ -68,7 +70,7 @@ createAnalytics <- function(d,
     if (d$info$cop_year == 2021) {
       # For COP21+, get data from import files for better consistency ####
       fy22_prioritizations <- getFY22Prioritizations(d)
-      
+
       d$data$analytics <-
         dplyr::bind_rows(
           d$datim$MER,
@@ -79,17 +81,17 @@ createAnalytics <- function(d,
     }
   }
 
-  
+
   #This has been moved to adorn_import_file :point_up
   # # Add timestamp and FY ####
   # d$data$analytics %<>%
-  #   dplyr::mutate(upload_timestamp = format(Sys.time(),"%Y-%m-%d %H:%M:%S", tz = "UTC"),
-  #                 fiscal_year = paste0("FY", stringr::str_sub(as.integer(d$info$cop_year)+1,-2)))
+  #   dplyr::mutate(upload_timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+  #                 fiscal_year = paste0("FY", stringr::str_sub(as.integer(d$info$cop_year)+1, -2)))
 
-  #TODO: This seems to no longer be required since it has been 
+  #TODO: This seems to no longer be required since it has been
   # moved to adorn_import_file
   # Column names coming out of adorn_import_file
-  # 
+  #
   # if (d$info$tool == "Data Pack") {
   #   d$data$analytics %<>%
   #     dplyr::select( ou,

@@ -10,7 +10,7 @@ pull_COPindicators(
 )
 }
 \arguments{
-\item{cop_year}{Year of COP for which to return indicator list. (e.g., for 
+\item{cop_year}{Year of COP for which to return indicator list. (e.g., for
 COP19 enter 19.) If left blank, will use COP Year as stored in datapackr.}
 
 \item{d2_session}{R6 datimutils object which handles authentication with DATIM}

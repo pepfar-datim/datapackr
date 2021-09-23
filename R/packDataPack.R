@@ -58,18 +58,22 @@ packDataPack <- function(model_data,
 
   # Open schema ####
   if (d$info$cop_year == 2020) {
-   d$info$schema <-  datapackr::cop20_data_pack_schema
+    d$info$schema <-  datapackr::cop20_data_pack_schema
   } else if (d$info$cop_year == 2021) {
     d$info$schema <- datapackr::cop21_data_pack_schema
-  } else {d$info$schema <- datapackr::data_pack_schema}
+  } else {
+    d$info$schema <- datapackr::data_pack_schema
+  }
 
   # Open template ####
   # Grab correct schema
   if (is.null(d$keychain$template_path)) {
     if (cop_year == 2021) {
       d$info$template_filename <- "COP21_Data_Pack_Template.xlsx"
-    } else {d$info$template_filename <-  "COP20_Data_Pack_Template_vFINAL.xlsx"}
-    
+    } else {
+      d$info$template_filename <-  "COP20_Data_Pack_Template_vFINAL.xlsx"
+    }
+
     d$keychain$template_path <- system.file("extdata",
                                  d$info$template_filename,
                                  package = "datapackr",
@@ -96,7 +100,7 @@ packDataPack <- function(model_data,
   d$tool$wb <- openxlsx::loadWorkbook(d$keychain$template_path)
 
   # Set global numeric format ####
-  options("openxlsx.numFmt" = "#,##0")
+  options("openxlsx.numFmt" = "#, ##0")
 
   # Write Home Sheet info ####
   d$tool$wb <- writeHomeTab(wb = d$tool$wb,
@@ -113,7 +117,7 @@ packDataPack <- function(model_data,
     ## Remove DSNUs
     dplyr::filter(!is.na(psnu_type)) %>%
     dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)
-  
+
   # TODO: Separate PSNUs as parameter for this function, allowing you to include
   # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
 
@@ -131,7 +135,7 @@ packDataPack <- function(model_data,
                                   cop_year = d$info$cop_year)
 
   # Hide unneeded sheets ####
-  # sheets_to_hide <- which(stringr::str_detect(names(d$tool$wb),"PSNUxIM|Summary"))
+  # sheets_to_hide <- which(stringr::str_detect(names(d$tool$wb), "PSNUxIM|Summary"))
   # openxlsx::sheetVisibility(d$tool$wb)[sheets_to_hide] <- "hidden"
 
   # Add Styles ####
@@ -139,17 +143,31 @@ packDataPack <- function(model_data,
   ## TODO: Address this in Data Pack?
   #   ## Add styles to Summary tab
   # summaryStyle = openxlsx::createStyle(fgFill = "#404040")
-  # openxlsx::addStyle(d$tool$wb, sheet = "Summary", summaryStyle, cols = 1:2, rows = 1:62, gridExpand = TRUE, stack = TRUE)
+  # openxlsx::addStyle(d$tool$wb, sheet = "Summary",
+  #summaryStyle, cols = 1:2, rows = 1:62, gridExpand = TRUE, stack = TRUE)
 
     ## Add styles to Spectrum tab
   #TODO: See if new openxlsx release addresses this issue
-  spectrumStyle1 = openxlsx::createStyle(fgFill = "#9CBEBD")
-  spectrumStyle2 = openxlsx::createStyle(fgFill = "#FFEB84")
-  openxlsx::addStyle(d$tool$wb, sheet = "Spectrum", spectrumStyle1, cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
-  openxlsx::addStyle(d$tool$wb, sheet = "Spectrum", spectrumStyle2, cols = 2, rows = 2, gridExpand = TRUE, stack = TRUE)
+  spectrumStyle1 <- openxlsx::createStyle(fgFill = "#9CBEBD")
+  spectrumStyle2 <- openxlsx::createStyle(fgFill = "#FFEB84")
+
+  openxlsx::addStyle(d$tool$wb,
+  sheet = "Spectrum",
+  spectrumStyle1,
+  cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
+
+  openxlsx::addStyle(d$tool$wb,
+  sheet = "Spectrum",
+  spectrumStyle2, cols = 2, rows = 2, gridExpand = TRUE, stack = TRUE)
+
   if (cop_year == 2020) {
-    openxlsx::addStyle(d$tool$wb, sheet = "Spectrum IDs", spectrumStyle1, cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
-    openxlsx::addStyle(d$tool$wb, sheet = "Spectrum IDs", spectrumStyle2, cols = 2, rows = 2, gridExpand = TRUE, stack = TRUE)
+    openxlsx::addStyle(d$tool$wb,
+    sheet = "Spectrum IDs",
+    spectrumStyle1, cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
+
+    openxlsx::addStyle(d$tool$wb,
+    sheet = "Spectrum IDs",
+    spectrumStyle2, cols = 2, rows = 2, gridExpand = TRUE, stack = TRUE)
   }
 
   # Add validations

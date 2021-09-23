@@ -17,7 +17,7 @@ getCOPDataFromDATIM(
 \item{cop_year}{Specifies COP year for dating as well as selection of
 templates.}
 
-\item{streams}{data stream or streams. One or more of "mer_targets","subnat_targets","impatt". 
+\item{streams}{data stream or streams. One or more of "mer_targets", "subnat_targets", "impatt".
 If not specified, then all data streams are returned.}
 
 \item{d2_session}{R6 datimutils object which handles authentication with DATIM}

@@ -18,11 +18,11 @@ writePSNUxIM <- function(d,
                         d2_session = dynGet("d2_default_session",
                                             inherits = TRUE)) {
 
-  d$keychain$snuxim_model_data_path = snuxim_model_data_path
-  d$keychain$output_folder = output_folder
+  d$keychain$snuxim_model_data_path <- snuxim_model_data_path
+  d$keychain$output_folder <- output_folder
 
   # Start running log of all warning and information messages ####
-  d$info$warning_msg <- NULL
+  d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
 
   if (d$info$has_comments_issue) {
@@ -31,31 +31,33 @@ writePSNUxIM <- function(d,
         "ERROR! Cannot update PSNUxIM information in a Data Pack with Threaded
         Comments. Please remove these and resubmit. For more information about
         the difference between Threaded Comments and Notes, see:
+        https://support.office.com/en-us/article/the-difference-between-threaded-comments-and-notes-75a51eec-4092-42ab-abf8-7669077b7be3")  # nolint
 
-        https://support.office.com/en-us/article/the-difference-between-threaded-comments-and-notes-75a51eec-4092-42ab-abf8-7669077b7be3")
-
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
 
-    if (interactive()) {
+    #TODO: Replace this with a centralized method
+    if (NROW(d$info$messages) > 0 & interactive()) {
       options(warning.length = 8170)
-      cat(crayon::red(d$info$warning_msg))
+      cat(crayon::red(d$info$messages$message))
     }
 
     return(d)
   }
 
   # Check whether to write anything into SNU x IM tab and write if needed ####
-  if ( !is.null(d$keychain$snuxim_model_data_path ) ) {
+  if (!is.null(d$keychain$snuxim_model_data_path)) {
     if (d$info$cop_year == 2020) {
       d <- packSNUxIM_2020(d)
     } else if (d$info$cop_year == 2021) {
       d <- packSNUxIM(d,
                       d2_session = d2_session)
     } else {
-      stop(paste0("Packing SNU x IM tabs is not supported for COP ",d$info$cop_year," Data Packs."))
+      stop(paste0("Packing SNU x IM tabs is not supported for COP ", d$info$cop_year, " Data Packs."))
     }
-  } else {stop("Cannot update PSNUxIM tab without model data.")}
+  } else {
+    stop("Cannot update PSNUxIM tab without model data.")
+  }
 
   # If new information added to SNU x IM tab, reexport Data Pack for user ####
   if (d$info$newSNUxIM) {
@@ -74,10 +76,7 @@ writePSNUxIM <- function(d,
   }
 
   # If warnings, show all grouped by issue ####
-  if (!is.null(d$info$warning_msg) & interactive()) {
-    options(warning.length = 8170)
-    cat(crayon::red(d$info$warning_msg))
-  }
+  printMessages(d$info$messages)
 
   return(d)
 
