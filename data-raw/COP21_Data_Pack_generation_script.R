@@ -3,7 +3,7 @@ library(magrittr)
 
 datapackr::loginToDATIM("~/.secrets/datim.json")
 
-output_folder <- "/Users/sam"
+output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/Mock Data Pack"
 
 model_data_path <- file.choose()
 
@@ -117,7 +117,7 @@ model_data <- readRDS(model_data_path)
 # pick <- datapackr::COP21_datapacks_countries
 
 for (i in 1:NROW(pick)) {
-  print(paste0(i," of ",NROW(pick)))
+  print(paste0(i," of ",NROW(pick), ": ", pick[[i,1]]))
 
   packDataPack(model_data = model_data,
                datapack_name = pick[[i,1]],

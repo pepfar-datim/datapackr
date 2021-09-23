@@ -1,48 +1,48 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
-#' @title writeDataSheet(wb, type = "Data Pack")
+#' @title writeDataSheet(wb, tool = "Data Pack")
 #' @description
 #' Function to write Data sheet structures
 #'
 #' @param wb Openxlsx workbook object.
 #' @param sheet Name of the sheet
-#' @param type Defaults to "Data Pack".
+#' @param tool Defaults to "Data Pack".
 #'
 #' @return Openxlsx workbook object with added, styled Home tab.
 #'
-frameDataSheet <- function(wb, sheet, type = "Data Pack") {
+frameDataSheet <- function(wb, sheet, tool = "Data Pack") {
 # Choose schema ####
-  if (type == "Data Pack") {
+  if (tool == "Data Pack") {
       schema <- datapackr::template_schema
   }
 
   schema %<>%
 # Filter to current sheet ####
     dplyr::filter(sheet_name == sheet) %>%
-    dplyr::select(-sheet_num,-sheet_name)
+    dplyr::select(-sheet_num, -sheet_name)
 
-  row_header_cols <- NROW(schema[schema$col_type == "Row Header",])
+  row_header_cols <- NROW(schema[schema$col_type == "Row Header", ])
 
 # Transpose to look like Tool rows ####
   schema %<>%
     t() %>%
     as.data.frame(stringsAsFactors = FALSE) %>%
-    dplyr::slice(-1,-2) %>%
+    dplyr::slice(-1, -2) %>%
 # Add sum rows ####
-    tibble::add_row(V1 = rep(NA_character_,2), .before = 3)
+    tibble::add_row(V1 = rep(NA_character_, 2), .before = 3)
 
-  schema[3,row_header_cols] <- "Data Pack Total"
-  schema[4,row_header_cols] <- "Site Subtotal"
+  schema[3, row_header_cols] <- "Data Pack Total"
+  schema[4, row_header_cols] <- "Site Subtotal"
 
 
 # Write rows into Pack sheet ####
   openxlsx::addWorksheet(wb = wb, sheetName = sheet, zoom = 90)
   openxlsx::writeData(wb = wb, sheet = sheet, x = schema,
-                      xy = c(1,1), colNames = FALSE)
+                      xy = c(1, 1), colNames = FALSE)
 
 # Write title into Pack sheet ####
   openxlsx::writeData(wb = wb, sheet = sheet, x = sheet,
-                      xy = c(1,1), colNames = FALSE)
+                      xy = c(1, 1), colNames = FALSE)
 
 # Add styles ####
   ## Title
@@ -52,17 +52,17 @@ frameDataSheet <- function(wb, sheet, type = "Data Pack") {
   ## Header Row
       openxlsx::addStyle(wb, sheet,
                          style = datapackr::styleGuide$data$header,
-                         rows = 1, cols = (row_header_cols+1):length(schema),
+                         rows = 1, cols = (row_header_cols + 1):length(schema),
                          gridExpand = TRUE, stack = TRUE)
   ## Labels
       openxlsx::addStyle(wb, sheet,
                          style = datapackr::styleGuide$data$label,
-                         rows = 2, cols = (row_header_cols+1):length(schema),
+                         rows = 2, cols = (row_header_cols + 1):length(schema),
                          gridExpand = TRUE, stack = TRUE)
   ## UIDs
       openxlsx::addStyle(wb, sheet,
                          style = datapackr::styleGuide$data$uid,
-                         rows = 5, cols = (row_header_cols+1):length(schema),
+                         rows = 5, cols = (row_header_cols + 1):length(schema),
                          gridExpand = TRUE, stack = TRUE)
   ## Row Headers
       openxlsx::addStyle(wb, sheet,
@@ -89,11 +89,11 @@ frameDataSheet <- function(wb, sheet, type = "Data Pack") {
 #'
 #' @param datapack_uid A unique ID specifying the PEPFAR Operating Unit
 #' the Tool belongs to.
-#' @param type Defaults to "Data Pack".
+#' @param tool Defaults to "Data Pack".
 #'
 #' @return OpenXLSX workbook object for use in data writing functions.
 #'
-packFrame <- function(datapack_uid, type = "Data Pack") {
+packFrame <- function(datapack_uid, tool = "Data Pack") {
 
 # Create Workbook ####
     wb <- openxlsx::createWorkbook(
@@ -107,10 +107,10 @@ packFrame <- function(datapack_uid, type = "Data Pack") {
     options("openxlsx.numFmt" = "#,##0")
 
 # Write Home Page ####
-   # wb <- writeHomeTab(wb = wb, datapack_uid = datapack_uid, type = type) #TODO: Update parameters
+   # wb <- writeHomeTab(wb = wb, datapack_uid = datapack_uid, tool = tool) #TODO: Update parameters
 
 # Frame data tabs ####
-    if (type == "Data Pack") {
+    if (tool == "Data Pack") {
         schema <- datapackr::template_schema
     }
 
@@ -118,9 +118,9 @@ packFrame <- function(datapack_uid, type = "Data Pack") {
       dplyr::pull(sheet_name) %>%
       unique()
 
-    for (i in 1:length(sheet_names)) {
-        sheet_name = sheet_names[i]
-        wb <- frameDataSheet(wb = wb, sheet_name, type = type)
+    for (i in seq_along(sheet_names)) {
+        sheet_name <- sheet_names[i]
+        wb <- frameDataSheet(wb = wb, sheet_name, tool = tool)
     }
 
   return(wb)

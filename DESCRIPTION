@@ -1,8 +1,8 @@
 Package: datapackr
 Type: Package
 Title: A Package that Packs and Unpacks all Data Packs
-Version: 4.5.4
-Date: 2021-09-01
+Version: 5.0.0
+Date: 2021-09-23
 Authors@R: c(
     person("Scott", "Jackson", email = "sjackson@baosystems.com",
         role = c("aut", "cre")),
@@ -22,7 +22,7 @@ Authors@R: c(
 Description: Generates and processes PEPFAR Data Packs and Site Tools.
 URL: https://github.com/pepfar-datim/datapackr
 BugReports: https://github.com/pepfar-datim/datapackr
-Depends: R (>= 3.6.0)
+Depends: R (>= 3.6.3)
 Imports:
     dplyr (>= 0.8.3),
     tidyr (>= 1.0.0),
@@ -52,14 +52,17 @@ Imports:
     rlang (>= 0.4.2),
     assertthat,
     plyr,
-    fuzzyjoin(>= 0.1.6)
+    fuzzyjoin (>= 0.1.6),
+    R6
 Suggests:
     devtools (>= 2.0.1),
     httptest,
-    testthat
+    testthat,
+    cellranger,
+    rprojroot
 Remotes: jason-p-pickering/datim-validation,
           pepfar-datim/data-pack-commons
-License: GPL-2
+License: file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1

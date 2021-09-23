@@ -7,16 +7,17 @@
 #'
 #' @param d Datapackr object.
 #' @param sheet Sheet to check
-#' 
+#'
 #' @return d
-#' 
+#'
 checkInvalidOrgUnits <- function(d, sheet) {
-  if (sheet %in% c("SNU x IM","PSNUxIM")) {
-    data = d$data$SNUxIM
+
+  if (sheet %in% c("SNU x IM", "PSNUxIM")) {
+    data <- d$data$SNUxIM
   } else {
-    data = d$data$extract
+    data <- d$data$extract
   }
-  
+
   invalid_orgunits <- data %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("value|distribution")), dplyr::any_vars(!is.na(.))) %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("value|distribution")), dplyr::any_vars(. != 0)) %>%
@@ -27,14 +28,15 @@ checkInvalidOrgUnits <- function(d, sheet) {
     dplyr::left_join(datapackr::valid_PSNUs, by = c("psnuid" = "psnu_uid")) %>%
     dplyr::filter(is.na(psnu)
                   | is.na(psnuid)) %>%
-    dplyr::select(PSNU) %>% 
-    dplyr::mutate(sheet=sheet)
-  
-  d$tests$invalid_orgunits<-dplyr::bind_rows(d$tests$invalid_orgunits,invalid_orgunits)
-  attr(d$tests$invalid_orgunits,"test_name") <- "Invalid orgunits"
-  
+    dplyr::select(PSNU) %>%
+    dplyr::mutate(sheet = sheet)
+
+  d$tests$invalid_orgunits <- dplyr::bind_rows(d$tests$invalid_orgunits, invalid_orgunits)
+  attr(d$tests$invalid_orgunits, "test_name") <- "Invalid orgunits"
+
+
   if (NROW(invalid_orgunits) > 0) {
-    
+
     warning_msg <-
       paste0(
         "ERROR! In tab ",
@@ -46,11 +48,11 @@ checkInvalidOrgUnits <- function(d, sheet) {
         " not valid PSNUs, or do not contain the required DATIM PSNU UID ->  \n\t* ",
         paste(invalid_orgunits$PSNU, collapse = "\n\t* "),
         "\n")
-    
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+
     d$info$has_error <- TRUE
   }
- 
-  return(d) 
+
+  return(d)
 }
-  

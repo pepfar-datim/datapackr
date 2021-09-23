@@ -4,10 +4,12 @@
 \alias{prepare_model_data.PSNUxIM}
 \title{packSNUxIM(data)}
 \usage{
-prepare_model_data.PSNUxIM(model_data, country_uids)
+prepare_model_data.PSNUxIM(snuxim_model_data, country_uids)
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{snuxim_model_data}{SNUxIM model data.}
+
+\item{country_uids}{One or more country UIDS.}
 }
 \value{
 d

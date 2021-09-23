@@ -1,0 +1,9 @@
+linters: with_defaults(
+    commas_linter = NULL, # 1373
+    line_length_linter(120), # 846
+    object_name_linter = NULL, # 270
+    commented_code_linter = NULL, # 88
+    object_usage_linter = NULL, # 84
+    cyclocomp_linter = NULL, # 7
+    dummy_linter = NULL
+  )

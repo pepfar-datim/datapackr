@@ -7,7 +7,7 @@
 unPackSchema_datapack(
   filepath = NULL,
   skip = NULL,
-  type = "Data Pack Template",
+  tool = "Data Pack Template",
   cop_year = getCurrentCOPYear(),
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
@@ -17,10 +17,12 @@ unPackSchema_datapack(
 
 \item{skip}{Character vector of Sheet Names to label for skipping in schema.}
 
-\item{type}{Type of tool to unpack.}
+\item{tool}{Type of tool to unpack.}
 
 \item{cop_year}{Specifies COP year for dating as well as selection of
 templates.}
+
+\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
 }
 \value{
 Data Pack schema.

@@ -9,35 +9,41 @@
 #' @return Modified d object with a DATIM compatible data frame for import id d$datim$OPU
 #'
 packForDATIM_OPU <- function(d) {
-  if (d$info$cop_year != 2020){
+  if (!d$info$cop_year %in% c(2020, 2021)) {
     stop("The COP year provided is not supported by packForDATIM_OPU")
   }
-  
-  map_DataPack_DATIM_DEs_COCs_local <- 
+
+  map_des_cocs_local <-
     datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
-  
+  if (d$info$cop_year == 2020) {
+    data <- d$data$extract
+
+    map_des_cocs_local %<>%
+      dplyr::rename(dataelementuid = dataelement) %>%
+      dplyr::mutate(
+        period = paste0(d$info$cop_year, "Oct"))
+  } else {
+    data <- d$data$SNUxIM
+  }
+
   # Add dataElement & categoryOptionCombo ####
-  d$datim$OPU <- d$data$extract %>%
-    dplyr::left_join(., (map_DataPack_DATIM_DEs_COCs_local %>%
+  d$datim$OPU <- data %>%
+    dplyr::left_join(., (map_des_cocs_local %>%
                             dplyr::rename(Age = valid_ages.name,
                                           Sex = valid_sexes.name,
                                           KeyPop = valid_kps.name)),
                      by = c("indicator_code", "Age", "Sex", "KeyPop", "support_type")) %>%
-    tidyr::drop_na(dataelement, categoryoptioncombouid) %>%
-  
-  # Add period ####
-    dplyr::mutate(
-      period = paste0(d$info$cop_year,"Oct")) %>%
+    tidyr::drop_na(dataelementuid, categoryoptioncombouid) %>%
 
   # Select and rename based on DATIM protocol ####
     dplyr::select(
-      dataElement = dataelement,
+      dataElement = dataelementuid,
       period,
       orgUnit = psnuid,
       categoryOptionCombo = categoryoptioncombouid,
       attributeOptionCombo = mech_code,
       value)
-  
+
   return(d)
-  
+
 }
