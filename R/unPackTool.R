@@ -30,9 +30,9 @@ unPackTool <- function(submission_path = NULL,
                            tool,
                            country_uids,
                            cop_year)
-  
-  #TODO: Are we sure we want to make this change ? If so, the object must be cloned. 
-  
+
+  #TODO: Are we sure we want to make this change ? If so, the object must be cloned.
+
   #d$keychain$d2_session <- d2_session$clone()
 
   # unPack file based on type
@@ -42,33 +42,11 @@ unPackTool <- function(submission_path = NULL,
   } else if (d$info$tool == "OPU Data Pack") {
     d <- unPackOPUDataPack(d,
                            d2_session = d2_session)
-  } else {stop("Selected tool not currently supported.")}
-
-  # If warnings, show all grouped by sheet and issue
-  if (!is.null(d$info$warning_msg) & interactive()) {
-    options(warning.length = 8170)
-
-    messages <-
-      paste(
-        paste(
-          seq_along(d$info$warning_msg),
-          ": " , d$info$warning_msg
-          #stringr::str_squish(gsub("\n", "", d$info$warning_msg))
-        ),
-        sep = "",
-        collapse = "\r\n")
-
-    key = paste0(
-      "*********************\r\n",
-      "KEY:\r\n",
-      "- WARNING!: Problematic, but doesn't stop us from processing your tool. May waive with approval from PPM and DUIT.\r\n",
-      "- ERROR!: You MUST address these issues and resubmit your tool.\r\n",
-      "*********************\r\n\r\n")
-
-    cat(crayon::red(crayon::bold("VALIDATION ISSUES: \r\n\r\n")))
-    cat(crayon::red(key))
-    cat(crayon::red(messages))
+  } else {
+    stop("Selected tool not currently supported.")
   }
+
+  printMessages(d$info$messages)
 
   return(d)
 }

@@ -9,7 +9,7 @@
 #' @return Modified d object with a DATIM compatible data frame for analytics id d$datim$UndistributedMER
 #'
 packForDATIM_UndistributedMER <- function(d) {
-  
+
   # Add dataElement & categoryOptionCombo ####
   d$datim$UndistributedMER <- d$data$MER %>%
     dplyr::mutate(
@@ -22,16 +22,16 @@ packForDATIM_UndistributedMER <- function(d) {
                                          KeyPop = valid_kps.name)),
                      by = c("indicator_code", "Age", "Sex", "KeyPop", "support_type")) %>%
     tidyr::drop_na(dataelementuid, categoryoptioncombouid) %>%
-    
+
     # Add period ####
   dplyr::mutate(
-    period = paste0(FY-1,"Oct")) %>%
-    
+    period = paste0(FY - 1, "Oct")) %>%
+
     # Add PSNU uid ####
   dplyr::mutate(
     psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")
   ) %>%
-    
+
     # Select and rename based on DATIM protocol ####
   dplyr::select(
     dataElement = dataelementuid,
@@ -40,7 +40,7 @@ packForDATIM_UndistributedMER <- function(d) {
     categoryOptionCombo = categoryoptioncombouid,
     attributeOptionCombo = mech_code,
     value)
-  
+
   return(d)
-  
+
 }

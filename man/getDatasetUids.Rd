@@ -19,5 +19,5 @@ returns a character vector of the related dataset uids
 }
 \description{
 returns character vector of dataset uids for a given FY {"2019", "2020", "2021"}
-and type {"targets", "results","subnat_impatt"}
+and type {"targets", "results", "subnat_impatt"}
 }

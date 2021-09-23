@@ -8,17 +8,19 @@
 #' @param d Datapackr object.
 #' @param sheet Sheet to check
 #' @param header_cols Header columns to check
-#' 
+#'
 #' @return d
-#' 
+#'
 
-checkNumericValues <- function(d, sheet, header_cols = NULL){
-  if (sheet %in% c("SNU x IM","PSNUxIM") & d$info$tool == "Data Pack") {
-    data = d$data$SNUxIM
+checkNumericValues <- function(d, sheet, header_cols = NULL) {
+
+  if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
+
+    data <- d$data$SNUxIM
   } else {
-    data = d$data$extract
+    data <- d$data$extract
   }
-  
+
   header_cols <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet,
                   !is.na(indicator_code),
@@ -27,7 +29,7 @@ checkNumericValues <- function(d, sheet, header_cols = NULL){
     dplyr::filter(col_type == "row_header")
 
   if (d$info$tool == "OPU Data Pack") {
-    
+
     # Should `header_cols` be brought in as a parameter or reproduced here?
     data %<>%
       tidyr::gather(key = "mechCode_supportType",
@@ -38,7 +40,7 @@ checkNumericValues <- function(d, sheet, header_cols = NULL){
       tidyr::drop_na(value)
 
   }
-  
+
   if (d$info$tool == "Data Pack" & sheet == "PSNUxIM" & d$info$cop_year == 2021) {
     data %<>%
       tidyr::gather(key = "mechCode_supportType",
@@ -61,10 +63,10 @@ checkNumericValues <- function(d, sheet, header_cols = NULL){
     dplyr::arrange(row_id) %>%
     dplyr::select(row_id) %>%
     dplyr::mutate(sheet = sheet)
-  
+
   d$tests$non_numeric <- dplyr::bind_rows(d$tests$non_numeric, non_numeric)
   attr(d$tests$non_numeric, "test_name") <- "Non-numeric values"
-  
+
   if (NROW(non_numeric) > 0) {
 
     warning_msg <-
@@ -78,7 +80,7 @@ checkNumericValues <- function(d, sheet, header_cols = NULL){
         paste(non_numeric$row_id, collapse = "\n\t* "),
         "\n")
 
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
 
   }
 

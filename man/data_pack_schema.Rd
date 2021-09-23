@@ -9,7 +9,7 @@
   \item{sheet_num}{Lists the index value associated with the sheet name
   listed in \code{sheet_name}.}
   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
-  \item{col}{Value describing the column position of each 
+  \item{col}{Value describing the column position of each
   \code{indicator_code}.}
   \item{label}{String label used to describe \code{indicator_code}.}
   \item{indicator_code}{Code used in the Data Pack to uniquely

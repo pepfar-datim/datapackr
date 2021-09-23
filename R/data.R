@@ -4,7 +4,7 @@
 #' @description Maps DATIM Prioritizations from their coded numerals (1-8) to
 #' their more descriptive names.
 #'
-#' @format 
+#' @format
 #' \describe{
 #'   \item{value}{Numeral associated with DATIM Prioritization.}
 #'   \item{Prioritization}{Name associated with DATIM Prioritization}
@@ -14,12 +14,12 @@
 #' @docType data
 #' @title Library of Openxlsx style objects to apply to both Data Pack and Site
 #' Tool files.
-#' 
-#' @description 
+#'
+#' @description
 #' A list object containing styles pertaining to different portions of the Data
 #' Pack.
-#' 
-#' @format 
+#'
+#' @format
 #' \describe{
 #'   \item{home}{Styles for title, Data Pack Name, & PEPFAR banner.}
 #'   \item{siteList}{Styles for site names, broken out by Community, Facility,
@@ -29,18 +29,18 @@
 "styleGuide"
 
 #' @docType data
-#' @title Schema describing correct structure of Data Pack template. 
+#' @title Schema describing correct structure of Data Pack template.
 #'
 #' @description This schema describes the correct structure of a Data Pack
 #' file, generated from the template used to produce Data Packs and useful in
 #' validating Data Packs passed through datapackr.
 #'
-#' @format 
+#' @format
 #' \describe{
 #'   \item{sheet_num}{Lists the index value associated with the sheet name
 #'   listed in \code{sheet_name}.}
 #'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
-#'   \item{col}{Value describing the column position of each 
+#'   \item{col}{Value describing the column position of each
 #'   \code{indicator_code}.}
 #'   \item{label}{String label used to describe \code{indicator_code}.}
 #'   \item{indicator_code}{Code used in the Data Pack to uniquely
@@ -57,13 +57,13 @@
 #' @docType data
 #' @title Map of indicators from Data Pack indicator codes to DATIM dataelements
 #' and categoryoptioncombos
-#' 
-#' @description 
+#'
+#' @description
 #' Dataset that maps Data Pack indicators to dataelements and
 #' categoryoptioncombos in DATIM, used for mapping datasets
 #' extracted from Data Packs to DATIM import file structure.
-#' 
-#' @format 
+#'
+#' @format
 #' \describe{
 #'   \item{indicator_code}{Code used in the Data Pack to uniquely identify each
 #'   distinct programmatic area of target setting.}
@@ -90,24 +90,24 @@
 #'   \item{technical_area}{}
 #'   \item{top_level}{}
 #' }
-#' 
+#'
 "map_DataPack_DATIM_DEs_COCs"
 
 
 #' @docType data
-#' @title Schema describing correct structure of COP20 Data Pack template. 
+#' @title Schema describing correct structure of COP20 Data Pack template.
 #'
 #' @description This schema describes the correct structure of a COP20 Data Pack
 #' file, generated from the template used to produce Data Packs and useful in
 #' validating Data Packs passed through datapackr.
 #'
-#' @format 
+#' @format
 #' \describe{
 #'   \item{sheet_num}{Lists the index value associated with the sheet name
 #'   listed in \code{sheet_name}.}
 #'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
 #'   \item{data_structure}{}
-#'   \item{col}{Value describing the column position of each 
+#'   \item{col}{Value describing the column position of each
 #'   \code{indicator_code}.}
 #'   \item{indicator_code}{Code used in the Data Pack to uniquely
 #'   identify each distinct programmatic area of target setting.}
@@ -133,7 +133,7 @@
 #' @description List of valid PSNUs used for generating Data Packs. Must be
 #' synced and saved manually.
 #'
-#' @format 
+#' @format
 #' \describe{
 #'   \item{ou}{}
 #'   \item{ou_id}{}
@@ -156,7 +156,7 @@
 #' @description List of valid categoryoptions based on current COP Target Code
 #' List. Must be synced and saved manually.
 #'
-#' @format 
+#' @format
 #' \describe{
 #'   \item{name}{}
 #'   \item{id}{}
@@ -169,9 +169,9 @@
 #' @docType data
 #' @title Datapack country groupings
 #'
-#' @description Tibble of data pack names and 
+#' @description Tibble of data pack names and
 #'
-#' @format 
+#' @format
 #' \describe{
 #'   \item{datapack_name}{Name on home tab of datapack}
 #'   \item{country_uids}{countries uids listed on home tab}

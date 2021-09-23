@@ -7,11 +7,11 @@
 #'     \code{d$data$SUBNAT_IMPATT} into a standard DATIM import file.
 #'
 #' @param d Datapackr object
-#' 
+#'
 #' @return Datapackr d object
-#' 
+#'
 exportSubnatToDATIM <- function(d) {
-  
+
   SUBNAT_IMPATT <- d$data$SUBNAT_IMPATT %>%
     dplyr::left_join(datapackr::map_DataPack_DATIM_DEs_COCs,
                      by = c("indicator_code" = "indicator_code",
@@ -26,7 +26,7 @@ exportSubnatToDATIM <- function(d) {
         dplyr::case_when(
           value_type == "integer" ~ datapackr::round_trunc(value),
           TRUE ~ value))
-    
+
   # Form into DATIM import file ####
   SUBNAT_IMPATT %<>%
     dplyr::select(
@@ -37,58 +37,58 @@ exportSubnatToDATIM <- function(d) {
       attributeOptionCombo,
       value
     )
-  
+
  # TEST: Duplicate Rows; Error; Continue ####
   duplicated_rows <- SUBNAT_IMPATT %>%
-    dplyr::group_by(dataElement,orgUnit,categoryOptionCombo,attributeOptionCombo,period) %>% 
-    dplyr::tally() %>% 
+    dplyr::group_by(dataElement, orgUnit, categoryOptionCombo, attributeOptionCombo, period) %>%
+    dplyr::tally() %>%
     dplyr::filter(n > 1)
-    
+
   d$tests$duplicated_subnat_impatt <- duplicated_rows
   attr(d$tests$duplicated_subnat_impatt, "test_name") <- "Duplicated SUBNAT/IMPATT data"
-  
+
   # TEST: Whether any NAs in any columns
-  if ( NROW(duplicated_rows) > 0 ) {
+  if (NROW(duplicated_rows) > 0) {
     warning_msg <-
       paste0(
         "ERROR! In tab SUBNATT/IMPATT. Duplicate rows. Contact support.")
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
-  
-  
+
+
   # TEST: Blank Rows; Error;
-  blank_rows <- SUBNAT_IMPATT %>% 
+  blank_rows <- SUBNAT_IMPATT %>%
     dplyr::filter_all(dplyr::any_vars(is.na(.)))
-  
+
   # TEST: Whether any NAs in any columns
-  if ( NROW(blank_rows) > 0 ) {
+  if (NROW(blank_rows) > 0) {
     d$tests$blank_rows_datim_subnat_impatt <- blank_rows
     attr(d$tests$blank_rows_datim_subnat_impatt, "test_name") <- "SUBNAT/IMPATT data with blanks"
     warning_msg <-
       paste0(
         "ERROR! In tab SUBNATT/IMPATT. DATIM Export has blank rows. Contact support.")
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
-  
-  # TEST: Negative values; Error; 
+
+  # TEST: Negative values; Error;
   if (any(SUBNAT_IMPATT$value < 0)) {
     warning_msg <- "ERROR occurred. Negative values present in SUBNAT/IMPATT data."
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
-  
+
   # Drop any rows with any NA to prevent breakage in iHub ####
   SUBNAT_IMPATT %<>%
     tidyr::drop_na()
-  
+
   d$datim$subnat_impatt <- SUBNAT_IMPATT %>%
     # PATCH: Drop TX_CURR_SUBNAT.R for now ####
     dplyr::filter(
       dataElement != "MktYDp33kd6"
     )
-  
+
   d$datim$subnat_fy20 <-  SUBNAT_IMPATT %>%
     dplyr::filter(
       period == "2020Q3",
@@ -98,7 +98,7 @@ exportSubnatToDATIM <- function(d) {
            dplyr::pull(dataelementuid)
         )
     )
-    
+
   d$datim$subnat_fy21 <-  SUBNAT_IMPATT %>%
     dplyr::filter(
       period == "2020Oct",
@@ -108,7 +108,7 @@ exportSubnatToDATIM <- function(d) {
            dplyr::pull(dataelementuid)
         )
     )
-    
+
   d$datim$subnat_fy22 <- SUBNAT_IMPATT %>%
     dplyr::filter(
       period == "2021Oct",
@@ -118,7 +118,7 @@ exportSubnatToDATIM <- function(d) {
            dplyr::pull(dataelementuid)
         )
     )
-    
+
   d$datim$impatt_fy22 <- SUBNAT_IMPATT %>%
     dplyr::filter(
       period == "2021Oct",
@@ -128,7 +128,7 @@ exportSubnatToDATIM <- function(d) {
            dplyr::pull(dataelementuid)
       )
     )
-      
+
   d$datim$fy22_prioritizations <- SUBNAT_IMPATT %>%
     dplyr::filter(
       period == "2021Oct",
@@ -138,6 +138,6 @@ exportSubnatToDATIM <- function(d) {
            dplyr::pull(dataelementuid)
         )
     )
-  
+
   return(d)
 }

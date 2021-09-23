@@ -81,17 +81,19 @@ packDataPackSheets <- function(wb,
 
   # Get sheets to loop if not provided as parameter. ####
   if (is.null(sheets)) {
-    wb_sheets = names(wb)
-    schema_sheets = schema %>%
+    wb_sheets <- names(wb)
+    schema_sheets <- schema %>%
       dplyr::filter(data_structure == "normal"
-                    & !(sheet_name %in% c("SNU x IM","PSNUxIM"))
+                    & !(sheet_name %in% c("SNU x IM", "PSNUxIM"))
                     & sheet_name %in% names(wb)) %>%
       dplyr::pull(sheet_name) %>%
       unique()
 
-    sheets = wb_sheets[wb_sheets %in% schema_sheets]
+    sheets <- wb_sheets[wb_sheets %in% schema_sheets]
 
-    if (length(sheets) == 0) {stop("This template file does not appear to be normal.")}
+    if (length(sheets) == 0) {
+      stop("This template file does not appear to be normal.")
+    }
   }
 
   # Loop through sheets ####
@@ -102,15 +104,17 @@ packDataPackSheets <- function(wb,
     org_units_sheet <- org_units
     sheet_codes <- schema %>%
       dplyr::filter(sheet_name == sheet
-                    & col_type %in% c("past","calculation")) %>%
+                    & col_type %in% c("past", "calculation")) %>%
       dplyr::pull(indicator_code)
 
     ## If no model data needed for a sheet, forward a NULL dataset to prevent errors
     if (length(sheet_codes) != 0) {
       sheet_data <- data %>%
         dplyr::filter(indicator_code %in% sheet_codes)
-    } else {sheet_data = NULL}
-    
+    } else {
+      sheet_data <- NULL
+    }
+
     if (sheet == "AGYW") {
       org_units_sheet <- datapackr::valid_PSNUs %>%
         dplyr::filter(country_uid %in% country_uids) %>%
@@ -118,7 +122,7 @@ packDataPackSheets <- function(wb,
         dplyr::arrange(dp_psnu) %>%
         dplyr::filter(!is.na(DREAMS)) %>%
         dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)
-      
+
       if (NROW(org_units_sheet) == 0) {
         next
       }

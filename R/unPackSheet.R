@@ -37,7 +37,7 @@ unPackDataPackSheet <- function(d, sheet) {
   duplicate_cols <- duplicated(names(d$data$extract))
 
   if (any(duplicate_cols)) {
-    d$data$extract <- d$data$extract[,-which(duplicate_cols)]
+    d$data$extract <- d$data$extract[, -which(duplicate_cols)]
   }
 
   # Make sure no blank column names ####
@@ -61,10 +61,10 @@ unPackDataPackSheet <- function(d, sheet) {
         TX_NEW.N.prevDiagnosedRate) %>%
       dplyr::filter(Age == "<01",
                     TX_NEW.N.Age_Sex_HIVStatus.T > 0) %>%
-      dplyr::filter_at(dplyr::vars(-PSNU,-Age,-Sex, -TX_NEW.N.EIDRate,
+      dplyr::filter_at(dplyr::vars(-PSNU, -Age, -Sex, -TX_NEW.N.EIDRate,
                                    -TX_NEW.N.Age_Sex_HIVStatus.T),
-                       dplyr::any_vars(.>0))
-    attr(d$tests$tx_new_invalid_lt1_sources,"test_name")<-"Invalid TX <01 data source"
+                       dplyr::any_vars(. > 0))
+    attr(d$tests$tx_new_invalid_lt1_sources, "test_name") <- "Invalid TX <01 data source"
 
 
     if (NROW(d$tests$tx_new_invalid_lt1_sources) > 0) {
@@ -75,7 +75,7 @@ unPackDataPackSheet <- function(d, sheet) {
           " MER Guidance recommends all testing for <01 year olds be performed through EID rather than HTS",
           "\n")
 
-      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
     }
   }
 
@@ -135,7 +135,7 @@ unPackDataPackSheet <- function(d, sheet) {
       dplyr::full_join(DATIM_DSNUs, by = "psnu_uid")
 
     d$tests$DSNU_comparison <- DSNU_comparison
-    attr(d$tests$DSNU_comparison,"test_name") <- "DSNU List Comparison"
+    attr(d$tests$DSNU_comparison, "test_name") <- "DSNU List Comparison"
 
     if (any(is.na(DSNU_comparison$DataPack))) {
       missing_DSNUs <- DSNU_comparison %>%
@@ -148,7 +148,7 @@ unPackDataPackSheet <- function(d, sheet) {
         paste(missing_DSNUs$PSNU.y, collapse = "\n\t* "),
         "\n")
 
-      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
       d$info$missing_DSNUs <- TRUE
     }
 
@@ -163,7 +163,7 @@ unPackDataPackSheet <- function(d, sheet) {
         paste(invalid_DSNUs$PSNU.x, collapse = "\n\t* "),
         "\n")
 
-      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
     }
 
   }
@@ -194,7 +194,7 @@ unPackDataPackSheet <- function(d, sheet) {
     if (NROW(blank_prioritizations) > 0) {
 
       d$tests$blank_prioritizations <- blank_prioritizations
-      attr(d$tests$blank_prioritizations ,"test_name") <- "Blank prioritization levels"
+      attr(d$tests$blank_prioritizations, "test_name") <- "Blank prioritization levels"
 
       warning_msg <-
         paste0(
@@ -208,21 +208,21 @@ unPackDataPackSheet <- function(d, sheet) {
           paste(blank_prioritizations$PSNU, collapse = "\n\t* "),
           "\n")
 
-      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
       d$info$has_error <- TRUE
 
     }
 
     # Test for valid priortization values
     invalid_prioritizations <- d$data$extract %>%
-      dplyr::filter(!(value %in% c("1","2","4","5","6","7","8")) )
+      dplyr::filter(!(value %in% c("1", "2", "4", "5", "6", "7", "8")))
 
 
     if (NROW(invalid_prioritizations) > 0) {
       d$tests$invalid_prioritizations <- invalid_prioritizations
-      attr(d$tests$invalid_prioritizations,"test_name")<-"Invalid prioritizations"
+      attr(d$tests$invalid_prioritizations, "test_name") <- "Invalid prioritizations"
 
-      invalid_prioritizations_strings <- invalid_prioritizations %>%
+      invalid_prio_strings <- invalid_prioritizations %>%
         tidyr::unite(row_id, c(PSNU, value), sep = ":  ") %>%
         dplyr::arrange(row_id) %>%
         dplyr::pull(row_id)
@@ -236,10 +236,10 @@ unPackDataPackSheet <- function(d, sheet) {
           " Data Pack User Guide to understand valid prioritization options. Refer to those",
           " PSNUs flagged by this check and correct their validation values in the 'SNU Prioritization'",
           " column on the Prioritization tab. -> \n\t* ",
-          paste(invalid_prioritizations_strings, collapse = "\n\t* "),
+          paste(invalid_prio_strings, collapse = "\n\t* "),
           "\n")
 
-      d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
       d$info$has_error <- TRUE
     }
 
@@ -264,12 +264,12 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::mutate(row_id = paste(indicator_code, values, sep = ":  ")) %>%
     dplyr::arrange(row_id) %>%
     dplyr::select(row_id) %>%
-    dplyr::mutate(sheet=sheet)
+    dplyr::mutate(sheet = sheet)
 
-  d$tests$non_numeric<-dplyr::bind_rows(d$tests$non_numeric,non_numeric)
-  attr(d$tests$non_numeric,"test_name")<-"Non-numeric values"
+  d$tests$non_numeric <- dplyr::bind_rows(d$tests$non_numeric, non_numeric)
+  attr(d$tests$non_numeric, "test_name") <- "Non-numeric values"
 
-  if(NROW(non_numeric) > 0) {
+  if (NROW(non_numeric) > 0) {
 
     warning_msg <-
       paste0(
@@ -282,7 +282,7 @@ unPackDataPackSheet <- function(d, sheet) {
         paste(non_numeric$row_id, collapse = "\n\t* "),
         "\n")
 
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
 
   # Now that non-numeric cases noted, convert all to numeric & drop non-numeric ####
@@ -299,10 +299,10 @@ unPackDataPackSheet <- function(d, sheet) {
   negative_values <- d$data$extract %>%
     dplyr::filter(value < 0)
 
-  d$tests$negative_values<-dplyr::bind_rows(d$test$negative_values,negative_values)
-  attr(d$tests$negative_values,"test_name")<-"Negative values"
+  d$tests$negative_values <- dplyr::bind_rows(d$test$negative_values, negative_values)
+  attr(d$tests$negative_values, "test_name") <- "Negative values"
 
-  if ( NROW(negative_values) > 0  ) {
+  if (NROW(negative_values) > 0) {
 
     warning_msg <-
       paste0(
@@ -313,7 +313,7 @@ unPackDataPackSheet <- function(d, sheet) {
         paste(unique(d$tests$negative_values$indicator_code), collapse = "\n\t* "),
         "\n")
 
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 
@@ -331,8 +331,8 @@ unPackDataPackSheet <- function(d, sheet) {
                   & !indicator_code %in% decimals_allowed) %>%
     dplyr::rename(sheet = sheet_name)
 
-    d$tests$decimal_values<-dplyr::bind_rows(d$tests$decimal_cols,decimal_cols)
-    attr(d$tests$decimal_values,"test_name")<-"Decimal values"
+    d$tests$decimal_values <- dplyr::bind_rows(d$tests$decimal_cols, decimal_cols)
+    attr(d$tests$decimal_values, "test_name") <- "Decimal values"
 
   if (NROW(decimal_cols) > 0) {
 
@@ -346,7 +346,7 @@ unPackDataPackSheet <- function(d, sheet) {
         paste(unique(decimal_cols$indicator_code), collapse = "\n\t* "),
         "\n")
 
-    d$info$warning_msg <- append(d$info$warning_msg, warning_msg)
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
 
   # TEST for duplicates ####
