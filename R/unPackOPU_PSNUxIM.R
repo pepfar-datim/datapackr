@@ -92,7 +92,7 @@ unPackOPU_PSNUxIM <- function(d) {
   invalid_mech_headers <- names(d$data$extract) %>%
     tibble::tibble(col_name = .) %>%
     dplyr::filter(!col_name %in% cols_to_keep$indicator_code,
-                  !(stringr::str_detect(col_name, "(\\d) {4,6}")
+                  !(stringr::str_detect(col_name, "(\\d)_{4,6}")
                     & stringr::str_detect(col_name, "DSD|TA")))
 
   d$tests$invalid_mech_headers <- data.frame(invalid_mech_headers = invalid_mech_headers$col_name)
