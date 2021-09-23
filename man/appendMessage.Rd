@@ -7,11 +7,11 @@
 appendMessage(x, message, level)
 }
 \arguments{
-\item{x}{}
+\item{x}{A message queue}
 
 \item{message}{A string or vector of strings of messages.}
 
-\item{level}{A string or vector of strings of 
+\item{level}{A string or vector of strings of
 message levels (ERROR, WARNING, INFO)}
 }
 \value{

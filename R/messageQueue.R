@@ -24,12 +24,12 @@ MessageQueue <- function(message=character(), level=character()) {
 
 #' Title appendMessage
 #' @description Generic function to handle appending messages to a MessageQueue
-#' @export
-#' @param x
+#' @param x A message queue
 #' @param message A string or vector of strings of messages.
 #' @param level A string or vector of strings of
 #' message levels (ERROR, WARNING, INFO)
 #' @return A MessageQueue class.
+#' @export
 
 appendMessage <- function(x, message, level) {
   UseMethod("appendMessage", x)
@@ -37,7 +37,6 @@ appendMessage <- function(x, message, level) {
 
 #' Title appendMessage.MessageQueue
 #' @description Internal S3 method to deal with appending messages
-#' @export
 #' @param x A MessageQueue object
 #' @param message  A message of vector of messages.
 #' @param level  A string of vector of message levels (ERROR, WARNING, INFO)
@@ -78,7 +77,6 @@ printMessages <- function(x) {
 
 #' Title printMessage.MessageQueue
 #' @description Internal S3 method to deal with printing messages
-#' @export
 #' @param x A MessageQueue object
 #' @param message  A message of vector of messages.
 #' @param level  A string of vector of message levels (ERROR, WARNING, INFO)

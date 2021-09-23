@@ -18,5 +18,4 @@ Returns a formatted output to the console
 }
 \description{
 Internal S3 method to deal with printing messages
-of a Datapack Object
 }
