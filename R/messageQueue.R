@@ -41,6 +41,7 @@ appendMessage <- function(x, message, level) {
 #' @param message  A message of vector of messages.
 #' @param level  A string of vector of message levels (ERROR, WARNING, INFO)
 #' @return A MessageQueue object
+#' @export
 
 appendMessage.MessageQueue <- function(x, message=NA, level=NA) {
 
@@ -81,6 +82,7 @@ printMessages <- function(x) {
 #' @param message  A message of vector of messages.
 #' @param level  A string of vector of message levels (ERROR, WARNING, INFO)
 #' @return Returns a formatted output to the console
+#' @export
 
 printMessages.MessageQueue <- function(x) {
   # If warnings, show all grouped by sheet and issue
