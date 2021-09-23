@@ -70,7 +70,8 @@ with_mock_api({
     expect_type(test_dataset,"list")
     expect_true("data.frame" %in% class(test_dataset))
     expect_true(NROW(test_dataset) > 0)
-    expect_setequal(names(test_dataset),c("operating_unit","country_name","country_uid","iso3","iso4","country","facility","community","prioritization"))
+    expect_setequal(names(test_dataset),c("operating_unit","country_name","country_uid",
+    "iso3","iso4","country","facility","community","prioritization"))
 
   })
 })
@@ -82,7 +83,8 @@ with_mock_api({
     expect_type(test_dataset,"list")
     expect_true("data.frame" %in% class(test_dataset))
     expect_true(NROW(test_dataset) > 0)
-    expect_setequal(names(test_dataset),c("data_element.name","data_element.id","category_combo.name","category_combo.id","grp","category_option.name","category_option.id"))
+    expect_setequal(names(test_dataset),c("data_element.name","data_element.id","category_combo.name",
+    "category_combo.id","grp","category_option.name","category_option.id"))
 
   })
 })
@@ -157,7 +159,8 @@ with_mock_api({
 
     test_dataset  <-   pullFullCodeList(FY = 2021, d2_session = training)
     expect_type(test_dataset, "list")
-    expect_setequal(names(test_dataset), c("dataelement", "dataelementuid", "categoryoptioncombo","categoryoptioncombouid","FY"))
+    expect_setequal(names(test_dataset), c("dataelement", "dataelementuid",
+    "categoryoptioncombo","categoryoptioncombouid","FY"))
     skip("FY22 code lists are not working?")
     test_dataset  <-   pullFullCodeList(FY = 2022, d2_session = training)
     })

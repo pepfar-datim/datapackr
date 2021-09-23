@@ -89,7 +89,8 @@ test_that("VMMC_CIRC Indeterminate Rate all keypop not NA expect NULL", {
 
 test_that("PMTCT Known Pos/PMTCT Total >  0.75 expect message", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~PMTCT_STAT.N.New.Pos.T, ~PMTCT_STAT.N.KnownPos.T, ~PMTCT_STAT.N.New.Neg.T,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,
+    ~PMTCT_STAT.N.New.Pos.T, ~PMTCT_STAT.N.KnownPos.T, ~PMTCT_STAT.N.New.Neg.T,
     "a", 1, "<1", "M", NA, 10, 100, 10,
     "b", 2, "<1", "M", NA, 0, 0, 0
   )
@@ -105,7 +106,8 @@ test_that("PMTCT Known Pos/PMTCT Total >  0.75 expect message", {
 
 test_that("PMTCT Known Pos/PMTCT Total <  0.75 expect null", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~PMTCT_STAT.N.New.Pos.T, ~PMTCT_STAT.N.KnownPos.T, ~PMTCT_STAT.N.New.Neg.T,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,
+    ~PMTCT_STAT.N.New.Pos.T, ~PMTCT_STAT.N.KnownPos.T, ~PMTCT_STAT.N.New.Neg.T,
     "a", 1, "<1", "M", NA, 10, 10, 10,
     "b", 2, "<1", "M", NA, 0, 0, 0,
     "c", 3, "<1", "M", NA, 25, 150, 25
@@ -117,7 +119,8 @@ test_that("PMTCT Known Pos/PMTCT Total <  0.75 expect null", {
 
 test_that("PMTCT Known Pos/PMTCT Total all zeros expect null", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~PMTCT_STAT.N.New.Pos.T, ~PMTCT_STAT.N.KnownPos.T, ~PMTCT_STAT.N.New.Neg.T,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~PMTCT_STAT.N.New.Pos.T
+    , ~PMTCT_STAT.N.KnownPos.T, ~PMTCT_STAT.N.New.Neg.T,
     "a", 1, "<1", "M", NA, 0, 0, 0,
     "b", 2, "<1", "M", NA, 0, 0, 0
   )
@@ -218,7 +221,8 @@ test_that(" Test retention all zeros expect NULL", {
 
 test_that(" Test linkage < 95% expect message", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T, ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
+     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
     "a", 1, "25-49", "F", NA, 95, 5, 94, 0, 0,
     "b", 2, "25-49", "M", NA, 95, 5, 95, 0, 0
   )
@@ -232,7 +236,8 @@ test_that(" Test linkage < 95% expect message", {
 
 test_that(" Test KP linkage < 95% expect message", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T, ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
+     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
     "a", 1, NA, NA, "PWID", 0, 0, 0, 100, 94,
     "b", 2, NA, NA, "PWID", 0, 0, 0, 100, 95
   )
@@ -246,7 +251,8 @@ test_that(" Test KP linkage < 95% expect message", {
 
 test_that(" Test linkage > 100% expect message", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T, ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
+    ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
     "a", 1, "25-49", "F", NA, 50, 50, 100, 0, 0,
     "b", 2, "25-49", "M", NA, 50, 50, 101, 0, 0
   )
@@ -260,7 +266,8 @@ test_that(" Test linkage > 100% expect message", {
 
 test_that(" Test KP linkage > 100% expect message", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T, ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
+     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
     "a", 1, NA, NA, "PWID", 0, 0, 0, 100, 100,
     "b", 2, NA, NA, "PWID", 0, 0, 0, 100, 101
   )
@@ -274,7 +281,8 @@ test_that(" Test KP linkage > 100% expect message", {
 
 test_that(" Test linkage = 98% expect NULL", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T, ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
+     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
     "a", 1, "25-49", "F", NA, 20, 20, 39, 0, 0,
     "b", 2, "25-49", "M", NA, 0, 0, 0, 0, 0
   )
@@ -285,7 +293,8 @@ test_that(" Test linkage = 98% expect NULL", {
 
 test_that(" Test KP linkage = 98% expect NULL", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T, ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
+     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
     "a", 1, NA, NA, "PWID", 0, 0, 0, 100, 98,
     "b", 2, NA, NA, "PWID", 0, 0, 0, 0, 0
   )
@@ -296,7 +305,8 @@ test_that(" Test KP linkage = 98% expect NULL", {
 
 test_that(" Test linkage all zeros expect NULL", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T, ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
+    ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
     "a", 1, "25-49", "F", NA, 0, 0, 0, 0, 0,
     "b", 2, "25-49", "M", NA, 0, 0, 0, 0, 0
   )
@@ -307,7 +317,8 @@ test_that(" Test linkage all zeros expect NULL", {
 
 test_that(" Test linkage with age <1", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T, ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
+     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
     "a", 1, "<01", "M", NA, 50, 50, 101, 100, 100,
     "b", 2, NA, NA, "PWID", 0, 0, 0, 100, 101
   )

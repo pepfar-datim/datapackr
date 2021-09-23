@@ -24,7 +24,8 @@ with_mock_api({
     expect_true(all(unlist(lapply(d$tests, function(x) (setequal(class(x), d_data_tests_types))))))
     all(unlist(lapply(d$tests, function(x) !is.null(attr(x, "test_name")))))
     validation_summary <- validationSummary(d)
-    expect_named(validation_summary, c("test_name", "validation_issue_category", "count", "ou", "ou_id", "country_name", "country_uid"), ignore.order = TRUE)
+    expect_named(validation_summary, c("test_name", "validation_issue_category", "count",
+     "ou", "ou_id", "country_name", "country_uid"), ignore.order = TRUE)
 
 
 
