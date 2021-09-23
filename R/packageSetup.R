@@ -157,7 +157,7 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
   if (is.null(template_filename)) {
     stop("Could not find any template for the provided paramaters")
   }
-
+  
   template_path <- system.file("extdata",
                                template_filename,
                                package = "datapackr",

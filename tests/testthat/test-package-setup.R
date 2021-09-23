@@ -30,7 +30,6 @@ test_that("We can pick a schema", {
 )
 
 test_that("We can pick template file", {
-
   test_template <-  pick_template_path(2020, "OPU Data Pack")
   expect_true(grepl("COP20_OPU_Data_Pack_Template.xlsx",
                     test_template))
@@ -145,11 +144,12 @@ test_that("We can check datapack paramaters", {
   #       season = "COP"
   #     )
   # )
+
   #This will return a handled error, but will NOT return "Global"
   expect_error(test_params <-
     check_params(datapack_name = NULL, country_uids = NULL
     ), "Must supply country_uids.")
-
+  
   test_args <-  list(datapack_name = "Zambia", country_uids = "f5RoebaDLMx")
   test_params <-  do.call(check_params, test_args)
   expect_true(identical(sort(unlist(test_params)), sort(unlist(test_args))))

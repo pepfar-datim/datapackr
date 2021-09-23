@@ -15,7 +15,6 @@ packForDATIM_OPU <- function(d) {
 
   map_des_cocs_local <-
     datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
-
   if (d$info$cop_year == 2020) {
     data <- d$data$extract
 
