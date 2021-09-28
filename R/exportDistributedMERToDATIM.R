@@ -17,12 +17,12 @@ autoResolveDuplicates <- function(d, keep_dedup) {
 
   if (NROW(over_allocated) > 0) {
     warning_msg <-
-      paste0(
+      paste(
         "INFO! ",
         NROW(over_allocated),
-        " pure duplicates with allocation greater than 100% were identified. These will",
-        " need to be deduplicated in DATIM. Ensure all necessary deduplication values are",
-        " 100% addressed. Please consult the Data Pack User Guide for more information.",
+        "pure duplicates with allocation greater than 100% were identified. These will",
+        "need to be deduplicated in DATIM. Ensure all necessary deduplication values are",
+        "100% addressed. Please consult the Data Pack User Guide for more information.",
         "/n"
 )
 
@@ -120,8 +120,8 @@ autoResolveDuplicates <- function(d, keep_dedup) {
 
   if (exists_with_rows(auto_resolve_pure_dupes)) {
     d$datim$MER <- dplyr::bind_rows(d$datim$MER, auto_resolve_pure_dupes)
-    warning_msg <- paste0("INFO! ", NROW(auto_resolve_pure_dupes),
-    " zero-valued pure deduplication adjustments will be added to your DATIM import.",
+    warning_msg <- paste("INFO! ", NROW(auto_resolve_pure_dupes),
+    "zero-valued pure deduplication adjustments will be added to your DATIM import.",
      "Please consult the DataPack wiki section on deduplication for more information. ")
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "INFO")
@@ -130,7 +130,7 @@ autoResolveDuplicates <- function(d, keep_dedup) {
   #Bind crosswalk dupes
   if (exists_with_rows(crosswalk_dupes_auto_resolved)) {
     d$datim$MER <- dplyr::bind_rows(d$datim$MER, crosswalk_dupes_auto_resolved)
-    warning_msg <- paste0("INFO! ", NROW(crosswalk_dupes_auto_resolved), " zero-valued crosswalk deduplication",
+    warning_msg <- paste("INFO! ", NROW(crosswalk_dupes_auto_resolved), "zero-valued crosswalk deduplication",
     "adjustments will be added to your DATIM import.Please consult the DataPack wiki section",
     "on deduplication for more information. ")
 
