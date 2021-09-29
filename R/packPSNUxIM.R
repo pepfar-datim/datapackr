@@ -385,7 +385,7 @@ packPSNUxIM <- function(wb,
     dplyr::mutate(
       dplyr::across(dplyr::all_of(col.formulas),
                     ~stringr::str_replace_all(., pattern = paste0("(?<=[:upper:])", top_rows + 1),
-                      replacement = as.character(seq_along(snuxim_model_data) + existing_rows))))
+                      replacement = as.character(seq_len(NROW(snuxim_model_data)) + existing_rows))))
 
   # Classify formula columns as formulas
   ## TODO: Improve approach

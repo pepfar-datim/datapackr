@@ -88,11 +88,14 @@ unPackOPU_PSNUxIM <- function(d) {
     tibble::as_tibble(.name_repair = "unique") %>%
     dplyr::select_if(function(x) any(!is.na(x)))
 
+  #TEST: Invalid indicator codes
+  d <- .testInvalidIndicatorCodes(d)
+
   # TEST: Improper Col Names; Error; Drop ####
   invalid_mech_headers <- names(d$data$extract) %>%
     tibble::tibble(col_name = .) %>%
     dplyr::filter(!col_name %in% cols_to_keep$indicator_code,
-                  !(stringr::str_detect(col_name, "(\\d){4,6}")
+                  !(stringr::str_detect(col_name, "(\\d){4,6}") #nolint
                     & stringr::str_detect(col_name, "DSD|TA")))
 
   d$tests$invalid_mech_headers <- data.frame(invalid_mech_headers = invalid_mech_headers$col_name)
@@ -514,4 +517,47 @@ unPackOPU_PSNUxIM <- function(d) {
 
   return(d)
 
+}
+
+.testInvalidIndicatorCodes <- function(d) {
+  #Test any invalid indicator codes
+
+  indicator_codes_sheet <- d$data$extract %>%
+    dplyr::select(indicator_code) %>%
+    dplyr::distinct()
+
+  if (d$info$cop_year == 2020) {
+    indicator_codes_schema <- datapackr::cop20_data_pack_schema %>%
+      dplyr::filter(dataset == "mer", col_type == "target") %>%
+      dplyr::select(indicator_code) %>%
+      dplyr::mutate(is_valid = TRUE)
+  } else if (d$info$cop_year == 2021) {
+    indicator_codes_schema <- cop21_data_pack_schema %>%
+      dplyr::filter(dataset == "mer", col_type == "target") %>%
+      dplyr::select(indicator_code) %>%
+      dplyr::mutate(is_valid = TRUE)
+  }
+
+  invalid_indicator_codes <- dplyr::left_join(indicator_codes_sheet,indicator_codes_schema) %>%
+    dplyr::filter(is.na(is_valid))
+
+  d$tests$invalid_indicator_codes <- invalid_indicator_codes
+  attr(d$tests$invalid_indicator_codes, "test_name") <-
+    "Invalid indicator codes"
+
+  if (NROW(d$tests$invalid_indicator_codes) > 0) {
+    d$info$has_error <- TRUE
+
+    warning_msg <-
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ", INVALID INDICATOR CODES: The following indicator codes are invalid",
+        " will be dropped in processing. ->  \n\t* ",
+        paste(d$tests$invalid_indicator_codes$indicator_code, collapse = "\n\t* "),
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+  }
+  return(d)
 }
