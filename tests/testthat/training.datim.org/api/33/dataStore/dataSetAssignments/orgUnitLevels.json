@@ -1,0 +1,52 @@
+{
+    "Lesotho": {
+        "iso3": "LSO",
+        "iso4": "",
+        "name3": "Lesotho",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 4
+    },
+    "Liberia": {
+        "iso3": "XWA",
+        "iso4": "LBR",
+        "name3": "West Africa Region",
+        "name4": "Liberia",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    },
+    "Namibia": {
+        "iso3": "NAM",
+        "iso4": "",
+        "name3": "Namibia",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 5
+    },
+    "Nigeria": {
+        "iso3": "NGA",
+        "iso4": "",
+        "name3": "Nigeria",
+        "name4": "",
+        "country": 3,
+        "facility": 6,
+        "community": 5,
+        "prioritization": 4
+    },
+    "Senegal": {
+        "iso3": "XWA",
+        "iso4": "SEN",
+        "name3": "West Africa Region",
+        "name4": "Senegal",
+        "country": 4,
+        "facility": 7,
+        "community": 6,
+        "prioritization": 5
+    }
+}

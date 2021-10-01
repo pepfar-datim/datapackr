@@ -5,18 +5,20 @@
 \title{Compile valid categoryOptions for a given dataset}
 \usage{
 getValidCOs(
-  data_element_group.id,
+  data_element_group.id = NULL,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{
 \item{data_element_group.id}{DATIM dataElementGroup id to filter against.}
+
+\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
 }
 \value{
 validCategoryOptions
 }
 \description{
 Queries DATIM API against the dataElementGroups endpoint and returns list of
-all dataElements associated with a provided dataSet, as well as all valid 
+all dataElements associated with a provided dataSet, as well as all valid
 categoryOptions associated with that dataElement.
 }

@@ -7,13 +7,18 @@
 pullFullCodeList(
   FY = getCurrentCOPYear() + 1,
   datastream = c("mer_targets", "mer_results", "subnat_targets", "subnat_results",
-    "impatt")
+    "impatt"),
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{
 \item{FY}{Reporting FY for which to filter active code lists.}
 
-\item{datastream}{Specify MER, SUBNAT, or IMPATT, or omit to specify all.}
+\item{datastream}{At least one
+of "mer_targets", "mer_results", "subnat_targets", "subnat_results" or "impatt".
+If left will return a code list for the specified COP Year of all streams}
+
+\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
 }
 \value{
 Combined code list as dataframe.

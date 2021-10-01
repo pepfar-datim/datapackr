@@ -1,0 +1,7 @@
+mechanism,code,uid,partner,primeid,agency,ou,startdate,enddate
+00000 De-duplication adjustment,00000,X8hrDf6bLDC,Dedupe adjustments Partner,,Dedupe adjustments Agency,,,
+00001 De-duplication adjustment (DSD-TA),00001,YGT1o7UxfFu,Dedupe adjustments Partner,,Dedupe adjustments Agency,,,
+00100 - PEPFAR-MOH align: MOH Data,00100,QCJpv5aDCJU,,,,,,
+00200 - PEPFAR-MOH align: PEPFAR Data,00200,TRX0yuTsJA9,,,,,,
+100000 - NUGGH1205 - Guyana CARPHA support CoAg GH001205,100000,eQRzpwveFwm,Caribbean Public Health Agency,857279384,HHS/CDC,Western Hemisphere Region,2019-10-01,2022-09-30
+100001 - NUGGH1205 - Jamaica CARPHA support CoAg GH001205,100001,TN5gPy0l1I6,Caribbean Public Health Agency,857279384,HHS/CDC,Western Hemisphere Region,2019-10-01,2022-09-30

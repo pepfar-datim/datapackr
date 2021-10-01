@@ -18,6 +18,8 @@ writePSNUxIM(
 
 \item{output_folder}{Local folder where you would like your Data Pack to be
 saved upon export.}
+
+\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
 }
 \value{
 d

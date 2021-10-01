@@ -8,3 +8,5 @@ packrat/lib*/
 Icon
 mechs.rds
 .Rprofile
+renv/
+

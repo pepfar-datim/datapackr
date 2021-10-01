@@ -4,7 +4,7 @@
 #'
 GetCredentialsFromConsole <- function() {
 
-  s <- list(dhis=list())
+  s <- list(dhis = list())
   s$dhis$username <- readline("Username: ")
   s$dhis$password <- getPass::getPass()
   s$dhis$baseurl <- readline("Server URL (ends with /): ")
@@ -21,16 +21,17 @@ LoadConfigFile <- function(config_path = NULL) {
   #Load from a file
   if (!is.null(config_path)) {
     if (file.access(config_path, mode = 4) == -1) {
-      stop(paste("Cannot read configuration located at",config_path))
+      stop(paste("Cannot read configuration located at", config_path))
     }
     dhis_config <- jsonlite::fromJSON(config_path)
     #Mangle the config to be sure it always ends with a single forward slash.
     #All other URIs should thus NOT begin with a /
     dhis_config$dhis$baseurl <-
-      stringi::stri_reverse(gsub("^/+", "/", paste0("/",stringi::stri_reverse(dhis_config$dhis$baseurl))))
+      stringi::stri_reverse(gsub("^/+", "/", paste0("/", stringi::stri_reverse(dhis_config$dhis$baseurl))))
     return(dhis_config)
   } else {
-    stop("You must specify a credentials file!") }
+    stop("You must specify a credentials file!")
+  }
 }
 
 #' @export
@@ -38,8 +39,9 @@ LoadConfigFile <- function(config_path = NULL) {
 #'
 #' @return Version of the API
 #'
-api_version <- function() { "33" }
-
+api_version <- function() {
+  "33"
+}
 
 #' @title Check login credentials
 #'
@@ -49,14 +51,24 @@ api_version <- function() { "33" }
 #' @param dhis_config List of DATIM login credentials, including username,
 #' password, and login URL.
 #'
-ValidateConfig<-function(dhis_config) {
+ValidateConfig <- function(dhis_config) {
+  is.baseurl <-
+    function(x) {
+      grepl("^http(?:[s])?://.+datim.org/$", x)
+    }
+  is.missing <- function(x) {
+    is.na(x) || missing(x) || x == ""
+  }
 
-  is.baseurl <- function(x) { grepl("^http(?:[s])?://.+datim.org/$", x)}
-  is.missing <- function(x) { is.na(x) || missing(x) || x == "" }
-
-  if (is.missing(dhis_config$dhis$username)) {stop("Username cannot by blank.")}
-  if (is.missing(dhis_config$dhis$password)) {stop("Password cannot by blank.")}
-  if (!is.baseurl(dhis_config$dhis$baseurl)) {stop("The base URL does not appear to be valid. It should end in /")}
+  if (is.missing(dhis_config$dhis$username)) {
+    stop("Username cannot by blank.")
+  }
+  if (is.missing(dhis_config$dhis$password)) {
+    stop("Password cannot by blank.")
+  }
+  if (!is.baseurl(dhis_config$dhis$baseurl)) {
+    stop("The base URL does not appear to be valid. It should end in /")
+  }
 }
 
 
@@ -66,17 +78,17 @@ ValidateConfig<-function(dhis_config) {
 #'
 #' @return TRUE if you are able to login to the server.
 #'
-DHISLogin<-function(dhis_config) {
+DHISLogin <- function(dhis_config) {
 
-  url <- URLencode(URL = paste0(getOption("baseurl"), "api/",api_version(),"/me"))
+  url <- URLencode(URL = paste0(getOption("baseurl"), "api/", api_version(), "/me"))
   #Logging in here will give us a cookie to reuse
-  r <- httr::GET(url ,
+  r <- httr::GET(url,
                  httr::authenticate(dhis_config$dhis$username, dhis_config$dhis$password),
                  httr::timeout(60))
-  if(!isLoggedIn()){
+  if (!isLoggedIn()) {
     stop("Could not authenticate you with the server!")
   } else {
-    me <- jsonlite::fromJSON(httr::content(r,as = "text"))
+    me <- jsonlite::fromJSON(httr::content(r, as = "text"))
     options("organisationUnit" = me$organisationUnits$id)
     return("Successfully logged into DATIM")
   }

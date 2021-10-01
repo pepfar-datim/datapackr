@@ -20,7 +20,7 @@ this or Country Names.}
 \item{country_names}{Names of Countries to return data for. Can supply either this
 or DATIM Country UIDs.}
 
-\item{d2_session}{DHIS2 Session id}
+\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
 }
 \value{
 Returns dataset needed for use in \code{\link{packOPUDataPack}}.

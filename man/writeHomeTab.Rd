@@ -2,14 +2,14 @@
 % Please edit documentation in R/writeHomeTab.R
 \name{writeHomeTab}
 \alias{writeHomeTab}
-\title{writeHomeTab(wb, datapack_uid, type = "Data Pack")}
+\title{writeHomeTab(wb, datapack_uid, tool = "Data Pack")}
 \usage{
 writeHomeTab(
   wb,
   datapack_name,
   country_uids,
   cop_year = getCurrentCOPYear(),
-  type = "Data Pack"
+  tool = "Data Pack"
 )
 }
 \arguments{
@@ -23,7 +23,7 @@ representing countries.}
 
 \item{cop_year}{COP Year in format YYYY.}
 
-\item{type}{Defaults to "Data Pack".}
+\item{tool}{Defaults to "Data Pack".}
 }
 \value{
 Openxlsx workbook object with added, styled Home tab.

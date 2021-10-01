@@ -2,9 +2,10 @@
 % Please edit documentation in R/packOPUDataPack.R
 \name{packOPUDataPack}
 \alias{packOPUDataPack}
-\title{Pack a COP20 OPU Data Pack}
+\title{Pack an OPU Data Pack}
 \usage{
 packOPUDataPack(
+  snuxim_model_data = NULL,
   datapack_name,
   country_uids,
   template_path = NULL,
@@ -15,18 +16,21 @@ packOPUDataPack(
 )
 }
 \arguments{
+\item{snuxim_model_data}{Export from DATIM needed to allocate data across
+mechanisms in the PSNUxIM tab}
+
 \item{datapack_name}{Name you would like associated with this Data Pack.
 (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
 
 \item{country_uids}{Unique IDs for countries to include in the Data Pack.
-For full list of these IDs, see \code{datapackr::dataPackMap}.}
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
 \item{template_path}{Local filepath to Data Pack template Excel (XLSX) file.
 This file MUST NOT have any data validation formats present. If left
-\code{NULL}, will prompt for file selection via window.}
+\code{NULL}, will select the default based on \code{cop_year} and \code{tool}.}
 
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
 \item{output_folder}{Local folder where you would like your Data Pack to be
 saved upon export. If left as \code{NULL}, will output to
@@ -36,13 +40,11 @@ saved upon export. If left as \code{NULL}, will output to
 processes to output_folder.}
 
 \item{d2_session}{DHIS2 Session id}
-
-\item{model_data}{Data from DATIM needed to pack into Data Pack}
 }
 \value{
-Exports a COP20 OPU Data Pack to Excel within \code{output_folder}.
+Exports an OPU Data Pack to Excel within \code{output_folder}.
 }
 \description{
-Takes a COP20 OPU Data Pack template, combines it with data pulled from DATIM
-API, and produces a COP20 OPU Data Pack ready for distribution.
+Takes an OPU Data Pack template, combines it with data pulled from DATIM
+API, and produces an OPU Data Pack ready for distribution.
 }

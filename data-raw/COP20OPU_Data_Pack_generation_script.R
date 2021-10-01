@@ -55,7 +55,7 @@ batch <- tibble::tribble(
   "Togo","EIUtrKbw8PQ"                                                 #46
 )
 
-pick <- batch[c(14),]
+pick <- batch[c(8),]
 # i = 1
 
 for (i in 1:NROW(pick)) {

@@ -8,7 +8,6 @@ getDataValueSets(
   keys,
   values,
   api_version = datapackr::api_version(),
-  max_attempts = 3,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
@@ -19,9 +18,7 @@ getDataValueSets(
 
 \item{api_version}{- api version to use when calling DHIS2}
 
-\item{max_attempts}{- number of times to try for a valid response}
-
-\item{base_url}{string - base address of instance (text before api/ in URL)}
+\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
 }
 \value{
 tibble with the data requested

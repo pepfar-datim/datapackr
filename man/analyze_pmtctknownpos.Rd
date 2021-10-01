@@ -2,7 +2,7 @@
 % Please edit documentation in R/checkAnalytics.R
 \name{analyze_pmtctknownpos}
 \alias{analyze_pmtctknownpos}
-\title{Check Data Pack data for PMTCT retention < 98\% or >100\%}
+\title{Check Data Pack data for PMTCT Known Pos Ratio > 75\%.}
 \usage{
 analyze_pmtctknownpos(data)
 }
@@ -14,5 +14,5 @@ a
 }
 \description{
 Check data gathered from Data Pack to identify cases where
-retention of PMTCT patients is less than the standard of 98\% or >100\%.
+PMTCT Known Pos Ratio > 75\%.
 }

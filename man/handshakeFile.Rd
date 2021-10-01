@@ -4,7 +4,7 @@
 \alias{handshakeFile}
 \title{Test an input file for read access and type. Prompt if issues.}
 \usage{
-handshakeFile(path, tool)
+handshakeFile(path, tool = "Data Pack")
 }
 \arguments{
 \item{path}{Filepath to test and use.}

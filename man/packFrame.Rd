@@ -4,13 +4,13 @@
 \alias{packFrame}
 \title{Create a Tool from scratch and prep it for data.}
 \usage{
-packFrame(datapack_uid, type = "Data Pack")
+packFrame(datapack_uid, tool = "Data Pack")
 }
 \arguments{
 \item{datapack_uid}{A unique ID specifying the PEPFAR Operating Unit
 the Tool belongs to.}
 
-\item{type}{Defaults to "Data Pack".}
+\item{tool}{Defaults to "Data Pack".}
 }
 \value{
 OpenXLSX workbook object for use in data writing functions.

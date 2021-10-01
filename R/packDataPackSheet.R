@@ -22,8 +22,8 @@ packDataPackSheet <- function(wb,
                               org_units,
                               schema = datapackr::data_pack_schema,
                               sheet_data,
-                              cop_year = getCurrentCOPYear()){ #TODO: Could we load a play dataset here?
-  
+                              cop_year = getCurrentCOPYear()) { #TODO: Could we load a play dataset here?
+
   # Prepare data for writing to sheet ####
   sheet_data <- prepareSheetData(sheet = sheet,
                                  org_units = org_units,
@@ -44,31 +44,31 @@ packDataPackSheet <- function(wb,
                   value_type == "percentage") %>%
     dplyr::pull(col)
 
-  percentStyle = openxlsx::createStyle(numFmt = "0%")
+  percentStyle <- openxlsx::createStyle(numFmt = "0%")
 
   if (length(percentCols) > 0) {
     openxlsx::addStyle(wb,
                        sheet = sheet,
                        percentStyle,
-                       rows = (1:NROW(sheet_data)) + headerRow("Data Pack Template", cop_year),
+                       rows = (seq_len(NROW(sheet_data))) + headerRow("Data Pack Template", cop_year),
                        cols = percentCols,
                        gridExpand = TRUE,
                        stack = TRUE)
   }
-  
+
   # Format HIV_PREV ####
-  if (sheet %in% c("Epi Cascade I","Cascade")) {
+  if (sheet %in% c("Epi Cascade I", "Cascade")) {
     percentDecimalCols <- schema %>%
       dplyr::filter(sheet_name == sheet,
-                    indicator_code %in% c("HIV_PREV.NA.Age/Sex/HIVStatus.T","HIV_PREV.T_1")) %>%
+                    indicator_code %in% c("HIV_PREV.NA.Age/Sex/HIVStatus.T", "HIV_PREV.T_1")) %>%
       dplyr::pull(col)
-    
-    percentDecimalStyle = openxlsx::createStyle(numFmt = "0.00%")
-    
+
+    percentDecimalStyle <- openxlsx::createStyle(numFmt = "0.00%")
+
     openxlsx::addStyle(wb,
                        sheet = sheet,
                        percentDecimalStyle,
-                       rows = (1:NROW(sheet_data)) + headerRow("Data Pack Template", cop_year),
+                       rows = (seq_len(NROW(sheet_data))) + headerRow("Data Pack Template", cop_year),
                        cols = percentDecimalCols,
                        gridExpand = TRUE,
                        stack = TRUE)
@@ -80,13 +80,13 @@ packDataPackSheet <- function(wb,
                   value_type == "integer") %>%
     dplyr::pull(col)
 
-  integerStyle = openxlsx::createStyle(numFmt = "#,##0")
+  integerStyle <- openxlsx::createStyle(numFmt = "#,##0")
 
   if (length(integerCols) > 0) {
     openxlsx::addStyle(wb,
                        sheet = sheet,
                        integerStyle,
-                       rows = (1:NROW(sheet_data)) + headerRow("Data Pack Template", cop_year),
+                       rows = (seq_len(NROW(sheet_data))) + headerRow("Data Pack Template", cop_year),
                        cols = integerCols,
                        gridExpand = TRUE,
                        stack = TRUE)
@@ -98,13 +98,13 @@ packDataPackSheet <- function(wb,
                   col_type == "target") %>%
     dplyr::pull(col)
 
-  targetStyle = openxlsx::createStyle(textDecoration = "bold")
+  targetStyle <- openxlsx::createStyle(textDecoration = "bold")
 
   if (length(targetCols) > 0) {
     openxlsx::addStyle(wb,
                        sheet = sheet,
                        targetStyle,
-                       rows = (1:NROW(sheet_data)) + headerRow("Data Pack Template", cop_year),
+                       rows = (seq_len(NROW(sheet_data))) + headerRow("Data Pack Template", cop_year),
                        cols = targetCols,
                        gridExpand = TRUE,
                        stack = TRUE)

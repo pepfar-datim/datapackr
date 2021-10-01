@@ -55,14 +55,14 @@ batch <- tibble::tribble(
   "Togo","EIUtrKbw8PQ"                                                 #46
 )
 
-pick <- batch[c(4),]
+pick <- batch[c(8),]
 # i = 1
 
 for (i in 1:NROW(pick)) {
   print(paste0(i," of ",NROW(pick), ": ", pick[[i,1]]))
 
-  create_play_spectrum_output(
-    country_uids = unlist(pick[[i,"country_uids"]]),
-    cop_year = 2020,
-    output_folder = output_folder)
+  spectrum_output <-
+    create_play_spectrum_output(
+      country_uids = unlist(pick[[i,"country_uids"]]),
+      cop_year = 2021)
 }

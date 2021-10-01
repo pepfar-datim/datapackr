@@ -38,30 +38,41 @@ canReadFile <- function(path) {
 #' @return Character vector containing valid filepath for further use.
 #'
 handshakeFile <- function(path,
-                          tool) {
+                          tool = "Data Pack") {
+
+  if (is.null(tool)) {
+    tool <- "Data Pack"
+  }
 
   if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
-    extension = "xlsx"
+    extension <- "xlsx"
   } else {
     stop(
       "Please specify correct file type: Data Pack, Data Pack Template, OPU Data Pack Template, OPU Data Pack.")
     }
 
   # If path has issues or NA, prompt user to select file from window.
-  if (!canReadFile(path) ) {
+  if (!canReadFile(path)) {
 
-    if ( interactive() ) {
-    interactive_print("Please choose a file.")
-    path <- file.choose() }
+    if (interactive()) {
+      interactive_print("Please choose a file.")
+      path <- file.choose()
+    }
 
-    if (!canReadFile(path)) {stop("File could not be read!")}
+    if (!canReadFile(path)) {
+      stop("File could not be read!")
+    }
 
   }
 
   # Check the file has correct extension
   if (tools::file_ext(path) != extension) {
-    stop(paste0("File is not the correct format! File must have extension .",
-                extension))
-  } else {return(path)}
+    stop(paste0(
+      "File is not the correct format! File must have extension .",
+      extension
+    ))
+  } else {
+    return(path)
+  }
 
 }
