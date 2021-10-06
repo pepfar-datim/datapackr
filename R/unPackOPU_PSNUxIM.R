@@ -550,9 +550,7 @@ unPackOPU_PSNUxIM <- function(d) {
 
     warning_msg <-
       paste0(
-        "ERROR! In tab ",
-        sheet,
-        ", INVALID INDICATOR CODES: The following indicator codes are invalid",
+        "ERROR! INVALID INDICATOR CODES: The following indicator codes are invalid",
         " will be dropped in processing. ->  \n\t* ",
         paste(d$tests$invalid_indicator_codes$indicator_code, collapse = "\n\t* "),
         "\n")
