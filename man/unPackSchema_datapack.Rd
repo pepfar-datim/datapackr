@@ -8,8 +8,7 @@ unPackSchema_datapack(
   filepath = NULL,
   skip = NULL,
   tool = "Data Pack Template",
-  cop_year = getCurrentCOPYear(),
-  d2_session = dynGet("d2_default_session", inherits = TRUE)
+  cop_year = getCurrentCOPYear()
 )
 }
 \arguments{
@@ -17,12 +16,11 @@ unPackSchema_datapack(
 
 \item{skip}{Character vector of Sheet Names to label for skipping in schema.}
 
-\item{tool}{Type of tool to unpack.}
+\item{tool}{Type of tool this function will create or interact with. Either
+\code{OPU Data Pack} or \code{Data Pack}}
 
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
-
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 }
 \value{
 Data Pack schema.
