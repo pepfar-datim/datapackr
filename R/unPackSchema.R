@@ -9,18 +9,14 @@
 #'
 #' @param filepath Local filepath for a Data Pack template (XLSX).
 #' @param skip Character vector of Sheet Names to label for skipping in schema.
-#' @param tool Type of tool to unpack.
-#' @param cop_year Specifies COP year for dating as well as selection of
-#' templates.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
+#' 
 #' @return Data Pack schema.
 #'
 unPackSchema_datapack <- function(filepath = NULL,
                                   skip = NULL,
                                   tool = "Data Pack Template",
-                                  cop_year = getCurrentCOPYear(),
-                                  d2_session = dynGet("d2_default_session",
-                                                      inherits = TRUE)) {
+                                  cop_year = getCurrentCOPYear()) {
 
   # Check the filepath is valid. If NA, request via window. ####
   filepath <- handshakeFile(path = filepath,
@@ -147,11 +143,7 @@ unPackSchema_datapack <- function(filepath = NULL,
             TRUE ~ empty)
         )
     } else if (cop_year == 2021) {
-      map_datapack_cogs <-
-        datimutils::getMetadata(categoryOptionGroups,
-                                fields = "id,name,categoryOptions[id,name]", # nolint
-                                "groupSets.name:like:COP 21 Data Pack",
-                                d2_session = d2_session)
+      map_datapack_cogs <- datapackr::datapack_cogs
 
     # Left-Pad digits with zeros
       pad <- function(digit) {
