@@ -93,12 +93,11 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
                           d2_session = d2_session)
 
     # Place Workbook into play ####
-    d$tool$wb <- datapackr::createWorkbook(datapack_name = d$info$datapack_name,
+    d$tool$wb <- datapackr::createDataPack(datapack_name = d$info$datapack_name,
                                            country_uids = d$info$country_uids,
                                            template_path = d$keychain$template_path,
                                            cop_year = d$info$cop_year,
-                                           tool = d$info$tool,
-                                           d2_session = d2_session)
+                                           tool = d$info$tool)
 
     # Get PSNU List####
     d$data$PSNUs <- datapackr::valid_PSNUs %>%
