@@ -255,9 +255,7 @@ check_params <- function(country_uids,
                          model_data,
                          snuxim_model_data,
                          output_folder,
-                         results_archive,
-                         d2_session = dynGet("d2_default_session",
-                                             inherits = TRUE)) {
+                         results_archive) {
 
   params <- list()
 
@@ -431,20 +429,22 @@ check_params <- function(country_uids,
     }
 
     interactive_print("Checking template against schema and DATIM...")
-    schema <- pick_schema(cop_year, tool)
+    package_schema <- pick_schema(cop_year, tool)
 
     input_tool <- paste0(tool, " Template")
-    schema_check <-
+    template_schema <-
       unPackSchema_datapack(
         filepath = template_path,
         skip = skip_tabs(tool = input_tool, cop_year = cop_year),
         tool = input_tool,
-        cop_year = cop_year,
-        d2_session = d2_session)
+        cop_year = cop_year)
 
-    if (!identical(schema, schema_check)) {
+    if (!identical(package_schema, template_schema)) {
       stop("Template provided does not match archived schema.")
+    } else {
+      interactive_print("Template provided matches published schema.")
     }
+    
     return(template_path)
   }
 
@@ -459,22 +459,24 @@ check_params <- function(country_uids,
                        cop_year = NULL,
                        tool = NULL,
                        datapack_name = NULL,
-                       template_path = NULL,
-                       d2_session) {
-    country_uids <- check_country_uids(country_uids)
-    cop_year <- check_cop_year(cop_year)
-    tool <- check_tool(tool)
-    datapack_name <- check_datapack_name(datapack_name, country_uids)
-    template_path <- check_template_path(template_path, cop_year, tool)
+                       template_path = NULL) {
 
       if (is.null(wb)) {
-        wb <- createWorkbook(datapack_name = datapack_name,
+        country_uids <- check_country_uids(country_uids)
+        cop_year <- check_cop_year(cop_year)
+        tool <- check_tool(tool)
+        datapack_name <- check_datapack_name(datapack_name, country_uids)
+        template_path <- check_template_path(template_path, cop_year, tool)
+        
+        d <- createDataPack(datapack_name = datapack_name,
                              country_uids = country_uids,
                              template_path = template_path,
                              cop_year = cop_year,
-                             tool = tool,
-                             d2_session = d2_session)
+                             tool = tool)
+        
+        wb <- d$tool$wb
       }
+    
     return(wb)
   }
 
@@ -484,8 +486,7 @@ check_params <- function(country_uids,
                           cop_year = cop_year,
                           tool = tool,
                           datapack_name = datapack_name,
-                          template_path = template_path,
-                          d2_session = d2_session)
+                          template_path = template_path)
   }
 
   # Check model_data ####
