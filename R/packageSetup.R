@@ -444,7 +444,7 @@ check_params <- function(country_uids,
     } else {
       interactive_print("Template provided matches published schema.")
     }
-    
+
     return(template_path)
   }
 
@@ -467,16 +467,16 @@ check_params <- function(country_uids,
         tool <- check_tool(tool)
         datapack_name <- check_datapack_name(datapack_name, country_uids)
         template_path <- check_template_path(template_path, cop_year, tool)
-        
+
         d <- createDataPack(datapack_name = datapack_name,
                              country_uids = country_uids,
                              template_path = template_path,
                              cop_year = cop_year,
                              tool = tool)
-        
+
         wb <- d$tool$wb
       }
-    
+
     return(wb)
   }
 

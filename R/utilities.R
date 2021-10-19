@@ -569,7 +569,7 @@ createDataPack <- function(datapack_name = NULL,
     template_path = template_path,
     schema = NULL,
     datapack_name = datapack_name)
-  
+
   for (p in names(params)) {
     assign(p, purrr::pluck(params, p))
   }
@@ -584,7 +584,7 @@ createDataPack <- function(datapack_name = NULL,
                     country_uids = country_uids,
                     cop_year = cop_year,
                     tool = tool)
-  
+
   # Create DP object
   d <- list(
     keychain = list(
@@ -598,7 +598,7 @@ createDataPack <- function(datapack_name = NULL,
     tool = list(
       wb = wb)
     )
-  
+
   return(d)
 }
 

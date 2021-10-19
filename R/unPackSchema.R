@@ -10,7 +10,7 @@
 #' @param filepath Local filepath for a Data Pack template (XLSX).
 #' @param skip Character vector of Sheet Names to label for skipping in schema.
 #' @inheritParams datapackr_params
-#' 
+#'
 #' @return Data Pack schema.
 #'
 unPackSchema_datapack <- function(filepath = NULL,
