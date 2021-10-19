@@ -17,8 +17,7 @@ check_params(
   model_data,
   snuxim_model_data,
   output_folder,
-  results_archive,
-  d2_session = dynGet("d2_default_session", inherits = TRUE)
+  results_archive
 )
 }
 \arguments{
@@ -59,8 +58,6 @@ saved upon export. If left as \code{NULL}, will output to
 
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}
-
-\item{d2_session}{DHIS2 Session id}
 }
 \value{
 params List of valid parameters to use in functions.

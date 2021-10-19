@@ -16,12 +16,24 @@
 #'
 #' @return Openxlsx workbook object with added, styled Home tab.
 #'
-writeHomeTab <- function(wb,
-                         datapack_name,
+writeHomeTab <- function(wb = NULL,
+                         datapack_name = NULL,
                          country_uids,
                          cop_year = getCurrentCOPYear(),
                          tool = "Data Pack") {
   #TODO: Setup for default to run PEPFARLANDIA version.
+
+  # Check & assign params
+  params <- check_params(
+    country_uids = country_uids,
+    datapack_name = datapack_name,
+    cop_year = cop_year,
+    tool = tool,
+    wb = wb)
+
+  for (p in names(params)) {
+    assign(p, purrr::pluck(params, p))
+  }
 
   # Add Tab ####
   if (!any(stringr::str_detect(names(wb), "Home"))) {
@@ -67,7 +79,16 @@ writeHomeTab <- function(wb,
 
   openxlsx::writeData(wb, "Home", countries, xy = c(col, row), colNames = F)
 
-  #TODO: Add feature to list country names in addition to country_uids right below
+  # country_names ####
+  country_names <-
+    check_params(country_uids = country_uids, datapack_name = NULL) %>%
+    purrr::pluck("datapack_name")
+
+  openxlsx::writeData(wb,
+                      "Home",
+                      country_names,
+                      xy = c(col, row + 1),
+                      colNames = F)
 
   # Generated: ####
   openxlsx::writeData(wb, "Home",

@@ -547,69 +547,63 @@ getDataPackSchema <- function(cop_year) {
 
 
 #' @export
-#' @title Create a clean Data Pack Workbook shell
+#' @title Create a new Data Pack
+#' @author Scott Jackson
+#' @description Creates a brand new Data Pack with the supplied characteristics.
 #'
-#' @param tool Either "Data Pack" or "OPU Data Pack"? Default is "Data Pack".
 #' @inheritParams datapackr_params
 #'
-#' @return wb Data Pack Workbook shell
+#' @return Data Pack object
 #'
-createWorkbook <- function(datapack_name = NULL,
+createDataPack <- function(datapack_name = NULL,
                            country_uids,
                            template_path = NULL,
-                           cop_year = getCurrentCOPYear(),
-                           tool = "Data Pack",
-                           d2_session = dynGet("d2_default_session",
-                                               inherits = TRUE)) {
+                           cop_year = NULL,
+                           tool = NULL) {
 
-  output_type <- tool
-  input_type <- paste0(output_type, " Template")
+  # Check & assign params
+  params <- check_params(
+    country_uids = country_uids,
+    cop_year = cop_year,
+    tool = tool,
+    template_path = template_path,
+    schema = NULL,
+    datapack_name = datapack_name)
 
-  if (is.null(datapack_name)) {
-    datapack_name <- datapackr::valid_PSNUs %>%
-      dplyr::select(country_name, country_uid) %>%
-      dplyr::distinct() %>%
-      dplyr::filter(country_uid %in% country_uids) %>%
-      dplyr::pull(country_name) %>%
-      paste(collapse = ", ")
-  }
-
-  if (is.null(template_path)) {
-    template_path <- pick_template_path(cop_year, output_type)
-  }
-
-  template_path %<>%
-    handshakeFile(input_type)
-
-  print("Checking template against schema and DATIM...")
-  schema <- pick_schema(cop_year, output_type)
-
-  schema_check <-
-    unPackSchema_datapack(
-      filepath = template_path,
-      skip = skip_tabs(tool = input_type, cop_year = cop_year),
-      tool = input_type,
-      cop_year = cop_year,
-      d2_session = d2_session)
-
-  if (!identical(schema, schema_check)) {
-    stop("Template provided does not match archived schema.")
+  for (p in names(params)) {
+    assign(p, purrr::pluck(params, p))
   }
 
   wb <- openxlsx::loadWorkbook(template_path)
 
   options("openxlsx.numFmt" = "#,##0")
 
-  # Write Home Sheet info ####
+  # Write Home Sheet info
   wb <- writeHomeTab(wb = wb,
                     datapack_name = datapack_name,
                     country_uids = country_uids,
                     cop_year = cop_year,
-                    tool = output_type)
+                    tool = tool)
 
-  return(wb)
+  # Create DP object
+  d <- list(
+    keychain = list(
+      template_path = template_path),
+    info = list(
+      tool = tool,
+      country_uids = country_uids,
+      cop_year = cop_year,
+      datapack_name = datapack_name,
+      schema = schema),
+    tool = list(
+      wb = wb)
+    )
+
+  return(d)
 }
 
+
+# TODO: To deprecate. Duplicate of check_template_path inside check_params
 
 #' @export
 #' @title Compare Data Pack template against schema
@@ -625,7 +619,7 @@ compareTemplateToSchema <- function(template_path = NULL,
                                    d2_session = dynGet("d2_default_session",
                                                        inherits = TRUE)) {
 
-  print("Checking template against schema and DATIM...")
+  interactive_print("Checking template against schema and DATIM...")
 
   if (is.null(template_path)) {
     template_path <- pick_template_path(cop_year, tool)
@@ -636,8 +630,7 @@ compareTemplateToSchema <- function(template_path = NULL,
       filepath = template_path,
       skip = skip_tabs(tool = paste0(tool, " Template"), cop_year = cop_year),
       tool = paste0(tool, " Template"),
-      cop_year = cop_year,
-      d2_session = d2_session)
+      cop_year = cop_year)
 
   package_schema <- pick_schema(cop_year, tool)
 

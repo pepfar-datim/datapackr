@@ -5,8 +5,8 @@
 \title{writeHomeTab(wb, datapack_uid, tool = "Data Pack")}
 \usage{
 writeHomeTab(
-  wb,
-  datapack_name,
+  wb = NULL,
+  datapack_name = NULL,
   country_uids,
   cop_year = getCurrentCOPYear(),
   tool = "Data Pack"

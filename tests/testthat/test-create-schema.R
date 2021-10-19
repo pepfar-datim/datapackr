@@ -8,8 +8,7 @@ Sys.setlocale(category = "LC_COLLATE", locale = "en_US.UTF-8")
 with_mock_api({
   test_that("We can create a datapack schema", {
 
-    test_dataset <- unPackSchema_datapack(test_sheet("COP21_Data_Pack_Template.xlsx"),
-                                          d2_session = training)
+    test_dataset <- unPackSchema_datapack(test_sheet("COP21_Data_Pack_Template.xlsx"))
     expect_type(test_dataset, "list")
     expect_named(
       test_dataset,
@@ -58,8 +57,7 @@ with_mock_api({
       filepath =
         system.file("extdata", "COP21_Data_Pack_Template.xlsx", package = "datapackr"),
       skip = skip_tabs(tool = "Data Pack Template", cop_year = 2021),
-      cop_year = 2021,
-      d2_session = training)
+      cop_year = 2021)
 
     expect_identical(schema, cop21_data_pack_schema)
   })
@@ -71,8 +69,7 @@ with_mock_api({
         skip = datapackr::skip_tabs(tool = "OPU Data Pack Template",
                                     cop_year = 2020),
         tool = "OPU Data Pack Template",
-        cop_year = 2020,
-        d2_session = training)
+        cop_year = 2020)
     expect_identical(schema, cop20OPU_data_pack_schema)
   })
 })
