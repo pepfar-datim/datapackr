@@ -22,7 +22,7 @@ writeHomeTab <- function(wb = NULL,
                          cop_year = getCurrentCOPYear(),
                          tool = "Data Pack") {
   #TODO: Setup for default to run PEPFARLANDIA version.
-  
+
   # Check & assign params
   params <- check_params(
     country_uids = country_uids,
@@ -30,7 +30,7 @@ writeHomeTab <- function(wb = NULL,
     cop_year = cop_year,
     tool = tool,
     wb = wb)
-  
+
   for (p in names(params)) {
     assign(p, purrr::pluck(params, p))
   }
@@ -78,12 +78,12 @@ writeHomeTab <- function(wb = NULL,
   countries <- paste(country_uids, collapse = ", ")
 
   openxlsx::writeData(wb, "Home", countries, xy = c(col, row), colNames = F)
-  
+
   # country_names ####
   country_names <-
     check_params(country_uids = country_uids, datapack_name = NULL) %>%
     purrr::pluck("datapack_name")
-  
+
   openxlsx::writeData(wb,
                       "Home",
                       country_names,

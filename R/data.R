@@ -211,3 +211,13 @@
 #'   \item{formula}{Excel formula defined for \code{indicator_code}.}
 #' }
 "cop20OPU_data_pack_schema"
+
+
+#' @docType data
+#' @title Datapack Category option groups
+#'
+#' @description Data frame of category option groups (id and name)
+#' along with their individual category options (id and name) as a 
+#' nested data frame.
+#'
+"datapack_cogs"
