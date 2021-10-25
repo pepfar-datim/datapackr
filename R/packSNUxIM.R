@@ -146,8 +146,8 @@ packSNUxIM <- function(d,
       DataPackTarget = paste0(
         "SUMIF(",
         sheet_name, "!$", id_col, ":$", id_col,
-        ", $F", row,
-        ", ", sheet_name, "!$", target_col, ":$", target_col, ")")
+        ",$F", row,
+        ",", sheet_name, "!$", target_col, ":$", target_col, ")")
     ) %>%
     dplyr::select(-id_col, -sheet_name, -target_col, -row)
 
@@ -339,7 +339,7 @@ packSNUxIM <- function(d,
                     stack = FALSE)
 
   # Format integers ####
-  # integerStyle = openxlsx::createStyle(numFmt = "#, ##0")
+  # integerStyle = openxlsx::createStyle(numFmt = "#,##0")
   #
   # integerCols <- grep("DataPackTarget", final_snuxim_cols)
   #

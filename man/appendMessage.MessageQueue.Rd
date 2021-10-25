@@ -18,5 +18,4 @@ A MessageQueue object
 }
 \description{
 Internal S3 method to deal with appending messages
-to a MessageQueue
 }

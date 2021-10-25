@@ -5,29 +5,31 @@
 #' @param level One of ERROR, WARNING, INFO
 #'
 #' @return Object of class data.frame and Message queue.
-#'
+#' @export
 
 MessageQueue <- function(message=character(), level=character()) {
 
-  me <- data.frame(
+  messages <- data.frame(
     message = message,
     level = level, stringsAsFactors = FALSE
   )
 
   ## Set the name for the class
-  class(me) <- c("data.frame", "MessageQueue")
-  return(me)
+
+  attr(messages, "class") <- "MessageQueue"
+
+  messages
 }
 
 
 #' Title appendMessage
 #' @description Generic function to handle appending messages to a MessageQueue
-#'
-#' @param x
+#' @param x A message queue
 #' @param message A string or vector of strings of messages.
 #' @param level A string or vector of strings of
 #' message levels (ERROR, WARNING, INFO)
 #' @return A MessageQueue class.
+#' @export
 
 appendMessage <- function(x, message, level) {
   UseMethod("appendMessage", x)
@@ -35,12 +37,11 @@ appendMessage <- function(x, message, level) {
 
 #' Title appendMessage.MessageQueue
 #' @description Internal S3 method to deal with appending messages
-#' to a MessageQueue
-#'
 #' @param x A MessageQueue object
 #' @param message  A message of vector of messages.
 #' @param level  A string of vector of message levels (ERROR, WARNING, INFO)
 #' @return A MessageQueue object
+#' @export
 
 appendMessage.MessageQueue <- function(x, message=NA, level=NA) {
 
@@ -77,11 +78,11 @@ printMessages <- function(x) {
 
 #' Title printMessage.MessageQueue
 #' @description Internal S3 method to deal with printing messages
-#' of a Datapack Object
 #' @param x A MessageQueue object
 #' @param message  A message of vector of messages.
 #' @param level  A string of vector of message levels (ERROR, WARNING, INFO)
 #' @return Returns a formatted output to the console
+#' @export
 
 printMessages.MessageQueue <- function(x) {
   # If warnings, show all grouped by sheet and issue
