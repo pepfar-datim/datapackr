@@ -2,6 +2,7 @@
 
 S3method(appendMessage,MessageQueue)
 S3method(printMessages,MessageQueue)
+export(.testInvalidIndicatorCodes)
 export(MessageQueue)
 export(add_dp_psnu)
 export(addcols)

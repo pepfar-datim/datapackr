@@ -12,7 +12,7 @@ datapack_cogs
 }
 \description{
 Data frame of category option groups (id and name)
-along with their individual category options (id and name) as a 
+along with their individual category options (id and name) as a
 nested data frame.
 }
 \keyword{datasets}
