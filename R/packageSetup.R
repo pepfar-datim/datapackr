@@ -44,7 +44,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
   if (tool %in% c("Data Pack", "Data Pack Template")) {
     if (cop_year == 2020) {
       skip = c("Home", "Instructions", "Summary", "Spectrum", "Spectrum IDs")
-    } else if (cop_year == 2021) {
+    } else if (cop_year %in% c(2021, 2022)) {
       skip = c("Home", "Summary", "Spectrum")
     }
   }
@@ -66,7 +66,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 #'
 headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
 
-  if (cop_year %in% c(2020,2021)) {
+  if (cop_year %in% c(2020, 2021, 2022)) {
     if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
       header_row <- 14
     } else stop("That tool type is not supported for that cop_year.")

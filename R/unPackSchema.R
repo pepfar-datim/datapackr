@@ -144,11 +144,19 @@ unPackSchema_datapack <- function(filepath = NULL,
             valid_kps == "pwidKPs" ~ list(disaggs$pwidKPs),
             TRUE ~ empty)
         )
-    } else if (cop_year == 2021) {
+    } else if (cop_year %in% c(2021, 2022)) {
+      groupsets_name <- paste0(
+          "groupSets.name:like:COP ",
+          "21",
+          # TODO: Replace after add groupset in DATIM based on MER 2.6
+          #stringr::str_sub(cop_year, -2, -1),
+          " Data Pack"
+      )
+      
       map_datapack_cogs <- 
         datimutils::getMetadata(categoryOptionGroups,
                                 fields = "id,name,categoryOptions[id,name]",
-                                "groupSets.name:like:COP 21 Data Pack",
+                                groupsets_name,
                                 d2_session = d2_session)
       
     # Left-Pad digits with zeros
