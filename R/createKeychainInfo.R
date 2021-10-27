@@ -77,7 +77,7 @@ createKeychainInfo <- function(submission_path = NULL,
     dplyr::select(PSNU)
 
   #if PSNU row count equal zero or it is empty then remove template variable and add Template label to column type
-  if(NROW(is_template$PSNU) == 0 | all(is.na(is_template$PSNU))){
+  if (NROW(is_template$PSNU) == 0 | all(is.na(is_template$PSNU))) {
     rm(is_template)
     tool_name_type %<>% dplyr::mutate(type = paste0(type, " Template"))
   } else {
@@ -102,7 +102,7 @@ createKeychainInfo <- function(submission_path = NULL,
 
   # Assign schema based on tool type ####
   assign_schema <- function(tool_type, cop_year) {
-    
+
     if (tool_type %in% c("Data Pack", "Data Pack Template")) {
       result <-  switch(
         as.character(cop_year),
@@ -126,7 +126,7 @@ createKeychainInfo <- function(submission_path = NULL,
       stop("Unable to process that type of Data Pack.")
     }
   }
-  
+
   d$info$schema <- assign_schema(d$info$tool, d$info$cop_year)
 
 
