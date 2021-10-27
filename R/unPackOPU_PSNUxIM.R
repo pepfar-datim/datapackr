@@ -558,7 +558,7 @@ unPackOPU_PSNUxIM <- function(d) {
 
   if (NROW(d$tests$invalid_indicator_codes) > 0) {
     d$info$has_error <- TRUE
-    
+
     warning_msg <-
       paste0(
         "ERROR! INVALID INDICATOR CODES: The following indicator codes are invalid",
