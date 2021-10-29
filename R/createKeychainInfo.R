@@ -104,7 +104,7 @@ createKeychainInfo <- function(submission_path = NULL,
   assign_schema <- function(tool_type, cop_year) {
 
     if (tool_type %in% c("Data Pack", "Data Pack Template")) {
-      result <-  switch(
+      result <- switch(
         as.character(cop_year),
         "2021" = datapackr::cop21_data_pack_schema,
         "2020" = datapackr::cop20_data_pack_schema,
