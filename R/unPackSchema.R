@@ -142,7 +142,7 @@ unPackSchema_datapack <- function(filepath = NULL,
             valid_kps == "pwidKPs" ~ list(disaggs$pwidKPs),
             TRUE ~ empty)
         )
-    } else if (cop_year %in% c(2021, 2022) {
+    } else if (cop_year %in% c(2021, 2022)) {
       map_datapack_cogs <- datapackr::datapack_cogs
       # TODO: Add cache for COP21, and another for COP22. Fork for each FY.
 
