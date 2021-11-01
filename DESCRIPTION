@@ -13,7 +13,7 @@ Authors@R: c(
     person("Chris", "Nemarich", email = "cnemarich@guidehouse.com",
         role = c("ctb")),
     person("Christian", "Domaas", email = "cdomaas@baosystems.com",
-        role = c("ctb")))
+        role = c("ctb"))
   )
 Description: Generates and processes PEPFAR Data Packs and Site Tools.
 URL: https://github.com/pepfar-datim/datapackr
