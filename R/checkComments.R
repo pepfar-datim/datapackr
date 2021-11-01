@@ -13,13 +13,11 @@ checkComments <- function(d) {
 
   wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
 
-  d$info$has_comments_issue <-
-    any(
-      unlist(
-        lapply(wb$comments, function(x) is.null(x["style"]))
+  d$info$has_comments_issue <- any(
+    unlist(
+      lapply(wb$comments, function(x) is.null(x["style"]))
       )
     )
-  
   if (d$info$has_comments_issue) {
     warning_msg <-
       paste0(
