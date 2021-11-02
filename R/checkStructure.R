@@ -10,11 +10,11 @@
 checkStructure <- function(d) {
 
   # pull all sheet names from submission as vector
-  submission_sheets <- readxl::excel_sheets(d$keychain$submission_path)
+  submission_sheets <- readxl::excel_sheets(d$keychain$submission_path)[0:20]
   # pull the unique sheet names from the schema (these are already ordered in the schema so can be called unique)
   sheets_check <- unique(d$info$schema$sheet_name)
   # what columns are missing from the submission?
-  missing_sheets <- sheet_name[!sheet_name %in% submission_sheets]
+  missing_sheets <- sheets_check[!sheets_check %in% submission_sheets]
   info_msg <- "Checking for any missing tabs..."
   interactive_print(info_msg)
   # are any of them false? if so retain a vector of the missing sheets (retained data frame format)
