@@ -9,32 +9,19 @@
 #'
 checkStructure <- function(d) {
 
-  # Check structural integrity of Workbook sheets ####
-  submission_sheets <-
-    readxl::excel_sheets(d$keychain$submission_path) %>%
-    tibble::enframe(name = NULL) %>%
-    dplyr::select(sheet_name = value) %>%
-    dplyr::mutate(submission_order = as.integer(1:(dplyr::n())))
-
-  # Check all sheets present and accounted for ####
-  sheets_check <- d$info$schema %>%
-    dplyr::select(sheet_name, template_order = sheet_num) %>%
-    dplyr::distinct() %>%
-    dplyr::left_join(submission_sheets, by = c("sheet_name")) %>%
-    dplyr::mutate(order_check = template_order == submission_order)
-
-  # TEST for missing Sheets ####
+  # pull all sheet names from submission as vector
+  submission_sheets <- readxl::excel_sheets(d$keychain$submission_path)
+  # pull the unique sheet names from the schema (these are already ordered in the schema so can be called unique)
+  sheets_check <- unique(d$info$schema$sheet_name)
+  # what columns are missing from the submission?
+  missing_sheets <- sheet_name[!sheet_name %in% submission_sheets]
   info_msg <- "Checking for any missing tabs..."
   interactive_print(info_msg)
-
-  d$tests$missing_sheets <- sheets_check %>%
-    dplyr::filter(is.na(submission_order))
-
-
+  # are any of them false? if so retain a vector of the missing sheets (retained data frame format)
+  d$tests$missing_sheets <- data.frame(sheet_name = missing_sheets)
   attr(d$tests$missing_sheets, "test_name") <- "Missing sheets"
-
-
-  if (any(is.na(sheets_check$submission_order))) {
+  # test if data frame has any rows, if so create warning collapsing sheet names otherwise no issues
+  if (any(NROW(d$tests$missing_sheets))) {
     warning_msg <-
       paste0(
         "WARNING! MISSING SHEETS: Please ensure no original sheets have",
@@ -43,7 +30,5 @@ checkStructure <- function(d) {
         "\n")
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
-
   return(d)
-
 }
