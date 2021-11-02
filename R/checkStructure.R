@@ -10,7 +10,7 @@
 checkStructure <- function(d) {
 
   # pull all sheet names from submission as vector
-  submission_sheets <- readxl::excel_sheets(d$keychain$submission_path)[0:20]
+  submission_sheets <- readxl::excel_sheets(d$keychain$submission_path)
   # pull the unique sheet names from the schema (these are already ordered in the schema so can be called unique)
   sheets_check <- unique(d$info$schema$sheet_name)
   # what columns are missing from the submission?
