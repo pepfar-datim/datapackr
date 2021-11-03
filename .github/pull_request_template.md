@@ -1,4 +1,5 @@
 **IMPORTANT: Please do not create a Pull Request without creating an issue first.**
+**IMPORTANT: Please add changes to the release notes in the NEWS.md file.**
 
 ## Summary of Proposed Changes
 <!--- Bulleted description of what this code changes, adds, removes, or resolves in the package
@@ -7,63 +8,50 @@
 - Removes redundant code in...
 --->
 
+
+## Affected Target Setting Cycles
+- [ ] COP
+- [ ] OPU
+- [ ] Neither
+
+
 ## Affected Process Elements
+- [ ] Data Pack Excel Template
 - [ ] Data Pack generation
 - [ ] Data Pack model
-- [ ] Data Pack self-service app
 - [ ] Data Pack processing
-- [ ] Site Tool model/distribution
-- [ ] Site Tool generation (from Data Pack)
-- [ ] Site Tool generation (from DATIM - for OPUs)
-- [ ] Site Tool self-service app
-- [ ] Site Tool to Data Pack comparison self-service app
-- [ ] Site Tool to DATIM comparison self-service app
-- [ ] Site Tool processing
-- [ ] Site Tool import
+- [ ] Data Pack validations
+- [ ] PSNUxIM generation
+- [ ] PSNUxIM processing
+- [ ] Target import into DATIM
+
+
 
 ## Types of changes
-
-<!--- What types of changes does your code introduce to Appium? --->
-<!--- _Put an `x` in the boxes that apply_ --->
-
-- [ ] Bugfix
-- [ ] Feature
+- [ ] Bugfixes
+- [ ] New Feature
+- [ ] Breaking Changes
 - [ ] Code style update (formatting, renaming)
 - [ ] Refactoring (no functional changes)
-- [ ] Build-related changes
+- [ ] Deprecating old code
 - [ ] Documentation content changes
 - [ ] Other (please describe): 
+
 
 ## Does this introduce a breaking change?
 
 - [ ] Yes
 - [ ] No
 
-<!-- If this introduces a breaking change, please describe the impact and migration path for existing applications below. -->
+<!-- If this introduces a breaking change, please describe the impact below. -->
+
 
 ## Related Issues
-<!--- Include list of issues resolved by this PR: --->
-- Resolves #01
-- Fixes #02
-- Closes #03
+<!--- Include list of issues in Jira resolved by this PR: --->
+- DP-XXX
+- DP-XXX
+- DP-XXX
 
-<!--- The following keywords, followed by an issue number, will close the referenced issue:
-
-- close
-- closes
-- closed
-- fix
-- fixes
-- fixed
-- resolve
-- resolves
-- resolved
-
-To close an issue in another repository, use the `username/repository#issue_number` syntax
---->
-
-## Testing Approach
-<!--- How has this code been tested? Where helpful, include screenshots --->
 
 ## Final Checklist
 
@@ -71,7 +59,7 @@ To close an issue in another repository, use the `username/repository#issue_numb
 - [ ] I have performed a self-review of my own code
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have made corresponding changes to the documentation
+- [ ] I have added my updates to the release notes in the NEWS.md file
 - [ ] My changes generate no new warnings
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
-- [ ] Any dependent changes have been merged and published in downstream modules
