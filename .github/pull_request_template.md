@@ -28,20 +28,15 @@
 
 
 ## Types of changes
+- [ ] Breaking Changes
 - [ ] Bugfixes
 - [ ] New Feature
-- [ ] Breaking Changes
+- [ ] Deprecating old code
 - [ ] Code style update (formatting, renaming)
 - [ ] Refactoring (no functional changes)
-- [ ] Deprecating old code
 - [ ] Documentation content changes
 - [ ] Other (please describe): 
 
-
-## Does this introduce a breaking change?
-
-- [ ] Yes
-- [ ] No
 
 <!-- If this introduces a breaking change, please describe the impact below. -->
 
@@ -55,11 +50,10 @@
 
 ## Final Checklist
 
-- [ ] My code follows the style guidelines of this project
-- [ ] I have performed a self-review of my own code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] I have added my updates to the release notes in the NEWS.md file
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] My code conforms to datapackr style guidelines.
+- [ ] My code is commented appropriately.
+- [ ] Documentation has been updated, where applicable.
+- [ ] My changes have been added to the release notes in the NEWS.md file.
+- [ ] My changes generate no new warnings.
+- [ ] Unit tests have been added or updated for new or modified features.
 - [ ] New and existing unit tests pass locally with my changes
