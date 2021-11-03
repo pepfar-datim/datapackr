@@ -18,6 +18,11 @@ unPackSchema_datapack <- function(filepath = NULL,
                                   tool = "Data Pack Template",
                                   cop_year = getCurrentCOPYear()) {
 
+  if ((tool == "Data Pack Template" & !cop_year %in% c(2021, 2022))
+      | (tool == "OPU Data Pack Template" & !cop_year %in% 2020:2022)) {
+    stop("Sorry, unPackSchema doesn't work for that combination of tool and cop_year.")
+  }
+
   # Check the filepath is valid. If NA, request via window. ####
   filepath <- handshakeFile(path = filepath,
                             tool = tool)
@@ -43,14 +48,6 @@ unPackSchema_datapack <- function(filepath = NULL,
   schema %<>%
     dplyr::filter(sheet_name %in% verbose_sheets,
                   row %in% c(5:(headerRow(tool, cop_year) + 1)))
-
-  # # Correctly enter array formulas ####
-  #   dplyr::mutate(
-  #     formula = dplyr::case_when(
-  #       is_array == "TRUE" ~ paste0("{", formula, "}"),
-  #       TRUE ~ formula
-  #     )
-  #   ) %>%
 
   # Gather and Spread to get formula, value, and indicator_code in separate cols ####
   schema %<>%
@@ -102,121 +99,72 @@ unPackSchema_datapack <- function(filepath = NULL,
         valid_sexes.options = empty,
         valid_kps.options = empty
       )
+  }
 
-  } else {
+  if (tool == "Data Pack Template") {
 
-    if (cop_year == 2020) {
-      valid_COs <- getValidCategoryOptions(cop_year = cop_year)
-
-      disaggs <- valid_COs %>%
-        dplyr::select(name = datapack_disagg, id, group = datapack_schema_group) %>%
-        dplyr::filter(group != "") %>%
-        tidyr::separate_rows(group, sep = ",") %>%
-        dplyr::arrange(group, name) %>%
-        dplyr::group_by(group) %>%
-        tidyr::nest(options = c(name, id)) %>%
-        tibble::deframe()
-
-      schema %<>%
-        dplyr::mutate(
-          valid_ages.options = dplyr::case_when(
-            valid_ages == "5 yr" ~ list(disaggs$`5yr`),
-            valid_ages == "5 yr, 25-49" ~ list(disaggs$`25-49`),
-            valid_ages == "15s" ~ list(disaggs$coarse),
-            valid_ages == "5 yr, 1+" ~ list(disaggs$`01+`),
-            valid_ages == "5 yr, 15+" ~ list(disaggs$`15+`),
-            valid_ages == "5 yr, 10+" ~ list(disaggs$`10+`),
-            valid_ages == "5 yr, <01-18+" ~ list(disaggs$ovc_serv),
-            valid_ages == "5 yr, <01-17" ~ list(disaggs$ovc_hiv_stat),
-            valid_ages == "01-04" ~ list(disaggs$`01-04`),
-            valid_ages == "<01" ~ list(disaggs$`<01`),
-            TRUE ~ empty),
-          valid_sexes.options = dplyr::case_when(
-            valid_sexes == "M/F" ~ list(disaggs$`M/F`),
-            valid_sexes == "M" ~ list(disaggs$`M/F`[disaggs$`M/F`$name == "Male", ]),
-            valid_sexes == "F" ~ list(disaggs$`M/F`[disaggs$`M/F`$name == "Female", ]),
-            TRUE ~ empty),
-          valid_kps.options = dplyr::case_when(
-            valid_kps == "coarseKPs" ~ list(disaggs$coarseKPs),
-            valid_kps == "fineKPs" ~ list(disaggs$fineKPs),
-            valid_kps == "pwidKPs" ~ list(disaggs$pwidKPs),
-            TRUE ~ empty)
-        )
-    } else if (cop_year %in% c(2021, 2022)) {
-      map_datapack_cogs <- datapackr::datapack_cogs
-      # TODO: Add cache for COP21, and another for COP22. Fork for each FY.
-
-      # groupsets_name <- paste0(
-      #     "groupSets.name:like:COP ",
-      #     "21",
-      #     # TODO: Replace after add groupset in DATIM based on MER 2.6
-      #     #stringr::str_sub(cop_year, -2, -1),
-      #     " Data Pack"
-      # )
-      #
-      # map_datapack_cogs <-
-      #   datimutils::getMetadata(categoryOptionGroups,
-      #                           fields = "id,name,categoryOptions[id,name]",
-      #                           groupsets_name,
-      #                           d2_session = d2_session)
-
-    # Left-Pad digits with zeros
-      pad <- function(digit) {
-        padded <- paste0("0", digit)
-      }
-
-      map_datapack_cogs %<>%
-        dplyr::mutate(
-          categoryOptions = purrr::map(
-            categoryOptions,
-            ~ .x %>%
-              dplyr::mutate(
-                name = stringr::str_replace_all(name, "(?<!\\d)\\d(?!\\d)", pad))
-          )
-        )
-
-    # Add disagg lists to schema ####
-      map_datapack_cogs %<>%
-        dplyr::select(-id) %>%
-        dplyr::rename(datapack_cog = name) %>%
-        tidyr::unnest(cols = categoryOptions) %>%
-        dplyr::distinct() %>%
-        dplyr::arrange(datapack_cog, name) %>%
-        dplyr::group_by(datapack_cog) %>%
-        tidyr::nest(options = c(name, id))
-
-      # TODO: Add test to make sure Data Pack COGs match the above list
-
-      schema %<>%
-        dplyr::left_join(
-          map_datapack_cogs %>% dplyr::rename(valid_ages.options = options),
-          by = c("valid_ages" = "datapack_cog")
-        ) %>%
-        dplyr::left_join(
-          map_datapack_cogs %>% dplyr::rename(valid_sexes.options = options),
-          by = c("valid_sexes" = "datapack_cog")
-        ) %>%
-        dplyr::left_join(
-          map_datapack_cogs %>% dplyr::rename(valid_kps.options = options),
-          by = c("valid_kps" = "datapack_cog")
-        )
-
-      schema %<>%
-        dplyr::mutate(
-          valid_ages.options = dplyr::case_when(
-            !is.na(valid_ages) ~ valid_ages.options,
-            TRUE ~ empty),
-          valid_sexes.options = dplyr::case_when(
-            !is.na(valid_sexes) ~ valid_sexes.options,
-            TRUE ~ empty),
-          valid_kps.options = dplyr::case_when(
-            !is.na(valid_kps) ~ valid_kps.options,
-            TRUE ~ empty),
-        )
-
+    if (cop_year == 2021) {
+      map_datapack_cogs <- datapackr::datapack_cogs$COP21
+    } else if (cop_year == 2022) {
+      map_datapack_cogs <- datapackr::datapack_cogs$COP22
     } else {
-      stop("Cannot map valid disaggregates for that COP Year")
+      stop("Can't find categoryOptionGroups for that cop_year and tool.")
     }
+
+  # Left-Pad digits with zeros
+    # TODO: Move into utilities.R
+    pad <- function(digit) {
+      padded <- paste0("0", digit)
+    }
+
+    map_datapack_cogs %<>%
+      dplyr::mutate(
+        categoryOptions = purrr::map(
+          categoryOptions,
+          ~ .x %>%
+            dplyr::mutate(
+              name = stringr::str_replace_all(name, "(?<!\\d)\\d(?!\\d)", pad))
+        )
+      )
+
+  # Add disagg lists to schema ####
+    map_datapack_cogs %<>%
+      dplyr::select(-id) %>%
+      dplyr::rename(datapack_cog = name) %>%
+      tidyr::unnest(cols = categoryOptions) %>%
+      dplyr::distinct() %>%
+      dplyr::arrange(datapack_cog, name) %>%
+      dplyr::group_by(datapack_cog) %>%
+      tidyr::nest(options = c(name, id))
+
+    # TODO: Add test to make sure Data Pack COGs match the above list
+
+    schema %<>%
+      dplyr::left_join(
+        map_datapack_cogs %>% dplyr::rename(valid_ages.options = options),
+        by = c("valid_ages" = "datapack_cog")
+      ) %>%
+      dplyr::left_join(
+        map_datapack_cogs %>% dplyr::rename(valid_sexes.options = options),
+        by = c("valid_sexes" = "datapack_cog")
+      ) %>%
+      dplyr::left_join(
+        map_datapack_cogs %>% dplyr::rename(valid_kps.options = options),
+        by = c("valid_kps" = "datapack_cog")
+      )
+
+    schema %<>%
+      dplyr::mutate(
+        valid_ages.options = dplyr::case_when(
+          !is.na(valid_ages) ~ valid_ages.options,
+          TRUE ~ empty),
+        valid_sexes.options = dplyr::case_when(
+          !is.na(valid_sexes) ~ valid_sexes.options,
+          TRUE ~ empty),
+        valid_kps.options = dplyr::case_when(
+          !is.na(valid_kps) ~ valid_kps.options,
+          TRUE ~ empty),
+      )
   }
 
   schema %<>%
@@ -240,6 +188,7 @@ unPackSchema_datapack <- function(filepath = NULL,
          ~ cop_year + 1,
         stringr::str_detect(indicator_code, "\\.T_1$") ~ cop_year,
         stringr::str_detect(indicator_code, "\\.R$") ~ cop_year - 1,
+      # Apply default cop_year to blank cols in PSNUxIM tab
         dataset == "mer" & col_type == "target" ~ datapackr::getCurrentCOPYear(),
         TRUE ~ NA_real_
       ),
@@ -248,54 +197,6 @@ unPackSchema_datapack <- function(filepath = NULL,
         col_type == "result" ~ paste0(FY, "Q3")
       )
     )
-
-  # Pull list of valid disaggs
-  # codeList <- DEs_COCs_COs_Cs()
-  #
-  # fullCodeList <- codeList %>%
-  # # Rename Key Population to match Data Pack namecon
-  #   dplyr::select(dataelement, dataelementuid,
-  #                 Age, Sex, KeyPop = `Key Population`) %>%
-  #
-  # # Drop other COs to only summarize Age, Sex, KP
-  #   dplyr::distinct() %>%
-  #
-  # # Map to only those indicator_codes used in Data Pack
-  #   dplyr::left_join(
-  #     (schema %>%
-  #        dplyr::filter(col_type == "target") %>%
-  #        dplyr::select(indicator_code, dataelement_dsd, dataelement_ta) %>%
-  #        tidyr::gather(key = "support_type", value = "dataelementuid",
-  #                      dataelement_dsd, dataelement_ta, na.rm = TRUE) %>%
-  #        dplyr::select(-support_type) %>%
-  #        dplyr::distinct()),
-  #     y = .,
-  #     by = "dataelementuid"
-  #   ) %>%
-  #   dplyr::mutate(
-  #     support_type = stringr::str_extract(dataelement, "(?<=(, ))(DSD|TA)(?=(, |\\)))"),
-  #     support_type = dplyr::case_when(is.na(support_type) ~ "dsd",
-  #                                     TRUE ~ tolower(support_type)))
-  #
-  # # Group Age, Sex, KP into single list col, and categoryoption name and id
-  #   # into another col
-  #   dplyr::group_by(dataelement, dataelementuid)
-  #
-  # match <- list("categoryoptioncombo", "Age|Sex|KeyPop")
-  # key <- list("valid_cocs", "valid_cos")
-  #
-  # fullCodeList <- purrr::map2(.x = match, .y = key,
-  #                    ~ fullCodeList %>%
-  #                      dplyr::select("dataelement", "dataelementuid", dplyr::matches(.x)) %>%
-  #                      tidyr::nest(.key = !! rlang::sym(.y))) %>%
-  #   dplyr::bind_cols() %>%
-  #   dplyr::select(-dataelement1, -dataelementuid1, -dataelement)
-  #
-  # # Add valid disaggs to schema
-  # schema %<>%
-  #   dplyr::left_join(
-  #     fullCodeList, by = c("dataelement_dsd" = "dataelementuid")
-  #   )
 
   # Add skipped sheets ####
   skipped_schema <- matrix(nrow = 0, ncol = NCOL(schema)) %>%
@@ -317,6 +218,7 @@ unPackSchema_datapack <- function(filepath = NULL,
     dplyr::select(sheet_num, sheet_name, data_structure, dplyr::everything())
 
 
+  #TODO: Convert remaining to separate function
   # TEST schema is valid (TRUE = Test fail) ####
   skip_sheets_num <- schema %>%
     dplyr::filter(sheet_name %in% skip) %>%
