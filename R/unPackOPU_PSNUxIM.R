@@ -519,6 +519,16 @@ unPackOPU_PSNUxIM <- function(d) {
 
 }
 
+#' @export
+#' @title Test for invalid Indicator Codes
+#'
+#' @description
+#' Tests for invalid Indicator Codes
+#'
+#' @param d Datapackr object
+#'
+#' @return d
+#'
 .testInvalidIndicatorCodes <- function(d) {
   #Test any invalid indicator codes
 
@@ -538,7 +548,8 @@ unPackOPU_PSNUxIM <- function(d) {
       dplyr::mutate(is_valid = TRUE)
   }
 
-  invalid_indicator_codes <- dplyr::left_join(indicator_codes_sheet,indicator_codes_schema) %>%
+  invalid_indicator_codes <- dplyr::left_join(indicator_codes_sheet,
+                                              indicator_codes_schema) %>%
     dplyr::filter(is.na(is_valid))
 
   d$tests$invalid_indicator_codes <- invalid_indicator_codes
