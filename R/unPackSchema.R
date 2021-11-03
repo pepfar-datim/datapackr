@@ -17,7 +17,7 @@ unPackSchema_datapack <- function(filepath = NULL,
                                   skip = NULL,
                                   tool = "Data Pack Template",
                                   cop_year = getCurrentCOPYear()) {
-  
+
   if ((tool == "Data Pack Template" & !cop_year %in% c(2021, 2022))
       | (tool == "OPU Data Pack Template" & !cop_year %in% 2020:2022)) {
     stop("Sorry, unPackSchema doesn't work for that combination of tool and cop_year.")
@@ -99,7 +99,7 @@ unPackSchema_datapack <- function(filepath = NULL,
         valid_sexes.options = empty,
         valid_kps.options = empty
       )
-  } 
+  }
 
   if (tool == "Data Pack Template") {
 

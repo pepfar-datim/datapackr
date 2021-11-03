@@ -32,7 +32,6 @@ if (getRversion() >= "2.15.1")
       "ancestors",
       "ART_coverage",
       "ART_coverage.psnu",
-      "as",
       "attribute_option_combo",
       "attribute_option_combo_code",
       "attributeoptioncombo",
