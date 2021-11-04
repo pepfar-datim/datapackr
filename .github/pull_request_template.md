@@ -31,7 +31,7 @@
 ## Reviewer:
 - [ ] Tests added/updated & passing.
 - [ ] Clean linting.
-- [ ] Related issue.
+- [ ] Related issue ticket in Jira/GitHub.
 - [ ] Documentation added/updated.
 - [ ] Code conforms to style guidelines.
 - [ ] Well commented.
