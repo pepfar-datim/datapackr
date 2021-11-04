@@ -1,6 +1,6 @@
 context("Create a DataPackSchema")
 
-#Explicity set the locale to avoid any issues related to ordering within objects
+#Explicitly set the locale to avoid any issues related to ordering within objects
 #when comparing them.
 
 Sys.setlocale(category = "LC_COLLATE", locale = "en_US.UTF-8")
@@ -8,7 +8,8 @@ Sys.setlocale(category = "LC_COLLATE", locale = "en_US.UTF-8")
 with_mock_api({
   test_that("We can create a datapack schema", {
 
-    test_dataset <- unPackSchema_datapack(test_sheet("COP21_Data_Pack_Template.xlsx"))
+    test_dataset <- unPackSchema_datapack(test_sheet("COP21_Data_Pack_Template.xlsx"),
+                                          cop_year = 2021)
     expect_type(test_dataset, "list")
     expect_named(
       test_dataset,
