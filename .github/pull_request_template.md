@@ -8,7 +8,7 @@
 4. Assign Scott Jackson, Jason Pickering, or Sam Garman as Reviewer.
 -->
 
-## Summary of Proposed Changes
+### Summary of Proposed Changes
 <!--- Bulleted description of what this code changes, adds, removes, or resolves in the package
 - Adds functionality to allow...
 - Resolves bug associated with...
