@@ -20,4 +20,4 @@ save(cop22_data_pack_schema,
      file = "./data/cop22_data_pack_schema.rda",
      compress = "xz")
 
-## Rebuld package again.
+## Rebuild package again.
