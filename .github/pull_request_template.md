@@ -1,4 +1,4 @@
-# Developer:
+## Developer:
 
 <!---
 **START HERE:**
@@ -15,7 +15,7 @@
 - Removes redundant code in...
 -->
 
-## Related Issues
+### Related Issues
 - DP-XXX
 - etc.
 
@@ -28,7 +28,7 @@
 -->
 
 
-# Reviewer:
+## Reviewer:
 - [ ] Tests added/updated & passing.
 - [ ] Clean linting.
 - [ ] Related issue.
