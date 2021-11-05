@@ -20,7 +20,8 @@ createTestDataset <- function(country_uids,
     stop("Not yet set up to produce a test dataset for that COP Year.")
     }
 
-  schema <- datapackr::getDataPackSchema(cop_year)
+  schema <- datapackr::pick_schema(cop_year = cop_year,
+                                   tool = "Data Pack")
   DATIM_map <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
 
   # Get PSNUs to test against ####
