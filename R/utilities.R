@@ -528,6 +528,25 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
 }
 
 #' @export
+#' @title getDataPackSchema
+#'
+#' @param cop_year cop year to pull get schema for
+#'
+#' @return {cop20, cop21}_data_pack_schema
+#'
+getDataPackSchema <- function(cop_year) {
+  if (cop_year == 2020) {
+    return(datapackr::cop20_data_pack_schema)
+  } else if (cop_year == 2021) {
+    return(datapackr::cop21_data_pack_schema)
+  } else {
+    stop("Datapack schema not available for the cop year provided")
+  }
+
+}
+
+
+#' @export
 #' @title Create a new Data Pack
 #' @author Scott Jackson
 #' @description Creates a brand new Data Pack with the supplied characteristics.

@@ -66,8 +66,7 @@ getOPUDataFromDATIM <- function(cop_year,
                                                d2_session = d2_session)
 
   # Filter data by required indicator_codes ####
-  indicator_codes <- datapackr::pick_schema(cop_year = cop_year,
-                                            tool = "Data Pack") %>%
+  indicator_codes <- datapackr::getDataPackSchema(cop_year = cop_year) %>%
     dplyr::filter(dataset == "mer",
                   col_type == "target") %>%
     .[["indicator_code"]]
