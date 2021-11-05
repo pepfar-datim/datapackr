@@ -26,7 +26,7 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
                                  template_path = template_path,
                                  cop_year = cop_year,
                                  tool = "OPU Data Pack")
-  
+
   # Adds output folder to d object ####
   d$keychain$output_folder <- output_folder
 
