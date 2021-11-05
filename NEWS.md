@@ -1,3 +1,18 @@
+# datapackr 5.0.2
+
+## Bug fixes
+* Resolves a bug with `packOPUDataPack` where `createDataPack` was not 
+implemented correctly in version 5.0.1.
+* Patches a bug with `getOPUDataFromDATIM` where `getCOPDataFromDATIM` returns
+a dataframe where the default Category Option Combo UID is listed as `default`
+rather than the appropriate DATIM UID. This will be removed in favor of a more
+permanent solution in future updates.
+
+## Deprecated features
+* `getDataPackSchema` has been deprecated in favor of `pick_schema` and has been
+replaced in the two locations where it was previously used.
+
+
 # datapackr 5.0.1
 
 ## New features
