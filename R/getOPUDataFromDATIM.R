@@ -71,8 +71,11 @@ getOPUDataFromDATIM <- function(cop_year,
                   col_type == "target") %>%
     .[["indicator_code"]]
 
-
+  # TODO: Remove the mutate function when the COC issue is fixed in DATIM
   data_datim %<>%
+    dplyr::mutate(categoryOptionCombo =
+                    ifelse(categoryOptionCombo == "default",
+                           "HllvX50cXC0", categoryOptionCombo)) %>%
     dplyr::left_join(map_des_cocs_local,
                       by = c("dataElement" = "dataelementuid",
                             "categoryOptionCombo" = "categoryoptioncombouid",
