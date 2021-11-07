@@ -38,18 +38,22 @@ canReadFile <- function(path) {
 #' @return Character vector containing valid filepath for further use.
 #'
 handshakeFile <- function(path,
-                          tool = "Data Pack") {
-
-  if (is.null(tool)) {
-    tool <- "Data Pack"
-  }
+                          tool) {
+  
+  # Collect parameters
+  tool <- tool %missing% NULL
+  tool_provided <- !is.null(tool)
 
   if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
     extension <- "xlsx"
   } else {
     stop(
       "Please specify correct file type: Data Pack, Data Pack Template, OPU Data Pack Template, OPU Data Pack.")
-    }
+  }
+  
+  tool <- stringr::str_remove(tool, " Template$")
+  
+  tool <- check_tool(tool = tool)
 
   # If path has issues or NA, prompt user to select file from window.
   if (!canReadFile(path)) {

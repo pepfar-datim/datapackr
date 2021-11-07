@@ -173,6 +173,23 @@ interactive_print <- function(x) {
   }
 }
 
+#' @export
+#'
+#' @title Uses r message instead of print if session is interactive.
+#'
+#' @description
+#' Supplied a message, will share as r message() only if the session is currently interactive.
+#'
+#' @param x Message to print.
+#'
+#' @return Printed message, \code{x}.
+#'
+interactive_message <- function(x) {
+  if (rlang::is_interactive()) {
+    message(x)
+  }
+}
+
 
 
 #' @export
@@ -527,24 +544,6 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
   }
 }
 
-#' @export
-#' @title getDataPackSchema
-#'
-#' @param cop_year cop year to pull get schema for
-#'
-#' @return {cop20, cop21}_data_pack_schema
-#'
-getDataPackSchema <- function(cop_year) {
-  if (cop_year == 2020) {
-    return(datapackr::cop20_data_pack_schema)
-  } else if (cop_year == 2021) {
-    return(datapackr::cop21_data_pack_schema)
-  } else {
-    stop("Datapack schema not available for the cop year provided")
-  }
-
-}
-
 
 #' @export
 #' @title Create a new Data Pack
@@ -641,3 +640,137 @@ compareTemplateToSchema <- function(template_path = NULL,
   }
 
 }
+
+
+#' @export
+#' @title Compile a list ending with different final collapse
+#' 
+#' @param ... - one or more R objects, to be converted to character vectors
+#' @param final - conjunction to use before serial list item (usually 'and' or 'or')
+#' @param oxford - TRUE/FALSE indicating whether to use the Oxford (i.e., serial) comma
+#'
+#' @return A character vector of the concatenated values.
+#'
+paste_oxford <- function(..., final = "and", oxford = TRUE){
+  to_paste <- unlist(list(...))
+  
+  if (length(to_paste) == 1) {
+    to_paste
+  } else {
+    first_bits <- to_paste[1:(length(to_paste)-1)]
+    last <- to_paste[length(to_paste)]
+    
+    start <- paste(first_bits, collapse = ", ")
+    serial <- paste0(final, " ", last)
+    
+    if (oxford) {
+      start = paste0(start, ", ")
+    } else if (length(to_paste) <= 2) {
+      start = paste0(start, " ")
+    }
+    paste0(start, serial)
+  }
+}
+
+#' Default value for `missing_arg`
+#'
+#' This infix function makes it easy to replace `missing_arg`s with a default
+#' value. It's inspired by the way that rlang's `%||%` infix operator works.
+#'
+#' @param x,y If `x` is missing, will return `y`; otherwise returns `x`.
+#' @export
+#' @name op-missing-default
+#' @examples
+#' x <- rlang::missing_arg()
+#' y <- x %missing% 2
+`%missing%` <- function(x, y = NULL) {
+  #if (rlang::is_missing(x)) y else x
+  rlang::maybe_missing(x, y)
+}
+
+
+#' @title Paste a Dataframe in a string
+#' @param x Dataframe to paste
+#' @export
+paste_dataframe <- function(x) {
+  paste(capture.output(print(x)), collapse = "\n")
+}
+
+
+#' @export
+#' @title Parse a value to numeric
+#' @description If x is character, attempts to parse the first occurence of a
+#' sub-string that looks like a number.
+#' 
+#' @importFrom stringr str_extract
+#' @importFrom rlang is_character
+#' 
+#' @param x Value to test and coerce
+#' 
+#' @return x parsed as numeric, if possible
+parse_maybe_number <- function(x, default = NULL) {
+  
+  if (!is.numeric(x)) {
+    
+    # If supplied a character vector attempt to parse
+    if (rlang::is_character(x)) {
+      x_string <- stringr::str_extract(x, "\\d+")
+      if (is.na(x_string)) {
+        x <- default
+        warning("Could not parse the provided character vector into something resembling a number.")
+      } else {
+        x <- as.numeric(x_string)
+      }
+      
+    } else if (is.factor(x)) {
+      x <- as.numeric(as.character(x))
+    } else {
+      x <- default
+    }
+    
+  }
+  
+  x
+  
+}
+
+
+
+commas <- function(...) paste0(..., collapse = ", ")
+
+names2 <- function(x) {
+  names(x) %||% rep("", length(x))
+}
+
+has_names <- function(x) {
+  nms <- names(x)
+  if (is.null(nms)) {
+    rep_along(x, FALSE)
+  } else {
+    !(is.na(nms) | nms == "")
+  }
+}
+
+ndots <- function(...) nargs()
+
+bullet <- function(...) paste0(bold(silver(" * ")), sprintf(...))
+
+# Re-exports ---------------------------------------------------
+
+#' Default value for `NULL`
+#' @importFrom rlang `%||%`
+#' @keywords NULL
+#' @export
+#' @name null-default
+rlang::`%||%`
+
+#' Default value for `NA`
+#' @importFrom rlang `%|%`
+#' @keywords NA
+#' @export
+#' @name na-default
+rlang::`%|%`
+
+#' @importFrom magrittr `%>%`
+#' @export
+magrittr::`%>%`

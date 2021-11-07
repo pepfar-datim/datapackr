@@ -4,10 +4,8 @@ test_that("We can pick a schema", {
 
   test_schema <-  pick_schema(2020, "OPU Data Pack")
   testthat::expect_identical(test_schema, datapackr::cop20OPU_data_pack_schema)
-
   test_schema <-  pick_schema(2021, "OPU Data Pack")
   testthat::expect_identical(test_schema, datapackr::cop21OPU_data_pack_schema)
-
 
   expect_error(pick_schema(1999, "OPU Data Pack"))
 
@@ -16,10 +14,7 @@ test_that("We can pick a schema", {
   test_schema <-  pick_schema(2021, "Data Pack")
   testthat::expect_identical(test_schema, datapackr::cop21_data_pack_schema)
 
-  #Are we sure we want to return this object for anything other than 2020
-  # and 2021?
-  test_schema <-  pick_schema(1999, "Data Pack")
-  testthat::expect_identical(test_schema, datapackr::data_pack_schema)
+  expect_error(pick_schema(1999, "OPU Data Pack"))
 
 
   #Throw an error for garbage inputs
@@ -59,72 +54,141 @@ test_that("We can pick template file", {
 
 
 test_that("We can check datapack paramaters", {
+
+  options(rlang_interactive = TRUE)
+
+  # check_params ####
+  # Test that when not supplied any parameters, check_params returns list of length 0.
   test_params <-  check_params()
   expect_type(test_params, "list")
-  #Is the intent that we should return a zero-length list with no arguments?
   expect_equal(length(test_params), 0L)
 
+  # country_uids ####
   #Test for a valid country UID
-  test_params <-  check_params(country_uids = "JTypsdEUNPw")
+  test_params <- check_params(country_uids = "JTypsdEUNPw")
   expect_type(test_params, "list")
   expect_equal(test_params$country_uids, "JTypsdEUNPw")
 
-  #Test for an invalid country UID
-  test_params <-  check_params(country_uids = "foo")
+  #Throw an error if supplied only invalid country UIDs
+  expect_error(check_params(country_uids = "foo", force = TRUE))
+
+  #Test for mix of valid and invalid country_uids
+  mix <- check_params(country_uids = c("JTypsdEUNPw", "foo"))
+  single_valid <- check_params(country_uids = "JTypsdEUNPw")
+  expect_equal(mix, single_valid)
+
+  # Throw an error if the argument is NULL or invalid, and force = TRUE
+  expect_error(check_params(country_uids = NULL, force = TRUE))
+  expect_error(check_params(country_uids = "foo", force = TRUE))
+
+  # If country_uids is NULL or invalid and force = FALSE, expect all countries returned
+  all_countries <- sort(unique(valid_PSNUs$country_uid))
+  expect_equal(
+    sort(check_params(country_uids = NULL, force = FALSE)$country_uids),
+    all_countries)
+  expect_equal(
+    sort(check_params(country_uids = "foo", force = FALSE)$country_uids),
+    all_countries)
+
+
+  # TODO: Add test for check_PSNUs
+
+
+  # cop_year ####
+  # Test for a valid COP year
+  test_params <- check_params(cop_year = 2020)
   expect_type(test_params, "list")
-  expect_equal(length(check_params(country_uids = "foo")$country_uids), 0L)
+  expect_equal(test_params$cop_year, 2020)
 
-  #Throw an error if the argument is NULL
-  expect_error(check_params(country_uids = NULL))
+  # Test for valid COP year supplied as character
+  test_params <- check_params(cop_year= "2020")
+  expect_type(test_params, "list")
+  expect_equal(test_params$cop_year, 2020)
 
-  #Test for a valid COP year
-  test_params <-  check_params(cop_year = 2020)
+  # Test for valid COP Year supplied in substring
+  test_params <- check_params(cop_year= "COP2020 I think")
   expect_type(test_params, "list")
   expect_equal(test_params$cop_year, 2020)
 
   #When supplied NULL, return the current COP year
-  #Are we sure about this?
-  test_params <-  check_params(cop_year = NULL)
+  test_params <- check_params(cop_year = NULL)
   expect_type(test_params, "list")
   expect_equal(test_params$cop_year, datapackr::getCurrentCOPYear())
 
-  #Error on a bogus COP year
+  # When supplied missing argument at individual function level, return the current COP year
+  test_param <- check_cop_year()
+  expect_type(test_param, "double")
+  expect_equal(test_param, datapackr::getCurrentCOPYear())
+
+  # Error on a bogus COP year
   expect_error(check_params(cop_year = 1999))
 
-  #Can check a valid tool
-  test_params <-  check_params(tool = "Data Pack")
+
+  # tool ####
+  # Can check a valid tool
+  test_params <- check_params(tool = "Data Pack")
   expect_type(test_params, "list")
   expect_equal(test_params$tool, "Data Pack")
 
-  #Can error on a bogus tool
+  # NULL or missing returns "Data Pack" default
+  test_params <- check_params(tool = NULL)
+  expect_type(test_params, "list")
+  expect_equal(test_params$tool, "Data Pack")
+  
+  test_param <- check_tool()
+  expect_type(test_param, "character")
+  expect_equal(test_param, "Data Pack")
+
+  # Can error on a bogus tool
   expect_error(check_params(tool = "Foo Pack"))
 
-  #Can check a valid season
-  test_params <-  check_params(season = "COP")
+
+  # season ####
+  # Can check a valid season
+  test_params <- check_params(season = "COP")
   expect_type(test_params, "list")
   expect_equal(test_params$season, "COP")
 
-  #Can error on a bogus tool
+  # Can error on a bogus season
   expect_error(check_params(season = "The Long Winter"))
 
-  #Return the season automatically if a DataPack and season is
-  #explicit set to NULL
-  test_params <-  check_params(tool = "Data Pack", season = NULL)
+  # Return the season automatically if a DataPack and season is
+  # explicit set to NULL
+  test_params <- check_params(tool = "Data Pack", season = NULL)
   expect_type(test_params, "list")
   expect_named(test_params, c("tool", "season"))
   expect_equal(test_params$season, "COP")
   expect_equal(test_params$tool, "Data Pack")
+  expect_message(test_params <- check_params(tool = "Data Pack", season = NULL))
 
-  #Return the season automatically if an OPU DataPack and season is
-  #explicit set to NULL
-  test_params <-  check_params(tool = "OPU Data Pack", season = NULL)
+  # Return the season automatically if an OPU DataPack and season is
+  # explicit set to NULL
+  test_params <- check_params(tool = "OPU Data Pack", season = NULL)
   expect_type(test_params, "list")
   expect_named(test_params, c("tool", "season"))
   expect_equal(test_params$season, "OPU")
   expect_equal(test_params$tool, "OPU Data Pack")
+  expect_message(check_params(tool = "OPU Data Pack", season = NULL))
+
+  # Deduce the season if not provided
+  test_params <- check_params(season = NULL)
+  expect_type(test_params, "list")
+  expect_named(test_params, c("season"))
+  expect_equal(test_params$season, "COP")
+  expect_message(check_params(season = NULL))
+
+  # If season and tool both provided, but don't match, issue warning, but leave
+  # both in place.
+  test_params <- check_params(tool = "OPU Data Pack", season = "COP")
+  expect_type(test_params, "list")
+  expect_named(test_params, c("tool", "season"))
+  expect_equal(test_params$season, "COP")
+  expect_equal(test_params$tool, "OPU Data Pack")
+  expect_message(check_params(tool = "OPU Data Pack", season = "COP"))
 
 
-  #Can check a valid schema
+  # schema ####
+  # Can check a valid schema
   test_params  <-
     check_params(
       schema = datapackr::cop20_data_pack_schema,
@@ -133,34 +197,58 @@ test_that("We can check datapack paramaters", {
     )
   expect_type(test_params, "list")
   expect_setequal(names(test_params), c("schema", "cop_year", "season"))
+  expect_identical(test_params$schema, datapackr::cop20_data_pack_schema)
 
-  # #Return a message when using an invalid combination of schema/cop_year/season
-  #
-  # expect_message(
-  #   test_params  <-
-  #     check_params(
-  #       schema = datapackr::cop20_data_pack_schema,
-  #       cop_year = 2021,
-  #       season = "COP"
-  #     )
-  # )
+  # Return a message when using an invalid combination of schema/cop_year/season
+  expect_message(
+    test_params  <-
+      check_params(
+        schema = datapackr::cop20_data_pack_schema,
+        cop_year = 2021,
+        season = "COP"
+      )
+  )
 
-  #This will return a handled error, but will NOT return "Global"
-  expect_error(test_params <-
-    check_params(datapack_name = NULL, country_uids = NULL
-    ), "Must supply country_uids.")
-
-  test_args <-  list(datapack_name = "Zambia", country_uids = "f5RoebaDLMx")
-  test_params <-  do.call(check_params, test_args)
+  # datapack_name ####
+  # Test valid combination
+  test_args <- list(datapack_name = "Zambia", country_uids = "f5RoebaDLMx")
+  test_params <- do.call(check_params, test_args)
   expect_true(identical(sort(unlist(test_params)), sort(unlist(test_args))))
 
-  #Expect an error here but there is not one?
-  # test_args <-  list(datapack_name = "Demoland", country_uids = "f5RoebaDLMx")
-  # expect_error(do.call(check_params, test_args))
+  # This will return a handled error, but will NOT return "Global"
+  expect_error(test_params <-
+                 check_params(datapack_name = NULL, country_uids = NULL
+                 ), "Must supply valid country_uids.")
 
-  #Expect an error here but there is not one?
-  #Only get a command line message
-  # test_args <-  list(datapack_name = "Zambia", country_uids = "abc12345678")
-  # expect_error(do.call(check_params, test_args))
+  # Expect a message if datapack_name and country_uids do not match (but allow
+  # custom names)
+  test_args <- list(datapack_name = "Demoland", country_uids = "f5RoebaDLMx")
+  expect_message(do.call(check_params, test_args))
+
+  # Expect an error here 
+  test_args <- list(datapack_name = "Zambia", country_uids = "abc12345678")
+  expect_error(do.call(check_params, test_args))
+
+
+  # Template Path ####
+  # Test valid combination
+  template_path <- pick_template_path(cop_year = 2021, tool = "Data Pack")
+  test_args <- list(template_path = template_path, cop_year = 2021, tool = "Data Pack")
+  test_params <- do.call(check_params, test_args)
+  expect_setequal(names(test_params), c("cop_year", "tool", "template_path"))
+  expect_true(identical(sort(unlist(test_params)), sort(unlist(test_args))))
+
+  # Test deduction power
+  test_args <- list(template_path = NULL, cop_year = 2020, tool = "OPU Data Pack")
+  test_params <- do.call(check_params, test_args)
+  expect_setequal(names(test_params), c("cop_year", "tool", "template_path"))
+  expected_path <- pick_template_path(cop_year = 2020, tool = "OPU Data Pack")
+  expect_identical(test_params$template_path, expected_path)
+
+  # Test invalid combination
+  template_path <- pick_template_path(cop_year = 2021, tool = "Data Pack")
+  test_args <- list(template_path = template_path, cop_year = 2021, tool = "OPU Data Pack")
+  expect_message(do.call(check_params, test_args))
+
   }
 )
