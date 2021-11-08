@@ -11,6 +11,7 @@
 ## Minor improvements and fixes
 * Improves and updates tests related to parameter checks and schemas.
 * Introduces many new small utilities functions such as `%missing%` and `%||%`.
+* Improves automation of Data Pack Template/schema validation.
 
 
 # datapackr 5.0.1
