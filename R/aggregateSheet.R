@@ -26,7 +26,6 @@ aggregateSheet <- function(d, sheet) {
       dplyr::summarise(value = sum(value)) %>%
       dplyr::ungroup()
   }
-  
   # Add ages to PMTCT_EID
   if (sheet == "PMTCT_EID") {
     d$data$extract %<>%
@@ -38,7 +37,6 @@ aggregateSheet <- function(d, sheet) {
         )
       )
   }
-  
   if (sheet == "KP") {
     d$data$extract %<>%
       dplyr::mutate(

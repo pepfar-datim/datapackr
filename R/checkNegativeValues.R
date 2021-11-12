@@ -13,12 +13,12 @@
 checkNegativeValues <- function(d, sheet) {
   negative_values <- d$data$extract %>%
     dplyr::filter(value < 0)
-  
+
   d$tests$negative_values <- dplyr::bind_rows(d$test$negative_values, negative_values)
   attr(d$tests$negative_values, "test_name") <- "Negative values"
-  
+
   if (NROW(negative_values) > 0) {
-    
+
     warning_msg <-
       paste0(
         "ERROR! In tab ",
@@ -27,7 +27,7 @@ checkNegativeValues <- function(d, sheet) {
         " against FY22 Targets are whole, positive, numeric values. These will be removed. -> \n\t* ",
         paste(unique(d$tests$negative_values$indicator_code), collapse = "\n\t* "),
         "\n")
-    
+
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
