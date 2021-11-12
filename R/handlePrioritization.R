@@ -13,17 +13,26 @@
 
 handlePrioritization <- function(d, sheet) {
 
+  #### gather error inputs ----
+
   # Remove _Military district from Prioritization extract as this can't be assigned a prioritization
   d$data$extract %<>%
     dplyr::filter(!stringr::str_detect(PSNU, "^_Military"),
                   # Excuse valid NA Prioritizations
                   value != "NA")
 
-  # blank prioritizations?
+  # are there blank prioritizations?
   blank_prioritizations <- d$data$extract %>%
     dplyr::filter(is.na(value)) %>%
     dplyr::select(PSNU)
 
+  # are there invalid prioritizations?
+  invalid_prioritizations <- d$data$extract %>%
+    dplyr::filter(!(value %in% c("1", "2", "4", "5", "6", "7", "8")))
+
+  #### test and return errors or d object ----
+
+  #blank prioritization testing
   if (NROW(blank_prioritizations) > 0) {
 
     d$tests$blank_prioritizations <- blank_prioritizations
@@ -45,11 +54,9 @@ handlePrioritization <- function(d, sheet) {
     d$info$has_error <- TRUE
   }
 
-  # Test for valid priortization values
-  invalid_prioritizations <- d$data$extract %>%
-    dplyr::filter(!(value %in% c("1", "2", "4", "5", "6", "7", "8")))
-
+  #invalid prioritization testing
   if (NROW(invalid_prioritizations) > 0) {
+
     d$tests$invalid_prioritizations <- invalid_prioritizations
     attr(d$tests$invalid_prioritizations, "test_name") <- "Invalid prioritizations"
 
