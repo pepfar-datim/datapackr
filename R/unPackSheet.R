@@ -162,7 +162,7 @@ unPackDataPackSheet <- function(d, sheet) {
   d <- defunctDisaggs(d, sheet)
 
   # Aggregate OVC_HIVSTAT
-  d <- aggregateSheets(d, sheet)
+  d <- aggregateSheet(d, sheet)
 
   return(d)
 }

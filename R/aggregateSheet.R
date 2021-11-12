@@ -11,7 +11,7 @@
 #' @return d
 #'
 
-aggregateSheets <- function(d, sheet){
+aggregateSheet <- function(d, sheet) {
   # Aggregate OVC_HIVSTAT
   if (sheet == "OVC") {
     d$data$extract %<>%
