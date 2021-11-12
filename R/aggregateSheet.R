@@ -51,4 +51,3 @@ aggregateSheet <- function(d, sheet) {
   }
   return(d)
 }
-
