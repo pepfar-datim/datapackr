@@ -533,3 +533,14 @@ check_params <- function(country_uids,
 
   return(params)
 }
+
+
+#' @export
+#' @title Returns version of the API
+#'
+#' @return Version of the API
+#'
+api_version <- function() {
+  "36"
+}
+
