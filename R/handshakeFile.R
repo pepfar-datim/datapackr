@@ -39,7 +39,7 @@ canReadFile <- function(path) {
 #'
 handshakeFile <- function(path,
                           tool) {
-  
+
   # Collect parameters
   tool <- tool %missing% NULL
   tool_provided <- !is.null(tool)
@@ -50,9 +50,9 @@ handshakeFile <- function(path,
     stop(
       "Please specify correct file type: Data Pack, Data Pack Template, OPU Data Pack Template, OPU Data Pack.")
   }
-  
+
   tool <- stringr::str_remove(tool, " Template$")
-  
+
   tool <- check_tool(tool = tool)
 
   # If path has issues or NA, prompt user to select file from window.

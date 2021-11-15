@@ -101,12 +101,12 @@ test_that("We can check datapack paramaters", {
   expect_equal(test_params$cop_year, 2020)
 
   # Test for valid COP year supplied as character
-  test_params <- check_params(cop_year= "2020")
+  test_params <- check_params(cop_year = "2020")
   expect_type(test_params, "list")
   expect_equal(test_params$cop_year, 2020)
 
   # Test for valid COP Year supplied in substring
-  test_params <- check_params(cop_year= "COP2020 I think")
+  test_params <- check_params(cop_year = "COP2020 I think")
   expect_type(test_params, "list")
   expect_equal(test_params$cop_year, 2020)
 
@@ -134,7 +134,7 @@ test_that("We can check datapack paramaters", {
   test_params <- check_params(tool = NULL)
   expect_type(test_params, "list")
   expect_equal(test_params$tool, "Data Pack")
-  
+
   test_param <- check_tool()
   expect_type(test_param, "character")
   expect_equal(test_param, "Data Pack")
@@ -225,7 +225,7 @@ test_that("We can check datapack paramaters", {
   test_args <- list(datapack_name = "Demoland", country_uids = "f5RoebaDLMx")
   expect_message(do.call(check_params, test_args))
 
-  # Expect an error here 
+  # Expect an error here
   test_args <- list(datapack_name = "Zambia", country_uids = "abc12345678")
   expect_error(do.call(check_params, test_args))
 
