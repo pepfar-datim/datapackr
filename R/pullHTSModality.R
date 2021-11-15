@@ -12,14 +12,15 @@
 getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL,
                            d2_session = dynGet("d2_default_session",
                                                inherits = TRUE)) {
-  if (cop_year %in% c(2020, 2021)) {
-    groupSet <- "ra9ZqrTtSQn"
-  } else if (cop_year == 2019) {
-    groupSet <- "Jm6OwL9IqEa"
-  } else if (cop_year == 2018) {
-    groupSet <- "CKTkg8dLlr7"
-  }
-
+  groupSet <- switch(
+    cop_year,
+    2022 = "bEktFhmEKn6",
+    2021 = "ra9ZqrTtSQn",
+    2020 = "ra9ZqrTtSQn",
+    2019 = "Jm6OwL9IqEa",
+    2018 = "CKTkg8dLlr7"
+  )
+  
   fy_pattern <- "FY\\d{2},\\d{2}R/FY\\d{2},\\d{2}T"
 
   modality_map <- api_call(paste0("dataElementGroupSets/", groupSet),
@@ -38,5 +39,5 @@ getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL,
       dplyr::filter(dataElement %in% dataElements)
   }
 
-  return(modality_map)
+  modality_map
 }
