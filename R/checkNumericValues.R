@@ -14,23 +14,17 @@
 
 checkNumericValues <- function(d, sheet, header_cols = NULL) {
 
-  if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
+  ## Process----
 
+  #what is the data source?
+  if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
     data <- d$data$SNUxIM
   } else {
     data <- d$data$extract
   }
 
-  header_cols <- d$info$schema %>%
-    dplyr::filter(sheet_name == sheet,
-                  !is.na(indicator_code),
-                  !indicator_code %in% c("sheet_num", "ID", "SNU1"),
-                  col_type %in% c("row_header", "target")) %>%
-    dplyr::filter(col_type == "row_header")
-
+  # process datapack vs opu datapack
   if (d$info$tool == "OPU Data Pack") {
-
-    # Should `header_cols` be brought in as a parameter or reproduced here?
     data %<>%
       tidyr::gather(key = "mechCode_supportType",
                     value = "value",
@@ -38,9 +32,7 @@ checkNumericValues <- function(d, sheet, header_cols = NULL) {
       dplyr::select(dplyr::all_of(header_cols$indicator_code),
                     mechCode_supportType, value) %>%
       tidyr::drop_na(value)
-
   }
-
   if (d$info$tool == "Data Pack" & sheet == "PSNUxIM" & d$info$cop_year == 2021) {
     data %<>%
       tidyr::gather(key = "mechCode_supportType",
@@ -51,6 +43,7 @@ checkNumericValues <- function(d, sheet, header_cols = NULL) {
       tidyr::drop_na(value)
   }
 
+  #produce non numeric data for testing
   non_numeric <- data %>%
     dplyr::mutate(value_numeric = suppressWarnings(as.numeric(value))) %>%
     dplyr::filter(is.na(value_numeric)) %>%
@@ -64,6 +57,7 @@ checkNumericValues <- function(d, sheet, header_cols = NULL) {
     dplyr::select(row_id) %>%
     dplyr::mutate(sheet = sheet)
 
+  ## Testing----
   d$tests$non_numeric <- dplyr::bind_rows(d$tests$non_numeric, non_numeric)
   attr(d$tests$non_numeric, "test_name") <- "Non-numeric values"
 

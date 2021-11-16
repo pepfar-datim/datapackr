@@ -11,12 +11,17 @@
 #' @return d
 #'
 checkDuplicateRows <- function(d, sheet) {
+
+  ## Process----
+
+  # what is the data source?
   if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
     data <- d$data$SNUxIM
   } else {
     data <- d$data$extract
   }
 
+  #produce header cols
   if (d$info$tool == "OPU Data Pack") {
     header_cols <- d$info$schema %>%
       dplyr::filter(
@@ -29,7 +34,9 @@ checkDuplicateRows <- function(d, sheet) {
     header_cols <- c("PSNU", "indicator_code", "Age", "Sex", "KeyPop")
   }
 
-  # TEST for duplicates ####
+  ## Testing----
+
+  # TEST for duplicates
   duplicates <- data %>%
     dplyr::filter(value != 0) %>%
     dplyr::select(tidyselect::any_of(header_cols)) %>%

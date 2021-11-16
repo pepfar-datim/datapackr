@@ -11,12 +11,20 @@
 #' @return d
 #'
 checkColStructure <- function(d, sheet) {
+
+  ## Process ----
+
+  #whats is our data source?
   if (sheet %in% c("SNU x IM", "PSNUxIM")) {
     data <- d$data$SNUxIM
   } else {
+    #  TODO: Add code to combine or drop duplicate columns
+    d$data$extract <- d$data$extract[, !duplicated(colnames(d$data$extract))] %>%
+      tibble::as_tibble(.name_repair = "unique")
     data <- d$data$extract
   }
 
+  #extract submitted columns
   submission_cols <- names(data) %>%
     tibble::enframe(name = NULL) %>%
     dplyr::select(indicator_code = value) %>%
@@ -27,6 +35,7 @@ checkColStructure <- function(d, sheet) {
         !stringr::str_detect(indicator_code, "\\d{4,}_(DSD|TA)|^$")),
         ~ .)
 
+  #check submission columns against schema columns
   col_check <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet) %>%
     dplyr::select(indicator_code, template_order = col) %>%
@@ -38,7 +47,9 @@ checkColStructure <- function(d, sheet) {
   d[["info"]][["col_check"]][[as.character(sheet)]] <- character()
   d[["info"]][["col_check"]][[as.character(sheet)]] <- col_check
 
-  # Alert to missing cols ####
+  ## Testing----
+
+  # Alert to missing cols
   if (any(is.na(col_check$submission_order))) {
 
     missing_cols <- col_check %>%
@@ -60,7 +71,7 @@ checkColStructure <- function(d, sheet) {
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
-  # Alert to duplicate columns ####
+  # Alert to duplicate columns
   submission_cols_no_blanks <- submission_cols %>%
     dplyr::filter(indicator_code != "") %>%
     dplyr::select(sheet, indicator_code)
@@ -91,10 +102,7 @@ checkColStructure <- function(d, sheet) {
     d$info$has_error <- TRUE
   }
 
-  #  TODO: Add code to combine or drop duplicate columns.
-
-  # Alert to columns which may be out of order ####
-
+  # Alert to columns which may be out of order
   columns_out_of_order <- col_check %>%
     dplyr::filter(template_order != submission_order) %>%
     dplyr::select(sheet,

@@ -12,20 +12,27 @@
 #'
 checkMissingMetadata <- function(d, sheet) {
 
-  if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
+  ## process----
 
+  #what is our data source?
+  if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
     data <- d$data$SNUxIM
   } else {
     data <- d$data$extract
   }
 
+  #what row does the data begin at?
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
 
+  #add column sheet with sheet label and add row value
+  #filter out data from columns that match indicator codes and that is empty
   missing_metadata <- data %>%
     dplyr::mutate(row = (1:dplyr::n()) + header_row,
                   sheet = sheet) %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("^PSNU$|^ID$|^indicator_code$")),
                      dplyr::any_vars(is.na(.)))
+
+  ## testing----
 
   # Alert to missing metadata
   if (NROW(missing_metadata) > 0) {

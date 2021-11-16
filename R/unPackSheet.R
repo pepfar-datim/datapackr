@@ -108,11 +108,7 @@ unPackDataPackSheet <- function(d, sheet) {
   # Run structural checks
   d <- checkColStructure(d, sheet)
 
-  # Remove duplicate columns (Take the first example)
-  # Make sure no blank column names
   # if tab has no target related content, send d back
-  d$data$extract <- d$data$extract[, !duplicated(colnames(d$data$extract))] %>%
-    tibble::as_tibble(.name_repair = "unique")
   if (NROW(d$data$extract) == 0) {
     d$data$extract <- NULL
     return(d)
@@ -145,8 +141,16 @@ unPackDataPackSheet <- function(d, sheet) {
   # Drop NAs
   d$data$extract %<>% tidyr::drop_na(value)
 
-  # TEST for non-numeric values
-  d <- checkNumericValues(d, sheet)
+  # pull the header columns from schema to pass to checkNumericValues
+  header_cols <- d$info$schema %>%
+    dplyr::filter(sheet_name == sheet,
+                  !is.na(indicator_code),
+                  !indicator_code %in% c("sheet_num", "ID", "SNU1"),
+                  col_type %in% c("row_header", "target")) %>%
+    dplyr::filter(col_type == "row_header")
+
+  # TEST for non-numeric values - added passing of header_cols
+  d <- checkNumericValues(d, sheet, header_cols = header_cols)
 
   # Now that non-numeric cases noted, convert all to numeric & drop non-numeric
   d$data$extract %<>%

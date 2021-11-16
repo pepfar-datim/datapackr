@@ -14,13 +14,16 @@
 #'
 defunctDisaggs <- function(d, sheet) {
 
-  if (sheet %in% c("SNU x IM", "PSNUxIM")) {
+  ## Process----
 
+  #what is our data source?
+  if (sheet %in% c("SNU x IM", "PSNUxIM")) {
     stop("Sorry! Can't check the SNU x IM tab with this function.")
   } else {
     data <- d$data$extract
   }
 
+  #compare valid disaggs vs defunct
   valid_disaggs <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet,
                   (col_type == "target" | indicator_code == "TX_CURR_SUBNAT.R")) %>%
@@ -34,7 +37,7 @@ defunctDisaggs <- function(d, sheet) {
     dplyr::select(indicator_code, Age, Sex, KeyPop) %>%
     dplyr::distinct()
 
-
+  ## Testing----
   d$tests$defunct_disaggs <- dplyr::bind_rows(d$tests$defunct_disaggs, defunct_disaggs)
   attr(d$tests$defunct_disaggs, "test_name") <- "Defunct disaggs"
 

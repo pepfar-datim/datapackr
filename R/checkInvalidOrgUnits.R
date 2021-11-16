@@ -12,12 +12,16 @@
 #'
 checkInvalidOrgUnits <- function(d, sheet) {
 
+  ## Process----
+
+  #what is the data source?
   if (sheet %in% c("SNU x IM", "PSNUxIM")) {
     data <- d$data$SNUxIM
   } else {
     data <- d$data$extract
   }
 
+  #pull together invalid units
   invalid_orgunits <- data %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("value|distribution")), dplyr::any_vars(!is.na(.))) %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("value|distribution")), dplyr::any_vars(. != 0)) %>%
@@ -31,9 +35,10 @@ checkInvalidOrgUnits <- function(d, sheet) {
     dplyr::select(PSNU) %>%
     dplyr::mutate(sheet = sheet)
 
+  ## Testing----
+
   d$tests$invalid_orgunits <- dplyr::bind_rows(d$tests$invalid_orgunits, invalid_orgunits)
   attr(d$tests$invalid_orgunits, "test_name") <- "Invalid orgunits"
-
 
   if (NROW(invalid_orgunits) > 0) {
 

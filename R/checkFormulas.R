@@ -10,30 +10,25 @@
 #' @return d
 #'
 checkFormulas <- function(d, sheet) {
+
+  ## Process----
+
+  #what is the data source?
   if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
     data <- d$data$SNUxIM
   } else {
     data <- d$data$extract
   }
 
+  #what row does the data begin at?
   header_row <- headerRow(tool = "Data Pack", cop_year = d$info$cop_year)
 
-  # Pull in formulas from schema ###
+  # pull in formulas from schema
   formulas_schema <- d$info$schema %>%
     dplyr::filter(
       sheet_name == sheet,
       !is.na(formula)) %>%
     dplyr::select(col, indicator_code, formula) %>%
-    # tidyr::crossing(row = ((header_row+1):max(formulas_datapack$row))) %>%
-    # dplyr::select(row, col, indicator_code, formula) %>%
-    # dplyr::mutate(
-    #   formula =
-    #     stringr::str_replace_all(
-    #       formula,
-    #       pattern = paste0("(?<=[:upper:])", header_row+1),
-    #       replacement = as.character((header_row+1):max(formulas_datapack$row))
-    #     )
-    # )
     dplyr::mutate(
       formula = stringr::str_replace_all(
         formula,
@@ -42,7 +37,7 @@ checkFormulas <- function(d, sheet) {
       )
     )
 
-  # Pull in formulas from Data Pack sheet ####
+  # Pull in formulas from Data Pack sheet
   formulas_datapack <-
     tidyxl::xlsx_cells(path = d$keychain$submission_path,
                       sheets = sheet,
@@ -81,8 +76,7 @@ checkFormulas <- function(d, sheet) {
         "\\\\d+"
       ))
 
-  # Compare formulas from schema against Data Pack to see diffs ####
-  #TODO: Add sheet to the output for audit purposes
+  # Compare formulas from schema against Data Pack to see diffs
   altered_formulas <- formulas_schema %>%
     dplyr::left_join(
       formulas_datapack,
@@ -99,13 +93,17 @@ checkFormulas <- function(d, sheet) {
     dplyr::mutate(count = dplyr::n()) %>%
     dplyr::group_by(indicator_code, correct_fx, submitted_fx, count) %>%
     dplyr::summarise(affected_rows = list(unique(row))) %>%
-    dplyr::ungroup()
+    dplyr::ungroup() %>%
+    dplyr::mutate(sheet = sheet) #Add sheet to the output for audit purposes
 
+  ## Testing----
+
+  # create data frame with altered formulas
   d$tests$altered_formulas <-
     dplyr::bind_rows(d$tests$altered_formulas, altered_formulas)
   attr(d$tests$altered_formulas, "test_name") <- "Altered Formulas"
 
-  # Compile warning message ####
+  # Compile warning message
   if (NROW(altered_formulas) > 0) {
 
     cols_affected <- altered_formulas %>%
