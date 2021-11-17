@@ -285,25 +285,6 @@ addcols <- function(data, cnames, type = "character") {
 
 }
 
-#' @export
-#' @title Return current FY based on system date.
-#'
-#' @return Current FY as numeric.
-#'
-currentFY <- function() {
-  current_year <- Sys.Date() %>%
-    format("%Y") %>%
-    as.numeric()
-
-  current_month <- Sys.Date() %>%
-    format("%m") %>%
-    as.numeric()
-
-  current_FY <- ifelse(current_month > 9, current_year + 1, current_year)
-
-  return(current_FY)
-}
-
 
 #' @export
 #' @title Determine whether the user is logged into DATIM or not.
