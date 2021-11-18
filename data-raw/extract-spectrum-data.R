@@ -18,6 +18,12 @@ for (filepath in dp_filepaths) {
       range = readxl::cell_limits(c(1, 4), c(NA, 16)),
       col_types = "text",
       .name_repair = "minimal"
+    ) %>%
+    dplyr::mutate(
+      calendar_quarter =
+        dplyr::case_when(
+          calendar_quarter == "CY2021Q3" ~ "CY2022Q3",
+          TRUE ~ calendar_quarter)
     )
   
   country_name <-
@@ -40,4 +46,18 @@ for (filepath in dp_filepaths) {
   
 }
 
-saveRDS(spectrum_extracts, "/Volumes/GoogleDrive/My Drive/PEPFAR/COP Targets/COP 22/2) Development/SpectrumExtracts.rds")
+saveRDS(spectrum_extracts, "/Volumes/GoogleDrive/My Drive/PEPFAR/COP Targets/COP 22/2) Development/Spectrum Examples/SpectrumExtracts.rds")
+
+
+# Export ####
+output_path <- "/Volumes/GoogleDrive/My Drive/PEPFAR/COP Targets/COP 22/2) Development/Spectrum Examples/"
+
+for (i in 1:length(spectrum_extracts)) {
+  country <- spectrum_extracts[[i]]$country_name
+  data <- spectrum_extracts[[i]]$data
+  
+  output_file_name <- 
+    paste0(output_path, "COP21SpectrumExtract_", country, ".csv")
+  
+  readr::write_csv(data, output_file_name)
+}
