@@ -322,7 +322,7 @@ check_params <- function(country_uids,
     if (is.null(cop_year)) {
       cop_year <- getCurrentCOPYear()
     }
-    if (!cop_year %in% c(2020, 2021)) {
+    if (!cop_year %in% c(2020, 2021, 2022)) {
       stop("Sorry, datapackr only supports COP20 and COP21 Data Packs.")
     }
     return(cop_year)
