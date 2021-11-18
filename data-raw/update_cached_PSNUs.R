@@ -10,10 +10,10 @@ datapackr::loginToDATIM(secrets)
 # between COP20 and COP21.
 # We preserve their country level PSNUs for the moment to allow for COP20 OPU
 # Processing
-cop22_valid_PSNUs <- getPSNUs(additional_fields = "lastUpdated")
+valid_PSNUs <- getPSNUs(additional_fields = "lastUpdated")
 
 compare_diffs <- datapackr::valid_PSNUs %>%
-  dplyr::full_join(cop22_valid_PSNUs, by = "psnu_uid") %>%
+  dplyr::full_join(valid_PSNUs, by = "psnu_uid") %>%
   dplyr::filter(is.na(psnu.x) | is.na(psnu.y))
 
-save(cop22_valid_PSNUs, file = "./data/cop22_valid_PSNUs.rda", compress = "xz")
+save(valid_PSNUs, file = "./data/valid_PSNUs.rda", compress = "xz")
