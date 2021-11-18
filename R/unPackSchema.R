@@ -1,15 +1,15 @@
 #' @export
 #' @md
-#' 
+#'
 #' @title Validate a `datapackr` Schema object
 #'
 #' @description
 #' Useful in validating a `datapackr` schema object and investigating any issues.
-#' 
+#'
 #' @inheritParams datapackr_params
-#' 
+#'
 #' @return List object with any failed Schema validation checks.
-#' 
+#'
 #' @family schema-helpers
 validateSchema <- function(schema,
                            filepath,
@@ -127,7 +127,7 @@ validateSchema <- function(schema,
         data = sheet_names_comparison)
     }
   }
-  
+
     ## dataset ####
   if (!grepl("OPU Data Pack", tool)) {
     datasets_invalid <- schema %>%
@@ -141,12 +141,12 @@ validateSchema <- function(schema,
             TRUE ~ TRUE)) %>%
       dplyr::filter(invalid_dataset == TRUE) %>%
       dplyr::select(sheet_name, data_structure, col, indicator_code, dataset, col_type)
-    
+
     if (NROW(datasets_invalid) != 0) {
-      tests$datasets_invalid = datasets_invalid
+      tests$datasets_invalid <- datasets_invalid
     }
   }
-  
+
     ## col_type ####
   if (!grepl("OPU Data Pack", tool)) {
     col_type_invalid <- schema %>%
@@ -157,21 +157,21 @@ validateSchema <- function(schema,
           & (sheet_num %in% skip_sheets$num & !is.na(col_type))) %>%
       dplyr::filter(invalid_col_type == TRUE) %>%
       dplyr::select(sheet_name, col, indicator_code, data_structure, col_type)
-    
+
     if (NROW(col_type_invalid) != 0) {
-      tests$col_type_invalid = col_type_invalid
+      tests$col_type_invalid <- col_type_invalid
     }
   }
-  
+
     ## dataElements ####
       ### UID Syntax
   DEs_schema <- schema %>%
     dplyr::filter(col_type %in% c("past", "target", "result")) %>%
     dplyr::select(sheet_name, col, indicator_code, dataset, dataelement_dsd, dataelement_ta)
-  
+
   uid_pattern <- "[A-Za-z][A-Za-z0-9]{10}"
   multi_uid_pattern <- paste0("^(",uid_pattern,")(\\.((",uid_pattern,")))*$")
-  
+
   DEs_DSD_syntax_invalid <- DEs_schema %>%
     dplyr::select(-dataelement_ta) %>%
     dplyr::mutate(
@@ -180,11 +180,11 @@ validateSchema <- function(schema,
           sheet_name == "PSNUxIM", dataelement_dsd != "NA",
           !stringr::str_detect(dataelement_dsd, multi_uid_pattern))) %>%
     dplyr::filter(invalid_DSD_DEs == TRUE)
-  
+
   if (NROW(DEs_DSD_syntax_invalid) != 0) {
-    tests$DEs_DSD_syntax_invalid = DEs_DSD_syntax_invalid
+    tests$DEs_DSD_syntax_invalid <- DEs_DSD_syntax_invalid
   }
-  
+
   DEs_TA_syntax_invalid <- DEs_schema %>%
     dplyr::select(-dataelement_dsd) %>%
     dplyr::mutate(
@@ -193,17 +193,17 @@ validateSchema <- function(schema,
           sheet_name == "PSNUxIM", dataelement_ta != "NA",
           !stringr::str_detect(dataelement_ta, multi_uid_pattern))) %>%
     dplyr::filter(invalid_TA_DEs == TRUE)
-    
+
   if (NROW(DEs_TA_syntax_invalid) != 0) {
-    tests$DEs_TA_syntax_invalid = DEs_TA_syntax_invalid
+    tests$DEs_TA_syntax_invalid <- DEs_TA_syntax_invalid
   }
-  
+
     ##> Match DATIM (valid UIDs only)
   # DEs_mismatch_DATIM <- DEs_schema %>%
   #   dplyr::filter(!dataelement_dsd %in% DEs_DSD_syntax_invalid$dataelement_dsd,
   #                 !dataelement_ta %in% DEs_TA_syntax_invalid$dataelement_ta) %>%
     # how to check these against DATIM... Cache the data? pull fresh? how to maintain which datasets to pull?
-    
+
     ## categoryoption_specified ####
       ### UID Syntax
   COs_syntax_invalid <- schema %>%
@@ -215,9 +215,9 @@ validateSchema <- function(schema,
           sheet_name == "PSNUxIM", categoryoption_specified != "NA",
           !stringr::str_detect(categoryoption_specified, multi_uid_pattern))) %>%
     dplyr::filter(invalid_COs == TRUE)
-  
+
   if (NROW(COs_syntax_invalid) != 0) {
-    tests$COs_syntax_invalid = COs_syntax_invalid
+    tests$COs_syntax_invalid <- COs_syntax_invalid
   }
 
     ## value_type ####
@@ -229,9 +229,9 @@ validateSchema <- function(schema,
           & (sheet_num %in% skip_sheets$num & !is.na(value_type))) %>%
       dplyr::filter(invalid_value_type == TRUE) %>%
       dplyr::select(sheet_name, col, indicator_code, value_type)
-    
+
     if (NROW(value_type_invalid) != 0) {
-      tests$value_type_invalid = value_type_invalid
+      tests$value_type_invalid <- value_type_invalid
     }
   }
       # TODO: Update
@@ -248,18 +248,18 @@ validateSchema <- function(schema,
     ## Test valid_kps ####
       #     valid_kps.test =
       #       !valid_kps %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog == "Coarse KPs"], empty),
-      
+
     ## Test formulas ####
   fxs_ref_error <- schema %>%
     dplyr::mutate(
       ref_error_fxs = stringr::str_detect(formula, "#REF")) %>%
     dplyr::filter(ref_error_fxs == TRUE) %>%
     dplyr::select(sheet_name, col, indicator_code, formula)
-  
+
   if (NROW(fxs_ref_error) != 0) {
-    tests$fxs_ref_error = fxs_ref_error
+    tests$fxs_ref_error <- fxs_ref_error
   }
-  
+
   # TODO: TESTS to add ####
     # * No duplicate indicator_codes on any single sheet
     # * Labels (row 3) for % cols include % at end
@@ -272,17 +272,17 @@ validateSchema <- function(schema,
     # * ID column fx is correct
     # * No invalid comment types
     # * Numeric or % formatting correct
-  
+
   # Compile test results ####
   if (length(tests) > 0) {
-    
+
     interactive_message("ERROR! Issues with schema values! See output.")
   } else {
     interactive_message("Schema checks out! Great job!")
   }
-  
+
   tests
-  
+
 }
 
 
@@ -299,7 +299,7 @@ validateSchema <- function(schema,
 #' @inheritParams datapackr_params
 #'
 #' @return Data Pack schema.
-#' 
+#'
 #' @family schema-helpers
 #'
 unPackSchema_datapack <- function(filepath = NULL,

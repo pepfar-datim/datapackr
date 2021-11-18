@@ -97,18 +97,18 @@ headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
 #' @return Schema file for given cop_year and tool type
 #'
 pick_schema <- function(cop_year, tool) {
-  
+
   # Collect parameters
   tool <- tool %missing% NULL
   cop_year <- cop_year %missing% NULL
-  
+
   tool_provided <- !is.null(tool)
   cop_year_provided <- !is.null(cop_year)
-  
+
   if (!tool_provided | !cop_year_provided) {
     interactive_print("Attempted to deduce schema.")
   }
-  
+
   cop_year %<>% check_cop_year()
   invisible(capture.output(tool %<>% check_tool(tool = ., cop_year = cop_year)))
 
@@ -131,7 +131,7 @@ pick_schema <- function(cop_year, tool) {
       stop("Data Pack schema not available for the COP year provided.")
     }
   }
-  
+
   schema
 }
 
@@ -145,13 +145,13 @@ pick_schema <- function(cop_year, tool) {
 #' @return Template filepath for given cop_year and tool.
 #'
 pick_template_path <- function(cop_year, tool) {
-  
+
   cop_year <- cop_year %missing% NULL
   tool <- tool %missing% NULL
-  
+
   params <- check_params(cop_year = cop_year,
                          tool = tool)
-  
+
   for (p in names(params)) {
     assign(p, purrr::pluck(params, p))
   }
@@ -229,7 +229,7 @@ pick_template_path <- function(cop_year, tool) {
 #' @param tool Type of tool this function will create or interact with. Either
 #' \code{OPU Data Pack} or \code{Data Pack}
 #' @param season Either \code{COP} or \code{OPU}.
-#' 
+#'
 #' @family parameter-helpers
 #'
 #' @return list of all paramaters of this constructor function

@@ -644,30 +644,27 @@ compareTemplateToSchema <- function(template_path = NULL,
 
 #' @export
 #' @title Compile a list ending with different final collapse
-#' 
+#'
 #' @param ... - one or more R objects, to be converted to character vectors
 #' @param final - conjunction to use before serial list item (usually 'and' or 'or')
 #' @param oxford - TRUE/FALSE indicating whether to use the Oxford (i.e., serial) comma
 #'
 #' @return A character vector of the concatenated values.
 #'
-paste_oxford <- function(..., final = "and", oxford = TRUE){
+paste_oxford <- function(..., final = "and", oxford = TRUE) {
   to_paste <- unlist(list(...))
-  
+
   if (length(to_paste) == 1) {
     to_paste
   } else {
-    first_bits <- to_paste[1:(length(to_paste)-1)]
+    first_bits <- to_paste[1:(length(to_paste) - 1)]
     last <- to_paste[length(to_paste)]
-    
+
     start <- paste(first_bits, collapse = ", ")
     serial <- paste0(final, " ", last)
-    
-    if (oxford) {
-      start = paste0(start, ", ")
-    } else if (length(to_paste) <= 2) {
-      start = paste0(start, " ")
-    }
+
+    start <- ifelse(oxford,paste0(start, ", "),paste0(start, " "))
+
     paste0(start, serial)
   }
 }
@@ -701,17 +698,17 @@ paste_dataframe <- function(x) {
 #' @title Parse a value to numeric
 #' @description If x is character, attempts to parse the first occurence of a
 #' sub-string that looks like a number.
-#' 
+#'
 #' @importFrom stringr str_extract
 #' @importFrom rlang is_character
-#' 
+#'
 #' @param x Value to test and coerce
-#' 
+#'
 #' @return x parsed as numeric, if possible
 parse_maybe_number <- function(x, default = NULL) {
-  
+
   if (!is.numeric(x)) {
-    
+
     # If supplied a character vector attempt to parse
     if (rlang::is_character(x)) {
       x_string <- stringr::str_extract(x, "\\d+")
@@ -721,17 +718,17 @@ parse_maybe_number <- function(x, default = NULL) {
       } else {
         x <- as.numeric(x_string)
       }
-      
+
     } else if (is.factor(x)) {
       x <- as.numeric(as.character(x))
     } else {
       x <- default
     }
-    
+
   }
-  
+
   x
-  
+
 }
 
 
@@ -740,12 +737,12 @@ parse_maybe_number <- function(x, default = NULL) {
 #' @md
 #' @description Tests whether a character string matches the regex of a DHIS2
 #' 11-digit UID. Vectorized over `string` and `pattern`.
-#' 
+#'
 #' @param string Input vector. Either a character vector, or something coercible
 #' to one.
-#' 
+#'
 #' @importFrom stringr str_detect
-#' 
+#'
 #' @return A logical vector.
 is_uidish <- function(string) {
   stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")
