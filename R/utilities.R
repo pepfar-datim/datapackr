@@ -125,36 +125,6 @@ swapColumns <- function(to, from) {
 
 }
 
-#' @export
-#' @title Write character vector of Excel formulas into Openxlsx Workbook object
-#' horizontally, rather than vertically.
-#'
-#' @description
-#' Takes a character vector of Excel formulas (\code{x}) and writes these into
-#' an Openxlsx Workbook object (\code{wb}) horizontally, beginning at the cell
-#' position demarcated by \code{xy}. This function augments the existing
-#' function in the Openxlsx package \code{\link[openxlsx]{writeFormula}} by
-#' overcoming its strict ability to write formulas only rowwise.
-#'
-#' @param wb A Workbook object containing a worksheet.
-#' @param sheet The worksheet to write to. Can be the worksheet index or name.
-#' @param x A character vector of Excel formulas.
-#' @param xy A vector of the form \code{c(start column, start row)}.
-#'
-writeFxColumnwise <- function(wb, sheet, x, xy) {
-  fx <- x %>%
-    t() %>%
-    as.data.frame() %>%
-    dplyr::mutate_all(as.character)
-
-  for (i in seq_along(fx)) {
-    class(fx[[i]]) <- c(class(fx[[i]]), "formula")
-  }
-
-  openxlsx::writeData(wb = wb, sheet = sheet, x = fx, xy = xy, colNames = FALSE)
-}
-
-
 
 #' @export
 #'
@@ -283,25 +253,6 @@ addcols <- function(data, cnames, type = "character") {
 
   return(data)
 
-}
-
-#' @export
-#' @title Return current FY based on system date.
-#'
-#' @return Current FY as numeric.
-#'
-currentFY <- function() {
-  current_year <- Sys.Date() %>%
-    format("%Y") %>%
-    as.numeric()
-
-  current_month <- Sys.Date() %>%
-    format("%m") %>%
-    as.numeric()
-
-  current_FY <- ifelse(current_month > 9, current_year + 1, current_year)
-
-  return(current_FY)
 }
 
 
