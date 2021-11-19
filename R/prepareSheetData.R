@@ -93,7 +93,7 @@ prepareSheetData <- function(sheet,
       + headerRow(tool = "Data Pack Template", cop_year = cop_year)))
 
   # Classify formula columns as formulas
-  for (i in 1:ncol(dataStructure)) { #Iterates over each column #seq_along(dataStructure) 
+  for (i in 1:ncol(dataStructure)) { #Iterates over each column #seq_along(dataStructure) shoudl be use if we are afraid this will ever return 0
     if (sum(is.na(dataStructure[[i]])) < 1 )
       #!all(any(is.na(dataStructure[[i]])))) #For each column, Check the col values for NAs; Returns list of T F, Check if any Trues exist, Check if all of the values are NOT True
          {
