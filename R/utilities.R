@@ -663,7 +663,7 @@ paste_oxford <- function(..., final = "and", oxford = TRUE) {
     start <- paste(first_bits, collapse = ", ")
     serial <- paste0(final, " ", last)
 
-    start <- ifelse(oxford,paste0(start, ", "),paste0(start, " "))
+    start <- ifelse(oxford, paste0(start, ", "), paste0(start, " "))
 
     paste0(start, serial)
   }
