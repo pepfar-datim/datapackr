@@ -65,7 +65,7 @@ createKeychainInfo <- function(submission_path = NULL,
   }
 
   # Determine if template, and if so, label type as template ####
-  is_template <-
+  check_if_template <-
     readxl::read_excel(
       path = d$keychain$submission_path,
       sheet = dplyr::if_else(tool_name_type$type == "OPU Data Pack", "PSNUxIM", "Prioritization"),
@@ -76,12 +76,9 @@ createKeychainInfo <- function(submission_path = NULL,
       .name_repair = "minimal") %>%
     dplyr::select(PSNU)
 
-  #if PSNU row count equal zero or it is empty then remove template variable and add Template label to column type
-  if (NROW(is_template$PSNU) == 0 | all(is.na(is_template$PSNU))) {
-    rm(is_template)
+  # If PSNU row count equal zero or empty then add Template label to column type
+  if (NROW(check_if_template$PSNU) == 0 | all(is.na(check_if_template$PSNU))) {
     tool_name_type %<>% dplyr::mutate(type = paste0(type, " Template"))
-  } else {
-    is_template <- FALSE
   }
 
   # Assign COP Year based on Home tab ####
@@ -144,13 +141,6 @@ createKeychainInfo <- function(submission_path = NULL,
     datapackr::unPackDataPackName(
       submission_path = d$keychain$submission_path,
       tool = d$info$tool)
-
-  # if (!d$info$datapack_name %in% unique(c(datapackr::valid_PSNUs$country_name,
-  #                                         "Latin America Region",
-  #                                         "Caribbean Region",
-  #                                         datapackr::valid_PSNUs$ou))) {
-  #   #TODO: This seems to do nothing. Should it?
-  # }
 
   # Determine country uids ####
   if (is.null(d$info$country_uids)) {
