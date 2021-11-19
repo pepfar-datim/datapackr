@@ -9,18 +9,23 @@
 #'
 checkStructure <- function(d) {
 
-  # pull all sheet names from submission as vector
+  # Pull all sheet names from submission as vector
   submission_sheets <- readxl::excel_sheets(d$keychain$submission_path)
-  # pull the unique sheet names from the schema (these are already ordered in the schema so can be called unique)
+
+  # Pull the unique sheet names from the schema (these are already ordered in the schema so can be called unique)
   sheets_check <- unique(d$info$schema$sheet_name)
-  # what columns are missing from the submission?
-  missing_sheets <- sheets_check[!sheets_check %in% submission_sheets]
+
+  # What columns are missing from the submission?
   info_msg <- "Checking for any missing tabs..."
   interactive_print(info_msg)
-  # are any of them false? if so retain a vector of the missing sheets (retained data frame format)
+
+  missing_sheets <- sheets_check[!sheets_check %in% submission_sheets]
+
+  # If any false, retain vector of missing sheets (retained data frame format)
   d$tests$missing_sheets <- data.frame(sheet_name = missing_sheets)
   attr(d$tests$missing_sheets, "test_name") <- "Missing sheets"
-  # test if data frame has any rows, if so create warning collapsing sheet names otherwise no issues
+
+  # Test if data frame has any rows, if so create warning collapsing sheet names otherwise no issues
   if (any(NROW(d$tests$missing_sheets))) {
     warning_msg <-
       paste0(
@@ -30,5 +35,7 @@ checkStructure <- function(d) {
         "\n")
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
-  return(d)
+  
+  d
+  
 }
