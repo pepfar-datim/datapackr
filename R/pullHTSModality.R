@@ -20,7 +20,7 @@ getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL,
     "2019" = "Jm6OwL9IqEa",
     "2018" = "CKTkg8dLlr7"
   )
-  
+
   fy_pattern <- "(FY)?\\d{2}(R|T)?|,|/"
 
   modality_map <- api_call(paste0("dataElementGroupSets/", groupSet),

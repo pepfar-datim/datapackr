@@ -543,4 +543,3 @@ check_params <- function(country_uids,
 api_version <- function() {
   "36"
 }
-

@@ -29,7 +29,7 @@ pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
 
   if (!datasets_provided) {
     datasets <- character(0)
-  
+
     if ("mer_targets" %in% datastream) {
       datasets <- c(datasets,
                     datapackr::getDatasetUids(FY, type = "mer_targets"))
@@ -50,9 +50,9 @@ pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
       datasets <- c(datasets,
                     datapackr::getDatasetUids(FY, type = "impatt"))
     }
-  
+
   }
-  
+
   datasets <- unique(datasets)
 
   ds <- data.frame()
