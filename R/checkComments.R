@@ -18,6 +18,7 @@ checkComments <- function(d) {
       lapply(wb$comments, function(x) is.null(x["style"]))
       )
     )
+  
   if (d$info$has_comments_issue) {
     warning_msg <-
       paste0(
