@@ -14,6 +14,8 @@ cop22_data_pack_schema <-
     skip = skip_tabs(tool = "Data Pack Template", cop_year = 2022),
     cop_year = 2022)
 
+waldo::compare(cop22_data_pack_schema, datapackr::cop22_data_pack_schema)
+
 save(cop22_data_pack_schema,
      file = "./data/cop22_data_pack_schema.rda",
      compress = "xz")
