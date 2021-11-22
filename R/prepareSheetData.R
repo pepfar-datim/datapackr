@@ -62,7 +62,7 @@ prepareSheetData <- function(sheet,
     tidyr::crossing(valid_disaggs) %>%
     dplyr::mutate(
       AgeCoarse = dplyr::case_when(
-        sheet == "OVC" ~ dplyr::case_when( 
+        sheet == "OVC" ~ dplyr::case_when(
           Age %in% c("<01", "01-04", "05-09", "10-14", "15-17", "<18") ~ "<18",
           Age %in% c("18-24", "25+", "18+", "18-20") ~ "18+"),
         TRUE ~ dplyr::case_when(
@@ -93,11 +93,13 @@ prepareSheetData <- function(sheet,
       + headerRow(tool = "Data Pack Template", cop_year = cop_year)))
 
   # Classify formula columns as formulas
-  for (i in 1:ncol(dataStructure)) { #Iterates over each column #seq_along(dataStructure) shoudl be use if we are afraid this will ever return 0
-    if (sum(is.na(dataStructure[[i]])) < 1 )
-      #!all(any(is.na(dataStructure[[i]])))) #For each column, Check the col values for NAs; Returns list of T F, Check if any Trues exist, Check if all of the values are NOT True
-         {
-      class(dataStructure[[i]]) <- c(class(dataStructure[[i]]), "formula") #IF so set the class of the column to (col value, formula)
+  for (i in seq_along(dataStructure)) { #Iterates over each column #seq_along(dataStructure)
+    if (sum(is.na(dataStructure[[i]])) < 1) {
+      #!all(any(is.na(dataStructure[[i]])))) #For each column, Check the col values for NAs;
+                                             #Returns list of T F, Check if any Trues exist,
+                                            #Check if all of the values are NOT True
+      #IF so set the class of the column to (col value, formula)
+      class(dataStructure[[i]]) <- c(class(dataStructure[[i]]), "formula")
     }
   }
 
@@ -161,7 +163,7 @@ prepareSheetData <- function(sheet,
     swapColumns(., combined) %>%
     as.data.frame(.)
 
-  # We should either remove this or explain why it is commented out 
+  # We should either remove this or explain why it is commented out
   ## Add Custom "M" Prioritization for _Military ####
   # if (sheet == "Prioritization") {
   #   dataStructure %<>%

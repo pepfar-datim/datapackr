@@ -43,10 +43,10 @@ packDataPackSheet <- function(wb,
   # Format percentages ####
   percentCols <- schema %>%
     dplyr::filter(sheet_name == sheet,
-                  value_type == "percentage") %>%# extact all percentage columns
-    dplyr::pull(col)# extracts single column. 
+                  value_type == "percentage") %>% # extact all percentage columns
+    dplyr::pull(col)# extracts single column.
 
-  percentStyle <- openxlsx::createStyle(numFmt = "0%")# cell formatting 
+  percentStyle <- openxlsx::createStyle(numFmt = "0%")# cell formatting
 
   if (length(percentCols) > 0) {
     openxlsx::addStyle(wb,
@@ -63,9 +63,9 @@ packDataPackSheet <- function(wb,
     percentDecimalCols <- schema %>%
       dplyr::filter(sheet_name == sheet,
                     indicator_code %in% c("HIV_PREV.NA.Age/Sex/HIVStatus.T", "HIV_PREV.T_1")) %>%
-      dplyr::pull(col)# extracts single column. 
+      dplyr::pull(col)# extracts single column.
 
-    percentDecimalStyle <- openxlsx::createStyle(numFmt = "0.00%")# cell formatting 
+    percentDecimalStyle <- openxlsx::createStyle(numFmt = "0.00%")# cell formatting
 
     openxlsx::addStyle(wb,
                        sheet = sheet,
@@ -79,10 +79,10 @@ packDataPackSheet <- function(wb,
   # Format integers ####
   integerCols <- schema %>%
     dplyr::filter(sheet_name == sheet,
-                  value_type == "integer") %>%# extact all integer columns
-    dplyr::pull(col)# extracts single column. 
+                  value_type == "integer") %>% # extact all integer columns
+    dplyr::pull(col)# extracts single column.
 
-  integerStyle <- openxlsx::createStyle(numFmt = "#,##0")# cell formatting 
+  integerStyle <- openxlsx::createStyle(numFmt = "#,##0")# cell formatting
 
   if (length(integerCols) > 0) {
     openxlsx::addStyle(wb,
@@ -97,10 +97,10 @@ packDataPackSheet <- function(wb,
   # Format targets ####
   targetCols <- schema %>%
     dplyr::filter(sheet_name == sheet,
-                  col_type == "target") %>%# extact all target columns
-    dplyr::pull(col)# extracts single column. 
+                  col_type == "target") %>% # extact all target columns
+    dplyr::pull(col)# extracts single column.
 
-  targetStyle <- openxlsx::createStyle(textDecoration = "bold")# cell formatting 
+  targetStyle <- openxlsx::createStyle(textDecoration = "bold")# cell formatting
 
   if (length(targetCols) > 0) {
     openxlsx::addStyle(wb,

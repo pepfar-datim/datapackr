@@ -75,7 +75,7 @@ packDataPackSheets <- function(wb,
   }
 
   data <- model_data[country_uids] %>%
-    dplyr::bind_rows() %>% 
+    dplyr::bind_rows() %>%
     tidyr::drop_na(value) %>%
     dplyr::select(-period) # Drops period column
 
