@@ -263,7 +263,7 @@ getPeriodInfo <- function(FY = NA,
 
 # Procedural logic to generate the actual schemas
     secrets <- "/Users/scott/.secrets/datim.json"
-    datapackr::loginToDATIM(secrets)
+    datimutils::loginToDATIM(secrets)
 
   ## Config File ####
     config_path = "./data-raw/DataPackConfiguration.csv"

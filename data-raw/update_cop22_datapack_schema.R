@@ -4,7 +4,7 @@
 library(datapackr)
 library(magrittr)
 
-datapackr::loginToDATIM("/Users/scott/.secrets/cop-test.json")
+datimutils::loginToDATIM("/Users/scott/.secrets/cop-test.json")
 
 datapack_template_filepath <- system.file("extdata",
                                           "COP22_Data_Pack_Template.xlsx",

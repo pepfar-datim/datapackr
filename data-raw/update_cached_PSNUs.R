@@ -4,7 +4,7 @@ library(datapackr)
 
 secrets <- "~/.secrets/datim.json"
 
-datapackr::loginToDATIM(secrets)
+datimutils::loginToDATIM(secrets)
 
 # Burkina Faso and Sierra Leone changed PSNU levels from Country to SNU1
 # between COP20 and COP21.
