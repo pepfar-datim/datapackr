@@ -267,33 +267,6 @@ addcols <- function(data, cnames, type = "character") {
 
 
 #' @export
-#' @title Determine whether the user is logged into DATIM or not.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
-#' @return TRUE or FALSE
-#'
-isLoggedIn <- function(d2_session = dynGet("d2_default_session",
-                                           inherits = TRUE)) {
-  baseurl <- d2_session$base_url
-
-  if (is.null(baseurl)) {
-    return(FALSE)
-  } else {
-    httr::set_config(httr::config(http_version = 0))
-    url <- URLencode(URL = paste0(baseurl, "api/me"))
-    #Logging in here will give us a cookie to reuse
-    r <- httr::GET(url,
-                   httr::timeout(180),
-                   handle = d2_session$handle)
-    if (r$status != 200L) {
-      return(FALSE)
-    } else {
-      return(TRUE)
-    }
-  }
-}
-
-
-#' @export
 #' @title getDatasetUids
 #'
 #' @description returns character vector of dataset uids for a given FY {"2019", "2020", "2021"}

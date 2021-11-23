@@ -6,6 +6,8 @@
     - The functions `DHISLogin`, `GetCredentialsFromConsole`, `LoadConfigFile`,
       and `ValidateConfig` were not exported and are now deprecated as well.
       They were previously only used by `loginToDATIM`.
+* `isLoggedIn` is retired as it was only used in `getMechList` and
+  `loginToDATIM`.
 
 # datapackr 5.0.1
 
