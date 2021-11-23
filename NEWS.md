@@ -1,3 +1,12 @@
+# datapackr 5.0.2
+
+## Deprecated features
+* `loginToDATIM` is retired in favor of the same function in `datimutils`. All
+  instances of this function being invoked have been replaced appropriately.
+    - The functions `DHISLogin`, `GetCredentialsFromConsole`, `LoadConfigFile`,
+      and `ValidateConfig` were not exported and are now deprecated as well.
+      They were previously only used by `loginToDATIM`.
+
 # datapackr 5.0.1
 
 ## New features
