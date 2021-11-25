@@ -14,7 +14,7 @@
 #'
 unPackSNUxIM <- function(d) {
 
-  if (d$info$cop_year %in% c(2020, 2021)) {
+  if (d$info$cop_year %in% c(2020, 2021,2022)) {
     sheet <- "PSNUxIM"
   } else {
     sheet <- "SNU x IM"
@@ -30,6 +30,8 @@ unPackSNUxIM <- function(d) {
       col_types = "text",
       .name_repair = "minimal"
     )
+  
+  
 
   if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1, 1]])) {
     d$info$has_psnuxim <- FALSE
