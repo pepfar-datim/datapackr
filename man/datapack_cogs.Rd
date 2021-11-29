@@ -5,7 +5,7 @@
 \alias{datapack_cogs}
 \title{Datapack Category option groups}
 \format{
-An object of class \code{data.frame} with 19 rows and 3 columns.
+An object of class \code{list} of length 2.
 }
 \usage{
 datapack_cogs

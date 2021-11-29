@@ -651,7 +651,7 @@ checkAnalytics <- function(d,
     messages <-
       paste(
         paste(
-          seq_along(d$info$analytics_warning_msg),
+          seq_len(NROW(d$info$analytics_warning_msg)),
           ": ", d$info$analytics_warning_msg
           #stringr::str_squish(gsub("\n", "", d$info$analytics_warning_msg))
         ),

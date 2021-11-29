@@ -1,3 +1,19 @@
+# datapackr 5.0.2
+
+## New features
+* Significantly improves handling of parameter checks and standardizes their
+  validation and defaults. Documentation for these checks is also added.
+
+## Breaking changes
+* Removes `getDataPackSchema` in favor of consolidated `pick_schema`.
+
+
+## Minor improvements and fixes
+* Improves and updates tests related to parameter checks and schemas.
+* Introduces many new small utilities functions such as `%missing%` and `%||%`.
+* Improves automation of Data Pack Template/schema validation.
+
+
 # datapackr 5.0.1
 
 ## New features
