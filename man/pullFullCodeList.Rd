@@ -8,6 +8,8 @@ pullFullCodeList(
   FY = getCurrentCOPYear() + 1,
   datastream = c("mer_targets", "mer_results", "subnat_targets", "subnat_results",
     "impatt"),
+  datasets,
+  expanded = FALSE,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
@@ -17,6 +19,11 @@ pullFullCodeList(
 \item{datastream}{At least one
 of "mer_targets", "mer_results", "subnat_targets", "subnat_results" or "impatt".
 If left will return a code list for the specified COP Year of all streams}
+
+\item{datasets}{Character vector of dataSet IDs to pull code lists for.}
+
+\item{expanded}{If TRUE, will add dataset, period, period_dataset, and
+targets_results, related categoryOption metadata,  as additional columns}
 
 \item{d2_session}{R6 datimutils object which handles authentication with DATIM}
 }

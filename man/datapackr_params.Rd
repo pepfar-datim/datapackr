@@ -84,3 +84,8 @@ list of all paramaters of this constructor function
 \description{
 Standardized package function parameter definitions
 }
+\seealso{
+Other parameter-helpers: 
+\code{\link{parameter-checks}}
+}
+\concept{parameter-helpers}
