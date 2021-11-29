@@ -132,7 +132,7 @@ api_sql_call <- function(sqlView, var = NULL,
     httr::GET(httr::timeout(180),
               handle = d2_session$handle) %>%
     httr::content(., "text") %>%
-    readr::read_csv()
+    readr::read_csv(file = ., show_col_types = FALSE)
 
   return(r)
 
