@@ -29,13 +29,17 @@ packDataPack <- function(model_data,
                          country_uids,
                          template_path = NULL,
                          cop_year = getCurrentCOPYear(),
-                         output_folder,
+                         output_folder = NULL,
                          results_archive = TRUE,
                          d2_session = dynGet("d2_default_session",
                                              inherits = TRUE)) {
 
   interactive_print(datapack_name)
   interactive_print(country_uids)
+  
+  if (is.null(output_folder) || file.access(output_folder, 2) != 0 ) {
+    stop("Cannot write to output_folder")
+  }
 
   # Create data train for use across remainder of program
   d <- list(
