@@ -700,8 +700,6 @@ is_uidish <- function(string) {
 }
 
 
-
-
 commas <- function(...) paste0(..., collapse = ", ")
 
 names2 <- function(x) {
