@@ -29,3 +29,8 @@ Data Pack schema.
 Supplied a filepath to a Data Pack template (XLSX), will extract and save a
 schema based on the template.
 }
+\seealso{
+Other schema-helpers: 
+\code{\link{validateSchema}()}
+}
+\concept{schema-helpers}

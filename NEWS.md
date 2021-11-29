@@ -1,5 +1,12 @@
 # datapackr 5.0.2
 
+## New features
+* Significantly improves handling of parameter checks and standardizes their
+  validation and defaults. Documentation for these checks is also added.
+
+## Breaking changes
+* Removes `getDataPackSchema` in favor of consolidated `pick_schema`.
+
 ## Deprecated features
 * `loginToDATIM` is retired in favor of the same function in `datimutils`. All
   instances of this function being invoked have been replaced appropriately.
@@ -8,6 +15,12 @@
       They were previously only used by `loginToDATIM`.
 * `isLoggedIn` is retired as it was only used in `getMechList` and
   `loginToDATIM`.
+
+## Minor improvements and fixes
+* Improves and updates tests related to parameter checks and schemas.
+* Introduces many new small utilities functions such as `%missing%` and `%||%`.
+* Improves automation of Data Pack Template/schema validation.
+
 
 # datapackr 5.0.1
 
