@@ -614,11 +614,8 @@ paste_oxford <- function(..., final = "and", oxford = TRUE) {
     start <- paste(first_bits, collapse = ", ")
     serial <- paste0(final, " ", last)
 
-    if (oxford) {
-      start <- paste0(start, ", ")
-    } else if (length(to_paste) <= 2) {
-      start <- paste0(start, " ")
-    }
+    start <- ifelse(oxford, paste0(start, ", "), paste0(start, " "))
+
     paste0(start, serial)
   }
 }
@@ -685,6 +682,22 @@ parse_maybe_number <- function(x, default = NULL) {
 
 }
 
+
+#' @export
+#' @title Is UID-ish
+#' @md
+#' @description Tests whether a character string matches the regex of a DHIS2
+#' 11-digit UID. Vectorized over `string` and `pattern`.
+#'
+#' @param string Input vector. Either a character vector, or something coercible
+#' to one.
+#'
+#' @importFrom stringr str_detect
+#'
+#' @return A logical vector.
+is_uidish <- function(string) {
+  stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")
+}
 
 
 commas <- function(...) paste0(..., collapse = ", ")

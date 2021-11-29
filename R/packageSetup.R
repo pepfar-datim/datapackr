@@ -125,6 +125,8 @@ pick_schema <- function(cop_year, tool) {
       schema <- datapackr::cop20_data_pack_schema
     } else if (cop_year == 2021) {
       schema <- datapackr::cop21_data_pack_schema
+    } else if (cop_year == 2022) {
+      schema <- datapackr::cop22_data_pack_schema
     } else {
       stop("Data Pack schema not available for the COP year provided.")
     }
@@ -142,7 +144,17 @@ pick_schema <- function(cop_year, tool) {
 #'
 #' @return Template filepath for given cop_year and tool.
 #'
-pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack") {
+pick_template_path <- function(cop_year, tool) {
+
+  cop_year <- cop_year %missing% NULL
+  tool <- tool %missing% NULL
+
+  params <- check_params(cop_year = cop_year,
+                         tool = tool)
+
+  for (p in names(params)) {
+    assign(p, purrr::pluck(params, p))
+  }
 
   template_filename <- NULL
 
@@ -159,6 +171,8 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
       template_filename <- "COP20_Data_Pack_Template_vFINAL.xlsx"
     } else if (cop_year == 2021) {
       template_filename <- "COP21_Data_Pack_Template.xlsx"
+    } else if (cop_year == 2022) {
+      template_filename <- "COP22_Data_Pack_Template.xlsx"
     }
   }
 
@@ -174,7 +188,7 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
   template_path <- handshakeFile(path = template_path,
                                  tool = tool)
 
-  return(template_path)
+  template_path
 
 }
 
