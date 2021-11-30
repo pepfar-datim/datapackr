@@ -8,9 +8,21 @@ a dataframe where the default Category Option Combo UID is listed as `default`
 rather than the appropriate DATIM UID. This will be removed in favor of a more
 permanent solution in future updates.
 
+## New features
+* Significantly improves handling of parameter checks and standardizes their
+  validation and defaults. Documentation for these checks is also added.
+
+## Breaking changes
+* Removes `getDataPackSchema` in favor of consolidated `pick_schema`.
+
 ## Deprecated features
 * `getDataPackSchema` has been deprecated in favor of `pick_schema` and has been
 replaced in the two locations where it was previously used.
+
+## Minor improvements and fixes
+* Improves and updates tests related to parameter checks and schemas.
+* Introduces many new small utilities functions such as `%missing%` and `%||%`.
+* Improves automation of Data Pack Template/schema validation.
 
 
 # datapackr 5.0.1

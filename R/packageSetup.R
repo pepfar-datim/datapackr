@@ -97,32 +97,42 @@ headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
 #' @return Schema file for given cop_year and tool type
 #'
 pick_schema <- function(cop_year, tool) {
-  supported_tools <- c("Data Pack", "OPU Data Pack")
-  if (!(tool %in% supported_tools)) {
-    stop("The specified tool type is not supported")
+
+  # Collect parameters
+  tool <- tool %missing% NULL
+  cop_year <- cop_year %missing% NULL
+
+  tool_provided <- !is.null(tool)
+  cop_year_provided <- !is.null(cop_year)
+
+  if (!tool_provided | !cop_year_provided) {
+    interactive_print("Attempted to deduce schema.")
   }
+
+  cop_year %<>% check_cop_year()
+  invisible(capture.output(tool %<>% check_tool(tool = ., cop_year = cop_year)))
 
   if (tool == "OPU Data Pack") {
     if (cop_year == 2020) {
-      return(datapackr::cop20OPU_data_pack_schema)
+      schema <- datapackr::cop20OPU_data_pack_schema
     } else if (cop_year == 2021) {
-      return(datapackr::cop21OPU_data_pack_schema)
+      schema <- datapackr::cop21OPU_data_pack_schema
     } else {
-      stop("The specified OPU year is not supported")
+      stop("OPU Data Pack schema not available for the COP year provided.")
     }
-  }
-
-  if (tool == "Data Pack") {
+  } else if (tool == "Data Pack") {
     if (cop_year == 2020) {
-      return(datapackr::cop20_data_pack_schema)
+      schema <- datapackr::cop20_data_pack_schema
     } else if (cop_year == 2021) {
-      return(datapackr::cop21_data_pack_schema)
+      schema <- datapackr::cop21_data_pack_schema
+    } else if (cop_year == 2022) {
+      schema <- datapackr::cop22_data_pack_schema
     } else {
-      return(datapackr::data_pack_schema)
+      stop("Data Pack schema not available for the COP year provided.")
     }
   }
 
-  stop("Could not find any schema for you.")
+  schema
 }
 
 #' @export
@@ -134,7 +144,17 @@ pick_schema <- function(cop_year, tool) {
 #'
 #' @return Template filepath for given cop_year and tool.
 #'
-pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack") {
+pick_template_path <- function(cop_year, tool) {
+
+  cop_year <- cop_year %missing% NULL
+  tool <- tool %missing% NULL
+
+  params <- check_params(cop_year = cop_year,
+                         tool = tool)
+
+  for (p in names(params)) {
+    assign(p, purrr::pluck(params, p))
+  }
 
   template_filename <- NULL
 
@@ -151,6 +171,8 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
       template_filename <- "COP20_Data_Pack_Template_vFINAL.xlsx"
     } else if (cop_year == 2021) {
       template_filename <- "COP21_Data_Pack_Template.xlsx"
+    } else if (cop_year == 2022) {
+      template_filename <- "COP22_Data_Pack_Template.xlsx"
     }
   }
 
@@ -166,7 +188,7 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
   template_path <- handshakeFile(path = template_path,
                                  tool = tool)
 
-  return(template_path)
+  template_path
 
 }
 
@@ -208,6 +230,8 @@ pick_template_path <- function(cop_year = getCurrentCOPYear(), tool = "Data Pack
 #' \code{OPU Data Pack} or \code{Data Pack}
 #' @param season Either \code{COP} or \code{OPU}.
 #'
+#' @family parameter-helpers
+#'
 #' @return list of all paramaters of this constructor function
 datapackr_params <- function(model_data,
                              snuxim_model_data,
@@ -234,302 +258,4 @@ datapackr_params <- function(model_data,
   #rlang::fn_fmls_names(fn = datapackr_params)
   #or explicitly return
   #NULL
-}
-
-#' @export
-#' @title Standardized package function parameter definitions
-#'
-#' @inheritParams datapackr_params
-#'
-#' @return params List of valid parameters to use in functions.
-#'
-check_params <- function(country_uids,
-                         PSNUs,
-                         cop_year,
-                         tool,
-                         season,
-                         schema,
-                         datapack_name,
-                         template_path,
-                         wb,
-                         model_data,
-                         snuxim_model_data,
-                         output_folder,
-                         results_archive) {
-
-  params <- list()
-
-  # Check Country UIDs ####
-  check_country_uids <- function(country_uids = NULL, force = TRUE) {
-    if (is.null(country_uids)) {
-      if (force) {
-        stop("Must supply country_uids.")
-      } else {
-        country_uids <- valid_PSNUs$country_uid %>%
-          unique()
-      }
-    } else {
-      if (any(!country_uids %in% valid_PSNUs$country_uid)) {
-        invalid_country_uids <- country_uids[!country_uids %in% valid_PSNUs$country_uid]
-        interactive_print(
-          paste0("The following supplied country_uids appear to be invalid and will be removed: ",
-                 paste(invalid_country_uids, collapse = ", "))
-        )
-        country_uids <- country_uids[country_uids %in% valid_PSNUs$country_uid]
-      }
-    }
-    return(country_uids)
-  }
-
-  if (!missing(country_uids)) {
-    params$country_uids <- check_country_uids(country_uids)
-  }
-
-  # Check PSNUs ####
-  check_PSNUs <- function(PSNUs = NULL, country_uids = NULL) {
-    # If no country_uids provided, return PSNUs across all country_uids.
-    country_uids <- check_country_uids(country_uids, force = FALSE)
-
-    # FILL
-    if (is.null(PSNUs)) { # PSNUs is NULL
-      PSNUs <- datapackr::valid_PSNUs %>%
-        dplyr::filter(., country_uid %in% country_uids) %>%
-        add_dp_psnu(.) %>%
-        dplyr::arrange(dp_psnu) %>%
-        dplyr::select(PSNU = dp_psnu, psnu_uid)
-    } else { # PSNUs is not NULL
-      # CLEAN
-      if (any(!PSNUs$psnu_uid %in% valid_PSNUs$psnu_uid)) {
-        # NOTE: May consider instead including both the name and uid for ease of resolution by user
-        invalid_PSNUs <- PSNUs$psnu_uid[!PSNUs$psnu_uid %in% valid_PSNUs$psnu_uid]
-        interactive_print(
-          paste0("The following supplied PSNUs appear to be invalid and will be removed: ",
-                 paste(invalid_PSNUs, collapse = ", "))
-        )
-        PSNUs <- PSNUs %>%
-          dplyr::filter(psnu_uid %in% valid_PSNUs$psnu_uid)
-      }
-    }
-    return(PSNUs)
-  }
-
-  if (!missing(PSNUs)) {
-    params$PSNUs <- check_PSNUs(PSNUs, country_uids)
-  }
-
-  # Check cop_year ####
-  check_cop_year <- function(cop_year = getCurrentCOPYear()) {
-    if (is.null(cop_year)) {
-      cop_year <- getCurrentCOPYear()
-    }
-    if (!cop_year %in% c(2020, 2021)) {
-      stop("Sorry, datapackr only supports COP20 and COP21 Data Packs.")
-    }
-    return(cop_year)
-  }
-
-  if (!missing(cop_year)) {
-    params$cop_year <- check_cop_year(cop_year)
-  }
-
-  # Check Tool ####
-  check_tool <- function(tool = NULL) {
-    if (is.null(tool)) {
-      tool <- "Data Pack"
-    } else {
-      if (!tool %in% c("Data Pack", "OPU Data Pack")) {
-        stop("Cannot support any tools other than `Data Pack` or `OPU Data Pack`")
-      }
-    }
-    return(tool)
-  }
-
-  if (!missing(tool)) {
-    params$tool <- check_tool(tool)
-  }
-
-  # Check season ####
-  check_season <- function(season = NULL, tool = NULL) {
-    tool <- check_tool(tool)
-    if (is.null(season)) {
-      if (tool == "OPU Data Pack") {
-        season <- "OPU"
-      } else {
-        season <- "COP"
-      }
-    } else {
-      if (!season %in% c("COP", "OPU")) {
-        stop("Cannot support any tools other than `COP` or `OPU`")
-      }
-    }
-    return(season)
-  }
-
-  if (!missing(season)) {
-    if (missing(tool)) {
-      tool <- check_tool()
-    }
-    params$season <- check_season(season, tool = tool)
-  }
-
-  # Check schema ####
-  check_schema <- function(schema = NULL, cop_year = NULL, tool = NULL) {
-    cop_year <- check_cop_year(cop_year)
-    tool <- check_tool(tool)
-
-    if (is.null(schema)) {
-      schema <- pick_schema(cop_year, tool)
-    } else {
-      true_schema <- pick_schema(cop_year, tool)
-      if (!identical(schema, true_schema)) {
-        interactive_print("Schema provided does not match archived schema. Are you using a custom schema on purpose?")
-      }
-    }
-    return(schema)
-  }
-
-  if (!missing(schema)) {
-    params$schema <- check_schema(schema, cop_year, tool)
-  }
-
-  # Check datapack_name ####
-  check_datapack_name <- function(datapack_name = NULL, country_uids = NULL) {
-    if (is.null(datapack_name)) {
-      if (is.null(country_uids)) {
-        datapack_name <- "Global"
-      } else {
-        country_uids <- check_country_uids(country_uids)
-        datapack_name <- valid_PSNUs %>%
-          dplyr::filter(country_uid %in% country_uids) %>%
-          dplyr::pull(country_name) %>%
-          unique() %>%
-          sort() %>%
-          paste(collapse = ", ")
-      }
-    }
-    return(datapack_name)
-  }
-
-  if (!missing(datapack_name)) {
-    params$datapack_name <- check_datapack_name(datapack_name, country_uids)
-  }
-
-  # Check template path ####
-  check_template_path <- function(template_path = NULL,
-                                  cop_year = NULL,
-                                  tool = NULL) {
-    cop_year <- check_cop_year(cop_year)
-    tool <- check_tool(tool)
-
-    if (is.null(template_path)) {
-      template_path <- pick_template_path(cop_year, tool)
-    } else {
-      template_path %<>%
-        handshakeFile(tool)
-    }
-
-    interactive_print("Checking template against schema and DATIM...")
-    package_schema <- pick_schema(cop_year, tool)
-
-    input_tool <- paste0(tool, " Template")
-    template_schema <-
-      unPackSchema_datapack(
-        filepath = template_path,
-        skip = skip_tabs(tool = input_tool, cop_year = cop_year),
-        tool = input_tool,
-        cop_year = cop_year)
-
-    if (!identical(package_schema, template_schema)) {
-      stop("Template provided does not match archived schema.")
-    } else {
-      interactive_print("Template provided matches published schema.")
-    }
-
-    return(template_path)
-  }
-
-  if (!missing(template_path)) {
-    params$template_path <- check_template_path(template_path, cop_year, tool)
-  }
-
-
-  # Check wb ####
-  check_wb <- function(wb = NULL,
-                       country_uids = NULL,
-                       cop_year = NULL,
-                       tool = NULL,
-                       datapack_name = NULL,
-                       template_path = NULL) {
-
-      if (is.null(wb)) {
-        country_uids <- check_country_uids(country_uids)
-        cop_year <- check_cop_year(cop_year)
-        tool <- check_tool(tool)
-        datapack_name <- check_datapack_name(datapack_name, country_uids)
-        template_path <- check_template_path(template_path, cop_year, tool)
-
-        d <- createDataPack(datapack_name = datapack_name,
-                             country_uids = country_uids,
-                             template_path = template_path,
-                             cop_year = cop_year,
-                             tool = tool)
-
-        wb <- d$tool$wb
-      }
-
-    return(wb)
-  }
-
-  if (!missing(wb)) {
-    params$wb <- check_wb(wb = wb,
-                          country_uids = country_uids,
-                          cop_year = cop_year,
-                          tool = tool,
-                          datapack_name = datapack_name,
-                          template_path = template_path)
-  }
-
-  # Check model_data ####
-
-
-  # Check snuxim_model_data ####
-  # check_snuxim_model_data <- function(snuxim_model_data = NULL,
-  #                                     cop_year = NULL,
-  #                                     country_uids = NULL,
-  #                                     d2_session) {
-  #
-  #   cop_year = check_cop_year(cop_year)
-  #   country_uids = check_country_uids(country_uids)
-  #
-  #   if (is.null(snuxim_model_data)) {
-  #
-  #   }
-  #   return(snuxim_model_data)
-  # }
-  #
-  # if (!missing(snuxim_model_data)) {
-  #   params$snuxim_model_data <- check_snuxim_model_data(snuxim_model_data = snuxim_model_data,
-  #                                                       cop_year = cop_year,
-  #                                                       country_uids = country_uids,
-  #                                                       d2_session = d2_session)
-  # }
-
-  # Check output_folder ####
-
-
-  # Check results_archive ####
-  check_results_archive <- function(results_archive = FALSE) {
-
-    if (!isTRUE(results_archive) & !isFALSE(results_archive)) {
-      stop("results_archive must be either TRUE or FALSE.")
-    }
-    return(results_archive)
-  }
-
-  if (!missing(results_archive)) {
-    params$results_archive <- check_results_archive(results_archive)
-  }
-
-
-  return(params)
 }

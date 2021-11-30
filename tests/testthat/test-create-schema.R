@@ -53,16 +53,6 @@ with_mock_api({
     expect_type(test_dataset$period,"character")
   })
 
-  test_that("COP21 template and schema match", {
-    schema <- unPackSchema_datapack(
-      filepath =
-        system.file("extdata", "COP21_Data_Pack_Template.xlsx", package = "datapackr"),
-      skip = skip_tabs(tool = "Data Pack Template", cop_year = 2021),
-      cop_year = 2021)
-
-    expect_identical(schema, cop21_data_pack_schema)
-  })
-
   test_that("COP20 opu template and schema match", {
     schema <-
       datapackr::unPackSchema_datapack(

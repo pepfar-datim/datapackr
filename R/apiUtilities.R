@@ -1,4 +1,13 @@
 #' @export
+#' @title Returns a version of the DHIS2 API for the current version of DATIM
+#'
+#' @return API version.
+#'
+api_version <- function() {
+  "33"
+}
+
+#' @export
 #' @title Start DATIM API query and specify table
 #'
 #' @description
@@ -132,7 +141,7 @@ api_sql_call <- function(sqlView, var = NULL,
     httr::GET(httr::timeout(180),
               handle = d2_session$handle) %>%
     httr::content(., "text") %>%
-    readr::read_csv()
+    readr::read_csv(file = ., show_col_types = FALSE)
 
   return(r)
 
