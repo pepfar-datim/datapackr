@@ -1,4 +1,13 @@
 #' @export
+#' @title Returns a version of the DHIS2 API for the current version of DATIM
+#'
+#' @return API version.
+#'
+api_version <- function() {
+  "33"
+}
+
+#' @export
 #' @title Start DATIM API query and specify table
 #'
 #' @description
