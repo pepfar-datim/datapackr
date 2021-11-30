@@ -36,8 +36,8 @@ packDataPack <- function(model_data,
 
   interactive_print(datapack_name)
   interactive_print(country_uids)
-  
-  if (is.null(output_folder) || file.access(output_folder, 2) != 0 ) {
+
+  if (is.null(output_folder) || file.access(output_folder, 2) != 0) {
     stop("Cannot write to output_folder")
   }
 
