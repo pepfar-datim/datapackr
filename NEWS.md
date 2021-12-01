@@ -11,6 +11,7 @@ permanent solution in future updates.
 ## New features
 * Significantly improves handling of parameter checks and standardizes their
   validation and defaults. Documentation for these checks is also added.
+* Adds functionality for producing COP22 Beta Packs and test data.
 
 ## Breaking changes
 * Removes `getDataPackSchema` in favor of consolidated `pick_schema`.
