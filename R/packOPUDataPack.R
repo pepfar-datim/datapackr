@@ -21,23 +21,16 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
                                                inherits = TRUE)) {
 
   # Create data sidecar ####
-  d <- list(
-    keychain = list(
-      template_path = template_path,
-      output_folder = output_folder
-    ),
-    info = list(
-      datapack_name = datapack_name,
-      country_uids = country_uids,
-      tool = "OPU Data Pack",
-      cop_year =  cop_year
-    ),
-    data = list(
-      snuxim_model_data = snuxim_model_data
-    )
-  )
+  d <- datapackr::createDataPack(datapack_name = datapack_name,
+                                 country_uids = country_uids,
+                                 template_path = template_path,
+                                 cop_year = cop_year,
+                                 tool = "OPU Data Pack")
 
-  # Start running log of all warning and information messages
+  # Adds output folder to d object ####
+  d$keychain$output_folder <- output_folder
+
+  # Start running log of all warning and information messages ####
   d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
 
@@ -79,25 +72,11 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
         dplyr::filter(value != 0)
   }
 
-  # Open schema ####
-  d$info$schema <- pick_schema(cop_year, "OPU Data Pack")
-
-  # Open template ####
-    # Grab correct schema
-  d$keychain$template_path <- pick_template_path(cop_year, "OPU Data Pack")
-
-    # Test template against schema ####
+  # Test template against schema ####
   compareTemplateToSchema(template_path = d$keychain$template_path,
                           cop_year = d$info$cop_year,
                           tool = d$info$tool,
                           d2_session = d2_session)
-
-    # Place Workbook into play ####
-    d$tool$wb <- datapackr::createDataPack(datapack_name = d$info$datapack_name,
-                                           country_uids = d$info$country_uids,
-                                           template_path = d$keychain$template_path,
-                                           cop_year = d$info$cop_year,
-                                           tool = d$info$tool)
 
     # Get PSNU List####
     d$data$PSNUs <- datapackr::valid_PSNUs %>%

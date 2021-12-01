@@ -97,10 +97,10 @@ packDataPackSheets <- function(wb,
   }
 
   # Loop through sheets ####
-  print("Writing Sheets...")
+  interactive_print("Writing Sheets...")
 
   for (sheet in sheets) {
-    print(sheet)
+    interactive_print(sheet)
     org_units_sheet <- org_units
     sheet_codes <- schema %>%
       dplyr::filter(sheet_name == sheet

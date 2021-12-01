@@ -65,7 +65,7 @@ createKeychainInfo <- function(submission_path = NULL,
   }
 
   # Determine if template, and if so, label type as template ####
-  is_template <-
+  check_if_template <-
     readxl::read_excel(
       path = d$keychain$submission_path,
       sheet = dplyr::if_else(tool_name_type$type == "OPU Data Pack", "PSNUxIM", "Prioritization"),
@@ -76,15 +76,8 @@ createKeychainInfo <- function(submission_path = NULL,
       .name_repair = "minimal") %>%
     dplyr::select(PSNU)
 
-  if (NROW(is_template$PSNU) == 0) {
-    is_template <- TRUE
-  } else if (all(is.na(is_template$PSNU))) {
-    is_template <- TRUE
-  } else {
-    is_template  <- FALSE
-  }
-
-  if (is_template) {
+  # If PSNU row count equal zero or empty then add Template label to column type
+  if (NROW(check_if_template$PSNU) == 0 | all(is.na(check_if_template$PSNU))) {
     tool_name_type %<>% dplyr::mutate(type = paste0(type, " Template"))
   }
 
@@ -105,27 +98,33 @@ createKeychainInfo <- function(submission_path = NULL,
   }
 
   # Assign schema based on tool type ####
-  if (d$info$tool %in% c("Data Pack", "Data Pack Template")) {
-    if (d$info$cop_year == 2021) {
-      d$info$schema <- datapackr::cop21_data_pack_schema
-    } else if (d$info$cop_year == 2020) {
-      d$info$schema <- datapackr::cop20_data_pack_schema
-    } else if (d$info$cop_year == 2019) {
-      d$info$schema <- datapackr::data_pack_schema
+  assign_schema <- function(tool_type, cop_year) {
+
+    if (tool_type %in% c("Data Pack", "Data Pack Template")) {
+      result <- switch(
+        as.character(cop_year),
+        "2021" = datapackr::cop21_data_pack_schema,
+        "2020" = datapackr::cop20_data_pack_schema,
+        "2019" = datapackr::data_pack_schema,
+        stop(paste0(
+          "Unable to process Data Packs from COP ", cop_year
+        ))
+      )
+    } else if (tool_type %in% c("OPU Data Pack", "OPU Data Pack Template")) {
+      result <- switch(
+        as.character(cop_year),
+        "2021" = datapackr::cop21OPU_data_pack_schema,
+        "2020" = datapackr::cop20OPU_data_pack_schema,
+        stop(
+          paste0("Unable to process OPU Data Packs from COP ", cop_year)
+        )
+      )
     } else {
-      stop(paste0("Unable to process Data Packs from COP ", d$info$cop_year))
-      }
-  } else if (d$info$tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
-    if (d$info$cop_year == 2020) {
-      d$info$schema <- datapackr::cop20OPU_data_pack_schema
-    } else if (d$info$cop_year == 2021) {
-      d$info$schema <- cop21OPU_data_pack_schema
-    } else {
-      stop(paste0("Unable to process OPU Data Packs from COP ", d$info$cop_year))
-      }
-  } else {
-    stop("Unable to process that type of Data Pack.")
+      stop("Unable to process that type of Data Pack.")
+    }
   }
+
+  d$info$schema <- assign_schema(d$info$tool, d$info$cop_year)
 
 
   # TEST to make sure tool type matches what we see in the submitted file's structure ####
@@ -142,13 +141,6 @@ createKeychainInfo <- function(submission_path = NULL,
     datapackr::unPackDataPackName(
       submission_path = d$keychain$submission_path,
       tool = d$info$tool)
-
-  if (!d$info$datapack_name %in% unique(c(datapackr::valid_PSNUs$country_name,
-                                          "Latin America Region",
-                                          "Caribbean Region",
-                                          datapackr::valid_PSNUs$ou))) {
-    #TODO: This seems to do nothing. Should it?
-  }
 
   # Determine country uids ####
   if (is.null(d$info$country_uids)) {
