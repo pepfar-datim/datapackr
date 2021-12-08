@@ -206,14 +206,14 @@ packSNUxIM <- function(d,
         ~stringr::str_replace_all(
           .,
           pattern = paste0("(?<=[:upper:])", top_rows + 1),
-          replacement = as.character(seq_along(snuxim_model_data) + existing_rows)
+          replacement = as.character(seq_len(NROW(snuxim_model_data)) + existing_rows)
           )
         )
       )
 
   # Classify formula columns as formulas
   ## TODO: Improve approach
-  for (i in seq_along(data_structure)) {
+  for (i in seq_len(NROW(data_structure))) {
     if (!all(any(is.na(data_structure[[i]])))) {
       class(data_structure[[i]]) <- c(class(data_structure[[i]]), "formula")
     }
