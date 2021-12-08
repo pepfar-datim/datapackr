@@ -247,7 +247,7 @@ packSNUxIM <- function(d,
   right_side <- data_structure %>%
     dplyr::select(
       -tidyselect::all_of(names(left_side)),
-      -tidyselect::matches("percent_col_\\d{1, 3}")
+      -tidyselect::matches("percent_col_\\d{1,3}") #nolint
     )
 
   # Write data to sheet ####
