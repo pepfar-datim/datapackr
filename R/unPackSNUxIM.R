@@ -14,6 +14,49 @@
 #'
 unPackSNUxIM <- function(d) {
 
+  #####local function to be moved
+  checkDuplicateRowsLocal <- function(d, sheet) {
+    duplicates <- d$data$SNUxIM %>%
+      dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget) %>%
+      dplyr::filter(DataPackTarget > 0) %>%
+      dplyr::select(-DataPackTarget) %>%
+      dplyr::group_by(dplyr::across(tidyselect::everything())) %>%
+      dplyr::summarise(n = (dplyr::n()), .groups = "drop") %>%
+      dplyr::filter(n > 1) %>%
+      dplyr::select(-n) %>%
+      dplyr::distinct() %>%
+      dplyr::arrange(dplyr::across(tidyselect::everything())) %>%
+      dplyr::mutate(sheet = sheet) %>%
+      dplyr::select(sheet, dplyr::everything())
+
+    if (NROW(duplicates) > 0) {
+
+      d$tests$duplicate_rows <- dplyr::bind_rows(d$tests$duplicate_rows, duplicates)
+      attr(d$tests$duplicate_rows, "test_name") <- "Duplicated rows"
+
+      dupes_msg <-
+        capture.output(
+          print(as.data.frame(duplicates), row.names = FALSE)
+        )
+
+      warning_msg <-
+        paste0(
+          "ERROR! In tab ",
+          sheet,
+          ": DUPLICATE ROWS found. Ensure rows are all unique, and the SNU Disaggregates",
+          " are not repeated within tabs. This issue may have been caused by inadvertent",
+          " or incorrect copying of data from one row to another. Duplicates are not permitted. -> \n\t",
+          paste(dupes_msg, collapse = "\n\t"),
+          "\n")
+
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+      d$info$has_error <- TRUE
+
+    }
+    return(d)
+  }
+  #####
+
   if (d$info$cop_year %in% c(2020, 2021)) {
     sheet <- "PSNUxIM"
   } else {
@@ -63,43 +106,7 @@ unPackSNUxIM <- function(d) {
   }
 
   # TEST: Duplicate Rows; Warn; Combine ####
-  duplicates <- d$data$SNUxIM %>%
-    dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget) %>%
-    dplyr::filter(DataPackTarget > 0) %>%
-    dplyr::select(-DataPackTarget) %>%
-    dplyr::group_by(dplyr::across(tidyselect::everything())) %>%
-    dplyr::summarise(n = (dplyr::n()), .groups = "drop") %>%
-    dplyr::filter(n > 1) %>%
-    dplyr::select(-n) %>%
-    dplyr::distinct() %>%
-    dplyr::arrange(dplyr::across(tidyselect::everything())) %>%
-    dplyr::mutate(sheet = sheet) %>%
-    dplyr::select(sheet, dplyr::everything())
-
-  if (NROW(duplicates) > 0) {
-
-    d$tests$duplicate_rows <- dplyr::bind_rows(d$tests$duplicate_rows, duplicates)
-    attr(d$tests$duplicate_rows, "test_name") <- "Duplicated rows"
-
-    dupes_msg <-
-      capture.output(
-        print(as.data.frame(duplicates), row.names = FALSE)
-      )
-
-    warning_msg <-
-      paste0(
-        "ERROR! In tab ",
-        sheet,
-        ": DUPLICATE ROWS found. Ensure rows are all unique, and the SNU Disaggregates",
-        " are not repeated within tabs. This issue may have been caused by inadvertent",
-        " or incorrect copying of data from one row to another. Duplicates are not permitted. -> \n\t",
-        paste(dupes_msg, collapse = "\n\t"),
-        "\n")
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-    d$info$has_error <- TRUE
-
-  }
+  d <- checkDuplicateRowsLocal(d, sheet)
 
   # Run structural checks ####
   d <- checkColStructure(d, sheet)

@@ -13,6 +13,8 @@
 checkDuplicateRows <- function(d, sheet) {
   if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
     data <- d$data$SNUxIM
+  } else if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "OPU Data Pack")  {
+    data <- d$data$SNUxIM
   } else {
     data <- d$data$extract
   }
@@ -28,7 +30,6 @@ checkDuplicateRows <- function(d, sheet) {
   } else {
     header_cols <- c("PSNU", "indicator_code", "Age", "Sex", "KeyPop")
   }
-
   # TEST for duplicates ####
   duplicates <- data %>%
     dplyr::filter(value != 0) %>%
