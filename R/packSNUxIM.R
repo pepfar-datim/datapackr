@@ -213,7 +213,7 @@ packSNUxIM <- function(d,
 
   # Classify formula columns as formulas
   ## TODO: Improve approach
-  for (i in seq_len(NROW(data_structure))) {
+  for (i in seq_along(data_structure)) {
     if (!all(any(is.na(data_structure[[i]])))) {
       class(data_structure[[i]]) <- c(class(data_structure[[i]]), "formula")
     }
