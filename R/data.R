@@ -17,7 +17,8 @@
 #'
 #' @description
 #' A list object containing styles pertaining to different portions of the Data
-#' Pack.
+#' Pack. These styles control things such as font type,font size, alignment,
+#' border thickness, and color
 #'
 #' @format
 #' \describe{
@@ -39,18 +40,18 @@
 #' \describe{
 #'   \item{sheet_num}{Lists the index value associated with the sheet name
 #'   listed in \code{sheet_name}.}
-#'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
+#'   \item{sheet_name}{Lists the sheet/tab name as used in the Data Pack.}
 #'   \item{col}{Value describing the column position of each
 #'   \code{indicator_code}.}
 #'   \item{label}{String label used to describe \code{indicator_code}.}
 #'   \item{indicator_code}{Code used in the Data Pack to uniquely
 #'   identify each distinct programmatic area of target setting.}
-#'   \item{formula}{Excel formula defined for \code{indicator_code}.}
+#'   \item{formula}{Excel formula defined for the \code{indicator_code}.}
 #'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
 #'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
 #'   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
 #'   in the \code{col_type} field, documents the dataset, either \code{MER},
-#'   \code{IMPATT}, or \code{SUBNAT}.}
+#'   \code{IMPATT},DATAPACK, or \code{SUBNAT}.}
 #' }
 "data_pack_schema"
 
@@ -61,68 +62,83 @@
 #' @description
 #' Dataset that maps Data Pack indicators to dataelements and
 #' categoryoptioncombos in DATIM, used for mapping datasets
-#' extracted from Data Packs to DATIM import file structure.
+#' extracted from Data Packs to DATIM, with the necessary import file structure.
 #'
 #' @format
 #' \describe{
 #'   \item{indicator_code}{Code used in the Data Pack to uniquely identify each
 #'   distinct programmatic area of target setting.}
-#'   \item{categoryoption_specified}{}
+#'   \item{col_type}{Values can be "target", "result" or NA} 
+#'   \item{value_type}{Describes what type of measure the indicator code is
+#'    represented by. Values can be "integer", "percentage", or NA}
+#'   \item{categoryoption_specified}{Categoryoption disaggregate} ??????????????? Ask Scott or Jason 
 #'   \item{valid_ages.name}{Age disaggregate}
 #'   \item{valid_ages.id}{Age disaggregate UID}
 #'   \item{valid_sexes.name}{Sex disaggregate}
 #'   \item{valid_sexes.id}{Sex disaggregate UID}
 #'   \item{valid_kps.name}{KP disaggregate}
 #'   \item{valid_kps.id}{KP disaggregate UID}
-#'   \item{categoryOptions.ids}{}
-#'   \item{support_type}{Either DSD or TA. The crossing of these with
-#'   \code{indicatorCode} roughly corresponds to DATIM dataelements.}
-#'   \item{dataelement}{DATIM uid for dataElements.}
-#'   \item{hts_modality}{}
-#'   \item{tech_area}{}
-#'   \item{numerator_denominator}{}
-#'   \item{dataelement.y}{}
-#'   \item{categoryoptioncombo}{}
+#'   \item{FY}{Fiscal Year }
+#'   \item{period}{Year and month of observation} ??????????????? Ask Scott or Jason 
+#'   \item{categoryOptions.ids}{Categoryoption UID}
+#'   \item{dataelementuid}{DATIM UID for dataElements.}
+#'   \item{hts_modality}{HIV Testing service type}
+#'   \item{period_dataset}{Fiscal year dataset results}
+#'   \item{dataelementname}{The name of the data element being described}
+#'   \item{categoryoptioncomboname}{The name of the various combinations of
+#'    categories and options}
 #'   \item{categoryoptioncombouid}{DATIM uid for categoryOptionCombos.}
-#'   \item{resultstatus}{}
-#'   \item{resultststaus_inclusive}{}
-#'   \item{disagg_type}{}
-#'   \item{technical_area}{}
-#'   \item{top_level}{}
+#'   \item{targets_results}{Category variable denoting "targets" or "results"}
+#'   \item{dataset}{Category variable denoting where the dateset stems from:
+#'    "impatt","subnat", "mer"}
+#'   \item{resultstatus}{Category variable denoting the status of the results} 
+#'   \item{resultststaus_inclusive}{Category variable denoting 
+#'    "Positive", "Negative", "Unknown"} 
+#'   \item{disagg_type}{Category variable denoting the dissagregate}  
+#'   \item{technical_area}{Category variable denoting the tecnical area}
+#'   \item{top_level}{Denotes if the top level is a numerator or denominator}
+#'   \item{support_type}{Category variable denoting "Sub-National", "DSD", "TA",
+#'    or "No Support Type". The crossing of these with \code{indicatorCode}
+#'    roughly corresponds to DATIM dataelements.}
+#'   \item{numerator_denominator}{Category variable denoting numerator or 
+#'    denominator}
 #' }
 #'
 "map_DataPack_DATIM_DEs_COCs"
 
-
 #' @docType data
-#' @title Schema describing correct structure of COP20 Data Pack template.
+#' @title Schema describing correct structure of the COP20 Data Pack template.
 #'
 #' @description This schema describes the correct structure of a COP20 Data Pack
-#' file, generated from the template used to produce Data Packs and useful in
-#' validating Data Packs passed through datapackr.
+#' file.It is generated from the template used to produce Data Packs, and is
+#' also useful in validating Data Packs passed through datapackr.
 #'
 #' @format
 #' \describe{
 #'   \item{sheet_num}{Lists the index value associated with the sheet name
 #'   listed in \code{sheet_name}.}
-#'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
-#'   \item{data_structure}{}
+#'   \item{sheet_name}{Lists the sheet/tab name as used in the Data Pack.}
+#'   \item{data_structure}{Binary column describing the structure of the data
+#'    These values consist of "skip" or "normal"}
 #'   \item{col}{Value describing the column position of each
 #'   \code{indicator_code}.}
 #'   \item{indicator_code}{Code used in the Data Pack to uniquely
 #'   identify each distinct programmatic area of target setting.}
 #'   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
-#'   in the \code{col_type} field, documents the dataset, either \code{MER},
+#'   in the \code{col_type} field, documents the dataset, either \code{MER}, ######### Might want to copy this documentation to the above 
 #'   \code{IMPATT}, or \code{SUBNAT}.}
 #'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
 #'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
-#'   \item{value_type}{}
-#'   \item{dataelement_dsd}{}
-#'   \item{dataelement_ta}{}
-#'   \item{categoryoption_specified}{}
-#'   \item{valid_ages}{}
-#'   \item{valid_sexes}{}
-#'   \item{valid_kps}{}
+#'   \item{value_type}{Category column describing the type of measure for the 
+#'    \code{indicator_code}. The values consist of "string", "integer",
+#'     "percentage", or NA}
+#'     
+#'   \item{dataelement_dsd}{}??????????????? Ask Scott or Jason 
+#'   \item{dataelement_ta}{}??????????????? Ask Scott or Jason 
+#'   \item{categoryoption_specified}{Categoryoption disaggregate} ??????????????? Ask Scott or Jason 
+#'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
+#'   \item{valid_sexes}{Compised of Sex disaggregate and the assoicated UID}
+#'   \item{valid_kps}{Compised of KP disaggregate and the assoicated UID}
 #'   \item{formula}{Excel formula defined for \code{indicator_code}.}
 #' }
 "cop20_data_pack_schema"
@@ -131,37 +147,40 @@
 #' @title List of valid PSNUs used for generating Data Packs.
 #'
 #' @description List of valid PSNUs used for generating Data Packs. Must be
-#' synced and saved manually.
+#' synced and saved manually!
 #'
 #' @format
 #' \describe{
-#'   \item{ou}{}
-#'   \item{ou_id}{}
-#'   \item{country_name}{}
-#'   \item{country_uid}{}
-#'   \item{snu1}{}
-#'   \item{snu1_uid}{}
-#'   \item{psnu}{}
-#'   \item{psnu_uid}{}
-#'   \item{psnu_type}{}
-#'   \item{lastUpdated}{}
+#'   \item{ou}{Operating Unit name associated with the Organisation Unit} ### Is this operating or Organization?
+#'   \item{ou_id}{Operating Unit UID}
+#'   \item{country_name}{Country name associated with the Organisation Unit}
+#'   \item{country_uid}{Country name UID}
+#'   \item{snu1}{Subnational Unit associated with the Organisation Unit}
+#'   \item{snu1_uid}{Subnational Unit UID}
+#'   \item{psnu}{Priority Sub-National Unit associated with the Organisation
+#'    Unit}
+#'   \item{psnu_uid}{Priority Sub-National Unit UID}
+#'   \item{psnu_type}{The type of Priority Sub-National Unit}
+#'   \item{lastUpdated}{The last time the Organisation Unit was updated}
 #'   \item{ancestors}{}
 #'   \item{organisationUnitGroups}{}
+#'   \item{DREAMS}{Determined, Resilient, Empowered, AIDS-free, Mentored, and
+#'    Safe Partnernship. Binary column "Y" or NA.}
 #' }
 "valid_PSNUs"
 
 #' @docType data
-#' @title List of  valid categoryoptions based on current COP Target Code List.
+#' @title List of valid categoryoptions based on current COP Target Code List.
 #'
 #' @description List of valid categoryoptions based on current COP Target Code
 #' List. Must be synced and saved manually.
 #'
 #' @format
 #' \describe{
-#'   \item{name}{}
-#'   \item{id}{}
-#'   \item{categoryoptiongroup}{}
-#'   \item{datapack_disagg}{}
+#'   \item{name}{Name of the Category Option}
+#'   \item{id}{Category Option UID}
+#'   \item{categoryoptiongroup}{The group by which the category option belongs}
+#'   \item{datapack_disagg}{Name of the Category option in the Data Pack}
 #'   \item{datapack_schema_group}{}
 #' }
 "valid_category_options"
@@ -169,15 +188,14 @@
 #' @docType data
 #' @title Datapack country groupings
 #'
-#' @description Tibble of data pack names and
+#' @description Tibble of data pack country names and their UID's
 #'
 #' @format
 #' \describe{
-#'   \item{datapack_name}{Name on home tab of datapack}
-#'   \item{country_uids}{countries uids listed on home tab}
+#'   \item{datapack_name}{Country name on home tab of datapack}
+#'   \item{country_uids}{Country's uids listed on the home tab}
 #' }
 "COP21_datapacks_countries"
-
 
 #' @docType data
 #' @title Schema describing correct structure of COP20 OPU Data Pack template.
@@ -190,8 +208,9 @@
 #' \describe{
 #'   \item{sheet_num}{Lists the index value associated with the sheet name
 #'   listed in \code{sheet_name}.}
-#'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
-#'   \item{data_structure}{}
+#'   \item{sheet_name}{Lists the sheet/tab name as used in the Data Pack.}
+#'   \item{data_structure}{Binary column describing the structure of the data
+#'    These values consist of "skip" or "normal"}
 #'   \item{col}{Value describing the column position of each
 #'   \code{indicator_code}.}
 #'   \item{indicator_code}{Code used in the Data Pack to uniquely
@@ -201,17 +220,19 @@
 #'   \code{IMPATT}, or \code{SUBNAT}.}
 #'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
 #'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
-#'   \item{value_type}{}
-#'   \item{dataelement_dsd}{}
-#'   \item{dataelement_ta}{}
-#'   \item{categoryoption_specified}{}
-#'   \item{valid_ages}{}
-#'   \item{valid_sexes}{}
-#'   \item{valid_kps}{}
+#'   \item{value_type}{Category column describing the type of measure for the 
+#'    \code{indicator_code}. The values consist of "string", "integer",
+#'     "percentage", or NA}
+#'     
+#'   \item{dataelement_dsd}{}??????????????? Ask Scott or Jason 
+#'   \item{dataelement_ta}{}??????????????? Ask Scott or Jason 
+#'   \item{categoryoption_specified}{Categoryoption disaggregate} ??????????????? Ask Scott or Jason 
+#'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
+#'   \item{valid_sexes}{Compised of Sex disaggregate and the assoicated UID}
+#'   \item{valid_kps}{Compised of KP disaggregate and the assoicated UID}
 #'   \item{formula}{Excel formula defined for \code{indicator_code}.}
 #' }
 "cop20OPU_data_pack_schema"
-
 
 #' @docType data
 #' @title Schema describing correct structure of COP21 OPU Data Pack template.
@@ -225,27 +246,29 @@
 #'   \item{sheet_num}{Lists the index value associated with the sheet name
 #'   listed in \code{sheet_name}.}
 #'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
-#'   \item{data_structure}{}
+#'   \item{data_structure}{Binary column describing the structure of the data
+#'    These values consist of "skip" or "normal"}
 #'   \item{col}{Value describing the column position of each
 #'   \code{indicator_code}.}
 #'   \item{indicator_code}{Code used in the Data Pack to uniquely
 #'   identify each distinct programmatic area of target setting.}
 #'   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
 #'   in the \code{col_type} field, documents the dataset, either \code{MER},
-#'   \code{IMPATT}, or \code{SUBNAT}.}
+#'   \code{IMPATT},\code{datapack}, or \code{SUBNAT}.}
 #'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
 #'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
-#'   \item{value_type}{}
-#'   \item{dataelement_dsd}{}
-#'   \item{dataelement_ta}{}
-#'   \item{categoryoption_specified}{}
-#'   \item{valid_ages}{}
-#'   \item{valid_sexes}{}
-#'   \item{valid_kps}{}
+#'   \item{value_type}{Category column describing the type of measure for the 
+#'    \code{indicator_code}. The values consist of "string", "integer",
+#'     "percentage", or NA}
+#'   \item{dataelement_dsd}{}??????????????? Ask Scott or Jason 
+#'   \item{dataelement_ta}{}??????????????? Ask Scott or Jason 
+#'   \item{categoryoption_specified}{Categoryoption disaggregate} ??????????????? Ask Scott or Jason
+#'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
+#'   \item{valid_sexes}{Compised of Sex disaggregate and the assoicated UID}
+#'   \item{valid_kps}{Compised of KP disaggregate and the assoicated UID}
 #'   \item{formula}{Excel formula defined for \code{indicator_code}.}
 #' }
 "cop21OPU_data_pack_schema"
-
 
 #' @docType data
 #' @title Datapack Category option groups
@@ -254,11 +277,15 @@
 #' along with their individual category options (id and name) as a
 #' nested data frame.
 #'
+#'#' @format
+#' \describe{
+#'   \item{name}{Name of the Category Option Group for example "01-04 Only"}
+#'   \item{id}{Category Option Group UID}
+#' }
 "datapack_cogs"
 
-
 #' @docType data
-#' @title Schema describing correct structure of COP21 Data Pack template.
+#' @title Schema describing the correct structure of the COP21 Data Pack template.
 #'
 #' @description This schema describes the correct structure of a COP21 Data Pack
 #' file, generated from the template used to produce Data Packs and useful in
@@ -269,27 +296,33 @@
 #'   \item{sheet_num}{Lists the index value associated with the sheet name
 #'   listed in \code{sheet_name}.}
 #'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
-#'   \item{data_structure}{}
+#'   \item{data_structure}{Binary column describing the structure of the data
+#'    These values consist of "skip" or "normal"}
 #'   \item{col}{Value describing the column position of each
 #'   \code{indicator_code}.}
 #'   \item{indicator_code}{Code used in the Data Pack to uniquely
 #'   identify each distinct programmatic area of target setting.}
 #'   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
 #'   in the \code{col_type} field, documents the dataset, either \code{MER},
-#'   \code{IMPATT}, or \code{SUBNAT}.}
+#'   \code{IMPATT},\code{datapack}, or \code{SUBNAT}.}
 #'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
 #'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
-#'   \item{value_type}{}
-#'   \item{dataelement_dsd}{}
-#'   \item{dataelement_ta}{}
+#'   \item{value_type}{Category column describing the type of measure for the 
+#'    \code{indicator_code}. The values consist of "string", "integer",
+#'     "percentage", or NA}
+#'   \item{dataelement_dsd}{Denotes whether this element has a 
+#'    "Direct Service Delivery" support type}
+#'   \item{dataelement_ta}{Denotes whether this element has a
+#'    "Technical Assistance" support type
 #'   \item{categoryoption_specified}{}
-#'   \item{valid_ages}{}
-#'   \item{valid_sexes}{}
-#'   \item{valid_kps}{}
+#'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
+#'   \item{valid_sexes}{Compised of Sex disaggregate and the assoicated UID}
+#'   \item{valid_kps}{Compised of KP disaggregate and the assoicated UID}
 #'   \item{formula}{Excel formula defined for \code{indicator_code}.}
+#'   \item{FY}{Fiscal Year }
+#'   \item{period}{Year and month of observation} ??????????????? Ask Scott or Jason 
 #' }
 "cop21_data_pack_schema"
-
 
 #' @docType data
 #' @title Schema describing correct structure of COP22 Data Pack template.
@@ -303,23 +336,31 @@
 #'   \item{sheet_num}{Lists the index value associated with the sheet name
 #'   listed in \code{sheet_name}.}
 #'   \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
-#'   \item{data_structure}{}
+#'   \item{data_structure}{Binary column describing the structure of the data
+#'    These values consist of "skip" or "normal"}
 #'   \item{col}{Value describing the column position of each
 #'   \code{indicator_code}.}
 #'   \item{indicator_code}{Code used in the Data Pack to uniquely
 #'   identify each distinct programmatic area of target setting.}
 #'   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
 #'   in the \code{col_type} field, documents the dataset, either \code{MER},
-#'   \code{IMPATT}, or \code{SUBNAT}.}
+#'   \code{IMPATT},\code{datapack}, or \code{SUBNAT}.}
 #'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
 #'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
-#'   \item{value_type}{}
-#'   \item{dataelement_dsd}{}
-#'   \item{dataelement_ta}{}
+#'   \item{value_type}{Category column describing the type of measure for the 
+#'    \code{indicator_code}. The values consist of "string", "integer",
+#'     "percentage", or NA}
+#'   \item{dataelement_dsd}{Denotes whether this element has a 
+#'    "Direct Service Delivery" support type}
+#'   \item{dataelement_ta}{Denotes whether this element has a
+#'    "Technical Assistance" support type
 #'   \item{categoryoption_specified}{}
-#'   \item{valid_ages}{}
-#'   \item{valid_sexes}{}
-#'   \item{valid_kps}{}
+#'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
+#'   \item{valid_sexes}{Compised of Sex disaggregate and the assoicated UID}
+#'   \item{valid_kps}{Compised of KP disaggregate and the assoicated UID}
 #'   \item{formula}{Excel formula defined for \code{indicator_code}.}
+#'   \item{FY}{Fiscal Year }
+#'   \item{period}{Year and month of observation} ??????????????? Ask Scott or Jason 
+#'   
 #' }
 "cop22_data_pack_schema"
