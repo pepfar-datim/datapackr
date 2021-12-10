@@ -26,6 +26,7 @@
 #'   \item{siteList}{Styles for site names, broken out by Community, Facility,
 #'   National, Military, or Inactive.}
 #'   \item{data}{Styles for title, headers, labels, and Unique ID row.}
+#'   \item{cop21_opu}{Styles specific to cop21_opu's}
 #' }
 "styleGuide"
 
@@ -71,15 +72,16 @@
 #'   \item{col_type}{Values can be "target", "result" or NA} 
 #'   \item{value_type}{Describes what type of measure the indicator code is
 #'    represented by. Values can be "integer", "percentage", or NA}
-#'   \item{categoryoption_specified}{Categoryoption disaggregate} ??????????????? Ask Scott or Jason 
+#'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
+#'    element}
 #'   \item{valid_ages.name}{Age disaggregate}
 #'   \item{valid_ages.id}{Age disaggregate UID}
 #'   \item{valid_sexes.name}{Sex disaggregate}
 #'   \item{valid_sexes.id}{Sex disaggregate UID}
 #'   \item{valid_kps.name}{KP disaggregate}
 #'   \item{valid_kps.id}{KP disaggregate UID}
-#'   \item{FY}{Fiscal Year }
-#'   \item{period}{Year and month of observation} ??????????????? Ask Scott or Jason 
+#'   \item{FY}{Fiscal Year}
+#'   \item{period}{DHIS2 period for example "2021Oct"}
 #'   \item{categoryOptions.ids}{Categoryoption UID}
 #'   \item{dataelementuid}{DATIM UID for dataElements.}
 #'   \item{hts_modality}{HIV Testing service type}
@@ -125,17 +127,19 @@
 #'   \item{indicator_code}{Code used in the Data Pack to uniquely
 #'   identify each distinct programmatic area of target setting.}
 #'   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
-#'   in the \code{col_type} field, documents the dataset, either \code{MER}, ######### Might want to copy this documentation to the above 
-#'   \code{IMPATT}, or \code{SUBNAT}.}
+#'   in the \code{col_type} field, documents the dataset, either \code{MER},
+#'   \code{IMPATT},\code{datapack}, or \code{SUBNAT}.}
 #'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
 #'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
 #'   \item{value_type}{Category column describing the type of measure for the 
 #'    \code{indicator_code}. The values consist of "string", "integer",
 #'     "percentage", or NA}
-#'     
-#'   \item{dataelement_dsd}{}??????????????? Ask Scott or Jason 
-#'   \item{dataelement_ta}{}??????????????? Ask Scott or Jason 
-#'   \item{categoryoption_specified}{Categoryoption disaggregate} ??????????????? Ask Scott or Jason 
+#'   \item{dataelement_dsd}{Denotes whether this element has a 
+#'    "Direct Service Delivery" support type}
+#'   \item{dataelement_ta}{Denotes whether this element has a
+#'    "Technical Assistance" support type
+#'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
+#'    element}
 #'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
 #'   \item{valid_sexes}{Compised of Sex disaggregate and the assoicated UID}
 #'   \item{valid_kps}{Compised of KP disaggregate and the assoicated UID}
@@ -151,7 +155,7 @@
 #'
 #' @format
 #' \describe{
-#'   \item{ou}{Operating Unit name associated with the Organisation Unit} ### Is this operating or Organization?
+#'   \item{ou}{Operating Unit name associated with the Organisation Unit}
 #'   \item{ou_id}{Operating Unit UID}
 #'   \item{country_name}{Country name associated with the Organisation Unit}
 #'   \item{country_uid}{Country name UID}
@@ -197,12 +201,14 @@
 #' }
 "COP21_datapacks_countries"
 
+
 #' @docType data
-#' @title Schema describing correct structure of COP20 OPU Data Pack template.
+#' @title Schema describing correct the structure of the COP20 OPU Data Pack
+#'  template.
 #'
-#' @description This schema describes the correct structure of a COP20 OPU Data Pack
-#' file, generated from the template used to produce Data Packs and useful in
-#' validating Data Packs passed through datapackr.
+#' @description This schema describes the correct structure of a COP20 OPU 
+#' Data Pack file, generated from the template used to produce Data Packs and
+#'  useful in validating Data Packs passed through datapackr.
 #'
 #' @format
 #' \describe{
@@ -217,16 +223,18 @@
 #'   identify each distinct programmatic area of target setting.}
 #'   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
 #'   in the \code{col_type} field, documents the dataset, either \code{MER},
-#'   \code{IMPATT}, or \code{SUBNAT}.}
+#'   \code{IMPATT},\code{datapack}, or \code{SUBNAT}.}
 #'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
 #'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
 #'   \item{value_type}{Category column describing the type of measure for the 
 #'    \code{indicator_code}. The values consist of "string", "integer",
 #'     "percentage", or NA}
-#'     
-#'   \item{dataelement_dsd}{}??????????????? Ask Scott or Jason 
-#'   \item{dataelement_ta}{}??????????????? Ask Scott or Jason 
-#'   \item{categoryoption_specified}{Categoryoption disaggregate} ??????????????? Ask Scott or Jason 
+#'   \item{dataelement_dsd}{Denotes whether this element has a 
+#'    "Direct Service Delivery" support type}
+#'   \item{dataelement_ta}{Denotes whether this element has a
+#'    "Technical Assistance" support type
+#'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
+#'    element}
 #'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
 #'   \item{valid_sexes}{Compised of Sex disaggregate and the assoicated UID}
 #'   \item{valid_kps}{Compised of KP disaggregate and the assoicated UID}
@@ -235,11 +243,12 @@
 "cop20OPU_data_pack_schema"
 
 #' @docType data
-#' @title Schema describing correct structure of COP21 OPU Data Pack template.
+#' @title Schema describing the correct structure of the COP21 OPU Data Pack
+#'  template.
 #'
-#' @description This schema describes the correct structure of a COP21 OPU Data Pack
-#' file, generated from the template used to produce Data Packs and useful in
-#' validating Data Packs passed through datapackr.
+#' @description This schema describes the correct structure of a COP21 OPU
+#'  Data Pack file, generated from the template used to produce Data Packs and
+#'  useful in validating Data Packs passed through datapackr.
 #'
 #' @format
 #' \describe{
@@ -260,9 +269,12 @@
 #'   \item{value_type}{Category column describing the type of measure for the 
 #'    \code{indicator_code}. The values consist of "string", "integer",
 #'     "percentage", or NA}
-#'   \item{dataelement_dsd}{}??????????????? Ask Scott or Jason 
-#'   \item{dataelement_ta}{}??????????????? Ask Scott or Jason 
-#'   \item{categoryoption_specified}{Categoryoption disaggregate} ??????????????? Ask Scott or Jason
+#'   \item{dataelement_dsd}{Denotes whether this element has a 
+#'    "Direct Service Delivery" support type}
+#'   \item{dataelement_ta}{Denotes whether this element has a
+#'    "Technical Assistance" support type
+#'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
+#'    element}
 #'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
 #'   \item{valid_sexes}{Compised of Sex disaggregate and the assoicated UID}
 #'   \item{valid_kps}{Compised of KP disaggregate and the assoicated UID}
@@ -314,18 +326,20 @@
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
 #'    "Technical Assistance" support type
-#'   \item{categoryoption_specified}{}
+#'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
+#'    element}
 #'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
 #'   \item{valid_sexes}{Compised of Sex disaggregate and the assoicated UID}
 #'   \item{valid_kps}{Compised of KP disaggregate and the assoicated UID}
 #'   \item{formula}{Excel formula defined for \code{indicator_code}.}
-#'   \item{FY}{Fiscal Year }
-#'   \item{period}{Year and month of observation} ??????????????? Ask Scott or Jason 
+#'   \item{FY}{Fiscal Year}
+#'   \item{period}{DHIS2 period for example "2021Oct"}
 #' }
 "cop21_data_pack_schema"
 
 #' @docType data
-#' @title Schema describing correct structure of COP22 Data Pack template.
+#' @title Schema describing the correct structure of teh COP22 Data Pack
+#'  template.
 #'
 #' @description This schema describes the correct structure of a COP22 Data Pack
 #' file, generated from the template used to produce Data Packs and useful in
@@ -354,13 +368,14 @@
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
 #'    "Technical Assistance" support type
-#'   \item{categoryoption_specified}{}
+#'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
+#'    element}
 #'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
 #'   \item{valid_sexes}{Compised of Sex disaggregate and the assoicated UID}
 #'   \item{valid_kps}{Compised of KP disaggregate and the assoicated UID}
 #'   \item{formula}{Excel formula defined for \code{indicator_code}.}
-#'   \item{FY}{Fiscal Year }
-#'   \item{period}{Year and month of observation} ??????????????? Ask Scott or Jason 
+#'   \item{FY}{Fiscal Year}
+#'   \item{period}{DHIS2 period for example "2021Oct"}
 #'   
 #' }
 "cop22_data_pack_schema"
