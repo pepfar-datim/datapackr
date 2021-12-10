@@ -69,7 +69,7 @@
 #' \describe{
 #'   \item{indicator_code}{Code used in the Data Pack to uniquely identify each
 #'   distinct programmatic area of target setting.}
-#'   \item{col_type}{Values can be "target", "result" or NA} 
+#'   \item{col_type}{Values can be "target", "result" or NA}
 #'   \item{value_type}{Describes what type of measure the indicator code is
 #'    represented by. Values can be "integer", "percentage", or NA}
 #'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
@@ -93,16 +93,16 @@
 #'   \item{targets_results}{Category variable denoting "targets" or "results"}
 #'   \item{dataset}{Category variable denoting where the dateset stems from:
 #'    "impatt","subnat", "mer"}
-#'   \item{resultstatus}{Category variable denoting the status of the results} 
-#'   \item{resultststaus_inclusive}{Category variable denoting 
-#'    "Positive", "Negative", "Unknown"} 
-#'   \item{disagg_type}{Category variable denoting the dissagregate}  
+#'   \item{resultstatus}{Category variable denoting the status of the results}
+#'   \item{resultststaus_inclusive}{Category variable denoting
+#'    "Positive", "Negative", "Unknown"}
+#'   \item{disagg_type}{Category variable denoting the dissagregate}
 #'   \item{technical_area}{Category variable denoting the tecnical area}
 #'   \item{top_level}{Denotes if the top level is a numerator or denominator}
 #'   \item{support_type}{Category variable denoting "Sub-National", "DSD", "TA",
 #'    or "No Support Type". The crossing of these with \code{indicatorCode}
 #'    roughly corresponds to DATIM dataelements.}
-#'   \item{numerator_denominator}{Category variable denoting numerator or 
+#'   \item{numerator_denominator}{Category variable denoting numerator or
 #'    denominator}
 #' }
 #'
@@ -131,10 +131,10 @@
 #'   \code{IMPATT},\code{datapack}, or \code{SUBNAT}.}
 #'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
 #'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
-#'   \item{value_type}{Category column describing the type of measure for the 
+#'   \item{value_type}{Category column describing the type of measure for the
 #'    \code{indicator_code}. The values consist of "string", "integer",
 #'     "percentage", or NA}
-#'   \item{dataelement_dsd}{Denotes whether this element has a 
+#'   \item{dataelement_dsd}{Denotes whether this element has a
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
 #'    "Technical Assistance" support type
@@ -206,7 +206,7 @@
 #' @title Schema describing correct the structure of the COP20 OPU Data Pack
 #'  template.
 #'
-#' @description This schema describes the correct structure of a COP20 OPU 
+#' @description This schema describes the correct structure of a COP20 OPU
 #' Data Pack file, generated from the template used to produce Data Packs and
 #'  useful in validating Data Packs passed through datapackr.
 #'
@@ -226,10 +226,10 @@
 #'   \code{IMPATT},\code{datapack}, or \code{SUBNAT}.}
 #'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
 #'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
-#'   \item{value_type}{Category column describing the type of measure for the 
+#'   \item{value_type}{Category column describing the type of measure for the
 #'    \code{indicator_code}. The values consist of "string", "integer",
 #'     "percentage", or NA}
-#'   \item{dataelement_dsd}{Denotes whether this element has a 
+#'   \item{dataelement_dsd}{Denotes whether this element has a
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
 #'    "Technical Assistance" support type
@@ -266,10 +266,10 @@
 #'   \code{IMPATT},\code{datapack}, or \code{SUBNAT}.}
 #'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
 #'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
-#'   \item{value_type}{Category column describing the type of measure for the 
+#'   \item{value_type}{Category column describing the type of measure for the
 #'    \code{indicator_code}. The values consist of "string", "integer",
 #'     "percentage", or NA}
-#'   \item{dataelement_dsd}{Denotes whether this element has a 
+#'   \item{dataelement_dsd}{Denotes whether this element has a
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
 #'    "Technical Assistance" support type
@@ -319,10 +319,10 @@
 #'   \code{IMPATT},\code{datapack}, or \code{SUBNAT}.}
 #'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
 #'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
-#'   \item{value_type}{Category column describing the type of measure for the 
+#'   \item{value_type}{Category column describing the type of measure for the
 #'    \code{indicator_code}. The values consist of "string", "integer",
 #'     "percentage", or NA}
-#'   \item{dataelement_dsd}{Denotes whether this element has a 
+#'   \item{dataelement_dsd}{Denotes whether this element has a
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
 #'    "Technical Assistance" support type
@@ -361,10 +361,10 @@
 #'   \code{IMPATT},\code{datapack}, or \code{SUBNAT}.}
 #'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
 #'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
-#'   \item{value_type}{Category column describing the type of measure for the 
+#'   \item{value_type}{Category column describing the type of measure for the
 #'    \code{indicator_code}. The values consist of "string", "integer",
 #'     "percentage", or NA}
-#'   \item{dataelement_dsd}{Denotes whether this element has a 
+#'   \item{dataelement_dsd}{Denotes whether this element has a
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
 #'    "Technical Assistance" support type
@@ -376,6 +376,5 @@
 #'   \item{formula}{Excel formula defined for \code{indicator_code}.}
 #'   \item{FY}{Fiscal Year}
 #'   \item{period}{DHIS2 period for example "2021Oct"}
-#'   
 #' }
 "cop22_data_pack_schema"
