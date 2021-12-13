@@ -14,7 +14,7 @@
 #'
 unPackSNUxIM <- function(d) {
 
-  #####local functions to be moved
+  # Helper functions----
   checkDuplicateRowsLocal <- function(d, sheet) {
     duplicates <- d$data$SNUxIM %>%
       dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget) %>%
@@ -156,6 +156,10 @@ unPackSNUxIM <- function(d) {
 
       d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
     }
+
+    names(d$data$SNUxIM) <- col_names$col_name_new
+    # --> This also removes non-essential text from IM name to leave only 12345_DSD format.
+
     return(d)
   }
 
@@ -248,6 +252,7 @@ unPackSNUxIM <- function(d) {
     return(d)
   }
 
+  #test negative target values
   checkNegativeTargets <- function(d) {
     d$tests$negative_IM_targets <- d$data$SNUxIM %>%
       tidyr::gather(key = "mechCode_supportType",
@@ -275,6 +280,7 @@ unPackSNUxIM <- function(d) {
     return(d)
   }
 
+  #check duplicated values
   checkPositiveDedups <- function(d) {
     d$tests$positive_dedupes <- d$data$SNUxIM %>%
       dplyr::filter(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0)
@@ -297,6 +303,7 @@ unPackSNUxIM <- function(d) {
     return(d)
   }
 
+  #check missing psnuxim combos
   checkMissingCombos <- function(d) {
     d$data$missingCombos <- d$data$MER %>%
       dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
@@ -328,7 +335,8 @@ unPackSNUxIM <- function(d) {
     return(d)
   }
 
-  checkDecimalValues <- function(d, sheet) {
+  #check Decimal values
+  checkDecimalValuesLocal <- function(d, sheet) {
     d$tests$decimals <- d$data$SNUxIM %>%
       dplyr::filter(value %% 1 != 0)
 
@@ -382,16 +390,72 @@ unPackSNUxIM <- function(d) {
     return(d)
   }
 
-  #####
+  #create original targets based on tool type
+  createOriginalTargets <- function(d) {
+    if (d$info$tool == "Data Pack") {
+      original_targets <- d$data$MER
+    } else {
+      original_targets <- d$data$SNUxIM %>%
+        dplyr::select(header_cols$indicator_code, "DataPackTarget") %>%
+        { suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)), # nolint
+                                            as.numeric))
+        } %>%
+        dplyr::group_by(dplyr::across(header_cols$indicator_code)) %>%
+        dplyr::summarise(DataPackTarget = sum(DataPackTarget)) %>%
+        dplyr::mutate(
+          psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)"),
+          sheet_name = sheet
+        ) %>%
+        dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop,
+                      value = DataPackTarget)
+    }
+    return(original_targets)
+  }
 
+  # check invalid mech headers
+  checkInvalidMechHeaders <- function(d) {
+    invalid_mech_headers <- dplyr::bind_rows(invalid_mech_headers, improper_dedupe_mechs)
+
+    d$tests$invalid_mech_headers <- data.frame(invalid_mech_headers = invalid_mech_headers$col_name)
+    attr(d$tests$invalid_mech_headers, "test_name") <- "Invalid mechanism headers"
+
+    if (NROW(d$tests$invalid_mech_headers) > 0) {
+      d$info$has_error <- TRUE
+
+      warning_msg <-
+        paste0(
+          "ERROR! In tab ",
+          sheet,
+          ", INVALID COLUMN HEADERS: Ensure all PSNUxIM column header mechanism are accurate",
+          " and complete, and contain at least the 5- or 6-digit mechanism code and either",
+          " `DSD` or `TA` (e.g., `12345_DSD`). The following column headers are invalid and",
+          " will be dropped in processing. Please use only the form 12345_DSD. ->  \n\t* ",
+          paste(d$tests$invalid_mech_headers$invalid_mech_headers, collapse = "\n\t* "),
+          "\n")
+
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+      d$info$has_error <- TRUE
+    }
+
+    d$data$SNUxIM %<>%
+      dplyr::select(-dplyr::all_of(d$tests$invalid_mech_headers$invalid_mech_headers))
+
+    return(d)
+  }
+
+  # Scripting----
+
+  # define sheet based on cop year
   if (d$info$cop_year %in% c(2020, 2021)) {
     sheet <- "PSNUxIM"
   } else {
     sheet <- "SNU x IM"
   }
 
+  # produce header row
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
 
+  # read data sheet
   d$data$SNUxIM <-
     readxl::read_excel(
       path = d$keychain$submission_path,
@@ -401,16 +465,16 @@ unPackSNUxIM <- function(d) {
       .name_repair = "minimal"
     )
 
-  # TEST: Missing Tab
+  ## TEST: Missing Tab ----
   d <- checkMissingTab(d)
 
-  # TEST: Duplicate Rows; Warn; Combine ####
+  ## TEST: Duplicate Rows; Warn; Combine ----
   d <- checkDuplicateRowsLocal(d, sheet)
 
-  # Run structural checks ####
+  ## TEST Run structural checks ----
   d <- checkColStructure(d, sheet)
 
-  # Save snapshot of original targets ####
+  # Save snapshot of original targets
   cols_to_keep <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet,
                   !is.na(indicator_code),
@@ -420,52 +484,33 @@ unPackSNUxIM <- function(d) {
   header_cols <- cols_to_keep %>%
     dplyr::filter(col_type == "row_header")
 
-  if (d$info$tool == "Data Pack") {
-    original_targets <- d$data$MER
-  } else {
-    original_targets <- d$data$SNUxIM %>%
-      dplyr::select(header_cols$indicator_code, "DataPackTarget") %>%
-      { suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)), # nolint
-                                         as.numeric))
-      } %>%
-      dplyr::group_by(dplyr::across(header_cols$indicator_code)) %>%
-      dplyr::summarise(DataPackTarget = sum(DataPackTarget)) %>%
-      dplyr::mutate(
-        psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)"),
-        sheet_name = sheet
-      ) %>%
-      dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop,
-                    value = DataPackTarget)
-  }
+  # produce the original targets
+  original_targets <- createOriginalTargets(d)
 
-  # Pare down to populated, updated targets only ####
+  # Pare down to populated, updated targets only
   d$data$SNUxIM <- d$data$SNUxIM[, cols_to_keep$col]
 
   d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
 
-  # TEST: Missing right-side formulas; Warn; Continue ####
+  ## TEST: Missing right-side formulas; Warn; Continue----
   d <- checkFormulasLocal(d)
 
-
-  # Drop rows where entire row is NA ####
+  ## Drop rows where entire row is NA ----
   d$data$SNUxIM %<>%
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
 
-  # TEST: Missing key metadata; Error; Drop ####
+  ## TEST: Missing key metadata; Error; Drop ----
   # TODO: Make compatible for OPUs
   if (d$info$tool == "Data Pack") {
     d <- checkMissingMetadata(d, sheet)
   }
-
-  # d$data$SNUxIM %<>%
-  #   dplyr::filter_at(dplyr::vars(PSNU, indicator_code), dplyr::any_vars(!is.na(.)))
 
   d$data$SNUxIM %<>%
     tidyr::drop_na(PSNU, indicator_code)
 
   # nolint
   # nolint start
-  # TEST: Improper Col Names; Error; Drop ####
+  ## TEST: Improper Col Names; Error; Drop ----
   invalid_mech_headers <- names(d$data$SNUxIM) %>%
     tibble::tibble(col_name = .) %>%
     dplyr::filter(!col_name %in% cols_to_keep$indicator_code,
@@ -473,40 +518,15 @@ unPackSNUxIM <- function(d) {
                     & stringr::str_detect(col_name, "DSD|TA")))
   # nolint end
 
-  #Test specifically for DSD and TA which have been populated as mechanisms by the user.
+  ## TEST specifically for DSD and TA which have been populated as mechanisms by the user.----
   improper_dedupe_mechs <- names(d$data$SNUxIM) %>%
     tibble::tibble(col_name = .) %>%
     dplyr::filter(!col_name %in% cols_to_keep$indicator_code,
                   (stringr::str_detect(col_name, "^0000[01]")))
 
-  invalid_mech_headers <- dplyr::bind_rows(invalid_mech_headers, improper_dedupe_mechs)
+  d <- checkInvalidMechHeaders(d)
 
-  d$tests$invalid_mech_headers <- data.frame(invalid_mech_headers = invalid_mech_headers$col_name)
-  attr(d$tests$invalid_mech_headers, "test_name") <- "Invalid mechanism headers"
-
-  if (NROW(d$tests$invalid_mech_headers) > 0) {
-    d$info$has_error <- TRUE
-
-    warning_msg <-
-      paste0(
-        "ERROR! In tab ",
-        sheet,
-        ", INVALID COLUMN HEADERS: Ensure all PSNUxIM column header mechanism are accurate",
-        " and complete, and contain at least the 5- or 6-digit mechanism code and either",
-        " `DSD` or `TA` (e.g., `12345_DSD`). The following column headers are invalid and",
-        " will be dropped in processing. Please use only the form 12345_DSD. ->  \n\t* ",
-        paste(d$tests$invalid_mech_headers$invalid_mech_headers, collapse = "\n\t* "),
-        "\n")
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-    d$info$has_error <- TRUE
-  }
-
-
-  d$data$SNUxIM %<>%
-    dplyr::select(-dplyr::all_of(d$tests$invalid_mech_headers$invalid_mech_headers))
-
-  # TEST: Duplicate Cols; Warn; Combine ####
+  ## TEST: Duplicate Cols; Warn; Combine ----
   col_names <- names(d$data$SNUxIM) %>%
     tibble::tibble(col_name = .) %>%
     dplyr::mutate(
@@ -529,23 +549,20 @@ unPackSNUxIM <- function(d) {
 
   d <- checkDuplicateCols(d, sheet)
 
-  names(d$data$SNUxIM) <- col_names$col_name_new
-  # --> This also removes non-essential text from IM name to leave only 12345_DSD format.
 
-  # TEST: Non-numeric data; Warn; Convert & Drop ####
+
+  ## TEST: Non-numeric data; Warn; Convert & Drop----
   # TODO: Make compatible for OPUs
   if (d$info$tool == "Data Pack") {
     d <- checkNumericValues(d, sheet, header_cols)
   }
-
-  #sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
 
   d$data$SNUxIM %<>%
     { suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)), #nolint
                                        as.numeric))
     }
 
-  # TEST: Missing Dedupe Rollup cols; Error; Add ####
+  ## TEST: Missing Dedupe Rollup cols; Error; Add ----
   dedupe_rollup_cols <- cols_to_keep %>%
     dplyr::filter(dataset == "mer" & col_type == "target" & !indicator_code %in% c("", "12345_DSD")) %>%
     dplyr::pull(indicator_code)
@@ -559,7 +576,7 @@ unPackSNUxIM <- function(d) {
       missing_cols_fatal,
       type = "numeric")
 
-  # Recalculate dedupes ####
+  ## Recalculate dedupes ----
     ## Other than IM cols, only the following should be considered safe for reuse here:
     # - Deduplicated DSD Rollup (FY22)
     # - Deduplicated TA Rollup (FY22)
@@ -585,11 +602,10 @@ unPackSNUxIM <- function(d) {
       `Crosswalk Dedupe` = `Total Deduplicated Rollup (FY22)` - `SUM - Crosswalk Total`
     )
 
-  # TEST: Improper dedupe values; Error; Continue ####
+  ## TEST: Improper dedupe values; Error; Continue ----
   d <- checkImproperDup(d, sheet)
 
-
-  # TEST: Negative IM Targets; Error; Drop ####
+  ## TEST: Negative IM Targets; Error; Drop ----
   d <- checkNegativeTargets(d)
 
   d$data$SNUxIM %<>%
@@ -599,15 +615,14 @@ unPackSNUxIM <- function(d) {
         ~ dplyr::if_else(.x < 0, NA_real_, .x))
     )
 
-  # TEST: Formula changes; Warning; Continue ####
+  ## TEST: Formula changes; Warning; Continue ----
   d <- checkFormulas(d, sheet)
 
-
-  # Remove all unneeded columns ####
+  ## Remove all unneeded columns ----
   d$data$SNUxIM %<>%
     dplyr::select(-dplyr::matches("Rollup|Total|MAX|SUM"))
 
-  # Extract PSNU uid ####
+  ## Extract PSNU uid ----
   d$data$SNUxIM %<>%
     dplyr::mutate(
       psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")
@@ -615,7 +630,7 @@ unPackSNUxIM <- function(d) {
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
                   dplyr::everything())
 
-  # Document all combos used in submitted PSNUxIM tab, prior to gathering. ####
+  ## Document all combos used in submitted PSNUxIM tab, prior to gathering. ----
     # This ensures tests for new combinations are correctly matched
   d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
@@ -625,7 +640,7 @@ unPackSNUxIM <- function(d) {
     d <- checkMissingCombos(d)
   }
 
-  # Gather all values in single column ####
+  ## Gather all values in single column ----
   d$data$SNUxIM %<>%
     tidyr::gather(key = "mechCode_supportType",
                   value = "value",
@@ -633,22 +648,22 @@ unPackSNUxIM <- function(d) {
     dplyr::select(dplyr::all_of(header_cols$indicator_code), psnuid,
                   mechCode_supportType, value)
 
-  # Drop NAs ####
+  ## Drop NAs ----
   d$data$SNUxIM %<>% tidyr::drop_na(value)
 
-  # TEST: Decimals; Error; Round ####
+  ## TEST: Decimals; Error; Round ----
   d <- checkDecimalValues(d, sheet)
 
   d$data$SNUxIM %<>%
     dplyr::mutate(value = round_trunc(value))
 
-  # TEST: Positive Dedupes; Error; Drop ####
+  ## TEST: Positive Dedupes; Error; Drop ----
   d <- checkPositiveDedups(d)
 
   d$data$SNUxIM %<>%
     dplyr::filter(!(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0))
 
-  # Remove unneeded strings from mechanism codes ####
+  ## Remove unneeded strings from mechanism codes ----
   d$data$SNUxIM %<>%
     dplyr::mutate(
       mechCode_supportType = dplyr::case_when(
@@ -664,15 +679,15 @@ unPackSNUxIM <- function(d) {
       dplyr::across(c(header_cols$indicator_code, "psnuid", "mechCode_supportType"))) %>%
     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
 
-  # TODO: TEST: Defunct disaggs; Error; Drop ####
+  ## TODO: TEST: Defunct disaggs; Error; Drop ----
   #d <- defunctDisaggs(d, sheet)
 
-  # Drop all zeros against IMs ####
+  ## Drop all zeros against IMs ----
   d$data$SNUxIM %<>%
     dplyr::filter(!(!stringr::str_detect(mechCode_supportType, "Dedupe")
                     & value == 0))
 
-  # Drop unneeded Dedupes ####
+  ## Drop unneeded Dedupes ----
   d$data$SNUxIM %<>%
     tidyr::pivot_wider(names_from = mechCode_supportType, values_from = value) %>%
     datapackr::addcols(cnames = c("Crosswalk Dedupe", "DSD Dedupe", "TA Dedupe"), type = "numeric")
@@ -718,7 +733,7 @@ unPackSNUxIM <- function(d) {
     dplyr::select(dplyr::all_of(header_cols$indicator_code), psnuid,
                   mechCode_supportType, value)
 
-  # TEST: Rounding Errors; Warn; Continue ####
+  ## TEST: Rounding Errors; Warn; Continue ----
   #TODO: For OPUs, create d$data$MER from DataPackTarget col? Use above for missing_combos step?
 
   comparison <- d$data$SNUxIM %>%
@@ -759,10 +774,10 @@ unPackSNUxIM <- function(d) {
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
-  # TEST: Data Pack total not fully distributed to IM ####
+  ## TEST: Data Pack total not fully distributed to IM ----
   d <- checkDistribution(d)
 
-  # Rename Dedupe IMs ####
+  ## Rename Dedupe IMs ----
   d$data$SNUxIM %<>%
     dplyr::mutate(
       mechCode_supportType = dplyr::case_when(
@@ -772,7 +787,7 @@ unPackSNUxIM <- function(d) {
         TRUE ~ mechCode_supportType)
     )
 
-  # Get mech codes and support types ####
+  ## Get mech codes and support types ----
   d$data$SNUxIM %<>%
     tidyr::separate(
       col = mechCode_supportType,
