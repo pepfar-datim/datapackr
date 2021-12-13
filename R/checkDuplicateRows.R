@@ -30,17 +30,34 @@ checkDuplicateRows <- function(d, sheet) {
   } else {
     header_cols <- c("PSNU", "indicator_code", "Age", "Sex", "KeyPop")
   }
+
   # TEST for duplicates ####
-  duplicates <- data %>%
-    dplyr::filter(value != 0) %>%
-    dplyr::select(tidyselect::any_of(header_cols)) %>%
-    dplyr::group_by(dplyr::across(tidyselect::everything())) %>%
-    dplyr::summarise(n = (dplyr::n()), .groups = "drop") %>%
-    dplyr::filter(n > 1) %>%
-    dplyr::select(-n) %>%
-    dplyr::distinct() %>%
-    dplyr::arrange(dplyr::across(tidyselect::everything())) %>%
-    dplyr::mutate(sheet = sheet)
+  if(sheet %in% c("SNU x IM", "PSNUxIM")) {
+    duplicates <- d$data$SNUxIM %>%
+      dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget) %>%
+      dplyr::filter(DataPackTarget > 0) %>%
+      dplyr::select(-DataPackTarget) %>%
+      dplyr::group_by(dplyr::across(tidyselect::everything())) %>%
+      dplyr::summarise(n = (dplyr::n()), .groups = "drop") %>%
+      dplyr::filter(n > 1) %>%
+      dplyr::select(-n) %>%
+      dplyr::distinct() %>%
+      dplyr::arrange(dplyr::across(tidyselect::everything())) %>%
+      dplyr::mutate(sheet = sheet) %>%
+      dplyr::select(sheet, dplyr::everything())
+  } else {
+    duplicates <- data %>%
+      dplyr::filter(value != 0) %>%
+      dplyr::select(tidyselect::any_of(header_cols)) %>%
+      dplyr::group_by(dplyr::across(tidyselect::everything())) %>%
+      dplyr::summarise(n = (dplyr::n()), .groups = "drop") %>%
+      dplyr::filter(n > 1) %>%
+      dplyr::select(-n) %>%
+      dplyr::distinct() %>%
+      dplyr::arrange(dplyr::across(tidyselect::everything())) %>%
+      dplyr::mutate(sheet = sheet)
+  }
+
 
   if (NROW(duplicates) > 0) {
 

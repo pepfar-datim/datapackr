@@ -33,6 +33,9 @@ checkDecimalValues <- function(d, sheet) {
 
       d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
     }
+
+    d$data$SNUxIM %<>%
+      dplyr::mutate(value = round_trunc(value))
     return(d)
 
   } else {
