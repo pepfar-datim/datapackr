@@ -456,9 +456,6 @@ unPackSNUxIM <- function(d) {
 
   d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
 
-  ## TEST: Missing right-side formulas; Warn; Continue----
-  d <- checkFormulasLocal(d)
-
   ## Drop rows where entire row is NA ----
   d$data$SNUxIM %<>%
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
@@ -578,7 +575,7 @@ unPackSNUxIM <- function(d) {
     )
 
   ## TEST: Formula changes; Warning; Continue ----
-  d <- checkFormulasLocal(d, sheet)
+  d <- checkFormulasLocal(d)
 
   ## Remove all unneeded columns ----
   d$data$SNUxIM %<>%
