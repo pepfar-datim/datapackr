@@ -199,7 +199,7 @@
 #' @format
 #' \describe{
 #'   \item{datapack_name}{Country name on home tab of datapack}
-#'   \item{country_uids}{Country's uids listed on the home tab}
+#'   \item{country_uids}{Country's UIDs listed on the home tab}
 #' }
 "COP21_datapacks_countries"
 
