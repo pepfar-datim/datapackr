@@ -156,7 +156,7 @@ createKeychainInfo <- function(submission_path = NULL,
 
   # Add placeholders for info messages ####
   if (d$info$tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack", "OPU Data Pack Template")
-      & d$info$cop_year %in% c("2020", "2021","2022")) {
+      & d$info$cop_year %in% c("2020", "2021", "2022")) {
     d$info$needs_psnuxim <- FALSE
     d$info$newSNUxIM <- FALSE
     d$info$has_psnuxim <- FALSE
