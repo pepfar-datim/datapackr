@@ -10,10 +10,10 @@
 #'
 #' @return r Sidecar object containing both an openxlsx Workbook and alert messages
 #'
-packPSNUxIM <- function(wb,
+packPSNUxIM <- function(wb,# Workbook object
                         data,
                         snuxim_model_data,
-                        cop_year = NULL,
+                        cop_year = NULL, # Cop year based on the file
                         tool = "OPU Data Pack",
                         schema = NULL,
                         d2_session = dynGet("d2_default_session",
@@ -27,10 +27,10 @@ packPSNUxIM <- function(wb,
   ps <- c("cop_year", "tool", "schema")
 
   for (p in ps) {
-    assign(p, purrr::pluck(params, p))
+    assign(p, purrr::pluck(params, p)) # Allows indexing similar to [[x]]
   }
 
-  if (!cop_year %in% c(2021)) {
+  if (!cop_year %in% c(2021)) {# if the cop year is not 2021, stops and throws message. #Ask Scott, do we need to add 2022 or change? I know the plan is to spin this off.
     stop(paste0("Packing PSNU x IM tabs is not supported for COP", cop_year, " Data Packs."))
   }
 
@@ -40,7 +40,7 @@ packPSNUxIM <- function(wb,
 
   # Create data sidecar to eventually compile and return ####
   r <- list(
-    wb = wb,
+    wb = wb,#Workbook object xlsx
     info = list(messages = MessageQueue(),
     has_error = FALSE))
 
@@ -74,9 +74,9 @@ packPSNUxIM <- function(wb,
 
   # Prepare SNUxIM model data
   snuxim_model_data %<>%
-    datapackr::adorn_import_file(cop_year = cop_year,
-                                 filter_rename_output = FALSE) %>%
-    dplyr::select(indicator_code, psnu_uid = orgUnit, mechanism_code,
+    datapackr::adorn_import_file(cop_year = cop_year, #adorn_import_file.R
+                                 filter_rename_output = FALSE) %>% # Final data in the new, more complete format?
+    dplyr::select(indicator_code, psnu_uid = orgUnit, mechanism_code, # Select columns wanted and rename where necessary
                   type = support_type,
                   age_option_name = Age, age_option_uid = valid_ages.id,
                   sex_option_name = Sex, sex_option_uid = valid_sexes.id,
@@ -84,27 +84,27 @@ packPSNUxIM <- function(wb,
                   value) %>%
     dplyr::group_by(dplyr::across(c(-mechanism_code, -type, -value))) %>%
     dplyr::mutate(
-      percent = value / sum(value)
+      percent = value / sum(value) #Creates percent column
     ) %>%
-    dplyr::ungroup() %>%
+    dplyr::ungroup() %>% #Opposite of group_by. Ungroups the data
     dplyr::arrange(indicator_code, psnu_uid, age_option_name, sex_option_name,
-                   kp_option_name, mechanism_code, type)
+                   kp_option_name, mechanism_code, type) #Put columns in desired order
+  # Prints during execution to inform the user. 
+  interactive_print("Getting data about your FY21 Mechanism Allocations from DATIM...") #Ask Scott or Jason is this okay to stay 21?
 
-  interactive_print("Getting data about your FY21 Mechanism Allocations from DATIM...")
-
-  # Drop data that can't be allocated across mech & DSD/TA
+  # Drop data that can't be allocated across mechanism codes & DSD/TA
   snuxim_model_data %<>%
-    dplyr::filter(stringr::str_detect(mechanism_code, "\\d{4,}"),
-                  stringr::str_detect(type, "DSD|TA"))
+    dplyr::filter(stringr::str_detect(mechanism_code, "\\d{4,}"), # Regex digits
+                  stringr::str_detect(type, "DSD|TA")) #Regex for DSDITA
 
   # Pivot mechs/type wider
   snuxim_model_data %<>%
-    tidyr::unite(col = mechcode_supporttype, mechanism_code, type) %>%
+    tidyr::unite(col = mechcode_supporttype, mechanism_code, type) %>% #Merges the 2 columns into 1 named mechcode_supporttype
     dplyr::select(psnu_uid, indicator_code, Age = age_option_name,
                   Sex = sex_option_name, KeyPop = kp_option_name,
-                  mechcode_supporttype, percent, value) %>%
+                  mechcode_supporttype, percent, value) %>% #Only keeps these columns
     dplyr::mutate(
-      mechcode_supporttype = dplyr::case_when(
+      mechcode_supporttype = dplyr::case_when( #converts certain mech codes. 
         mechcode_supporttype == "00000_DSD" ~ "DSD Dedupe",
         mechcode_supporttype == "00000_TA" ~ "TA Dedupe",
         mechcode_supporttype == "00001_TA" ~ "Crosswalk Dedupe",
@@ -113,28 +113,29 @@ packPSNUxIM <- function(wb,
     )
 
   percents <- snuxim_model_data %>%
-    dplyr::select(-value) %>%
-    tidyr::pivot_wider(names_from = mechcode_supporttype,
+    dplyr::select(-value) %>% #Drops value column
+    tidyr::pivot_wider(names_from = mechcode_supporttype, #pivots data to be wide with more columns
                        values_from = percent)
 
   values <- snuxim_model_data %>%
-    dplyr::select(-percent, -mechcode_supporttype) %>%
+    dplyr::select(-percent, -mechcode_supporttype) %>% #Drops these columns
     dplyr::group_by(dplyr::across(c(-value))) %>%
-    dplyr::summarise(value = sum(value)) %>%
+    dplyr::summarise(value = sum(value)) %>% #Summarize based upon values
     dplyr::ungroup()
 
+  #Throws a warning to the user if the number rows do not match after munging.
   if (NROW(percents) != NROW(values)) {
     stop("Aggregating values and percents led to different row counts!")
   }
 
-  snuxim_model_data <- values %>%
+  snuxim_model_data <- values %>% #Joins percents to values 
     dplyr::left_join(percents,
                      by = c("psnu_uid", "indicator_code", "Age", "Sex", "KeyPop"))
 
   # EID: Align model data age bands with Data Pack
   snuxim_model_data %<>%
     dplyr::mutate(
-      Age = dplyr::if_else(
+      Age = dplyr::if_else( #If age contains the below values place NA. 
         indicator_code %in% c("PMTCT_EID.N.2.T", "PMTCT_EID.N.12.T"),
         NA_character_,
         Age
@@ -142,7 +143,7 @@ packPSNUxIM <- function(wb,
     )
 
   # Double check that Dedupe cols all exist as expected
-  snuxim_model_data %<>%
+  snuxim_model_data %<>% #Adds the below columns to snuxim_model_data
     datapackr::addcols(cnames = c("DSD Dedupe",
                                   "TA Dedupe",
                                   "Crosswalk Dedupe"),
@@ -183,7 +184,7 @@ packPSNUxIM <- function(wb,
       `Max_Crosswalk.T_1` =
         pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = T))
 
-  # Create Dedupe Resolution columns
+  # Create Dedupe Resolution columns. Prints for user to see what is occurring
   interactive_print("Studying your deduplication patterns...")
 
   snuxim_model_data %<>%
@@ -367,7 +368,7 @@ packPSNUxIM <- function(wb,
   ## TODO: Improve this next piece to be more efficient instead of using str_replace_all
 
   data_structure %<>%
-    dplyr::arrange(col) %>%
+    dplyr::arrange(col) %>% #Arrange rows based upon col values
     dplyr::mutate(
       column_names = dplyr::case_when(
         col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_", col),
@@ -537,7 +538,7 @@ packPSNUxIM <- function(wb,
   # warningStyle <- openxlsx::createStyle(fontColour = "#9C5700", bgFill = "#FFEB9C")
   # normalStyle <- openxlsx::createStyle(fontColour = "#000000", bgFill = "#FFFFFF")
 
-    # Hide rows 5-13
+    # Hide rows 5-13 in the workbook
   interactive_print("Tidying up...")
   openxlsx::setRowHeights(wb = r$wb,
                           sheet = "PSNUxIM",
@@ -545,7 +546,7 @@ packPSNUxIM <- function(wb,
                           heights = 0)
 
   # Hide columns
-  #TODO: Hide colsin percentage section being unused by IMs
+  #TODO: Hide columns in percentage section being unused by IMs
   hiddenCols <- schema %>%
     dplyr::filter(sheet_name == "PSNUxIM",
                   indicator_code %in% c("ID", "sheet_num", "DSD Dedupe",
