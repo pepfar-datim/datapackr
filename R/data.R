@@ -194,7 +194,7 @@
 #' @docType data
 #' @title Datapack country groupings
 #'
-#' @description Tibble of data pack country names and their UID's
+#' @description Tibble of data pack country names and their UIDs.
 #'
 #' @format
 #' \describe{
