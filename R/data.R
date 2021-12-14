@@ -361,7 +361,8 @@
 #'   in the \code{col_type} field, documents the dataset, either \code{MER},
 #'   \code{IMPATT},\code{datapack}, or \code{SUBNAT}.}
 #'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
-#'   (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
+#'   (\code{target}), historic data (\code{past}), reference figure
+#'   (\code{reference}), row header (\code{row_header}) or not (\code{NA}).}
 #'   \item{value_type}{Category column describing the type of measure for the
 #'    \code{indicator_code}. The values consist of "string", "integer",
 #'     "percentage", or NA}
