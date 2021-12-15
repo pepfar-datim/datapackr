@@ -33,10 +33,10 @@ checkNumericValues <- function(d, sheet, header_cols = NULL) {
                     mechCode_supportType, value) %>%
       tidyr::drop_na(value)
   }
-  
-  #TODO: This may or may not be applicable to COP22 datapacks, but we should 
-  #determine if it is. 
-  
+
+  #TODO: This may or may not be applicable to COP22 datapacks, but we should
+  #determine if it is.
+
   if (d$info$tool == "Data Pack" & sheet == "PSNUxIM" & d$info$cop_year == 2021) {
     data %<>%
       tidyr::gather(key = "mechCode_supportType",
