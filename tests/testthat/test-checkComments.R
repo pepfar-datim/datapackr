@@ -10,7 +10,3 @@ test_that("Can pass a COP21 DP Template", {
   #should expect no issues so FALSE
   expect_false(foo$info$has_comments_issue)
 })
-
-
-
-

@@ -14,7 +14,7 @@ packForDATIM_UndistributedMER <- function(d) {
   d$datim$UndistributedMER <- d$data$MER %>%
     dplyr::mutate(
       support_type = "DSD",
-      mech_code = "999999"
+      mech_code = default_catOptCombo()
     ) %>%
     dplyr::left_join(., (datapackr::map_DataPack_DATIM_DEs_COCs %>%
                            dplyr::rename(Age = valid_ages.name,
