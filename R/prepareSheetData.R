@@ -163,28 +163,6 @@ prepareSheetData <- function(sheet,
     swapColumns(., combined) %>%
     as.data.frame(.)
 
-  # We should either remove this or explain why it is commented out
-  ## Add Custom "M" Prioritization for _Military ####
-  # if (sheet == "Prioritization") {
-  #   dataStructure %<>%
-  #     dplyr::mutate(
-  #       IMPATT.PRIORITY_SNU.T_1 = as.character(IMPATT.PRIORITY_SNU.T_1),
-  #       IMPATT.PRIORITY_SNU.T_1 =
-  #         dplyr::case_when(
-  #           stringr::str_detect(PSNU, "^_Military") ~ "M",
-  #           TRUE ~ IMPATT.PRIORITY_SNU.T_1
-  #         )
-  #     )
-  # }
-
-  # # Translate Prioritizations
-  # if (sheet == "Prioritization") {
-  #   pznDict <- with(prioritizations, setNames(Prioritization, value))
-  #
-  #   dataStructure$IMPATT.PRIORITY_SNU.T_1 <-
-  #     dplyr::recode(dataStructure$IMPATT.PRIORITY_SNU.T_1, !!!pznDict)
-  # }
-
   return(dataStructure)
 
 }
