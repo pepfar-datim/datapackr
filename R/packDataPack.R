@@ -17,27 +17,29 @@
 #' @param  cop_year Specifies COP year for dating as well as selection of
 #' templates.
 #' @param output_folder Local folder where you would like your Data Pack to be
-#' saved upon export. If left as \code{NULL}, will output to
-#' \code{Working Directory}.
+#' saved upon export.
 #' @param results_archive If TRUE, will export compiled results of all tests and
 #' processes to output_folder.
 #' @param d2_session DHIS2 Session id
 #'
 #' @return Exports a Data Pack to Excel within \code{output_folder}.
 #'
-#TODO Remove use of getwd()!!
 packDataPack <- function(model_data,
                          datapack_name,
                          country_uids,
                          template_path = NULL,
                          cop_year = getCurrentCOPYear(),
-                         output_folder = getwd(),
+                         output_folder = NULL,
                          results_archive = TRUE,
                          d2_session = dynGet("d2_default_session",
                                              inherits = TRUE)) {
 
-  print(datapack_name)
-  print(country_uids)
+  interactive_print(datapack_name)
+  interactive_print(country_uids)
+
+  if (is.null(output_folder) || file.access(output_folder, 2) != 0) {
+    stop("Cannot write to output_folder")
+  }
 
   # Create data train for use across remainder of program
   d <- list(
@@ -61,8 +63,8 @@ packDataPack <- function(model_data,
     d$info$schema <-  datapackr::cop20_data_pack_schema
   } else if (d$info$cop_year == 2021) {
     d$info$schema <- datapackr::cop21_data_pack_schema
-  } else {
-    d$info$schema <- datapackr::data_pack_schema
+  } else if (d$info$cop_year == 2022) {
+    d$info$schema <- datapackr::cop22_data_pack_schema
   }
 
   # Open template ####
@@ -70,8 +72,8 @@ packDataPack <- function(model_data,
   if (is.null(d$keychain$template_path)) {
     if (cop_year == 2021) {
       d$info$template_filename <- "COP21_Data_Pack_Template.xlsx"
-    } else {
-      d$info$template_filename <-  "COP20_Data_Pack_Template_vFINAL.xlsx"
+    } else if (cop_year == 2022) {
+      d$info$template_filename <- "COP22_Data_Pack_Template.xlsx"
     }
 
     d$keychain$template_path <- system.file("extdata",
@@ -84,7 +86,7 @@ packDataPack <- function(model_data,
                                              tool = "Data Pack Template")
 
   # Test template against schema ####
-  print("Checking template against schema and DATIM...")
+  interactive_print("Checking template against schema and DATIM...")
   schema <-
     unPackSchema_datapack(
       filepath = d$keychain$template,
@@ -120,9 +122,6 @@ packDataPack <- function(model_data,
   # TODO: Separate PSNUs as parameter for this function, allowing you to include
   # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
 
-  # TODO: AFTER regionalization is deployed to DATIM, add lastUpdated lookup to
-  # check whether PSNUs have been updated at all since valid_PSNUs was last run.
-
   # Write Main Sheets ####
   d$tool$wb <- packDataPackSheets(wb = d$tool$wb,
                                   country_uids = d$info$country_uids,
@@ -138,7 +137,7 @@ packDataPack <- function(model_data,
   # openxlsx::sheetVisibility(d$tool$wb)[sheets_to_hide] <- "hidden"
 
   # Add Styles ####
-  print("Cleaning up Styles...")
+  interactive_print("Cleaning up Styles...")
   ## TODO: Address this in Data Pack?
   #   ## Add styles to Summary tab
   # summaryStyle = openxlsx::createStyle(fgFill = "#404040")
@@ -151,13 +150,13 @@ packDataPack <- function(model_data,
   spectrumStyle2 <- openxlsx::createStyle(fgFill = "#FFEB84")
 
   openxlsx::addStyle(d$tool$wb,
-  sheet = "Spectrum",
-  spectrumStyle1,
-  cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
+    sheet = "Spectrum",
+    spectrumStyle1,
+    cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
 
   openxlsx::addStyle(d$tool$wb,
-  sheet = "Spectrum",
-  spectrumStyle2, cols = 2, rows = 2, gridExpand = TRUE, stack = TRUE)
+    sheet = "Spectrum",
+    spectrumStyle2, cols = 2, rows = 2, gridExpand = TRUE, stack = TRUE)
 
   if (cop_year == 2020) {
     openxlsx::addStyle(d$tool$wb,
@@ -170,12 +169,12 @@ packDataPack <- function(model_data,
   }
 
   # Add validations
-  print("Adding Validations...")
+  interactive_print("Adding Validations...")
   #TODO: Adding validations prevents use of openxlsx to add SNU x IM tab
 
 
   # Save & Export Workbook
-  print("Saving...")
+  interactive_print("Saving...")
   exportPackr(data = d$tool$wb,
               output_path = d$keychain$output_folder,
               tool = d$info$tool,

@@ -4,7 +4,7 @@
 \alias{pick_template_path}
 \title{Pick correct template filepath}
 \usage{
-pick_template_path(cop_year = getCurrentCOPYear(), tool = "Data Pack")
+pick_template_path(cop_year, tool)
 }
 \arguments{
 \item{cop_year}{Specifies COP year for dating as well as selection of

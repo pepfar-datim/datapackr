@@ -12,15 +12,16 @@
 getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL,
                            d2_session = dynGet("d2_default_session",
                                                inherits = TRUE)) {
-  if (cop_year %in% c(2020, 2021)) {
-    groupSet <- "ra9ZqrTtSQn"
-  } else if (cop_year == 2019) {
-    groupSet <- "Jm6OwL9IqEa"
-  } else if (cop_year == 2018) {
-    groupSet <- "CKTkg8dLlr7"
-  }
+  groupSet <- switch(
+    as.character(cop_year),
+    "2022" = "a0oGIk4aN23",
+    "2021" = "ra9ZqrTtSQn",
+    "2020" = "ra9ZqrTtSQn",
+    "2019" = "Jm6OwL9IqEa",
+    "2018" = "CKTkg8dLlr7"
+  )
 
-  fy_pattern <- "FY\\d{2},\\d{2}R/FY\\d{2},\\d{2}T"
+  fy_pattern <- "(FY)?\\d{2}(R|T)?|,|/"
 
   modality_map <- api_call(paste0("dataElementGroupSets/", groupSet),
                            d2_session = d2_session) %>%
@@ -30,7 +31,10 @@ getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL,
     dplyr::distinct() %>%
     dplyr::select(dataElement = id,
                   hts_modality = name) %>%
-    dplyr::mutate(hts_modality = stringr::str_trim(stringr::str_remove(hts_modality, fy_pattern)))
+    dplyr::mutate(
+      hts_modality =
+        stringr::str_trim(
+          stringr::str_remove_all(hts_modality, fy_pattern)))
 
 
   if (!is.null(dataElements)) {
@@ -38,5 +42,5 @@ getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL,
       dplyr::filter(dataElement %in% dataElements)
   }
 
-  return(modality_map)
+  modality_map
 }
