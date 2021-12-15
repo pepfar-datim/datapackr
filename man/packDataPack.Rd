@@ -10,7 +10,7 @@ packDataPack(
   country_uids,
   template_path = NULL,
   cop_year = getCurrentCOPYear(),
-  output_folder,
+  output_folder = NULL,
   results_archive = TRUE,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
