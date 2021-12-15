@@ -35,7 +35,7 @@ checkStructure <- function(d) {
         "\n")
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
-  
+
   d
-  
+
 }

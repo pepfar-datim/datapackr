@@ -30,8 +30,6 @@ unPackSNUxIM <- function(d) {
       col_types = "text",
       .name_repair = "minimal"
     )
-  
-  
 
   if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1, 1]])) {
     d$info$has_psnuxim <- FALSE
