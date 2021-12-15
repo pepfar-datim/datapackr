@@ -168,8 +168,11 @@
 #'   \item{psnu_uid}{Priority Sub-National Unit UID}
 #'   \item{psnu_type}{The type of Priority Sub-National Unit}
 #'   \item{lastUpdated}{The last time the Organisation Unit was updated}
-#'   \item{ancestors}{}
-#'   \item{organisationUnitGroups}{}
+#'   \item{ancestors}{A nested eleven column data frame that contains the
+#'    ancestors associated with the }
+#'   \item{organisationUnitGroups}{A nested two column data frame that
+#'    contains the name and id of the groups the organisation unit is associated
+#'    with. For example "Community" and "PvuaP6YALSA"}
 #'   \item{DREAMS}{Determined, Resilient, Empowered, AIDS-free, Mentored, and
 #'    Safe Partnernship. Binary column "Y" or NA.}
 #' }
