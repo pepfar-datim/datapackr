@@ -169,7 +169,9 @@
 #'   \item{psnu_type}{The type of Priority Sub-National Unit}
 #'   \item{lastUpdated}{The last time the Organisation Unit was updated}
 #'   \item{ancestors}{A nested eleven column data frame that contains the
-#'    ancestors associated with the }
+#'    list of parent organisation units that contain the PSNU,
+#'    including the names, ids, and which organisationUnitGroups that those
+#'    parent organisation units belong to}
 #'   \item{organisationUnitGroups}{A nested two column data frame that
 #'    contains the name and id of the groups the organisation unit is associated
 #'    with. For example "Community" and "PvuaP6YALSA"}
@@ -190,7 +192,8 @@
 #'   \item{id}{Category Option UID}
 #'   \item{categoryoptiongroup}{The group by which the category option belongs}
 #'   \item{datapack_disagg}{Name of the Category option in the Data Pack}
-#'   \item{datapack_schema_group}{}
+#'   \item{datapack_schema_group}{Identifies the set of category options that
+#'    are mapped to a particular column in the DataPack}
 #' }
 "valid_category_options"
 
