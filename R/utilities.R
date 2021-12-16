@@ -241,14 +241,15 @@ getCountries <- function(datapack_uid = NA) {
 
 
 #' @export
-#' @title Add list of columns as NULL columns to supplied dataframe.
+#' @title Adds a list of columns, with the value of NULL, to the supplied
+#'  dataframe.
 #'
 #' @description
 #' Supplied a character vector of column names, \code{cnames}, \code{addcols}
 #' will add one new, \code{NULL} column to \code{data} for each element of
 #' \code{cnames} and name it after the corresponding element of \code{cnames}.
 #'
-#' @param data Dataframe to add columns.
+#' @param data The dataframe to add the columns to.
 #' @param cnames Character vector of one or more column names to be added to
 #' \code{data}.
 #' @param type \code{character}, \code{numeric}, \code{logical}
@@ -256,9 +257,12 @@ getCountries <- function(datapack_uid = NA) {
 #' @return Dataframe \code{data} with added columns listed in \code{cnames}.
 #'
 addcols <- function(data, cnames, type = "character") {
-  add <- cnames[!cnames %in% names(data)]
+  add <- cnames[!cnames %in% names(data)] #Subsets column name list BY only
+  # keeping names that are NOT in the supplied dataframes column names already.
 
-  if (length(add) != 0) {
+  if (length(add) != 0) { #If their are columns that need to be filled in THEN
+    #Impute the NA value based upon the type provided in the function. 
+    # TODO: #Automate the character type or at least a list variable for type.
     if (type == "character") {
       data[add] <- NA_character_
     } else if (type == "numeric") {
