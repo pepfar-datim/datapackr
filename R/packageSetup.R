@@ -67,9 +67,9 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 }
 
 #' @export
-#' @title Tool header rows
+#' @title Tool to assist with formatting the header rows
 #'
-#' @param tool "Data Pack", "Data Pack Template".
+#' @param tool "Data Pack", "Data Pack Template",""OPU Data Pack".
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
 #'

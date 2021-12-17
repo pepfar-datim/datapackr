@@ -261,6 +261,7 @@ packPSNUxIM <- function(wb,# Workbook object
                          type = "character")
   }
 
+# Found in packageSetup.R
   top_rows <- headerRow(tool = tool, cop_year = cop_year)
   existing_rows <- top_rows
 
