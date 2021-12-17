@@ -177,7 +177,7 @@ packPSNUxIM <- function(wb,# Workbook object
       )
 
   # Create Max columns
-  snuxim_model_data %<>%
+  snuxim_model_data %<>% #rowMax found in utilities.R
     datapackr::rowMax(cn = "Max_TA.T_1", regex = "\\d{4,}_TA") %>% # nolint
     datapackr::rowMax(cn = "Max_DSD.T_1", regex = "\\d{4,}_DSD") %>% # nolint
     dplyr::mutate(
@@ -225,7 +225,7 @@ packPSNUxIM <- function(wb,# Workbook object
                   `DSD Dedupe`, `TA Dedupe`, `Crosswalk Dedupe`)
 
   # Prep dataset of targets to allocate ####
-  data %<>%
+  data %<>% #function found in adorn_import_file.R
     adorn_import_file(cop_year = cop_year, filter_rename_output = FALSE) %>%
     dplyr::select(PSNU = dp_psnu, orgUnit, indicator_code, Age, Sex, KeyPop,
                   DataPackTarget = value) %>%
@@ -399,7 +399,8 @@ packPSNUxIM <- function(wb,# Workbook object
   # Combine schema with SNU x IM model dataset ####
   #TODO: Fix this to not re-add mechanisms removed by the Country Team
   #(filter snuxim_model_data to only columns with not all NA related to data in missing combos)
-  data_structure <- datapackr::swapColumns(data_structure, snuxim_model_data) %>%
+  data_structure <- datapackr::swapColumns(data_structure, snuxim_model_data) %>% 
+    #swapColumns found in utilities.R
     dplyr::bind_cols(
       snuxim_model_data %>%
         dplyr::select(tidyselect::matches("\\d{4,}")) # nolint
