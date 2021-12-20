@@ -1,9 +1,9 @@
 #' @export
-#' @title Convert PSNU-level DATIM import file into analytics-friendly object
+#' @title Convert a 'PSNU-level' DATIM import file into an analytics-friendly
+#'  object.
 #'
-#' @description Convert PSNU-level DATIM import file into analytics-friendly
-#' object, similar to the MER Structured Datasets
-#'
+#' @description Convert a 'PSNU-level' DATIM import file into an
+#'  analytics-friendly object, similar to the MER Structured Datasets
 #' @param psnu_import_file DHIS2 import file to convert
 #' @param cop_year COP Year
 #' @param psnu_prioritizations List of orgUnit, value containing prioritization
@@ -15,7 +15,7 @@
 #' @return data
 #'
 adorn_import_file <- function(psnu_import_file,
-                              cop_year = getCurrentCOPYear(),
+                              cop_year = getCurrentCOPYear(),#packageSetup.R
                               psnu_prioritizations = NULL,
                               filter_rename_output = TRUE,
                               d2_session = dynGet("d2_default_session",
@@ -26,40 +26,40 @@ adorn_import_file <- function(psnu_import_file,
 
   # Adorn PSNUs
     dplyr::left_join(
-      (valid_PSNUs %>%
-        add_dp_psnu() %>%
+      (valid_PSNUs %>% #Comes from file data/valid_PSNUs.rda
+        add_dp_psnu() %>% #Found in getPSNUs.R
         dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id,
-                      psnu, psnu_uid, dp_psnu, psnu_type, DREAMS)),
-      by = c("orgUnit" = "psnu_uid"))
+                      psnu, psnu_uid, dp_psnu, psnu_type, DREAMS)),#cols to keep
+      by = c("orgUnit" = "psnu_uid")) #Columns to join on
 
   # Add Prioritizations ####
-  if (is.null(psnu_prioritizations)) {
+  if (is.null(psnu_prioritizations)) {#IF no psnu_prioritizations are found
     data %<>%
       dplyr::mutate(
-        prioritization = NA_character_
+        prioritization = NA_character_# Then fill prioritization column with NA
       )
-  } else {
-    prio_defined <- prioritization_dict() %>%
+  } else { #IF psnu_prioritizations are found
+    prio_defined <- prioritization_dict() %>%# Dict found in utilities.R
       dplyr::select(value, prioritization = name)
 
     prio <- psnu_prioritizations %>%
-      dplyr::select(orgUnit, value) %>%
-      dplyr::left_join(prio_defined, by = "value") %>%
-      dplyr::select(-value)
+      dplyr::select(orgUnit, value) %>% #Columns to keep
+      dplyr::left_join(prio_defined, by = "value") %>% #Columns to join on
+      dplyr::select(-value)# Drop 'value' column
 
     data %<>%
-      dplyr::left_join(prio, by = "orgUnit") %>%
+      dplyr::left_join(prio, by = "orgUnit") %>%# Join data and prio
       dplyr::mutate(
-        prioritization =
+        prioritization =# If col prioritization is 'na' replace with a value
           dplyr::case_when(is.na(prioritization) ~ "No Prioritization",
                            TRUE ~ prioritization))
   }
 
   # Adorn Mechanisms ####
-  country_uids <- unique(data$country_uid)
+  country_uids <- unique(data$country_uid) #Creates a list of country uids
 
   mechs <-
-    getMechanismView(
+    getMechanismView(# details can be found in adornMechanism.R
       country_uids = country_uids,
       cop_year = cop_year,
       include_dedupe = TRUE,
@@ -69,25 +69,33 @@ adorn_import_file <- function(psnu_import_file,
 
   # Allow mapping of either numeric codes or alphanumeric uids
   data_codes <- data %>%
+    # Filter column attribute Option combo based on if it has 4 digits
     dplyr::filter(stringr::str_detect(attributeOptionCombo, "\\d{4,}")) %>%
+    #Rename column
     dplyr::rename(mechanism_code = attributeOptionCombo) %>%
+    # Join data with mechs
     dplyr::left_join(mechs, by = c("mechanism_code" = "mechanism_code"))
 
   data_ids <- data %>%
     dplyr::filter(
       stringr::str_detect(
         attributeOptionCombo,
+        # Filter letter a-z ignore caps,followed by alphanumeric value, and must
+        # be 10 characters in length
         "[A-Za-z][A-Za-z0-9]{10}")) %>%
+    #Join data with mechs based on column attributeOptionCombo
     dplyr::left_join(mechs, by = c("attributeOptionCombo" = "attributeOptionCombo"))
-
+  
+  # Stack data_codes and data_ids on top of one another. 
   data <- dplyr::bind_rows(data_codes, data_ids)
 
-  map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year)
+  map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year)# Found in utilities.R
 
   # Adorn dataElements & categoryOptionCombos ####
 
   # TODO: Is this munging still required with the map being a function of fiscal year?
-   if (cop_year == 2020) {
+   if (cop_year == 2020) {# If cop year equal 2020 modify entries in
+                            # valid_sexes.name as follows
      map_des_cocs$valid_sexes.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
                                                           map_des_cocs$valid_kps.name == "Male PWID"] <- "Male"
      map_des_cocs$valid_sexes.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
@@ -98,28 +106,33 @@ adorn_import_file <- function(psnu_import_file,
                                                         map_des_cocs$valid_kps.name == "Female PWID"] <- NA_character_
      #TODO: Fix inconsistent naming of dataelement/dataelementuid
      map_des_cocs %<>%
+       #rename the columns in map_des_cocs
        dplyr::rename(dataelementuid = dataelement,
                      dataelementname = dataelement.y,
                      categoryoptioncomboname = categoryoptioncombo) %>%
-       dplyr::mutate(FY = 2021,
-                       period = paste0(cop_year, "Oct"))
+       # Modify period based upon FY column
+       dplyr::mutate(FY = 2021,period = paste0(cop_year, "Oct"))
      }
 
   data %<>%
     dplyr::mutate(
+      #Create a time stamp column based on the the servers system time
       upload_timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+      #Create a fiscal year column based on the period column values using regex 
       fiscal_year = suppressWarnings(dplyr::if_else(stringr::str_detect(period, "Oct"),
                                                     as.numeric(stringr::str_replace(period, "Oct", "")) + 1,
                                                     as.numeric(stringr::str_replace(period, "Q3", ""))
                                                     )
                                      )
-      ) %>%
+      ) %>%#Join to map_des_cocs
     dplyr::left_join(
       (map_des_cocs %>%
+         #Rename columns
           dplyr::rename(
             Age = valid_ages.name,
             Sex = valid_sexes.name,
             KeyPop = valid_kps.name)),
+      #Columns to match on
       by = c("dataElement" = "dataelementuid",
              "categoryOptionCombo" = "categoryoptioncombouid",
              "fiscal_year" = "FY",
@@ -127,7 +140,9 @@ adorn_import_file <- function(psnu_import_file,
     )
 
   # Select/order columns ####
-  if (filter_rename_output) {
+  #Flag set in original function, approx line 20
+  if (filter_rename_output) {# IF flag is true, Keep the below columns from data
+                              # and rename where necessary with =. 
     data %<>%
       dplyr::select(ou,
                      ou_id,
