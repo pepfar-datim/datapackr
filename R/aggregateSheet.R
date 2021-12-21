@@ -11,7 +11,7 @@
 #' @return d
 #'
 
-aggregateSheets <- function(d, sheet){
+aggregateSheets <- function(d, sheet) {
   # Aggregate OVC_HIVSTAT
   if (sheet == "OVC") {
     d$data$extract %<>%
@@ -26,7 +26,7 @@ aggregateSheets <- function(d, sheet){
       dplyr::summarise(value = sum(value)) %>%
       dplyr::ungroup()
   }
-  
+
   # Add ages to PMTCT_EID
   if (sheet == "PMTCT_EID") {
     d$data$extract %<>%
@@ -38,7 +38,7 @@ aggregateSheets <- function(d, sheet){
         )
       )
   }
-  
+
   if (sheet == "KP") {
     d$data$extract %<>%
       dplyr::mutate(
@@ -51,4 +51,3 @@ aggregateSheets <- function(d, sheet){
   }
   return(d)
 }
-

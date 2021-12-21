@@ -22,7 +22,7 @@ handleTX <- function(d, sheet) {
                                  -TX_NEW.N.Age_Sex_HIVStatus.T),
                      dplyr::any_vars(. > 0))
   attr(d$tests$tx_new_invalid_lt1_sources, "test_name") <- "Invalid TX <01 data source"
-  
+
   if (NROW(d$tests$tx_new_invalid_lt1_sources) > 0) {
     warning_msg <-
       paste0(
@@ -30,7 +30,7 @@ handleTX <- function(d, sheet) {
         ": TX_NEW for <01 year olds being targeted through method other than EID.",
         " MER Guidance recommends all testing for <01 year olds be performed through EID rather than HTS",
         "\n")
-    
+
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
   return(d)

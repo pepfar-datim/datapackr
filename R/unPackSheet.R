@@ -12,37 +12,37 @@
 #' @return d
 #'
 unPackDataPackSheet <- function(d, sheet) {
-  
-  ## Helper functions---- 
-  
+
+  ## Helper functions----
+
   #replaces the original target columns assignment
   getTargetCols <- function(d, sheet) {
-    
+
     target_cols <- d$info$schema %>%
       dplyr::filter(sheet_name == sheet
                     & (col_type == "target" | (col_type == "result" & dataset == "subnat"))
                     # Filter by what's in submission to avoid unknown column warning messages
                     & indicator_code %in% colnames(d$data$extract)) %>%
       dplyr::pull(indicator_code)
-    
+
     return(target_cols)
   }
-  
+
   #replaces the original logic for gathering columns by indicator code
   gatherCols <- function(d, sheet) {
-    
+
     d$data$extract %<>%
       tidyr::gather(key = "indicator_code",
                     value = "value",
                     -PSNU, -psnuid, -Age, -Sex, -KeyPop, -sheet_name) %>%
       dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value)
-    
+
     return(d)
   }
-  
+
   #replaces the original logic for compiling sheets and adding psnuid
   prepForCompilation <- function(d, sheet) {
-    
+
     d$data$extract %<>%
       addcols(c("KeyPop", "Age", "Sex")) %>%
       # Select only target-related columns
@@ -58,12 +58,12 @@ unPackDataPackSheet <- function(d, sheet) {
       ) %>%
       dplyr::select(PSNU, psnuid, sheet_name, Age, Sex, KeyPop,
                     dplyr::everything())
-    
+
     return(d)
   }
-  
+
   ## Scripting----
-  
+
   #read data
   header_row <- headerRow(tool = "Data Pack", cop_year = d$info$cop_year)
   d$data$extract <-
@@ -102,63 +102,63 @@ unPackDataPackSheet <- function(d, sheet) {
     d <- handleTX(d, sheet)
   }
 
-  #List Target Columns, send d back if empty 
+  #List Target Columns, send d back if empty
   target_cols <- getTargetCols(d, sheet)
   if (NROW(target_cols) == 0) {
     d$data$extract <- NULL
     return(d)
   }
 
-  # Add cols to allow compiling with other sheets 
+  # Add cols to allow compiling with other sheets
   d <- prepForCompilation(d, sheet)
 
-  # TEST: No missing metadata 
+  # TEST: No missing metadata
   d <- checkMissingMetadata(d, sheet)
 
-  # If PSNU has been deleted, drop the row 
+  # If PSNU has been deleted, drop the row
   d$data$extract %<>%
     dplyr::filter(!is.na(PSNU))
 
-  # Check for Formula changes 
+  # Check for Formula changes
   d <- checkFormulas(d, sheet)
 
-  # Gather all indicators as single column for easier processing 
+  # Gather all indicators as single column for easier processing
   d <- gatherCols(d, sheet)
 
-  # TEST that all Prioritizations completed 
+  # TEST that all Prioritizations completed
   if (sheet == "Prioritization") {
     d <- handlePrioritization(d, sheet)
   } else if (sheet == "AGYW") {
     d <- handleAGYW(d, sheet)
   }
 
-  # Drop NAs 
+  # Drop NAs
   d$data$extract %<>%
     tidyr::drop_na(value)
 
-  # TEST for non-numeric values 
+  # TEST for non-numeric values
   d <- checkNumericValues(d, sheet)
 
   # Now that non-numeric cases noted, convert all to numeric & drop non-numeric
   d$data$extract %<>%
     dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
     tidyr::drop_na(value) %>%
-  # Filter out zeros 
+  # Filter out zeros
     dplyr::filter(value != 0)
 
-  # TEST: No invalid org units 
+  # TEST: No invalid org units
   d <- checkInvalidOrgUnits(d, sheet)
 
-  # TEST for Negative values 
+  # TEST for Negative values
   d <- checkNegativeValues(d, sheet)
 
   # TEST for Decimal values
   d <- checkDecimalValues(d, sheet)
 
-  # TEST for duplicates 
+  # TEST for duplicates
   d <- checkDuplicateRows(d, sheet)
 
-  # TEST for defunct disaggs 
+  # TEST for defunct disaggs
   d <- defunctDisaggs(d, sheet)
 
   # Aggregate OVC_HIVSTAT
