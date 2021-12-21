@@ -208,7 +208,7 @@ unPackDataPackSheet <- function(d, sheet) {
           paste(blank_prioritizations$PSNU, collapse = "\n\t* "),
           "\n")
 
-      d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
       d$info$has_error <- TRUE
 
     }
@@ -282,7 +282,7 @@ unPackDataPackSheet <- function(d, sheet) {
         paste(non_numeric$row_id, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
 
   # Now that non-numeric cases noted, convert all to numeric & drop non-numeric ####
@@ -346,7 +346,7 @@ unPackDataPackSheet <- function(d, sheet) {
         paste(unique(decimal_cols$indicator_code), collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
 
   # TEST for duplicates ####
