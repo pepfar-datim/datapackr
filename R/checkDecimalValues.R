@@ -39,7 +39,7 @@ checkDecimalValues <- function(d, sheet) {
         " to this rule may be HIV_PREV.) These will be rounded. -> \n\t* ",
         paste(unique(decimal_cols$indicator_code), collapse = "\n\t* "),
         "\n")
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
   return(d)

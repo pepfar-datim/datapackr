@@ -50,7 +50,7 @@ handlePrioritization <- function(d, sheet) {
         paste(blank_prioritizations$PSNU, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 
