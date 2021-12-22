@@ -41,7 +41,7 @@ packPSNUxIM <- function(wb,# Workbook object
   # Create data sidecar to eventually compile and return ####
   r <- list(
     wb = wb,#Workbook object xlsx
-    info = list(messages = MessageQueue(),
+    info = list(messages = MessageQueue(), #Found in messagesQueue.R
     has_error = FALSE))
 
   #TODO: Test/write this part to be compatible with COP Data Pack
@@ -75,8 +75,10 @@ packPSNUxIM <- function(wb,# Workbook object
   # Prepare SNUxIM model data
   snuxim_model_data %<>%
     datapackr::adorn_import_file(cop_year = cop_year, #adorn_import_file.R
-                                 filter_rename_output = FALSE) %>% # Final data in the new, more complete format?
-    dplyr::select(indicator_code, psnu_uid = orgUnit, mechanism_code, # Select columns wanted and rename where necessary
+                                 # Final data in the new, more complete format?
+                                 filter_rename_output = FALSE) %>% 
+    # Select columns wanted and rename where necessary
+    dplyr::select(indicator_code, psnu_uid = orgUnit, mechanism_code, 
                   type = support_type,
                   age_option_name = Age, age_option_uid = valid_ages.id,
                   sex_option_name = Sex, sex_option_uid = valid_sexes.id,
@@ -152,8 +154,11 @@ packPSNUxIM <- function(wb,# Workbook object
   # Create Deduplicated Rollups
   snuxim_model_data %<>%
     dplyr::mutate(
+      #Regex looks for 4 digits or the string "HllvX50cXC0"
       `Total Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}|HllvX50cXC0")), na.rm = TRUE),
+      #Regex looks for 4digits followed by _DSD
       `DSD Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_DSD")), na.rm = TRUE),
+      #Regex looks for 4digits followed by _TA
       `TA Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_TA")), na.rm = TRUE))
 
   # Create Duplicated Rollups
