@@ -17,7 +17,9 @@ unPackSNUxIM <- function(d) {
   # Helper functions----
 
   #test missing formulas
-  checkFormulasLocal <- function(d) {
+  #this code checks that all formulas from Target Values are applied through all the data
+  #reports back columns that are missing formulas
+  checkFormulasRight <- function(d) {
     d$tests$psnuxim_missing_rs_fxs <-
       tidyxl::xlsx_cells(path = d$keychain$submission_path,
                          sheets = "PSNUxIM",
@@ -50,7 +52,7 @@ unPackSNUxIM <- function(d) {
   return(d)
   }
 
-  #test missing psnuxim tab
+  #test missing PSNUxIM tab and data
   checkMissingTab <- function(d) {
     if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1, 1]])) {
       d$info$has_psnuxim <- FALSE
@@ -85,12 +87,8 @@ unPackSNUxIM <- function(d) {
     return(d)
   }
 
-  #test invalid mechanisms
-  #checkMechanism <- function(d, sheet) {
-  #    return(d)
-  #}
-
   #check duplicate columns
+  #mutates column names to test for duplicates
   checkDuplicateCols <- function(d, sheet) {
 
     d$tests$duplicate_cols <- col_names %>%
@@ -124,6 +122,7 @@ unPackSNUxIM <- function(d) {
   }
 
   #check Dedup values
+  #requires missing_cols_fatal
   checkDedup <- function(d, sheet) {
 
     d$tests$missing_cols_fatal <- data.frame(missing_cols_fatal = missing_cols_fatal)
@@ -147,6 +146,7 @@ unPackSNUxIM <- function(d) {
     return(d)
   }
 
+  #checks the range of different deduplicated targets and warns if they are outside range
   checkImproperDup <- function(d, sheet) {
     dedupe_cols <- names(d$data$SNUxIM)[which(grepl("Deduplicated", names(d$data$SNUxIM)))]
 
@@ -213,7 +213,9 @@ unPackSNUxIM <- function(d) {
   }
 
   #test negative target values
+  #warns on negative target values
   checkNegativeTargets <- function(d) {
+
     d$tests$negative_IM_targets <- d$data$SNUxIM %>%
       tidyr::gather(key = "mechCode_supportType",
                     value = "value",
@@ -242,6 +244,7 @@ unPackSNUxIM <- function(d) {
 
   #check duplicated values
   checkPositiveDedups <- function(d) {
+
     d$tests$positive_dedupes <- d$data$SNUxIM %>%
       dplyr::filter(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0)
     attr(d$tests$positive_dedupes, "test_name") <- "Positive dedupes"
@@ -269,6 +272,7 @@ unPackSNUxIM <- function(d) {
 
   #check missing psnuxim combos
   checkMissingCombos <- function(d) {
+
     d$data$missingCombos <- d$data$MER %>%
       dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
       dplyr::anti_join(d$data$PSNUxIM_combos,
@@ -299,29 +303,7 @@ unPackSNUxIM <- function(d) {
     return(d)
   }
 
-  #check Decimal values
-  checkDecimalValuesLocal <- function(d, sheet) {
-    d$tests$decimals <- d$data$SNUxIM %>%
-      dplyr::filter(value %% 1 != 0)
-
-    attr(d$tests$decimals, "test_name") <- "Decimal values"
-
-    if (NROW(d$tests$decimals) > 0) {
-      d$info$has_error <- TRUE
-
-      warning_msg <-
-        paste0(
-          "ERROR! In tab ",
-          sheet,
-          ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
-          paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
-          "\n")
-
-      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
-    }
-    return(d)
-  }
-
+  #check distribution
   checkDistribution <- function(d) {
     d$tests$imbalanced_distribution <- comparison %>%
       dplyr::filter(is.na(PSNUxIM_value) | is.na(DataPackTarget) | abs(diff) > 2)
@@ -401,9 +383,6 @@ unPackSNUxIM <- function(d) {
       d$info$has_error <- TRUE
     }
 
-    d$data$SNUxIM %<>%
-      dplyr::select(-dplyr::all_of(d$tests$invalid_mech_headers$invalid_mech_headers))
-
     return(d)
   }
 
@@ -453,10 +432,12 @@ unPackSNUxIM <- function(d) {
 
   # Pare down to populated, updated targets only
   d$data$SNUxIM <- d$data$SNUxIM[, cols_to_keep$col]
-
   d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
 
-  ## Drop rows where entire row is NA ----
+  ## TEST: Missing right-side formulas; Warn; Continue ----
+  d <- checkFormulasRight(d)
+
+  ## PROCESS Drop rows where entire row is NA ----
   d$data$SNUxIM %<>%
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
 
@@ -486,6 +467,9 @@ unPackSNUxIM <- function(d) {
                   (stringr::str_detect(col_name, "^0000[01]")))
 
   d <- checkInvalidMechHeaders(d)
+
+  d$data$SNUxIM %<>%
+    dplyr::select(-dplyr::all_of(d$tests$invalid_mech_headers$invalid_mech_headers))
 
   ## TEST: Duplicate Cols; Warn; Combine ----
   col_names <- names(d$data$SNUxIM) %>%
@@ -535,7 +519,7 @@ unPackSNUxIM <- function(d) {
       missing_cols_fatal,
       type = "numeric")
 
-  ## Recalculate dedupes ----
+  ## PROCESS Recalculate dedupes ----
     ## Other than IM cols, only the following should be considered safe for reuse here:
     # - Deduplicated DSD Rollup (FY22)
     # - Deduplicated TA Rollup (FY22)
@@ -575,13 +559,13 @@ unPackSNUxIM <- function(d) {
     )
 
   ## TEST: Formula changes; Warning; Continue ----
-  d <- checkFormulasLocal(d)
+  d <- checkFormulas(d, sheet)
 
-  ## Remove all unneeded columns ----
+  ## PROCESS Remove all unneeded columns ----
   d$data$SNUxIM %<>%
     dplyr::select(-dplyr::matches("Rollup|Total|MAX|SUM"))
 
-  ## Extract PSNU uid ----
+  ## PROCESS Extract PSNU uid ----
   d$data$SNUxIM %<>%
     dplyr::mutate(
       psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")
@@ -589,8 +573,8 @@ unPackSNUxIM <- function(d) {
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
                   dplyr::everything())
 
-  ## Document all combos used in submitted PSNUxIM tab, prior to gathering. ----
-    # This ensures tests for new combinations are correctly matched
+  ## PROCESS Document all combos used in submitted PSNUxIM tab, prior to gathering. ----
+  # This ensures tests for new combinations are correctly matched
   d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
     dplyr::distinct()
@@ -599,7 +583,7 @@ unPackSNUxIM <- function(d) {
     d <- checkMissingCombos(d)
   }
 
-  ## Gather all values in single column ----
+  ## PROCESS Gather all values in single column ----
   d$data$SNUxIM %<>%
     tidyr::gather(key = "mechCode_supportType",
                   value = "value",
@@ -607,7 +591,7 @@ unPackSNUxIM <- function(d) {
     dplyr::select(dplyr::all_of(header_cols$indicator_code), psnuid,
                   mechCode_supportType, value)
 
-  ## Drop NAs ----
+  ## PROCESS Drop NAs ----
   d$data$SNUxIM %<>% tidyr::drop_na(value)
 
   ## TEST: Decimals; Error; Round ----
@@ -616,7 +600,7 @@ unPackSNUxIM <- function(d) {
   ## TEST: Positive Dedupes; Error; Drop ----
   d <- checkPositiveDedups(d)
 
-  ## Remove unneeded strings from mechanism codes ----
+  ## PROCESS Remove unneeded strings from mechanism codes ----
   d$data$SNUxIM %<>%
     dplyr::mutate(
       mechCode_supportType = dplyr::case_when(
@@ -635,12 +619,12 @@ unPackSNUxIM <- function(d) {
   ## TODO: TEST: Defunct disaggs; Error; Drop ----
   #d <- defunctDisaggs(d, sheet)
 
-  ## Drop all zeros against IMs ----
+  ## PROCESS Drop all zeros against IMs ----
   d$data$SNUxIM %<>%
     dplyr::filter(!(!stringr::str_detect(mechCode_supportType, "Dedupe")
                     & value == 0))
 
-  ## Drop unneeded Dedupes ----
+  ## PROCESS Drop unneeded Dedupes ----
   d$data$SNUxIM %<>%
     tidyr::pivot_wider(names_from = mechCode_supportType, values_from = value) %>%
     datapackr::addcols(cnames = c("Crosswalk Dedupe", "DSD Dedupe", "TA Dedupe"), type = "numeric")
@@ -730,7 +714,7 @@ unPackSNUxIM <- function(d) {
   ## TEST: Data Pack total not fully distributed to IM ----
   d <- checkDistribution(d)
 
-  ## Rename Dedupe IMs ----
+  ## PROCESS Rename Dedupe IMs ----
   d$data$SNUxIM %<>%
     dplyr::mutate(
       mechCode_supportType = dplyr::case_when(
@@ -740,7 +724,7 @@ unPackSNUxIM <- function(d) {
         TRUE ~ mechCode_supportType)
     )
 
-  ## Get mech codes and support types ----
+  ## PROCESS Get mech codes and support types ----
   d$data$SNUxIM %<>%
     tidyr::separate(
       col = mechCode_supportType,
