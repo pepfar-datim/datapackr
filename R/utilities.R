@@ -317,7 +317,6 @@ getDatasetUids <-  function(fiscal_year,
                             type = c("mer_targets", "mer_results",
                                      "subnat_targets", "subnat_results",
                                      "impatt")) {
-  
   datasets <- character(0)
   if  (fiscal_year == "2023") {
     if ("mer_targets" %in% type) {
@@ -380,18 +379,15 @@ getDatasetUids <-  function(fiscal_year,
     if ("subnat_targets" %in% type) {
       datasets <- c(datasets,
                     "j7jzezIhgPj") #Host Country Targets: COP Prioritization SNU (USG) FY2021
-      
-    }
+      }
     if ("subnat_results" %in% type) {
       datasets <- c(datasets,
                     "xiTCzZJ2GPP") #Host Country Results: COP Prioritization SNU (USG) FY2021Q4
-      
-    }
+      }
     if ("impatt" %in% type) {
       datasets <- c(datasets,
                     "jxnjnBAb1VD") # Planning Attributes: COP Prioritization SNU FY2021
-      
-    }
+      }
   } else if (fiscal_year == "2020") {
     if ("mer_targets" %in% type) {
       datasets <- c(datasets,
