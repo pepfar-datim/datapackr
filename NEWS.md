@@ -1,3 +1,9 @@
+# datapackr 5.0.3
+
+## Bug fixes
+* Patches a bug with `compareData_DatapackVsDatim` where `compareData_OpuDatapackVsDatim` to convert original default COC code
+to "default"
+
 # datapackr 5.0.2
 
 ## Bug fixes
