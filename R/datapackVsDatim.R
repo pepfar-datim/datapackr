@@ -222,8 +222,10 @@ compareData_OpuDatapackVsDatim <-
     
 # recoding to account for code change in DATIM for the default COC
 # if all other code is updated to use uids instead of codes this can be removed 
-    datapack_data$categoryOptionCombo[datapack_data$categoryOptionCombo == "HllvX50cXC0"] <- "default"
-    datapack_data$attributeOptionCombo[datapack_data$attributeOptionCombo == "HllvX50cXC0"] <- "default"
+    datapack_data$categoryOptionCombo[datapack_data$categoryOptionCombo == 
+                                        "HllvX50cXC0"] <- "default"
+    datapack_data$attributeOptionCombo[datapack_data$attributeOptionCombo == 
+                                         "HllvX50cXC0"] <- "default"
 
     # ensure datapack_data has the expected columns
     if (!identical(
