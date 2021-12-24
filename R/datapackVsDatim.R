@@ -214,7 +214,7 @@ compareData_OpuDatapackVsDatim <-
   function(d, d2_session = dynGet("d2_default_session",
                                   inherits = TRUE)) {
 
-    if (!(d$info$cop_year %in% c(2020,2021))) {
+    if (!(d$info$cop_year %in% c(2020, 2021))) {
       stop("Attempting to use compareData_OpuDatapackVsDatim for unsupported COP year")
     }
 
