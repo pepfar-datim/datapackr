@@ -27,6 +27,7 @@ prepareSheetData <- function(sheet,
                   & sheet_name == sheet
                   & col_type == "target")
 
+  # If there are valid_disaggs then format into their own individual cols ####
   if (NROW(valid_disaggs) > 0) {
     valid_disaggs %<>%
       dplyr::select(valid_ages, valid_sexes, valid_kps) %>%
@@ -39,7 +40,7 @@ prepareSheetData <- function(sheet,
                     Sex = valid_sexes.name,
                     KeyPop = valid_kps.name) %>%
       dplyr::arrange(Age, Sex, KeyPop)
-  } else {
+  } else {# If there are not valid_disaggs then impute blank char columns ####
     valid_disaggs <- tibble::tribble(
       ~ Age,
       ~ Sex,
@@ -75,14 +76,14 @@ prepareSheetData <- function(sheet,
     dplyr::arrange_at(dplyr::vars(dplyr::everything()))
 
   # Setup data structure ####
-  dataStructure <- schema %>%
-    dplyr::filter(sheet_name == sheet) %>%
-    dplyr::arrange(col) %>%
+  dataStructure <- schema %>% #Start with base schema
+    dplyr::filter(sheet_name == sheet) %>% #Filter by sheet name
+    dplyr::arrange(col) %>% #Arrange the data based upon columns
     `row.names<-`(.[, "indicator_code"]) %>%
     dplyr::select(formula) %>%
     t() %>%
     tibble::as_tibble() %>%
-    ## Setup formulas
+    ## Setup formulas by modifying char columns
     dplyr::slice(rep(1:dplyr::n(), times = NROW(row_headers))) %>%
     dplyr::mutate_if(
       is.character,
@@ -92,9 +93,12 @@ prepareSheetData <- function(sheet,
         + headerRow(tool = "Data Pack Template", cop_year = cop_year)))
 
   # Classify formula columns as formulas
-  ## TODO: Improve approach
-  for (i in seq_along(dataStructure)) {
-    if (!all(any(is.na(dataStructure[[i]])))) {
+  for (i in seq_along(dataStructure)) { #Iterates over each column #seq_along(dataStructure)
+    if (sum(is.na(dataStructure[[i]])) < 1) {
+      #!all(any(is.na(dataStructure[[i]])))) #For each column, Check the col values for NAs;
+                                             #Returns list of T F, Check if any Trues exist,
+                                            #Check if all of the values are NOT True
+      #IF so set the class of the column to (col value, formula)
       class(dataStructure[[i]]) <- c(class(dataStructure[[i]]), "formula")
     }
   }
@@ -107,9 +111,9 @@ prepareSheetData <- function(sheet,
          dplyr::case_when(
            sex_option_uid == "Qn0I5FbKQOA" ~ "wyeCT63FkXB", #Male -> Male PWID
            sex_option_uid == "Z1EnpTPaUfq" ~ "G6OYSzplF5a", #Female -> Female PWID
-           TRUE                 ~ kp_option_uid
+           TRUE ~ kp_option_uid #If neither are true impute kp_option_uid
          ),
-       sex_option_uid = NA_character_
+       sex_option_uid = NA_character_ #Transforms col 'sex_option_uid' into NA's
      )
   }
 
@@ -158,28 +162,6 @@ prepareSheetData <- function(sheet,
   dataStructure %<>%
     swapColumns(., combined) %>%
     as.data.frame(.)
-
-
-  ## Add Custom "M" Prioritization for _Military ####
-  # if (sheet == "Prioritization") {
-  #   dataStructure %<>%
-  #     dplyr::mutate(
-  #       IMPATT.PRIORITY_SNU.T_1 = as.character(IMPATT.PRIORITY_SNU.T_1),
-  #       IMPATT.PRIORITY_SNU.T_1 =
-  #         dplyr::case_when(
-  #           stringr::str_detect(PSNU, "^_Military") ~ "M",
-  #           TRUE ~ IMPATT.PRIORITY_SNU.T_1
-  #         )
-  #     )
-  # }
-
-  # # Translate Prioritizations
-  # if (sheet == "Prioritization") {
-  #   pznDict <- with(prioritizations, setNames(Prioritization, value))
-  #
-  #   dataStructure$IMPATT.PRIORITY_SNU.T_1 <-
-  #     dplyr::recode(dataStructure$IMPATT.PRIORITY_SNU.T_1, !!!pznDict)
-  # }
 
   return(dataStructure)
 

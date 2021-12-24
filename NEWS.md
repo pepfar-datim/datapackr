@@ -4,6 +4,15 @@
 * Patches a bug with `compareData_DatapackVsDatim` where `compareData_OpuDatapackVsDatim` to convert original default COC code
 to "default"
 
+## New features
+
+* Initial launch of COP22 Data Pack processing!
+
+## Breaking changes
+
+
+## Minor improvements and fixes
+
 # datapackr 5.0.2
 
 ## Bug fixes
