@@ -15,6 +15,9 @@
 unPackSNUxIM <- function(d) {
 
   # Helper functions----
+  # some processes have been modularized into small helper functions for ease of auditing the scripting
+  # in the future. Any processes that can be served by existing functions in the R directory have been
+  # implemented.
 
   #test missing formulas
   #this code checks that all formulas from Target Values are applied through all the data
@@ -54,6 +57,7 @@ unPackSNUxIM <- function(d) {
 
   #test missing PSNUxIM tab and data
   checkMissingTab <- function(d) {
+
     if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1, 1]])) {
       d$info$has_psnuxim <- FALSE
 
@@ -122,7 +126,7 @@ unPackSNUxIM <- function(d) {
   }
 
   #check Dedup values
-  #requires missing_cols_fatal
+  #requires missing_cols_fatal nad reports back when there are missing columns that are mandatory
   checkDedup <- function(d, sheet) {
 
     d$tests$missing_cols_fatal <- data.frame(missing_cols_fatal = missing_cols_fatal)
@@ -303,6 +307,38 @@ unPackSNUxIM <- function(d) {
     return(d)
   }
 
+  #check rounding
+  checkRounding <- function(d) {
+
+    d$tests$PSNUxIM_rounding_diffs <- comparison %>%
+      tidyr::drop_na(PSNUxIM_value, DataPackTarget) %>%
+      dplyr::filter(abs(diff) <= 2)
+
+    attr(d$tests$PSNUxIM_rounding_diffs, "test_name") <- "PSNUxIM Rounding diffs"
+
+    if (NROW(d$tests$PSNUxIM_rounding_diffs) > 0) {
+      warning_msg <-
+        paste0(
+          "WARNING: ",
+          NROW(d$tests$PSNUxIM_rounding_diffs),
+          " cases where rounding based on PSNUxIM distributions has caused a small",
+          " amount of variation from original targets set in other sheets.",
+          " A small amount of rounding may be unavoidable given the nature of the",
+          " target-setting process. You can review these cases in the FlatPack",
+          " provided as an output from this app.",
+          " To resolve these cases, please review the PSNUxIM tab to identify and",
+          " address cases where multiplication of",
+          " distribution percentages against FY22 Targets has caused rounding error. You may",
+          " address this by gradually altering distribution percentages to fine tune",
+          " allocations against one or more mechanisms. For additional guidance, see the Data Pack User Guide.",
+          "\n"
+        )
+
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    }
+    return(d)
+  }
+
   #check distribution
   checkDistribution <- function(d) {
     d$tests$imbalanced_distribution <- comparison %>%
@@ -337,7 +373,7 @@ unPackSNUxIM <- function(d) {
   }
 
   #create original targets based on tool type
-  createOriginalTargets <- function(d) {
+  createOriginalTargets <- function(d, sheet) {
     if (d$info$tool == "Data Pack") {
       original_targets <- d$data$MER
     } else {
@@ -360,6 +396,7 @@ unPackSNUxIM <- function(d) {
 
   # check invalid mech headers
   checkInvalidMechHeaders <- function(d) {
+
     invalid_mech_headers <- dplyr::bind_rows(invalid_mech_headers, improper_dedupe_mechs)
 
     d$tests$invalid_mech_headers <- data.frame(invalid_mech_headers = invalid_mech_headers$col_name)
@@ -414,10 +451,10 @@ unPackSNUxIM <- function(d) {
   ## TEST: Duplicate Rows; Warn; Combine ----
   d <- checkDuplicateRows(d, sheet)
 
-  ## TEST Run structural checks ----
+  ## TEST: Run structural checks ----
   d <- checkColStructure(d, sheet)
 
-  # Save snapshot of original targets
+  ## PRCOESS: Save snapshot of original targets
   cols_to_keep <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet,
                   !is.na(indicator_code),
@@ -427,10 +464,10 @@ unPackSNUxIM <- function(d) {
   header_cols <- cols_to_keep %>%
     dplyr::filter(col_type == "row_header")
 
-  # produce the original targets
-  original_targets <- createOriginalTargets(d)
+  ## PROCESS: produce the original targets
+  original_targets <- createOriginalTargets(d, sheet)
 
-  # Pare down to populated, updated targets only
+  ## PROCESS: Pare down to populated, updated targets only
   d$data$SNUxIM <- d$data$SNUxIM[, cols_to_keep$col]
   d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
 
@@ -442,7 +479,6 @@ unPackSNUxIM <- function(d) {
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
 
   ## TEST: Missing key metadata; Error; Drop ----
-  # TODO: Make compatible for OPUs
   if (d$info$tool == "Data Pack") {
     d <- checkMissingMetadata(d, sheet)
   }
@@ -460,7 +496,7 @@ unPackSNUxIM <- function(d) {
                     & stringr::str_detect(col_name, "DSD|TA")))
   # nolint end
 
-  ## TEST specifically for DSD and TA which have been populated as mechanisms by the user.----
+  ## TEST: Specifically for DSD and TA which have been populated as mechanisms by the user.----
   improper_dedupe_mechs <- names(d$data$SNUxIM) %>%
     tibble::tibble(col_name = .) %>%
     dplyr::filter(!col_name %in% cols_to_keep$indicator_code,
@@ -495,8 +531,9 @@ unPackSNUxIM <- function(d) {
   d <- checkDuplicateCols(d, sheet)
 
   ## TEST: Non-numeric data; Warn; Convert & Drop----
-  # TODO: Make compatible for OPUs
   if (d$info$tool == "Data Pack") {
+    d <- checkNumericValues(d, sheet, header_cols)
+  } else {
     d <- checkNumericValues(d, sheet, header_cols)
   }
 
@@ -519,7 +556,7 @@ unPackSNUxIM <- function(d) {
       missing_cols_fatal,
       type = "numeric")
 
-  ## PROCESS Recalculate dedupes ----
+  ## PROCESS: Recalculate dedupes ----
     ## Other than IM cols, only the following should be considered safe for reuse here:
     # - Deduplicated DSD Rollup (FY22)
     # - Deduplicated TA Rollup (FY22)
@@ -561,11 +598,11 @@ unPackSNUxIM <- function(d) {
   ## TEST: Formula changes; Warning; Continue ----
   d <- checkFormulas(d, sheet)
 
-  ## PROCESS Remove all unneeded columns ----
+  ## PROCESS: Remove all unneeded columns ----
   d$data$SNUxIM %<>%
     dplyr::select(-dplyr::matches("Rollup|Total|MAX|SUM"))
 
-  ## PROCESS Extract PSNU uid ----
+  ## PROCESS: Extract PSNU uid ----
   d$data$SNUxIM %<>%
     dplyr::mutate(
       psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")
@@ -573,7 +610,7 @@ unPackSNUxIM <- function(d) {
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
                   dplyr::everything())
 
-  ## PROCESS Document all combos used in submitted PSNUxIM tab, prior to gathering. ----
+  ## PROCESS: Document all combos used in submitted PSNUxIM tab, prior to gathering. ----
   # This ensures tests for new combinations are correctly matched
   d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
@@ -583,7 +620,7 @@ unPackSNUxIM <- function(d) {
     d <- checkMissingCombos(d)
   }
 
-  ## PROCESS Gather all values in single column ----
+  ## PROCESS: Gather all values in single column ----
   d$data$SNUxIM %<>%
     tidyr::gather(key = "mechCode_supportType",
                   value = "value",
@@ -591,7 +628,7 @@ unPackSNUxIM <- function(d) {
     dplyr::select(dplyr::all_of(header_cols$indicator_code), psnuid,
                   mechCode_supportType, value)
 
-  ## PROCESS Drop NAs ----
+  ## PROCESS: Drop NAs ----
   d$data$SNUxIM %<>% tidyr::drop_na(value)
 
   ## TEST: Decimals; Error; Round ----
@@ -600,7 +637,7 @@ unPackSNUxIM <- function(d) {
   ## TEST: Positive Dedupes; Error; Drop ----
   d <- checkPositiveDedups(d)
 
-  ## PROCESS Remove unneeded strings from mechanism codes ----
+  ## PROCESS: Remove unneeded strings from mechanism codes ----
   d$data$SNUxIM %<>%
     dplyr::mutate(
       mechCode_supportType = dplyr::case_when(
@@ -616,15 +653,12 @@ unPackSNUxIM <- function(d) {
       dplyr::across(c(header_cols$indicator_code, "psnuid", "mechCode_supportType"))) %>%
     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
 
-  ## TODO: TEST: Defunct disaggs; Error; Drop ----
-  #d <- defunctDisaggs(d, sheet)
-
-  ## PROCESS Drop all zeros against IMs ----
+  ## PROCESS: Drop all zeros against IMs ----
   d$data$SNUxIM %<>%
     dplyr::filter(!(!stringr::str_detect(mechCode_supportType, "Dedupe")
                     & value == 0))
 
-  ## PROCESS Drop unneeded Dedupes ----
+  ## PROCESS: Drop unneeded Dedupes ----
   d$data$SNUxIM %<>%
     tidyr::pivot_wider(names_from = mechCode_supportType, values_from = value) %>%
     datapackr::addcols(cnames = c("Crosswalk Dedupe", "DSD Dedupe", "TA Dedupe"), type = "numeric")
@@ -671,50 +705,25 @@ unPackSNUxIM <- function(d) {
                   mechCode_supportType, value)
 
   ## TEST: Rounding Errors; Warn; Continue ----
-  #TODO: For OPUs, create d$data$MER from DataPackTarget col? Use above for missing_combos step?
 
   comparison <- d$data$SNUxIM %>%
     dplyr::select(-mechCode_supportType, PSNUxIM_value = value) %>%
     dplyr::group_by(dplyr::across(c(tidyselect::everything(), -PSNUxIM_value))) %>%
     dplyr::summarise(PSNUxIM_value = sum(PSNUxIM_value, na.rm = TRUE), .groups = "drop") %>%
     dplyr::full_join(.,
-      original_targets %>%
-        dplyr::select(-sheet_name, DataPackTarget = value) %>%
-        dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T"))
+                     original_targets %>%
+                       dplyr::select(-sheet_name, DataPackTarget = value) %>%
+                       dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T"))
     ) %>%
     dplyr::filter(is.na(PSNUxIM_value) | is.na(DataPackTarget) | PSNUxIM_value != DataPackTarget) %>%
     dplyr::mutate(diff = PSNUxIM_value - DataPackTarget)
 
-  d$tests$PSNUxIM_rounding_diffs <- comparison %>%
-    tidyr::drop_na(PSNUxIM_value, DataPackTarget) %>%
-    dplyr::filter(abs(diff) <= 2)
-
-  attr(d$tests$PSNUxIM_rounding_diffs, "test_name") <- "PSNUxIM Rounding diffs"
-
-  if (NROW(d$tests$PSNUxIM_rounding_diffs) > 0) {
-    warning_msg <-
-      paste0(
-        "WARNING: ",
-        NROW(d$tests$PSNUxIM_rounding_diffs),
-        " cases where rounding based on PSNUxIM distributions has caused a small",
-        " amount of variation from original targets set in other sheets.",
-        " A small amount of rounding may be unavoidable given the nature of the",
-        " target-setting process. You can review these cases in the FlatPack",
-        " provided as an output from this app.",
-        " To resolve these cases, please review the PSNUxIM tab to identify and address cases where multiplication of",
-        " distribution percentages against FY22 Targets has caused rounding error. You may",
-        " address this by gradually altering distribution percentages to fine tune",
-        " allocations against one or more mechanisms. For additional guidance, see the Data Pack User Guide.",
-        "\n"
-      )
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
-  }
+  d <- checkRounding(d)
 
   ## TEST: Data Pack total not fully distributed to IM ----
   d <- checkDistribution(d)
 
-  ## PROCESS Rename Dedupe IMs ----
+  ## PROCESS: Rename Dedupe IMs ----
   d$data$SNUxIM %<>%
     dplyr::mutate(
       mechCode_supportType = dplyr::case_when(
@@ -724,7 +733,7 @@ unPackSNUxIM <- function(d) {
         TRUE ~ mechCode_supportType)
     )
 
-  ## PROCESS Get mech codes and support types ----
+  ## PROCESS: Get mech codes and support types ----
   d$data$SNUxIM %<>%
     tidyr::separate(
       col = mechCode_supportType,
