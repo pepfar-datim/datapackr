@@ -32,8 +32,9 @@ checkDuplicateRows <- function(d, sheet) {
   }
 
   # TEST for duplicates ####
+
   if (sheet %in% c("SNU x IM", "PSNUxIM")) {
-    duplicates <- d$data$SNUxIM %>%
+    duplicates <- data %>%
       dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget) %>%
       dplyr::filter(DataPackTarget > 0) %>%
       dplyr::select(-DataPackTarget) %>%
