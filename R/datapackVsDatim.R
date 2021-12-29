@@ -80,10 +80,18 @@ compareData_DatapackVsDatim <-
     # d <- datapackr::exportDistributedDataToDATIM(d, keep_dedup = TRUE)
 
     d$datim$MER$value <- as.numeric(d$datim$MER$value)
+
     d$datim$subnat_impatt$value <-
       as.numeric(d$datim$subnat_impatt$value)
     datapack_data <-
       dplyr::bind_rows(d$datim$MER, d$datim$subnat_impatt)
+
+# recoding to account for code change in DATIM for the default COC
+# if all other code is updated to use uids instead of codes this can be removed
+    datapack_data$categoryOptionCombo[datapack_data$categoryOptionCombo ==
+                                      "HllvX50cXC0"] <- "default"
+    datapack_data$attributeOptionCombo[datapack_data$attributeOptionCombo ==
+                                       "HllvX50cXC0"] <- "default"
 
     # ensure datapack_data has the expected columns
     if (!identical(
@@ -206,11 +214,18 @@ compareData_OpuDatapackVsDatim <-
   function(d, d2_session = dynGet("d2_default_session",
                                   inherits = TRUE)) {
 
-    if (d$info$cop_year != 2020) {
+    if (!(d$info$cop_year %in% c(2020, 2021))) {
       stop("Attempting to use compareData_OpuDatapackVsDatim for unsupported COP year")
     }
 
     datapack_data <- d$datim$OPU
+
+# recoding to account for code change in DATIM for the default COC
+# if all other code is updated to use uids instead of codes this can be removed
+    datapack_data$categoryOptionCombo[datapack_data$categoryOptionCombo ==
+                                        "HllvX50cXC0"] <- "default"
+    datapack_data$attributeOptionCombo[datapack_data$attributeOptionCombo ==
+                                         "HllvX50cXC0"] <- "default"
 
     # ensure datapack_data has the expected columns
     if (!identical(
