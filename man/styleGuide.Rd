@@ -11,6 +11,7 @@ Tool files.}
   \item{siteList}{Styles for site names, broken out by Community, Facility,
   National, Military, or Inactive.}
   \item{data}{Styles for title, headers, labels, and Unique ID row.}
+  \item{cop21_opu}{Styles specific to cop21_opu's}
 }
 }
 \usage{
@@ -18,6 +19,7 @@ styleGuide
 }
 \description{
 A list object containing styles pertaining to different portions of the Data
-Pack.
+Pack. These styles control things such as font type,font size, alignment,
+border thickness, and color
 }
 \keyword{datasets}
