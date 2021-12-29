@@ -1,6 +1,6 @@
 context("Create a DataPackSchema")
 
-#Explicity set the locale to avoid any issues related to ordering within objects
+#Explicitly set the locale to avoid any issues related to ordering within objects
 #when comparing them.
 
 Sys.setlocale(category = "LC_COLLATE", locale = "en_US.UTF-8")
@@ -8,7 +8,8 @@ Sys.setlocale(category = "LC_COLLATE", locale = "en_US.UTF-8")
 with_mock_api({
   test_that("We can create a datapack schema", {
 
-    test_dataset <- unPackSchema_datapack(test_sheet("COP21_Data_Pack_Template.xlsx"))
+    test_dataset <- unPackSchema_datapack(test_sheet("COP21_Data_Pack_Template.xlsx"),
+                                          cop_year = 2021)
     expect_type(test_dataset, "list")
     expect_named(
       test_dataset,
@@ -50,16 +51,6 @@ with_mock_api({
     expect_type(test_dataset$formula,"character")
     expect_type(test_dataset$FY,"double")
     expect_type(test_dataset$period,"character")
-  })
-
-  test_that("COP21 template and schema match", {
-    schema <- unPackSchema_datapack(
-      filepath =
-        system.file("extdata", "COP21_Data_Pack_Template.xlsx", package = "datapackr"),
-      skip = skip_tabs(tool = "Data Pack Template", cop_year = 2021),
-      cop_year = 2021)
-
-    expect_identical(schema, cop21_data_pack_schema)
   })
 
   test_that("COP20 opu template and schema match", {

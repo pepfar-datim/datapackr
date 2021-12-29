@@ -89,8 +89,8 @@ prepareSheetData <- function(sheet,
       is.character,
       stringr::str_replace_all,
       pattern = paste0("(?<=[:upper:])", headerRow(tool = "Data Pack Template", cop_year = cop_year) + 1),
-      replacement = as.character(seq_along(NROW(row_headers))
-      + headerRow(tool = "Data Pack Template", cop_year = cop_year)))
+      replacement = as.character(seq_len(NROW(row_headers))
+        + headerRow(tool = "Data Pack Template", cop_year = cop_year)))
 
   # Classify formula columns as formulas
   for (i in seq_along(dataStructure)) { #Iterates over each column #seq_along(dataStructure)

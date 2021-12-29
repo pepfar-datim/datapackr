@@ -10,7 +10,7 @@ packDataPack(
   country_uids,
   template_path = NULL,
   cop_year = getCurrentCOPYear(),
-  output_folder = getwd(),
+  output_folder = NULL,
   results_archive = TRUE,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
@@ -32,8 +32,7 @@ This file MUST NOT have any data validation formats present. If left
 templates.}
 
 \item{output_folder}{Local folder where you would like your Data Pack to be
-saved upon export. If left as \code{NULL}, will output to
-\code{Working Directory}.}
+saved upon export.}
 
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}

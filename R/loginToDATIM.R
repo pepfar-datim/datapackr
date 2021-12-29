@@ -34,14 +34,6 @@ LoadConfigFile <- function(config_path = NULL) {
   }
 }
 
-#' @export
-#' @title Returns version of the API
-#'
-#' @return Version of the API
-#'
-api_version <- function() {
-  "33"
-}
 
 #' @title Check login credentials
 #'
