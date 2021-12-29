@@ -14,5 +14,11 @@ datapack_cogs
 Data frame of category option groups (id and name)
 along with their individual category options (id and name) as a
 nested data frame.
+
+#' @format
+\describe{
+  \item{name}{Name of the Category Option Group for example "01-04 Only"}
+  \item{id}{Category Option Group UID}
+}
 }
 \keyword{datasets}
