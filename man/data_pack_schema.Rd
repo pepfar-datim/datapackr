@@ -8,18 +8,19 @@
 \describe{
   \item{sheet_num}{Lists the index value associated with the sheet name
   listed in \code{sheet_name}.}
-  \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
+  \item{sheet_name}{Lists the sheet/tab name as used in the Data Pack.}
   \item{col}{Value describing the column position of each
   \code{indicator_code}.}
   \item{label}{String label used to describe \code{indicator_code}.}
   \item{indicator_code}{Code used in the Data Pack to uniquely
   identify each distinct programmatic area of target setting.}
-  \item{formula}{Excel formula defined for \code{indicator_code}.}
+  \item{formula}{Excel formula defined for the \code{indicator_code}.}
   \item{col_type}{Flags whether an \code{indicator_code} is a Target
-  (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
+  (\code{target}), historic data (\code{past}), reference figure
+  (\code{reference}), row header (\code{row_header}) or not (\code{NA}).}
   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
   in the \code{col_type} field, documents the dataset, either \code{MER},
-  \code{IMPATT}, or \code{SUBNAT}.}
+  \code{IMPATT},DATAPACK, or \code{SUBNAT}.}
 }
 }
 \usage{
