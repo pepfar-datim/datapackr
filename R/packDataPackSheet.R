@@ -63,7 +63,7 @@ packDataPackSheet <- function(wb,
   if (sheet %in% c("Epi Cascade I", "Cascade")) {
     percentDecimalCols <- schema %>%
       dplyr::filter(sheet_name == sheet,
-                    indicator_code %in% 
+                    indicator_code %in%
                       c("HIV_PREV.NA.Age/Sex/HIVStatus.T", "HIV_PREV.T_1",
                         "Incidence_SUBNAT.Rt.T_1", "Incidence.Rt.T_1", "Incidence.Rt.T")) %>%
       dplyr::pull(col)
