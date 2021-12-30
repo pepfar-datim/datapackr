@@ -2,7 +2,7 @@
 # metadata, then combines this with the Data Pack schema to create a full map between
 # Data Packs and DATIM for the purpose of generating import and analytics tables.
 
-datapackr::loginToDATIM("~/.secrets/datim.json")
+datimutils::loginToDATIM("~/.secrets/datim.json")
 
 cop_year = getCurrentCOPYear()
 

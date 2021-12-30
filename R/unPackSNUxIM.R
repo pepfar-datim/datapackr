@@ -426,7 +426,7 @@ unPackSNUxIM <- function(d) {
   # Scripting----
 
   # define sheet based on cop year
-  if (d$info$cop_year %in% c(2020, 2021)) {
+  if (d$info$cop_year %in% c(2020, 2021, 2022)) {
     sheet <- "PSNUxIM"
   } else {
     sheet <- "SNU x IM"

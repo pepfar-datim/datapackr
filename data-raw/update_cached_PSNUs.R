@@ -4,7 +4,7 @@ library(datapackr)
 
 secrets <- "~/.secrets/datim.json"
 
-datapackr::loginToDATIM(secrets)
+datimutils::loginToDATIM(secrets)
 
 # Processing
 valid_PSNUs <- getPSNUs(additional_fields = "lastUpdated")
