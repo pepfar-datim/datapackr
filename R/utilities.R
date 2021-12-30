@@ -7,17 +7,6 @@ default_catOptCombo <- function() {
   "HllvX50cXC0"
 }
 
-
-#' @export
-#' @title Returns version of the API
-#'
-#' @return Version of the API
-#'
-api_version <- function() {
-  "33"
-}
-
-
 #' @title Round at 0.5 toward integer with highest absolute value
 #'
 #' @description
