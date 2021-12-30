@@ -2,13 +2,13 @@
 % Please edit documentation in R/utilities.R
 \name{api_version}
 \alias{api_version}
-\title{Returns version of the API}
+\title{Returns a version of the DHIS2 API for the current version of DATIM}
 \usage{
 api_version()
 }
 \value{
-Version of the API
+API version.
 }
 \description{
-Returns version of the API
+Returns a version of the DHIS2 API for the current version of DATIM
 }

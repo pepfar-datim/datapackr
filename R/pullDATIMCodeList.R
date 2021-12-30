@@ -20,7 +20,7 @@ pullDATIMCodeList <- function(dataset,
     stop("Invalid dataset uid provided!")
   }
 
-  print(ds$name[ds$id == dataset])
+  interactive_print(ds$name[ds$id == dataset])
 
   # Pull Code List
   codeList <- api_sql_call(sqlView = "DotdxKrNZxG",
