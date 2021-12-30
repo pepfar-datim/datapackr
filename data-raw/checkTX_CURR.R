@@ -18,7 +18,7 @@ library(datapackr)
 # Point to DATIM login secrets ####
 secrets <- "/Users/scott/.secrets/datim.json"
 
-datapackr::loginToDATIM(secrets)
+datimutils::loginToDATIM(secrets)
 
 # Choose file ####
 data_pack_filepath <- file.choose()

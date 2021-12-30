@@ -16,7 +16,7 @@ to "default"
 # datapackr 5.0.2
 
 ## Bug fixes
-* Resolves a bug with `packOPUDataPack` where `createDataPack` was not 
+* Resolves a bug with `packOPUDataPack` where `createDataPack` was not
 implemented correctly in version 5.0.1.
 * Patches a bug with `getOPUDataFromDATIM` where `getCOPDataFromDATIM` returns
 a dataframe where the default Category Option Combo UID is listed as `default`

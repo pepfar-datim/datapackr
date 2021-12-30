@@ -1,7 +1,7 @@
 library(datapackr)
 library(magrittr)
 
-datapackr::loginToDATIM("~/.secrets/datim.json")
+datimutils::loginToDATIM("~/.secrets/datim.json")
 
 snuxim_model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/Model Data/PSNUxIM_20210201_1.rds"
 output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/COP21 OPUs"
