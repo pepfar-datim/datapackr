@@ -37,15 +37,15 @@ packDataPackSheet <- function(wb,
                       x = sheet_data,
                       xy = c(1, headerRow("Data Pack Template", cop_year)),
                       colNames = T, rowNames = F, withFilter = FALSE)
-  
+
   # Format targets ####
   targetCols <- schema %>%
     dplyr::filter(sheet_name == sheet,
                   col_type == "target") %>%
     dplyr::pull(col)
-  
+
   targetStyle <- openxlsx::createStyle(textDecoration = "bold")
-  
+
   if (length(targetCols) > 0) {
     openxlsx::addStyle(wb,
                        sheet = sheet,
