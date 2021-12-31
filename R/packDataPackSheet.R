@@ -38,10 +38,30 @@ packDataPackSheet <- function(wb,
                       xy = c(1, headerRow("Data Pack Template", cop_year)),
                       colNames = T, rowNames = F, withFilter = FALSE)
 
+  # Format targets ####
+  targetCols <- schema %>%
+    dplyr::filter(sheet_name == sheet,
+                  col_type == "target") %>%
+    dplyr::pull(col)
+
+  targetStyle <- openxlsx::createStyle(textDecoration = "bold")
+
+  if (length(targetCols) > 0) {
+    openxlsx::addStyle(wb,
+                       sheet = sheet,
+                       targetStyle,
+                       rows = (seq_len(NROW(sheet_data))) + headerRow("Data Pack Template", cop_year),
+                       cols = targetCols,
+                       gridExpand = TRUE,
+                       stack = TRUE)
+  }
+
   # Format percentages ####
   percentCols <- schema %>%
     dplyr::filter(sheet_name == sheet,
                   value_type == "percentage") %>%
+    dplyr::filter(!indicator_code %in%
+                    c("HIV_PREV.T_1", "Incidence_SUBNAT.Rt.T_1")) %>%
     dplyr::pull(col)
 
   percentStyle <- openxlsx::createStyle(numFmt = "0%")
@@ -57,10 +77,12 @@ packDataPackSheet <- function(wb,
   }
 
   # Format HIV_PREV ####
-  if (sheet %in% c("Epi Cascade I", "Cascade")) {
+  if (sheet %in% c("Epi Cascade I", "Cascade", "PMTCT", "VMMC", "KP")) {
     percentDecimalCols <- schema %>%
       dplyr::filter(sheet_name == sheet,
-                    indicator_code %in% c("HIV_PREV.NA.Age/Sex/HIVStatus.T", "HIV_PREV.T_1")) %>%
+                    indicator_code %in%
+                      c("HIV_PREV.NA.Age/Sex/HIVStatus.T", "HIV_PREV.T_1",
+                        "Incidence_SUBNAT.Rt.T_1", "KP_ESTIMATES.Prev.T")) %>%
       dplyr::pull(col)
 
     percentDecimalStyle <- openxlsx::createStyle(numFmt = "0.00%")
@@ -88,24 +110,6 @@ packDataPackSheet <- function(wb,
                        integerStyle,
                        rows = (seq_len(NROW(sheet_data))) + headerRow("Data Pack Template", cop_year),
                        cols = integerCols,
-                       gridExpand = TRUE,
-                       stack = TRUE)
-  }
-
-  # Format targets ####
-  targetCols <- schema %>%
-    dplyr::filter(sheet_name == sheet,
-                  col_type == "target") %>%
-    dplyr::pull(col)
-
-  targetStyle <- openxlsx::createStyle(textDecoration = "bold")
-
-  if (length(targetCols) > 0) {
-    openxlsx::addStyle(wb,
-                       sheet = sheet,
-                       targetStyle,
-                       rows = (seq_len(NROW(sheet_data))) + headerRow("Data Pack Template", cop_year),
-                       cols = targetCols,
                        gridExpand = TRUE,
                        stack = TRUE)
   }
