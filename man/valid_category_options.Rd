@@ -3,14 +3,15 @@
 \docType{data}
 \name{valid_category_options}
 \alias{valid_category_options}
-\title{List of  valid categoryoptions based on current COP Target Code List.}
+\title{List of valid categoryoptions based on current COP Target Code List.}
 \format{
 \describe{
-  \item{name}{}
-  \item{id}{}
-  \item{categoryoptiongroup}{}
-  \item{datapack_disagg}{}
-  \item{datapack_schema_group}{}
+  \item{name}{Name of the Category Option}
+  \item{id}{Category Option UID}
+  \item{categoryoptiongroup}{The group by which the category option belongs}
+  \item{datapack_disagg}{Name of the Category option in the Data Pack}
+  \item{datapack_schema_group}{Identifies the set of category options that
+   are mapped to a particular column in the DataPack}
 }
 }
 \usage{

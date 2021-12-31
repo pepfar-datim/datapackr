@@ -101,7 +101,7 @@ packDataPack <- function(model_data,
   d$tool$wb <- openxlsx::loadWorkbook(d$keychain$template_path)
 
   # Set global numeric format ####
-  options("openxlsx.numFmt" = "#, ##0")
+  options("openxlsx.numFmt" = "#,##0")
 
   # Write Home Sheet info ####
   d$tool$wb <- writeHomeTab(wb = d$tool$wb,
@@ -144,7 +144,7 @@ packDataPack <- function(model_data,
   # openxlsx::addStyle(d$tool$wb, sheet = "Summary",
   #summaryStyle, cols = 1:2, rows = 1:62, gridExpand = TRUE, stack = TRUE)
 
-    ## Add styles to Spectrum tab
+    ## Add styles to Spectrum tab ####
   #TODO: See if new openxlsx release addresses this issue
   spectrumStyle1 <- openxlsx::createStyle(fgFill = "#9CBEBD")
   spectrumStyle2 <- openxlsx::createStyle(fgFill = "#FFEB84")

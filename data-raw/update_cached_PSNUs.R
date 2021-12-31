@@ -4,7 +4,7 @@ library(datapackr)
 
 secrets <- "~/.secrets/datim.json"
 
-datapackr::loginToDATIM(secrets)
+datimutils::loginToDATIM(secrets)
 
 
 # NOTE: Full documentation can be found in data.R
