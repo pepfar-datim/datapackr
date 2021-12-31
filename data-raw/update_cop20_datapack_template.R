@@ -3,7 +3,7 @@
 
 secrets <- "/Users/scott/.secrets/triage.json"
 
-datapackr::loginToDATIM(secrets)
+datimutils::loginToDATIM(secrets)
 
 datapack_template_filepath <- system.file("extdata",
                                           "COP20_Data_Pack_Template_vFINAL.xlsx",

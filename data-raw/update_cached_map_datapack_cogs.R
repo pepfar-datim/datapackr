@@ -4,7 +4,7 @@ library(datapackr)
 
 secrets <- "~/.secrets/cop-test.json"
 
-datapackr::loginToDATIM(secrets)
+datimutils::loginToDATIM(secrets)
 
 # Processing
 datapack_cogs <- datapackr::datapack_cogs

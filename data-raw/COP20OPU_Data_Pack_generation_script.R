@@ -1,7 +1,7 @@
 library(datapackr)
 library(magrittr)
 
-datapackr::loginToDATIM("~/.secrets/datim.json")
+datimutils::loginToDATIM("~/.secrets/datim.json")
 
 output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/COP20 OPUs/Test Packs"
 

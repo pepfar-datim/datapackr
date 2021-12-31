@@ -13,8 +13,11 @@ model_data <- readRDS(model_data_path)
 betapack_countries <- c("Malawi", "Namibia", "Nigeria", "South Africa",
                         "Uganda", "Zambia", "Zimbabwe", "India") 
 
+cascade_rework <- c("Malawi", "Namibia", "South Africa",
+                        "Zimbabwe", "Mozambique")
+
 pick <- datapackr::COP21_datapacks_countries %>%
-  dplyr::filter(datapack_name %in% betapack_countries)
+  dplyr::filter(datapack_name %in% cascade_rework)
 
 # Dedupe Testing ####
 # pick <- datapackr::COP21_datapacks_countries %>%
