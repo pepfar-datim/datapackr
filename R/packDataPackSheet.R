@@ -34,9 +34,11 @@ packDataPackSheet <- function(wb,
   # Write data to sheet ####
   openxlsx::writeData(wb = wb,
                       sheet = sheet,
-                      x = sheet_data,
-                      xy = c(1, headerRow("Data Pack Template", cop_year)),
-                      colNames = T, rowNames = F, withFilter = FALSE)
+                      x = sheet_data, # Object to be written.
+                      xy = c(1, headerRow("Data Pack Template", cop_year)),# Defines start column and start row.
+                      colNames = T,
+                      rowNames = F,
+                      withFilter = FALSE)# Filters are not applied to column name row
 
   # Format targets ####
   targetCols <- schema %>%
@@ -64,7 +66,7 @@ packDataPackSheet <- function(wb,
                     c("HIV_PREV.T_1", "Incidence_SUBNAT.Rt.T_1")) %>%
     dplyr::pull(col)
 
-  percentStyle <- openxlsx::createStyle(numFmt = "0%")
+  percentStyle <- openxlsx::createStyle(numFmt = "0%")# cell formatting
 
   if (length(percentCols) > 0) {
     openxlsx::addStyle(wb,
@@ -72,8 +74,8 @@ packDataPackSheet <- function(wb,
                        percentStyle,
                        rows = (seq_len(NROW(sheet_data))) + headerRow("Data Pack Template", cop_year),
                        cols = percentCols,
-                       gridExpand = TRUE,
-                       stack = TRUE)
+                       gridExpand = TRUE,# styling applied to all rows and cols.
+                       stack = TRUE)# New style is merged with existing cell styles.
   }
 
   # Format HIV_PREV ####
@@ -85,24 +87,24 @@ packDataPackSheet <- function(wb,
                         "Incidence_SUBNAT.Rt.T_1", "KP_ESTIMATES.Prev.T")) %>%
       dplyr::pull(col)
 
-    percentDecimalStyle <- openxlsx::createStyle(numFmt = "0.00%")
+    percentDecimalStyle <- openxlsx::createStyle(numFmt = "0.00%")# cell formatting
 
     openxlsx::addStyle(wb,
                        sheet = sheet,
                        percentDecimalStyle,
                        rows = (seq_len(NROW(sheet_data))) + headerRow("Data Pack Template", cop_year),
                        cols = percentDecimalCols,
-                       gridExpand = TRUE,
-                       stack = TRUE)
+                       gridExpand = TRUE,# styling applied to all rows and cols.
+                       stack = TRUE)# New style is merged with existing cell styles.
   }
 
   # Format integers ####
   integerCols <- schema %>%
     dplyr::filter(sheet_name == sheet,
-                  value_type == "integer") %>%
-    dplyr::pull(col)
+                  value_type == "integer") %>% # extact all integer columns
+    dplyr::pull(col)# extracts single column.
 
-  integerStyle <- openxlsx::createStyle(numFmt = "#,##0")
+  integerStyle <- openxlsx::createStyle(numFmt = "#,##0")# cell formatting
 
   if (length(integerCols) > 0) {
     openxlsx::addStyle(wb,
@@ -110,8 +112,8 @@ packDataPackSheet <- function(wb,
                        integerStyle,
                        rows = (seq_len(NROW(sheet_data))) + headerRow("Data Pack Template", cop_year),
                        cols = integerCols,
-                       gridExpand = TRUE,
-                       stack = TRUE)
+                       gridExpand = TRUE,# styling applied to all rows and cols.
+                       stack = TRUE)# New style is merged with existing cell styles.
   }
 
   # Hide rows 5-13 ####
