@@ -67,7 +67,7 @@ createAnalytics <- function(d,
             support_type = "DSD")
         )
     }
-    if (d$info$cop_year == 2021) {
+    if (d$info$cop_year %in% c(2021,2022) ) { #TODO: Check this works for COP22
       # For COP21+, get data from import files for better consistency ####
       fy22_prioritizations <- getFY22Prioritizations(d)
 
@@ -79,6 +79,8 @@ createAnalytics <- function(d,
                           psnu_prioritizations = fy22_prioritizations,
                           d2_session = d2_session)
     }
+    
+    
   }
 
 

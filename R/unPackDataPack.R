@@ -52,10 +52,12 @@ unPackDataPack <- function(d,
   interactive_print("Separating datasets...")
   d <- separateDataSets(d)
 
+  if (d$info$has_psnuxim) {
   # Unpack the SNU x IM sheet ####
   interactive_print("Unpacking the PSNUxIM tab...")
   d <- unPackSNUxIM(d)
-
+  }
+  
   # Prepare undistributed import file for use in analytics if necessary ####
   d <- packForDATIM(d, type = "Undistributed MER")
 
