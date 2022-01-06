@@ -1,13 +1,15 @@
 # datapackr 5.0.3
 
 ## New features
-
 * Initial launch of COP22 Data Pack processing!
 
 ## Breaking changes
-
+* Now requires R version 4.1.1 or higher.
 
 ## Minor improvements and fixes
+* Updated and improved documentation of datasets in `datapackr`.
+* Improves handling of default `categoryOptionCombo`.
+* Improves documentation of `packDataPackSheet`, `packSheets`, and `prepareSheetData`.
 
 ## Deprecated features
 * `loginToDATIM` is retired in favor of the same function in `datimutils`. All
