@@ -371,11 +371,12 @@ packPSNUxIM <- function(wb,# Workbook object
       col < (col.im.targets[1])) %>%
     dplyr::pull(col)
 
-  ## TODO: Improve this next piece to be more efficient instead of using str_replace_all
+  ## TODO: Improve this next piece to be more efficient instead of using str_replace_all.
+  ## #We could use map, but I don't think a performance boost will be realized? 
 
   data_structure %<>%
     dplyr::arrange(col) %>% #Arrange rows based upon col values
-    dplyr::mutate(
+    dplyr::mutate(#Sets column names based upon col.im.percents values
       column_names = dplyr::case_when(
         col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_", col),
         col >= col.im.targets[1] & col <= (col.im.targets[1] + count.im.datim - 1) ~ paste0("target_col_", col),
@@ -386,7 +387,7 @@ packPSNUxIM <- function(wb,# Workbook object
     tibble::column_to_rownames(var = "column_names") %>%
     dplyr::select(formula) %>%
     t() %>%
-    tibble::as_tibble() %>%
+    tibble::as_tibble() %>% #make tibble
     ## Setup formulas
     dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
     dplyr::mutate(
@@ -395,10 +396,15 @@ packPSNUxIM <- function(wb,# Workbook object
                       replacement = as.character(seq_len(NROW(snuxim_model_data)) + existing_rows))))
 
   # Classify formula columns as formulas
-  ## TODO: Improve approach
-  for (i in seq_along(data_structure)) {
-    if (!all(any(is.na(data_structure[[i]])))) {
-      class(data_structure[[i]]) <- c(class(data_structure[[i]]), "formula")
+  ## Not sure if my approach is better, but is more readable. 
+  for (i in seq_along(data_structure)) {#Iterates over each column
+    # checks the values of each column to see if any NA's exist in them,
+    # Then adds the trues up. 
+    # TLDR; If it contains any NA's skip and go to the next column. 
+    if (sum(is.na(data_structure[[i]])) < 1) {
+      # IF so set the class of the column to (col value, formula)
+      class(data_structure[[i]]) <- c(class(data_structure[[i]]),
+                                      "formula")
     }
   }
 
@@ -409,6 +415,8 @@ packPSNUxIM <- function(wb,# Workbook object
     #swapColumns found in utilities.R
     dplyr::bind_cols(
       snuxim_model_data %>%
+        # Regex matches string that start with 4 digits. Note this can mean
+        # more than 4, just has to start with ####
         dplyr::select(tidyselect::matches("\\d{4,}")) # nolint
     )
 
@@ -418,6 +426,8 @@ packPSNUxIM <- function(wb,# Workbook object
     dplyr::pull(indicator_code)
 
   IM_cols <- data_structure %>%
+    # Regex matches string that start with 4 digits. Note this can mean
+    # more than 4, just has to start with ####
     dplyr::select(tidyselect::matches("\\d{4,}")) %>% # nolint
     names() %>%
     sort()
@@ -431,6 +441,8 @@ packPSNUxIM <- function(wb,# Workbook object
   right_side <- data_structure %>%
     dplyr::select(
       -tidyselect::all_of(names(left_side)),
+      # Regex matches string that start with 1 to 3 digits. Note this can mean
+      # 1 will be matched and 111, but 1111 will be considered two matches.
       -tidyselect::matches("percent_col_\\d{1,3}") # nolint
     )
 
