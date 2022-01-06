@@ -461,8 +461,9 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
   } else if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
                                            datapackr::map_DataPack_DATIM_DEs_COCs)) {
     return(datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
+  } else if (cop_year == 2022) {
+    return(datapackr::cop22_map_DataPack_DATIM_DEs_COCs)
   } else { # if map_DataPack_DATIM_DEs_COCs has drifted or COP year is invalid this notifies us
-           # when map is updated for COP22 we will want to update support in this function
     stop("The COP year and configuration provided is not supported by get_Map_DataPack_DATIM_DEs_COCs")
   }
 }
