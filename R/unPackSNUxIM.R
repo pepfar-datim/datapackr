@@ -320,9 +320,9 @@ unPackSNUxIM <- function(d) {
 
   # Recalculate dedupes ####
     ## Other than IM cols, only the following should be considered safe for reuse here:
-    # - Deduplicated DSD Rollup (FY22)
-    # - Deduplicated TA Rollup (FY22)
-    # - Total Deduplicated Rollup (FY22)
+    # - Deduplicated DSD Rollup
+    # - Deduplicated TA Rollup
+    # - Total Deduplicated Rollup
     ## All others must be recalculated to protect against formula breakers.
 
   d$data$SNUxIM %<>%
@@ -335,13 +335,13 @@ unPackSNUxIM <- function(d) {
       `SUM - DSD` = `DSD Duplicated Rollup`,
       `SUM - Crosswalk Total` =
         rowSums(dplyr::select(.,
-                              `Deduplicated DSD Rollup (FY22)`, `Deduplicated TA Rollup (FY22)`),
+                              `Deduplicated DSD Rollup`, `Deduplicated TA Rollup`),
                 na.rm = TRUE),
       `MAX - Crosswalk Total` =
-        pmax(`Deduplicated DSD Rollup (FY22)`, `Deduplicated TA Rollup (FY22)`, na.rm = T),
-      `DSD Dedupe` = `Deduplicated DSD Rollup (FY22)` - `SUM - DSD`,
-      `TA Dedupe` = `Deduplicated TA Rollup (FY22)` - `SUM - TA`,
-      `Crosswalk Dedupe` = `Total Deduplicated Rollup (FY22)` - `SUM - Crosswalk Total`
+        pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = T),
+      `DSD Dedupe` = `Deduplicated DSD Rollup` - `SUM - DSD`,
+      `TA Dedupe` = `Deduplicated TA Rollup` - `SUM - TA`,
+      `Crosswalk Dedupe` = `Total Deduplicated Rollup` - `SUM - Crosswalk Total`
     )
 
   # TEST: Improper dedupe values; Error; Continue ####
@@ -355,18 +355,18 @@ unPackSNUxIM <- function(d) {
     ) %>%
     dplyr::mutate(
       `issues.Deduplicated DSD Rollup` =
-        !(`Deduplicated DSD Rollup (FY22)` >= `MAX - DSD`
-          & `Deduplicated DSD Rollup (FY22)` <= `SUM - DSD`),
+        !(`Deduplicated DSD Rollup` >= `MAX - DSD`
+          & `Deduplicated DSD Rollup` <= `SUM - DSD`),
 
       # Deduplicated TA within range
       `issues.Deduplicated TA Rollup` =
-        !(`Deduplicated TA Rollup (FY22)` >= `MAX - TA`
-          & `Deduplicated TA Rollup (FY22)` <= `SUM - TA`),
+        !(`Deduplicated TA Rollup` >= `MAX - TA`
+          & `Deduplicated TA Rollup` <= `SUM - TA`),
 
       # Crosswalk dedupe within range
       `issues.Total Deduplicated Rollup` =
-        !(`Total Deduplicated Rollup (FY22)` >= `MAX - Crosswalk Total`
-          & `Total Deduplicated Rollup (FY22)` <= `SUM - Crosswalk Total`)
+        !(`Total Deduplicated Rollup` >= `MAX - Crosswalk Total`
+          & `Total Deduplicated Rollup` <= `SUM - Crosswalk Total`)
     ) %>%
     dplyr::select(dplyr::all_of(c(header_cols$indicator_code, dedupe_cols)),
                   `MAX - DSD`, `SUM - DSD`, `MAX - TA`, `SUM - TA`,
@@ -651,7 +651,7 @@ unPackSNUxIM <- function(d) {
         " target-setting process. You can review these cases in the FlatPack",
         " provided as an output from this app.",
         " To resolve these cases, please review the PSNUxIM tab to identify and address cases where multiplication of",
-        " distribution percentages against FY22 Targets has caused rounding error. You may",
+        " distribution percentages against Targets has caused rounding error. You may",
         " address this by gradually altering distribution percentages to fine tune",
         " allocations against one or more mechanisms. For additional guidance, see the Data Pack User Guide.",
         "\n"
