@@ -2,7 +2,7 @@
 
 secrets <- "/Users/scott/.secrets/test-mer2.json"
 
-loginToDATIM(secrets)
+datimutils::loginToDATIM(secrets)
 
 valid_category_options <- getValidCategoryOptions(cop_year = getCurrentCOPYear())
 

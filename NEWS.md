@@ -1,7 +1,30 @@
+# datapackr 5.0.3
+
+## New features
+* Initial launch of COP22 Data Pack processing!
+
+## Breaking changes
+* Now requires R version 4.1.1 or higher.
+
+## Minor improvements and fixes
+* Updated and improved documentation of datasets in `datapackr`.
+* Improves handling of default `categoryOptionCombo`.
+* Improves documentation of `packDataPackSheet`, `packSheets`, and `prepareSheetData`.
+
+## Deprecated features
+* `loginToDATIM` is retired in favor of the same function in `datimutils`. All
+  instances of this function being invoked have been replaced appropriately.
+    - The functions `DHISLogin`, `GetCredentialsFromConsole`, `LoadConfigFile`,
+      and `ValidateConfig` were not exported and are now deprecated as well.
+      They were previously only used by `loginToDATIM`.
+* `isLoggedIn` is retired as it was only used in `getMechList` and
+  `loginToDATIM`.
+
+
 # datapackr 5.0.2
 
 ## Bug fixes
-* Resolves a bug with `packOPUDataPack` where `createDataPack` was not 
+* Resolves a bug with `packOPUDataPack` where `createDataPack` was not
 implemented correctly in version 5.0.1.
 * Patches a bug with `getOPUDataFromDATIM` where `getCOPDataFromDATIM` returns
 a dataframe where the default Category Option Combo UID is listed as `default`

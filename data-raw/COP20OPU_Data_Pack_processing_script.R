@@ -1,5 +1,5 @@
 
-datapackr::loginToDATIM("~/.secrets/datim.json")
+datimutils::loginToDATIM("~/.secrets/datim.json")
 
 # snuxim_model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/PSNUxIM_20200207.rds"
 # output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment"
