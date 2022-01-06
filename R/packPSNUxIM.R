@@ -30,7 +30,7 @@ packPSNUxIM <- function(wb,# Workbook object
     assign(p, purrr::pluck(params, p)) # Allows indexing similar to [[x]]
   }
 
-  if (!cop_year %in% c(2021)) {# if the cop year is not 2021, stops and throws message. #Ask Scott, do we need to add 2022 or change? I know the plan is to spin this off.
+  if (!cop_year %in% c(2021)) {# if the cop year is not 2021, stops and throws message.
     stop(paste0("Packing PSNU x IM tabs is not supported for COP", cop_year, " Data Packs."))
   }
 
@@ -92,7 +92,7 @@ packPSNUxIM <- function(wb,# Workbook object
     dplyr::arrange(indicator_code, psnu_uid, age_option_name, sex_option_name,
                    kp_option_name, mechanism_code, type) #Put columns in desired order
   # Prints during execution to inform the user. 
-  interactive_print("Getting data about your FY21 Mechanism Allocations from DATIM...") #Ask Scott or Jason is this okay to stay 21?
+  interactive_print("Getting data about your FY21 Mechanism Allocations from DATIM...") 
 
   # Drop data that can't be allocated across mechanism codes & DSD/TA
   snuxim_model_data %<>%
