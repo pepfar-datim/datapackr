@@ -186,7 +186,7 @@ check_PSNUs <- function(PSNUs = NULL, country_uids = NULL) {
       dplyr::arrange(dp_psnu) %>%
       dplyr::select(PSNU = dp_psnu, psnu_uid)
   } else {
-    # If PSNUs is provided, check to make sure these are all valid. 
+    # If PSNUs is provided, check to make sure these are all valid.
     # Warn and remove invalid PSNu's as needed.
     if (any(!PSNUs$psnu_uid %in% valid_PSNUs$psnu_uid)) {
       invalid_PSNUs <- PSNUs %>%
@@ -222,7 +222,7 @@ check_cop_year <- function(cop_year) {
   # Check type & parse if character and resembles a numeric
   cop_year %<>% parse_maybe_number()# Found in utilities.R
 
-  if (!cop_year %in% supported_cop_years) {# If cop year isn't supported. 
+  if (!cop_year %in% supported_cop_years) {# If cop year isn't supported.
     stop(paste0("Sorry, datapackr only supports tools from ",
                 paste_oxford(paste0("COP",supported_cop_years - 2000))))
   }
@@ -257,7 +257,7 @@ check_tool <- function(tool, season, cop_year) {
   }
 
   # Validate cop_year and season, if provided.
-  if (cop_year_provided) cop_year %<>% check_cop_year()# Can be seen above. 
+  if (cop_year_provided) cop_year %<>% check_cop_year()# Can be seen above.
   if (season_provided) {
     season %<>% check_season(season = ., tool = tool)
     deduced_tool <- switch(season, "OPU" = "OPU Data Pack", "COP" = "Data Pack")

@@ -262,7 +262,7 @@ addcols <- function(data, cnames, type = "character") {
   # keeping names that are NOT in the supplied dataframes column names already.
 
   if (length(add) != 0) { #If their are columns that need to be filled in THEN
-    #Impute the NA value based upon the type provided in the function. 
+    #Impute the NA value based upon the type provided in the function.
     # TODO: #Automate the character type or at least a list variable for type.
     if (type == "character") {
       data[add] <- NA_character_
@@ -476,7 +476,7 @@ rowMax <- function(df, cn, regex) {
     df[[cn]] <- NA_integer_
     return(df)
   }
-# Create the new column in the dataframe, and ensure its column type is numeric. 
+# Create the new column in the dataframe, and ensure its column type is numeric.
   df[[cn]] <- df_filtered %>%
     purrr::pmap(pmax, na.rm = T) %>% # Row-wise Calculations.
     as.numeric

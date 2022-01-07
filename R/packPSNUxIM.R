@@ -76,9 +76,9 @@ packPSNUxIM <- function(wb,# Workbook object
   snuxim_model_data %<>%
     datapackr::adorn_import_file(cop_year = cop_year, #adorn_import_file.R
                                  # Final data in the new, more complete format?
-                                 filter_rename_output = FALSE) %>% 
+                                 filter_rename_output = FALSE) %>%
     # Select columns wanted and rename where necessary
-    dplyr::select(indicator_code, psnu_uid = orgUnit, mechanism_code, 
+    dplyr::select(indicator_code, psnu_uid = orgUnit, mechanism_code,
                   type = support_type,
                   age_option_name = Age, age_option_uid = valid_ages.id,
                   sex_option_name = Sex, sex_option_uid = valid_sexes.id,
@@ -91,8 +91,8 @@ packPSNUxIM <- function(wb,# Workbook object
     dplyr::ungroup() %>% #Opposite of group_by. Ungroups the data
     dplyr::arrange(indicator_code, psnu_uid, age_option_name, sex_option_name,
                    kp_option_name, mechanism_code, type) #Put columns in desired order
-  # Prints during execution to inform the user. 
-  interactive_print("Getting data about your FY21 Mechanism Allocations from DATIM...") 
+  # Prints during execution to inform the user.
+  interactive_print("Getting data about your FY21 Mechanism Allocations from DATIM...")
 
   # Drop data that can't be allocated across mechanism codes & DSD/TA
   snuxim_model_data %<>%
@@ -101,12 +101,14 @@ packPSNUxIM <- function(wb,# Workbook object
 
   # Pivot mechs/type wider
   snuxim_model_data %<>%
-    tidyr::unite(col = mechcode_supporttype, mechanism_code, type) %>% #Merges the 2 columns into 1 named mechcode_supporttype
+    #Merges the 2 columns into 1 named mechcode_supporttype
+    tidyr::unite(col = mechcode_supporttype, mechanism_code, type) %>%
     dplyr::select(psnu_uid, indicator_code, Age = age_option_name,
                   Sex = sex_option_name, KeyPop = kp_option_name,
                   mechcode_supporttype, percent, value) %>% #Only keeps these columns
     dplyr::mutate(
-      mechcode_supporttype = dplyr::case_when( #converts certain mech codes. 
+      #converts certain mech codes.
+      mechcode_supporttype = dplyr::case_when(
         mechcode_supporttype == "00000_DSD" ~ "DSD Dedupe",
         mechcode_supporttype == "00000_TA" ~ "TA Dedupe",
         mechcode_supporttype == "00001_TA" ~ "Crosswalk Dedupe",
@@ -130,14 +132,15 @@ packPSNUxIM <- function(wb,# Workbook object
     stop("Aggregating values and percents led to different row counts!")
   }
 
-  snuxim_model_data <- values %>% #Joins percents to values 
+  snuxim_model_data <- values %>% #Joins percents to values
     dplyr::left_join(percents,
                      by = c("psnu_uid", "indicator_code", "Age", "Sex", "KeyPop"))
 
   # EID: Align model data age bands with Data Pack
   snuxim_model_data %<>%
     dplyr::mutate(
-      Age = dplyr::if_else( #If age contains the below values place NA. 
+      #If age contains the below values place NA.
+      Age = dplyr::if_else(
         indicator_code %in% c("PMTCT_EID.N.2.T", "PMTCT_EID.N.12.T"),
         NA_character_,
         Age
@@ -372,7 +375,7 @@ packPSNUxIM <- function(wb,# Workbook object
     dplyr::pull(col)
 
   ## TODO: Improve this next piece to be more efficient instead of using str_replace_all.
-  ## #We could use map, but I don't think a performance boost will be realized? 
+  ## #We could use map, but I don't think a performance boost will be realized?
 
   data_structure %<>%
     dplyr::arrange(col) %>% #Arrange rows based upon col values
@@ -396,11 +399,11 @@ packPSNUxIM <- function(wb,# Workbook object
                       replacement = as.character(seq_len(NROW(snuxim_model_data)) + existing_rows))))
 
   # Classify formula columns as formulas
-  ## Not sure if my approach is better, but is more readable. 
+  ## Not sure if my approach is better, but is more readable.
   for (i in seq_along(data_structure)) {#Iterates over each column
     # checks the values of each column to see if any NA's exist in them,
-    # Then adds the trues up. 
-    # TLDR; If it contains any NA's skip and go to the next column. 
+    # Then adds the trues up.
+    # TLDR; If it contains any NA's skip and go to the next column.
     if (sum(is.na(data_structure[[i]])) < 1) {
       # IF so set the class of the column to (col value, formula)
       class(data_structure[[i]]) <- c(class(data_structure[[i]]),
@@ -411,7 +414,7 @@ packPSNUxIM <- function(wb,# Workbook object
   # Combine schema with SNU x IM model dataset ####
   #TODO: Fix this to not re-add mechanisms removed by the Country Team
   #(filter snuxim_model_data to only columns with not all NA related to data in missing combos)
-  data_structure <- datapackr::swapColumns(data_structure, snuxim_model_data) %>% 
+  data_structure <- datapackr::swapColumns(data_structure, snuxim_model_data) %>%
     #swapColumns found in utilities.R
     dplyr::bind_cols(
       snuxim_model_data %>%

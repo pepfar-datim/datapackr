@@ -39,7 +39,8 @@ adorn_import_file <- function(psnu_import_file,
         prioritization = NA_character_# Then fill prioritization column with NA
       )
   } else { #IF psnu_prioritizations are found
-    prio_defined <- prioritization_dict() %>%# Dict found in utilities.R
+    # Dict found in utilities.R
+    prio_defined <- prioritization_dict() %>%
       dplyr::select(value, prioritization = name)
 
     prio <- psnu_prioritizations %>%
@@ -48,9 +49,9 @@ adorn_import_file <- function(psnu_import_file,
       dplyr::select(-value)# Drop 'value' column
 
     data %<>%
-      dplyr::left_join(prio, by = "orgUnit") %>%# Join data and prio
+      dplyr::left_join(prio, by = "orgUnit") %>% # Join data and prio
       dplyr::mutate(
-        prioritization =# If col prioritization is 'na' replace with a value
+        prioritization = # If col prioritization is 'na' replace with a value
           dplyr::case_when(is.na(prioritization) ~ "No Prioritization",
                            TRUE ~ prioritization))
   }
@@ -85,8 +86,8 @@ adorn_import_file <- function(psnu_import_file,
         "[A-Za-z][A-Za-z0-9]{10}")) %>%
     #Join data with mechs based on column attributeOptionCombo
     dplyr::left_join(mechs, by = c("attributeOptionCombo" = "attributeOptionCombo"))
-  
-  # Stack data_codes and data_ids on top of one another. 
+
+  # Stack data_codes and data_ids on top of one another.
   data <- dplyr::bind_rows(data_codes, data_ids)
 
   map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year)# Found in utilities.R
@@ -118,13 +119,13 @@ adorn_import_file <- function(psnu_import_file,
     dplyr::mutate(
       #Create a time stamp column based on the the servers system time
       upload_timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S", tz = "UTC"),
-      #Create a fiscal year column based on the period column values using regex 
+      #Create a fiscal year column based on the period column values using regex
       fiscal_year = suppressWarnings(dplyr::if_else(stringr::str_detect(period, "Oct"),
                                                     as.numeric(stringr::str_replace(period, "Oct", "")) + 1,
                                                     as.numeric(stringr::str_replace(period, "Q3", ""))
                                                     )
                                      )
-      ) %>%#Join to map_des_cocs
+      ) %>% #Join to map_des_cocs
     dplyr::left_join(
       (map_des_cocs %>%
          #Rename columns
@@ -142,7 +143,7 @@ adorn_import_file <- function(psnu_import_file,
   # Select/order columns ####
   #Flag set in original function, approx line 20
   if (filter_rename_output) {# IF flag is true, Keep the below columns from data
-                              # and rename where necessary with =. 
+                              # and rename where necessary with =.
     data %<>%
       dplyr::select(ou,
                      ou_id,
