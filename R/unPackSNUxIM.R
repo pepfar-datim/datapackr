@@ -61,6 +61,9 @@ unPackSNUxIM <- function(d) {
   } else {
     d$info$has_psnuxim <- TRUE
   }
+  
+  # PATCH: Remove hard-coded FYs
+  names(d$data$SNUxIM) <- stringr::str_replace(names(d$data$SNUxIM), " \\(FY22\\)", "")
 
   # TEST: Duplicate Rows; Warn; Combine ####
   duplicates <- d$data$SNUxIM %>%
