@@ -10,6 +10,9 @@
 #'
 packForDATIM_MER <- function(d) {
 
+  
+  datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
+  
   # Combine PSNUxIM distributed data with undistributed AGYW_PREV
   agyw_data <- d$data$MER %>%
     dplyr::filter(stringr::str_detect(indicator_code, "^AGYW_PREV")) %>%
@@ -23,7 +26,7 @@ packForDATIM_MER <- function(d) {
     dplyr::bind_rows(agyw_data) %>%
 
   # Add dataElement & categoryOptionCombo ####
-    dplyr::left_join(., (datapackr::map_DataPack_DATIM_DEs_COCs %>%
+    dplyr::left_join(., (datim_map %>%
                            dplyr::rename(Age = valid_ages.name,
                                          Sex = valid_sexes.name,
                                          KeyPop = valid_kps.name)),
