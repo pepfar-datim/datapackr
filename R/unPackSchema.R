@@ -335,7 +335,7 @@ unPackSchema_datapack <- function(template_path = NULL,
 
   schema %<>%
     dplyr::filter(sheet_name %in% verbose_sheets,
-                  row %in% c(5:(headerRow(tool, cop_year) + 1)))
+                  row %in% c(3:(headerRow(tool, cop_year) + 4)))
 
   # Gather and Spread to get formula, value, and indicator_code in separate cols ####
   schema %<>%
@@ -344,6 +344,7 @@ unPackSchema_datapack <- function(template_path = NULL,
     tidyr::spread(new.col, value) %>%
     #TODO: How to avoid hardcoding these numbers??
     dplyr::select(sheet_num, sheet_name, col,
+                  col_name = character_3,
                   dataset = character_5,
                   col_type = character_6,
                   value_type = character_7,
@@ -456,7 +457,7 @@ unPackSchema_datapack <- function(template_path = NULL,
   }
 
   schema %<>%
-    dplyr::select(sheet_num, sheet_name, col, indicator_code,
+    dplyr::select(sheet_num, sheet_name, col, col_name, indicator_code,
                   dataset, col_type, value_type,
                   dataelement_dsd, dataelement_ta, categoryoption_specified,
                   valid_ages = valid_ages.options,
