@@ -10,7 +10,7 @@ getMechanismViewFromDATIM <- function(cop_year = NULL,
                                   d2_session = dynGet("d2_default_session",
                                                       inherits = TRUE)) {
 
-  url_filter <- 
+  url_filter <-
     ifelse(is.null(cop_year), "",
             paste0("&filter=startdate:lt:", cop_year + 1, "-10-01",
                    "&filter=enddate:gt:", cop_year, "-09-30"))
@@ -130,7 +130,7 @@ getMechanismView <- function(country_uids = NULL,
     mechs %<>%
       dplyr::filter(ou %in% ous | is.na(ou))
   }
-  
+
   # Filter by COP Year ####
   if (!is.null(cop_year)) {
     mechs %<>%
@@ -146,7 +146,7 @@ getMechanismView <- function(country_uids = NULL,
     mechs %<>%
       dplyr::filter(!attributeOptionCombo %in% MOH)
   }
-  
+
   if (!include_dedupe) {
     dedupe <- c("X8hrDf6bLDC", "YGT1o7UxfFu")
     mechs %<>%

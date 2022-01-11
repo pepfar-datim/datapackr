@@ -15,21 +15,22 @@ packForDATIM_UndistributedMER <- function(data,
 
   # Check params
   params <- check_params(cop_year = cop_year)
-  
+
   ps <- c("cop_year")
-  
+
   for (p in ps) {
     assign(p, purrr::pluck(params, p))
   }
-  
+
   rm(params, ps, p)
-  
+
   # Check dataset ####
   if (!all(names(data) == c("PSNU", "psnuid", "sheet_name", "indicator_code",
                             "Age", "Sex", "KeyPop", "value"))) {
-    stop("Provided dataset should have the following columns: PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value")
+    stop(paste0("Provided dataset should have the following columns: PSNU, ",
+          "psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value"))
   }
-  
+
   # Add dataElement & categoryOptionCombo ####
   datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = cop_year)
   UndistributedMER <- data %>%

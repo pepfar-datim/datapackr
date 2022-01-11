@@ -65,10 +65,12 @@ createAnalytics <- function(d,
     } else if (d$info$cop_year %in% c(2021, 2022)) {
       # For COP21+, get data from import files for better consistency ####
       prioritizations <- getFY22Prioritizations(d)
-      
+
       if (d$info$has_psnuxim) {
         targets <- d$datim$MER
-      } else {targets <- d$data$UndistributedMER}
+      } else {
+        targets <- d$data$UndistributedMER
+      }
 
       d$data$analytics <-
         dplyr::bind_rows(
@@ -77,8 +79,12 @@ createAnalytics <- function(d,
         adorn_import_file(cop_year = d$info$cop_year,
                           psnu_prioritizations = prioritizations,
                           d2_session = d2_session)
-    } else {stop("createAnalytics does not work on Data Packs for that COP Year.")}
-  } else {stop("Sorry, we don't recognize that tool type.")}
-  
+    } else {
+      stop("createAnalytics does not work on Data Packs for that COP Year.")
+    }
+  } else {
+    stop("Sorry, we don't recognize that tool type.")
+  }
+
   d
 }

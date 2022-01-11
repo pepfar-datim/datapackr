@@ -82,7 +82,7 @@ adorn_import_file <- function(psnu_import_file,
   data <- dplyr::bind_rows(data_codes, data_ids)
 
   # Adorn dataElements & categoryOptionCombos ####
-  
+
   map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year)
 
   # TODO: Is this munging still required with the map being a function of fiscal year?

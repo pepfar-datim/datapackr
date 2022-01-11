@@ -10,9 +10,9 @@
 #'
 packForDATIM_MER <- function(d) {
 
-  
+
   datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
-  
+
   # Combine PSNUxIM distributed data with undistributed AGYW_PREV
   agyw_data <- d$data$MER %>%
     dplyr::filter(stringr::str_detect(indicator_code, "^AGYW_PREV")) %>%

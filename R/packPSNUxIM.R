@@ -23,13 +23,13 @@ packPSNUxIM <- function(wb,
   params <- check_params(cop_year = cop_year,
                          tool = tool,
                          schema = schema)
-  
+
   ps <- c("cop_year", "tool", "schema")
-  
+
   for (p in ps) {
     assign(p, purrr::pluck(params, p))
   }
-  
+
   rm(params, ps, p)
 
   if (!cop_year %in% c(2021, 2022)) {
@@ -48,12 +48,13 @@ packPSNUxIM <- function(wb,
     dplyr::filter(rowSums(is.na(.)) != ncol(.))
   # TODO: Consider replacing this with something more straightforward like:
   # all(is.na(snuxim_model_data))
-  
+
   if (NROW(empty_snuxim_model_data) == 0 | is.null(snuxim_model_data)) {
-    interactive_warning("Provided SNUxIM model data seems empty or fatally flawed. Please provide acceptable model data.")
+    interactive_warning(paste0("Provided SNUxIM model data seems empty or ",
+      "fatally flawed. Please provide acceptable model data."))
     snuxim_model_data <- NULL
   }
-  
+
   ## Munge ####
   snuxim_model_data %<>%
     datapackr::adorn_import_file(cop_year = cop_year,
@@ -258,7 +259,7 @@ packPSNUxIM <- function(wb,
     }
 
     interactive_print("Analyzing targets set across your Data Pack...")
-    
+
   ## Get ID & target col letters ####
     sheets <- schema %>%
       dplyr::filter(
@@ -283,11 +284,11 @@ packPSNUxIM <- function(wb,
                       col_ltr = openxlsx::int2col(submission_order)) %>%
         dplyr::left_join(schema %>% dplyr::select(indicator_code, sheet_name, dataset, col_type),
                          by = c("indicator_code", "sheet_name"))
-      
+
       id <- ifelse("ID" %in% subm_cols$indicator_code, "ID", "PSNU")
       id_cols <- subm_cols[subm_cols$indicator_code == id,] %>%
         dplyr::select(sheet_name, id_col = col_ltr)
-      
+
       col_ltrs <- subm_cols %>%
         dplyr::filter(dataset == "mer" & col_type == "target") %>%
         dplyr::select(sheet_name, indicator_code, target_col = col_ltr) %>%
@@ -297,7 +298,7 @@ packPSNUxIM <- function(wb,
         dplyr::mutate(
           id_col = dplyr::if_else(indicator_code == "OVC_HIVSTAT.T", "B", id_col)) %>%
         dplyr::bind_rows(col_ltrs, .)
-      
+
     }
 
     snuxim_model_data %<>%
@@ -307,6 +308,7 @@ packPSNUxIM <- function(wb,
         row = as.integer((1:dplyr::n()) + existing_rows),
 
   ## Add DataPackTarget column as formula ####
+    # nolint start
         DataPackTarget = paste0(
           'SUMIF(',
           sheet_name, '!$', id_col, ':$', id_col,
@@ -314,6 +316,7 @@ packPSNUxIM <- function(wb,
           ', ', sheet_name, '!$', target_col, ':$', target_col, ')')
       ) %>%
       dplyr::select(-id_col, -sheet_name, -target_col, -row)
+    # nolint end
 
     class(snuxim_model_data[["DataPackTarget"]]) <- c(class(snuxim_model_data[["DataPackTarget"]]), "formula")
   }
@@ -323,7 +326,7 @@ packPSNUxIM <- function(wb,
 
   data_structure <- schema %>%
     dplyr::filter(sheet_name == "PSNUxIM")
-  
+
   start_col <- ifelse(cop_year == 2021, "12345_DSD", "Not PEPFAR")
 
   col.im.targets <- data_structure %>%

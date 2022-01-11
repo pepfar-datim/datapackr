@@ -11,7 +11,7 @@
 #' @return Datapackr d object
 #'
 exportSubnatToDATIM <- function(d) {
-  
+
   datim_map <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
 
   SUBNAT_IMPATT <- d$data$SUBNAT_IMPATT %>%
