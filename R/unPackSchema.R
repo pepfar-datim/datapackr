@@ -337,7 +337,7 @@ unPackSchema_datapack <- function(filepath = NULL,
   schema %<>%
     dplyr::filter(sheet_name %in% verbose_sheets,
                   row %in% c(3:(headerRow(tool, cop_year) + 4)))
-  
+
   # Fetches schema column information ####
   schema_cols <- schema_cols(cop_year)
 

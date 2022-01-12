@@ -72,7 +72,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 #' @param cop_year COP Year for dating as well as selection of templates.
 #'
 #' @return List of columns to select from template.
-#' 
+#'
 schema_cols <- function(cop_year = getCurrentCOPYear()) {
   if (cop_year %in% c(2020, 2021)) {
     cols <- tibble::tribble(
@@ -93,7 +93,7 @@ schema_cols <- function(cop_year = getCurrentCOPYear()) {
       "formula", "formula_15",
       "value", "numeric_15"
     )
-  } else if (cop_year== 2022) {
+  } else if (cop_year == 2022) {
     cols <- tibble::tribble(
       ~name, ~code,
       "sheet_num", "sheet_num",
@@ -116,7 +116,7 @@ schema_cols <- function(cop_year = getCurrentCOPYear()) {
   } else {
     stop("That cop_year is not currently supported.")
   }
-  
+
   return(cols)
 }
 
