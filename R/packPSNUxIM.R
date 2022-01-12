@@ -301,20 +301,26 @@ packPSNUxIM <- function(wb,
 
     }
 
+  ## Add DataPackTarget column as formula ####
     snuxim_model_data %<>%
       dplyr::left_join(
         col_ltrs, by = "indicator_code") %>%
       dplyr::mutate(
         row = as.integer((1:dplyr::n()) + existing_rows),
 
-  ## Add DataPackTarget column as formula ####
     # nolint start
-        DataPackTarget = paste0(
-          'SUMIF(',
-          sheet_name, '!$', id_col, ':$', id_col,
-          ', $F', row,
-          ', ', sheet_name, '!$', target_col, ':$', target_col, ')')
+        DataPackTarget = 
+          dplyr::case_when(
+            (Age == "50+" & sheet_name %in% c("Cascade", "PMTCT", "TB", "PMTCT"))
+              ~ paste0(
+                'SUM(SUMIFS(', sheet_name, '!$', target_col, ':$', target_col,
+                ',', sheet_name, '!$B:$B,$A', row,
+                ',', sheet_name, '!$C:$C,{"50-54","55-59","60-64","65+"}',
+                ',', sheet_name, '!$D:$D,$D', row, '))'),
+            TRUE ~ paste0('SUMIF(', sheet_name, '!$', id_col, ':$', id_col,
+                       ',$F', row, ',', sheet_name, '!$', target_col, ':$', target_col, ')'))
       ) %>%
+
       dplyr::select(-id_col, -sheet_name, -target_col, -row)
     # nolint end
 
