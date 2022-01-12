@@ -337,27 +337,18 @@ unPackSchema_datapack <- function(filepath = NULL,
   schema %<>%
     dplyr::filter(sheet_name %in% verbose_sheets,
                   row %in% c(3:(headerRow(tool, cop_year) + 4)))
+  
+  # Fetches schema column information ####
+  schema_cols <- schema_cols(cop_year)
 
   # Gather and Spread to get formula, value, and indicator_code in separate cols ####
   schema %<>%
-    tidyr::gather(key, value, -sheet_num, -sheet_name, -col, -row) %>%
-    tidyr::unite(new.col, c(key, row)) %>%
-    tidyr::spread(new.col, value) %>%
+    tidyr::pivot_longer(!c(sheet_num, sheet_name, col, row),
+                        values_transform = list(value = as.character)) %>%
+    tidyr::unite(new.col, c(name, row)) %>%
+    tidyr::pivot_wider(names_from = new.col, values_from = value) %>%
     #TODO: How to avoid hardcoding these numbers??
-    dplyr::select(sheet_num, sheet_name, col,
-                  col_name = character_3,
-                  dataset = character_5,
-                  col_type = character_6,
-                  value_type = character_7,
-                  dataelement_dsd = character_8,
-                  dataelement_ta = character_9,
-                  categoryoption_specified = character_10,
-                  valid_ages = character_11,
-                  valid_sexes = character_12,
-                  valid_kps = character_13,
-                  indicator_code = character_14,
-                  formula = formula_15,
-                  value = numeric_15)
+    dplyr::select(with(schema_cols, setNames(code, name)))
 
   # When formula is empty, pull from value (Assumed value) ####
   schema %<>%
@@ -385,9 +376,9 @@ unPackSchema_datapack <- function(filepath = NULL,
 
     schema %<>%
       dplyr::mutate(
-        valid_ages.options = empty,
-        valid_sexes.options = empty,
-        valid_kps.options = empty
+        valid_ages = empty,
+        valid_sexes = empty,
+        valid_kps = empty
       )
   }
 
@@ -445,26 +436,20 @@ unPackSchema_datapack <- function(filepath = NULL,
 
     schema %<>%
       dplyr::mutate(
-        valid_ages.options = dplyr::case_when(
+        valid_ages = dplyr::case_when(
           !is.na(valid_ages) ~ valid_ages.options,
           TRUE ~ empty),
-        valid_sexes.options = dplyr::case_when(
+        valid_sexes = dplyr::case_when(
           !is.na(valid_sexes) ~ valid_sexes.options,
           TRUE ~ empty),
-        valid_kps.options = dplyr::case_when(
+        valid_kps = dplyr::case_when(
           !is.na(valid_kps) ~ valid_kps.options,
           TRUE ~ empty),
       )
   }
 
   schema %<>%
-    dplyr::select(sheet_num, sheet_name, col, col_name, indicator_code,
-                  dataset, col_type, value_type,
-                  dataelement_dsd, dataelement_ta, categoryoption_specified,
-                  valid_ages = valid_ages.options,
-                  valid_sexes = valid_sexes.options,
-                  valid_kps = valid_kps.options,
-                  formula) %>%
+    dplyr::select(schema_cols$name[schema_cols$name != "value"]) %>%
     dplyr::arrange(sheet_num, col)
 
   # Add FY & period to identify targets across years (needed to produce import files)
@@ -511,6 +496,5 @@ unPackSchema_datapack <- function(filepath = NULL,
     schema <- dplyr::select(schema, -FY, -period)
   }
 
-  schema
-
+  return(schema)
 }
