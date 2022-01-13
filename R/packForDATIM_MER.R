@@ -10,8 +10,11 @@
 #'
 packForDATIM_MER <- function(d) {
 
-
-  datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
+  if (d$info$cop_year == 2022) {
+    datim_map <- datapackr::cop22_map_adorn_import_file
+  } else {
+    datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
+  }
 
   # Combine PSNUxIM distributed data with undistributed AGYW_PREV
   agyw_data <- d$data$MER %>%
@@ -33,8 +36,8 @@ packForDATIM_MER <- function(d) {
                      by = c("indicator_code", "Age", "Sex", "KeyPop", "support_type")) %>%
     tidyr::drop_na(dataelementuid, categoryoptioncombouid) %>%
 
-  # Add period ####
   dplyr::mutate(
+  # Add period ####
     period = dplyr::case_when(
       stringr::str_detect(indicator_code, "\\.R$") ~ paste0(FY - 1, "Q4"),
       TRUE ~ paste0(FY - 1, "Oct")),
@@ -46,7 +49,10 @@ packForDATIM_MER <- function(d) {
         TRUE ~ value),
 
   # Add PSNU uid ####
-      psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")
+      psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)"),
+      mech_code =
+        dplyr::case_when(mech_code == "Unallocated" ~ default_catOptCombo(),
+                         TRUE ~ mech_code)
     ) %>%
 
   # Select and rename based on DATIM protocol ####
