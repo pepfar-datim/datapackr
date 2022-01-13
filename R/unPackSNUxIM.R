@@ -768,7 +768,7 @@ unPackSNUxIM <- function(d) {
   }
 
   # Get mech codes and support types ####
-  test <- d$data$SNUxIM %>%
+  d$data$SNUxIM %<>%
     tidyr::separate(
       col = mechCode_supportType,
       into = c("mech_code", "support_type"),
