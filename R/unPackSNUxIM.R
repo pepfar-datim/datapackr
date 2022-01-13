@@ -736,7 +736,7 @@ unPackSNUxIM <- function(d) {
     dplyr::mutate(value = abs(diff)) %>%
     dplyr::mutate(mechCode_supportType = "Unallocated_DSD") %>%
     dplyr::select(-type, -PSNUxIM_value, -DataPack_value, -diff)
-  
+
   attr(d$tests$unallocatedIMs, "test_name") <- "Data not yet allocated to IM"
 
   if (NROW(d$tests$unallocatedIMs) > 0) {

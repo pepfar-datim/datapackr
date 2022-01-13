@@ -79,7 +79,7 @@ createAnalytics <- function(d,
         adorn_import_file(cop_year = d$info$cop_year,
                           psnu_prioritizations = prioritizations,
                           d2_session = d2_session)
-      
+
       if (d$info$unallocatedIMs) {
         d$data$analytics %<>%
           dplyr::mutate(
@@ -92,7 +92,7 @@ createAnalytics <- function(d,
                 TRUE ~ mechanism_code)
           )
       }
-      
+
     } else {
       stop("createAnalytics does not work on Data Packs for that COP Year.")
     }
