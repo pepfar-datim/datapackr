@@ -23,7 +23,8 @@ packForDATIM <- function(d, type = NULL) {
   } else if (type == "OPU PSNUxIM") {
     d <- packForDATIM_OPU(d)
   } else if (type == "Undistributed MER") {
-    d <- packForDATIM_UndistributedMER(d)
+    d$data$UndistributedMER <- packForDATIM_UndistributedMER(data = d$data$MER,
+                                                             cop_year = d$info$cop_year)
   } else{
     stop("Please specify data type in parameters: 'PSNUxIM', 'SUBNAT_IMPATT', 'OPU PSNUxIM'")
   }

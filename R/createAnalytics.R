@@ -11,7 +11,6 @@ getFY22Prioritizations <- function(d) {
   psnu_prioritizations <- d$datim$fy22_prioritizations %>%
     dplyr::select(orgUnit, value)
 
-
   psnus <- dplyr::filter(datapackr::valid_PSNUs, psnu_type == "SNU") %>%
     dplyr::filter(country_uid %in% d$info$country_uids) %>%
     dplyr::select(ancestor_uid = psnu_uid, ancestor_name = psnu)
@@ -29,7 +28,6 @@ getFY22Prioritizations <- function(d) {
     dplyr::select(orgUnit = psnu_uid, value)
 
   dplyr::bind_rows(psnu_prioritizations, dreams_prioritizations)
-
 
 }
 
@@ -55,9 +53,7 @@ createAnalytics <- function(d,
       adorn_import_file(cop_year = d$info$cop_year,
                         psnu_prioritizations = NULL,
                         d2_session = d2_session)
-  }
-
-  if (d$info$tool == "Data Pack") {
+  } else if (d$info$tool == "Data Pack") {
     if (d$info$cop_year == 2020) {
       d$data$analytics <- dplyr::bind_rows(
         d$data$distributedMER,
@@ -66,102 +62,43 @@ createAnalytics <- function(d,
             mechanism_code = "HllvX50cXC0",
             support_type = "DSD")
         )
-    }
-    if (d$info$cop_year == 2021) {
+    } else if (d$info$cop_year %in% c(2021, 2022)) {
       # For COP21+, get data from import files for better consistency ####
-      fy22_prioritizations <- getFY22Prioritizations(d)
+      prioritizations <- getFY22Prioritizations(d)
+
+      if (d$info$has_psnuxim) {
+        targets <- d$datim$MER
+      } else {
+        targets <- d$data$UndistributedMER
+      }
 
       d$data$analytics <-
         dplyr::bind_rows(
-          d$datim$MER,
+          targets,
           d$datim$subnat_impatt) %>%
         adorn_import_file(cop_year = d$info$cop_year,
-                          psnu_prioritizations = fy22_prioritizations,
+                          psnu_prioritizations = prioritizations,
                           d2_session = d2_session)
+
+      if (d$info$unallocatedIMs) {
+        d$data$analytics %<>%
+          dplyr::mutate(
+            mechanism_code =
+              dplyr::case_when(
+                is.na(mechanism_code)
+                  & !indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")
+                  & support_type != "Sub-National"
+                  ~ "Unallocated",
+                TRUE ~ mechanism_code)
+          )
+      }
+
+    } else {
+      stop("createAnalytics does not work on Data Packs for that COP Year.")
     }
+  } else {
+    stop("Sorry, we don't recognize that tool type.")
   }
 
-
-  #This has been moved to adorn_import_file :point_up
-  # # Add timestamp and FY ####
-  # d$data$analytics %<>%
-  #   dplyr::mutate(upload_timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S", tz = "UTC"),
-  #                 fiscal_year = paste0("FY", stringr::str_sub(as.integer(d$info$cop_year)+1, -2)))
-
-  #TODO: This seems to no longer be required since it has been
-  # moved to adorn_import_file
-  # Column names coming out of adorn_import_file
-  #
-  # if (d$info$tool == "Data Pack") {
-  #   d$data$analytics %<>%
-  #     dplyr::select( ou,
-  #                    ou_id,
-  #                    country_name,
-  #                    country_uid,
-  #                    snu1,
-  #                    snu1_id,
-  #                    psnu,
-  #                    psnu_uid,
-  #                    prioritization,
-  #                    mechanism_code,
-  #                    mechanism_desc,
-  #                    partner_id,
-  #                    partner_desc,
-  #                    funding_agency  = agency,
-  #                    fiscal_year,
-  #                    dataelement_id  = dataElement,
-  #                    dataelement_name = dataelementname,
-  #                    indicator = technical_area,
-  #                    numerator_denominator,
-  #                    support_type,
-  #                    hts_modality,
-  #                    categoryoptioncombo_id = categoryOptionCombo,
-  #                    categoryoptioncombo_name = categoryoptioncomboname,
-  #                    age = Age,
-  #                    sex = Sex,
-  #                    key_population = KeyPop,
-  #                    resultstatus_specific = resultstatus,
-  #                    upload_timestamp,
-  #                    disagg_type,
-  #                    resultstatus_inclusive,
-  #                    top_level,
-  #                    target_value = value,
-  #                    indicator_code)
-  # } else {
-  #   d$data$analytics %<>%
-  #     dplyr::select( ou,
-  #                    ou_id,
-  #                    country_name,
-  #                    country_uid,
-  #                    snu1,
-  #                    snu1_id,
-  #                    psnu,
-  #                    psnu_uid,
-  #                    mechanism_code,
-  #                    mechanism_desc,
-  #                    partner_id,
-  #                    partner_desc,
-  #                    funding_agency  = agency,
-  #                    fiscal_year,
-  #                    dataelement_id  = dataelement,
-  #                    dataelement_name = dataelement.y,
-  #                    indicator = technical_area,
-  #                    numerator_denominator ,
-  #                    support_type ,
-  #                    hts_modality ,
-  #                    categoryoptioncombo_id = categoryoptioncombouid,
-  #                    categoryoptioncombo_name = categoryoptioncombo,
-  #                    age = Age,
-  #                    sex = Sex,
-  #                    key_population = KeyPop,
-  #                    resultstatus_specific = resultstatus,
-  #                    upload_timestamp,
-  #                    disagg_type,
-  #                    resultstatus_inclusive,
-  #                    top_level,
-  #                    target_value = value,
-  #                    indicator_code)
-  # }
-
-  return(d)
+  d
 }

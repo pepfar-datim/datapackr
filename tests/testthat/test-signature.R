@@ -21,6 +21,7 @@ test_that("Can generate a key chain", {
        "missing_psnuxim_combos",
        "missing_DSNUs",
        "needs_psnuxim",
+       "unallocatedIMs",
        "messages"
      )
    )
@@ -34,6 +35,7 @@ test_that("Can generate a key chain", {
    expect_false(d$info$has_error)
    expect_false(d$info$missing_DSNUs)
    expect_false(d$info$missing_psnuxim_combos)
+   expect_false(d$info$unallocatedIMs)
    expect_equal(d$info$tool, "Data Pack")
    expect_equal(d$info$cop_year, 2021)
    expect_false(d$info$needs_psnuxim)

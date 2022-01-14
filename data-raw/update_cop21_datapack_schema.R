@@ -26,6 +26,8 @@ cop21_data_pack_schema <-
 # 
 # View(comparison_df)
 
+waldo::compare(cop21_data_pack_schema, datapackr::cop21_data_pack_schema)
+
 save(cop21_data_pack_schema,
      file = "./data/cop21_data_pack_schema.rda",
      compress = "xz")

@@ -10,9 +10,10 @@ getMechanismViewFromDATIM <- function(cop_year = NULL,
                                   d2_session = dynGet("d2_default_session",
                                                       inherits = TRUE)) {
 
-  url_filter <-  ifelse(is.null(cop_year),"",
-  paste0("&filter=startdate:lt:", cop_year + 1, "-10-01",
-             "&filter=enddate:gt:", cop_year, "-09-30"))
+  url_filter <-
+    ifelse(is.null(cop_year), "",
+            paste0("&filter=startdate:lt:", cop_year + 1, "-10-01",
+                   "&filter=enddate:gt:", cop_year, "-09-30"))
 
   paste0(d2_session$base_url,
          "api/sqlViews/fgUtV6e9YIX/data.csv?paging=false", url_filter) %>%
@@ -86,12 +87,12 @@ getMechanismView <- function(country_uids = NULL,
   can_read_file <- file.access(cached_mechs_path, 4) == 0
   can_write_file <- file.access(dirname(cached_mechs_path), 2) == 0
 
-    # Check whether Cached Mech List is stale
-    if (is.null(d2_session$max_cache_age)) {
-      max_cache_age <- "1 day"
-    } else {
-      max_cache_age <- d2_session$max_cache_age
-    }
+  # Check whether Cached Mech List is stale
+  if (is.null(d2_session$max_cache_age)) {
+    max_cache_age <- "1 day"
+  } else {
+    max_cache_age <- d2_session$max_cache_age
+  }
 
   if (file.exists(cached_mechs_path) & can_read_file) {
     is_lt <- function(x,y)  x < y
@@ -102,7 +103,6 @@ getMechanismView <- function(country_uids = NULL,
     is_fresh <- FALSE
   }
 
-
   if (is_fresh & can_read_file) {
     interactive_print("Loading cached mechs file")
     mechs <- readRDS(cached_mechs_path)
@@ -111,18 +111,15 @@ getMechanismView <- function(country_uids = NULL,
   if (!is_fresh) {
     interactive_print("Fetching new mechs file from DATIM")
     mechs <-
-      getMechanismViewFromDATIM(
-                                d2_session = d2_session)
+      getMechanismViewFromDATIM(d2_session = d2_session)
     if (can_write_file) {
       interactive_print(paste0("Overwriting stale mechanisms view to ", cached_mechs_path))
       saveRDS(mechs, file = cached_mechs_path)
     }
   }
 
-
   # Filter by OU from a vector of country UIDs
   if (!is.null(country_uids)) {
-
     ous <- datapackr::valid_PSNUs %>%
       dplyr::select(ou, ou_id, country_uid) %>%
       dplyr::distinct() %>%
@@ -130,27 +127,31 @@ getMechanismView <- function(country_uids = NULL,
       dplyr::pull(ou) %>%
       unique(.)
 
-    mechs %<>% dplyr::filter(ou %in% ous)
-    }
+    mechs %<>%
+      dplyr::filter(ou %in% ous | is.na(ou))
+  }
 
+  # Filter by COP Year ####
   if (!is.null(cop_year)) {
     mechs %<>%
         dplyr::filter(
-                      startdate < paste0(cop_year + 1, "-10-01"),
-                      enddate > paste0(cop_year, "-09-30"))
+          (startdate < paste0(max(cop_year) + 1, "-10-01") &
+            enddate > paste0(min(cop_year), "-09-30"))
+          | is.na(startdate))
   }
 
-    # Include Dedupe or MOH
-      if (!include_dedupe) {
-        dedupe <- c("X8hrDf6bLDC", "YGT1o7UxfFu")
-        mechs %<>%  dplyr::filter((attributeOptionCombo %in% dedupe) == FALSE)
-      }
+  # Include Dedupe or MOH ####
+  if (!include_MOH) {
+    MOH <- c("QCJpv5aDCJU", "TRX0yuTsJA9")
+    mechs %<>%
+      dplyr::filter(!attributeOptionCombo %in% MOH)
+  }
 
-      # Include Dedupe or MOH
-      if (!include_MOH) {
-        MOH <- c("QCJpv5aDCJU", "TRX0yuTsJA9")
-        mechs %<>%  dplyr::filter((attributeOptionCombo %in% MOH) == FALSE)
-      }
+  if (!include_dedupe) {
+    dedupe <- c("X8hrDf6bLDC", "YGT1o7UxfFu")
+    mechs %<>%
+      dplyr::filter(!attributeOptionCombo %in% dedupe)
+  }
 
   structure_ok <- dplyr::setequal(names(empty_mechs_view), names(mechs))
 

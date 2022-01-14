@@ -10,14 +10,18 @@ getDatasetUids(
 )
 }
 \arguments{
-\item{fiscal_year}{character - one of {"2019", "2020", "2021"}}
+\item{fiscal_year}{character - one of: {"2019", "2020", "2021", "2022",
+"2023"}}
 
-\item{type}{character vector - one or more of {"targets", "results", "subnat_impatt"}}
+\item{type}{character vector - one or more of:
+{"mer_targets", "mer_results", "subnat_targets", "subnat_results", "impatt"}}
 }
 \value{
 returns a character vector of the related dataset uids
 }
 \description{
-returns character vector of dataset uids for a given FY {"2019", "2020", "2021"}
-and type {"targets", "results", "subnat_impatt"}
+returns character vector of dataset uids for a given FY:
+{"2019", "2020", ... , "2023"}
+and type {"mer_targets", "mer_results", "subnat_targets", "subnat_results",
+"impatt"}
 }

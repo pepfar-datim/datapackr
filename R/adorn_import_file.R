@@ -27,6 +27,7 @@ adorn_import_file <- function(psnu_import_file,
   # Adorn PSNUs
     dplyr::left_join(
       (valid_PSNUs %>%
+         dplyr::filter(psnu_uid %in% psnu_import_file$orgUnit) %>%
         add_dp_psnu() %>%
         dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id,
                       psnu, psnu_uid, dp_psnu, psnu_type, DREAMS)),
@@ -56,11 +57,9 @@ adorn_import_file <- function(psnu_import_file,
   }
 
   # Adorn Mechanisms ####
-  country_uids <- unique(data$country_uid)
-
   mechs <-
     getMechanismView(
-      country_uids = country_uids,
+      country_uids = unique(data$country_uid),
       cop_year = cop_year,
       include_dedupe = TRUE,
       include_MOH = TRUE,
@@ -82,9 +81,9 @@ adorn_import_file <- function(psnu_import_file,
 
   data <- dplyr::bind_rows(data_codes, data_ids)
 
-  map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year)
-
   # Adorn dataElements & categoryOptionCombos ####
+
+  map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year)
 
   # TODO: Is this munging still required with the map being a function of fiscal year?
    if (cop_year == 2020) {
@@ -103,7 +102,9 @@ adorn_import_file <- function(psnu_import_file,
                      categoryoptioncomboname = categoryoptioncombo) %>%
        dplyr::mutate(FY = 2021,
                        period = paste0(cop_year, "Oct"))
-     }
+   } else if (cop_year == 2022) {
+     map_des_cocs <- datapackr::cop22_map_adorn_import_file
+   }
 
   data %<>%
     dplyr::mutate(
@@ -123,8 +124,7 @@ adorn_import_file <- function(psnu_import_file,
       by = c("dataElement" = "dataelementuid",
              "categoryOptionCombo" = "categoryoptioncombouid",
              "fiscal_year" = "FY",
-             "period" = "period")
-    )
+             "period" = "period"))
 
   # Select/order columns ####
   if (filter_rename_output) {
@@ -164,6 +164,6 @@ adorn_import_file <- function(psnu_import_file,
                      indicator_code)
   }
 
-  return(data)
+  data
 
 }
