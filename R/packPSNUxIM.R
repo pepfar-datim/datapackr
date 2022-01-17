@@ -311,7 +311,7 @@ packPSNUxIM <- function(wb,
     # nolint start
         DataPackTarget = 
           dplyr::case_when(
-            (Age == "50+" & sheet_name %in% c("Cascade", "PMTCT", "TB", "PMTCT"))
+            (Age == "50+" & sheet_name %in% c("Cascade", "PMTCT", "TB", "VMMC"))
               ~ paste0(
                 'SUM(SUMIFS(', sheet_name, '!$', target_col, ':$', target_col,
                 ',', sheet_name, '!$B:$B,$A', row,
