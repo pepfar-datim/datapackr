@@ -30,12 +30,10 @@ packPSNUxIM <- function(wb,
     assign(p, purrr::pluck(params, p))
   }
 
-  if (!cop_year %in% c(2021)) {
-    stop(paste0("Packing PSNU x IM tabs is not supported for COP", cop_year, " Data Packs."))
-  }
+  rm(params, ps, p)
 
-  if (tool != "OPU Data Pack") {
-    stop("Sorry, this function currently only works for COP21 OPU Data Packs.")
+  if (!cop_year %in% c(2021, 2022)) {
+    stop(paste0("Packing PSNU x IM tabs is not supported for COP", cop_year, " Data Packs."))
   }
 
   # Create data sidecar to eventually compile and return ####
@@ -44,35 +42,20 @@ packPSNUxIM <- function(wb,
     info = list(messages = MessageQueue(),
     has_error = FALSE))
 
-  #TODO: Test/write this part to be compatible with COP Data Pack
+  # Prep model data ####
+  ## Check if empty ####
+  empty_snuxim_model_data <- snuxim_model_data %>%
+    dplyr::filter(rowSums(is.na(.)) != ncol(.))
+  # TODO: Consider replacing this with something more straightforward like:
+  # all(is.na(snuxim_model_data))
 
-  # # Check if SNUxIM data already exists ####
-  # if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM$PSNU[1])) {
-  #   d$info$has_psnuxim <- FALSE
-  # } else {d$info$has_psnuxim <- TRUE}
-  #
-  # # If does exist, extract missing combos ####
-  # if (d$info$has_psnuxim) {
-  #   d$data$missingCombos <- d$data$MER %>%
-  #     # TODO: Create this here rather than upstream
-  #     dplyr::anti_join(d$data$PSNUxIM_combos)
-  #
-  #   d$info$missing_psnuxim_combos <- (NROW(d$data$missingCombos) > 0)
-  # }
-  #
-  # # Proceed IFF no PSNU x IM tab exists, or exists but with missing combos ####
-  # if (d$info$has_psnuxim & !d$info$missing_psnuxim_combos) {
-  #   return(d)
-  # }
-  #
-  # # Prepare SNU x IM model dataset ####
-  # if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
-  #   targets_data <- d$data$missingCombos
-  # } else {
-  #   targets_data <- d$data$MER
-  # }
+  if (NROW(empty_snuxim_model_data) == 0 | is.null(snuxim_model_data)) {
+    interactive_warning(paste0("Provided SNUxIM model data seems empty or ",
+      "fatally flawed. Please provide acceptable model data."))
+    snuxim_model_data <- NULL
+  }
 
-  # Prepare SNUxIM model data
+  ## Munge ####
   snuxim_model_data %<>%
     datapackr::adorn_import_file(cop_year = cop_year,
                                  filter_rename_output = FALSE) %>%
@@ -90,14 +73,14 @@ packPSNUxIM <- function(wb,
     dplyr::arrange(indicator_code, psnu_uid, age_option_name, sex_option_name,
                    kp_option_name, mechanism_code, type)
 
-  interactive_print("Getting data about your FY21 Mechanism Allocations from DATIM...")
+  interactive_print("Getting data about your Mechanism Allocations from DATIM...")
 
-  # Drop data that can't be allocated across mech & DSD/TA
+  ## Drop data that can't be allocated across mech & DSD/TA ####
   snuxim_model_data %<>%
     dplyr::filter(stringr::str_detect(mechanism_code, "\\d{4,}"),
                   stringr::str_detect(type, "DSD|TA"))
 
-  # Pivot mechs/type wider
+  ## Pivot mechs/type wider ####
   snuxim_model_data %<>%
     tidyr::unite(col = mechcode_supporttype, mechanism_code, type) %>%
     dplyr::select(psnu_uid, indicator_code, Age = age_option_name,
@@ -131,7 +114,7 @@ packPSNUxIM <- function(wb,
     dplyr::left_join(percents,
                      by = c("psnu_uid", "indicator_code", "Age", "Sex", "KeyPop"))
 
-  # EID: Align model data age bands with Data Pack
+  ## Align EID age bands with Data Pack ####
   snuxim_model_data %<>%
     dplyr::mutate(
       Age = dplyr::if_else(
@@ -141,21 +124,21 @@ packPSNUxIM <- function(wb,
       )
     )
 
-  # Double check that Dedupe cols all exist as expected
+  ## Check Dedupe cols ####
   snuxim_model_data %<>%
     datapackr::addcols(cnames = c("DSD Dedupe",
                                   "TA Dedupe",
                                   "Crosswalk Dedupe"),
                        type = "numeric")
 
-  # Create Deduplicated Rollups
+  ## Create Deduplicated Rollups ####
   snuxim_model_data %<>%
     dplyr::mutate(
       `Total Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}|HllvX50cXC0")), na.rm = TRUE),
       `DSD Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_DSD")), na.rm = TRUE),
       `TA Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_TA")), na.rm = TRUE))
 
-  # Create Duplicated Rollups
+  ## Create Duplicated Rollups ####
   snuxim_model_data %<>%
     dplyr::mutate(
       `Deduplicated DSD Rollup` =
@@ -175,7 +158,7 @@ packPSNUxIM <- function(wb,
           )
       )
 
-  # Create Max columns
+  ## Create Max columns ####
   snuxim_model_data %<>%
     datapackr::rowMax(cn = "Max_TA.T_1", regex = "\\d{4,}_TA") %>% # nolint
     datapackr::rowMax(cn = "Max_DSD.T_1", regex = "\\d{4,}_DSD") %>% # nolint
@@ -183,7 +166,7 @@ packPSNUxIM <- function(wb,
       `Max_Crosswalk.T_1` =
         pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = T))
 
-  # Create Dedupe Resolution columns
+  ## Create Dedupe Resolution columns ####
   interactive_print("Studying your deduplication patterns...")
 
   snuxim_model_data %<>%
@@ -192,38 +175,38 @@ packPSNUxIM <- function(wb,
                   dsd_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_DSD"))))) %>% # nolint
     dplyr::ungroup() %>%
     dplyr::mutate(
-      `TA Dedupe Resolution (FY22)` = dplyr::case_when(
+      `TA Dedupe Resolution` = dplyr::case_when(
         `TA Duplicated Rollup` == 0 | ta_im_count <= 1 ~ NA_character_,
         # or where count(TA IMs) == 1
         `Deduplicated TA Rollup` == `TA Duplicated Rollup` ~ "SUM",
         `Deduplicated TA Rollup` == `Max_TA.T_1` ~ "MAX",
         TRUE ~ "CUSTOM"),
-      `DSD Dedupe Resolution (FY22)` = dplyr::case_when(
+      `DSD Dedupe Resolution` = dplyr::case_when(
         `DSD Duplicated Rollup` == 0 | dsd_im_count <= 1 ~ NA_character_,
         `Deduplicated DSD Rollup` == `DSD Duplicated Rollup` ~ "SUM",
         `Deduplicated DSD Rollup` == `Max_DSD.T_1` ~ "MAX",
         TRUE ~ "CUSTOM"),
-      `Crosswalk Dedupe Resolution (FY22)` = dplyr::case_when(
+      `Crosswalk Dedupe Resolution` = dplyr::case_when(
         `Total Duplicated Rollup` == 0 | `Deduplicated TA Rollup` == 0 | `Deduplicated DSD Rollup` == 0
         ~ NA_character_,
         `Total Deduplicated Rollup` == `Total Duplicated Rollup` ~ "SUM",
         `Total Deduplicated Rollup` == `Max_Crosswalk.T_1` ~ "MAX",
         TRUE ~ "CUSTOM"),
-      `Custom DSD Dedupe Allocation (FY22) (% of DataPackTarget)` = `DSD Dedupe`,
-      `Custom TA Dedupe Allocation (FY22) (% of DataPackTarget)` = `TA Dedupe`,
-      `Custom Crosswalk Dedupe Allocation (FY22) (% of DataPackTarget)` = `Crosswalk Dedupe`
+      `Custom DSD Dedupe Allocation (% of DataPackTarget)` = `DSD Dedupe`,
+      `Custom TA Dedupe Allocation (% of DataPackTarget)` = `TA Dedupe`,
+      `Custom Crosswalk Dedupe Allocation (% of DataPackTarget)` = `Crosswalk Dedupe`
     ) %>%
     dplyr::select(psnu_uid, indicator_code, Age, Sex, KeyPop,
                   tidyselect::matches("\\d{4,}"), # nolint
-                  `Custom DSD Dedupe Allocation (FY22) (% of DataPackTarget)`,
-                  `Custom TA Dedupe Allocation (FY22) (% of DataPackTarget)`,
-                  `Custom Crosswalk Dedupe Allocation (FY22) (% of DataPackTarget)`,
-                  `DSD Dedupe Resolution (FY22)`,
-                  `TA Dedupe Resolution (FY22)`,
-                  `Crosswalk Dedupe Resolution (FY22)`,
+                  `Custom DSD Dedupe Allocation (% of DataPackTarget)`,
+                  `Custom TA Dedupe Allocation (% of DataPackTarget)`,
+                  `Custom Crosswalk Dedupe Allocation (% of DataPackTarget)`,
+                  `DSD Dedupe Resolution`,
+                  `TA Dedupe Resolution`,
+                  `Crosswalk Dedupe Resolution`,
                   `DSD Dedupe`, `TA Dedupe`, `Crosswalk Dedupe`)
 
-  # Prep dataset of targets to allocate ####
+  # Prep Targets dataset ####
   data %<>%
     adorn_import_file(cop_year = cop_year, filter_rename_output = FALSE) %>%
     dplyr::select(PSNU = dp_psnu, orgUnit, indicator_code, Age, Sex, KeyPop,
@@ -232,11 +215,11 @@ packPSNUxIM <- function(wb,
     dplyr::summarise(DataPackTarget = sum(DataPackTarget)) %>%
     dplyr::ungroup()
 
-  # Do not include AGYW_PREV -- These are not allocated to IMs
+  ## Drop AGYW_PREV (Not allocated to IMs) ####
   data %<>%
     dplyr::filter(!indicator_code %in% c("AGYW_PREV.N.T", "AGYW_PREV.D.T"))
 
-  # Filter SNU x IM model dataset to only those data needed in tab ####
+  # Filter model dataset to only those data needed in tab ####
   interactive_print("Focusing on patterns relevant to your submitted tool...")
 
   if (NROW(snuxim_model_data) > 0) {
@@ -250,13 +233,13 @@ packPSNUxIM <- function(wb,
                "KeyPop" = "KeyPop"))
   } else {
     snuxim_model_data <- data %>%
-      datapackr::addcols(cnames = c("Custom DSD Dedupe Allocation (FY22) (% of DataPackTarget)",
-                                    "Custom TA Dedupe Allocation (FY22) (% of DataPackTarget)",
-                                    "Custom Crosswalk Dedupe Allocation (FY22) (% of DataPackTarget)"),
+      datapackr::addcols(cnames = c("Custom DSD Dedupe Allocation (% of DataPackTarget)",
+                                    "Custom TA Dedupe Allocation (% of DataPackTarget)",
+                                    "Custom Crosswalk Dedupe Allocation (% of DataPackTarget)"),
                          type = "numeric") %>%
-      datapackr::addcols(cnames = c("DSD Dedupe Resolution (FY22)",
-                                    "TA Dedupe Resolution (FY22)",
-                                    "Crosswalk Dedupe Resolution (FY22)"),
+      datapackr::addcols(cnames = c("DSD Dedupe Resolution",
+                                    "TA Dedupe Resolution",
+                                    "Crosswalk Dedupe Resolution"),
                          type = "character")
   }
 
@@ -264,78 +247,85 @@ packPSNUxIM <- function(wb,
   existing_rows <- top_rows
 
   # Add DataPackTarget to non-OPU Data Pack ####
-  # TODO: Test and write for COP Data Packs
-  # if (tool == "Data Pack") {
-    # if (d$info$has_psnuxim) {
-    #   existing_rows <-
-    #     readxl::read_excel(
-    #       path = d$keychain$submission_path,
-    #       sheet = "PSNUxIM",
-    #       range = readxl::cell_limits(c(1, 2), c(NA, 2)),
-    #       col_names = F,
-    #       .name_repair = "minimal"
-    #     ) %>%
-    #     NROW()
-    # }
+  if (tool == "Data Pack") {
+    if (d$info$has_psnuxim) {
+      existing_rows <- openxlsx::read.xlsx(wb,
+                                           sheet = "PSNUxIM",
+                                           skipEmptyRows = FALSE,
+                                           startRow = 1,
+                                           cols = 1:2,
+                                           colNames = FALSE) %>%
+        NROW()
+    }
 
-  #   interactive_print("Analyzing targets set across your Data Pack...")
-  #
-  #
-  #
-  #   get_ID_col <- function(data) {
-  #     col_letter <- data %>%
-  #       dplyr::filter(indicator_code == "ID")
-  #
-  #     if (NROW(col_letter) == 0) {
-  #       col_letter <- data %>%
-  #         dplyr::filter(indicator_code == "PSNU")}
-  #
-  #     col_letter %<>%
-  #       dplyr::pull(submission_order) %>%
-  #       openxlsx::int2col()
-  #
-  #     return(col_letter)
-  #   }
-  #
-  #   id_cols <- lapply(d$info$col_check, get_ID_col) %>%
-  #     dplyr::bind_rows() %>%
-  #     t() %>%
-  #     as.data.frame(stringsAsFactors = FALSE) %>%
-  #     dplyr::rename(id_col = V1) %>%
-  #     tibble::rownames_to_column("sheet_name")
-  #
-  #   target_cols <- datapackr::cop21_data_pack_schema %>%
-  #     dplyr::filter(dataset == "mer" & col_type == "target" & (!sheet_name %in% c("PSNUxIM", "AGYW"))) %>%
-  #     dplyr::mutate(
-  #       target_col = openxlsx::int2col(col)
-  #     ) %>%
-  #     dplyr::select(sheet_name, indicator_code, target_col)
-  #
-  #   snuxim_model_data %<>%
-  #     dplyr::left_join(
-  #       id_cols, by = c("sheet_name" = "sheet_name")) %>%
-  #     dplyr::left_join(
-  #       target_cols, by = c("indicator_code" = "indicator_code",
-  #                           "sheet_name" = "sheet_name")) %>%
-  #     dplyr::mutate(
-  #       row = as.integer((1:dplyr::n()) + existing_rows),
-  #
-  #       # Accommodate OGAC request to aggregate OVC_HIVSTAT.T across age/sex ####
-  #       id_col = dplyr::case_when(
-  #         indicator_code == "OVC_HIVSTAT.T" ~ "B",
-  #         TRUE ~ id_col),
-  #
-  #       # Add DataPackTarget column & classify just that col as formula ####
-  #       DataPackTarget = paste0(
-  #         'SUMIF(',
-  #         sheet_name, '!$', id_col, ':$', id_col,
-  #         ', $F', row,
-  #         ', ', sheet_name, '!$', target_col, ':$', target_col, ')')
-  #     ) %>%
-  #     dplyr::select(-id_col, -sheet_name, -target_col, -row)
-  #
-  #   class(snuxim_model_data[["DataPackTarget"]]) <- c(class(snuxim_model_data[["DataPackTarget"]]), "formula")
-  # }
+    interactive_print("Analyzing targets set across your Data Pack...")
+
+  ## Get ID & target col letters ####
+    sheets <- schema %>%
+      dplyr::filter(
+        data_structure == "normal", !sheet_name %in% c("PSNUxIM", "KP Validation")) %>%
+      dplyr::pull(sheet_name) %>%
+      unique()
+
+    col_ltrs <- tibble::tribble(~sheet_name, ~indicator_code, ~target_col)
+
+    for (sheet in sheets) {
+      subm_cols <-
+        openxlsx::read.xlsx(
+          wb,
+          sheet = sheet,
+          rows = headerRow(tool = tool, cop_year = cop_year),
+          colNames = TRUE) %>%
+        names(.) %>%
+        tibble::enframe(name = NULL) %>%
+        dplyr::rename(indicator_code = value) %>%
+        dplyr::mutate(sheet_name = sheet,
+                      submission_order = 1:dplyr::n(),
+                      col_ltr = openxlsx::int2col(submission_order)) %>%
+        dplyr::left_join(schema %>% dplyr::select(indicator_code, sheet_name, dataset, col_type),
+                         by = c("indicator_code", "sheet_name"))
+
+      id <- ifelse("ID" %in% subm_cols$indicator_code, "ID", "PSNU")
+      id_cols <- subm_cols[subm_cols$indicator_code == id,] %>%
+        dplyr::select(sheet_name, id_col = col_ltr)
+
+      col_ltrs <- subm_cols %>%
+        dplyr::filter(dataset == "mer" & col_type == "target") %>%
+        dplyr::select(sheet_name, indicator_code, target_col = col_ltr) %>%
+        dplyr::left_join(id_cols, by = "sheet_name") %>%
+
+  ## Accommodate OGAC request to aggregate OVC_HIVSTAT.T across age/sex ####
+        dplyr::mutate(
+          id_col = dplyr::if_else(indicator_code == "OVC_HIVSTAT.T", "B", id_col)) %>%
+        dplyr::bind_rows(col_ltrs, .)
+
+    }
+
+  ## Add DataPackTarget column as formula ####
+    snuxim_model_data %<>%
+      dplyr::left_join(
+        col_ltrs, by = "indicator_code") %>%
+      dplyr::mutate(
+        row = as.integer((1:dplyr::n()) + existing_rows),
+
+    # nolint start
+        DataPackTarget = 
+          dplyr::case_when(
+            (Age == "50+" & sheet_name %in% c("Cascade", "PMTCT", "TB", "VMMC"))
+              ~ paste0(
+                'SUM(SUMIFS(', sheet_name, '!$', target_col, ':$', target_col,
+                ',', sheet_name, '!$B:$B,$A', row,
+                ',', sheet_name, '!$C:$C,{"50-54","55-59","60-64","65+"}',
+                ',', sheet_name, '!$D:$D,$D', row, '))'),
+            TRUE ~ paste0('SUMIF(', sheet_name, '!$', id_col, ':$', id_col,
+                       ',$F', row, ',', sheet_name, '!$', target_col, ':$', target_col, ')'))
+      ) %>%
+
+      dplyr::select(-id_col, -sheet_name, -target_col, -row)
+    # nolint end
+
+    class(snuxim_model_data[["DataPackTarget"]]) <- c(class(snuxim_model_data[["DataPackTarget"]]), "formula")
+  }
 
   # Get formulas & column order from schema ####
   interactive_print("Building your custom PSNUxIM tab...")
@@ -343,16 +333,21 @@ packPSNUxIM <- function(wb,
   data_structure <- schema %>%
     dplyr::filter(sheet_name == "PSNUxIM")
 
+  start_col <- ifelse(cop_year == 2021, "12345_DSD", "Not PEPFAR")
+
   col.im.targets <- data_structure %>%
-    dplyr::filter(col_type == "target" & indicator_code %in% c("12345_DSD", "")) %>%
+    dplyr::filter(col_type == "target",
+                  indicator_code %in% c("Not PEPFAR", "12345_DSD", "")) %>%
     dplyr::filter(
-      indicator_code == "12345_DSD" | col == max(col)) %>%
+      indicator_code == start_col | col == max(col)) %>%
     dplyr::pull(col)
 
   col.im.percents <- data_structure %>%
-    dplyr::filter(col_type == "allocation" & (indicator_code == "12345_DSD" | is.na(indicator_code))) %>%
+    dplyr::filter(col_type == "allocation"
+                  & (indicator_code %in% c("12345_DSD", "Not PEPFAR")
+                     | is.na(indicator_code))) %>%
     dplyr::filter(
-      indicator_code == "12345_DSD" | col == max(col)) %>%
+      indicator_code == start_col | col == max(col)) %>%
     dplyr::pull(col)
 
   count.im.datim <- names(snuxim_model_data)[stringr::str_detect(names(snuxim_model_data), "\\d{4,}_(DSD|TA)")] %>%
@@ -402,7 +397,8 @@ packPSNUxIM <- function(wb,
     dplyr::bind_cols(
       snuxim_model_data %>%
         dplyr::select(tidyselect::matches("\\d{4,}")) # nolint
-    )
+    ) %>%
+    dplyr::mutate(`Not PEPFAR` = as.double(NA_integer_))
 
   header_cols <- schema %>%
     dplyr::filter(sheet_name == "PSNUxIM"
@@ -417,6 +413,7 @@ packPSNUxIM <- function(wb,
   left_side <- data_structure %>%
     dplyr::select(
       tidyselect::all_of(header_cols),
+      `Not PEPFAR`,
       tidyselect::all_of(IM_cols)
     )
 
@@ -428,6 +425,7 @@ packPSNUxIM <- function(wb,
 
   # Write data to sheet ####
   interactive_print("Writing your new PSNUxIM data to your Data Pack...")
+  # Have to remove filters to accommodate bug in openxlsx
   r$wb %<>% openxlsx::removeFilter(names(.))
 
   # Write data to new PSNUxIM tab
@@ -545,7 +543,7 @@ packPSNUxIM <- function(wb,
                           heights = 0)
 
   # Hide columns
-  #TODO: Hide colsin percentage section being unused by IMs
+  #TODO: Hide cols in percentage section being unused by IMs
   hiddenCols <- schema %>%
     dplyr::filter(sheet_name == "PSNUxIM",
                   indicator_code %in% c("ID", "sheet_num", "DSD Dedupe",

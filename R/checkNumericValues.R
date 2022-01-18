@@ -15,7 +15,6 @@
 checkNumericValues <- function(d, sheet, header_cols = NULL) {
 
   if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
-
     data <- d$data$SNUxIM
   } else {
     data <- d$data$extract
@@ -41,7 +40,7 @@ checkNumericValues <- function(d, sheet, header_cols = NULL) {
 
   }
 
-  if (d$info$tool == "Data Pack" & sheet == "PSNUxIM" & d$info$cop_year == 2021) {
+  if (d$info$tool == "Data Pack" & sheet == "PSNUxIM" & d$info$cop_year %in% c(2021, 2022)) {
     data %<>%
       tidyr::gather(key = "mechCode_supportType",
                     value = "value",

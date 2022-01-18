@@ -13,12 +13,11 @@ unPackSheets <- function(d) {
 
   # Get sheets list
   sheets <- d$info$schema %>%
-    dplyr::select(sheet_name) %>%
-    dplyr::distinct() %>%
     dplyr::filter(
-      !sheet_name %in% skip_tabs(tool = d$info$tool, cop_year = d$info$cop_year)
-        & !sheet_name %in% c("SNU x IM", "PSNUxIM")) %>%
-    dplyr::pull(sheet_name)
+      !sheet_name %in% c(skip_tabs(tool = d$info$tool, cop_year = d$info$cop_year),
+                         "SNU x IM", "PSNUxIM")) %>%
+    dplyr::pull(sheet_name) %>%
+    unique()
 
   actual_sheets <- readxl::excel_sheets(d$keychain$submission_path)
   sheets_to_read <- sheets[sheets %in% actual_sheets]

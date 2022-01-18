@@ -162,6 +162,7 @@ createKeychainInfo <- function(submission_path = NULL,
     d$info$has_psnuxim <- FALSE
     d$info$missing_psnuxim_combos <- FALSE
     d$info$missing_DSNUs <- FALSE
+    d$info$unallocatedIMs <- FALSE
   }
 
   return(d)

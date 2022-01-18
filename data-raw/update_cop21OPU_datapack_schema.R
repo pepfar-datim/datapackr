@@ -11,7 +11,7 @@ cop21OPU_data_pack_schema <-
   unPackSchema_datapack(
     filepath = datapack_template_filepath,
     skip = skip_tabs(tool = "OPU Data Pack Template", cop_year = 2021),
-    type = "OPU Data Pack Template",
+    tool = "OPU Data Pack Template",
     cop_year = 2021)
 
 # comparison <- diffdf::diffdf(base = datapackr::cop21_data_pack_schema,
@@ -26,6 +26,8 @@ cop21OPU_data_pack_schema <-
 # comparison_df <- comparison$comparison_df
 # 
 # View(comparison_df)
+
+waldo::compare(cop21OPU_data_pack_schema, datapackr::cop21OPU_data_pack_schema)
 
 save(cop21OPU_data_pack_schema,
      file = "./data/cop21OPU_data_pack_schema.rda",
