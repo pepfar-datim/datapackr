@@ -1,3 +1,8 @@
+# datapackr 5.1.1
+
+## Bug fixes
+* This maintenance release fixes a bug with `unPackCountryUIDs` that was introduced in v5.0.1 due to linting. This bug preventing the processing of COP and OPU tools in `datapackr-app` as well as broke the `createAnalytics` function for regional tools.
+
 # datapackr 5.1.0
 
 ## Breaking changes
