@@ -4,18 +4,13 @@
 #' @description
 #' Creates Keychain info needed for use across most datapackr unPack functions.
 #'
-#' @param submission_path Local path to the file to import.
-#' @param tool What type of tool is the submission file? Default is "Data Pack".
-#' @param country_uids List of 11 digit alphanumeric DATIM codes representing
-#' countries. If not provided, will check file for these codes. If not in file,
-#' will flag error.
-#' @param cop_year Specifies COP year for dating as well as selection of
-#' templates.
+#' @inheritParams datapackr_params
 #'
 createKeychainInfo <- function(submission_path = NULL,
                                tool = NULL,
                                country_uids = NULL,
-                               cop_year = NULL) {
+                               cop_year = NULL,
+                               d2_session = NULL) {
 
   # Create data sidecar for use across remainder of program
   d <- list(
@@ -26,6 +21,14 @@ createKeychainInfo <- function(submission_path = NULL,
       country_uids = country_uids,
       cop_year = cop_year)
   )
+  
+  # Pulls username if `d2_session` object provided
+  d$info$source_user <- ifelse(!is.null(d2_session),
+                               d2_session$me$userCredentials$username,
+                               NULL)
+
+  # Generate a unique identifier
+  d$info$uuid <- uuid::UUIDgenerate()
 
   # Start running log of all warning and information messages
   d$info$messages <- MessageQueue()
@@ -142,6 +145,9 @@ createKeychainInfo <- function(submission_path = NULL,
     datapackr::unPackDataPackName(
       submission_path = d$keychain$submission_path,
       tool = d$info$tool)
+  
+  # Generate sane_name for tool
+  d$info$sane_name <- getSaneName(d$info$datapack_name)
 
   # Determine country uids ####
   if (is.null(d$info$country_uids)) {

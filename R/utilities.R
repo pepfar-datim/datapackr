@@ -238,6 +238,25 @@ getCountries <- function(datapack_uid = NA) {
 
 }
 
+#' @export
+#' @title Get Sane Name for Data Pack Tool
+#'
+#' @description Takes a Data Pack tool name and generates a
+#' "Sane name" for the tool which has no spaces or punctuation.
+#' 
+#' @param datapack_name A string from the \code{d$info$datapack_name} object.
+#'
+#' @return String with the sane name.
+
+getSaneName <- function(datapack_name){
+  sane_name <- datapack_name %>%
+    stringr::str_extract_all(
+      string = d$info$datapack_name,
+      pattern = "[A-Za-z0-9_]",
+      simplify = TRUE) %>%
+    paste0(., sep = "", collapse = "")
+}
+
 
 #' @export
 #' @title Add list of columns as NULL columns to supplied dataframe.

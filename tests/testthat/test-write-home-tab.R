@@ -13,9 +13,12 @@ test_that("Can write a home tab", {
     names(d$info),
     c(
       "datapack_name",
+      "sane_name",
       "tool",
       "country_uids",
       "cop_year",
+      "source_user",
+      "uuid",
       "schema",
       "has_error",
       "newSNUxIM",
@@ -34,6 +37,9 @@ test_that("Can write a home tab", {
   expect_false(d$info$newSNUxIM)
   expect_equal(d$info$country_uids, "qllxzIjjurr")
   expect_equal(d$info$datapack_name, "Lesotho")
+  expect_equal(d$info$sane_name, "Lesotho")
+  expect_type(d$info$uuid, "character")
+  expect_null(d$info$source_user)
   expect_false(d$info$newSNUxIM)
   expect_false(d$info$has_error)
   expect_false(d$info$missing_DSNUs)

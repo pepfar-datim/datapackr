@@ -49,9 +49,12 @@ packDataPack <- function(model_data,
     ),
     info = list(
       datapack_name = datapack_name,
+      sane_name = getSaneName(datapack_name),
       country_uids = country_uids,
       tool = "Data Pack",
-      cop_year =  cop_year
+      cop_year =  cop_year,
+      source_user = d2_session$me$userCredentials$username,
+      uuid = uuid::UUIDgenerate()
     ),
     data = list(
       model_data = model_data
