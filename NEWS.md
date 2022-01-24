@@ -1,3 +1,27 @@
+# datapackr 5.1.1
+
+## Bug fixes
+* This maintenance release fixes a bug with `unPackCountryUIDs` that was introduced in v5.0.1 due to linting. This bug preventing the processing of COP and OPU tools in `datapackr-app` as well as broke the `createAnalytics` function for regional tools.
+
+# datapackr 5.1.0
+
+## Breaking changes
+* The function `packForDATIM_UndistributedMER` now takes in arguments for MER data and COP year instead of an entire `d` object and returns a table of undistributed MER data rather than return a `d` object with data nested under `d$data$UndistributedMER`.
+
+## New features
+* Updates COP22 Data Pack template and processing code.
+    - Removes "Summary" tab from COP22 tools and processing code.
+    - Includes "Not PEPFAR" column to PSNUxIM tab and adds support for processing this data.
+      Drops dataf from this column before creating the analytics table and MER exports.
+* Adds item to `d` object for unallocated IMs nested under `d$info$unallocatedIMs`.
+
+## Minor improvements and fixes
+* Additional handling for default Category Option Combos.
+* Adds dataset UIDs for COP22 to the `getDatasetUids` function.
+* Updates `getMapDataPack_DATIM_DEs_COCs` to include handling for COP22 map.
+* Adds test for `getDatasetUids`
+* Adds explicit comparison checks when updating schemas and Data Pack-DATIM mapping files using the `waldo` package.
+
 # datapackr 5.0.3
 
 ## New features

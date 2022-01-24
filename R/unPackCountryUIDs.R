@@ -30,10 +30,8 @@ unPackCountryUIDs <- function(submission_path,
       range = countryUIDs_homeCell()) %>%
     names() %>%
     stringr::str_remove_all("\\s") %>%
-    stringr::str_split(", ") %>%
-    unlist()
-
-  country_uids <- country_uids[grep("[A-Za-z][A-Za-z0-9]{10}", country_uids)]
+    stringr::str_split(",") %>% #nolint
+    purrr::pluck(1)
 
   # Check that country_uids in correct cell
   if (length(country_uids) == 0) {
