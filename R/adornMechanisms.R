@@ -52,9 +52,6 @@ getMechanismViewFromDATIM <- function(cop_year = NULL,
 #' Default is FALSE.
 #' @param include_MOH Logical. If TRUE will include MOH mechanisms. Default is
 #' FALSE.
-#' @param cached_mechs_path Local file path to the cached mechanisms file.
-#' @param cached_mechs_path Filepath to an RDS file containing a cached copy of the
-#' SQL view used defined via a envionment variable.
 #' @param update_stale_cache If the cached_mechs_path file is outdated or unreadable,
 #' should a new cache be saved?
 #' @inheritParams unPackTool
