@@ -21,7 +21,7 @@ createKeychainInfo <- function(submission_path = NULL,
       country_uids = country_uids,
       cop_year = cop_year)
   )
-  
+
   # Pulls username if `d2_session` object provided
   d$info$source_user <- switch(!is.null(d2_session),
                                d2_session$me$userCredentials$username,
@@ -145,7 +145,7 @@ createKeychainInfo <- function(submission_path = NULL,
     datapackr::unPackDataPackName(
       submission_path = d$keychain$submission_path,
       tool = d$info$tool)
-  
+
   # Generate sane_name for tool
   d$info$sane_name <- getSaneName(d$info$datapack_name)
 

@@ -243,12 +243,12 @@ getCountries <- function(datapack_uid = NA) {
 #'
 #' @description Takes a Data Pack tool name and generates a
 #' "Sane name" for the tool which has no spaces or punctuation.
-#' 
+#'
 #' @param datapack_name A string from the \code{d$info$datapack_name} object.
 #'
 #' @return String with the sane name.
 
-getSaneName <- function(datapack_name){
+getSaneName <- function(datapack_name) {
   sane_name <- datapack_name %>%
     stringr::str_extract_all(
       string = .,

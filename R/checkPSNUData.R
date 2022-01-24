@@ -8,7 +8,8 @@
 #' @return d
 #'
 checkPSNUData  <-  function(d,
-                            validation_rules_path = paste0(Sys.getenv("support_files_directory"), "cop_validation_rules.rds"),
+                            validation_rules_path =
+                              paste0(Sys.getenv("support_files_directory"), "cop_validation_rules.rds"),
                             d2_session = dynGet("d2_default_session",
                                                 inherits = TRUE)) {
 
