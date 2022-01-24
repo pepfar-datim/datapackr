@@ -14,14 +14,11 @@
 #'
 unPackSNUxIM <- function(d) {
 
-  if (d$info$cop_year %in% c(2020, 2021, 2022)) {
-    sheet <- "PSNUxIM"
-  } else {
-    sheet <- "SNU x IM"
-  }
-
+  # produce header row
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
+  sheet = "PSNUxIM"
 
+  # read data sheet
   d$data$SNUxIM <-
     readxl::read_excel(
       path = d$keychain$submission_path,
@@ -31,6 +28,7 @@ unPackSNUxIM <- function(d) {
       .name_repair = "minimal"
     )
 
+  ## TEST: Missing Tab; WARN; Continue ####
   if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1, 1]])) {
     d$info$has_psnuxim <- FALSE
 
@@ -66,45 +64,16 @@ unPackSNUxIM <- function(d) {
   names(d$data$SNUxIM) <- stringr::str_replace(names(d$data$SNUxIM), " \\(FY22\\)", "")
 
   # TEST: Duplicate Rows; Warn; Combine ####
-  duplicates <- d$data$SNUxIM %>%
-    dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget) %>%
-    dplyr::filter(DataPackTarget > 0) %>%
-    dplyr::select(-DataPackTarget) %>%
-    dplyr::group_by(dplyr::across(tidyselect::everything())) %>%
-    dplyr::summarise(n = (dplyr::n()), .groups = "drop") %>%
-    dplyr::filter(n > 1) %>%
-    dplyr::select(-n) %>%
-    dplyr::distinct() %>%
-    dplyr::arrange(dplyr::across(tidyselect::everything())) %>%
-    dplyr::mutate(sheet = sheet) %>%
-    dplyr::select(sheet, dplyr::everything())
+  t <- checkDupeRows(data = d$data$SNUxIM,
+                     tool = d$info$tool,
+                     cop_year = d$info$cop_year,
+                     sheet = sheet)
+  
+  d$info$messages <- appendMessage(d$info$messages, t$warning_msg, "ERROR")
+  d$info$has_error <- (d$info$has_error | t$has_error)
+  d$tests$duplicate_rows %<>% dplyr::bind_rows(t$test_result)
 
-  if (NROW(duplicates) > 0) {
-
-    d$tests$duplicate_rows <- dplyr::bind_rows(d$tests$duplicate_rows, duplicates)
-    attr(d$tests$duplicate_rows, "test_name") <- "Duplicated rows"
-
-    dupes_msg <-
-      capture.output(
-        print(as.data.frame(duplicates), row.names = FALSE)
-      )
-
-    warning_msg <-
-      paste0(
-        "ERROR! In tab ",
-        sheet,
-        ": DUPLICATE ROWS found. Ensure rows are all unique, and the SNU Disaggregates",
-        " are not repeated within tabs. This issue may have been caused by inadvertent",
-        " or incorrect copying of data from one row to another. Duplicates are not permitted. -> \n\t",
-        paste(dupes_msg, collapse = "\n\t"),
-        "\n")
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-    d$info$has_error <- TRUE
-
-  }
-
-  # Run structural checks ####
+  # TEST: Structural checks; WARNING; Continue ####
   d <- checkColStructure(d, sheet)
 
   # Save snapshot of original targets ####
@@ -504,7 +473,7 @@ unPackSNUxIM <- function(d) {
   # Drop NAs ####
   d$data$SNUxIM %<>% tidyr::drop_na(value)
 
-  # TEST: Decimals; Error; Round ####
+  # TEST: Decimals; Warning; Round ####
   d$tests$decimals <- d$data$SNUxIM %>%
     dplyr::filter(value %% 1 != 0)
 
@@ -515,7 +484,7 @@ unPackSNUxIM <- function(d) {
 
     warning_msg <-
       paste0(
-        "ERROR! In tab ",
+        "WARNING! In tab ",
         sheet,
         ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
         paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
