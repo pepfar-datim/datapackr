@@ -251,7 +251,7 @@ getCountries <- function(datapack_uid = NA) {
 getSaneName <- function(datapack_name){
   sane_name <- datapack_name %>%
     stringr::str_extract_all(
-      string = d$info$datapack_name,
+      string = .,
       pattern = "[A-Za-z0-9_]",
       simplify = TRUE) %>%
     paste0(., sep = "", collapse = "")

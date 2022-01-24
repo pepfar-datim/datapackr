@@ -49,7 +49,7 @@ checkMechanisms <- function(d,
                   These MUST be reallocated to a valid mechanism
                   ", paste(bad_mechs, sep = "", collapse = ", "))
     d$tests$bad_mechs <- bad_mechs
-    d$info$warning_msg <- append(msg, d$info$warning_msg)
+    d$info$warning_msg <- appendMessage(msg, d$info$warning_msg)
     d$info$had_error <- TRUE
   }
   

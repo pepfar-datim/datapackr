@@ -23,7 +23,7 @@ createKeychainInfo <- function(submission_path = NULL,
   )
   
   # Pulls username if `d2_session` object provided
-  d$info$source_user <- ifelse(!is.null(d2_session),
+  d$info$source_user <- switch(!is.null(d2_session),
                                d2_session$me$userCredentials$username,
                                NULL)
 
