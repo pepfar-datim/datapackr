@@ -65,6 +65,48 @@ unPackSNUxIM <- function(d) {
   # PATCH: Remove hard-coded FYs
   names(d$data$SNUxIM) <- stringr::str_replace(names(d$data$SNUxIM), " \\(FY22\\)", "")
 
+  # Document all combos used in submitted PSNUxIM tab ####
+  # This ensures tests for new combinations are correctly matched
+  d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
+    dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop) %>%
+    dplyr::mutate(
+      psnuid =
+        stringr::str_extract(
+          PSNU,
+          "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
+    dplyr::distinct() %>%
+    dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop)
+
+  if (d$info$tool == "Data Pack") {
+    d$data$missingCombos <- d$data$MER %>%
+      dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
+      dplyr::anti_join(d$data$PSNUxIM_combos,
+                       by =  c("PSNU", "psnuid", "indicator_code", "Age", "Sex", "KeyPop"))
+
+    d$tests$missing_combos <- d$data$missingCombos
+    attr(d$tests$missing_combos, "test_name") <- "Missing target combinations"
+
+    d$info$missing_psnuxim_combos <- (NROW(d$data$missingCombos) > 0)
+
+    if (d$info$missing_psnuxim_combos) {
+      d$info$needs_psnuxim <- TRUE
+
+      warning_msg <-
+        paste0(
+          "WARNING! Your Data Pack may need a new PSNUxIM tab. Along with this warning, ",
+          " you should also receive an updated copy of your Data Pack with new rows added",
+          " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
+          " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack, ",
+          " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
+          " all changes to other tabs of your Data Pack are complete.  Once all other updates",
+          " are complete, you may return here to update your PSNUxIM tab at any time.",
+          "\n")
+
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+
+    }
+  }
+
   # TEST: Duplicate Rows; Warn; Combine ####
   duplicates <- d$data$SNUxIM %>%
     dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget) %>%
@@ -457,41 +499,6 @@ unPackSNUxIM <- function(d) {
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
                   dplyr::everything())
 
-  # Document all combos used in submitted PSNUxIM tab, prior to gathering. ####
-    # This ensures tests for new combinations are correctly matched
-  d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
-    dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
-    dplyr::distinct()
-
-  if (d$info$tool == "Data Pack") {
-    d$data$missingCombos <- d$data$MER %>%
-      dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
-      dplyr::anti_join(d$data$PSNUxIM_combos,
-                       by =  c("PSNU", "psnuid", "indicator_code", "Age", "Sex", "KeyPop"))
-
-    d$tests$missing_combos <- d$data$missingCombos
-    attr(d$tests$missing_combos, "test_name") <- "Missing target combinations"
-
-    d$info$missing_psnuxim_combos <- (NROW(d$data$missingCombos) > 0)
-
-    if (d$info$missing_psnuxim_combos) {
-      d$info$needs_psnuxim <- TRUE
-
-      warning_msg <-
-        paste0(
-          "WARNING! Your Data Pack may need a new PSNUxIM tab. Along with this warning, ",
-          " you should also receive an updated copy of your Data Pack with new rows added",
-          " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
-          " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack, ",
-          " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
-          " all changes to other tabs of your Data Pack are complete.  Once all other updates",
-          " are complete, you may return here to update your PSNUxIM tab at any time.",
-          "\n")
-
-      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
-
-    }
-  }
 
   # Gather all values in single column ####
   d$data$SNUxIM %<>%

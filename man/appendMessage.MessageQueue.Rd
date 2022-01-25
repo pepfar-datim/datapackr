@@ -9,9 +9,9 @@
 \arguments{
 \item{x}{A MessageQueue object}
 
-\item{message}{A message of vector of messages.}
+\item{message}{A message or vector of messages.}
 
-\item{level}{A string of vector of message levels (ERROR, WARNING, INFO)}
+\item{level}{A string or vector of message levels (ERROR, WARNING, INFO)}
 }
 \value{
 A MessageQueue object
