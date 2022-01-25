@@ -27,7 +27,7 @@ packPSNUxIM <- function(wb,
   for (p in names(params)) {
     assign(p, purrr::pluck(params, p))
   }
-  
+
   rm(params, p)
 
   if (!cop_year %in% c(2021, 2022)) {
@@ -61,7 +61,7 @@ packPSNUxIM <- function(wb,
              "period" = "period",
              "orgUnit" = "orgUnit",
              "categoryOptionCombo" = "categoryOptionCombo"))
-  
+
   ## Translate from import format ####
   snuxim_model_data %<>%
     datapackr::adorn_import_file(cop_year = cop_year,
@@ -82,7 +82,7 @@ packPSNUxIM <- function(wb,
 
   ## Drop data that can't be allocated across mech & DSD/TA ####
   interactive_print("Getting data about your Mechanism Allocations from DATIM...")
-  
+
   snuxim_model_data %<>%
     dplyr::filter(stringr::str_detect(mechanism_code, "\\d{4,}"),
                   stringr::str_detect(type, "DSD|TA"))
@@ -262,17 +262,17 @@ packPSNUxIM <- function(wb,
                                          startRow = top_rows,
                                          cols = 1:1,
                                          colNames = TRUE)
-    
+
     existing_rows <- existing_data %>%
       NROW() + top_rows
-    
+
     existing_data %<>% tidyr::drop_na(PSNU)
-    
+
     has_psnuxim <- (NROW(existing_data) > 0)
 
   ## Get ID & target col letters ####
     interactive_print("Analyzing targets set across your Data Pack...")
-    
+
     sheets <- schema %>%
       dplyr::filter(
         data_structure == "normal", !sheet_name %in% c("PSNUxIM", "KP Validation")) %>%
@@ -463,7 +463,7 @@ packPSNUxIM <- function(wb,
                           cols = col.im.percents[1]:col.im.percents[2],
                           colNames = FALSE) %>%
       as.character()
-    
+
     existing_im_cols <- existing_im_cols[!existing_im_cols %in% c("", "Not PEPFAR")]
 
     complete_cols <- c(existing_im_cols, IM_cols) %>% unique()
@@ -506,7 +506,7 @@ packPSNUxIM <- function(wb,
 
   # Formatting ####
   interactive_print("Tidying up...")
-  
+
   ## Format percent columns
   interactive_print("Stylizing percent columns...")
 
@@ -532,7 +532,7 @@ packPSNUxIM <- function(wb,
     dplyr::filter(sheet_name == "PSNUxIM",
                   value_type == "integer") %>%
     dplyr::pull(col)
-  
+
   openxlsx::addStyle(
     wb = r$wb,
     sheet = "PSNUxIM",
@@ -592,7 +592,7 @@ packPSNUxIM <- function(wb,
       ifelse(has_psnuxim,
              paste0("added ", NROW(left_side), " rows to your PSNUxIM tab.",
                     " These have been highlighted green for your reference."),
-             "populated your PSNUxIM tab for the first time." ),
+             "populated your PSNUxIM tab for the first time."),
       " An updated copy of your Data Pack is now available for download.",
       " Please review your PSNUxIM tab, and carefully review the Data Pack User Guide",
       " for detailed guidance on how to use this tab.",

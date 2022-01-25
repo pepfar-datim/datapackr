@@ -62,23 +62,23 @@ writePSNUxIM <- function(d,
   } else if (d$info$cop_year == 2022) {
   # Prepare data to distribute ####
     d$info$has_psnuxim <- !(NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM$PSNU[1]))
-    
+
     # # If does exist, extract missing combos ####
     # if (d$info$has_psnuxim) {
     #   d$data$missingCombos <- d$data$MER %>%
     #     # TODO: Create this here rather than upstream
     #     dplyr::anti_join(d$data$PSNUxIM_combos)
-    # 
+
     #   d$info$missing_psnuxim_combos <- (NROW(d$data$missingCombos) > 0)
     # }
-    
+
     # TODO: Move this into packPSNUxIM to allow that function to exit early if all good
     # Proceed IFF no PSNU x IM tab exists, or exists but with missing combos ####
     if (d$info$has_psnuxim & !d$info$missing_psnuxim_combos) {
       interactive_warning("No new information available to write to PSNUxIM tab.")
       return(d)
     }
-    
+
     # Prepare targets to distribute ####
     if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
       targets_data <- packForDATIM_UndistributedMER(data = d$data$missingCombos,
@@ -86,10 +86,10 @@ writePSNUxIM <- function(d,
     } else {
       targets_data <- d$data$UndistributedMER
     }
-    
+
     # Prepare d$tool$wb ####
     d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
-  
+
     # Prepare d$data$snuxim_model_data ####
     smd <- readRDS(d$keychain$snuxim_model_data_path)
     d$data$snuxim_model_data <- smd[d$info$country_uids] %>%
@@ -121,7 +121,7 @@ writePSNUxIM <- function(d,
       dplyr::group_by(dplyr::across(c(-value))) %>%
       dplyr::summarise(value = sum(value)) %>%
       dplyr::ungroup()
-      
+
     ## Filter model data to match targets_data ####
     d$data$snuxim_model_data %<>%
       dplyr::right_join(
