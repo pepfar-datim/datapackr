@@ -24,13 +24,11 @@ packPSNUxIM <- function(wb,
                          tool = tool,
                          schema = schema)
 
-  ps <- c("cop_year", "tool", "schema")
-
-  for (p in ps) {
+  for (p in names(params)) {
     assign(p, purrr::pluck(params, p))
   }
-
-  rm(params, ps, p)
+  
+  rm(params, p)
 
   if (!cop_year %in% c(2021, 2022)) {
     stop(paste0("Packing PSNU x IM tabs is not supported for COP", cop_year, " Data Packs."))
@@ -55,7 +53,16 @@ packPSNUxIM <- function(wb,
     snuxim_model_data <- NULL
   }
 
-  ## Munge ####
+  ## Filter to match targets data ####
+  snuxim_model_data %<>%
+    dplyr::right_join(
+      data %>% dplyr::select(-value, -attributeOptionCombo) %>% dplyr::distinct(),
+      by = c("dataElement" = "dataElement",
+             "period" = "period",
+             "orgUnit" = "orgUnit",
+             "categoryOptionCombo" = "categoryOptionCombo"))
+  
+  ## Translate from import format ####
   snuxim_model_data %<>%
     datapackr::adorn_import_file(cop_year = cop_year,
                                  filter_rename_output = FALSE) %>%
@@ -73,9 +80,9 @@ packPSNUxIM <- function(wb,
     dplyr::arrange(indicator_code, psnu_uid, age_option_name, sex_option_name,
                    kp_option_name, mechanism_code, type)
 
-  interactive_print("Getting data about your Mechanism Allocations from DATIM...")
-
   ## Drop data that can't be allocated across mech & DSD/TA ####
+  interactive_print("Getting data about your Mechanism Allocations from DATIM...")
+  
   snuxim_model_data %<>%
     dplyr::filter(stringr::str_detect(mechanism_code, "\\d{4,}"),
                   stringr::str_detect(type, "DSD|TA"))
@@ -247,20 +254,25 @@ packPSNUxIM <- function(wb,
   existing_rows <- top_rows
 
   # Add DataPackTarget to non-OPU Data Pack ####
+  has_psnuxim <- TRUE
   if (tool == "Data Pack") {
-    if (d$info$has_psnuxim) {
-      existing_rows <- openxlsx::read.xlsx(wb,
-                                           sheet = "PSNUxIM",
-                                           skipEmptyRows = FALSE,
-                                           startRow = 1,
-                                           cols = 1:2,
-                                           colNames = FALSE) %>%
-        NROW()
-    }
-
-    interactive_print("Analyzing targets set across your Data Pack...")
+    existing_data <- openxlsx::read.xlsx(r$wb,
+                                         sheet = "PSNUxIM",
+                                         skipEmptyRows = FALSE,
+                                         startRow = top_rows,
+                                         cols = 1:1,
+                                         colNames = TRUE)
+    
+    existing_rows <- existing_data %>%
+      NROW() + top_rows
+    
+    existing_data %<>% tidyr::drop_na(PSNU)
+    
+    has_psnuxim <- (NROW(existing_data) > 0)
 
   ## Get ID & target col letters ####
+    interactive_print("Analyzing targets set across your Data Pack...")
+    
     sheets <- schema %>%
       dplyr::filter(
         data_structure == "normal", !sheet_name %in% c("PSNUxIM", "KP Validation")) %>%
@@ -320,7 +332,6 @@ packPSNUxIM <- function(wb,
             TRUE ~ paste0('SUMIF(', sheet_name, '!$', id_col, ':$', id_col,
                        ',$F', row, ',', sheet_name, '!$', target_col, ':$', target_col, ')'))
       ) %>%
-
       dplyr::select(-id_col, -sheet_name, -target_col, -row)
     # nolint end
 
@@ -428,76 +439,75 @@ packPSNUxIM <- function(wb,
   # Have to remove filters to accommodate bug in openxlsx
   r$wb %<>% openxlsx::removeFilter(names(.))
 
-  # Write data to new PSNUxIM tab
+  ## Right Side ----
   openxlsx::writeData(wb = r$wb,
                       sheet = "PSNUxIM",
                       x = right_side,
                       xy = c(col.im.percents[2] + 1, existing_rows + 1),
                       colNames = F, rowNames = F, withFilter = FALSE)
 
-  # if (!d$info$has_psnuxim) {
+  ## Left Side ----
+  if (!has_psnuxim) {
     openxlsx::writeData(wb = r$wb,
                         sheet = "PSNUxIM",
                         x = left_side,
                         xy = c(1, existing_rows),
                         colNames = T, rowNames = F, withFilter = FALSE)
 
-    #TODO: Test/write for COP Data Pack appending
-  # } else if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
-  #
-  #   # OR, Append rows to bottom of existing PSNUxIM tab ####
-  #   SNUxIM_cols <-
-  #     readxl::read_excel(
-  #       path = d$keychain$submission_path,
-  #       sheet = "PSNUxIM",
-  #       range = readxl::cell_limits(c(top_rows, 9), c(top_rows, 83)),
-  #       .name_repair = "minimal"
-  #     ) %>%
-  #     names() %>%
-  #     magrittr::extract(., stringr::str_detect(., "\\d{4,}_(DSD|TA)"))
-  #
-  #   complete_cols <- c(IM_cols, SNUxIM_cols) %>% unique()
-  #
-  #   left_side %<>%
-  #     addcols(complete_cols) %>%
-  #     dplyr::select(tidyselect::all_of(c(header_cols, complete_cols)))
-  #
-  #   openxlsx::writeData(wb = d$tool$wb,
-  #                       sheet = "PSNUxIM",
-  #                       x = left_side,
-  #                       xy = c(1, existing_rows+1),
-  #                       colNames = F, rowNames = F, withFilter = FALSE)
-  #
-  #   # Add additional col_names if any
-  #   new_mech_cols <- IM_cols[!IM_cols %in% SNUxIM_cols]
-  #   if (length(new_mech_cols) > 0) {
-  #     openxlsx::writeData(wb = d$tool$wb,
-  #                         sheet = "PSNUxIM",
-  #                         x = new_mech_cols %>% as.matrix() %>% t(),
-  #                         xy = c(8+length(SNUxIM_cols)+1, top_rows),
-  #                         colNames = F, rowNames = F, withFilter = FALSE)
-  #   }
-  #
-  #   # Add green highlights to appended rows, if any
-  #   newRowStyle <- openxlsx::createStyle(fontColour = "#006100", fgFill = "#C6EFCE")
-  #
-  #   openxlsx::addStyle(
-  #     wb = d$tool$wb,
-  #     sheet = "PSNUxIM",
-  #     newRowStyle,
-  #     rows = (existing_rows + 1):(existing_rows + NROW(left_side)),
-  #     cols = 1:5,
-  #     gridExpand = TRUE,
-  #     stack = FALSE)
-  # } else {
-  #   stop("Cannot write data where there seems to be no new data needed.")
-  # }
+  } else if (has_psnuxim & existing_rows > top_rows) {
+    existing_im_cols <-
+      openxlsx::read.xlsx(r$wb,
+                          sheet = "PSNUxIM",
+                          skipEmptyRows = FALSE,
+                          rows = top_rows,
+                          cols = col.im.percents[1]:col.im.percents[2],
+                          colNames = FALSE) %>%
+      as.character()
+    
+    existing_im_cols <- existing_im_cols[!existing_im_cols %in% c("", "Not PEPFAR")]
 
-  # d$info$newSNUxIM <- TRUE
+    complete_cols <- c(existing_im_cols, IM_cols) %>% unique()
+
+    left_side %<>%
+      addcols(complete_cols) %>%
+      dplyr::select(tidyselect::all_of(c(header_cols, complete_cols)))
+
+    openxlsx::writeData(wb = r$wb,
+                        sheet = "PSNUxIM",
+                        x = left_side,
+                        xy = c(1, existing_rows + 1),
+                        colNames = F, rowNames = F, withFilter = FALSE)
+
+  ## Add additional col_names if any ----
+    new_mech_cols <- IM_cols[!IM_cols %in% existing_im_cols]
+    if (length(new_mech_cols) > 0) {
+      openxlsx::writeData(wb = r$wb,
+                          sheet = "PSNUxIM",
+                          x = new_mech_cols %>% as.matrix() %>% t(),
+                          xy = c(col.im.percents[1] + length(existing_im_cols) + 1,
+                                 top_rows),
+                          colNames = F, rowNames = F, withFilter = FALSE)
+    }
+
+  ## Add green highlights to appended rows, if any
+    newRowStyle <- openxlsx::createStyle(fontColour = "#006100", fgFill = "#C6EFCE")
+
+    openxlsx::addStyle(
+      wb = r$wb,
+      sheet = "PSNUxIM",
+      style = newRowStyle,
+      rows = (existing_rows + 1):(existing_rows + NROW(left_side)),
+      cols = 1:5,
+      gridExpand = TRUE,
+      stack = FALSE)
+  } else {
+    stop("Cannot write data because there seems to be no new data needed.")
+  }
 
   # Formatting ####
-
-    # Format percent columns
+  interactive_print("Tidying up...")
+  
+  ## Format percent columns
   interactive_print("Stylizing percent columns...")
 
   percentCols <- schema %>%
@@ -509,46 +519,50 @@ packPSNUxIM <- function(wb,
 
   openxlsx::addStyle(wb = r$wb,
                      sheet = "PSNUxIM",
-                     percentStyle,
-                     rows = (top_rows + 1):(existing_rows + NROW(data_structure)),
+                     style = percentStyle,
+                     rows = (existing_rows + 1):(existing_rows + NROW(left_side)),
                      cols = percentCols,
                      gridExpand = TRUE,
                      stack = FALSE)
 
-    # Format integers
-  # integerStyle = openxlsx::createStyle(numFmt = "#,##0") # nolint
-  #
-  # integerCols <- grep("DataPackTarget", final_snuxim_cols)
-  #q
-  # openxlsx::addStyle(
-  #   wb = d$tool$wb,
-  #   sheet = "PSNUxIM",
-  #   integerStyle,
-  #   rows = (top_rows + 1):(existing_rows + NROW(data_structure)),
-  #   cols = integerCols,
-  #   gridExpand = TRUE,
-  #   stack = TRUE)
+  ## Format integers
+  integerStyle = openxlsx::createStyle(numFmt = "#,##0") # nolint
 
+  integerCols <- schema %>%
+    dplyr::filter(sheet_name == "PSNUxIM",
+                  value_type == "integer") %>%
+    dplyr::pull(col)
+  
+  openxlsx::addStyle(
+    wb = r$wb,
+    sheet = "PSNUxIM",
+    style = integerStyle,
+    rows = (existing_rows + 1):(existing_rows + NROW(left_side)),
+    cols = integerCols,
+    gridExpand = TRUE,
+    stack = TRUE)
 
-  # Consider adding errorStyling here to emphasize where incorrect disaggs entered.
+  ## Consider adding errorStyling here to emphasize where incorrect disaggs entered.
   # errorStyle <- openxlsx::createStyle(fontColour = "#9C0006", bgFill = "#FFC7CE")
   # warningStyle <- openxlsx::createStyle(fontColour = "#9C5700", bgFill = "#FFEB9C")
   # normalStyle <- openxlsx::createStyle(fontColour = "#000000", bgFill = "#FFFFFF")
 
-    # Hide rows 5-13
-  interactive_print("Tidying up...")
+  ## Hide rows 5-13
   openxlsx::setRowHeights(wb = r$wb,
                           sheet = "PSNUxIM",
                           rows = 4:(top_rows - 1),
                           heights = 0)
 
-  # Hide columns
+  ## Hide columns
   #TODO: Hide cols in percentage section being unused by IMs
   hiddenCols <- schema %>%
     dplyr::filter(sheet_name == "PSNUxIM",
                   indicator_code %in% c("ID", "sheet_num", "DSD Dedupe",
                                         "TA Dedupe", "Crosswalk Dedupe")) %>%
-    dplyr::pull(col)
+    dplyr::pull(col) %>%
+    c(.,
+      (col.im.percents[1] + length(existing_im_cols) + length(new_mech_cols) + 1):
+        col.im.percents[2])
 
   openxlsx::setColWidths(wb = r$wb,
                          sheet = "PSNUxIM",
@@ -556,15 +570,17 @@ packPSNUxIM <- function(wb,
                          hidden = TRUE)
 
   # Tab generation date ####
-  openxlsx::writeData(r$wb, "PSNUxIM",
-                      paste("Last Updated on:", Sys.time()),
+  openxlsx::writeData(r$wb,
+                      sheet = "PSNUxIM",
+                      x = paste("Last Updated on:", Sys.time()),
                       xy = c(1, 2),
                       colNames = F)
 
   # Package Version ####
-  openxlsx::writeData(r$wb, "PSNUxIM",
-                      paste("Package version:",
-                            as.character(utils::packageVersion("datapackr"))),
+  openxlsx::writeData(r$wb,
+                      sheet = "PSNUxIM",
+                      x = paste("Package version:",
+                                as.character(utils::packageVersion("datapackr"))),
                       xy = c(2, 2),
                       colNames = F)
 
@@ -573,13 +589,12 @@ packPSNUxIM <- function(wb,
   warning_msg <-
     paste0(
       "INFO: Based on your submission, we have ",
-      # ifelse(d$info$has_psnuxim,
-      #        paste0("added ", NROW(data_structure), " rows to your PSNUxIM tab.",
-      #               " These have been highlighted green for your reference."),
-             "populated your PSNUxIM tab for the first time." #),
-      ,
-      " An updated copy of your Data Pack is available for download from this app.",
-      " Please review your PSNUxIM tab and carefully review the Data Pack User Guide",
+      ifelse(has_psnuxim,
+             paste0("added ", NROW(left_side), " rows to your PSNUxIM tab.",
+                    " These have been highlighted green for your reference."),
+             "populated your PSNUxIM tab for the first time." ),
+      " An updated copy of your Data Pack is now available for download.",
+      " Please review your PSNUxIM tab, and carefully review the Data Pack User Guide",
       " for detailed guidance on how to use this tab.",
       "\n\n",
       "NOTE: Upon opening your updated PSNUxIM tab, please be sure to drag down",
