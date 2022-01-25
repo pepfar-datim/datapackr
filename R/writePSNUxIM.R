@@ -19,7 +19,7 @@ writePSNUxIM <- function(d,
                                             inherits = TRUE)) {
 
   if (is.null(output_folder)) {
-    stop("Please provide valid output_folder destination")
+    interactive_warning("If no output_folder is provided, new Data Packs will not be written.")
   }
 
   if (is.null(snuxim_model_data_path)) {
@@ -148,7 +148,7 @@ writePSNUxIM <- function(d,
   }
 
   # If new information added to SNU x IM tab, reexport Data Pack for user ####
-  if (d$info$newSNUxIM) {
+  if (d$info$newSNUxIM & !is.null(output_folder)) {
     interactive_print("Removing troublesome NAs that may have been added inadvertently...")
     d <- strip_wb_NAs(d)
 
