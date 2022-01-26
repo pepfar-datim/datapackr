@@ -499,7 +499,6 @@ unPackSNUxIM <- function(d) {
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
                   dplyr::everything())
 
-
   # Gather all values in single column ####
   d$data$SNUxIM %<>%
     tidyr::gather(key = "mechCode_supportType",
