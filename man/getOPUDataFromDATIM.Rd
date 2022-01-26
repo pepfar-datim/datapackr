@@ -12,7 +12,7 @@ getOPUDataFromDATIM(
 )
 }
 \arguments{
-\item{cop_year}{COP Year. Remember, COP20 = FY21 targets.}
+\item{cop_year}{COP Year. Remember, COP22 = FY23 targets.}
 
 \item{country_uids}{DATIM UIDs of Countries to return data for. Can supply either
 this or Country Names.}

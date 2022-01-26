@@ -20,8 +20,8 @@ include countries. Regional Operating Unit uids will not be accepted. If not
 supplied, returns entire mechanism list, trimmed to user's DATIM permissions.}
 
 \item{cop_year}{Numeric value of COP Fiscal Year to filter mechanism list by.
-Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
-\code{2019}. If a FY is not supplied, returns entire mechanism list.}
+Ex: For mechanisms active in FY 2023, pertaining to COP 2022, enter
+\code{2022}. If a FY is not supplied, returns entire mechanism list.}
 
 \item{include_dedupe}{Logical. If TRUE will include deduplication mechanisms.
 Default is FALSE.}
