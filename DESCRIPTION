@@ -45,6 +45,7 @@ Imports:
     lubridate (>= 1.7.4),
     data.table (>= 1.12.8),
     scales (>= 1.0.0),
+    datimutils,
     datimvalidation,
     datapackcommons (>= 0.2.0),
     tidyselect (>= 0.2.5),
@@ -53,15 +54,19 @@ Imports:
     assertthat,
     plyr,
     fuzzyjoin (>= 0.1.6),
-    R6
+    R6,
+    uuid
 Suggests:
     devtools (>= 2.0.1),
     httptest,
     testthat,
     cellranger,
-    rprojroot
+    rprojroot,
+    waldo,
+    doMC
 Remotes: pepfar-datim/datim-validation,
-          pepfar-datim/data-pack-commons
+         pepfar-datim/data-pack-commons,
+         pepfar-datim/datimutils
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true

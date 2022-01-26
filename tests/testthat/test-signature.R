@@ -16,7 +16,6 @@ test_that("Can generate a key chain", {
        "tool",
        "country_uids",
        "cop_year",
-       "source_user",
        "uuid",
        "organisation_unit",
        "schema",

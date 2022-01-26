@@ -17,7 +17,6 @@ test_that("Can write a home tab", {
       "tool",
       "country_uids",
       "cop_year",
-      "source_user",
       "uuid",
       "organisation_unit",
       "schema",
@@ -43,7 +42,6 @@ test_that("Can write a home tab", {
   expect_equal(d$info$organisation_unit, data.frame(ou = "Lesotho",
                                                     ou_id = "qllxzIjjurr",
                                                     row.names = "organisationUnits.42"))
-  expect_null(d$info$source_user)
   expect_false(d$info$newSNUxIM)
   expect_false(d$info$has_error)
   expect_false(d$info$missing_DSNUs)
