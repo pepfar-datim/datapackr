@@ -127,7 +127,6 @@ unPackCountryUIDs <- function(submission_path,
     warning("No PSNUs were detected.")
   }
 
-
   return(country_uids)
 
 }
@@ -167,7 +166,6 @@ parsePSNUs <- function(submission_path,tool,cop_year) {
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
 
   #Test for valid PSNU UIDs
-
   malformed_psnu_uids <- PSNUs %>%
     dplyr::filter(is.na(psnu_uid)) %>%
     dplyr::distinct()
