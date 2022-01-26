@@ -499,6 +499,33 @@ unPackSNUxIM <- function(d) {
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
                   dplyr::everything())
 
+  #Test for invalid PSNUs
+
+  possible_psnus <- datapackr::valid_PSNUs %>%
+    dplyr::filter(country_uid %in% d$info$country_uids) %>%
+    dplyr::pull(psnu_uid)
+
+  d$tests$invalid_psnus <- d$data$SNUxIM %>%
+    dplyr::filter(!(psnuid %in% possible_psnus)) %>%
+    dplyr::select(PSNU) %>%
+    dplyr::distinct() %>%
+    dplyr::pull(PSNU)
+
+  attr(d$tests$invalid_psnus,"test_name") <- "Invalid PSNUs"
+
+  if (length(invalid_psnus) > 0) {
+    d$info$has_error <- TRUE
+
+    warning_msg <-
+      paste0(
+        "ERROR!: ",
+        NROW(d$tests$invalid_psnus),
+        " invalid PSNU identifiers were detected. Please check the UID and fix the following PSNUs:",
+        paste(d$tests$invalid_psnus,sep = "",collapse = ";"))
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+  }
+
   # Gather all values in single column ####
   d$data$SNUxIM %<>%
     tidyr::gather(key = "mechCode_supportType",
