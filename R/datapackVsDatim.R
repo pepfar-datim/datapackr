@@ -216,7 +216,9 @@ compareData_OpuDatapackVsDatim <-
 # current assumption is that d$datim$OPU has mech codes but this is planned to change
 # this assertion alerts us if the change is made and we forget to make necessary changes here:
 
-    assertthat::assert_that(max(stringr::str_length(d$datim$OPU$attributeOptionCombo)) < 11)
+    assertthat::assert_that(
+      !any(datapackr::is_uidish(d$datim$OPU$attributeOptionCombo))
+    )
 
     if (!(d$info$cop_year %in% c(2020, 2021))) {
       stop("Attempting to use compareData_OpuDatapackVsDatim for unsupported COP year")
