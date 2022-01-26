@@ -213,11 +213,16 @@ compareData_DatapackVsDatim <-
 compareData_OpuDatapackVsDatim <-
   function(d, d2_session = dynGet("d2_default_session",
                                   inherits = TRUE)) {
+    
+# current assumption is that d$datim$OPU has mech codes but this is planned to change
+# this assertion alerts us if the change is made and we forget to make necessary changes here:
+    
+    assertthat::assert_that(max(stringr::str_length(d$datim$OPU$attributeOptionCombo)) < 11)
 
     if (!(d$info$cop_year %in% c(2020, 2021))) {
       stop("Attempting to use compareData_OpuDatapackVsDatim for unsupported COP year")
     }
-
+    
     datapack_data <- d$datim$OPU
 
 # recoding to account for code change in DATIM for the default COC
@@ -282,7 +287,10 @@ compareData_OpuDatapackVsDatim <-
                     orgUnit,
                     categoryOptionCombo,
                     attributeOptionCombo,
-                    datim_value)
+                    datim_value) %>% 
+# AGYW data don't have mechs and aren't in OPU data packs
+# exclude them from comparison or any other data without mech
+      dplyr::filter(attributeOptionCombo != "default") 
 
 # extract dedupes from import file to handle seperately
     dedupes <- dplyr::filter(datapack_data,
