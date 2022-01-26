@@ -28,7 +28,7 @@ packDataPackSheets <- function(wb,
                                ou_level = "Prioritization",
                                org_units = NULL, #TODO: Any way we could use PEPFARlandia here?
                                model_data = NULL, #TODO: Could we load a play dataset here?
-                               schema = datapackr::data_pack_schema, # Load in base schema from package
+                               schema = pick_schema(), # Load in current COP year schema from package
                                sheets = NULL,
                                cop_year = getCurrentCOPYear()) {
 
