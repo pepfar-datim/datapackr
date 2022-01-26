@@ -127,10 +127,10 @@ compareData_DatapackVsDatim <-
 # Get data from DATIM using data value sets
 
     datim_data <- dplyr::bind_rows(
-      getCOPDataFromDATIM(country_uid = d$info$country_uids,
+      getCOPDataFromDATIM(country_uids = d$info$country_uids,
                           cop_year = d$info$cop_year,
                           d2_session = d2_session),
-      getCOPDataFromDATIM(country_uid = d$info$country_uids,
+      getCOPDataFromDATIM(country_uids = d$info$country_uids,
                           cop_year = d$info$cop_year - 1,
                           streams = c("subnat_targets"),
                           d2_session = d2_session)) %>%
