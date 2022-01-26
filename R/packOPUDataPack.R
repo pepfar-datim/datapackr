@@ -34,8 +34,8 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
   d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
 
-  if (!d$info$cop_year %in% c(2020, 2021)) {
-    stop("Sorry! We're only set up to run this for COP20 or COP21 OPUs.")
+  if (!d$info$cop_year %in% c(2021)) {
+    stop("Sorry! We're only set up to run this for COP21 OPUs.")
   }
 
   # Check if provided model data is empty ####
@@ -65,11 +65,11 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
   # Prepare totals data for allocation ####
   if (d$info$cop_year == 2021) {
     d$data$UndistributedMER <- d$data$snuxim_model_data %>%
-        dplyr::mutate(attributeOptionCombo = default_catOptCombo()) %>%
-        dplyr::group_by(dplyr::across(c(-value))) %>%
-        dplyr::summarise(value = sum(value), na.rm = TRUE) %>%
-        dplyr::ungroup() %>%
-        dplyr::filter(value != 0)
+      dplyr::mutate(attributeOptionCombo = default_catOptCombo()) %>%
+      dplyr::group_by(dplyr::across(c(-value))) %>%
+      dplyr::summarise(value = sum(value), na.rm = TRUE) %>%
+      dplyr::ungroup() %>%
+      dplyr::filter(value != 0)
   }
 
   # Test template against schema ####
@@ -78,46 +78,41 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
                           tool = d$info$tool,
                           d2_session = d2_session)
 
-    # Get PSNU List####
-    d$data$PSNUs <- datapackr::valid_PSNUs %>%
-      dplyr::filter(country_uid %in% d$info$country_uids) %>%
-      add_dp_psnu(.) %>%
-      dplyr::arrange(dp_psnu) %>%
-      dplyr::select(PSNU = dp_psnu, psnu_uid)
+  # Get PSNU List####
+  d$data$PSNUs <- datapackr::valid_PSNUs %>%
+    dplyr::filter(country_uid %in% d$info$country_uids) %>%
+    add_dp_psnu(.) %>%
+    dplyr::arrange(dp_psnu) %>%
+    dplyr::select(PSNU = dp_psnu, psnu_uid)
 
-    # Write PSNUxIM tab ####
-    if (d$info$cop_year == 2020) {
-      d <- packSNUxIM_OPU(d)
-    } else {
-      r <- packPSNUxIM(wb = d$tool$wb,
-                          data = d$data$UndistributedMER,
-                          snuxim_model_data = d$data$snuxim_model_data,
-                          cop_year = d$info$cop_year,
-                          tool = d$info$tool,
-                          schema = d$info$schema,
-                          d2_session = d2_session)
+  # Write PSNUxIM tab ####
+  r <- packPSNUxIM(wb = d$tool$wb,
+                   data = d$data$UndistributedMER,
+                   snuxim_model_data = d$data$snuxim_model_data,
+                   cop_year = d$info$cop_year,
+                   tool = d$info$tool,
+                   schema = d$info$schema,
+                   d2_session = d2_session)
+  
+  d$tool$wb <- r$wb
+  d$info$messages <- appendMessage(d$info$messages, r$message, r$level)
 
-      d$tool$wb <- r$wb
-      d$info$messages <- appendMessage(d$info$messages, r$message, r$level)
-    }
+  # Save & Export Workbook
+  print("Saving...")
+  exportPackr(data = d$tool$wb,
+              output_path = d$keychain$output_folder,
+              tool = d$info$tool,
+              datapack_name = d$info$datapack_name)
 
-    # Save & Export Workbook
-    print("Saving...")
-    exportPackr(data = d$tool$wb,
+  # Save & Export Archive
+  if (results_archive) {
+    print("Archiving...")
+    exportPackr(data = d,
                 output_path = d$keychain$output_folder,
-                tool = d$info$tool,
+                tool = "Results Archive",
                 datapack_name = d$info$datapack_name)
+  }
 
-    # Save & Export Archive
-    if (results_archive) {
-      print("Archiving...")
-      exportPackr(data = d,
-                  output_path = d$keychain$output_folder,
-                  tool = "Results Archive",
-                  datapack_name = d$info$datapack_name)
-    }
-
-
-    printMessages(d$info$messages)
+  printMessages(d$info$messages)
 
 }

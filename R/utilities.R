@@ -490,13 +490,11 @@ rowMax <- function(df, cn, regex) {
 #'
 #' @param cop_year cop year to pull get map for
 #'
-#' @return {cop20, cop21}_map_DataPack_DATIM_DEs_COCs
+#' @return {cop21, cop22}_map_DataPack_DATIM_DEs_COCs
 #'
 getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
-  if (cop_year == 2020) {
-      return(datapackr::cop20_map_DataPack_DATIM_DEs_COCs)
-  } else if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
-                                           datapackr::map_DataPack_DATIM_DEs_COCs)) {
+  if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
+                                    datapackr::map_DataPack_DATIM_DEs_COCs)) {
     return(datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
   } else if (cop_year == 2022) {
     return(datapackr::cop22_map_DataPack_DATIM_DEs_COCs)

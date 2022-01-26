@@ -105,8 +105,6 @@ createKeychainInfo <- function(submission_path = NULL,
         as.character(cop_year),
         "2022" = datapackr::cop22_data_pack_schema,
         "2021" = datapackr::cop21_data_pack_schema,
-        "2020" = datapackr::cop20_data_pack_schema,
-        "2019" = datapackr::data_pack_schema,
         stop(paste0(
           "Unable to process Data Packs from COP ", cop_year
         ))
@@ -115,7 +113,6 @@ createKeychainInfo <- function(submission_path = NULL,
       result <- switch(
         as.character(cop_year),
         "2021" = datapackr::cop21OPU_data_pack_schema,
-        "2020" = datapackr::cop20OPU_data_pack_schema,
         stop(
           paste0("Unable to process OPU Data Packs from COP ", cop_year)
         )
@@ -156,7 +153,7 @@ createKeychainInfo <- function(submission_path = NULL,
 
   # Add placeholders for info messages ####
   if (d$info$tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack", "OPU Data Pack Template")
-      & d$info$cop_year %in% c("2020", "2021", "2022")) {
+      & d$info$cop_year %in% c("2021", "2022")) {
     d$info$needs_psnuxim <- FALSE
     d$info$newSNUxIM <- FALSE
     d$info$has_psnuxim <- FALSE

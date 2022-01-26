@@ -54,11 +54,8 @@ writePSNUxIM <- function(d,
   }
 
   # Check whether to write anything into SNU x IM tab and write if needed ####
-  if (d$info$cop_year == 2020) {
-    d <- packSNUxIM_2020(d)
-  } else if (d$info$cop_year == 2021) {
-    d <- packSNUxIM(d,
-                    d2_session = d2_session)
+  if (d$info$cop_year == 2021) {
+    d <- packSNUxIM(d, d2_session = d2_session)
   } else if (d$info$cop_year == 2022) {
   # Prepare data to distribute ####
     d$info$has_psnuxim <- !(NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM$PSNU[1]))

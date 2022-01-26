@@ -59,9 +59,7 @@ packDataPack <- function(model_data,
   )
 
   # Open schema ####
-  if (d$info$cop_year == 2020) {
-    d$info$schema <-  datapackr::cop20_data_pack_schema
-  } else if (d$info$cop_year == 2021) {
+  if (d$info$cop_year == 2021) {
     d$info$schema <- datapackr::cop21_data_pack_schema
   } else if (d$info$cop_year == 2022) {
     d$info$schema <- datapackr::cop22_data_pack_schema
@@ -157,16 +155,6 @@ packDataPack <- function(model_data,
   openxlsx::addStyle(d$tool$wb,
     sheet = "Spectrum",
     spectrumStyle2, cols = 2, rows = 2, gridExpand = TRUE, stack = TRUE)
-
-  if (cop_year == 2020) {
-    openxlsx::addStyle(d$tool$wb,
-    sheet = "Spectrum IDs",
-    spectrumStyle1, cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
-
-    openxlsx::addStyle(d$tool$wb,
-    sheet = "Spectrum IDs",
-    spectrumStyle2, cols = 2, rows = 2, gridExpand = TRUE, stack = TRUE)
-  }
 
   # Add validations
   interactive_print("Adding Validations...")

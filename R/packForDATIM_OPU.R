@@ -9,22 +9,13 @@
 #' @return Modified d object with a DATIM compatible data frame for import id d$datim$OPU
 #'
 packForDATIM_OPU <- function(d) {
-  if (!d$info$cop_year %in% c(2020, 2021)) {
+  if (!d$info$cop_year %in% c(2021)) {
     stop("The COP year provided is not supported by packForDATIM_OPU")
   }
 
   map_des_cocs_local <-
     datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
-  if (d$info$cop_year == 2020) {
-    data <- d$data$extract
-
-    map_des_cocs_local %<>%
-      dplyr::rename(dataelementuid = dataelement) %>%
-      dplyr::mutate(
-        period = paste0(d$info$cop_year, "Oct"))
-  } else {
-    data <- d$data$SNUxIM
-  }
+  data <- d$data$SNUxIM
 
   # Add dataElement & categoryOptionCombo ####
   d$datim$OPU <- data %>%

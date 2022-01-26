@@ -16,7 +16,7 @@ createTestDataset <- function(country_uids,
                               cop_year,
                               d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
-    if (!(cop_year %in% c(2020, 2021))) {
+    if (!(cop_year %in% c(2021))) {
     stop("Not yet set up to produce a test dataset for that COP Year.")
     }
 
