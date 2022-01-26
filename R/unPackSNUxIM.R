@@ -513,7 +513,7 @@ unPackSNUxIM <- function(d) {
 
   attr(d$tests$invalid_psnus,"test_name") <- "Invalid PSNUs"
 
-  if (length(invalid_psnus) > 0) {
+  if (length(d$tests$invalid_psnus) > 0) {
     d$info$has_error <- TRUE
 
     warning_msg <-
