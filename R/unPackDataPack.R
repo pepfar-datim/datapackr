@@ -82,7 +82,7 @@ unPackDataPack <- function(d,
   #                    by = c("orgUnit" = "psnu_uid")) %>%
   #   dplyr::pull(country_uid) %>%
   #   unique()
-  # 
+  #
   # if (!all(purrr::map_lgl(observed_country_uids,
   #                        ~ .x %in% d$info$country_uids))) {
   #   warning("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")

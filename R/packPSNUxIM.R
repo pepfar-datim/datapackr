@@ -322,7 +322,7 @@ packPSNUxIM <- function(wb,
         row = as.integer((1:dplyr::n()) + existing_rows),
 
     # nolint start
-        DataPackTarget = 
+        DataPackTarget =
           dplyr::case_when(
             (Age == "50+" & sheet_name %in% c("Cascade", "PMTCT", "TB", "VMMC"))
               ~ paste0(
@@ -454,9 +454,13 @@ packPSNUxIM <- function(wb,
                         x = left_side,
                         xy = c(1, existing_rows),
                         colNames = T, rowNames = F, withFilter = FALSE)
+
+    #Set these variables now for initial PSNUxIM tabs
+    #They will be used later on but set dynamically
+    #Below in cases of Datapacks with existing PSNUxIM tabs
     existing_im_cols <- 0
     new_mech_cols <- 0
-    
+
   } else if (has_psnuxim & existing_rows > top_rows) {
     existing_im_cols <-
       openxlsx::read.xlsx(r$wb,
