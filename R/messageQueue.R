@@ -78,12 +78,12 @@ printMessages <- function(x) {
 
 #' Title printMessage.MessageQueue
 #' @description Internal S3 method to deal with printing messages
+#'
 #' @param x A MessageQueue object
-#' @param message  A message of vector of messages.
-#' @param level  A string of vector of message levels (ERROR, WARNING, INFO)
+#'
 #' @return Returns a formatted output to the console
 #' @export
-
+#' 
 printMessages.MessageQueue <- function(x) {
   # If warnings, show all grouped by sheet and issue
   if (NROW(x) > 0 & interactive()) {

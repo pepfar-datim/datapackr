@@ -2,6 +2,7 @@
 #' @name datapackr
 #' @title Data Pack on R
 #'
+#' @description
 #' datapackr: a grammar of Data Pack manipulation
 #'
 #'

@@ -649,6 +649,8 @@ paste_dataframe <- function(x) {
 #' @importFrom rlang is_character
 #'
 #' @param x Value to test and coerce
+#' @param default Default value to assign to x if not a character string,
+#'  \code{NA_character_}, or a factor.
 #'
 #' @return x parsed as numeric, if possible
 parse_maybe_number <- function(x, default = NULL) {

@@ -8,10 +8,6 @@
 }
 \arguments{
 \item{x}{A MessageQueue object}
-
-\item{message}{A message of vector of messages.}
-
-\item{level}{A string of vector of message levels (ERROR, WARNING, INFO)}
 }
 \value{
 Returns a formatted output to the console
