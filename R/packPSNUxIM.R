@@ -65,7 +65,8 @@ packPSNUxIM <- function(wb,
   ## Translate from import format ####
   snuxim_model_data %<>%
     datapackr::adorn_import_file(cop_year = cop_year,
-                                 filter_rename_output = FALSE) %>%
+                                 filter_rename_output = FALSE,
+                                 d2_session = d2_session) %>%
     dplyr::select(indicator_code, psnu_uid = orgUnit, mechanism_code,
                   type = support_type,
                   age_option_name = Age, age_option_uid = valid_ages.id,
@@ -215,7 +216,7 @@ packPSNUxIM <- function(wb,
 
   # Prep Targets dataset ####
   data %<>%
-    adorn_import_file(cop_year = cop_year, filter_rename_output = FALSE) %>%
+    adorn_import_file(cop_year = cop_year, filter_rename_output = FALSE,d2_session = d2_session) %>%
     dplyr::select(PSNU = dp_psnu, orgUnit, indicator_code, Age, Sex, KeyPop,
                   DataPackTarget = value) %>%
     dplyr::group_by(dplyr::across(c(-DataPackTarget))) %>%
