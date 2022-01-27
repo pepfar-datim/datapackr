@@ -45,6 +45,7 @@ Imports:
     lubridate (>= 1.7.4),
     data.table (>= 1.12.8),
     scales (>= 1.0.0),
+    datimutils,
     datimvalidation,
     datapackcommons (>= 0.2.0),
     tidyselect (>= 0.2.5),
@@ -59,9 +60,12 @@ Suggests:
     httptest,
     testthat,
     cellranger,
-    rprojroot
-Remotes: pepfar-datim/datim-validation,
-          pepfar-datim/data-pack-commons
+    rprojroot,
+    waldo
+Remotes:
+    pepfar-datim/datimutils,
+    pepfar-datim/datim-validation,
+    pepfar-datim/data-pack-commons
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
