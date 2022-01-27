@@ -9,7 +9,7 @@ datapack_template_filepath <- system.file("extdata",
                                           mustWork = TRUE)
 cop21OPU_data_pack_schema <-
   unPackSchema_datapack(
-    filepath = datapack_template_filepath,
+    template_path = datapack_template_filepath,
     skip = skip_tabs(tool = "OPU Data Pack Template", cop_year = 2021),
     tool = "OPU Data Pack Template",
     cop_year = 2021)

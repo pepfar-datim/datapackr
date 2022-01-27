@@ -572,7 +572,7 @@ compareTemplateToSchema <- function(template_path = NULL,
 
   template_schema <-
     unPackSchema_datapack(
-      filepath = template_path,
+      template_path = template_path,
       skip = skip_tabs(tool = paste0(tool, " Template"), cop_year = cop_year),
       tool = paste0(tool, " Template"),
       cop_year = cop_year)
