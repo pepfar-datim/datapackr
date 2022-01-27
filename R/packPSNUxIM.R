@@ -250,27 +250,31 @@ packPSNUxIM <- function(wb,
                                     "Crosswalk Dedupe Resolution"),
                          type = "character")
   }
-
-  top_rows <- headerRow(tool = tool, cop_year = cop_year)
-  existing_rows <- top_rows
+  
+  # TODO: Filter to see if we're trying to write data that's already there
+  # TODO: Check whether we need to proceed at all, based on whether `data` is duplicated in PSNUxIM tab already
+  # TODO: Then move all these checks up to avoid wasting time processing snuxim_model_data
+  
+  # Document existing state of PSNUxIM tab ####
+  header_row <- headerRow(tool = tool, cop_year = cop_year)
+  header_cols <- schema %>%
+    dplyr::filter(sheet_name == "PSNUxIM"
+                  & col_type == "row_header") %>%
+    dplyr::pull(indicator_code)
+  
+  existing_data <- openxlsx::read.xlsx(r$wb,
+                                       sheet = "PSNUxIM",
+                                       skipEmptyRows = FALSE,
+                                       startRow = header_row,
+                                       cols = 1:length(header_cols),
+                                       colNames = TRUE)
+  
+  first_blank_row <- NROW(existing_data) + header_row + 1
+  
+  initial_psnuxim <- first_blank_row == (header_row + 1)
 
   # Add DataPackTarget to non-OPU Data Pack ####
-  has_psnuxim <- TRUE
   if (tool == "Data Pack") {
-    existing_data <- openxlsx::read.xlsx(r$wb,
-                                         sheet = "PSNUxIM",
-                                         skipEmptyRows = FALSE,
-                                         startRow = top_rows,
-                                         cols = 1:1,
-                                         colNames = TRUE)
-
-    existing_rows <- existing_data %>%
-      NROW() + top_rows
-
-    existing_data %<>% tidyr::drop_na(PSNU)
-
-    has_psnuxim <- (NROW(existing_data) > 0)
-
   ## Get ID & target col letters ####
     interactive_print("Analyzing targets set across your Data Pack...")
 
@@ -287,7 +291,7 @@ packPSNUxIM <- function(wb,
         openxlsx::read.xlsx(
           wb,
           sheet = sheet,
-          rows = headerRow(tool = tool, cop_year = cop_year),
+          rows = header_row,
           colNames = TRUE) %>%
         names(.) %>%
         tibble::enframe(name = NULL) %>%
@@ -319,7 +323,7 @@ packPSNUxIM <- function(wb,
       dplyr::left_join(
         col_ltrs, by = "indicator_code") %>%
       dplyr::mutate(
-        row = as.integer((1:dplyr::n()) + existing_rows),
+        row = as.integer((1:dplyr::n()) + first_blank_row - 1),
 
     # nolint start
         DataPackTarget =
@@ -391,8 +395,8 @@ packPSNUxIM <- function(wb,
     dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
     dplyr::mutate(
       dplyr::across(dplyr::all_of(col.formulas),
-                    ~stringr::str_replace_all(., pattern = paste0("(?<=[:upper:])", top_rows + 1),
-                      replacement = as.character(seq_len(NROW(snuxim_model_data)) + existing_rows))))
+                    ~stringr::str_replace_all(., pattern = paste0("(?<=[:upper:])", header_row + 1),
+                      replacement = as.character(seq_len(NROW(snuxim_model_data)) + first_blank_row - 1))))
 
   # Classify formula columns as formulas
   ## TODO: Improve approach
@@ -444,55 +448,52 @@ packPSNUxIM <- function(wb,
   openxlsx::writeData(wb = r$wb,
                       sheet = "PSNUxIM",
                       x = right_side,
-                      xy = c(col.im.percents[2] + 1, existing_rows + 1),
+                      xy = c(col.im.percents[2] + 1, first_blank_row),
                       colNames = F, rowNames = F, withFilter = FALSE)
 
+  # Document new and existing mech cols ####
+  existing_im_cols <-
+    openxlsx::read.xlsx(r$wb,
+                        sheet = "PSNUxIM",
+                        skipEmptyRows = FALSE,
+                        rows = header_row,
+                        cols = col.im.percents[1]:col.im.percents[2],
+                        colNames = FALSE) %>%
+    as.character()
+  
+  existing_im_cols <- existing_im_cols[!existing_im_cols %in% c("", "Not PEPFAR", "12345_DSD")]
+  
+  complete_cols <- c(existing_im_cols, IM_cols) %>% unique()
+  new_mech_cols <- IM_cols[!IM_cols %in% existing_im_cols]
+  
   ## Left Side ----
-  if (!has_psnuxim) {
+  if (initial_psnuxim) {
     openxlsx::writeData(wb = r$wb,
                         sheet = "PSNUxIM",
                         x = left_side,
-                        xy = c(1, existing_rows),
+                        xy = c(1, first_blank_row - 1),
                         colNames = T, rowNames = F, withFilter = FALSE)
 
-    #Set these variables now for initial PSNUxIM tabs
-    #They will be used later on but set dynamically
-    #Below in cases of Datapacks with existing PSNUxIM tabs
-    existing_im_cols <- 0
-    new_mech_cols <- 0
-
-  } else if (has_psnuxim & existing_rows > top_rows) {
-    existing_im_cols <-
-      openxlsx::read.xlsx(r$wb,
-                          sheet = "PSNUxIM",
-                          skipEmptyRows = FALSE,
-                          rows = top_rows,
-                          cols = col.im.percents[1]:col.im.percents[2],
-                          colNames = FALSE) %>%
-      as.character()
-
-    existing_im_cols <- existing_im_cols[!existing_im_cols %in% c("", "Not PEPFAR")]
-
-    complete_cols <- c(existing_im_cols, IM_cols) %>% unique()
-
+  } else {
     left_side %<>%
       addcols(complete_cols) %>%
-      dplyr::select(tidyselect::all_of(c(header_cols, complete_cols)))
+      dplyr::select(tidyselect::all_of(c(header_cols)),
+                    tidyselect::any_of("Not PEPFAR"),
+                    tidyselect::all_of(c(complete_cols)))
 
     openxlsx::writeData(wb = r$wb,
                         sheet = "PSNUxIM",
                         x = left_side,
-                        xy = c(1, existing_rows + 1),
+                        xy = c(1, first_blank_row),
                         colNames = F, rowNames = F, withFilter = FALSE)
 
   ## Add additional col_names if any ----
-    new_mech_cols <- IM_cols[!IM_cols %in% existing_im_cols]
     if (length(new_mech_cols) > 0) {
       openxlsx::writeData(wb = r$wb,
                           sheet = "PSNUxIM",
                           x = new_mech_cols %>% as.matrix() %>% t(),
                           xy = c(col.im.percents[1] + length(existing_im_cols) + 1,
-                                 top_rows),
+                                 header_row),
                           colNames = F, rowNames = F, withFilter = FALSE)
     }
 
@@ -503,12 +504,10 @@ packPSNUxIM <- function(wb,
       wb = r$wb,
       sheet = "PSNUxIM",
       style = newRowStyle,
-      rows = (existing_rows + 1):(existing_rows + NROW(left_side)),
+      rows = (first_blank_row):(first_blank_row - 1 + NROW(left_side)),
       cols = 1:5,
       gridExpand = TRUE,
       stack = FALSE)
-  } else {
-    stop("Cannot write data because there seems to be no new data needed.")
   }
 
   # Formatting ####
@@ -527,7 +526,7 @@ packPSNUxIM <- function(wb,
   openxlsx::addStyle(wb = r$wb,
                      sheet = "PSNUxIM",
                      style = percentStyle,
-                     rows = (existing_rows + 1):(existing_rows + NROW(left_side)),
+                     rows = first_blank_row:(first_blank_row - 1 + NROW(left_side)),
                      cols = percentCols,
                      gridExpand = TRUE,
                      stack = FALSE)
@@ -544,7 +543,7 @@ packPSNUxIM <- function(wb,
     wb = r$wb,
     sheet = "PSNUxIM",
     style = integerStyle,
-    rows = (existing_rows + 1):(existing_rows + NROW(left_side)),
+    rows = (first_blank_row):(first_blank_row - 1 + NROW(left_side)),
     cols = integerCols,
     gridExpand = TRUE,
     stack = TRUE)
@@ -557,19 +556,22 @@ packPSNUxIM <- function(wb,
   ## Hide rows 5-13
   openxlsx::setRowHeights(wb = r$wb,
                           sheet = "PSNUxIM",
-                          rows = 4:(top_rows - 1),
+                          rows = 4:(header_row - 1),
                           heights = 0)
 
-  ## Hide columns
-  #TODO: Hide cols in percentage section being unused by IMs
+  ## Hide unused columns in left section ####
+  openxlsx::setColWidths(wb = r$wb,
+                         sheet = "PSNUxIM",
+                         cols = col.im.percents[1]:col.im.percents[2],
+                         hidden = FALSE)
+  
   hiddenCols <- schema %>%
     dplyr::filter(sheet_name == "PSNUxIM",
                   indicator_code %in% c("ID", "sheet_num", "DSD Dedupe",
                                         "TA Dedupe", "Crosswalk Dedupe")) %>%
     dplyr::pull(col) %>%
     c(.,
-      (col.im.percents[1] + length(existing_im_cols) + length(new_mech_cols) + 1):
-        col.im.percents[2])
+      (length(left_side) + 1):col.im.percents[2])
 
   openxlsx::setColWidths(wb = r$wb,
                          sheet = "PSNUxIM",
@@ -596,7 +598,7 @@ packPSNUxIM <- function(wb,
   warning_msg <-
     paste0(
       "INFO: Based on your submission, we have ",
-      ifelse(has_psnuxim,
+      ifelse(!initial_psnuxim,
              paste0("added ", NROW(left_side), " rows to your PSNUxIM tab.",
                     " These have been highlighted green for your reference."),
              "populated your PSNUxIM tab for the first time."),
