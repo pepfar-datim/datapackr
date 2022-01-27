@@ -269,7 +269,7 @@
 #' @title Map from Data Pack to DATIM for the adorning import files
 #'
 #' @description
-#' Dataset that is a full map between Data Packs and DATIM for 
+#' Dataset that is a full map between Data Packs and DATIM for
 #' the purpose of generating import and analytics tables.
 #'
 #' @format

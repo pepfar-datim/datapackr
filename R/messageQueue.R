@@ -83,7 +83,7 @@ printMessages <- function(x) {
 #'
 #' @return Returns a formatted output to the console
 #' @export
-#' 
+#'
 printMessages.MessageQueue <- function(x) {
   # If warnings, show all grouped by sheet and issue
   if (NROW(x) > 0 & interactive()) {
