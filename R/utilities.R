@@ -706,7 +706,7 @@ names2 <- function(x) {
 has_names <- function(x) {
   nms <- names(x)
   if (is.null(nms)) {
-    rep_along(x, FALSE)
+    rlang::rep_along(x, FALSE)
   } else {
     !(is.na(nms) | nms == "")
   }
@@ -714,7 +714,7 @@ has_names <- function(x) {
 
 ndots <- function(...) nargs()
 
-bullet <- function(...) paste0(bold(silver(" * ")), sprintf(...))
+bullet <- function(...) paste0(crayon::bold(crayon::silver(" * ")), sprintf(...))
 
 # Re-exports ---------------------------------------------------
 
