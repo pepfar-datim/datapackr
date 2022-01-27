@@ -455,6 +455,7 @@ packPSNUxIM <- function(wb,
                         xy = c(1, existing_rows),
                         colNames = T, rowNames = F, withFilter = FALSE)
     existing_im_cols <- 0
+    new_mech_cols <- 0
     
   } else if (has_psnuxim & existing_rows > top_rows) {
     existing_im_cols <-
