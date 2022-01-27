@@ -139,7 +139,7 @@
 #'   \item{dataelement_dsd}{Denotes whether this element has a
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
-#'    "Technical Assistance" support type
+#'    "Technical Assistance" support type}
 #'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
 #'    element}
 #'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
@@ -241,7 +241,7 @@
 #'   \item{dataelement_dsd}{Denotes whether this element has a
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
-#'    "Technical Assistance" support type
+#'    "Technical Assistance" support type}
 #'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
 #'    element}
 #'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
@@ -282,7 +282,7 @@
 #'   \item{dataelement_dsd}{Denotes whether this element has a
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
-#'    "Technical Assistance" support type
+#'    "Technical Assistance" support type}
 #'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
 #'    element}
 #'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
@@ -299,7 +299,7 @@
 #' along with their individual category options (id and name) as a
 #' nested data frame.
 #'
-#'#' @format
+#' @format
 #' \describe{
 #'   \item{name}{Name of the Category Option Group for example "01-04 Only"}
 #'   \item{id}{Category Option Group UID}
@@ -336,7 +336,7 @@
 #'   \item{dataelement_dsd}{Denotes whether this element has a
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
-#'    "Technical Assistance" support type
+#'    "Technical Assistance" support type}
 #'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
 #'    element}
 #'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
@@ -379,7 +379,7 @@
 #'   \item{dataelement_dsd}{Denotes whether this element has a
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
-#'    "Technical Assistance" support type
+#'    "Technical Assistance" support type}
 #'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
 #'    element}
 #'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
