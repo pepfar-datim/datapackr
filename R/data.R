@@ -384,21 +384,6 @@
 "datapack_cogs"
 
 #' @docType data
-#' @title Data Pack Updated Indicator Codes
-#'
-#' @description Data frame showing the relationship between COP20 and COP21
-#' Data Pack indicator codes.
-#'
-#' @format
-#' \describe{
-#'   \item{indicator_code}{Old Data Pack indicator code for COP20.}
-#'   \item{indicator_code_updated}{New Data Pack indicator code for COP21.}
-#'   \item{finalized}{Binary of 0 or 1 indicating if the new indicator code
-#'   has been finalized or may be subject to further revisions.}
-#' }
-"updated_indicator_codes"
-
-#' @docType data
 #' @title Schema describing the correct structure of the COP21 Data Pack template.
 #'
 #' @description This schema describes the correct structure of a COP21 Data Pack
