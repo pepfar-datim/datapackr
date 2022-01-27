@@ -454,7 +454,8 @@ packPSNUxIM <- function(wb,
                         x = left_side,
                         xy = c(1, existing_rows),
                         colNames = T, rowNames = F, withFilter = FALSE)
-
+    existing_im_cols <- 0
+    
   } else if (has_psnuxim & existing_rows > top_rows) {
     existing_im_cols <-
       openxlsx::read.xlsx(r$wb,
