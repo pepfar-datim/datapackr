@@ -93,7 +93,7 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
                    tool = d$info$tool,
                    schema = d$info$schema,
                    d2_session = d2_session)
-  
+
   d$tool$wb <- r$wb
   d$info$messages <- appendMessage(d$info$messages, r$message, r$level)
 
