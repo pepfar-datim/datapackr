@@ -250,27 +250,27 @@ packPSNUxIM <- function(wb,
                                     "Crosswalk Dedupe Resolution"),
                          type = "character")
   }
-  
+
   # TODO: Filter to see if we're trying to write data that's already there
   # TODO: Check whether we need to proceed at all, based on whether `data` is duplicated in PSNUxIM tab already
   # TODO: Then move all these checks up to avoid wasting time processing snuxim_model_data
-  
+
   # Document existing state of PSNUxIM tab ####
   header_row <- headerRow(tool = tool, cop_year = cop_year)
   header_cols <- schema %>%
     dplyr::filter(sheet_name == "PSNUxIM"
                   & col_type == "row_header") %>%
     dplyr::pull(indicator_code)
-  
+
   existing_data <- openxlsx::read.xlsx(r$wb,
                                        sheet = "PSNUxIM",
                                        skipEmptyRows = FALSE,
                                        startRow = header_row,
-                                       cols = 1:length(header_cols),
+                                       cols = seq_len(NROW(header_cols)),
                                        colNames = TRUE)
-  
+
   first_blank_row <- NROW(existing_data) + header_row + 1
-  
+
   initial_psnuxim <- first_blank_row == (header_row + 1)
 
   # Add DataPackTarget to non-OPU Data Pack ####
@@ -460,12 +460,12 @@ packPSNUxIM <- function(wb,
                         cols = col.im.percents[1]:col.im.percents[2],
                         colNames = FALSE) %>%
     as.character()
-  
+
   existing_im_cols <- existing_im_cols[!existing_im_cols %in% c("", "Not PEPFAR", "12345_DSD")]
-  
+
   complete_cols <- c(existing_im_cols, IM_cols) %>% unique()
   new_mech_cols <- IM_cols[!IM_cols %in% existing_im_cols]
-  
+
   ## Left Side ----
   if (initial_psnuxim) {
     openxlsx::writeData(wb = r$wb,
@@ -564,7 +564,7 @@ packPSNUxIM <- function(wb,
                          sheet = "PSNUxIM",
                          cols = col.im.percents[1]:col.im.percents[2],
                          hidden = FALSE)
-  
+
   hiddenCols <- schema %>%
     dplyr::filter(sheet_name == "PSNUxIM",
                   indicator_code %in% c("ID", "sheet_num", "DSD Dedupe",
