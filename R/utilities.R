@@ -137,7 +137,7 @@ swapColumns <- function(to, from) {
 #' @return Printed message, \code{x}.
 #'
 interactive_print <- function(x) {
-  if (interactive()) {
+  if (rlang::is_interactive()) {
     print(x)
   }
 }
@@ -159,7 +159,22 @@ interactive_message <- function(x) {
   }
 }
 
-
+#' @export
+#'
+#' @title Issue a warning if the session is interactive
+#'
+#' @description
+#' Supplied a string, will issue a warning as r warning() only if the session is currently interactive.
+#'
+#' @param x Warning string.
+#'
+#' @return Warning message, \code{x}.
+#'
+interactive_warning <- function(x) {
+  if (rlang::is_interactive()) {
+    warning(x)
+  }
+}
 
 #' @export
 #' @title Pull list of Countries from DATIM.
