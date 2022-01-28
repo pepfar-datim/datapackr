@@ -38,8 +38,8 @@ appendMessage <- function(x, message, level) {
 #' Title appendMessage.MessageQueue
 #' @description Internal S3 method to deal with appending messages
 #' @param x A MessageQueue object
-#' @param message  A message of vector of messages.
-#' @param level  A string of vector of message levels (ERROR, WARNING, INFO)
+#' @param message  A message or vector of messages.
+#' @param level  A string or vector of message levels (ERROR, WARNING, INFO)
 #' @return A MessageQueue object
 #' @export
 
