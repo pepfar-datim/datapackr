@@ -172,7 +172,7 @@ interactive_message <- function(x) {
 #'
 interactive_warning <- function(x) {
   if (rlang::is_interactive()) {
-    warning(x)
+    warning(x,call. = FALSE)
   }
 }
 
