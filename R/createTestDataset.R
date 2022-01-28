@@ -41,7 +41,7 @@ createTestDataset <- function(country_uids,
       dataElement = dataelementuid, categoryOptionCombo = categoryoptioncombouid,
       FY, col_type, value_type, dataset, indicator_code, period) %>%
     dplyr::distinct()
-  
+
   des_cocs.subnat_impatt <- DATIM_map %>%
     dplyr::filter(stringr::str_detect(dataset, "impatt|subnat"),
                   !stringr::str_detect(indicator_code, "PRIORITY_SNU")) %>%
@@ -55,11 +55,11 @@ createTestDataset <- function(country_uids,
     dplyr::filter(!stringr::str_detect(dataset,"impatt|subnat"),
                   !indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
     dplyr::select(dataElement, categoryOptionCombo, period, value_type)
-  
+
   des_cocs.DREAMS <- DATIM_map %>%
     dplyr::filter(indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
     dplyr::select(dataElement, categoryOptionCombo, period, value_type)
-  
+
   # Get Mech list ####
   mechs <-
     getMechanismView(
@@ -101,7 +101,7 @@ createTestDataset <- function(country_uids,
     dplyr::mutate(
       attributeOptionCombo = datapackr::default_catOptCombo(),
       value = sample(0:8, dplyr::n(), replace = TRUE))
-  
+
   DREAMS_org_units <- datapackr::valid_PSNUs %>%
     dplyr::filter(
       country_uid %in% country_uids,
@@ -109,13 +109,13 @@ createTestDataset <- function(country_uids,
       DREAMS == "Y") %>%
     dplyr::select(orgUnit = psnu_uid) %>%
     dplyr::distinct()
-  
+
   test_dataset.DREAMS <- DREAMS_org_units %>%
     tidyr::crossing(des_cocs.DREAMS) %>%
     dplyr::mutate(
       attributeOptionCombo = datapackr::default_catOptCombo(),
       value = as.double(100))
-  
+
   test_dataset <- dplyr::bind_rows(test_dataset.MER,
                                    test_dataset.DREAMS,
                                    test_dataset.subnat_impatt,
