@@ -42,22 +42,7 @@ unPackCountryUIDs <- function(submission_path,
           ifelse(tool %in% c("Data Pack", "Data Pack Template"), "Prioritization", "SNUxIM"),
         " tab instead."))
 
-    PSNUs <-
-      readxl::read_excel(
-        path = submission_path,
-        sheet = ifelse(tool %in% c("Data Pack", "Data Pack Template"), "Prioritization", "SNUxIM"),
-        range = readxl::cell_limits(
-          c(headerRow(tool = tool, cop_year = cop_year), 1),
-          c(NA, NA)),
-        col_types = "text",
-        .name_repair = "minimal") %>%
-      dplyr::select(PSNU) %>%
-      # Add PSNU uid ####
-      dplyr::mutate(
-        psnu_uid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
-      dplyr::left_join(datapackr::valid_PSNUs %>%
-                         dplyr::select(psnu_uid, country_name, country_uid),
-                       by = "psnu_uid")
+    PSNUs <- parsePSNUs(submission_path,tool,cop_year)
 
     if (NROW(PSNUs) == 0) {
       blank_psnus <- TRUE
@@ -130,7 +115,38 @@ unPackCountryUIDs <- function(submission_path,
     stop(msg)
   }
 
-  # TEST: Check country_uids and PSNUs in Data Pack match
+  PSNUs <- parsePSNUs(submission_path,tool,cop_year)
+
+  if (NROW(PSNUs) > 0) {
+    # TEST: Check country_uids and PSNUs in Data Pack match
+    if (!all(purrr::map_lgl(unique(PSNUs$country_uid),
+                            ~ .x %in% country_uids))) {
+      warning("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
+    }
+  } else {
+    warning("No PSNUs were detected.")
+  }
+
+  return(country_uids)
+
+}
+
+#' @export
+#' @title Extract PSNUs from submitted file
+#'
+#' @description
+#' When supplied a submission path, tool type and COP year,
+#' will return a data frame of PSNU, psnu_uid,country_name, and country_uid
+#' If there are malformed PSNU UIDs in the file, an error will be thrown.
+#'
+#' @param submission_path Local path to the file to import.
+#' @param tool What type of tool is the submission file? Default is "Data Pack".
+#' @param cop_year Specifies COP year for dating as well as selection of
+#' templates.
+#'
+#' @return Data frame of parsed PSNUs.
+#'
+parsePSNUs <- function(submission_path,tool,cop_year) {
   PSNUs <-
     readxl::read_excel(
       path = submission_path,
@@ -146,13 +162,20 @@ unPackCountryUIDs <- function(submission_path,
     psnu_uid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
     dplyr::left_join(datapackr::valid_PSNUs %>%
                        dplyr::select(psnu_uid, country_name, country_uid),
-                     by = "psnu_uid")
+                     by = "psnu_uid") %>%
+    dplyr::filter_all(dplyr::any_vars(!is.na(.)))
 
-  if (!all(purrr::map_lgl(unique(PSNUs$country_uid),
-                          ~ .x %in% country_uids))) {
-    warning("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
+  #Test for valid PSNU UIDs
+  malformed_psnu_uids <- PSNUs %>%
+    dplyr::filter(is.na(psnu_uid)) %>%
+    dplyr::distinct()
+
+  if (NROW(malformed_psnu_uids) > 0) {
+    msg <- paste("ERROR: The PSNUxIM tab contains malformed PSNU identifiers. The following
+      rows were affected: ",paste(malformed_psnu_uids$PSNU,sep = "",collapse = ";"),". This error
+      must be fixed in order to proceed.")
+    stop(msg)
   }
 
-  return(country_uids)
-
+  PSNUs
 }

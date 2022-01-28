@@ -1,3 +1,7 @@
+# datapackr 5.1.3
+## Bug Fixes
+* Better validation of PSNU identifier strings. 
+
 # datapackr 5.1.2
 
 ## Bug Fixes
