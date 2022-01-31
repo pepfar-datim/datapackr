@@ -56,7 +56,7 @@ with_mock_api({
   test_that("COP20 opu template and schema match", {
     schema <-
       datapackr::unPackSchema_datapack(
-        filepath =  system.file("extdata", "COP20_OPU_Data_Pack_Template.xlsx", package = "datapackr"),
+        template_path =  system.file("extdata", "COP20_OPU_Data_Pack_Template.xlsx", package = "datapackr"),
         skip = datapackr::skip_tabs(tool = "OPU Data Pack Template",
                                     cop_year = 2020),
         tool = "OPU Data Pack Template",
