@@ -1,3 +1,12 @@
+# datapackr 5.1.2
+
+## Bug Fixes
+* Corrects the % of EID by 12 months from 95% (same as by 2 months) to 100%.
+* Updates comments and conditional formatting in the Cascade Tab over HTS_INDEX yield columns to align with COP Guidance (<10% as warning, rather than 20%).
+
+## New Features
+* For COP22 Data Packs, enables appending data to the bottom of the PSNUxIM tab when data is detected in the main tabs of the Data Pack, but not reflected in the PSNUxIM tab.
+
 # datapackr 5.1.1
 
 ## Bug fixes

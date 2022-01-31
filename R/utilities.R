@@ -137,7 +137,7 @@ swapColumns <- function(to, from) {
 #' @return Printed message, \code{x}.
 #'
 interactive_print <- function(x) {
-  if (interactive()) {
+  if (rlang::is_interactive()) {
     print(x)
   }
 }
@@ -159,7 +159,22 @@ interactive_message <- function(x) {
   }
 }
 
-
+#' @export
+#'
+#' @title Issue a warning if the session is interactive
+#'
+#' @description
+#' Supplied a string, will issue a warning as r warning() only if the session is currently interactive.
+#'
+#' @param x Warning string.
+#'
+#' @return Warning message, \code{x}.
+#'
+interactive_warning <- function(x) {
+  if (rlang::is_interactive()) {
+    warning(x,call. = FALSE)
+  }
+}
 
 #' @export
 #' @title Pull list of Countries from DATIM.
@@ -617,7 +632,7 @@ compareTemplateToSchema <- function(template_path = NULL,
 
   template_schema <-
     unPackSchema_datapack(
-      filepath = template_path,
+      template_path = template_path,
       skip = skip_tabs(tool = paste0(tool, " Template"), cop_year = cop_year),
       tool = paste0(tool, " Template"),
       cop_year = cop_year)
@@ -694,6 +709,8 @@ paste_dataframe <- function(x) {
 #' @importFrom rlang is_character
 #'
 #' @param x Value to test and coerce
+#' @param default Default value to assign to x if not a character string,
+#'  \code{NA_character_}, or a factor.
 #'
 #' @return x parsed as numeric, if possible
 parse_maybe_number <- function(x, default = NULL) {
@@ -749,7 +766,7 @@ names2 <- function(x) {
 has_names <- function(x) {
   nms <- names(x)
   if (is.null(nms)) {
-    rep_along(x, FALSE)
+    rlang::rep_along(x, FALSE)
   } else {
     !(is.na(nms) | nms == "")
   }
@@ -757,7 +774,7 @@ has_names <- function(x) {
 
 ndots <- function(...) nargs()
 
-bullet <- function(...) paste0(bold(silver(" * ")), sprintf(...))
+bullet <- function(...) paste0(crayon::bold(crayon::silver(" * ")), sprintf(...))
 
 # Re-exports ---------------------------------------------------
 

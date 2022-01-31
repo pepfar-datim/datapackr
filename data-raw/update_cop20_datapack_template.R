@@ -11,7 +11,7 @@ datapack_template_filepath <- system.file("extdata",
                                           mustWork = TRUE)
 cop20_data_pack_schema <-
   unPackSchema_datapack(
-    filepath = datapack_template_filepath,
+    template_path = datapack_template_filepath,
     skip = skip_tabs(tool = "Data Pack Template", cop_year = 2020),
     cop_year = 2020)
 

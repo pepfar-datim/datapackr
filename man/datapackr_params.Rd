@@ -24,7 +24,8 @@ datapackr_params(
   wb,
   PSNUs,
   tool,
-  season
+  season,
+  ...
 )
 }
 \arguments{
@@ -81,6 +82,8 @@ processes to output_folder.}
 \code{OPU Data Pack} or \code{Data Pack}}
 
 \item{season}{Either \code{COP} or \code{OPU}.}
+
+\item{...}{Additional arguments to pass.}
 }
 \value{
 list of all paramaters of this constructor function

@@ -519,7 +519,7 @@ checkTemplatePath <- function(template_path,
   input_tool <- paste0(tool, " Template")
   template_schema <-
     unPackSchema_datapack(
-      filepath = template_path,
+      template_path = template_path,
       skip = skip_tabs(tool = input_tool, cop_year = cop_year),
       tool = input_tool,
       cop_year = cop_year)
@@ -545,7 +545,7 @@ checkWB <- function(wb = NULL,
     country_uids <- check_country_uids(country_uids)
     cop_year <- check_cop_year(cop_year)
     tool <- check_tool(tool)
-    datapack_name <- checkDatapackName(datapack_name, country_uids)
+    datapack_name <- checkDataPackName(datapack_name, country_uids)
     template_path <- checkTemplatePath(template_path, cop_year, tool)
 
     d <- createDataPack(datapack_name = datapack_name,

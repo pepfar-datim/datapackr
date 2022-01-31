@@ -283,7 +283,7 @@ getPeriodInfo <- function(FY = NA,
   ## Updated COP19 Data Pack Schema ####
     datapack_template_filepath <- "./data-raw/COP19_Data_Pack_Template_vFinal.xlsx"
     data_pack_schema <- unPackSchema_datapack(
-      filepath = datapack_template_filepath,
+      template_path = datapack_template_filepath,
       skip = skip_tabs(tool = "Data Pack Template"),
       cop_year = 2019)
     save(data_pack_schema, file = "./data/data_pack_schema.rda")
@@ -295,7 +295,7 @@ getPeriodInfo <- function(FY = NA,
                                               mustWork = TRUE)
     cop20_data_pack_schema <-
       unPackSchema_datapack(
-        filepath = datapack_template_filepath,
+        template_path = datapack_template_filepath,
         skip = skip_tabs(tool = "Data Pack Template", cop_year = 2020),
         cop_year = 2020)
     save(cop20_data_pack_schema,

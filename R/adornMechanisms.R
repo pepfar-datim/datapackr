@@ -132,8 +132,8 @@ getMechanismView <- function(country_uids = NULL,
   if (!is.null(cop_year)) {
     mechs %<>%
         dplyr::filter(
-          (startdate < paste0(max(cop_year) + 1, "-10-01") &
-            enddate > paste0(min(cop_year), "-09-30"))
+          (startdate < paste0(max(as.numeric(cop_year)) + 1, "-10-01") &
+            enddate > paste0(min(as.numeric(cop_year)), "-09-30"))
           | is.na(startdate))
   }
 
