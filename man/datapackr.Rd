@@ -3,8 +3,8 @@
 \docType{package}
 \name{datapackr}
 \alias{datapackr}
-\title{Data Pack on R
-
+\title{Data Pack on R}
+\description{
 datapackr: a grammar of Data Pack manipulation
 
 
@@ -18,4 +18,5 @@ It has three main goals:
 \item Generate Data Packs, either at District or Site Level as directed.
 \item Process and validate Data Packs submitted for review
 \item Prepare Data Pack data for import into DATIM, the PEPFAR data collection database.
-}}
+}
+}
