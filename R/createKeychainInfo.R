@@ -27,9 +27,6 @@ createKeychainInfo <- function(submission_path = NULL,
                                d2_session$me$userCredentials$username,
                                NULL)
 
-  # Generate a unique identifier
-  d$info$uuid <- uuid::UUIDgenerate()
-
   # Start running log of all warning and information messages
   d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE

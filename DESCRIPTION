@@ -52,8 +52,7 @@ Imports:
     assertthat,
     plyr,
     fuzzyjoin (>= 0.1.6),
-    R6,
-    uuid
+    R6
 Suggests:
     devtools (>= 2.0.1),
     httptest,

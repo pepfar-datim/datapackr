@@ -16,7 +16,6 @@ test_that("Can generate a key chain", {
        "tool",
        "country_uids",
        "cop_year",
-       "uuid",
        "organisation_unit",
        "schema",
        "has_error",
@@ -36,7 +35,6 @@ test_that("Can generate a key chain", {
    expect_equal(d$info$country_uids, "qllxzIjjurr")
    expect_equal(d$info$datapack_name, "Lesotho")
    expect_equal(d$info$sane_name, "Lesotho")
-   expect_type(d$info$uuid, "character")
    expect_equal(d$info$organisation_unit, data.frame(ou = "Lesotho",
                                                      ou_id = "qllxzIjjurr",
                                                      row.names = "organisationUnits.42"))
