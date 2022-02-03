@@ -2,7 +2,7 @@
 % Please edit documentation in R/packForDATIM_OPU.R
 \name{packForDATIM_OPU}
 \alias{packForDATIM_OPU}
-\title{packForDATIM_OPU(d)}
+\title{packForDATIM_OPU(d, datim_map)}
 \usage{
 packForDATIM_OPU(d, datim_map)
 }

@@ -1,5 +1,6 @@
 #' @export
-#' @title packForDATIM_UndistributedMER(d)
+#' @importFrom magrittr %>% %<>%
+#' @title packForDATIM_UndistributedMER(d, datim_map)
 #'
 #' @description Packs undistributed MER data from Data Pack for use in analytics (NOT IMPORT).
 #'

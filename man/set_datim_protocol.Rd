@@ -10,7 +10,7 @@ set_datim_protocol(data)
 \item{data}{the dataset needed}
 }
 \value{
-A logical vector.
+a dataframe with the appropriate columns
 }
 \description{
 Tests whether a character string matches the regex of a DHIS2
