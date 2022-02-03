@@ -91,6 +91,7 @@ if (getRversion() >= "2.15.1")
       "Custom DSD Dedupe Allocation (FY22) (% of DataPackTarget)",
       "Custom TA Dedupe Allocation (% of DataPackTarget)",
       "Custom TA Dedupe Allocation (FY22) (% of DataPackTarget)",
+      "d",
       "d2_default_session",
       "d2_session",
       "data_element",
