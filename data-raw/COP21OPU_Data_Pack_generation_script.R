@@ -5,7 +5,7 @@ library(magrittr)
 secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
 datimutils::loginToDATIM(secrets)
 
-output_folder <- Sys.getenv("OUTPUT_FOLDER")
+output_folder <- Sys.getenv("OUTPUT_FOLDER") %>% paste0(., "COP21 OPUs/")
 
 # batch <- tibble::tribble(
 #   ~datapack_name, ~country_uids,
