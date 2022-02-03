@@ -262,7 +262,8 @@ getPeriodInfo <- function(FY = NA,
 
 
 # Procedural logic to generate the actual schemas
-    secrets <- "/Users/scott/.secrets/datim.json"
+  ## Point to DATIM login secrets ####
+    secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
     datimutils::loginToDATIM(secrets)
 
   ## Config File ####
