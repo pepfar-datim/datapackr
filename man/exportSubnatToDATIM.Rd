@@ -2,7 +2,7 @@
 % Please edit documentation in R/exportSubnatToDatim.R
 \name{exportSubnatToDATIM}
 \alias{exportSubnatToDATIM}
-\title{exportSubnatToDATIM(d)}
+\title{exportSubnatToDATIM(d, datim_map)}
 \usage{
 exportSubnatToDATIM(d, datim_map)
 }
