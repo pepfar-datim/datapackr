@@ -5,9 +5,11 @@ library(lubridate)
 require(datapackcommons)
 require(datapackr)
 
-datimutils::loginToDATIM("/users/sam/.secrets/datim.json")
-base_url = getOption("baseurl")
-country_details <- datapackcommons::GetCountryLevels(base_url)
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
+datimutils::loginToDATIM(secrets)
+
+country_details <- datapackcommons::GetCountryLevels()
 uids <- country_details$id
 names <- country_details$country_name
 

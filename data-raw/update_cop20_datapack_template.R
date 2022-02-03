@@ -1,8 +1,8 @@
 ## If you've made any edits to the Excel template, rebuild package first to
 ## capture these, then run the below.
 
-secrets <- "/Users/scott/.secrets/triage.json"
-
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "triage.json")
 datimutils::loginToDATIM(secrets)
 
 datapack_template_filepath <- system.file("extdata",
