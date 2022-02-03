@@ -1,6 +1,6 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
-#' @title packForDATIM_MER(d)
+#' @title packForDATIM_MER(d, datim_map)
 #'
 #' @description Packs extracted PSNUxIM data from COP Data Pack for DATIM import.
 #'

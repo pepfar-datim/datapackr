@@ -2,7 +2,7 @@
 % Please edit documentation in R/packForDATIM_MER.R
 \name{packForDATIM_MER}
 \alias{packForDATIM_MER}
-\title{packForDATIM_MER(d)}
+\title{packForDATIM_MER(d, datim_map)}
 \usage{
 packForDATIM_MER(d, datim_map)
 }

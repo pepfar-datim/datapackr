@@ -2,7 +2,7 @@
 % Please edit documentation in R/packForDATIM_UndistributedMER.R
 \name{packForDATIM_UndistributedMER}
 \alias{packForDATIM_UndistributedMER}
-\title{packForDATIM_UndistributedMER(d)}
+\title{packForDATIM_UndistributedMER(d, datim_map)}
 \usage{
 packForDATIM_UndistributedMER(d, datim_map)
 }

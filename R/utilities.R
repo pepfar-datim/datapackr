@@ -699,7 +699,7 @@ addPsnuid <- function(string) {
 #'
 #' @importFrom stringr str_detect
 #'
-#' @return A logical vector.
+#' @return A dataframe, renamed and joined
 map_datim_join <- function(data, second_data_set) {
   data %>% dplyr::left_join(., (second_data_set %>%
                                           dplyr::rename(Age = valid_ages.name,
@@ -719,7 +719,7 @@ map_datim_join <- function(data, second_data_set) {
 #'
 #' @importFrom stringr str_detect
 #'
-#' @return A logical vector.
+#' @return a dataframe with the appropriate columns
 set_datim_protocol <- function(data) {
   data %>% dplyr::select(
     dataElement = dataelementuid,

@@ -9,10 +9,10 @@ map_datim_join(data, second_data_set)
 \arguments{
 \item{data}{the dataset needed}
 
-\item{datim_map}{the datim_map used for the pack for datim function}
+\item{second_data_set}{the datim_map used for the pack for datim function}
 }
 \value{
-A logical vector.
+A dataframe, renamed and joined
 }
 \description{
 Tests whether a character string matches the regex of a DHIS2

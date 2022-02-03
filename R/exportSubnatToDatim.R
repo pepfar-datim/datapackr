@@ -1,6 +1,6 @@
 #' @export
 #' @importFrom magrittr %>% %<>%
-#' @title exportSubnatToDATIM(d)
+#' @title exportSubnatToDATIM(d, datim_map)
 #'
 #' @description Takes the outputs of the \code{\link{unPackSheets}} function and
 #'     adds  a dataframe containing SUBNAT and IMPATT data,
