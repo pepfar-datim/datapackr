@@ -58,12 +58,14 @@ batch <- tibble::tribble(
 
 pick <- batch[c(8),]
 # i = 1
+# snuxim_model_data = NULL
 # datapack_name = pick[[i,1]]
 # country_uids = unlist(pick[[i,"country_uids"]])
 # template_path = NULL
 # cop_year = 2020
 # output_folder = output_folder
 # results_archive = FALSE
+# d2_session = d2_default_session$clone()
 
 for (i in 1:NROW(pick)) {
   print(paste0(i," of ",NROW(pick), ": ", pick[[i,1]]))
