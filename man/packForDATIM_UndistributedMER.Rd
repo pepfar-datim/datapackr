@@ -4,13 +4,12 @@
 \alias{packForDATIM_UndistributedMER}
 \title{packForDATIM_UndistributedMER(d)}
 \usage{
-packForDATIM_UndistributedMER(data, cop_year)
+packForDATIM_UndistributedMER(d, datim_map)
 }
 \arguments{
-\item{data}{Dataframe to pack for DATIM. Any mechanism attribution will be ignored.}
+\item{d}{Datapackr object}
 
-\item{cop_year}{COP Year to use for tailoring functions. Remember,
-FY22 targets = COP21.}
+\item{datim_map}{datim map object for the cop year}
 }
 \value{
 MER data formatted as standard DATIM import file, with all data

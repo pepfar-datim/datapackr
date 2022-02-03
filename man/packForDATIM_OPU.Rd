@@ -4,10 +4,12 @@
 \alias{packForDATIM_OPU}
 \title{packForDATIM_OPU(d)}
 \usage{
-packForDATIM_OPU(d)
+packForDATIM_OPU(d, datim_map)
 }
 \arguments{
 \item{d}{Datapackr object}
+
+\item{datim_map}{datim map object for the cop year}
 }
 \value{
 Modified d object with a DATIM compatible data frame for import id d$datim$OPU
