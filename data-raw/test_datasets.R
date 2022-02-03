@@ -249,7 +249,7 @@ library(datapackr)
 secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "cop-test.json")
 datimutils::loginToDATIM(secrets)
 
-output_folder <- Sys.getenv("OUTPUT_FOLDER")
+output_folder <- Sys.getenv("OUTPUT_FOLDER") %>% paste0(., "Test Data/")
 cop_year = 2022
 
 # Scenario A: Vanilla case ####
