@@ -291,7 +291,7 @@ check_tool <- function(tool, season, cop_year) {
     valid_cop_years <-
       switch(
         tool,
-        "Data Pack" = 2021:2022,
+        "Data Pack" = 2020:2022,
         "OPU Data Pack" = 2020:2021
       )
 
