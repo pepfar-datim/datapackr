@@ -4,18 +4,12 @@
 #' @description Packs extracted PSNUxIM data from COP Data Pack for DATIM import.
 #'
 #' @param d Datapackr object
-#'
+#' @param datim_map datim map object for the cop year
 #' @return Modified d object with a DATIM compatible data frame for import id d$datim$MER
 #'
-packForDATIM_MER <- function(d) {
+packForDATIM_MER <- function(d, datim_map) {
 
-  if (d$info$cop_year == 2022) {
-    datim_map <- datapackr::cop22_map_adorn_import_file
-  } else {
-    datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
-  }
-
-  # Combine PSNUxIM distributed data with undistributed AGYW_PREV
+  # Combine PSNUxIM distributed data with undistributed AGYW_PREV -----
   agyw_data <- d$data$MER %>%
     dplyr::filter(stringr::str_detect(indicator_code, "^AGYW_PREV")) %>%
     dplyr::mutate(
@@ -24,47 +18,27 @@ packForDATIM_MER <- function(d) {
     ) %>%
     dplyr::select(names(d$data$SNUxIM))
 
+  # Add dataElement & categoryOptionCombo and bind rows PSNuIM -----
   d$datim$MER <- d$data$SNUxIM %>%
     dplyr::bind_rows(agyw_data) %>%
+    map_datim_join(datim_map) %>%
 
-  # Add dataElement & categoryOptionCombo ####
-    dplyr::left_join(., (datim_map %>%
-                           dplyr::rename(Age = valid_ages.name,
-                                         Sex = valid_sexes.name,
-                                         KeyPop = valid_kps.name)),
-                     by = c("indicator_code", "Age", "Sex", "KeyPop", "support_type")) %>%
-    tidyr::drop_na(dataelementuid, categoryoptioncombouid) %>%
-
-  dplyr::mutate(
-  # Add period ####
-    period = dplyr::case_when(
-      stringr::str_detect(indicator_code, "\\.R$") ~ paste0(FY - 1, "Q4"),
-      TRUE ~ paste0(FY - 1, "Oct")),
-
-  # Round value ####
+  # Round value ----
+    dplyr::mutate(
     value =
       dplyr::case_when(
         value_type == "integer" ~ datapackr::round_trunc(value),
         TRUE ~ value),
 
-  # Add PSNU uid ####
-      psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)"),
-      mech_code =
-        dplyr::case_when(mech_code == "Unallocated" ~ default_catOptCombo(),
-                         TRUE ~ mech_code)
+  # Add PSNU uid ----
+      psnuid = addPsnuid(PSNU)
     ) %>%
 
-  # Select and rename based on DATIM protocol ####
-  dplyr::select(
-    dataElement = dataelementuid,
-    period,
-    orgUnit = psnuid,
-    categoryOptionCombo = categoryoptioncombouid,
-    attributeOptionCombo = mech_code,
-    value) %>%
+  # Select and rename based on DATIM protocol ----
+  set_datim_protocol() %>%
 
-  # Drop any rows with NA in any col to prevent breakage in iHub ####
-    tidyr::drop_na()
+  # Drop any rows with NA in any col to prevent breakage in iHub ----
+  tidyr::drop_na()
 
   return(d)
 

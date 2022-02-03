@@ -4,10 +4,12 @@
 \alias{packForDATIM_MER}
 \title{packForDATIM_MER(d)}
 \usage{
-packForDATIM_MER(d)
+packForDATIM_MER(d, datim_map)
 }
 \arguments{
 \item{d}{Datapackr object}
+
+\item{datim_map}{datim map object for the cop year}
 }
 \value{
 Modified d object with a DATIM compatible data frame for import id d$datim$MER

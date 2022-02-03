@@ -4,10 +4,12 @@
 \alias{exportSubnatToDATIM}
 \title{exportSubnatToDATIM(d)}
 \usage{
-exportSubnatToDATIM(d)
+exportSubnatToDATIM(d, datim_map)
 }
 \arguments{
 \item{d}{Datapackr object}
+
+\item{datim_map}{datim map object for the cop year}
 }
 \value{
 Datapackr d object
