@@ -151,7 +151,7 @@ packSNUxIM_OPU <- function(d) {
 
   # Classify formula columns as formulas ####
   ## TODO: Improve approach - Use apply form instead
-  for (i in seq_len(NROW(fx_cols))) {
+  for (i in seq_len(NCOL(fx_cols))) {
     if (!all(any(is.na(fx_cols[[i]])))) {
       class(fx_cols[[i]]) <- c(class(fx_cols[[i]]), "formula")
     }

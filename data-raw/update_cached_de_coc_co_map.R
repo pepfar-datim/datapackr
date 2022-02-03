@@ -1,6 +1,8 @@
 # This script begins with the Full Code List from DATIM, then combines categoryOption
 # metadata, then combines this with the Data Pack schema to create a full map between
 # Data Packs and DATIM for the purpose of generating import and analytics tables.
+library(magrittr)
+library(datapackr)
 
 # Point to DATIM login secrets ####
 secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
