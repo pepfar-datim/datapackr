@@ -14,16 +14,26 @@
 #'
 packForDATIM <- function(d, type = NULL) {
 
+  # call datim map once for cop year to pass to functions
+  datim_map <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
+
   if (is.null(type)) {
     stop("Please specify data type in parameters: 'PSNUxIM', 'SUBNAT_IMPATT', 'OPU PSNUxIM', 'Undistributed MER'")
   } else if (type == "SUBNAT_IMPATT") {
-    d <- exportSubnatToDATIM(d)
+    d <- exportSubnatToDATIM(d, datim_map)
   } else if (type == "PSNUxIM") {
-    d <- packForDATIM_MER(d)
+    d <- packForDATIM_MER(d, datim_map)
   } else if (type == "OPU PSNUxIM") {
-    d <- packForDATIM_OPU(d)
+
+    # exceptions for 2020 and 2021
+    if (!d$info$cop_year %in% c(2020, 2021)) {
+      stop("The COP year provided is not supported by packForDATIM_OPU")
+    } else {
+      d <- packForDATIM_OPU(d, datim_map)
+    }
+
   } else if (type == "Undistributed MER") {
-    d <- packForDATIM_UndistributedMER(d)
+    d <- packForDATIM_UndistributedMER(d, datim_map)
   } else{
     stop("Please specify data type in parameters: 'PSNUxIM', 'SUBNAT_IMPATT', 'OPU PSNUxIM'")
   }

@@ -671,6 +671,70 @@ is_uidish <- function(string) {
   stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")
 }
 
+#' @export
+#' @title addPsnuid
+#' @md
+#' @description Tests whether a character string matches the regex of a DHIS2
+#' 11-digit UID. Vectorized over `string` and `pattern`.
+#'
+#' @param string Input vector. Either a character vector, or something coercible
+#' to one.
+#'
+#' @importFrom stringr str_detect
+#'
+#' @return A logical vector.
+addPsnuid <- function(string) {
+  stringr::str_extract(string, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")
+}
+
+
+#' @export
+#' @title map_datim_join
+#' @md
+#' @description Tests whether a character string matches the regex of a DHIS2
+#' 11-digit UID. Vectorized over `string` and `pattern`.
+#'
+#' @param data the dataset needed
+#' @param second_data_set the datim_map used for the pack for datim function
+#'
+#' @importFrom stringr str_detect
+#'
+#' @return A logical vector.
+map_datim_join <- function(data, second_data_set) {
+  data %>% dplyr::left_join(., (second_data_set %>%
+                                          dplyr::rename(Age = valid_ages.name,
+                                                        Sex = valid_sexes.name,
+                                                        KeyPop = valid_kps.name)),
+                                    by = c("indicator_code", "Age", "Sex", "KeyPop", "support_type")) %>%
+    tidyr::drop_na(dataelementuid, categoryoptioncombouid)
+}
+
+#' @export
+#' @title set_datim_protocol
+#' @md
+#' @description Tests whether a character string matches the regex of a DHIS2
+#' 11-digit UID. Vectorized over `string` and `pattern`.
+#'
+#' @param data the dataset needed
+#'
+#' @importFrom stringr str_detect
+#'
+#' @return A logical vector.
+set_datim_protocol <- function(data) {
+  data %>% dplyr::select(
+    dataElement = dataelementuid,
+    period,
+    orgUnit = psnuid,
+    categoryOptionCombo = categoryoptioncombouid,
+    attributeOptionCombo = mech_code,
+    value
+    )
+}
+
+
+
+
+
 
 commas <- function(...) paste0(..., collapse = ", ")
 

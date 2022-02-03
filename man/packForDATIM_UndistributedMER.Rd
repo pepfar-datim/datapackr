@@ -4,10 +4,12 @@
 \alias{packForDATIM_UndistributedMER}
 \title{packForDATIM_UndistributedMER(d)}
 \usage{
-packForDATIM_UndistributedMER(d)
+packForDATIM_UndistributedMER(d, datim_map)
 }
 \arguments{
 \item{d}{Datapackr object}
+
+\item{datim_map}{datim map object for the cop year}
 }
 \value{
 Modified d object with a DATIM compatible data frame for analytics id d$datim$UndistributedMER
