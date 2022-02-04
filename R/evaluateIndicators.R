@@ -1,6 +1,6 @@
 #' Title
 #'
-#' @param combis A vector of data element and category option combo UIDs 
+#' @param combis A vector of data element and category option combo UIDs
 #' of the form #{dataelement_id.categoryoptioncombo_id}
 #' @param values A vector of values
 #' @param inds A dataframe consisting of indicator UIDs,name,numerator and denominator expression.
@@ -8,13 +8,10 @@
 #' @return
 #' @export
 #'
-#' @examples
 evaluateIndicators <- function(combis, values, inds) {
 
-  indicators_empty <- data.frame("Indicator" = character(),
-                                 "N_OR_D" = character(),
-                                 "Age" = character(),
-                                 id = character(),
+  indicators_empty <- data.frame(id = character(),
+                                 name = character(),
                                  numerator = numeric(),
                                  denominator = numeric(),
                                  value = numeric())
@@ -32,7 +29,7 @@ evaluateIndicators <- function(combis, values, inds) {
     dplyr::ungroup() %>%
     dplyr::mutate(exp = paste0(exp, "}"))
 
-  #Define a function for any expressions which match 
+  #Define a function for any expressions which match
   #either the numerator or denominator
   matches_indicator <- function(x) {
     agrepl(x, inds$numerator) |

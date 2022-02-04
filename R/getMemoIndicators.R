@@ -3,7 +3,7 @@
 #' @param cop_year COP Year
 #' @param d2_session Datimutils session object
 #'
-#' @return A dataframe consisting of indicator UIDs,name,numerator and denominator expression. 
+#' @return A dataframe consisting of indicator UIDs,name,numerator and denominator expression.
 #' If a given COP year does not exist, NULL is returned
 #' @export
 #'
@@ -22,12 +22,12 @@ getMemoIndicators <- function(cop_year, d2_session = dynGet("d2_default_session"
     warning("Could not find an indicator group for the given COP year.")
     return(NULL)
   }
-  
+
   inds <-
     datimutils::getIndicatorGroups(ind_group,
                                    d2_session = d2_session,
                                    fields = "indicators[id, name, numerator, denominator]")
-  
+
   #If we do not get any indicators at this point, something is wrong.
   if (class(inds) != "data.frame") {
     warning("Could not find fetch indicators from DATIM!")
@@ -36,4 +36,3 @@ getMemoIndicators <- function(cop_year, d2_session = dynGet("d2_default_session"
 
   inds
 }
-
