@@ -57,7 +57,7 @@ unPackOPU_PSNUxIM <- function(d) {
   }
 
   # TODO: Check column structures ####
-    # d <- checkColStructure(d, sheet)
+    d <- checkColStructure(d, sheet)
 
   # Pare down to updated targets only ####
   d$data$extract <-
@@ -182,7 +182,7 @@ unPackOPU_PSNUxIM <- function(d) {
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
 
   # TODO TEST: No missing metadata ####
-    #d <- checkMissingMetadata(d, sheet)
+    d <- checkMissingMetadata(d, sheet)
 
   # TEST: Missing Dedupe Rollup cols; Error; Add ####
   dedupe_rollup_cols <- cols_to_keep %>%
@@ -432,7 +432,7 @@ unPackOPU_PSNUxIM <- function(d) {
     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
 
   # TODO: TEST: Defunct disaggs; Error; Drop ####
-    #d <- defunctDisaggs(d, sheet)
+    d <- defunctDisaggs(d, sheet)
 
   # Drop all zeros against IMs ####
   d$data$extract %<>%

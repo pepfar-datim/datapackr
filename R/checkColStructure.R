@@ -11,7 +11,7 @@
 #' @return d
 #'
 checkColStructure <- function(d, sheet) {
-  if (sheet %in% c("SNU x IM", "PSNUxIM")) {
+  if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$cop_year != 2020) {
     data <- d$data$SNUxIM
   } else {
     data <- d$data$extract
