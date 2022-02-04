@@ -50,7 +50,7 @@ checkMechanisms <- function(d,
                   ", paste(bad_mechs, sep = "", collapse = ", "))
     d$tests$bad_mechs <- bad_mechs
     d$info$warning_msg <- appendMessage(msg, d$info$warning_msg)
-    d$info$had_error <- TRUE
+    d$info$has_error <- TRUE
   }
 
   return(d)
