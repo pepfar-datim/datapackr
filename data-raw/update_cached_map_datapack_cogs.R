@@ -2,8 +2,8 @@
 library(magrittr)
 library(datapackr)
 
-secrets <- "~/.secrets/cop-test.json"
-
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "cop-test.json")
 datimutils::loginToDATIM(secrets)
 
 # Processing

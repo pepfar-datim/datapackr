@@ -2,8 +2,9 @@
 # categoryOptionCombo pairs
 
 # Method using datimutils ####
-secrets <- "~/.secrets/cop-test.json"
-datapackr::loginToDATIM(secrets)
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "cop-test.json")
+datimutils::loginToDATIM(secrets)
 entryform_id = "eeZpSGQu8hx"
 data <- datimutils::getMetadata(end_point = "dataEntryForms",
                                 paste0("id:eq:", entryform_id),
