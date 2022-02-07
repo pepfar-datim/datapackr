@@ -16,13 +16,12 @@ checkMechanisms <- function(d,
   mechs_data <- unique(d$datim$MER$attributeOptionCombo)
 
   period_info <- datimvalidation::getPeriodFromISO(paste0(d$info$cop_year, "Oct"))
-
-  operating_unit <- getOperatingUnitFromCountryUIDs(d$info$country_uids)
+ 
 
   mechs_datim <- datapackr::getMechanismView(d2_session = d2_session,
                                              update_stale_cache = TRUE,
                                              cached_mechs_path = cached_mechs_path) %>%
-    dplyr::filter(ou == operating_unit$ou) %>%
+    dplyr::filter(ou == d$info$operating_unit$ou) %>%
     dplyr::filter(!is.na(startdate)) %>%
     dplyr::filter(!is.na(enddate)) %>%
     dplyr::filter(startdate <= period_info$startDate) %>%

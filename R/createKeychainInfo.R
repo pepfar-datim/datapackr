@@ -154,8 +154,8 @@ createKeychainInfo <- function(submission_path = NULL,
   }
 
   ## Determine additional Organisation Unit information and save
-  ## under `d$info$organisation_unit` for use in validating mechanisms
-  d$info$organisation_unit <- getOUFromCountryUIDs(d$info$country_uids)
+  ## under `d$info$operating_unit` for use in validating mechanisms
+  d$info$operating_unit <- getOUFromCountryUIDs(d$info$country_uids)
 
   # Check the submission file exists and prompt for user input if not
   d$keychain$submission_path <- handshakeFile(path = d$keychain$submission_path,

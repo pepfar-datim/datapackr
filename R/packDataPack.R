@@ -54,7 +54,7 @@ packDataPack <- function(model_data,
       tool = "Data Pack",
       cop_year =  cop_year,
       source_user = d2_session$me$userCredentials$username,
-      organisation_unit = getOUFromCountryUIDs(country_uids)
+      operating_unit = getOUFromCountryUIDs(country_uids)
     ),
     data = list(
       model_data = model_data
