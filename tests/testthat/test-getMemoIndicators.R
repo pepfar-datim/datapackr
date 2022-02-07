@@ -2,11 +2,11 @@ context("Memo generation tests")
 
 
 with_mock_api({
-  test_that("We can get issue a warning if the COP year is not found", {
+  test_that("We can  issue a warning if the COP year is not found", {
     expect_warning(inds <- datapackr::getMemoIndicators("1999"))
     expect_null(inds)
   })
-  
+
 })
 
 
@@ -16,5 +16,5 @@ with_mock_api({
     expect_type(inds,"list")
     expect_setequal(names(inds),c("id","name","numerator","denominator"))
   })
-  
+
 })
