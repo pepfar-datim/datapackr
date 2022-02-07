@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title Check Data Pack sheet for non-numeric values
 #'
 #' @description Checks data pulled from a single sheet in a Data Pack and

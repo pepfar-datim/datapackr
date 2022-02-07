@@ -39,7 +39,6 @@ round_trunc <- function(x, digits = 0) {
 
 
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title Pull IMPATT levels from DATIM for all PEPFAR countries
 #'
 #' @description
@@ -84,7 +83,6 @@ getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
 }
 
 
-#' @importFrom lazyeval interp
 #' @export
 #' @title Swap columns between dataframes
 #'
@@ -651,7 +649,7 @@ paste_oxford <- function(..., final = "and", oxford = TRUE) {
 #' @param x Dataframe to paste
 #' @export
 paste_dataframe <- function(x) {
-  paste(capture.output(print(x)), collapse = "\n")
+  paste(utils::capture.output(print(x)), collapse = "\n")
 }
 
 
@@ -659,9 +657,6 @@ paste_dataframe <- function(x) {
 #' @title Parse a value to numeric
 #' @description If x is character, attempts to parse the first occurence of a
 #' sub-string that looks like a number.
-#'
-#' @importFrom stringr str_extract
-#' @importFrom rlang is_character
 #'
 #' @param x Value to test and coerce
 #' @param default Default value to assign to x if not a character string,
@@ -703,8 +698,6 @@ parse_maybe_number <- function(x, default = NULL) {
 #'
 #' @param string Input vector. Either a character vector, or something coercible
 #' to one.
-#'
-#' @importFrom stringr str_detect
 #'
 #' @return A logical vector.
 is_uidish <- function(string) {
@@ -750,3 +743,7 @@ rlang::`%|%`
 #' @importFrom magrittr `%>%`
 #' @export
 magrittr::`%>%`
+
+#' @importFrom magrittr `%<>%`
+#' @export
+magrittr::`%<>%`

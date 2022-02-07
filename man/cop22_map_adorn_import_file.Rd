@@ -49,7 +49,7 @@
 cop22_map_adorn_import_file
 }
 \description{
-Dataset that is a full map between Data Packs and DATIM for 
+Dataset that is a full map between Data Packs and DATIM for
 the purpose of generating import and analytics tables.
 }
 \keyword{datasets}

@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title packSNUxIM(data)
 #'
 #' @description Packs SNUxIM data prepared from unPackSNUxIM for import to DATIM.
