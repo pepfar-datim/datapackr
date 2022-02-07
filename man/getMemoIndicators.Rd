@@ -15,7 +15,7 @@ getMemoIndicators(
 \item{d2_session}{Datimutils session object}
 }
 \value{
-A dataframe consisting of indicator UIDs,name,numerator and denominator expression. 
+A dataframe consisting of indicator UIDs,name,numerator and denominator expression.
 If a given COP year does not exist, NULL is returned
 }
 \description{

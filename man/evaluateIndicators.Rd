@@ -7,7 +7,7 @@
 evaluateIndicators(combis, values, inds)
 }
 \arguments{
-\item{combis}{A vector of data element and category option combo UIDs 
+\item{combis}{A vector of data element and category option combo UIDs
 of the form #{dataelement_id.categoryoptioncombo_id}}
 
 \item{values}{A vector of values}

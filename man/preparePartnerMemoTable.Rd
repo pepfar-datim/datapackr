@@ -15,7 +15,7 @@ preparePartnerMemoTable(
 \item{d2_session}{Datimutils sesssion object}
 }
 \value{
-Tibble in wide format with Agency,Partner,Mechanism and all 
+Tibble in wide format with Agency,Partner,Mechanism and all
 grouped indicators along the columns
 }
 \description{
