@@ -1,3 +1,11 @@
+#' Title
+#'
+#' @param d 
+#'
+#' @return d object with d$memo$structure
+#' @export
+#'
+
 memoStructure <- function(d) {
 
 
