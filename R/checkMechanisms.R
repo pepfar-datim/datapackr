@@ -16,7 +16,7 @@ checkMechanisms <- function(d,
   mechs_data <- unique(d$datim$MER$attributeOptionCombo)
 
   period_info <- datimvalidation::getPeriodFromISO(paste0(d$info$cop_year, "Oct"))
- 
+
 
   mechs_datim <- datapackr::getMechanismView(d2_session = d2_session,
                                              update_stale_cache = TRUE,

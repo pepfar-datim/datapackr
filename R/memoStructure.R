@@ -1,6 +1,6 @@
 #' Title
 #'
-#' @param d 
+#' @param d
 #'
 #' @return d object with d$memo$structure
 #' @export

@@ -6,7 +6,7 @@
 #' @export
 #'
 seperateIndicatorMetadata <- function(x) {
-  
+
   x %>%
     dplyr::mutate(name = stringr::str_replace_all(name, "^COP\\d\\d Targets ", "")) %>%
     dplyr::mutate(name = stringr::str_trim(name)) %>%
@@ -38,22 +38,22 @@ seperateIndicatorMetadata <- function(x) {
 #' Title
 #'
 #' @param d Datapackr d object
-#' @param d2_session 
+#' @param d2_session
 #'
 #' @return Datapackr d object with d$data$memo table
 #' @export
 #'
 
 preparePrioTable <- function(d, d2_session) {
-  
+
   d <- memoStructure(d)
-  
+
   df_cols <- purrr::pluck(d$memo$structure, "col_order")
-  
+
   df_rows <- purrr::pluck(d$memo$structure, "row_order") %>%
     dplyr::select(ind, options) %>%
     dplyr::mutate(row_order = dplyr::row_number())
-  
+
   df_base <- tidyr::crossing(df_rows, dplyr::select(df_cols, name)) %>%
     dplyr::arrange(ind, options, name) %>%
     dplyr::mutate(value = 0) %>%
@@ -61,8 +61,8 @@ preparePrioTable <- function(d, d2_session) {
                   Age = options,
                   prioritization = name,
                   value)
-  
-  inds <-datapackr::getMemoIndicators(d$info$cop_year, d2_session)
+
+  inds <- datapackr::getMemoIndicators(d$info$cop_year, d2_session)
   #Calculate the indicators by prioritization level
   df <- d %>%
     purrr::pluck("data") %>%
@@ -79,17 +79,17 @@ preparePrioTable <- function(d, d2_session) {
     dplyr::select(-dataelement_id,-categoryoptioncombo_id) %>%
     dplyr::group_by(prioritization) %>%
     tidyr::nest()
-  
+
   #Likely not worth the overhead to process  this in parallel since the number of groups is small
   df$indicator_results <-
     lapply(df$data, function(x)
       evaluateIndicators(x$combi, x$value, inds = inds))
-  
-  
+
+
   if (NROW(df) == 0) {
     return(d)
   }
-  
+
   df <- df %>%
     dplyr::select(-data) %>%
     tidyr::unnest(indicator_results) %>%
@@ -97,10 +97,10 @@ preparePrioTable <- function(d, d2_session) {
     tidyr::complete(., prioritization, name, fill = list(value = 0)) %>%
     seperateIndicatorMetadata(.) %>%
     dplyr::group_by(Age, Indicator, prioritization) %>%
-    dplyr::summarise(value = sum(value),.groups="drop") %>%
+    dplyr::summarise(value = sum(value),.groups = "drop") %>%
     dplyr::mutate(prioritization = dplyr::case_when(is.na(prioritization) ~ "No Prioritization",
                                                     TRUE ~ prioritization))
-  
+
   df_total <- df %>%
     dplyr::filter(Age != "Total") %>%
     dplyr::select(-Age) %>%
@@ -109,10 +109,10 @@ preparePrioTable <- function(d, d2_session) {
     dplyr::ungroup() %>%
     dplyr::mutate(Age = "Total") %>%
     dplyr::select(names(df))
-  
+
   d$data$prio_table <- dplyr::bind_rows(df, df_total, df_base) %>%
     dplyr::group_by(Indicator, Age, prioritization) %>%
-    dplyr::summarise(value = sum(value),.groups="drop") %>%
+    dplyr::summarise(value = sum(value),.groups = "drop") %>%
     dplyr::mutate(Age = factor(Age, levels = (unique(Age)))) %>%
     dplyr::left_join(df_rows, by = c("Indicator" = "ind", "Age" = "options")) %>%
     dplyr::left_join((df_cols %>%
@@ -123,6 +123,6 @@ preparePrioTable <- function(d, d2_session) {
     tidyr::pivot_wider(names_from = prioritization, values_from = "value") %>%
     mutate("Total" = rowSums(across(where(is.numeric)))) %>%
     dplyr::select("Indicator", "Age", 3:dim(.)[2])
-  
+
   return(d)
 }
