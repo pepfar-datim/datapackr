@@ -50,30 +50,7 @@ preparePartnerMemoTable <- function(d, d2_session = dynGet("d2_default_session",
     tidyr::unnest(indicator_results) %>%
     dplyr::rename("Mechanism" = mechanism_code, "Agency" = funding_agency, "Partner" = partner_desc, Value = value) %>%
     dplyr::select(-id, -numerator, -denominator) %>%
-    dplyr::mutate(name = stringr::str_replace_all(name, "^COP2[[:digit:]] Targets ", "")) %>%
-    dplyr::mutate(name = stringr::str_trim(name)) %>%
-    tidyr::separate("name", into = c("Indicator", "N_OR_D", "Age"), sep = " ") %>%
-    dplyr::mutate(Indicator = case_when(Indicator == "GEND_GBV" & N_OR_D == "Physical" ~
-                                          "GEND_GBV Physical and Emotional Violence",
-                                        Indicator == "GEND_GBV" & N_OR_D == "Sexual" ~
-                                          "GEND_GBV Sexual Violence",
-                                        TRUE ~ Indicator)) %>%
-    dplyr::select(-"N_OR_D") %>%
-    dplyr::mutate(Age = case_when(Age == "15-" ~ "<15",
-                                  Age == "15+" ~ "15+",
-                                  Age == "18-" ~"<18",
-                                  Age == "18+" ~ "18+",
-                                  TRUE ~ "Total")) %>%
-    dplyr::mutate(Age = case_when(Indicator %in% c("CXCA_SCRN",
-                                                   "OVC_HIVSTAT",
-                                                   "KP_PREV",
-                                                   "PMTCT_EID",
-                                                   "KP_MAT",
-                                                   "VMMC_CIRC",
-                                                   "PrEP_NEW",
-                                                   "PrEP_CURR",
-                                                   "GEND_GBV") ~ "Total",
-                                  TRUE ~ Age)) %>%
+    seperateIndicatorMetadata(.) %>%
     tidyr::complete(., tidyr::nesting(Mechanism, Agency, Partner), Indicator, Age, fill = list(Value = 0)) %>%
     tidyr::drop_na()
 
