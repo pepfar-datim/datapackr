@@ -115,5 +115,5 @@ checkPSNUData  <-  function(d,
     d$info$had_error <- TRUE
   }
 
-  return(d)
+  d
 }
