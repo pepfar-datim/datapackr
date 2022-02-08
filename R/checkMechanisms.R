@@ -37,7 +37,7 @@ checkMechanisms <- function(d,
   }
 
   #Allow for the dedupe mechanisms in COP21 Data packs
-  if (d$info$tool == "Data Pack" & d$info$cop_year == 2021) {
+  if (d$info$tool == "Data Pack" & d$info$cop_year %in% c(2021,2022)) {
     mechs_datim <- append(c("00000", "00001"), mechs_datim)
   }
 
@@ -48,7 +48,7 @@ checkMechanisms <- function(d,
                   These MUST be reallocated to a valid mechanism
                   ", paste(bad_mechs, sep = "", collapse = ", "))
     d$tests$bad_mechs <- bad_mechs
-    d$info$warning_msg <- appendMessage(msg, d$info$warning_msg)
+    d$info$messagesg <- appendMessage(msg,  d$info$messages,"ERROR")
     d$info$has_error <- TRUE
   }
 
