@@ -45,62 +45,53 @@ checkPSNUData  <-  function(d,
     return(d)
   }
 
-  # We need ALL mechanisms to be in DATIM before remapping....TODO
-  vr_data$attributeOptionCombo  <-
-    datimvalidation::remapMechs(vr_data$attributeOptionCombo,
-                                d2_session$user_orgunit,
-                                "code",
-                                "id",
-                                d2session = d2_session)
 
-  # TODO Can this be replaced with a call to `getDatasetUids`?
-  datasets_uid  <-
-    if (d$info$cop_year == "2020") {
-      c("Pmc0yYAIi1t", "s1sxJuqXsvV")
-    } else if  (d$info$cop_year == "2021") {
-      c("YfZot37BbTm", "Pmc0yYAIi1t") #TODO...why do we have last years dataset here?
 
-    } else if (d$info$cop_year == "2022") {
-      c("iADcaCD5YXh")
+    vr_data <- datimvalidation::prepDataForValidation(vr_data) %>% 
+      dplyr::select(-dataElement,-period,-categoryOptionCombo) %>% 
+      dplyr::group_by(orgUnit,attributeOptionCombo) %>% 
+      tidyr::nest()
+    
+    
+    #Evaluate the indicators in parallel if possible
+    if ("parallel" %in% rownames(installed.packages()) == TRUE) {
+      vr_data$vr_results <-
+        parallel::mclapply(vr_data$data, function(x)
+          datimvalidation::evaluateValidation(x$combi, x$value, vr = vr_rules,return_violations_only = FALSE), mc.cores = parallel::detectCores())
+    } else {
+      vr_data$vr_results <-
+        lapply(vr_data$data, function(x)
+          datimvalidation::evaluateValidation(x$combi, x$value, vr = vr_rules ,return_violations_only=FALSE))
     }
+  
+  #Unnest the data  
+  vr_data <- vr_data %>% 
+    tidyr::unnest(vr_results) %>% 
+    dplyr::inner_join(valid_PSNUs[,c("psnu","psnu_uid")], by = c("orgUnit"="psnu_uid")) %>% 
+    dplyr::ungroup()
+  
+  
+  if (sum(!vr_data$result) > 0) {
 
-  if (Sys.info()["sysname"] == "Linux") {
-    ncores  <-  parallel::detectCores() - 1
-    doMC::registerDoMC(cores = ncores)
-    is_parallel  <-  TRUE
-  } else {
-    is_parallel  <-  FALSE
-  }
-
-  vr_violations <-
-    datimvalidation::validateData(vr_data,
-                                  parallel = is_parallel,
-                                  return_violations_only = FALSE,
-                                  vr = vr_rules,
-                                  d2session = d2_session)
-
-  if (NROW(vr_violations) > 0) {
-
-    diff  <-  gsub(" [<>]= ", "/", vr_violations$formula)
-    vr_violations$diff <-
+    diff  <-  gsub(" [<>]= ", "/", vr_data$formula)
+    vr_data$diff <-
       sapply(diff, function(x) round((eval(parse(text = x)) - 1) * 100, 2))
-    vr_violations$diff <-
-      ifelse(vr_violations$rightSide.expression == 0 |
-               vr_violations$leftSide.expression == 0,
+    vr_data$diff <-
+      ifelse(vr_data$rightSide.expression == 0 |
+               vr_data$leftSide.expression == 0,
              NA,
-             vr_violations$diff)
+             vr_data$diff)
 
-    diff  <-  gsub(" [<>]= ", "-", vr_violations$formula)
-    vr_violations$abs_diff <-
+    diff  <-  gsub(" [<>]= ", "-", vr_data$formula)
+    vr_data$abs_diff <-
       sapply(diff, function(x) {
         abs(eval(parse(text = x)))
       })
 
-    d$tests$vr_rules_check  <-  vr_violations  %>%
-      dplyr::select(name, ou_name, mech_code, formula, diff, abs_diff) %>%
-      dplyr::rename("Validation rule" = name,
-                    "PSNU" = ou_name,
-                    "Mechanism" = mech_code,
+    d$tests$vr_rules_check  <-  vr_data  %>%
+      dplyr::select("Validation rule" = name,
+                    "PSNU" = psnu,
+                    "Mechanism" = attributeOptionCombo,
                     "Formula" = formula,
                     "Diff (%)" = diff,
                     "Diff (Absolute)" = abs_diff,
@@ -108,12 +99,11 @@ checkPSNUData  <-  function(d,
 
     attr(d$tests$vr_rules_check, "test_name") <- "Validation rule violations"
 
-    warning_msg <- paste("WARNING: ", NROW(vr_violations),
+    warning_msg <- paste("WARNING: ", NROW(sum(!d$tests$vr_rules_check$Valid)),
                          "validation rule issues found in",
                          d$info$datapack_name, "DataPack.\n")
-  
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "Warning")
-    d$info$had_error <- TRUE
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
   d
