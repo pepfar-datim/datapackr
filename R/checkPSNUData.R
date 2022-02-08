@@ -14,7 +14,7 @@ checkPSNUData  <-  function(d,
                                                 inherits = TRUE)) {
 
   # Checks that Validation Rules file can be found and read
-  print(validation_rules_path)
+
   can_read_file <- file.access(validation_rules_path, 4) == 0
 
   # If Validation Rules file can be found, retrieve it
@@ -103,15 +103,16 @@ checkPSNUData  <-  function(d,
                     "Mechanism" = mech_code,
                     "Formula" = formula,
                     "Diff (%)" = diff,
-                    "Diff (Absolute)" = abs_diff)
+                    "Diff (Absolute)" = abs_diff,
+                    "Valid" = result)
 
     attr(d$tests$vr_rules_check, "test_name") <- "Validation rule violations"
 
     warning_msg <- paste("WARNING: ", NROW(vr_violations),
                          "validation rule issues found in",
                          d$info$datapack_name, "DataPack.\n")
-    d$tests$vr_rules_check <-
-      d$info$messages <- appendMessage(d$info$messages, warning_msg, "Warning")
+  
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "Warning")
     d$info$had_error <- TRUE
   }
 
