@@ -77,7 +77,7 @@ if (!(d$info$cop_year %in% c("2020","2021","2022"))) {
   }
 
   #TOOD: Confirm the memo structure for 2022
-  if (d$info$cop_year = "2021") {
+  if (d$info$cop_year == "2021") {
     row_order <- tibble::tribble(
       ~ind, ~options, ~in_partner_table,
       "HTS_INDEX", "<15", TRUE,
@@ -140,7 +140,7 @@ if (!(d$info$cop_year %in% c("2020","2021","2022"))) {
       "AGYW_PREV", "Total", FALSE)
   }
  #TOOD: Confirm the memo structure for 2022
-  if (d$info$cop_year = "2022") {
+  if (d$info$cop_year == "2022") {
     row_order <- tibble::tribble(
       ~ind, ~options, ~in_partner_table,
       "HTS_INDEX", "<15", TRUE,
