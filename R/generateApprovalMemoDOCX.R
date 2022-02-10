@@ -2,11 +2,12 @@
 #'
 #' @param d 
 #' @param draft Should a draft watermark be added to the document?
+#' @param remove_empty_columns Should empty columns be removed?
 #'
 #' @return Returns a COP Memo DOCX object suitable for download
 #' @export
 #'
-generateApprovalMemo <- function(d,draft=TRUE) {
+generateApprovalMemo <- function(d,draft=TRUE, remove_empty_columns = TRUE) {
 
   prio_table <- d %>%
     purrr::pluck("data") %>%
@@ -97,6 +98,7 @@ generateApprovalMemo <- function(d,draft=TRUE) {
     unlist() %>%
     c("Funding Agency", "Partner", "Mechanism", .)
 
+  #TODO: This needs to be redone based on the COP year
   chunks <- list(c(1:15), c(1:3, 16:26), c(1:3, 27:35), c(1:3, 36:44))
 
   renderPartnerTable <- function(chunk) {

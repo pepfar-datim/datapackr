@@ -4,12 +4,14 @@
 \alias{generateApprovalMemo}
 \title{Title}
 \usage{
-generateApprovalMemo(d, draft = TRUE)
+generateApprovalMemo(d, draft = TRUE, remove_empty_columns = TRUE)
 }
 \arguments{
 \item{d}{}
 
 \item{draft}{Should a draft watermark be added to the document?}
+
+\item{remove_empty_columns}{Should empty columns be removed?}
 }
 \value{
 Returns a COP Memo DOCX object suitable for download
