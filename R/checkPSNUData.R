@@ -7,23 +7,14 @@
 #'
 #' @return d
 #'
-checkPSNUData  <-  function(d,
-                            validation_rules_path =
-                              paste0(Sys.getenv("support_files_directory"), "cop_validation_rules.rds"),
-                            d2_session = dynGet("d2_default_session",
-                                                inherits = TRUE)) {
+checkPSNUData  <-  function(d, d2_session = dynGet("d2_default_session",
+                                                   inherits = TRUE)) {
 
-  # Checks that Validation Rules file can be found and read
+  stopifnot("Cannot validate data for this COP year!" =
+              d$info$cop_year %in% names(datapackr::cop_validation_rules))
 
-  can_read_file <- file.access(validation_rules_path, 4) == 0
-
-  # If Validation Rules file can be found, retrieve it
-  if (can_read_file) {
-    vr_rules <- readRDS(validation_rules_path) %>%
-      purrr::pluck(., as.character(d$info$cop_year))
-  } else {
-    stop("Cannot find validation rules file!")
-  }
+  vr_rules <- datapackr::cop_validation_rules %>%
+    purrr::pluck(., as.character(d$info$cop_year))
 
   vr_data <- d$data$analytics %>%
     dplyr::select(

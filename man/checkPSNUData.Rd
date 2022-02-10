@@ -4,12 +4,7 @@
 \alias{checkPSNUData}
 \title{Check PSNUxIM tab Data}
 \usage{
-checkPSNUData(
-  d,
-  validation_rules_path = paste0(Sys.getenv("support_files_directory"),
-    "cop_validation_rules.rds"),
-  d2_session = dynGet("d2_default_session", inherits = TRUE)
-)
+checkPSNUData(d, d2_session = dynGet("d2_default_session", inherits = TRUE))
 }
 \arguments{
 \item{d}{Datapackr sidecar object}
