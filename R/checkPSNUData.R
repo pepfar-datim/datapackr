@@ -45,32 +45,32 @@ checkPSNUData  <-  function(d,
     return(d)
   }
 
-
-
-    vr_data <- datimvalidation::prepDataForValidation(vr_data) %>% 
-      dplyr::select(-dataElement,-period,-categoryOptionCombo) %>% 
-      dplyr::group_by(orgUnit,attributeOptionCombo) %>% 
+    vr_data <- datimvalidation::prepDataForValidation(vr_data) %>%
+      dplyr::select(-dataElement,-period,-categoryOptionCombo) %>%
+      dplyr::group_by(orgUnit,attributeOptionCombo) %>%
       tidyr::nest()
-    
-    
+
+
     #Evaluate the indicators in parallel if possible
     if ("parallel" %in% rownames(installed.packages()) == TRUE) {
       vr_data$vr_results <-
         parallel::mclapply(vr_data$data, function(x)
-          datimvalidation::evaluateValidation(x$combi, x$value, vr = vr_rules,return_violations_only = FALSE), mc.cores = parallel::detectCores())
+          datimvalidation::evaluateValidation(x$combi,
+          x$value, vr = vr_rules,return_violations_only = FALSE),
+          mc.cores = parallel::detectCores())
     } else {
       vr_data$vr_results <-
         lapply(vr_data$data, function(x)
-          datimvalidation::evaluateValidation(x$combi, x$value, vr = vr_rules ,return_violations_only=FALSE))
+          datimvalidation::evaluateValidation(x$combi, x$value, vr = vr_rules ,return_violations_only = FALSE))
     }
-  
-  #Unnest the data  
-  vr_data <- vr_data %>% 
-    tidyr::unnest(vr_results) %>% 
-    dplyr::inner_join(valid_PSNUs[,c("psnu","psnu_uid")], by = c("orgUnit"="psnu_uid")) %>% 
+
+  #Unnest the data
+  vr_data <- vr_data %>%
+    tidyr::unnest(vr_results) %>%
+    dplyr::inner_join(valid_PSNUs[,c("psnu","psnu_uid")], by = c("orgUnit" = "psnu_uid")) %>%
     dplyr::ungroup()
-  
-  
+
+
   if (sum(!vr_data$result) > 0) {
 
     diff  <-  gsub(" [<>]= ", "/", vr_data$formula)

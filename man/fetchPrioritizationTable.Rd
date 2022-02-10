@@ -17,6 +17,6 @@ fetchPrioritizationTable(d, d2_session, include_no_prio = TRUE)
 A modified d object with d$data$memo$datim$prio
 }
 \description{
-Utility function which retrieves prioritization table 
+Utility function which retrieves prioritization table
 data from the DATIM analytics API.
 }
