@@ -66,7 +66,7 @@ fetchPrioritizationTable <- function(d, d2_session, include_no_prio = TRUE) {
     dplyr::mutate(Value = as.numeric(Value)) %>%
     dplyr::inner_join(inds, by = c(`Data` = "id")) %>%
     dplyr::select(-Data) %>%
-    datapackr::seperateIndicatorMetadata(.) %>%
+    datapackr::separateIndicatorMetadata(.) %>%
     dplyr::left_join(., prios, by = "psnu_uid") %>%
     dplyr::mutate(prioritization = as.character(prioritization)) %>%
     dplyr::mutate(prioritization = dplyr::case_when(is.na(prioritization) ~ "No Prioritization",

@@ -50,7 +50,7 @@ preparePartnerMemoTable <- function(d, d2_session = dynGet("d2_default_session",
     dplyr::ungroup() %>%
     dplyr::rename("Mechanism" = mechanism_code, "Agency" = funding_agency, "Partner" = partner_desc, Value = value) %>%
     dplyr::select(-id, -numerator, -denominator) %>%
-    seperateIndicatorMetadata(.) %>%
+    separateIndicatorMetadata(.) %>%
     tidyr::complete(., tidyr::nesting(Mechanism, Agency, Partner), Indicator, Age, fill = list(Value = 0)) %>%
     tidyr::drop_na()
 

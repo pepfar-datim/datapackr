@@ -1,11 +1,12 @@
-#' Title
+#' @title Separate Indicator Metadata
 #'
 #' @param x Data frame containing indicator names which have not been separated
 #'
-#' @return Data frame with indicator names separated into two columns: Indicator & Age
+#' @return Data frame with indicator names separated into
+#' two columns: Indicator & Age
 #' @export
 #'
-seperateIndicatorMetadata <- function(x) {
+separateIndicatorMetadata <- function(x) {
 
   x %>%
     dplyr::mutate(name = stringr::str_replace_all(name, "^COP\\d\\d Targets ", "")) %>%
@@ -95,7 +96,7 @@ preparePrioTable <- function(d, d2_session) {
     tidyr::unnest(indicator_results) %>%
     dplyr::select(-id, -numerator, -denominator) %>%
     tidyr::complete(., prioritization, name, fill = list(value = 0)) %>%
-    seperateIndicatorMetadata(.) %>%
+    separateIndicatorMetadata(.) %>%
     dplyr::group_by(Age, Indicator, prioritization) %>%
     dplyr::summarise(value = sum(value),.groups = "drop") %>%
     dplyr::mutate(prioritization = dplyr::case_when(is.na(prioritization) ~ "No Prioritization",
