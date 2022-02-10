@@ -60,7 +60,9 @@ Suggests:
     cellranger,
     rprojroot,
     waldo,
-    doMC
+    parallel,
+    gdtools,
+    flextable
 Remotes:
     pepfar-datim/datimutils,
     pepfar-datim/datim-validation,
