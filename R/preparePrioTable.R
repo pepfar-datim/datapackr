@@ -36,15 +36,13 @@ separateIndicatorMetadata <- function(x) {
 }
 
 
-#' Title
+#' @title Prepare COP Memo Prioritization Target Table Data
 #'
-#' @param d Datapackr d object
-#' @param d2_session
+#' @inheritParams datapackr_params
 #'
 #' @return Datapackr d object with d$data$memo table
 #' @export
 #'
-
 preparePrioTable <- function(d, d2_session) {
 
   d <- memoStructure(d)

@@ -1,13 +1,13 @@
-#' Title
+#' @title Generate COP Approval Memo Target Tables (DOCX Format)
 #'
-#' @param d Dataoackr d object
 #' @param draft Should a draft watermark be added to the document?
 #' @param remove_empty_columns Should empty columns be removed?
+#' @inheritParams datapackr_params
 #'
 #' @return Returns a COP Memo DOCX object suitable for download
 #' @export
 #'
-generateApprovalMemo <- function(d,draft=TRUE, remove_empty_columns = TRUE) {
+generateApprovalMemo <- function(d, draft = TRUE, remove_empty_columns = TRUE) {
 
   prio_table <- d %>%
     purrr::pluck("data") %>%

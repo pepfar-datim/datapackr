@@ -2,16 +2,16 @@
 % Please edit documentation in R/memoStructure.R
 \name{memoStructure}
 \alias{memoStructure}
-\title{Title}
+\title{COP Memo Target Table Structure}
 \usage{
 memoStructure(d)
 }
 \arguments{
-\item{d}{}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 d object with d$memo$structure
 }
 \description{
-Title
+COP Memo Target Table Structure
 }

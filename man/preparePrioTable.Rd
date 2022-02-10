@@ -2,18 +2,18 @@
 % Please edit documentation in R/preparePrioTable.R
 \name{preparePrioTable}
 \alias{preparePrioTable}
-\title{Title}
+\title{Prepare COP Memo Prioritization Target Table Data}
 \usage{
 preparePrioTable(d, d2_session)
 }
 \arguments{
-\item{d}{Datapackr d object}
+\item{d}{Datapackr sidecar object}
 
-\item{d2_session}{}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Datapackr d object with d$data$memo table
 }
 \description{
-Title
+Prepare COP Memo Prioritization Target Table Data
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/getMemoIndicators.R
 \name{getMemoIndicators}
 \alias{getMemoIndicators}
-\title{Title}
+\title{Get COP Memo Indicators}
 \usage{
 getMemoIndicators(
   cop_year,
@@ -10,14 +10,15 @@ getMemoIndicators(
 )
 }
 \arguments{
-\item{cop_year}{COP Year}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
-\item{d2_session}{Datimutils session object}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 A dataframe consisting of indicator UIDs,name,numerator and denominator expression.
 If a given COP year does not exist, NULL is returned
 }
 \description{
-Title
+Get COP Memo Indicators
 }

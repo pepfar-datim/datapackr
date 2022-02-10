@@ -1,15 +1,15 @@
-#' Title
+#' Get COP Memo Indicators
 #'
-#' @param cop_year COP Year
-#' @param d2_session Datimutils session object
+#' @inheritParams datapackr_params
 #'
 #' @return A dataframe consisting of indicator UIDs,name,numerator and denominator expression.
 #' If a given COP year does not exist, NULL is returned
 #' @export
 #'
 
-getMemoIndicators <- function(cop_year, d2_session = dynGet("d2_default_session",
-                                                            inherits = TRUE)) {
+getMemoIndicators <- function(cop_year,
+                              d2_session = dynGet("d2_default_session",
+                                                  inherits = TRUE)) {
   #Fetch indicators from the COP21 memo group
   #TODO: Make this work for both COP years.!
   ind_group <- switch(as.character(cop_year),

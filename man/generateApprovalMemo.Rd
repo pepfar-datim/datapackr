@@ -2,12 +2,12 @@
 % Please edit documentation in R/generateApprovalMemoDOCX.R
 \name{generateApprovalMemo}
 \alias{generateApprovalMemo}
-\title{Title}
+\title{Generate COP Approval Memo Target Tables (DOCX Format)}
 \usage{
 generateApprovalMemo(d, draft = TRUE, remove_empty_columns = TRUE)
 }
 \arguments{
-\item{d}{}
+\item{d}{Datapackr sidecar object}
 
 \item{draft}{Should a draft watermark be added to the document?}
 
@@ -17,5 +17,5 @@ generateApprovalMemo(d, draft = TRUE, remove_empty_columns = TRUE)
 Returns a COP Memo DOCX object suitable for download
 }
 \description{
-Title
+Generate COP Approval Memo Target Tables (DOCX Format)
 }

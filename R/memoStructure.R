@@ -1,6 +1,6 @@
-#' Title
+#' @title COP Memo Target Table Structure
 #'
-#' @param d
+#' @inheritParams datapackr_params
 #'
 #' @return d object with d$memo$structure
 #' @export
