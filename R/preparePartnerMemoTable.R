@@ -25,8 +25,7 @@ preparePartnerMemoTable <- function(d, d2_session = dynGet("d2_default_session",
                   partner_desc,
                   value = target_value) %>%
     dplyr::group_by(dataelement_id, categoryoptioncombo_id, mechanism_code, funding_agency, partner_desc) %>%
-    dplyr::summarise(value = sum(value)) %>%
-    dplyr::ungroup() %>%
+    dplyr::summarise(value = sum(value),.groups = "drop") %>%
     dplyr::mutate(combi = paste0("#{", dataelement_id, ".", categoryoptioncombo_id, "}")) %>%
     dplyr::select(-dataelement_id,-categoryoptioncombo_id) %>%
     dplyr::group_by(mechanism_code,funding_agency,partner_desc) %>%
@@ -48,6 +47,7 @@ preparePartnerMemoTable <- function(d, d2_session = dynGet("d2_default_session",
   df <- df %>%
     dplyr::select(-data) %>%
     tidyr::unnest(indicator_results) %>%
+    dplyr::ungroup() %>%
     dplyr::rename("Mechanism" = mechanism_code, "Agency" = funding_agency, "Partner" = partner_desc, Value = value) %>%
     dplyr::select(-id, -numerator, -denominator) %>%
     seperateIndicatorMetadata(.) %>%
@@ -70,8 +70,7 @@ preparePartnerMemoTable <- function(d, d2_session = dynGet("d2_default_session",
 
   d_totals <- dplyr::bind_rows(d_base, df) %>%
     dplyr::group_by(`Indicator`, `Age`) %>%
-    dplyr::summarise(`Value` = sum(`Value`)) %>%
-    dplyr::ungroup() %>%
+    dplyr::summarise(`Value` = sum(`Value`),.groups = "drop") %>%
     dplyr::mutate(`Partner` = "Total", `Mechanism` = "Total", Agency = "Total")
 
   #Remove dedupe

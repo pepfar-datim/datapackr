@@ -1,6 +1,6 @@
 #' Title
 #'
-#' @param d 
+#' @param d Dataoackr d object
 #' @param draft Should a draft watermark be added to the document?
 #' @param remove_empty_columns Should empty columns be removed?
 #'
