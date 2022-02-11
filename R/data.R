@@ -649,7 +649,7 @@
 #' COP years.
 #' @md
 #'
-#' @format The following COP years are included in this dataset: 
+#' @format The following COP years are included in this dataset:
 #' \describe{
 #'   \item{2020}{A list object containing the validation rules for COP20/FY21.}
 #'   \item{2021}{A list object containing the validation rules for COP21/FY22.}
@@ -658,7 +658,7 @@
 #'
 #' @section Structure for COP20 and COP21 data sets:
 #' Data sets for 2020 and 2021 conforms to the following structure:
-#' 
+#'
 #' * `description`: A description of the DATIM validation rule, showing the
 #' relationship required between two indicators. Synonymous to
 #' the `name` and `instruction` columns.
@@ -707,7 +707,7 @@
 #' * `id`: The DATIM UID for the rule.
 #' * `periodType`: A string indicating whether the indicator is reported
 #' quartery or annually. The value is either `Quarterly` or `FinancialOct`.
-#' * `description`: A description of the DATIM validation rule, showing the 
+#' * `description`: A description of the DATIM validation rule, showing the
 #' relationship required between two indicators. Synonymous to
 #' the `name` column.
 #' * `operator`: The operator used in the validation rule. This must be either
