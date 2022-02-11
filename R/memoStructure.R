@@ -152,8 +152,6 @@ if (!(d$info$cop_year %in% c("2020","2021","2022"))) {
       "HTS_TST_POS", "<15", TRUE,
       "HTS_TST_POS", "15+", TRUE,
       "HTS_TST_POS", "Total", FALSE,
-      "HTS_RECENT","<15",TRUE,
-      "HTS_RECENT","15+",TRUE,
       "HTS_RECENT","Total",TRUE,
       "HTS_SELF", "<15", TRUE,
       "HTS_SELF", "15+", TRUE,
