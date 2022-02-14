@@ -10,7 +10,7 @@ memoStructure <- function(d) {
 
 
 if (!(d$info$cop_year %in% c("2020","2021","2022"))) {
-  warning("COP Memo structure uknown for given COP year")
+  warning("COP Memo structure unknown for given COP year")
   return(d)
 }
 
@@ -139,7 +139,7 @@ if (!(d$info$cop_year %in% c("2020","2021","2022"))) {
       "GEND_GBV", "Total", TRUE,
       "AGYW_PREV", "Total", FALSE)
   }
- #TOOD: Confirm the memo structure for 2022
+
   if (d$info$cop_year == "2022") {
     row_order <- tibble::tribble(
       ~ind, ~options, ~in_partner_table,
@@ -206,15 +206,15 @@ if (!(d$info$cop_year %in% c("2020","2021","2022"))) {
   }
 
   col_order <- tibble::tribble(
-    ~value, ~name, ~col_order,
-    0, "No Prioritization", 7,
-    1, "Scale-up: Saturation", 2,
-    2, "Scale-up: Aggressive", 3,
-    4, "Sustained", 4,
-    5, "Centrally Supported", 5,
-    6, "Sustained: Commodities", 6,
-    7, "Attained", 1,
-    8, "Not PEPFAR Supported", 8) %>%
+    ~value, ~name, ~col_order, ~id,
+    0, "No Prioritization", 7, "CJYtvFbjeG2",
+    1, "Scale-up: Saturation", 2, "IzmZerN7tDN",
+    2, "Scale-up: Aggressive", 3, "AHMMjoPYta6",
+    4, "Sustained", 4, "b1X6pxMHgs6",
+    5, "Centrally Supported", 5, "pibJV72pMyW",
+    6, "Sustained: Commodities", 6, "ma6CQUVQRWI",
+    7, "Attained", 1, "ATX2xv8PsrX",
+    8, "Not PEPFAR Supported", 8,"p0JrTY2hLii") %>%
     dplyr::mutate(Prioritization = paste0(value, " - ", name))
 
   d$memo$structure <- list(row_order = row_order, col_order = col_order)

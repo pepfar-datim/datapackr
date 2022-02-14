@@ -1,4 +1,43 @@
 #' Title
+#'
+#' @param psnus
+#' @param cop_year
+#' @param d2_session
+#'
+#' @return
+#' @export
+#'
+
+getExistingPrioritization <- function(psnus, cop_year, d2_session) {
+  period <- paste0(cop_year, "Oct")
+  ous <- paste(psnus, sep = "", collapse = ";")
+  prios <-
+    datimutils::getAnalytics(
+      dx = "r4zbW3owX9n",
+      pe_f = period,
+      ou = ous,
+      d2_session = d2_session
+    )
+
+  if (is.null(prios)) {
+    return(data.frame("psnu_uid" = psnus, "prioritization" = "No Prioritization"))
+  }
+
+  prios %>%
+    dplyr::select(-Data) %>%
+    dplyr::rename("psnu_uid" = "Organisation unit",
+                  "value" = "Value") %>%
+    dplyr::left_join(datapackr::prioritization_dict()) %>%
+    dplyr::select(psnu_uid, "prioritization" = "name") %>%
+    dplyr::mutate(prioritization = dplyr::case_when(
+      is.na(prioritization) ~ "No Prioritization",
+      TRUE ~ prioritization
+    ))
+
+}
+
+
+#' Title
 #' @description Utility function which retrieves prioritization table
 #' data from the DATIM analytics API.
 #' @param d Datapackr d object
@@ -14,17 +53,15 @@ fetchPrioritizationTable <- function(d, d2_session, include_no_prio = TRUE) {
   inds <- getMemoIndicators(d$info$cop_year, d2_session = d2_session) %>%
     select(name, id)
 
+  #Get the structure if it does not exist
+  if (is.null(d$memo$structure)) {
+    d <- memoStructure(d)
+  }
+
   #TODO: Replace this with memoStructure
-  df_cols <- tibble::tribble(
-    ~id, ~shortName, ~col_name,
-    "ATX2xv8PsrX", "PPG Attained", "Attained",
-    "IzmZerN7tDN", "PPG Scale-up: Saturation", "Scale-up: Saturation",
-    "AHMMjoPYta6", "PPG Scale up: Aggressive", "Scale-up: Aggressive",
-    "b1X6pxMHgs6", "PPG Sustained", "Sustained",
-    "pibJV72pMyW", "PPG Centrally Supported", "Centrally Supported",
-    "CJYtvFbjeG2", "PPG No Prioritization", "No Prioritization",
-    "p0JrTY2hLii", "PPG Not PEPFAR Supported", "Not PEPFAR Supported"
-  )
+  df_cols <- d$memo$structure$col_order %>%
+    dplyr::select(id,col_name = name)
+
 
   df_rows <- d$memo$structure %>%
     purrr::pluck("row_order") %>%
@@ -44,7 +81,7 @@ fetchPrioritizationTable <- function(d, d2_session, include_no_prio = TRUE) {
 
   #Break up into 2048 character URLS (approximately)
   n_requests <- ceiling(nchar(paste(psnus, sep = "", collapse = ";")) / 2048)
-  n_groups <- split(sample(psnus), 1:n_requests)
+  n_groups <- n_groups <- split(psnus, ceiling(seq_along(psnus) / (length(psnus) / n_requests)))
 
   getPrioTable <- function(x) {
     datimutils::getAnalytics(ou = x,
@@ -72,16 +109,14 @@ fetchPrioritizationTable <- function(d, d2_session, include_no_prio = TRUE) {
     dplyr::mutate(prioritization = dplyr::case_when(is.na(prioritization) ~ "No Prioritization",
                                                     TRUE ~ prioritization)) %>%
     dplyr::group_by(`Indicator`, `Age`, `prioritization`) %>%
-    dplyr::summarise(Value = sum(Value)) %>%
-    dplyr::ungroup() %>%
+    dplyr::summarise(Value = sum(Value),.groups = "drop") %>%
     dplyr::rename("col_name" = "prioritization")
 
   df_totals <- df %>%
     dplyr::filter(Age != "Total") %>%
     group_by(Indicator, col_name) %>%
-    dplyr::summarise(Value = sum(Value)) %>%
+    dplyr::summarise(Value = sum(Value),.groups = "drop") %>%
     dplyr::mutate(Age = "Total") %>%
-    dplyr::ungroup() %>%
     dplyr::select(names(df))
 
   df_final <- dplyr::bind_rows(df, df_totals, df_base) %>%
@@ -95,14 +130,15 @@ fetchPrioritizationTable <- function(d, d2_session, include_no_prio = TRUE) {
     tidyr::pivot_wider(names_from = col_name, values_from = "Value") %>%
     suppressWarnings()
 
-  #Remove NOT pepfar supported if its only zeros, otherwise, show this, since its potentially problematic
+  #Remove NOT PEPFAR supported if its only zeros, otherwise, show this, since its potentially problematic
   if (df_final %>% dplyr::select("Not PEPFAR Supported") %>% sum(., na.rm = TRUE) == 0) {
     df_final <- df_final %>% select(-`Not PEPFAR Supported`)
   }
 
   df_final %<>%
     mutate("Total" = rowSums(across(where(is.numeric)))) %>%
-    dplyr::select("Indicator", "Age", 3:dim(.)[2])
+    dplyr::select("Indicator", "Age", 3:dim(.)[2]) %>%
+    dplyr::select(tidyselect::where(~ any(. != 0))) # Remove all columns which are completely zero
 
   if (!include_no_prio & any("No Prioritization" %in% names(df_final))) {
     df_final %<>% dplyr::select(-`No Prioritization`)

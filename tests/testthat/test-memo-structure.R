@@ -19,5 +19,5 @@ test_that("We can create a memo structure", {
   expect_true("data.frame" %in% class(d$memo$structure$row_order))
   expect_setequal(names(d$memo$structure$row_order),c("ind","options","in_partner_table"))
   expect_true("data.frame" %in% class(d$memo$structure$col_order))
-  expect_setequal(names(d$memo$structure$col_order),c("value","name","col_order","Prioritization"))
+  expect_setequal(names(d$memo$structure$col_order),c("value","name","col_order","id","Prioritization"))
   })
