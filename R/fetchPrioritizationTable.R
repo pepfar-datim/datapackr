@@ -38,7 +38,6 @@ getExistingPrioritization <- function(psnus, cop_year, d2_session) {
 
 
 #' Title
-#' @importFrom tidyselect where
 #' @description Utility function which retrieves prioritization table
 #' data from the DATIM analytics API.
 #' @param d Datapackr d object
