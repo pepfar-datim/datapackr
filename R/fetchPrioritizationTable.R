@@ -1,10 +1,10 @@
 #' Title
 #'
-#' @param psnus
-#' @param cop_year
-#' @param d2_session
+#' @param psnus A list of PSNUs
+#' @param cop_year The cop year
+#' @param d2_session Datimutils d2_session object
 #'
-#' @return
+#' @return A data frame consisting of Organisation unit, Value, prioritization
 #' @export
 #'
 
@@ -38,6 +38,7 @@ getExistingPrioritization <- function(psnus, cop_year, d2_session) {
 
 
 #' Title
+#' @importFrom tidyselect where
 #' @description Utility function which retrieves prioritization table
 #' data from the DATIM analytics API.
 #' @param d Datapackr d object
@@ -137,8 +138,7 @@ fetchPrioritizationTable <- function(d, d2_session, include_no_prio = TRUE) {
 
   df_final %<>%
     mutate("Total" = rowSums(across(where(is.numeric)))) %>%
-    dplyr::select("Indicator", "Age", 3:dim(.)[2]) %>%
-    dplyr::select(tidyselect::where(~ any(. != 0))) # Remove all columns which are completely zero
+    dplyr::select(where(~ any(. != 0))) # Remove all columns which are completely zero
 
   if (!include_no_prio & any("No Prioritization" %in% names(df_final))) {
     df_final %<>% dplyr::select(-`No Prioritization`)
