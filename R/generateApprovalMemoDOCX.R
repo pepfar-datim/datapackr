@@ -110,8 +110,8 @@ generateApprovalMemo <- function(d, draft = TRUE, remove_empty_columns = TRUE) {
       delete_part(., part = "header") %>%
       add_header_row(., values = sub_heading[chunk]) %>%
       add_header_row(., top = TRUE, values = group_heading[chunk]) %>%
-      merge_h(., part = "header") %>%
       merge_v(., part = "header") %>%
+      merge_h(., i = 1, part = "header") %>%
       fontsize(., size = 7, part = "all") %>%
       style(., pr_p = style_para_prio, part = "body") %>%
       width(., j = 1:3, 0.75) %>%
