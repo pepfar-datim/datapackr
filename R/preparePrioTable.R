@@ -43,7 +43,8 @@ separateIndicatorMetadata <- function(x) {
 #' @return Datapackr d object with d$data$memo table
 #' @export
 #'
-preparePrioTable <- function(d, d2_session) {
+preparePrioTable <- function(d, d2_session = dynGet("d2_default_session",
+                                                    inherits = TRUE)) {
 
   d <- memoStructure(d)
 
@@ -103,7 +104,7 @@ preparePrioTable <- function(d, d2_session) {
   df_total <- df %>%
     dplyr::filter(Age != "Total") %>%
     dplyr::select(-Age) %>%
-    group_by(prioritization, Indicator) %>%
+    dplyr::group_by(prioritization, Indicator) %>%
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(Age = "Total") %>%
@@ -120,7 +121,8 @@ preparePrioTable <- function(d, d2_session) {
     dplyr::arrange(col_order, row_order, Age) %>%
     dplyr::select(-row_order, -col_order) %>%
     tidyr::pivot_wider(names_from = prioritization, values_from = "value") %>%
-    mutate("Total" = rowSums(across(where(is.numeric)))) %>%
+    dplyr::mutate("Total" = rowSums(across(where(is.numeric)))) %>%
+    dplyr::select(Total != 0) %>% # Remove all rows which are completely zero
     dplyr::select("Indicator", "Age", 3:dim(.)[2]) %>%
     dplyr::select(where(~ any(. != 0))) # Remove all columns which are completely zero
 

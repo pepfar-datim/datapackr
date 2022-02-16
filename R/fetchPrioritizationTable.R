@@ -48,7 +48,8 @@ getExistingPrioritization <- function(psnus, cop_year, d2_session) {
 #' @export
 #'
 
-fetchPrioritizationTable <- function(d, d2_session, include_no_prio = TRUE) {
+fetchPrioritizationTable <- function(d, d2_session = dynGet("d2_default_session",
+                                                            inherits = TRUE), include_no_prio = TRUE) {
 
   inds <- getMemoIndicators(d$info$cop_year, d2_session = d2_session) %>%
     select(name, id)
@@ -136,7 +137,8 @@ fetchPrioritizationTable <- function(d, d2_session, include_no_prio = TRUE) {
   }
 
   df_final %<>%
-    mutate("Total" = rowSums(across(where(is.numeric)))) %>%
+    dplyr::mutate("Total" = rowSums(across(where(is.numeric)))) %>%
+    dplyr::select(Total != 0) %>% # Remove all rows which are completely zero
     dplyr::select(where(~ any(. != 0))) # Remove all columns which are completely zero
 
   if (!include_no_prio & any("No Prioritization" %in% names(df_final))) {

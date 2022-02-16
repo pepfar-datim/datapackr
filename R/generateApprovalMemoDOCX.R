@@ -99,7 +99,7 @@ generateApprovalMemo <- function(d, draft = TRUE, remove_empty_columns = TRUE) {
     c("Funding Agency", "Partner", "Mechanism", .)
 
   #TODO: This needs to be redone based on the COP year
-  chunks <- list(c(1:15), c(1:3, 16:26), c(1:3, 27:35), c(1:3, 36:44))
+  chunks <- d$memo$structure$row_order
 
   renderPartnerTable <- function(chunk) {
 

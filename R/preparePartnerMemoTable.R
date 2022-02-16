@@ -79,7 +79,7 @@ preparePartnerMemoTable <- function(d, d2_session = dynGet("d2_default_session",
 
   d_indicators <- d$memo$structure %>%
     purrr::pluck("row_order") %>%
-    dplyr::filter(in_partner_table) %>%
+    dplyr::filter(!is.na(partner_chunk)) %>%
     dplyr::select(ind, options) %>%
     dplyr::mutate(indicator_name = factor(paste(ind, options)))
 
