@@ -89,7 +89,7 @@ packDataPack <- function(model_data,
   interactive_print("Checking template against schema and DATIM...")
   schema <-
     unPackSchema_datapack(
-      filepath = d$keychain$template,
+      template_path = d$keychain$template,
       skip = skip_tabs(tool = "Data Pack Template", cop_year = cop_year),
       cop_year = cop_year)
 
@@ -101,7 +101,7 @@ packDataPack <- function(model_data,
   d$tool$wb <- openxlsx::loadWorkbook(d$keychain$template_path)
 
   # Set global numeric format ####
-  options("openxlsx.numFmt" = "#, ##0")
+  options("openxlsx.numFmt" = "#,##0")
 
   # Write Home Sheet info ####
   d$tool$wb <- writeHomeTab(wb = d$tool$wb,
@@ -133,8 +133,8 @@ packDataPack <- function(model_data,
                                   cop_year = d$info$cop_year)
 
   # Hide unneeded sheets ####
-  # sheets_to_hide <- which(stringr::str_detect(names(d$tool$wb), "PSNUxIM|Summary"))
-  # openxlsx::sheetVisibility(d$tool$wb)[sheets_to_hide] <- "hidden"
+  sheets_to_hide <- which(stringr::str_detect(names(d$tool$wb), "PSNUxIM"))
+  openxlsx::sheetVisibility(d$tool$wb)[sheets_to_hide] <- "hidden"
 
   # Add Styles ####
   interactive_print("Cleaning up Styles...")
@@ -144,7 +144,7 @@ packDataPack <- function(model_data,
   # openxlsx::addStyle(d$tool$wb, sheet = "Summary",
   #summaryStyle, cols = 1:2, rows = 1:62, gridExpand = TRUE, stack = TRUE)
 
-    ## Add styles to Spectrum tab
+    ## Add styles to Spectrum tab ####
   #TODO: See if new openxlsx release addresses this issue
   spectrumStyle1 <- openxlsx::createStyle(fgFill = "#9CBEBD")
   spectrumStyle2 <- openxlsx::createStyle(fgFill = "#FFEB84")

@@ -2,8 +2,9 @@
 # metadata, then combines this with the Data Pack schema to create a full map between
 # Data Packs and DATIM for the purpose of generating import and analytics tables.
 
-datapackr::loginToDATIM("~/.secrets/test-mer2.json")
-
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
+datimutils::loginToDATIM(secrets)
 cop_year = 2022
 
 # Pull code lists ####
@@ -129,6 +130,23 @@ dp_map %<>%
                                      ~ NA_character_,
                                      TRUE ~ .)) %>%
   dplyr::distinct()
+
+## Remap PMTCT_EID ages ####
+# dp_map %<>%
+#   dplyr::mutate(
+#     valid_ages.id =
+#       dplyr::case_when(
+#         indicator_code == "PMTCT_EID.N.2.T" ~ "J4SQd7SnDi2",
+#         indicator_code == "PMTCT_EID.N.12.T" ~ "pbXCUjm50XK",
+#         TRUE ~ valid_ages.id
+#       ),
+#     valid_ages.name =
+#       dplyr::case_when(
+#         indicator_code == "PMTCT_EID.N.2.T" ~ "02 - 12 months",
+#         indicator_code == "PMTCT_EID.N.12.T" ~ "<= 02 months",
+#         TRUE ~ valid_ages.name
+#       )
+#   )
     
 ## Remap 50+ age bands where necessary ####
 fine_sr_age_des <- fullCodeList %>%
@@ -160,7 +178,7 @@ dp_map %<>%
   dplyr::mutate(categoryOptions.ids = purrr::map(categoryOptions.ids, na.omit)) %>%
   dplyr::mutate(categoryOptions.ids = purrr::map_chr(categoryOptions.ids, paste, collapse = ".")) %>%
 
-## Apply default categoryOption against dataElements with no assigned cOs. ####
+## Apply default categoryOption against dataElements with no assigned COs. ####
   dplyr::mutate(
     categoryOptions.ids =
       dplyr::case_when(
@@ -360,6 +378,8 @@ compare_diffs <- datapackr::cop22_map_DataPack_DATIM_DEs_COCs %>%
                                "categoryOptions.ids","support_type","resultstatus","resultstatus_inclusive")) %>%
   dplyr::filter(is.na(indicator_code) | is.na(dataelementname.x) | is.na(dataelementname.y))
 
+waldo::compare(datapackr::cop22_map_DataPack_DATIM_DEs_COCs, dp_map)
+
 # Expected changes from COP21:
 # - finer age bands on DATIM side for TX_CURR only
 # - finer age bands on DP side, mapped to 50+ on DATIM side
@@ -372,3 +392,29 @@ compare_diffs <- datapackr::cop22_map_DataPack_DATIM_DEs_COCs %>%
 cop22_map_DataPack_DATIM_DEs_COCs <- dp_map
 
 save(cop22_map_DataPack_DATIM_DEs_COCs, file = "./data/cop22_map_DataPack_DATIM_DEs_COCs.rda", compress = "xz")
+
+
+# Create map for adorning import files, to avoid issues with 50+ finer age bands
+fine_sr_age_des <- fullCodeList %>%
+  dplyr::filter(stringr::str_detect(categoryOptions.ids, "SMXPADytkkF|RQbUeV6OAVk|C0GAyd5PaGn|HuWOqxjK4D5")) %>%
+  dplyr::pull(dataelementuid) %>%
+  unique()
+
+cop22_map_adorn_import_file <- dp_map %>%
+  dplyr::mutate(
+    valid_ages.id =
+      dplyr::if_else(
+        !dataelementuid %in% fine_sr_age_des,
+        stringr::str_replace(
+          string = valid_ages.id,
+          pattern = "SMXPADytkkF|RQbUeV6OAVk|C0GAyd5PaGn|HuWOqxjK4D5",
+          replacement = "TpXlQcoXGZF"),
+        valid_ages.id),
+    valid_ages.name =
+      dplyr::if_else(
+        valid_ages.id == "TpXlQcoXGZF",
+        "50+",
+        valid_ages.name)) %>%
+  dplyr::distinct()
+
+save(cop22_map_adorn_import_file, file = "./data/cop22_map_adorn_import_file.rda", compress = "xz")

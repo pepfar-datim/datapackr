@@ -1,6 +1,7 @@
 library(magrittr)
 library(datapackr)
 
+output_folder <- Sys.getenv("OUTPUT_FOLDER") %>% paste0("Spectrum Examples/")
 dp_folder <- "/Users/scott/Downloads/BetaPack COP21 DPs"
 
 dp_filenames <- list.files(dp_folder)
@@ -46,11 +47,10 @@ for (filepath in dp_filepaths) {
   
 }
 
-saveRDS(spectrum_extracts, "/Volumes/GoogleDrive/My Drive/PEPFAR/COP Targets/COP 22/2) Development/Spectrum Examples/SpectrumExtracts.rds")
+saveRDS(spectrum_extracts, paste0(output_folder, "SpectrumExtracts.rds"))
 
 
 # Export ####
-output_path <- "/Volumes/GoogleDrive/My Drive/PEPFAR/COP Targets/COP 22/2) Development/Spectrum Examples/"
 
 for (i in 1:length(spectrum_extracts)) {
   country <- spectrum_extracts[[i]]$country_name

@@ -52,8 +52,10 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
   if (tool %in% c("Data Pack", "Data Pack Template")) {
     if (cop_year == 2020) {
       skip <- c("Home", "Instructions", "Summary", "Spectrum", "Spectrum IDs")
-    } else if (cop_year %in% c(2021, 2022)) {
+    } else if (cop_year %in% c(2021)) {
       skip <- c("Home", "Summary", "Spectrum")
+    } else if (cop_year %in% c(2022)) {
+      skip <- c("Home", "Spectrum")
     }
   }
   else if (tool == "OPU Data Pack Template" &
@@ -229,6 +231,7 @@ pick_template_path <- function(cop_year, tool) {
 #' @param tool Type of tool this function will create or interact with. Either
 #' \code{OPU Data Pack} or \code{Data Pack}
 #' @param season Either \code{COP} or \code{OPU}.
+#' @param ... Additional arguments to pass.
 #'
 #' @family parameter-helpers
 #'
@@ -251,7 +254,8 @@ datapackr_params <- function(model_data,
                              wb,
                              PSNUs,
                              tool,
-                             season) {
+                             season,
+                             ...) {
 
   # This function should return something
   #Return its own argument names

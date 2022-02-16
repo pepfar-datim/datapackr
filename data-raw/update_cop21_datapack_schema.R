@@ -1,7 +1,9 @@
 ## If you've made any edits to the Excel template, rebuild package first to
 ## capture these, then run the below.
 
-datimutils::loginToDATIM("/Users/scott/.secrets/datim.json")
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
+datimutils::loginToDATIM(secrets)
 
 datapack_template_filepath <- system.file("extdata",
                                           "COP21_Data_Pack_Template.xlsx",
@@ -9,7 +11,7 @@ datapack_template_filepath <- system.file("extdata",
                                           mustWork = TRUE)
 cop21_data_pack_schema <-
   unPackSchema_datapack(
-    filepath = datapack_template_filepath,
+    template_path = datapack_template_filepath,
     skip = skip_tabs(tool = "Data Pack Template", cop_year = 2021),
     cop_year = 2021)
 
@@ -25,6 +27,8 @@ cop21_data_pack_schema <-
 # comparison_df <- comparison$comparison_df
 # 
 # View(comparison_df)
+
+waldo::compare(cop21_data_pack_schema, datapackr::cop21_data_pack_schema)
 
 save(cop21_data_pack_schema,
      file = "./data/cop21_data_pack_schema.rda",

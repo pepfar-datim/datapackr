@@ -16,7 +16,7 @@ library(stringr)
 library(datapackr)
 
 # Point to DATIM login secrets ####
-secrets <- "/Users/scott/.secrets/datim.json"
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
 
 datimutils::loginToDATIM(secrets)
 

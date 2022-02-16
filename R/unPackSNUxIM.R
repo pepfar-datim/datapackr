@@ -542,6 +542,7 @@ unPackSNUxIM <- function(d) {
                                        as.numeric))
     }
 
+
   ## TEST: Missing Dedupe Rollup cols; Error; Add ----
   dedupe_rollup_cols <- cols_to_keep %>%
     dplyr::filter(dataset == "mer" & col_type == "target" & !indicator_code %in% c("", "12345_DSD")) %>%
@@ -558,9 +559,9 @@ unPackSNUxIM <- function(d) {
 
   ## PROCESS: Recalculate dedupes ----
     ## Other than IM cols, only the following should be considered safe for reuse here:
-    # - Deduplicated DSD Rollup (FY22)
-    # - Deduplicated TA Rollup (FY22)
-    # - Total Deduplicated Rollup (FY22)
+    # - Deduplicated DSD Rollup
+    # - Deduplicated TA Rollup
+    # - Total Deduplicated Rollup
     ## All others must be recalculated to protect against formula breakers.
 
   d$data$SNUxIM %<>%
@@ -573,13 +574,13 @@ unPackSNUxIM <- function(d) {
       `SUM - DSD` = `DSD Duplicated Rollup`,
       `SUM - Crosswalk Total` =
         rowSums(dplyr::select(.,
-                              `Deduplicated DSD Rollup (FY22)`, `Deduplicated TA Rollup (FY22)`),
+                              `Deduplicated DSD Rollup`, `Deduplicated TA Rollup`),
                 na.rm = TRUE),
       `MAX - Crosswalk Total` =
-        pmax(`Deduplicated DSD Rollup (FY22)`, `Deduplicated TA Rollup (FY22)`, na.rm = T),
-      `DSD Dedupe` = `Deduplicated DSD Rollup (FY22)` - `SUM - DSD`,
-      `TA Dedupe` = `Deduplicated TA Rollup (FY22)` - `SUM - TA`,
-      `Crosswalk Dedupe` = `Total Deduplicated Rollup (FY22)` - `SUM - Crosswalk Total`
+        pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = T),
+      `DSD Dedupe` = `Deduplicated DSD Rollup` - `SUM - DSD`,
+      `TA Dedupe` = `Deduplicated TA Rollup` - `SUM - TA`,
+      `Crosswalk Dedupe` = `Total Deduplicated Rollup` - `SUM - Crosswalk Total`
     )
 
   ## TEST: Improper dedupe values; Error; Continue ----
@@ -619,7 +620,7 @@ unPackSNUxIM <- function(d) {
   if (d$info$tool == "Data Pack") {
     d <- checkMissingCombos(d)
   }
-
+  
   ## PROCESS: Gather all values in single column ----
   d$data$SNUxIM %<>%
     tidyr::gather(key = "mechCode_supportType",
@@ -641,7 +642,7 @@ unPackSNUxIM <- function(d) {
   d$data$SNUxIM %<>%
     dplyr::mutate(
       mechCode_supportType = dplyr::case_when(
-        stringr::str_detect(mechCode_supportType, "Dedupe") ~ mechCode_supportType,
+        stringr::str_detect(mechCode_supportType, "Dedupe|Not PEPFAR") ~ mechCode_supportType,
         TRUE ~ paste0(stringr::str_extract(mechCode_supportType, "\\d{4,}"),
                       "_",
                       stringr::str_extract(mechCode_supportType, "DSD|TA"))
@@ -710,13 +711,25 @@ unPackSNUxIM <- function(d) {
     dplyr::select(-mechCode_supportType, PSNUxIM_value = value) %>%
     dplyr::group_by(dplyr::across(c(tidyselect::everything(), -PSNUxIM_value))) %>%
     dplyr::summarise(PSNUxIM_value = sum(PSNUxIM_value, na.rm = TRUE), .groups = "drop") %>%
+    tidyr::replace_na(list(PSNUxIM_value = 0)) %>%
     dplyr::full_join(.,
                      original_targets %>%
                        dplyr::select(-sheet_name, DataPackTarget = value) %>%
                        dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T"))
     ) %>%
-    dplyr::filter(is.na(PSNUxIM_value) | is.na(DataPackTarget) | PSNUxIM_value != DataPackTarget) %>%
-    dplyr::mutate(diff = PSNUxIM_value - DataPackTarget)
+    #tidyr::replace_na(list(PSNUxIM_value = 0, DataPack_value = 0)) %>%
+    dplyr::filter(is.na(PSNUxIM_value) | is.na(DataPack_value) | PSNUxIM_value != DataPack_value) %>%
+    dplyr::mutate(
+      diff = dplyr::if_else(is.na(PSNUxIM_value), 0, PSNUxIM_value)
+              - dplyr::if_else(is.na(DataPack_value), 0, DataPack_value),
+      type =
+        dplyr::case_when(
+          (is.na(DataPack_value) | DataPack_value == 0)
+            & !is.na(PSNUxIM_value) & PSNUxIM_value != 0  ~ "Missing in DP",
+          !is.na(DataPack_value) & DataPack_value != 0 & abs(diff) <= 2 ~ "Rounding",
+          !is.na(DataPack_value) & DataPack_value != 0 & diff > 2 ~ "Overallocation",
+          !is.na(DataPack_value) & DataPack_value != 0 & diff < -2 ~ "Underallocation"
+        ))
 
   d <- checkRounding(d)
 

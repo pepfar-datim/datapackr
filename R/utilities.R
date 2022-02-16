@@ -137,7 +137,7 @@ swapColumns <- function(to, from) {
 #' @return Printed message, \code{x}.
 #'
 interactive_print <- function(x) {
-  if (interactive()) {
+  if (rlang::is_interactive()) {
     print(x)
   }
 }
@@ -159,7 +159,22 @@ interactive_message <- function(x) {
   }
 }
 
-
+#' @export
+#'
+#' @title Issue a warning if the session is interactive
+#'
+#' @description
+#' Supplied a string, will issue a warning as r warning() only if the session is currently interactive.
+#'
+#' @param x Warning string.
+#'
+#' @return Warning message, \code{x}.
+#'
+interactive_warning <- function(x) {
+  if (rlang::is_interactive()) {
+    warning(x,call. = FALSE)
+  }
+}
 
 #' @export
 #' @title Pull list of Countries from DATIM.
@@ -275,38 +290,66 @@ addcols <- function(data, cnames, type = "character") {
 #' @export
 #' @title getDatasetUids
 #'
-#' @description returns character vector of dataset uids for a given FY {"2019", "2020", "2021"}
-#' and type {"targets", "results", "subnat_impatt"}
-#' @param fiscal_year character - one of {"2019", "2020", "2021"}
-#' @param type character vector - one or more of {"targets", "results", "subnat_impatt"}
+#' @description returns character vector of dataset uids for a given FY:
+#' {"2019", "2020", ... , "2023"}
+#' and type {"mer_targets", "mer_results", "subnat_targets", "subnat_results",
+#' "impatt"}
+#' @param fiscal_year character - one of: {"2019", "2020", "2021", "2022",
+#' "2023"}
+#' @param type character vector - one or more of:
+#' {"mer_targets", "mer_results", "subnat_targets", "subnat_results", "impatt"}
 #' @return returns a character vector of the related dataset uids
 #'
 getDatasetUids <-  function(fiscal_year,
                             type = c("mer_targets", "mer_results",
                                      "subnat_targets", "subnat_results",
                                      "impatt")) {
-
   datasets <- character(0)
-  if (fiscal_year == "2022") {
+  if  (fiscal_year == "2023") {
     if ("mer_targets" %in% type) {
       datasets <- c(datasets,
-                    "YfZot37BbTm", # MER Target Setting: PSNU (Facility and Community Combined)
+                    "iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
                     "cihuwjoY5xP", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
-                    "wvnouBMuLuE") # Host Country Targets: DREAMS (USG)
+                    "vzhO50taykm") # Host Country Targets: DREAMS (USG)
     }
     if ("mer_results" %in% type) {
-      stop("FY22 results input not supported by getDatasetUids")
+      stop("FY23 results input not supported by getDatasetUids")
     }
     if ("subnat_targets" %in% type) {
       datasets <- c(datasets,
-                    "Va7TYyHraRn") #Host Country Targets: COP Prioritization SNU (USG)
+                    "J4tdiDEi08O") #Host Country Targets: COP Prioritization SNU (USG)
     }
     if ("subnat_results" %in% type) {
-      stop("FY22 results input not supported by getDatasetUids")
+      stop("FY23 results input not supported by getDatasetUids")
     }
     if ("impatt" %in% type) {
       datasets <- c(datasets,
-                    "Zn27xns9Fmx") #Planning Attributes: COP Prioritization SNU
+                    "CxMsvlKepvE") #Planning Attributes: COP Prioritization SNU
+    }
+  } else if  (fiscal_year == "2022") {
+    if ("mer_targets" %in% type) {
+      datasets <- c(datasets,
+                    "YfZot37BbTm", # MER Target Setting: PSNU (Facility and Community Combined) FY2022
+                    "cihuwjoY5xP", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
+                    "wvnouBMuLuE") # Host Country Targets: DREAMS (USG) FY2022
+    }
+    if ("mer_results" %in% type) {
+      datasets <- c(datasets,
+                    "BHlhyPmRTUY", # MER Results: Facility Based
+                    "HfhTPdnRWES", # MER Results: Community Based
+                    "MGNVwVicMVm") # Host Country Results: DREAMS (USG)
+    }
+    if ("subnat_targets" %in% type) {
+      datasets <- c(datasets,
+                    "Va7TYyHraRn") #Host Country Targets: COP Prioritization SNU (USG) FY2022
+    }
+    if ("subnat_results" %in% type) {
+      datasets <- c(datasets,
+                    "IXiORiVFqIv") #Host Country Results: COP Prioritization SNU (USG)
+    }
+    if ("impatt" %in% type) {
+      datasets <- c(datasets,
+                    "Zn27xns9Fmx") #Planning Attributes: COP Prioritization SNU FY2022
     }
   } else if (fiscal_year == "2021") {
     if ("mer_targets" %in% type) {
@@ -316,27 +359,22 @@ getDatasetUids <-  function(fiscal_year,
     }
     if ("mer_results" %in% type) {
       datasets <- c(datasets,
-                    "zL8TlPVzEBZ", # MER Results: Facility Based
-                    #"", # MER Results: Facility Based - DoD ONLY
-                    #"", # MER Results: Community Based - DoD ONLY FY2020Q4
-                    "TBcmmtoaCBC", # MER Results: Community Based
-                    "qHyrHc4zwx4") # Host Country Results: DREAMS (USG)
+                    "zL8TlPVzEBZ", # MER Results: Facility Based FY2021Q4
+                    "TBcmmtoaCBC", # MER Results: Community Based FY2021Q4
+                    "qHyrHc4zwx4") # Host Country Results: DREAMS (USG) FY2021Q4
     }
     if ("subnat_targets" %in% type) {
       datasets <- c(datasets,
                     "j7jzezIhgPj") #Host Country Targets: COP Prioritization SNU (USG) FY2021
-
-    }
+      }
     if ("subnat_results" %in% type) {
       datasets <- c(datasets,
-                    "xiTCzZJ2GPP") #Host Country Results: COP Prioritization SNU (USG)
-
-    }
+                    "xiTCzZJ2GPP") #Host Country Results: COP Prioritization SNU (USG) FY2021Q4
+      }
     if ("impatt" %in% type) {
       datasets <- c(datasets,
                     "jxnjnBAb1VD") # Planning Attributes: COP Prioritization SNU FY2021
-
-    }
+      }
   } else if (fiscal_year == "2020") {
     if ("mer_targets" %in% type) {
       datasets <- c(datasets,
@@ -348,9 +386,9 @@ getDatasetUids <-  function(fiscal_year,
     if ("mer_results" %in% type) {
       datasets <- c(datasets,
                     "qzVASYuaIey", # MER Results: Community Based FY2020Q4
-                    "BPEyzcDb8fT", # MER Results: Community Based - DoD ONLY
+                    "BPEyzcDb8fT", # MER Results: Community Based - DoD ONLY FY2021Q4
                     "jKdHXpBfWop", # MER Results: Facility Based FY2020Q4
-                    "em1U5x9hhXh", # MER Results: Facility Based - DoD ONLY
+                    "em1U5x9hhXh", # MER Results: Facility Based - DoD ONLY FY2021Q4
                     "mbdbMiLZ4AA") # Host Country Results: DREAMS (USG) FY2020Q4
     }
     if ("subnat_targets" %in% type) {
@@ -397,8 +435,7 @@ getDatasetUids <-  function(fiscal_year,
     stop(paste("FY", fiscal_year, "input not supported by getDatasetUids"))
   }
   return(datasets)
-  }
-
+}
 
 #' @export
 #' @title Define prioritization values.
@@ -461,8 +498,9 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
   } else if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
                                            datapackr::map_DataPack_DATIM_DEs_COCs)) {
     return(datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
+  } else if (cop_year == 2022) {
+    return(datapackr::cop22_map_DataPack_DATIM_DEs_COCs)
   } else { # if map_DataPack_DATIM_DEs_COCs has drifted or COP year is invalid this notifies us
-           # when map is updated for COP22 we will want to update support in this function
     stop("The COP year and configuration provided is not supported by get_Map_DataPack_DATIM_DEs_COCs")
   }
 }
@@ -549,7 +587,7 @@ compareTemplateToSchema <- function(template_path = NULL,
 
   template_schema <-
     unPackSchema_datapack(
-      filepath = template_path,
+      template_path = template_path,
       skip = skip_tabs(tool = paste0(tool, " Template"), cop_year = cop_year),
       tool = paste0(tool, " Template"),
       cop_year = cop_year)
@@ -626,6 +664,8 @@ paste_dataframe <- function(x) {
 #' @importFrom rlang is_character
 #'
 #' @param x Value to test and coerce
+#' @param default Default value to assign to x if not a character string,
+#'  \code{NA_character_}, or a factor.
 #'
 #' @return x parsed as numeric, if possible
 parse_maybe_number <- function(x, default = NULL) {
@@ -745,7 +785,7 @@ names2 <- function(x) {
 has_names <- function(x) {
   nms <- names(x)
   if (is.null(nms)) {
-    rep_along(x, FALSE)
+    rlang::rep_along(x, FALSE)
   } else {
     !(is.na(nms) | nms == "")
   }
@@ -753,7 +793,7 @@ has_names <- function(x) {
 
 ndots <- function(...) nargs()
 
-bullet <- function(...) paste0(bold(silver(" * ")), sprintf(...))
+bullet <- function(...) paste0(crayon::bold(crayon::silver(" * ")), sprintf(...))
 
 # Re-exports ---------------------------------------------------
 

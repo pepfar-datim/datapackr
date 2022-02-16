@@ -2,7 +2,9 @@ library(datapackr)
 library(datimutils)
 library(magrittr)
 
-datimutils::loginToDATIM("~/.secrets/datim.json")
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
+datimutils::loginToDATIM(secrets)
 
 d2_session <- d2_default_session
 
@@ -144,5 +146,3 @@ openxlsx::writeData(wb = flatpack_wb,
                     x = modalitySummaryTable(d$data$analytics))
 
 openxlsx::saveWorkbook(flatpack_wb, file = flatpack_filename, overwrite = TRUE)
-
-

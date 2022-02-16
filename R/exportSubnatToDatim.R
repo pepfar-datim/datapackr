@@ -12,7 +12,6 @@
 #'
 exportSubnatToDATIM <- function(d, datim_map) {
 
-  # create base data data set ----
   SUBNAT_IMPATT <- d$data$SUBNAT_IMPATT %>%
     dplyr::left_join(datim_map,
                      by = c("indicator_code" = "indicator_code",
@@ -36,8 +35,11 @@ exportSubnatToDATIM <- function(d, datim_map) {
       orgUnit = psnuid,
       categoryOptionCombo = categoryoptioncombouid,
       attributeOptionCombo,
-      value
-    )
+      value) %>%
+  # Aggregate across 50+ age bands ####
+    dplyr::group_by(dplyr::across(c(-value))) %>%
+    dplyr::summarise(value = sum(value)) %>%
+    dplyr::ungroup()
 
  # TEST: Duplicate Rows; Error; Continue ----
   duplicated_rows <- SUBNAT_IMPATT %>%
@@ -57,7 +59,7 @@ exportSubnatToDATIM <- function(d, datim_map) {
     d$info$has_error <- TRUE
   }
 
-  # TEST: Blank Rows; Error ----
+  # TEST: Blank Rows; Error;
   blank_rows <- SUBNAT_IMPATT %>%
     dplyr::filter_all(dplyr::any_vars(is.na(.)))
 
@@ -91,12 +93,9 @@ exportSubnatToDATIM <- function(d, datim_map) {
 
   d$datim$fy22_prioritizations <- SUBNAT_IMPATT %>%
     dplyr::filter(
-      period == "2021Oct",
+      #period == "2021Oct",
       dataElement %in%
-        (datapackr::map_DataPack_DATIM_DEs_COCs %>%
-           dplyr::filter(period_dataset == "FY22 IMPATT" & indicator_code == "IMPATT.PRIORITY_SNU.T") %>%
-           dplyr::pull(dataelementuid)
-        )
+        datim_map$dataelementuid[which(datim_map$indicator_code == "IMPATT.PRIORITY_SNU.T")]
     )
 
   return(d)

@@ -245,9 +245,12 @@ packCOP22TestDataset <- function(country_uids,
 library(magrittr)
 library(datapackr)
 
-datapackr::loginToDATIM("~/.secrets/cop-test.json")
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "cop-test.json")
+datimutils::loginToDATIM(secrets)
+
+output_folder <- Sys.getenv("OUTPUT_FOLDER") %>% paste0(., "Test Data/")
 cop_year = 2022
-output_path <- "/Volumes/GoogleDrive/My Drive/PEPFAR/COP Targets/COP 22/3) Testing & Deployment/Test Data/"
 
 # Scenario A: Vanilla case ####
 datapack_names <- c("Cameroon")
@@ -337,7 +340,7 @@ scenario_names <- c("scenario_a", "scenario_b", "scenario_c", "scenario_e",
  
 for (i in 1:length(scenarios)) {
   output_file_name <- 
-    paste0(output_path, "Data Pack_", scenario_names[i], "_",
+    paste0(output_folder, "Data Pack_", scenario_names[i], "_",
            format(Sys.time(), "%Y%m%d%H%M%S"), ".csv")
   
   readr::write_csv(scenarios[[i]], output_file_name)
