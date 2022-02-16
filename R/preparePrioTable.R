@@ -122,9 +122,9 @@ preparePrioTable <- function(d, d2_session = dynGet("d2_default_session",
     dplyr::select(-row_order, -col_order) %>%
     tidyr::pivot_wider(names_from = prioritization, values_from = "value") %>%
     dplyr::mutate("Total" = rowSums(across(where(is.numeric)))) %>%
-    dplyr::select(Total != 0) %>% # Remove all rows which are completely zero
+    dplyr::filter(Total != 0) %>% # Remove all rows which are completely zero
     dplyr::select("Indicator", "Age", 3:dim(.)[2]) %>%
     dplyr::select(where(~ any(. != 0))) # Remove all columns which are completely zero
 
-  return(d)
+  d
 }
