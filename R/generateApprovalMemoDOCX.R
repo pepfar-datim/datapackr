@@ -84,7 +84,7 @@ generateApprovalMemo <- function(d, draft = TRUE, remove_empty_columns = TRUE) {
   #Partners tables
   partners_table <- d$data$partners_table %>%
     dplyr::mutate_if(is.numeric,
-                     function(x) ifelse(x == 0, "-", formatC(x, format = "f", big.mark = ", ", digits = 0)))
+                     function(x) ifelse(x == 0, "-", formatC(x, format = "f", big.mark = ",", digits = 0)))
 
   sub_heading <- names(partners_table)[4:length(partners_table)] %>%
     stringr::str_split(., " ") %>%
