@@ -13,16 +13,16 @@ generateApprovalMemo <- function(d, draft = TRUE, remove_empty_columns = TRUE) {
     purrr::pluck("data") %>%
     purrr::pluck("prio_table")
 
-  #Remove any columns which are all zeros to save space.
-  column_filter <-
-    d$data$prio_table %>%
-    summarise(across(where(is.numeric), ~ sum(.x, na.rm = FALSE) != 0)) %>%
-    t() %>%
-    as.data.frame() %>%
-    dplyr::filter(!V1) %>%
-    row.names()
-
-  prio_table %<>% dplyr::select(-column_filter)
+  # #Remove any columns which are all zeros to save space.
+  # column_filter <-
+  #   d$data$prio_table %>%
+  #   summarise(across(where(is.numeric), ~ sum(.x, na.rm = FALSE) != 0)) %>%
+  #   t() %>%
+  #   as.data.frame() %>%
+  #   dplyr::filter(!V1) %>%
+  #   row.names()
+  # 
+  # prio_table %<>% dplyr::select(-column_filter)
 
   #Transform all zeros to dashes
   prio_table %<>%
@@ -98,8 +98,9 @@ generateApprovalMemo <- function(d, draft = TRUE, remove_empty_columns = TRUE) {
     unlist() %>%
     c("Funding Agency", "Partner", "Mechanism", .)
 
-  #TODO: This needs to be redone based on the COP year
-  chunks <- d$memo$structure$row_order
+
+  chunks <- d$memo$structure$row_order %>% 
+    dplyr::filter(!is.na(partner_chunk))
 
   renderPartnerTable <- function(chunk) {
 
@@ -124,9 +125,16 @@ generateApprovalMemo <- function(d, draft = TRUE, remove_empty_columns = TRUE) {
     return(partner_table)
   }
 
-  for (i in seq_along(chunks)) {
-    chunk <- chunks[[i]]
-    partner_table_ft <- renderPartnerTable(chunk = chunk)
+  for (chunk in unique(chunks$partner_chunk)) {
+   this_chunk <- chunks %>% 
+     dplyr::filter(partner_chunk == chunk) %>% 
+      dplyr::mutate(cols = paste(ind,options)) %>% 
+      dplyr::pull(cols)
+   
+   this_chunk <-   which(names(partners_table) %in%  c("Agency","Partner","Mechanism",this_chunk))
+   
+      
+    partner_table_ft <- renderPartnerTable(chunk = this_chunk)
     doc <- body_add_flextable(doc, partner_table_ft)
     doc <- body_add_break(doc, pos = "after")
   }
