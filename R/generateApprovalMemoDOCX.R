@@ -21,7 +21,7 @@ generateApprovalMemo <- function(d, draft = TRUE, remove_empty_columns = TRUE) {
   #   as.data.frame() %>%
   #   dplyr::filter(!V1) %>%
   #   row.names()
-  # 
+  #
   # prio_table %<>% dplyr::select(-column_filter)
 
   #Transform all zeros to dashes
@@ -99,7 +99,7 @@ generateApprovalMemo <- function(d, draft = TRUE, remove_empty_columns = TRUE) {
     c("Funding Agency", "Partner", "Mechanism", .)
 
 
-  chunks <- d$memo$structure$row_order %>% 
+  chunks <- d$memo$structure$row_order %>%
     dplyr::filter(!is.na(partner_chunk))
 
   renderPartnerTable <- function(chunk) {
@@ -126,14 +126,14 @@ generateApprovalMemo <- function(d, draft = TRUE, remove_empty_columns = TRUE) {
   }
 
   for (chunk in unique(chunks$partner_chunk)) {
-   this_chunk <- chunks %>% 
-     dplyr::filter(partner_chunk == chunk) %>% 
-      dplyr::mutate(cols = paste(ind,options)) %>% 
+   this_chunk <- chunks %>%
+     dplyr::filter(partner_chunk == chunk) %>%
+      dplyr::mutate(cols = paste(ind,options)) %>%
       dplyr::pull(cols)
-   
+
    this_chunk <-   which(names(partners_table) %in%  c("Agency","Partner","Mechanism",this_chunk))
-   
-      
+
+
     partner_table_ft <- renderPartnerTable(chunk = this_chunk)
     doc <- body_add_flextable(doc, partner_table_ft)
     doc <- body_add_break(doc, pos = "after")
