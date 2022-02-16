@@ -21,9 +21,10 @@ getCOPDataFromDATIM <- function(country_uids,
                                 streams = c("mer_targets", "subnat_targets", "impatt"),
                                 d2_session = dynGet("d2_default_session",
                                                     inherits = TRUE)) {
-  if (!cop_year %in% c(2020,
-                       2021,
-                       2022)) {
+
+
+  if (!cop_year %in% c(2020:2022)) {
+
     stop("The COP year provided is not supported by the internal function getCOPDataFromDATIM")
     ### NOTE for COP23 some special handling of SUBNAT data for FY23 like the code below may be
     ### required if the 50+ finer age categories needs to be imported during COP23

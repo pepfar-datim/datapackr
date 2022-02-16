@@ -59,7 +59,10 @@ Suggests:
     testthat,
     cellranger,
     rprojroot,
-    waldo
+    waldo,
+    parallel,
+    gdtools,
+    flextable
 Remotes:
     pepfar-datim/datimutils,
     pepfar-datim/datim-validation,

@@ -642,3 +642,88 @@
 #'   \item{period}{DHIS2 period for example "2021Oct"}
 #' }
 "cop22_data_pack_schema"
+
+#' @docType data
+#' @title COP Validation Rules
+#' @description A nested list of validation rules for both current and past
+#' COP years.
+#' @md
+#'
+#' @format The following COP years are included in this dataset:
+#' \describe{
+#'   \item{2020}{A list object containing the validation rules for COP20/FY21.}
+#'   \item{2021}{A list object containing the validation rules for COP21/FY22.}
+#'   \item{2022}{A list object containing the validation rules for COP22/FY23.}
+#' }
+#'
+#' @section Structure for COP20 and COP21 data sets:
+#' Data sets for 2020 and 2021 conforms to the following structure:
+#'
+#' * `description`: A description of the DATIM validation rule, showing the
+#' relationship required between two indicators. Synonymous to
+#' the `name` and `instruction` columns.
+#' * `id`: The DATIM UID for the rule.
+#' * `importance`: Category showing the relative importance of the validaiton
+#' rule. For COP20 and COP21, this is always listed as `MEDIUM`.
+#' * `instruction`: A description of the DATIM validation rule, showing the
+#' relationship required between two indicators. Synonymous to the `description`
+#' and `name` columns.
+#' * `name`: A description of the DATIM validation rule, showing the
+#' relationship required between two indicators. Synonymous to the `description`
+#' and `instruction` columns.
+#' * `operator`: The operator used in the validation rule. This must be either
+#' `<=`, `>=`, or `|`.
+#' * `periodType`: A string indicating whether the indicator is reported
+#' quartery or annually. The value is either `Quarterly` or `FinancialOct`.
+#' * `ruletype`: The type of rule being applied. This value is
+#' always `VALIDATION`.
+#' * `leftSide.dataElements`: A nested list containing a single DATIM data
+#' element defining the indicator on the left-hand side of the equation.
+#' * `leftSide.description`: A description of the indicator on the left-hand
+#' side of the validation rule equation.
+#' * `leftSide.expression`: An expression defining how to calculate the value
+#' of the left-hand side of the validation rule equation.
+#' * `leftSide.missingValueStrategy`: A string that states whether this rule
+#' should be skipped if the value of the left-hand side of the equation is
+#' missing. Value is either `NEVER_SKIP` or `SKIP_IF_ALL_VALUES_MISSING`.
+#' * `rightSide.dataElements`: A nested list containing a single DATIM data
+#' element defining the indicator on the right-hand side of the equation.
+#' * `rightSide.description`: A description of the indicator on the right-hand
+#' side of the validation rule equation.
+#' * `rightSide.expression`: An expression defining how to calculate the value
+#' of the right-hand side of the validation rule equation.
+#' * `rightSide.missingValueStrategy`: A string that states whether this rule
+#' should be skipped if the value of the right-hand side of the equation is
+#' missing. Value is either `NEVER_SKIP` or `SKIP_IF_ALL_VALUES_MISSING`.
+#' * `rightSide.ops`:
+#' * `leftSide.ops`:
+#'
+#' @section Structure for COP22 data set:
+#' The data set for COP22 conforms to the following structure:
+#'
+#' * `name`: A descriptive name of the DATIM validation rule, showing the
+#' relationship required between two indicators. Synonymous to
+#' the `description` column.
+#' * `id`: The DATIM UID for the rule.
+#' * `periodType`: A string indicating whether the indicator is reported
+#' quartery or annually. The value is either `Quarterly` or `FinancialOct`.
+#' * `description`: A description of the DATIM validation rule, showing the
+#' relationship required between two indicators. Synonymous to
+#' the `name` column.
+#' * `operator`: The operator used in the validation rule. This must be either
+#' `<=`, `>=`, or `|`.
+#' * `leftSide.expression`: An expression defining how to calculate the value
+#' of the left-hand side of the validation rule equation.
+#' * `leftSide.missingValueStrategy`:  A string that states whether this rule
+#' should be skipped if the value of the left-hand side of the equation is
+#' missing. Value is either `NEVER_SKIP` or `SKIP_IF_ALL_VALUES_MISSING`.
+#' * `rightSide:expression`: An expression defining how to calculate the value
+#' of the right-hand side of the validation rule equation.
+#' * `rightSide.missingValueStrategy`:  A string that states whether this rule
+#' should be skipped if the value of the right-hand side of the equation is
+#' missing. Value is either `NEVER_SKIP` or `SKIP_IF_ALL_VALUES_MISSING`.
+#' * `rightSide.ops`:
+#' * `leftSide.ops`:
+#'
+#' @source \url{https://www.datim.org/}
+"cop_validation_rules"

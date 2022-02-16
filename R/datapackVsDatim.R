@@ -292,7 +292,7 @@ compareData_OpuDatapackVsDatim <-
 # exclude them from comparison or any other data without mech
       dplyr::filter(attributeOptionCombo != "default")
 
-# extract dedupes from import file to handle seperately
+# extract dedupes from import file to handle separately
     dedupes <- dplyr::filter(datapack_data,
                              attributeOptionCombo %in%
                                c("00000", "00001")) %>%

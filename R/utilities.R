@@ -255,6 +255,51 @@ getCountries <- function(datapack_uid = NA) {
 
 
 #' @export
+#' @title Get Sane Name for Data Pack Tool
+#'
+#' @description Takes a Data Pack tool name and generates a
+#' "Sane name" for the tool which has no spaces or punctuation.
+#'
+#' @param datapack_name A string from the \code{d$info$datapack_name} object.
+#'
+#' @return String with the sane name.
+
+getSaneName <- function(datapack_name) {
+  sane_name <- datapack_name %>%
+    stringr::str_extract_all(
+      string = .,
+      pattern = "[A-Za-z0-9_]",
+      simplify = TRUE) %>%
+    paste0(., sep = "", collapse = "")
+}
+
+
+#' @export
+#' @title Get Operating Unit from Country UIDs
+#'
+#' @description Takes in a set of Country UIDs and returns an Operating Unit name.
+#'
+#' @param country_uids List of country UIDs from the \code{d$info$country_uids} object.
+#'
+#' @return d
+#'
+getOUFromCountryUIDs <- function(country_uids) {
+  ou <- datapackr::valid_PSNUs %>%
+    dplyr::select(ou, ou_id, country_name, country_uid) %>%
+    dplyr::distinct() %>%
+    dplyr::filter(country_uid %in% country_uids) %>%
+    dplyr::select(ou, ou_id) %>%
+    dplyr::distinct()
+
+  if (NROW(ou) != 1) {
+    stop("Datapacks cannot belong to multiple operating units")
+  }
+
+  return(ou)
+}
+
+
+#' @export
 #' @title Add list of columns as NULL columns to supplied dataframe.
 #'
 #' @description

@@ -14,6 +14,7 @@ datapackr_params(
   country_uids,
   template_path,
   submission_path,
+  cached_mechs_path,
   cop_year,
   output_folder,
   results_archive,
@@ -51,6 +52,9 @@ This file MUST NOT have any data validation formats present. If left
 \code{NULL}, will select the default based on \code{cop_year} and \code{tool}.}
 
 \item{submission_path}{Local path to the file to import.}
+
+\item{cached_mechs_path}{Local file path to an RDS file containing
+a cached copy of the mechanisms SQL view.}
 
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}
