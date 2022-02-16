@@ -191,7 +191,6 @@ if (!(d$info$cop_year %in% c("2020","2021","2022"))) {
       "KP_PREV", "Total", 5,
       "KP_MAT", "Total", 5,
       "PrEP_NEW", "Total", 5,
-      "PrEP_CT", "15+", 5,
       "PrEP_CT", "Total", 5, #TODO: Need to fix this indicator
       "CXCA_SCRN", "Total", 6,
       "PP_PREV", "<15", 6,
