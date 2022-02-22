@@ -62,7 +62,8 @@ Suggests:
     waldo,
     parallel,
     gdtools,
-    flextable
+    flextable,
+    officer
 Remotes:
     pepfar-datim/datimutils,
     pepfar-datim/datim-validation,

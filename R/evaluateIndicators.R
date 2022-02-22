@@ -10,6 +10,9 @@
 #'
 evaluateIndicators <- function(combis, values, inds) {
 
+  if (is.null(inds)) {
+    stop("No indicator metadata found")
+  }
   indicators_empty <- data.frame(id = character(),
                                  name = character(),
                                  numerator = numeric(),

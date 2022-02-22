@@ -4,10 +4,17 @@
 \alias{generateApprovalMemo}
 \title{Generate COP Approval Memo Target Tables (DOCX Format)}
 \usage{
-generateApprovalMemo(d, draft = TRUE, remove_empty_columns = TRUE)
+generateApprovalMemo(
+  d,
+  d2_sesssion,
+  memo_type,
+  draft = TRUE,
+  remove_empty_columns = TRUE,
+  include_no_prio = TRUE
+)
 }
 \arguments{
-\item{d}{Datapackr sidecar object}
+\item{d}{}
 
 \item{draft}{Should a draft watermark be added to the document?}
 

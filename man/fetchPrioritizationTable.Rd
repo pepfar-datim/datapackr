@@ -4,19 +4,18 @@
 \alias{fetchPrioritizationTable}
 \title{Title}
 \usage{
-fetchPrioritizationTable(d, d2_session, include_no_prio = TRUE)
+fetchPrioritizationTable(psnus, cop_year, d2_session)
 }
 \arguments{
-\item{d}{Datapackr d object}
+\item{psnus}{A list of PSNUs}
 
-\item{d2_session}{Datimutils session}
+\item{cop_year}{The cop year}
 
-\item{include_no_prio}{If set to true, include No prioritization data}
+\item{d2_session}{Datimutils d2_session object}
 }
 \value{
-A modified d object with d$data$memo$datim$prio
+A data frame consisting of Organisation unit, Value, prioritization
 }
 \description{
-Utility function which retrieves prioritization table
-data from the DATIM analytics API.
+Title
 }

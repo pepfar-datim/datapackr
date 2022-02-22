@@ -6,7 +6,7 @@
 #' @export
 #'
 
-memoStructure <- function(d) {
+memoStructure <- function(d, d2_session) {
 
 
 if (!(d$info$cop_year %in% c("2020","2021","2022"))) {
@@ -217,6 +217,8 @@ if (!(d$info$cop_year %in% c("2020","2021","2022"))) {
     dplyr::mutate(Prioritization = paste0(value, " - ", name))
 
   d$memo$structure <- list(row_order = row_order, col_order = col_order)
+
+  d$memo$inds <- getMemoIndicators(d$info$cop_year, d2_session)
 
   d
 }
