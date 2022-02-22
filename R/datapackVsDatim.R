@@ -74,7 +74,7 @@ compareData_DatapackVsDatim <-
 # start main processing
 # start off with dedups included
 
-    if (d$info$cop_year != 2021) {
+    if (!(d$info$cop_year %in% c(2021, 2022))) {
       stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
     }
     # d <- datapackr::exportDistributedDataToDATIM(d, keep_dedup = TRUE)
