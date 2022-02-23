@@ -1,15 +1,14 @@
-#' Get COP Memo Indicators
+#' @export
+#' @title Get COP Memo Indicators
 #'
 #' @inheritParams datapackr_params
 #'
-#' @return A dataframe consisting of indicator UIDs,name,numerator and denominator expression.
-#' If a given COP year does not exist, NULL is returned
-#' @export
+#' @return A dataframe consisting of indicator UIDs, name, numerator, and
+#' denominator expression. If a given COP year does not exist, NULL is returned.
 #'
-
-getMemoIndicators <- function(cop_year,
-                              d2_session = dynGet("d2_default_session",
-                                                  inherits = TRUE)) {
+get_memo_indicators <- function(cop_year,
+                                d2_session = dynGet("d2_default_session",
+                                                    inherits = TRUE)) {
   #Fetch indicators from the COP21 memo group
   #TODO: Make this work for both COP years.!
   ind_group <- switch(as.character(cop_year),
@@ -24,9 +23,11 @@ getMemoIndicators <- function(cop_year,
   }
 
   inds <-
-    datimutils::getIndicatorGroups(ind_group,
-                                   d2_session = d2_session,
-                                   fields = "indicators[id, name, numerator, denominator]")
+    datimutils::getIndicatorGroups(
+      ind_group,
+      fields = "indicators[id, name, numerator, denominator]",
+      d2_session = d2_session
+    )
 
   #If we do not get any indicators at this point, something is wrong.
   if (class(inds) != "data.frame") {

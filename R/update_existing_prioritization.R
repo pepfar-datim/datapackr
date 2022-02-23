@@ -1,13 +1,13 @@
-#' Title
+#' @export
+#' @title Update Existing Prioritization
 #'
-#' @param d
-#' @param d2_session
+#' @inheritParams datapackr_params
 #'
 #' @return
-#' @export
 #'
-
-updateExistingPrioritization <- function(d, d2_session) {
+update_existing_prioritization <- function(d, d2_session =
+                                             dynGet("d2_default_session",
+                                                    inherits = TRUE)) {
 
   psnus <- d$data$analytics$psnu_uid %>% unique() %>% unlist()
 
@@ -25,20 +25,23 @@ updateExistingPrioritization <- function(d, d2_session) {
   prios <- n_groups %>% purrr::map_dfr(getPrioTable)
 
   if (NROW(prios) > 0 & any(is.na(prios$Value))) {
-    msg <- paste("ERROR! Missing prioriziation PSNU prioritization levels have been detected.",
-                 "Affected PSNUs will be classified as No Prioritization but may lead to inconsistencies",
+    msg <- paste("ERROR! Missing prioriziation PSNU prioritization levels",
+                 "have been detected. Affected PSNUs will be classified as No",
+                 "Prioritization but may lead to inconsistencies",
                  "in the draft memo generation and comparison")
 
     d$info$messages <- appendMessage(d$info$messages, "ERROR")
 
-    prios <- prios %>% dplyr::mutate("Value" = dplyr::case_when(is.na(Value) ~ 0,
-                                                                TRUE ~ Value))
+    prios <- prios %>%
+      dplyr::mutate("Value" = dplyr::case_when(is.na(Value) ~ 0,
+                                               TRUE ~ Value))
   }
 
   if (NROW(prios) == 0 & NROW(d$data$analytics) > 0) {
-    msg <- paste("ERROR! We could not obtain any prioritization information from DATIM",
-                 "All PSNUs will be classified as No Prioritization but may lead to inconsistencies",
-                 "in the draft memo generation and comparison")
+    msg <- paste("ERROR! We could not obtain any prioritization information",
+                 "from DATIM All PSNUs will be classified as No Prioritization",
+                 "but may lead to inconsistencies in the draft memo",
+                 "generation and comparison")
 
     d$info$messages <- appendMessage(d$info$messages, "ERROR")
     prios <- tibble::tibble("Organisation unit" = psnus,
@@ -57,8 +60,9 @@ updateExistingPrioritization <- function(d, d2_session) {
   d$data$analytics %<>%
     dplyr::select(-prioritization) %>%
     dplyr::left_join(prios, by = "psnu_uid") %>%
-    dplyr::mutate(prioritization = dplyr::case_when(is.na(prioritization) ~ "No Prioritization",
-                                                    TRUE ~ prioritization))
+    dplyr::mutate(prioritization = dplyr::case_when(
+      is.na(prioritization) ~ "No Prioritization",
+      TRUE ~ prioritization))
 
-  return(d)
+  d
 }
