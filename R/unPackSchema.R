@@ -17,6 +17,9 @@ validateSchema <- function(schema,
                            tool,
                            season) {
 
+  stopifnot("Package \"waldo\" must be installed to use this function." =
+              requireNamespace("waldo", quietly = TRUE))
+
   # Collect parameters ####
   schema <- schema %missing% NULL
   schema_provided <- !is.null(schema)
