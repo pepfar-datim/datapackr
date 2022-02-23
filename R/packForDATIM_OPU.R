@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title packForDATIM_OPU(d)
 #'
 #' @description Packs extracted PSNUxIM data from OPU Data Pack for DATIM import.

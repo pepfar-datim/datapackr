@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title writePSNUxIM(d)
 #'
 #' @description Checks a Data Pack for need of new or appended PSNUxIM data, then

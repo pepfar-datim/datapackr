@@ -1,6 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
-#' @importFrom stats complete.cases
 #' @title packSNUxIM_OPU(d)
 #'
 #' @description Packs SNUxIM tab for OPU Data Packs.

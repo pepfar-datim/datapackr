@@ -1,6 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
-#' @importFrom stats complete.cases
 #' @title packSNUxIM(data)
 #'
 #' @description Packs SNUxIM data prepared from unPackSNUxIM for import to DATIM.

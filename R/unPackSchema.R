@@ -288,6 +288,7 @@ validateSchema <- function(schema,
 
 #' @export
 #' @importFrom data.table :=
+#' @importFrom methods as
 #' @title Extract and save schema from Data Pack template.
 #'
 #' @description
@@ -489,7 +490,7 @@ unPackSchema_datapack <- function(template_path = NULL,
   # Add skipped sheets ####
   skipped_schema <- matrix(nrow = 0, ncol = NCOL(schema)) %>%
     as.data.frame() %>%
-    setNames(names(schema))
+    stats::setNames(names(schema))
 
   skipped_schema[] <- mapply(FUN = as, skipped_schema, sapply(schema, class), SIMPLIFY = FALSE)
 

@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom rlist list.remove
 #' @title separateDataSets(d)
 #'
 #' @description After data has been extracted from all sheets in a Data Pack,

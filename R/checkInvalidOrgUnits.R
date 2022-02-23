@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title checkInvalidOrgUnits(d)
 #'
 #' @description Checks data pulled from a single sheet in a Data Pack and
