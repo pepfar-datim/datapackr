@@ -1,6 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
-#' @importFrom utils packageVersion
 #' @title writeHomeTab(wb, datapack_uid, tool = "Data Pack")
 #'
 #' @description

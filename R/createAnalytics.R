@@ -33,7 +33,6 @@ getFY22Prioritizations <- function(d) {
 
 
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title createAnalytics(d)
 #'
 #' @description Wrapper function for creation of d$data$analytics object

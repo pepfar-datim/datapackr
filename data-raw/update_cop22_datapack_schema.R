@@ -4,7 +4,9 @@
 library(datapackr)
 library(magrittr)
 
-datimutils::loginToDATIM("/Users/scott/.secrets/datim.json")
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
+datimutils::loginToDATIM(secrets)
 
 datapack_template_filepath <- system.file("extdata",
                                           "COP22_Data_Pack_Template.xlsx",
@@ -12,7 +14,7 @@ datapack_template_filepath <- system.file("extdata",
                                           mustWork = TRUE)
 cop22_data_pack_schema <-
   unPackSchema_datapack(
-    filepath = datapack_template_filepath,
+    template_path = datapack_template_filepath,
     skip = skip_tabs(tool = "Data Pack Template", cop_year = 2022),
     cop_year = 2022)
 

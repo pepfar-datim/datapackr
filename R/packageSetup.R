@@ -112,7 +112,7 @@ pick_schema <- function(cop_year, tool) {
   }
 
   cop_year %<>% check_cop_year()
-  invisible(capture.output(tool %<>% check_tool(tool = ., cop_year = cop_year)))
+  invisible(utils::capture.output(tool %<>% check_tool(tool = ., cop_year = cop_year)))
 
   if (tool == "OPU Data Pack") {
     if (cop_year == 2020) {
@@ -231,6 +231,7 @@ pick_template_path <- function(cop_year, tool) {
 #' @param tool Type of tool this function will create or interact with. Either
 #' \code{OPU Data Pack} or \code{Data Pack}
 #' @param season Either \code{COP} or \code{OPU}.
+#' @param ... Additional arguments to pass.
 #'
 #' @family parameter-helpers
 #'
@@ -253,7 +254,8 @@ datapackr_params <- function(model_data,
                              wb,
                              PSNUs,
                              tool,
-                             season) {
+                             season,
+                             ...) {
 
   # This function should return something
   #Return its own argument names

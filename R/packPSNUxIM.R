@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title packPSNUxIM
 #'
 #' @description Packs the PSNUxIM tab in either a COP or OPU Data Pack.

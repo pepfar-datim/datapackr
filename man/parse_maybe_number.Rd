@@ -8,6 +8,9 @@ parse_maybe_number(x, default = NULL)
 }
 \arguments{
 \item{x}{Value to test and coerce}
+
+\item{default}{Default value to assign to x if not a character string,
+\code{NA_character_}, or a factor.}
 }
 \value{
 x parsed as numeric, if possible

@@ -143,8 +143,6 @@ autoResolveDuplicates <- function(d, keep_dedup) {
 
 
 #' @export
-#' @importFrom magrittr %>% %<>%
-#' @importFrom stats complete.cases
 #' @title exportDistributedDataToDATIM(data)
 #'
 #' @description Packs distributed MER data prepared from unPackSNUxIM for import to DATIM.
@@ -207,7 +205,7 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
 
     # Remove anything which is NA here. Under COP19 guidance,
     #this will include only TX_PVLS.N.Age/Sex/Indication/HIVStatus.20T.Routine
-    dplyr::filter(complete.cases(.))
+    dplyr::filter(stats::complete.cases(.))
 
 
   return(d)

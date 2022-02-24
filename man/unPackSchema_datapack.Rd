@@ -5,14 +5,16 @@
 \title{Extract and save schema from Data Pack template.}
 \usage{
 unPackSchema_datapack(
-  filepath = NULL,
+  template_path = NULL,
   skip = NULL,
   tool = "Data Pack Template",
   cop_year = getCurrentCOPYear()
 )
 }
 \arguments{
-\item{filepath}{Local filepath for a Data Pack template (XLSX).}
+\item{template_path}{Local filepath to Data Pack template Excel (XLSX) file.
+This file MUST NOT have any data validation formats present. If left
+\code{NULL}, will select the default based on \code{cop_year} and \code{tool}.}
 
 \item{skip}{Character vector of Sheet Names to label for skipping in schema.}
 

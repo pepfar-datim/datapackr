@@ -58,6 +58,162 @@
 "data_pack_schema"
 
 #' @docType data
+#' @title Map of COP20 indicators from Data Pack indicator codes to
+#' DATIM dataelements and categoryoptioncombos
+#'
+#' @description
+#' Dataset that maps COP20 Data Pack indicators to dataelements and
+#' categoryoptioncombos in DATIM, used for mapping datasets
+#' extracted from Data Packs to DATIM, with the necessary import file structure.
+#'
+#' @format
+#' \describe{
+#'   \item{indicator_code}{Code used in the Data Pack to uniquely identify each
+#'   distinct programmatic area of target setting.}
+#'   \item{col_type}{Values can be "target", "result" or NA}
+#'   \item{value_type}{Describes what type of measure the indicator code is
+#'    represented by. Values can be "integer", "percentage", or NA}
+#'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
+#'    element}
+#'   \item{valid_ages.name}{Age disaggregate}
+#'   \item{valid_ages.id}{Age disaggregate UID}
+#'   \item{valid_sexes.name}{Sex disaggregate}
+#'   \item{valid_sexes.id}{Sex disaggregate UID}
+#'   \item{valid_kps.name}{KP disaggregate}
+#'   \item{valid_kps.id}{KP disaggregate UID}
+#'   \item{FY}{Fiscal Year}
+#'   \item{period}{DHIS2 period for example "2021Oct"}
+#'   \item{categoryOptions.ids}{Categoryoption UID}
+#'   \item{dataelementuid}{DATIM UID for dataElements.}
+#'   \item{hts_modality}{HIV Testing service type}
+#'   \item{period_dataset}{Fiscal year dataset results}
+#'   \item{dataelementname}{The name of the data element being described}
+#'   \item{categoryoptioncomboname}{The name of the various combinations of
+#'    categories and options}
+#'   \item{categoryoptioncombouid}{DATIM uid for categoryOptionCombos.}
+#'   \item{targets_results}{Category variable denoting "targets" or "results"}
+#'   \item{dataset}{Category variable denoting where the dateset stems from:
+#'    "impatt","subnat", "mer"}
+#'   \item{resultstatus}{Category variable denoting the status of the results}
+#'   \item{resultststaus_inclusive}{Category variable denoting
+#'    "Positive", "Negative", "Unknown"}
+#'   \item{disagg_type}{Category variable denoting the dissagregate}
+#'   \item{technical_area}{Category variable denoting the tecnical area}
+#'   \item{top_level}{Denotes if the top level is a numerator or denominator}
+#'   \item{support_type}{Category variable denoting "Sub-National", "DSD", "TA",
+#'    or "No Support Type". The crossing of these with \code{indicatorCode}
+#'    roughly corresponds to DATIM dataelements.}
+#'   \item{numerator_denominator}{Category variable denoting numerator or
+#'    denominator}
+#' }
+#'
+"cop20_map_DataPack_DATIM_DEs_COCs"
+
+#' @docType data
+#' @title Map of COP21 indicators from Data Pack indicator codes to
+#' DATIM dataelements and categoryoptioncombos
+#'
+#' @description
+#' Dataset that maps COP21 Data Pack indicators to dataelements and
+#' categoryoptioncombos in DATIM, used for mapping datasets
+#' extracted from Data Packs to DATIM, with the necessary import file structure.
+#'
+#' @format
+#' \describe{
+#'   \item{indicator_code}{Code used in the Data Pack to uniquely identify each
+#'   distinct programmatic area of target setting.}
+#'   \item{col_type}{Values can be "target", "result" or NA}
+#'   \item{value_type}{Describes what type of measure the indicator code is
+#'    represented by. Values can be "integer", "percentage", or NA}
+#'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
+#'    element}
+#'   \item{valid_ages.name}{Age disaggregate}
+#'   \item{valid_ages.id}{Age disaggregate UID}
+#'   \item{valid_sexes.name}{Sex disaggregate}
+#'   \item{valid_sexes.id}{Sex disaggregate UID}
+#'   \item{valid_kps.name}{KP disaggregate}
+#'   \item{valid_kps.id}{KP disaggregate UID}
+#'   \item{FY}{Fiscal Year}
+#'   \item{period}{DHIS2 period for example "2021Oct"}
+#'   \item{categoryOptions.ids}{Categoryoption UID}
+#'   \item{dataelementuid}{DATIM UID for dataElements.}
+#'   \item{hts_modality}{HIV Testing service type}
+#'   \item{period_dataset}{Fiscal year dataset results}
+#'   \item{dataelementname}{The name of the data element being described}
+#'   \item{categoryoptioncomboname}{The name of the various combinations of
+#'    categories and options}
+#'   \item{categoryoptioncombouid}{DATIM uid for categoryOptionCombos.}
+#'   \item{targets_results}{Category variable denoting "targets" or "results"}
+#'   \item{dataset}{Category variable denoting where the dateset stems from:
+#'    "impatt","subnat", "mer"}
+#'   \item{resultstatus}{Category variable denoting the status of the results}
+#'   \item{resultststaus_inclusive}{Category variable denoting
+#'    "Positive", "Negative", "Unknown"}
+#'   \item{disagg_type}{Category variable denoting the dissagregate}
+#'   \item{technical_area}{Category variable denoting the tecnical area}
+#'   \item{top_level}{Denotes if the top level is a numerator or denominator}
+#'   \item{support_type}{Category variable denoting "Sub-National", "DSD", "TA",
+#'    or "No Support Type". The crossing of these with \code{indicatorCode}
+#'    roughly corresponds to DATIM dataelements.}
+#'   \item{numerator_denominator}{Category variable denoting numerator or
+#'    denominator}
+#' }
+#'
+"cop21_map_DataPack_DATIM_DEs_COCs"
+
+#' @docType data
+#' @title Map of COP22 indicators from Data Pack indicator codes to
+#' DATIM dataelements and categoryoptioncombos
+#'
+#' @description
+#' Dataset that maps COP22 Data Pack indicators to dataelements and
+#' categoryoptioncombos in DATIM, used for mapping datasets
+#' extracted from Data Packs to DATIM, with the necessary import file structure.
+#'
+#' @format
+#' \describe{
+#'   \item{indicator_code}{Code used in the Data Pack to uniquely identify each
+#'   distinct programmatic area of target setting.}
+#'   \item{col_type}{Values can be "target", "result" or NA}
+#'   \item{value_type}{Describes what type of measure the indicator code is
+#'    represented by. Values can be "integer", "percentage", or NA}
+#'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
+#'    element}
+#'   \item{valid_ages.name}{Age disaggregate}
+#'   \item{valid_ages.id}{Age disaggregate UID}
+#'   \item{valid_sexes.name}{Sex disaggregate}
+#'   \item{valid_sexes.id}{Sex disaggregate UID}
+#'   \item{valid_kps.name}{KP disaggregate}
+#'   \item{valid_kps.id}{KP disaggregate UID}
+#'   \item{FY}{Fiscal Year}
+#'   \item{period}{DHIS2 period for example "2021Oct"}
+#'   \item{categoryOptions.ids}{Categoryoption UID}
+#'   \item{dataelementuid}{DATIM UID for dataElements.}
+#'   \item{hts_modality}{HIV Testing service type}
+#'   \item{period_dataset}{Fiscal year dataset results}
+#'   \item{dataelementname}{The name of the data element being described}
+#'   \item{categoryoptioncomboname}{The name of the various combinations of
+#'    categories and options}
+#'   \item{categoryoptioncombouid}{DATIM uid for categoryOptionCombos.}
+#'   \item{targets_results}{Category variable denoting "targets" or "results"}
+#'   \item{dataset}{Category variable denoting where the dateset stems from:
+#'    "impatt","subnat", "mer"}
+#'   \item{resultstatus}{Category variable denoting the status of the results}
+#'   \item{resultststaus_inclusive}{Category variable denoting
+#'    "Positive", "Negative", "Unknown"}
+#'   \item{disagg_type}{Category variable denoting the dissagregate}
+#'   \item{technical_area}{Category variable denoting the tecnical area}
+#'   \item{top_level}{Denotes if the top level is a numerator or denominator}
+#'   \item{support_type}{Category variable denoting "Sub-National", "DSD", "TA",
+#'    or "No Support Type". The crossing of these with \code{indicatorCode}
+#'    roughly corresponds to DATIM dataelements.}
+#'   \item{numerator_denominator}{Category variable denoting numerator or
+#'    denominator}
+#' }
+#'
+"cop22_map_DataPack_DATIM_DEs_COCs"
+
+#' @docType data
 #' @title Map of indicators from Data Pack indicator codes to DATIM dataelements
 #' and categoryoptioncombos
 #'
@@ -110,6 +266,56 @@
 "map_DataPack_DATIM_DEs_COCs"
 
 #' @docType data
+#' @title Map from Data Pack to DATIM for the adorning import files
+#'
+#' @description
+#' Dataset that is a full map between Data Packs and DATIM for
+#' the purpose of generating import and analytics tables.
+#'
+#' @format
+#' \describe{
+#'   \item{indicator_code}{Code used in the Data Pack to uniquely identify each
+#'   distinct programmatic area of target setting.}
+#'   \item{col_type}{Values can be "target", "result" or NA}
+#'   \item{value_type}{Describes what type of measure the indicator code is
+#'    represented by. Values can be "integer", "percentage", or NA}
+#'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
+#'    element}
+#'   \item{valid_ages.name}{Age disaggregate}
+#'   \item{valid_ages.id}{Age disaggregate UID}
+#'   \item{valid_sexes.name}{Sex disaggregate}
+#'   \item{valid_sexes.id}{Sex disaggregate UID}
+#'   \item{valid_kps.name}{KP disaggregate}
+#'   \item{valid_kps.id}{KP disaggregate UID}
+#'   \item{FY}{Fiscal Year}
+#'   \item{period}{DHIS2 period for example "2021Oct"}
+#'   \item{categoryOptions.ids}{Categoryoption UID}
+#'   \item{dataelementuid}{DATIM UID for dataElements.}
+#'   \item{hts_modality}{HIV Testing service type}
+#'   \item{period_dataset}{Fiscal year dataset results}
+#'   \item{dataelementname}{The name of the data element being described}
+#'   \item{categoryoptioncomboname}{The name of the various combinations of
+#'    categories and options}
+#'   \item{categoryoptioncombouid}{DATIM uid for categoryOptionCombos.}
+#'   \item{targets_results}{Category variable denoting "targets" or "results"}
+#'   \item{dataset}{Category variable denoting where the dateset stems from:
+#'    "impatt","subnat", "mer"}
+#'   \item{resultstatus}{Category variable denoting the status of the results}
+#'   \item{resultststaus_inclusive}{Category variable denoting
+#'    "Positive", "Negative", "Unknown"}
+#'   \item{disagg_type}{Category variable denoting the dissagregate}
+#'   \item{technical_area}{Category variable denoting the tecnical area}
+#'   \item{top_level}{Denotes if the top level is a numerator or denominator}
+#'   \item{support_type}{Category variable denoting "Sub-National", "DSD", "TA",
+#'    or "No Support Type". The crossing of these with \code{indicatorCode}
+#'    roughly corresponds to DATIM dataelements.}
+#'   \item{numerator_denominator}{Category variable denoting numerator or
+#'    denominator}
+#' }
+#'
+"cop22_map_adorn_import_file"
+
+#' @docType data
 #' @title Schema describing correct structure of the COP20 Data Pack template.
 #'
 #' @description This schema describes the correct structure of a COP20 Data Pack
@@ -139,7 +345,7 @@
 #'   \item{dataelement_dsd}{Denotes whether this element has a
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
-#'    "Technical Assistance" support type
+#'    "Technical Assistance" support type}
 #'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
 #'    element}
 #'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
@@ -179,6 +385,37 @@
 #'    Safe Partnernship. Binary column "Y" or NA.}
 #' }
 "valid_PSNUs"
+
+#' @docType data
+#' @title List of valid COP22 PSNUs used for generating Data Packs.
+#'
+#' @description List of valid COP22 PSNUs used for generating Data Packs.
+#' Must be synced and saved manually!
+#'
+#' @format
+#' \describe{
+#'   \item{ou}{Operating Unit name associated with the Organisation Unit}
+#'   \item{ou_id}{Operating Unit UID}
+#'   \item{country_name}{Country name associated with the Organisation Unit}
+#'   \item{country_uid}{Country name UID}
+#'   \item{snu1}{Subnational Unit associated with the Organisation Unit}
+#'   \item{snu1_uid}{Subnational Unit UID}
+#'   \item{psnu}{Priority Sub-National Unit associated with the Organisation
+#'    Unit}
+#'   \item{psnu_uid}{Priority Sub-National Unit UID}
+#'   \item{psnu_type}{The type of Priority Sub-National Unit}
+#'   \item{lastUpdated}{The last time the Organisation Unit was updated}
+#'   \item{ancestors}{A nested eleven column data frame that contains the
+#'    list of parent organisation units that contain the PSNU,
+#'    including the names, ids, and which organisationUnitGroups that those
+#'    parent organisation units belong to}
+#'   \item{organisationUnitGroups}{A nested two column data frame that
+#'    contains the name and id of the groups the organisation unit is associated
+#'    with. For example "Community" and "PvuaP6YALSA"}
+#'   \item{DREAMS}{Determined, Resilient, Empowered, AIDS-free, Mentored, and
+#'    Safe Partnernship. Binary column "Y" or NA.}
+#' }
+"cop22_valid_PSNUs"
 
 #' @docType data
 #' @title List of valid categoryoptions based on current COP Target Code List.
@@ -241,7 +478,7 @@
 #'   \item{dataelement_dsd}{Denotes whether this element has a
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
-#'    "Technical Assistance" support type
+#'    "Technical Assistance" support type}
 #'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
 #'    element}
 #'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
@@ -282,7 +519,7 @@
 #'   \item{dataelement_dsd}{Denotes whether this element has a
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
-#'    "Technical Assistance" support type
+#'    "Technical Assistance" support type}
 #'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
 #'    element}
 #'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
@@ -299,12 +536,27 @@
 #' along with their individual category options (id and name) as a
 #' nested data frame.
 #'
-#'#' @format
+#' @format
 #' \describe{
 #'   \item{name}{Name of the Category Option Group for example "01-04 Only"}
 #'   \item{id}{Category Option Group UID}
 #' }
 "datapack_cogs"
+
+#' @docType data
+#' @title Data Pack Updated Indicator Codes
+#'
+#' @description Data frame showing the relationship between COP20 and COP21
+#' Data Pack indicator codes.
+#'
+#' @format
+#' \describe{
+#'   \item{indicator_code}{Old Data Pack indicator code for COP20.}
+#'   \item{indicator_code_updated}{New Data Pack indicator code for COP21.}
+#'   \item{finalized}{Binary of 0 or 1 indicating if the new indicator code
+#'   has been finalized or may be subject to further revisions.}
+#' }
+"updated_indicator_codes"
 
 #' @docType data
 #' @title Schema describing the correct structure of the COP21 Data Pack template.
@@ -336,7 +588,7 @@
 #'   \item{dataelement_dsd}{Denotes whether this element has a
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
-#'    "Technical Assistance" support type
+#'    "Technical Assistance" support type}
 #'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
 #'    element}
 #'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
@@ -379,7 +631,7 @@
 #'   \item{dataelement_dsd}{Denotes whether this element has a
 #'    "Direct Service Delivery" support type}
 #'   \item{dataelement_ta}{Denotes whether this element has a
-#'    "Technical Assistance" support type
+#'    "Technical Assistance" support type}
 #'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
 #'    element}
 #'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}

@@ -1,3 +1,32 @@
+# datapackr 5.1.3
+
+## Bug Fixes
+* Downgrades `openxslx` to version 4.2.3 to prevent error with PSNUxIM packing.
+* Changes the HTS modality group set to `HTS Modality (USE ONLY for FY22 Results/FY23 Targets)`. 
+* Change `compareData_OpuDatapackVsDatim` to NOT compare AGYW data which are not part of OPU data packs.
+
+## Breaking changes
+* Changes arguments for `unPackSchema_datapack` and `validateSchema` to use standard argument names. Replaces `filepath` with `template_path` and replaces their usage in all relevant locations.
+
+## Minor improvements and fixes
+* Reexports magrittr `%<>%` function.
+* Adds missing function `interactive_warning`.
+* Removes function `getPass` since this code is commented out and functionality has been replaced by `datimutils`.
+* Cleans up mismatched brackets in `data.R` file and allows for creation of documentation for all datasets.
+* Updates `.Rbuildignore` to include all appropriate files and folder.
+* Clears error with R dependency by downgrading required version to R 4.1.0.
+* Updates package dependencies:
+    - Adds dependency and remote for `datimutils`.
+    - Adds dependency for `methods`.
+    - Suggests `waldo` package.
+    - Removes `scales` and `stringi` as dependencies as they are not used.
+    - Moves `assertthat` from `Imports` to `Suggests` since it is only used in `data-raw` files.
+* Moves the following variables from `data-raw` files to environment variables. Users can add these to an `.Rprofile` to streamline their workflow:
+    - `SECRETS_FOLDER`
+    - `OUTPUT_FOLDER`
+    - `MODEL_DATA_PATH`
+    - `SNUXIM_MODEL_DATA_PATH`
+
 # datapackr 5.1.2
 
 ## Bug Fixes

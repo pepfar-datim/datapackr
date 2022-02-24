@@ -1,6 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
-#' @importFrom stats complete.cases
 #' @title packSNUxIM_OPU(d)
 #'
 #' @description Packs SNUxIM tab for OPU Data Packs.
@@ -134,7 +132,7 @@ packSNUxIM_OPU <- function(d) {
     dplyr::select(col, indicator_code, column_names, formula)
 
   fx_cols <- schema_plus %>%
-    `row.names <- `(.[, "column_names"]) %>%
+    `row.names<-`(.[, "column_names"]) %>%
     dplyr::filter(!is.na(formula)) %>%
     dplyr::select(formula) %>%
     t() %>%

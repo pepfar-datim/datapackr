@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title Pack a Data Pack
 #'
 #' @description
@@ -89,7 +88,7 @@ packDataPack <- function(model_data,
   interactive_print("Checking template against schema and DATIM...")
   schema <-
     unPackSchema_datapack(
-      filepath = d$keychain$template,
+      template_path = d$keychain$template,
       skip = skip_tabs(tool = "Data Pack Template", cop_year = cop_year),
       cop_year = cop_year)
 

@@ -39,7 +39,6 @@ round_trunc <- function(x, digits = 0) {
 
 
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title Pull IMPATT levels from DATIM for all PEPFAR countries
 #'
 #' @description
@@ -84,7 +83,6 @@ getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
 }
 
 
-#' @importFrom lazyeval interp
 #' @export
 #' @title Swap columns between dataframes
 #'
@@ -587,7 +585,7 @@ compareTemplateToSchema <- function(template_path = NULL,
 
   template_schema <-
     unPackSchema_datapack(
-      filepath = template_path,
+      template_path = template_path,
       skip = skip_tabs(tool = paste0(tool, " Template"), cop_year = cop_year),
       tool = paste0(tool, " Template"),
       cop_year = cop_year)
@@ -651,7 +649,7 @@ paste_oxford <- function(..., final = "and", oxford = TRUE) {
 #' @param x Dataframe to paste
 #' @export
 paste_dataframe <- function(x) {
-  paste(capture.output(print(x)), collapse = "\n")
+  paste(utils::capture.output(print(x)), collapse = "\n")
 }
 
 
@@ -660,10 +658,9 @@ paste_dataframe <- function(x) {
 #' @description If x is character, attempts to parse the first occurence of a
 #' sub-string that looks like a number.
 #'
-#' @importFrom stringr str_extract
-#' @importFrom rlang is_character
-#'
 #' @param x Value to test and coerce
+#' @param default Default value to assign to x if not a character string,
+#'  \code{NA_character_}, or a factor.
 #'
 #' @return x parsed as numeric, if possible
 parse_maybe_number <- function(x, default = NULL) {
@@ -702,8 +699,6 @@ parse_maybe_number <- function(x, default = NULL) {
 #' @param string Input vector. Either a character vector, or something coercible
 #' to one.
 #'
-#' @importFrom stringr str_detect
-#'
 #' @return A logical vector.
 is_uidish <- function(string) {
   stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")
@@ -719,7 +714,7 @@ names2 <- function(x) {
 has_names <- function(x) {
   nms <- names(x)
   if (is.null(nms)) {
-    rep_along(x, FALSE)
+    rlang::rep_along(x, FALSE)
   } else {
     !(is.na(nms) | nms == "")
   }
@@ -727,7 +722,7 @@ has_names <- function(x) {
 
 ndots <- function(...) nargs()
 
-bullet <- function(...) paste0(bold(silver(" * ")), sprintf(...))
+bullet <- function(...) paste0(crayon::bold(crayon::silver(" * ")), sprintf(...))
 
 # Re-exports ---------------------------------------------------
 
@@ -748,3 +743,7 @@ rlang::`%|%`
 #' @importFrom magrittr `%>%`
 #' @export
 magrittr::`%>%`
+
+#' @importFrom magrittr `%<>%`
+#' @export
+magrittr::`%<>%`
