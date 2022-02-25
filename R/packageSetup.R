@@ -202,13 +202,29 @@ pick_template_path <- function(cop_year, tool) {
 #' @param datapack_name Name you would like associated with this Data Pack.
 #' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
 #' @param datasets Character vector of dataSet IDs.
+#' @param datastreams One or more of "mer_targets", "mer_results",
+#' "subnat_targets", "subnat_results", or "impatt".
+#' @param fiscal_year character - one of: {"2019", "2020", "2021", "2022",
+#' "2023"}
+#' @param FY Reporting FY for which to filter active code lists.
+#' @param include_dedupe Logical. If TRUE will include deduplication mechanisms.
+#' Default is FALSE.
+#' @param include_DREAMS If \code{TRUE} will also include DREAMS
+#' organisation units.
+#' @param include_mil Logical. If \code{TRUE}, will also include _Military nodes
+#' related to \code{country_uids}. Default is \code{TRUE}.
+#' @param include_MOH Logical. If TRUE will include MOH mechanisms. Default is
+#' FALSE.
 #' @param MER MER dataset extract from unPackSheets
 #' @param model_data Data from DATIM needed to pack into a COP Data Pack.
 #' @param model_data_path Filepath to model data produced from DATIM.
 #' @param org_units A list of DATIM organisation units.
+#' @param ou_level Level in DATIM hierarchy to pull orgUnits from. Choose from:
+#' "Prioritization", "Community", "Facility", or the numbers 4 through 7.
 #' @param output_folder Local folder where you would like your Data Pack to be
 #' saved upon export. If left as \code{NULL}, will output to
 #' \code{Working Directory}.
+#' @param path Filepath to test.
 #' @param PSNUs Dataframe of PSNUs to use in this function, containing at least
 #' \code{psnu_uid}.
 #' @param PSNUxIM_combos Dataset extract from unPackSNUxIM that shows data
@@ -219,7 +235,9 @@ pick_template_path <- function(cop_year, tool) {
 #' \code{NULL} will select the default based on \code{cop_year} and \code{tool}.
 #' @param season Either \code{COP} or \code{OPU}.
 #' @param sheet Specified sheet within wb.
+#' @param sheet_data Dataset to use as input for packing Data Pack.
 #' @param sheets Specified sheets within wb.
+#' @param skip Character vector of Sheet Names to label for skipping in schema.
 #' @param SNUxIM SNUxIM dataset extract from unPackSNUxIM
 #' @param snuxim_model_data Export from DATIM needed to allocate data across
 #' mechanisms in the PSNUxIM tab
@@ -230,6 +248,8 @@ pick_template_path <- function(cop_year, tool) {
 #' \code{NULL}, will select the default based on \code{cop_year} and \code{tool}.
 #' @param tool Type of tool this function will create or interact with. Either
 #' \code{OPU Data Pack} or \code{Data Pack}
+#' @param update_stale_cache If the cached_mechs_path file is outdated or unreadable,
+#' should a new cache be saved?
 #' @param wb Openxlsx workbook object.
 #' @param ... Additional arguments to pass.
 #'
@@ -245,24 +265,36 @@ datapackr_params <- function(api_call,
                              dataElements,
                              datapack_name,
                              datasets,
+                             datastreams,
+                             fiscal_year,
+                             FY,
+                             include_dedupe,
+                             include_DREAMS,
+                             include_mil,
+                             include_MOH,
                              MER,
                              model_data,
                              model_data_path,
                              org_units,
+                             ou_level,
                              output_folder,
+                             path,
                              PSNUs,
                              PSNUxIM_combos,
                              results_archive,
                              season,
                              schema,
                              sheet,
+                             sheet_data,
                              sheets,
+                             skip,
                              SNUxIM,
                              snuxim_model_data,
                              snuxim_model_data_path,
                              submission_path,
                              template_path,
                              tool,
+                             update_stale_cache,
                              wb,
                              ...) {
 

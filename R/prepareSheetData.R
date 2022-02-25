@@ -4,7 +4,6 @@
 #' @description
 #' Prepares provided dataset for writing into specified Data Pack sheet.
 #'
-#' @param sheet_data Data to prepare.
 #' @inheritParams datapackr_params
 #'
 #' @return dataframe of data prepared for Data Pack

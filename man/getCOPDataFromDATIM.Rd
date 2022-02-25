@@ -7,7 +7,7 @@
 getCOPDataFromDATIM(
   country_uids,
   cop_year,
-  streams = c("mer_targets", "subnat_targets", "impatt"),
+  datastreams = c("mer_targets", "subnat_targets", "impatt"),
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
@@ -18,8 +18,8 @@ For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}
 
-\item{streams}{data stream or streams. One or more of "mer_targets", "subnat_targets", "impatt".
-If not specified, then all data streams are returned.}
+\item{datastreams}{One or more of "mer_targets", "mer_results",
+"subnat_targets", "subnat_results", or "impatt".}
 
 \item{d2_session}{DHIS2 Session id}
 }
@@ -27,7 +27,9 @@ If not specified, then all data streams are returned.}
 Raw data in DATIM for a country for the COP data sets for a given COP Year.
 }
 \description{
-Grab all raw data in DATIM for a country for the COP data sets for a given COP Year.
+Grab all raw data in DATIM for a country for the COP data sets for a given
+COP Year. If no datastream is specified, then all of "mer_targets",
+"subnat_targets", and "impatt" are returned by default.
 }
 \examples{
 \dontrun{getCOPDataFromDATIM(country_uid = d$info$country_uids, cop_year = d$info$cop_year)}

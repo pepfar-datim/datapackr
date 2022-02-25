@@ -4,7 +4,7 @@
 #' @description
 #' Given a file path, will test whether the file can be read.
 #'
-#' @param path Filepath to test. Default is NA.
+#' @inheritParams datapackr_params
 #'
 #' @return Logical. \code{TRUE} if file can be read, \code{FALSE} if not.
 #'
@@ -30,7 +30,6 @@ canReadFile <- function(path) {
 #' correct filetype. If either readability or file type is invalid, will prompt
 #' for user selection of correct filepath via computer window.
 #'
-#' @param path Filepath to test and use.
 #' @inheritParams datapackr_params
 #'
 #' @return Character vector containing valid filepath for further use.

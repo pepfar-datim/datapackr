@@ -2,7 +2,7 @@
 % Please edit documentation in R/unPackSchema.R
 \name{validateSchema}
 \alias{validateSchema}
-\title{Validate a \code{datapackr} Schema object}
+\title{Validate a `datapackr` Schema object}
 \usage{
 validateSchema(schema, template_path, cop_year, tool, season)
 }
@@ -26,7 +26,7 @@ FY22 targets = COP21.}
 List object with any failed Schema validation checks.
 }
 \description{
-Useful in validating a \code{datapackr} schema object and investigating any issues.
+Useful in validating a `datapackr` schema object and investigating any issues.
 }
 \seealso{
 Other schema-helpers: 

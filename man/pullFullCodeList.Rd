@@ -6,7 +6,7 @@
 \usage{
 pullFullCodeList(
   FY = getCurrentCOPYear() + 1,
-  datastream = c("mer_targets", "mer_results", "subnat_targets", "subnat_results",
+  datastreams = c("mer_targets", "mer_results", "subnat_targets", "subnat_results",
     "impatt"),
   datasets,
   expanded = FALSE,
@@ -16,9 +16,8 @@ pullFullCodeList(
 \arguments{
 \item{FY}{Reporting FY for which to filter active code lists.}
 
-\item{datastream}{At least one
-of "mer_targets", "mer_results", "subnat_targets", "subnat_results" or "impatt".
-If left will return a code list for the specified COP Year of all streams}
+\item{datastreams}{One or more of "mer_targets", "mer_results",
+"subnat_targets", "subnat_results", or "impatt".}
 
 \item{datasets}{Character vector of dataSet IDs.}
 
@@ -32,5 +31,6 @@ Combined code list as dataframe.
 }
 \description{
 Pulls all code lists for MER, SUBNAT, and IMPATT for a specified FY and
-combines these into a unique list.
+combines these into a unique list. If no datastream is specified, then
+all datastreams are returned.
 }

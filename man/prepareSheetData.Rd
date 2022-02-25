@@ -20,7 +20,7 @@ prepareSheetData(
 \item{schema}{Which datapackr schema to use in guiding this function. If left
 \code{NULL} will select the default based on \code{cop_year} and \code{tool}.}
 
-\item{sheet_data}{Data to prepare.}
+\item{sheet_data}{Dataset to use as input for packing Data Pack.}
 
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}

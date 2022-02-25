@@ -2,10 +2,10 @@
 #' @title Grab all raw data in DATIM for a country for the COP data sets for a given COP Year.
 #'
 #' @description
-#' Grab all raw data in DATIM for a country for the COP data sets for a given COP Year.
+#' Grab all raw data in DATIM for a country for the COP data sets for a given
+#' COP Year. If no datastream is specified, then all of "mer_targets",
+#' "subnat_targets", and "impatt" are returned by default.
 #'
-#' @param streams data stream or streams. One or more of "mer_targets", "subnat_targets", "impatt".
-#' If not specified, then all data streams are returned.
 #' @inheritParams datapackr_params
 #'
 #' @return Raw data in DATIM for a country for the COP data sets for a given COP Year.
@@ -15,19 +15,19 @@
 #'
 getCOPDataFromDATIM <- function(country_uids,
                                 cop_year,
-                                streams = c("mer_targets", "subnat_targets", "impatt"),
+                                datastreams = c("mer_targets", "subnat_targets", "impatt"),
                                 d2_session = dynGet("d2_default_session",
                                                     inherits = TRUE)) {
   if (!cop_year %in% c(2020, 2021)) {
     stop("The COP year provided is not supported by the internal function getCOPDataFromDATIM")
   }
 
-  dataset_uids <- datapackr::getDatasetUids(cop_year + 1, streams)
+  dataset_uids <- datapackr::getDatasetUids(cop_year + 1, datastreams)
 
   # hack to allow forward compatibility between FY21 subnat dataset in DATIM and
   # COP21/FY22 datapack
   # need to be able to grab dataelements from FY22 subnat targets dataset for FY21 period
-  if (cop_year == 2020 && "subnat_targets" %in% streams) {
+  if (cop_year == 2020 && "subnat_targets" %in% datastreams) {
     dataset_uids <-  c(dataset_uids, datapackr::getDatasetUids(2022, "subnat_targets"))
   }
 

@@ -1,6 +1,4 @@
 #' @export
-#' @md
-#'
 #' @title Validate a `datapackr` Schema object
 #'
 #' @description
@@ -298,7 +296,6 @@ validateSchema <- function(schema,
 #' Supplied a filepath to a Data Pack template (XLSX), will extract and save a
 #' schema based on the template.
 #'
-#' @param skip Character vector of Sheet Names to label for skipping in schema.
 #' @inheritParams datapackr_params
 #'
 #' @return Data Pack schema.

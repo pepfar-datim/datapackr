@@ -4,6 +4,7 @@
 #' @description
 #' Pulls the DATIM code list for specified datasets.
 #'
+#' @param dataset Dataset uid to query.
 #' @inheritParams datapackr_params
 #'
 #' @return Code list as dataframe.

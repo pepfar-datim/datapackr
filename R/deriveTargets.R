@@ -4,12 +4,11 @@
 #' Takes Data Pack data and derives other targets not explicitly
 #' set during COP.
 #'
-#' @param data Dataframe with either Data Pack data.
-#' @inheritParams datapackr_params
+#' @param data Dataframe with Data Pack data.
 #'
 #' @return Dataframe with added, derived targets.
 #'
-deriveTargets <- function(data, type) {
+deriveTargets <- function(data) {
   derived <- data %>%
     dplyr::filter(
       stringr::str_detect(

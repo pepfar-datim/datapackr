@@ -132,7 +132,7 @@ compareData_DatapackVsDatim <-
                           d2_session = d2_session),
       getCOPDataFromDATIM(country_uids = d$info$country_uids,
                           cop_year = d$info$cop_year - 1,
-                          streams = c("subnat_targets"),
+                          datastreams = c("subnat_targets"),
                           d2_session = d2_session)) %>%
       dplyr::filter(value != 0) %>% # we don't import 0s up front so we should ignore any here
       dplyr::filter(value != "") %>%

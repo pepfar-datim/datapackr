@@ -5,9 +5,6 @@
 #' Queries DATIM to extract list of PSNUs and adds additional PSNUs not
 #' currently in DATIM as needed.
 #'
-#' @param include_mil Logical. If \code{TRUE}, will also include _Military nodes
-#' related to \code{country_uids}. Default is \code{TRUE}.
-#' @param include_DREAMS If \code{TRUE} will also include DREAMS organisation units.
 #' @param additional_fields Character string of any fields to return from DATIM
 #' API other than those returned by default: \code{name}, \code{id}, \code{ancestors},
 #' & \code{organisationUnitGroups}.

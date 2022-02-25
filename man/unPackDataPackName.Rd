@@ -6,6 +6,12 @@
 \usage{
 unPackDataPackName(submission_path, tool)
 }
+\arguments{
+\item{submission_path}{Local path to the file to import.}
+
+\item{tool}{Type of tool this function will create or interact with. Either
+\code{OPU Data Pack} or \code{Data Pack}}
+}
 \value{
 Character vector of the name of the data pack.
 }

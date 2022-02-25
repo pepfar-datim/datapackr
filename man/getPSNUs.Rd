@@ -19,7 +19,8 @@ For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 \item{include_mil}{Logical. If \code{TRUE}, will also include _Military nodes
 related to \code{country_uids}. Default is \code{TRUE}.}
 
-\item{include_DREAMS}{If \code{TRUE} will also include DREAMS organisation units.}
+\item{include_DREAMS}{If \code{TRUE} will also include DREAMS
+organisation units.}
 
 \item{additional_fields}{Character string of any fields to return from DATIM
 API other than those returned by default: \code{name}, \code{id}, \code{ancestors},

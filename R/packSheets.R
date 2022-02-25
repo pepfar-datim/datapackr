@@ -5,8 +5,6 @@
 #' Loops through all normally structured sheets in a submitted Data Pack
 #' and writes data.
 #'
-#' @param ou_level Level in DATIM hierarchy to pull orgUnits from. Choose from:
-#' "Prioritization", "Community", "Facility", or the numbers 4 through 7.
 #' @inheritParams datapackr_params
 #'
 #' @return wb with all sheets written except SNU x IM

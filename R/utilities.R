@@ -295,10 +295,9 @@ addcols <- function(data, cnames, type = "character") {
 #' {"2019", "2020", ... , "2023"}
 #' and type {"mer_targets", "mer_results", "subnat_targets", "subnat_results",
 #' "impatt"}
-#' @param fiscal_year character - one of: {"2019", "2020", "2021", "2022",
-#' "2023"}
 #' @param type character vector - one or more of:
 #' {"mer_targets", "mer_results", "subnat_targets", "subnat_results", "impatt"}
+#' @inheritParams datapackr_params
 #' @return returns a character vector of the related dataset uids
 #'
 getDatasetUids <-  function(fiscal_year,
@@ -569,7 +568,6 @@ createDataPack <- function(datapack_name = NULL,
 #' @export
 #' @title Compare Data Pack template against schema
 #'
-#' @param tool Either "Data Pack" or "OPU Data Pack"? Default is "Data Pack".
 #' @inheritParams datapackr_params
 #'
 #' @return Message indicating comparison failure or success.

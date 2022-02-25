@@ -14,24 +14,36 @@ datapackr_params(
   dataElements,
   datapack_name,
   datasets,
+  datastreams,
+  fiscal_year,
+  FY,
+  include_dedupe,
+  include_DREAMS,
+  include_mil,
+  include_MOH,
   MER,
   model_data,
   model_data_path,
   org_units,
+  ou_level,
   output_folder,
+  path,
   PSNUs,
   PSNUxIM_combos,
   results_archive,
   season,
   schema,
   sheet,
+  sheet_data,
   sheets,
+  skip,
   SNUxIM,
   snuxim_model_data,
   snuxim_model_data_path,
   submission_path,
   template_path,
   tool,
+  update_stale_cache,
   wb,
   ...
 )
@@ -59,6 +71,26 @@ For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
 \item{datasets}{Character vector of dataSet IDs.}
 
+\item{datastreams}{One or more of "mer_targets", "mer_results",
+"subnat_targets", "subnat_results", or "impatt".}
+
+\item{fiscal_year}{character - one of: {"2019", "2020", "2021", "2022",
+"2023"}}
+
+\item{FY}{Reporting FY for which to filter active code lists.}
+
+\item{include_dedupe}{Logical. If TRUE will include deduplication mechanisms.
+Default is FALSE.}
+
+\item{include_DREAMS}{If \code{TRUE} will also include DREAMS
+organisation units.}
+
+\item{include_mil}{Logical. If \code{TRUE}, will also include _Military nodes
+related to \code{country_uids}. Default is \code{TRUE}.}
+
+\item{include_MOH}{Logical. If TRUE will include MOH mechanisms. Default is
+FALSE.}
+
 \item{MER}{MER dataset extract from unPackSheets}
 
 \item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
@@ -67,9 +99,14 @@ For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
 \item{org_units}{A list of DATIM organisation units.}
 
+\item{ou_level}{Level in DATIM hierarchy to pull orgUnits from. Choose from:
+"Prioritization", "Community", "Facility", or the numbers 4 through 7.}
+
 \item{output_folder}{Local folder where you would like your Data Pack to be
 saved upon export. If left as \code{NULL}, will output to
 \code{Working Directory}.}
+
+\item{path}{Filepath to test.}
 
 \item{PSNUs}{Dataframe of PSNUs to use in this function, containing at least
 \code{psnu_uid}.}
@@ -87,7 +124,11 @@ processes to output_folder.}
 
 \item{sheet}{Specified sheet within wb.}
 
+\item{sheet_data}{Dataset to use as input for packing Data Pack.}
+
 \item{sheets}{Specified sheets within wb.}
+
+\item{skip}{Character vector of Sheet Names to label for skipping in schema.}
 
 \item{SNUxIM}{SNUxIM dataset extract from unPackSNUxIM}
 
@@ -104,6 +145,9 @@ This file MUST NOT have any data validation formats present. If left
 
 \item{tool}{Type of tool this function will create or interact with. Either
 \code{OPU Data Pack} or \code{Data Pack}}
+
+\item{update_stale_cache}{If the cached_mechs_path file is outdated or unreadable,
+should a new cache be saved?}
 
 \item{wb}{Openxlsx workbook object.}
 

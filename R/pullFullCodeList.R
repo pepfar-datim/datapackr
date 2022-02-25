@@ -3,19 +3,16 @@
 #'
 #' @description
 #' Pulls all code lists for MER, SUBNAT, and IMPATT for a specified FY and
-#' combines these into a unique list.
+#' combines these into a unique list. If no datastream is specified, then
+#' all datastreams are returned.
 #'
-#' @param FY Reporting FY for which to filter active code lists.
-#' @param datastream At least one
-#' of "mer_targets", "mer_results", "subnat_targets", "subnat_results" or "impatt".
-#' If left will return a code list for the specified COP Year of all streams
 #' @param expanded If TRUE, will add dataset, period, period_dataset, and
 #' targets_results, related categoryOption metadata,  as additional columns
 #' @inheritParams datapackr_params
 #' @return Combined code list as dataframe.
 #'
 pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
-                             datastream = c("mer_targets", "mer_results",
+                             datastreams = c("mer_targets", "mer_results",
                                             "subnat_targets", "subnat_results",
                                             "impatt"),
                              datasets,
@@ -29,23 +26,23 @@ pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
   if (!datasets_provided) {
     datasets <- character(0)
 
-    if ("mer_targets" %in% datastream) {
+    if ("mer_targets" %in% datastreams) {
       datasets <- c(datasets,
                     datapackr::getDatasetUids(FY, type = "mer_targets"))
     }
-    if ("mer_results" %in% datastream) {
+    if ("mer_results" %in% datastreams) {
       datasets <- c(datasets,
                     datapackr::getDatasetUids(FY, type = "mer_results"))
     }
-    if ("subnat_targets" %in% datastream) {
+    if ("subnat_targets" %in% datastreams) {
       datasets <- c(datasets,
                     datapackr::getDatasetUids(FY, type = "subnat_targets"))
     }
-    if ("subnat_results" %in% datastream) {
+    if ("subnat_results" %in% datastreams) {
       datasets <- c(datasets,
                     datapackr::getDatasetUids(FY, type = "subnat_results"))
     }
-    if ("impatt" %in% datastream) {
+    if ("impatt" %in% datastreams) {
       datasets <- c(datasets,
                     datapackr::getDatasetUids(FY, type = "impatt"))
     }

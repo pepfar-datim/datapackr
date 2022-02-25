@@ -23,8 +23,7 @@ packDataPackSheet(
 \item{schema}{Which datapackr schema to use in guiding this function. If left
 \code{NULL} will select the default based on \code{cop_year} and \code{tool}.}
 
-\item{sheet_data}{Dataset to use as input for packing Data Pack. If left NULL,
-will produce a Data Pack with orgUnits and disagg specifications, but no data.}
+\item{sheet_data}{Dataset to use as input for packing Data Pack.}
 
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}
@@ -33,5 +32,7 @@ FY22 targets = COP21.}
 wb with specified sheet packed with data
 }
 \description{
-Packs data into a specified Data Pack sheet
+Packs data into a specified Data Pack sheet. If `sheet_data` is
+left NULL, will produce a Data Pack with orgUnits and disagg
+specifications, but no data.
 }

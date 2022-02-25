@@ -12,7 +12,7 @@ getValidCategoryOptions <- function(cop_year = getCurrentCOPYear()) {
 
   ## Pull full Code List from DATIM ####
   fullCodeList <- datapackr::pullFullCodeList(FY = cop_year + 1,
-                                              datastream = c("mer_targets",
+                                              datastreams = c("mer_targets",
                                                              "subnat_targets",
                                                              "impatt"))
 

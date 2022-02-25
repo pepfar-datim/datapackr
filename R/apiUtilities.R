@@ -42,6 +42,7 @@ api_call <- function(endpoint,
 #' \href{https://docs.dhis2.org/2.22/en/developer/html/ch01s08.html}{DHIS2 Web API documentation}
 #' for valid operators.
 #' @param match Text to match using \code{operator}.
+#' @inheritParams datapackr_params
 #'
 #' @return Web-encoded URL for DATIM API query.
 #'
@@ -67,6 +68,7 @@ api_filter <- function(api_call, field, operation, match) {
 #' Specifies fields to return from DATIM API query and encodes for web.
 #'
 #' @param fields Fields to return. No need to include \code{&fields=}.
+#' @inheritParams datapackr_params
 #'
 #' @return Web-encoded URL for DATIM API query.
 #'

@@ -7,7 +7,7 @@
 handshakeFile(path, tool)
 }
 \arguments{
-\item{path}{Filepath to test and use.}
+\item{path}{Filepath to test.}
 
 \item{tool}{Type of tool this function will create or interact with. Either
 \code{OPU Data Pack} or \code{Data Pack}}

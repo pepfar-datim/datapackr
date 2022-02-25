@@ -7,7 +7,6 @@
 getOPUDataFromDATIM(
   cop_year,
   country_uids = NULL,
-  country_names = NULL,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }

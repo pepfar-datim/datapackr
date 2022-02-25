@@ -2,10 +2,10 @@
 #' @title Pack data into a Data Pack sheet
 #'
 #' @description
-#' Packs data into a specified Data Pack sheet
+#' Packs data into a specified Data Pack sheet. If `sheet_data` is
+#' left NULL, will produce a Data Pack with orgUnits and disagg
+#' specifications, but no data.
 #'
-#' @param sheet_data Dataset to use as input for packing Data Pack. If left NULL,
-#' will produce a Data Pack with orgUnits and disagg specifications, but no data.
 #' @inheritParams datapackr_params
 #'
 #' @return wb with specified sheet packed with data

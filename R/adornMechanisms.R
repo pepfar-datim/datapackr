@@ -38,12 +38,6 @@ getMechanismViewFromDATIM <- function(cop_year = NULL,
 #' is available to be read. Otherwise, if the user is logged in, the view
 #' will be obtained from DATIM. Otherwise, an empty dataframe is returned.
 #'
-#' @param include_dedupe Logical. If TRUE will include deduplication mechanisms.
-#' Default is FALSE.
-#' @param include_MOH Logical. If TRUE will include MOH mechanisms. Default is
-#' FALSE.
-#' @param update_stale_cache If the cached_mechs_path file is outdated or unreadable,
-#' should a new cache be saved?
 #' @inheritParams datapackr_params
 #'
 #' @return Mechs

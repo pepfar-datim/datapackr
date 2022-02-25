@@ -4,6 +4,8 @@
 #' @description
 #' When supplied a submission path, will return the name of the datapack.
 #'
+#' @inheritParams datapackr_params
+#'
 #' @return Character vector of the name of the data pack.
 #'
 unPackDataPackName <- function(submission_path,

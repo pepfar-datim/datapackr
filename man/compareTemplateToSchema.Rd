@@ -19,7 +19,8 @@ This file MUST NOT have any data validation formats present. If left
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}
 
-\item{tool}{Either "Data Pack" or "OPU Data Pack"? Default is "Data Pack".}
+\item{tool}{Type of tool this function will create or interact with. Either
+\code{OPU Data Pack} or \code{Data Pack}}
 
 \item{d2_session}{DHIS2 Session id}
 }

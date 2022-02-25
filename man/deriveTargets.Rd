@@ -4,10 +4,10 @@
 \alias{deriveTargets}
 \title{Derive non-Data Pack targets from others in the Data Pack}
 \usage{
-deriveTargets(data, type)
+deriveTargets(data)
 }
 \arguments{
-\item{data}{Dataframe with either Data Pack data.}
+\item{data}{Dataframe with Data Pack data.}
 }
 \value{
 Dataframe with added, derived targets.

@@ -7,7 +7,7 @@
 canReadFile(path)
 }
 \arguments{
-\item{path}{Filepath to test. Default is NA.}
+\item{path}{Filepath to test.}
 }
 \value{
 Logical. \code{TRUE} if file can be read, \code{FALSE} if not.
