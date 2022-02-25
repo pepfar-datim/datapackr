@@ -18,7 +18,7 @@ getDataValueSets(
 
 \item{api_version}{- api version to use when calling DHIS2}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 tibble with the data requested

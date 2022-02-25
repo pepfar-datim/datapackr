@@ -2,7 +2,7 @@
 % Please edit documentation in R/datapackVsDatim.R
 \name{compareData_DatapackVsDatim}
 \alias{compareData_DatapackVsDatim}
-\title{compareData_DatapackVsDatim}
+\title{Compare Data Pack Targets to DATIM}
 \usage{
 compareData_DatapackVsDatim(
   d,
@@ -10,9 +10,9 @@ compareData_DatapackVsDatim(
 )
 }
 \arguments{
-\item{d}{list object - parsed data pack object}
+\item{d}{Datapackr sidecar object}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,
@@ -20,5 +20,6 @@ $updates (import to bring DATIM up to date with datapack), $deletes
 (import to bring DATIM up to date with datapack)
 }
 \description{
-Compares the data in a parsed data pack that would be destined for DATIM with target data in in DATIM.
+Compares the data in a parsed data pack that would be
+destined for DATIM with target data in in DATIM.
 }

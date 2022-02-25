@@ -2,14 +2,14 @@
 % Please edit documentation in R/defunctDisaggs.R
 \name{defunctDisaggs}
 \alias{defunctDisaggs}
-\title{defunctDisaggs(d)}
+\title{Check for Defunct Disaggregates}
 \usage{
 defunctDisaggs(d, sheet)
 }
 \arguments{
-\item{d}{Datapackr object.}
+\item{d}{Datapackr sidecar object}
 
-\item{sheet}{Sheet name.}
+\item{sheet}{Specified sheet within wb.}
 }
 \value{
 d

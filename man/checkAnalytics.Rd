@@ -11,12 +11,11 @@ checkAnalytics(
 )
 }
 \arguments{
-\item{d}{datapackr object}
+\item{d}{Datapackr sidecar object}
 
-\item{model_data_path}{Filepath to model data produced from most recent DATIM
-sync.}
+\item{model_data_path}{Filepath to model data produced from DATIM.}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 d

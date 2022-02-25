@@ -11,12 +11,13 @@ createTestDataset(
 )
 }
 \arguments{
-\item{country_uids}{UIDs for Countries to tailor data for.}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
-\item{cop_year}{COP year for dating as well as selection of
-templates.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
-\item{d2_session}{datimutils d2Session object}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 wb with specified sheet packed with data

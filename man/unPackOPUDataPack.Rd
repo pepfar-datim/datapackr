@@ -10,7 +10,7 @@ unPackOPUDataPack(
 )
 }
 \arguments{
-\item{d}{datapackr sidecar}
+\item{d}{Datapackr sidecar object}
 
 \item{d2_session}{DHIS2 Session id}
 }

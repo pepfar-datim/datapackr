@@ -15,14 +15,14 @@ unPackTool(
 \arguments{
 \item{submission_path}{Local path to the file to import.}
 
-\item{tool}{What type of tool is the submission file? Default is "Data Pack".}
+\item{tool}{Type of tool this function will create or interact with. Either
+\code{OPU Data Pack} or \code{Data Pack}}
 
-\item{country_uids}{List of 11 digit alphanumeric DATIM codes representing
-countries. If not provided, will check file for these codes. If not in file,
-will flag error.}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
 \item{d2_session}{DHIS2 Session id}
 }

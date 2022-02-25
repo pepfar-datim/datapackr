@@ -13,10 +13,11 @@ unPackCountryUIDs(
 \arguments{
 \item{submission_path}{Local path to the file to import.}
 
-\item{tool}{What type of tool is the submission file? Default is "Data Pack".}
+\item{tool}{Type of tool this function will create or interact with. Either
+\code{OPU Data Pack} or \code{Data Pack}}
 
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 }
 \value{
 Character vector of country_uids.

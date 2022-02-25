@@ -16,27 +16,25 @@ packDataPackSheets(
 )
 }
 \arguments{
-\item{wb}{datapackr list object.}
+\item{wb}{Openxlsx workbook object.}
 
-\item{country_uids}{Character vector of Country UIDs from DATIM.}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
 \item{ou_level}{Level in DATIM hierarchy to pull orgUnits from. Choose from:
 "Prioritization", "Community", "Facility", or the numbers 4 through 7.}
 
-\item{org_units}{Allows for specification of custom list of orgUnits to include
-in Data Pack sheets.}
+\item{org_units}{A list of DATIM organisation units.}
 
-\item{model_data}{Dataset to use as input for packing Data Pack. If left NULL,
-will produce a Data Pack with orgUnits and disagg specifications, but no data.}
+\item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
 
-\item{schema}{Defaults to standard Data Pack schema, but allows for provision
-of custom schema if needed.}
+\item{schema}{Which datapackr schema to use in guiding this function. If left
+\code{NULL} will select the default based on \code{cop_year} and \code{tool}.}
 
-\item{sheets}{Sheets to pack. Defaults to all those available in \code{wb},
-minus the first few front-matter/summary tabs.}
+\item{sheets}{Specified sheets within wb.}
 
-\item{cop_year}{COP year for dating as well as selection of
-templates.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 }
 \value{
 wb with all sheets written except SNU x IM

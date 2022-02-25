@@ -5,79 +5,107 @@
 \title{Standardized package function parameter definitions}
 \usage{
 datapackr_params(
-  model_data,
-  snuxim_model_data,
-  SNUxIM,
-  MER,
-  PSNUxIM_combos,
-  datapack_name,
-  country_uids,
-  template_path,
-  submission_path,
+  api_call,
+  cached_mechs_path,
   cop_year,
-  output_folder,
-  results_archive,
+  country_uids,
   d2_session,
   d,
-  schema,
-  wb,
+  dataElements,
+  datapack_name,
+  datasets,
+  MER,
+  model_data,
+  model_data_path,
+  org_units,
+  output_folder,
   PSNUs,
-  tool,
+  PSNUxIM_combos,
+  results_archive,
   season,
+  schema,
+  sheet,
+  sheets,
+  SNUxIM,
+  snuxim_model_data,
+  snuxim_model_data_path,
+  submission_path,
+  template_path,
+  tool,
+  wb,
   ...
 )
 }
 \arguments{
-\item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
+\item{api_call}{Base DATIM API query, specifying API table and setting paging
+as false.}
 
-\item{snuxim_model_data}{Export from DATIM needed to allocate data across
-mechanisms in the PSNUxIM tab}
-
-\item{SNUxIM}{SNUxIM dataset extract from unPackSNUxIM}
-
-\item{MER}{MER dataset extract from unPackSheets}
-
-\item{PSNUxIM_combos}{Dataset extract from unPackSNUxIM that shows data
-missing from the PSNUxIM tab.}
-
-\item{datapack_name}{Name you would like associated with this Data Pack.
-(Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
-
-\item{country_uids}{Unique IDs for countries to include in the Data Pack.
-For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
-
-\item{template_path}{Local filepath to Data Pack template Excel (XLSX) file.
-This file MUST NOT have any data validation formats present. If left
-\code{NULL}, will select the default based on \code{cop_year} and \code{tool}.}
-
-\item{submission_path}{Local path to the file to import.}
+\item{cached_mechs_path}{Local file path to the cached mechanisms RDS file.}
 
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}
 
-\item{output_folder}{Local folder where you would like your Data Pack to be
-saved upon export. If left as \code{NULL}, will output to
-\code{Working Directory}.}
-
-\item{results_archive}{If TRUE, will export compiled results of all tests and
-processes to output_folder.}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
 \item{d2_session}{DHIS2 Session id}
 
 \item{d}{Datapackr sidecar object}
 
-\item{schema}{Which datapackr schema to use in guiding this function. If left
-\code{NULL} will select the default based on \code{cop_year} and \code{tool}.}
+\item{dataElements}{List of dataElements to filter against.}
 
-\item{wb}{Openxlsx workbook object.}
+\item{datapack_name}{Name you would like associated with this Data Pack.
+(Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
+
+\item{datasets}{Character vector of dataSet IDs.}
+
+\item{MER}{MER dataset extract from unPackSheets}
+
+\item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
+
+\item{model_data_path}{Filepath to model data produced from DATIM.}
+
+\item{org_units}{A list of DATIM organisation units.}
+
+\item{output_folder}{Local folder where you would like your Data Pack to be
+saved upon export. If left as \code{NULL}, will output to
+\code{Working Directory}.}
 
 \item{PSNUs}{Dataframe of PSNUs to use in this function, containing at least
 \code{psnu_uid}.}
 
+\item{PSNUxIM_combos}{Dataset extract from unPackSNUxIM that shows data
+missing from the PSNUxIM tab.}
+
+\item{results_archive}{If TRUE, will export compiled results of all tests and
+processes to output_folder.}
+
+\item{season}{Either \code{COP} or \code{OPU}.}
+
+\item{schema}{Which datapackr schema to use in guiding this function. If left
+\code{NULL} will select the default based on \code{cop_year} and \code{tool}.}
+
+\item{sheet}{Specified sheet within wb.}
+
+\item{sheets}{Specified sheets within wb.}
+
+\item{SNUxIM}{SNUxIM dataset extract from unPackSNUxIM}
+
+\item{snuxim_model_data}{Export from DATIM needed to allocate data across
+mechanisms in the PSNUxIM tab}
+
+\item{snuxim_model_data_path}{Filepath where SNU x IM distribution model is stored.}
+
+\item{submission_path}{Local path to the file to import.}
+
+\item{template_path}{Local filepath to Data Pack template Excel (XLSX) file.
+This file MUST NOT have any data validation formats present. If left
+\code{NULL}, will select the default based on \code{cop_year} and \code{tool}.}
+
 \item{tool}{Type of tool this function will create or interact with. Either
 \code{OPU Data Pack} or \code{Data Pack}}
 
-\item{season}{Either \code{COP} or \code{OPU}.}
+\item{wb}{Openxlsx workbook object.}
 
 \item{...}{Additional arguments to pass.}
 }

@@ -7,9 +7,6 @@
 api_filter(api_call, field, operation, match)
 }
 \arguments{
-\item{api_call}{Base DATIM API query, specifying API table and setting paging
-as false.}
-
 \item{field}{Endpoint field aginst which to filter.}
 
 \item{operation}{Operation to apply as filter. See

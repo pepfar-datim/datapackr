@@ -2,12 +2,12 @@
 % Please edit documentation in R/packForDATIM.R
 \name{packForDATIM}
 \alias{packForDATIM}
-\title{packForDATIM(data)}
+\title{Pack Data Pack Data For DATIM}
 \usage{
 packForDATIM(d, type = NULL)
 }
 \arguments{
-\item{d}{Datapackr object.}
+\item{d}{Datapackr sidecar object}
 
 \item{type}{Type of dataset to prep for DATIM. Choose from \code{PSNUxIM},
 \code{SUBNAT_IMPATT}, \code{OPU PSNUxIM}, or \code{Site}.}

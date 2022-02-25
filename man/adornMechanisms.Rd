@@ -2,7 +2,7 @@
 % Please edit documentation in R/adornMechanisms.R
 \name{adornMechanisms}
 \alias{adornMechanisms}
-\title{adornMechanisms(data)}
+\title{Adorn Mechanisms}
 \usage{
 adornMechanisms(
   data,

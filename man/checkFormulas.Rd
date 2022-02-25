@@ -7,9 +7,9 @@
 checkFormulas(d, sheet)
 }
 \arguments{
-\item{d}{Datapackr object.}
+\item{d}{Datapackr sidecar object}
 
-\item{sheet}{Sheet to unpack.}
+\item{sheet}{Specified sheet within wb.}
 }
 \value{
 d

@@ -2,12 +2,12 @@
 % Please edit documentation in R/validationSummary.R
 \name{validationSummary}
 \alias{validationSummary}
-\title{validationSummary(d)}
+\title{Validation Summary}
 \usage{
 validationSummary(d)
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 Data frame consisting of ou, ou_id, country_name, country_uid, validation_issue_category, count

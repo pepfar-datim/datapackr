@@ -16,7 +16,7 @@ api_sql_call(
 \item{var}{Variable to substitute into SQL query. Only supply if SQL view is
 of type query.}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Web-encoded URL for DATIM API query.

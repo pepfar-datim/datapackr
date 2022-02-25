@@ -7,10 +7,11 @@
 pick_schema(cop_year, tool)
 }
 \arguments{
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
-\item{tool}{Either Data Pack or OPU Data Pack}
+\item{tool}{Type of tool this function will create or interact with. Either
+\code{OPU Data Pack} or \code{Data Pack}}
 }
 \value{
 Schema file for given cop_year and tool type

@@ -12,15 +12,16 @@ getCOPDataFromDATIM(
 )
 }
 \arguments{
-\item{country_uids}{country_uids}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
 \item{streams}{data stream or streams. One or more of "mer_targets", "subnat_targets", "impatt".
 If not specified, then all data streams are returned.}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Raw data in DATIM for a country for the COP data sets for a given COP Year.

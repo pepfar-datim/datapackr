@@ -7,9 +7,9 @@
 unPackDataPack(d, d2_session = dynGet("d2_default_session", inherits = TRUE))
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{d}{Datapackr sidecar object}
 
-\item{d2_session}{DHIS2 Session ID}
+\item{d2_session}{DHIS2 Session id}
 }
 \description{
 Processes a submitted Data Pack (in .xlsx format) by identifying integrity

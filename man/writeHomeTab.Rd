@@ -2,7 +2,7 @@
 % Please edit documentation in R/writeHomeTab.R
 \name{writeHomeTab}
 \alias{writeHomeTab}
-\title{writeHomeTab(wb, datapack_uid, tool = "Data Pack")}
+\title{Write Home Tab}
 \usage{
 writeHomeTab(
   wb = NULL,
@@ -18,12 +18,14 @@ writeHomeTab(
 \item{datapack_name}{Name you would like associated with this Data Pack.
 (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
 
-\item{country_uids}{Character vector of 11 digit alphanumeric DATIM codes
-representing countries.}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
-\item{cop_year}{COP Year in format YYYY.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
-\item{tool}{Defaults to "Data Pack".}
+\item{tool}{Type of tool this function will create or interact with. Either
+\code{OPU Data Pack} or \code{Data Pack}}
 }
 \value{
 Openxlsx workbook object with added, styled Home tab.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/adornMechanisms.R
 \name{getMechanismViewFromDATIM}
 \alias{getMechanismViewFromDATIM}
-\title{getMechanismViewFromDATIM}
+\title{Get Mechanism View From DATIM}
 \usage{
 getMechanismViewFromDATIM(
   cop_year = NULL,
@@ -10,8 +10,8 @@ getMechanismViewFromDATIM(
 )
 }
 \arguments{
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
 \item{d2_session}{DHIS2 Session id}
 }
@@ -19,5 +19,5 @@ templates.}
 Mechanism List
 }
 \description{
-getMechanismViewFromDATIM
+Get Mechanism View From DATIM
 }

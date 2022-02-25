@@ -13,8 +13,8 @@ getPSNUs(
 )
 }
 \arguments{
-\item{country_uids}{Character vector of DATIM country IDs. This can only
-include countries. Regional Operating Unit UIDs will not be accepted}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
 \item{include_mil}{Logical. If \code{TRUE}, will also include _Military nodes
 related to \code{country_uids}. Default is \code{TRUE}.}
@@ -25,7 +25,7 @@ related to \code{country_uids}. Default is \code{TRUE}.}
 API other than those returned by default: \code{name}, \code{id}, \code{ancestors},
 & \code{organisationUnitGroups}.}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Data frame of PSNUs

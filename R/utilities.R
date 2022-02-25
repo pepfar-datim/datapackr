@@ -188,7 +188,9 @@ interactive_warning <- function(x) {
 #'
 #' @return Data frame of Countries
 #'
-getCountries <- function(datapack_uid = NA) {
+getCountries <- function(datapack_uid = NA,
+                         d2_session = dynGet("d2_default_session",
+                                             inherits = TRUE)) {
 
   # Pull Country List
     countries <-

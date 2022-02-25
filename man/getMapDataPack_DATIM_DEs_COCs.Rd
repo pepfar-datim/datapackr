@@ -7,7 +7,8 @@
 getMapDataPack_DATIM_DEs_COCs(cop_year)
 }
 \arguments{
-\item{cop_year}{cop year to pull get map for}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 }
 \value{
 {cop20, cop21}_map_DataPack_DATIM_DEs_COCs

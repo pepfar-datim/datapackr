@@ -4,24 +4,18 @@
 \alias{exportPackr}
 \title{Export output.}
 \usage{
-exportPackr(data, output_path, tool, datapack_name)
+exportPackr(data, output_folder, tool, datapack_name)
 }
 \arguments{
 \item{data}{Data object to export. Can be either a dataframe or an Openxlsx
 Workbook object.}
 
-\item{output_path}{A local path directing to the folder where you would like
-outputs to be saved. If not supplied, will output to working directory.}
+\item{output_folder}{Local folder where you would like your Data Pack to be
+saved upon export. If left as \code{NULL}, will output to
+\code{Working Directory}.}
 
-\item{tool}{File prefix to be applied in output filename, as follows:
-  \describe{
-    \item{\code{Data Pack}}{Openxlsx Workbook object containing Data Pack.}
-    \item{\code{FAST Export}}{Data frame containing FAST export data.}
-    \item{\code{SUBNAT IMPATT}}{Data frame containing SUBNAT/IMPATT data.}
-    \item{\code{Results Archive}}{List object containing results archive.}
-    \item{\code{OPU Data Pack}}{Openxlsx Workbook object containing OPU Data Pack.}
-    \item{\code{Spectrum Example}}{Data frame containing example Spectrum output.}
-}}
+\item{tool}{Type of tool this function will create or interact with. Either
+\code{OPU Data Pack} or \code{Data Pack}}
 
 \item{datapack_name}{Name you would like associated with this Data Pack.
 (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}

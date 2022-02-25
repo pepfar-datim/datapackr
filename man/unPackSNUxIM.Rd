@@ -2,12 +2,12 @@
 % Please edit documentation in R/unPackSNUxIM.R
 \name{unPackSNUxIM}
 \alias{unPackSNUxIM}
-\title{unPackSNUxIM(d)}
+\title{Unpack SNUxIM tab}
 \usage{
 unPackSNUxIM(d)
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 d

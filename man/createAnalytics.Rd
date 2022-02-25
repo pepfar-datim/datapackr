@@ -2,14 +2,14 @@
 % Please edit documentation in R/createAnalytics.R
 \name{createAnalytics}
 \alias{createAnalytics}
-\title{createAnalytics(d)}
+\title{Create Analytics}
 \usage{
 createAnalytics(d, d2_session = dynGet("d2_default_session", inherits = TRUE))
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{d}{Datapackr sidecar object}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Modified d object with d$data$analytics

@@ -2,18 +2,18 @@
 % Please edit documentation in R/exportSubnatToDatim.R
 \name{exportSubnatToDATIM}
 \alias{exportSubnatToDATIM}
-\title{exportSubnatToDATIM(d)}
+\title{Prepare SUBNAT Data as a DATIM Import File}
 \usage{
 exportSubnatToDATIM(d)
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 Datapackr d object
 }
 \description{
 Takes the outputs of the \code{\link{unPackSheets}} function and
-    adds  a dataframe containing SUBNAT and IMPATT data,
+    adds a dataframe containing SUBNAT and IMPATT data,
     \code{d$data$SUBNAT_IMPATT} into a standard DATIM import file.
 }

@@ -2,12 +2,12 @@
 % Please edit documentation in R/separateDataSets.R
 \name{separateDataSets}
 \alias{separateDataSets}
-\title{separateDataSets(d)}
+\title{Separate Datasets}
 \usage{
 separateDataSets(d)
 }
 \arguments{
-\item{d}{Datapackr object.}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 d

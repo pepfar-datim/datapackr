@@ -6,12 +6,6 @@
 \usage{
 unPackDataPackName(submission_path, tool)
 }
-\arguments{
-\item{submission_path}{Local path to the file to import.}
-
-\item{tool}{What type of tool is the submission file? Default is "Data Pack".
-javascript:;}
-}
 \value{
 Character vector of the name of the data pack.
 }

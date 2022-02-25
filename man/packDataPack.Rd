@@ -16,23 +16,24 @@ packDataPack(
 )
 }
 \arguments{
-\item{model_data}{Data from DATIM needed to pack into Data Pack}
+\item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
 
 \item{datapack_name}{Name you would like associated with this Data Pack.
 (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
 
 \item{country_uids}{Unique IDs for countries to include in the Data Pack.
-For full list of these IDs, see \code{datapackr::dataPackMap}.}
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
 \item{template_path}{Local filepath to Data Pack template Excel (XLSX) file.
 This file MUST NOT have any data validation formats present. If left
-\code{NULL}, will prompt for file selection via window.}
+\code{NULL}, will select the default based on \code{cop_year} and \code{tool}.}
 
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
 \item{output_folder}{Local folder where you would like your Data Pack to be
-saved upon export.}
+saved upon export. If left as \code{NULL}, will output to
+\code{Working Directory}.}
 
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}

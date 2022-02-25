@@ -2,16 +2,16 @@
 % Please edit documentation in R/createAnalytics.R
 \name{getFY22Prioritizations}
 \alias{getFY22Prioritizations}
-\title{getFY22Prioritizations(d)}
+\title{Get FY22 Prioritizations}
 \usage{
 getFY22Prioritizations(d)
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 Dataframe of psnu_uid and value
 }
 \description{
-getFY22Prioritizations(d)
+Get FY22 Prioritizations
 }

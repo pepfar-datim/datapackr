@@ -7,10 +7,11 @@
 headerRow(tool, cop_year = getCurrentCOPYear())
 }
 \arguments{
-\item{tool}{"Data Pack", "Data Pack Template".}
+\item{tool}{Type of tool this function will create or interact with. Either
+\code{OPU Data Pack} or \code{Data Pack}}
 
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 }
 \value{
 Header row

@@ -2,13 +2,13 @@
 % Please edit documentation in R/getValidCategoryOptions.R
 \name{getValidCategoryOptions}
 \alias{getValidCategoryOptions}
-\title{getValidCategoryOptions}
+\title{Get Valid Category Options}
 \usage{
 getValidCategoryOptions(cop_year = getCurrentCOPYear())
 }
 \arguments{
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 }
 \value{
 Dataframe of all valid categoryOptions for specified FY

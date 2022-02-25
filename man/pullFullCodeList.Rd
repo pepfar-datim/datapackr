@@ -20,12 +20,12 @@ pullFullCodeList(
 of "mer_targets", "mer_results", "subnat_targets", "subnat_results" or "impatt".
 If left will return a code list for the specified COP Year of all streams}
 
-\item{datasets}{Character vector of dataSet IDs to pull code lists for.}
+\item{datasets}{Character vector of dataSet IDs.}
 
 \item{expanded}{If TRUE, will add dataset, period, period_dataset, and
 targets_results, related categoryOption metadata,  as additional columns}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Combined code list as dataframe.

@@ -7,9 +7,6 @@
 api_fields(api_call, fields)
 }
 \arguments{
-\item{api_call}{Base DATIM API query, specifying API table and setting paging
-as false.}
-
 \item{fields}{Fields to return. No need to include \code{&fields=}.}
 }
 \value{

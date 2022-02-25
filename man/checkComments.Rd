@@ -7,7 +7,7 @@
 checkComments(d)
 }
 \arguments{
-\item{d}{datapackr object}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 Logical whether there exists a comments issue in specified Excel file

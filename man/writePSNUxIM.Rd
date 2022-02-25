@@ -2,7 +2,7 @@
 % Please edit documentation in R/writePSNUxIM.R
 \name{writePSNUxIM}
 \alias{writePSNUxIM}
-\title{writePSNUxIM(d)}
+\title{Write PSNUxIM Tab}
 \usage{
 writePSNUxIM(
   d,
@@ -12,14 +12,15 @@ writePSNUxIM(
 )
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{d}{Datapackr sidecar object}
 
 \item{snuxim_model_data_path}{Filepath where SNU x IM distribution model is stored.}
 
 \item{output_folder}{Local folder where you would like your Data Pack to be
-saved upon export.}
+saved upon export. If left as \code{NULL}, will output to
+\code{Working Directory}.}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 d

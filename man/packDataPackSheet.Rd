@@ -14,20 +14,20 @@ packDataPackSheet(
 )
 }
 \arguments{
-\item{wb}{datapackr list object.}
+\item{wb}{Openxlsx workbook object.}
 
-\item{sheet}{Specified sheet within wb}
+\item{sheet}{Specified sheet within wb.}
 
-\item{org_units}{Org Units to write in.}
+\item{org_units}{A list of DATIM organisation units.}
 
-\item{schema}{Defaults to standard Data Pack schema, but allows for provision
-of custom schema if needed.}
+\item{schema}{Which datapackr schema to use in guiding this function. If left
+\code{NULL} will select the default based on \code{cop_year} and \code{tool}.}
 
 \item{sheet_data}{Dataset to use as input for packing Data Pack. If left NULL,
 will produce a Data Pack with orgUnits and disagg specifications, but no data.}
 
-\item{cop_year}{COP year for dating as well as selection of
-templates.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 }
 \value{
 wb with specified sheet packed with data

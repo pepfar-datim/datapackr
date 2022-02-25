@@ -7,9 +7,9 @@
 checkColStructure(d, sheet)
 }
 \arguments{
-\item{d}{Datapackr object.}
+\item{d}{Datapackr sidecar object}
 
-\item{sheet}{Sheet to check}
+\item{sheet}{Specified sheet within wb.}
 }
 \value{
 d

@@ -2,12 +2,12 @@
 % Please edit documentation in R/packForPAW.R
 \name{packForPAW}
 \alias{packForPAW}
-\title{packForPAW}
+\title{Pack For PAW}
 \usage{
 packForPAW(d)
 }
 \arguments{
-\item{d}{Datapackr object.}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 Data frame ready for use in PAW

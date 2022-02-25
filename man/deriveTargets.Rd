@@ -8,8 +8,6 @@ deriveTargets(data, type)
 }
 \arguments{
 \item{data}{Dataframe with either Data Pack data.}
-
-\item{type}{Type of data, either \code{Data Pack}.}
 }
 \value{
 Dataframe with added, derived targets.

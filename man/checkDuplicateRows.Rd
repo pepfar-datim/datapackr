@@ -2,14 +2,14 @@
 % Please edit documentation in R/checkDuplicateRows.R
 \name{checkDuplicateRows}
 \alias{checkDuplicateRows}
-\title{checkDuplicateRows(d)}
+\title{Check Duplicate Rows}
 \usage{
 checkDuplicateRows(d, sheet)
 }
 \arguments{
-\item{d}{Datapackr object.}
+\item{d}{Datapackr sidecar object}
 
-\item{sheet}{Sheet to check}
+\item{sheet}{Specified sheet within wb.}
 }
 \value{
 d

@@ -7,7 +7,7 @@
 strip_wb_NAs(d)
 }
 \arguments{
-\item{d}{datapackr object}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 Updated datapackr object with NAs removed from d$tool$wb

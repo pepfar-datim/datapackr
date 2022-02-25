@@ -7,7 +7,8 @@
 add_dp_psnu(PSNUs)
 }
 \arguments{
-\item{PSNUs}{Data frame of PSNUs produced by \code{\link{getPSNUs}}.}
+\item{PSNUs}{Dataframe of PSNUs to use in this function, containing at least
+\code{psnu_uid}.}
 }
 \value{
 Data frame of PSNUs with added Data Pack label, \code{dp_psnu}.

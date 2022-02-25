@@ -15,7 +15,8 @@ adorn_import_file(
 \arguments{
 \item{psnu_import_file}{DHIS2 import file to convert}
 
-\item{cop_year}{COP Year}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
 \item{psnu_prioritizations}{List of orgUnit, value containing prioritization
 values for each PSNU. If not included, blank prioritizations shown.}
@@ -23,7 +24,7 @@ values for each PSNU. If not included, blank prioritizations shown.}
 \item{filter_rename_output}{T/F Should this function output the final data in
 the new, more complete format?}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 data

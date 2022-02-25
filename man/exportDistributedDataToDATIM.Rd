@@ -7,7 +7,7 @@
 exportDistributedDataToDATIM(d, keep_dedup = FALSE)
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{d}{Datapackr sidecar object}
 
 \item{keep_dedup}{T/F as to whether to include Dedupe values in export file.}
 }

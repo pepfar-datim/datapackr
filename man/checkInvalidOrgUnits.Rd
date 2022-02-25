@@ -2,14 +2,14 @@
 % Please edit documentation in R/checkInvalidOrgUnits.R
 \name{checkInvalidOrgUnits}
 \alias{checkInvalidOrgUnits}
-\title{checkInvalidOrgUnits(d)}
+\title{Check Invalid Org Units}
 \usage{
 checkInvalidOrgUnits(d, sheet)
 }
 \arguments{
-\item{d}{Datapackr object.}
+\item{d}{Datapackr sidecar object}
 
-\item{sheet}{Sheet to check}
+\item{sheet}{Specified sheet within wb.}
 }
 \value{
 d

@@ -7,7 +7,7 @@
 packSNUxIM_2020(d)
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 d
