@@ -4,10 +4,7 @@
 #' @description
 #' Compiles a test DATIM import file as would be output by a Data Pack.
 #'
-#' @param country_uids UIDs for Countries to tailor data for.
-#' @param cop_year COP year for dating as well as selection of
-#' templates.
-#' @param d2_session datimutils d2Session object
+#' @inheritParams datapackr_params
 #'
 #' @return wb with specified sheet packed with data
 #'

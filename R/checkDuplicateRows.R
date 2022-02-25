@@ -1,11 +1,10 @@
 #' @export
-#' @title checkDuplicateRows(d)
+#' @title Check Duplicate Rows
 #'
 #' @description Checks data pulled from a single sheet in a Data Pack and
 #' alerts where there are duplicate rows.
 #'
-#' @param d Datapackr object.
-#' @param sheet Sheet to check
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'

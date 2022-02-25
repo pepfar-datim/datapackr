@@ -5,20 +5,9 @@
 #' Loops through all normally structured sheets in a submitted Data Pack
 #' and writes data.
 #'
-#' @param wb datapackr list object.
-#' @param country_uids Character vector of Country UIDs from DATIM.
 #' @param ou_level Level in DATIM hierarchy to pull orgUnits from. Choose from:
 #' "Prioritization", "Community", "Facility", or the numbers 4 through 7.
-#' @param org_units Allows for specification of custom list of orgUnits to include
-#' in Data Pack sheets.
-#' @param model_data Dataset to use as input for packing Data Pack. If left NULL,
-#' will produce a Data Pack with orgUnits and disagg specifications, but no data.
-#' @param schema Defaults to standard Data Pack schema, but allows for provision
-#' of custom schema if needed.
-#' @param sheets Sheets to pack. Defaults to all those available in \code{wb},
-#' minus the first few front-matter/summary tabs.
-#' @param cop_year COP year for dating as well as selection of
-#' templates.
+#' @inheritParams datapackr_params
 #'
 #' @return wb with all sheets written except SNU x IM
 #'

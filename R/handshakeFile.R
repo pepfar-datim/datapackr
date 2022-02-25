@@ -31,8 +31,7 @@ canReadFile <- function(path) {
 #' for user selection of correct filepath via computer window.
 #'
 #' @param path Filepath to test and use.
-#' @param tool What type of tool is the submission file? Options include
-#' "Data Pack", "Data Pack Template", and "OPU Data Pack Template".
+#' @inheritParams datapackr_params
 #'
 #' @return Character vector containing valid filepath for further use.
 #'

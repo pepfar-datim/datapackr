@@ -42,9 +42,7 @@ dataPackName_homeCell <- function() {
 #' @export
 #' @title List of tabs to skip for given tool.
 #'
-#' @param tool "Data Pack", "Data Pack Template".
-#' @param cop_year COP year for dating as well as selection of
-#' templates.
+#' @inheritParams datapackr_params
 #'
 #' @return Character vector of tab names to skip.
 #'
@@ -71,9 +69,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 #' @export
 #' @title Tool header rows
 #'
-#' @param tool "Data Pack", "Data Pack Template".
-#' @param cop_year Specifies COP year for dating as well as selection of
-#' templates.
+#' @inheritParams datapackr_params
 #'
 #' @return Header row
 #'
@@ -92,9 +88,7 @@ headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
 #' @export
 #' @title Pick correct schema
 #'
-#' @param cop_year Specifies COP year for dating as well as selection of
-#' templates.
-#' @param tool Either Data Pack or OPU Data Pack
+#' @inheritParams datapackr_params
 #'
 #' @return Schema file for given cop_year and tool type
 #'
@@ -140,9 +134,7 @@ pick_schema <- function(cop_year, tool) {
 #' @export
 #' @title Pick correct template filepath
 #'
-#' @param cop_year Specifies COP year for dating as well as selection of
-#' templates.
-#' @param tool Either Data Pack or OPU Data Pack
+#' @inheritParams datapackr_params
 #'
 #' @return Template filepath for given cop_year and tool.
 #'
@@ -195,66 +187,83 @@ pick_template_path <- function(cop_year, tool) {
 }
 
 
-
-
 #' @title Standardized package function parameter definitions
 #'
-#' @param model_data Data from DATIM needed to pack into a COP Data Pack.
-#' @param snuxim_model_data Export from DATIM needed to allocate data across
-#' mechanisms in the PSNUxIM tab
-#' @param SNUxIM SNUxIM dataset extract from unPackSNUxIM
-#' @param MER MER dataset extract from unPackSheets
-#' @param PSNUxIM_combos Dataset extract from unPackSNUxIM that shows data
-#' missing from the PSNUxIM tab.
-#' @param datapack_name Name you would like associated with this Data Pack.
-#' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
-#' @param country_uids Unique IDs for countries to include in the Data Pack.
-#' For full list of these IDs, see \code{datapackr::valid_PSNUs}.
-#' @param template_path Local filepath to Data Pack template Excel (XLSX) file.
-#' This file MUST NOT have any data validation formats present. If left
-#' \code{NULL}, will select the default based on \code{cop_year} and \code{tool}.
-#' @param submission_path Local path to the file to import.
+#' @param api_call Base DATIM API query, specifying API table and setting paging
+#' as false.
+#' @param cached_mechs_path Local file path to the cached mechanisms RDS file.
 #' @param cop_year COP Year to use for tailoring functions. Remember,
 #' FY22 targets = COP21.
+#' @param country_uids Unique IDs for countries to include in the Data Pack.
+#' For full list of these IDs, see \code{datapackr::valid_PSNUs}.
+#' @param d2_session DHIS2 Session id
+#' @param d Datapackr sidecar object
+#' @param dataElements List of dataElements to filter against.
+#' @param datapack_name Name you would like associated with this Data Pack.
+#' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
+#' @param datasets Character vector of dataSet IDs.
+#' @param MER MER dataset extract from unPackSheets
+#' @param model_data Data from DATIM needed to pack into a COP Data Pack.
+#' @param model_data_path Filepath to model data produced from DATIM.
+#' @param org_units A list of DATIM organisation units.
 #' @param output_folder Local folder where you would like your Data Pack to be
 #' saved upon export. If left as \code{NULL}, will output to
 #' \code{Working Directory}.
-#' @param results_archive If TRUE, will export compiled results of all tests and
-#' processes to output_folder.
-#' @param d2_session DHIS2 Session id
-#' @param d Datapackr sidecar object
-#' @param schema Which datapackr schema to use in guiding this function. If left
-#' \code{NULL} will select the default based on \code{cop_year} and \code{tool}.
-#' @param wb Openxlsx workbook object.
 #' @param PSNUs Dataframe of PSNUs to use in this function, containing at least
 #' \code{psnu_uid}.
+#' @param PSNUxIM_combos Dataset extract from unPackSNUxIM that shows data
+#' missing from the PSNUxIM tab.
+#' @param results_archive If TRUE, will export compiled results of all tests and
+#' processes to output_folder.
+#' @param schema Which datapackr schema to use in guiding this function. If left
+#' \code{NULL} will select the default based on \code{cop_year} and \code{tool}.
+#' @param season Either \code{COP} or \code{OPU}.
+#' @param sheet Specified sheet within wb.
+#' @param sheets Specified sheets within wb.
+#' @param SNUxIM SNUxIM dataset extract from unPackSNUxIM
+#' @param snuxim_model_data Export from DATIM needed to allocate data across
+#' mechanisms in the PSNUxIM tab
+#' @param snuxim_model_data_path Filepath where SNU x IM distribution model is stored.
+#' @param submission_path Local path to the file to import.
+#' @param template_path Local filepath to Data Pack template Excel (XLSX) file.
+#' This file MUST NOT have any data validation formats present. If left
+#' \code{NULL}, will select the default based on \code{cop_year} and \code{tool}.
 #' @param tool Type of tool this function will create or interact with. Either
 #' \code{OPU Data Pack} or \code{Data Pack}
-#' @param season Either \code{COP} or \code{OPU}.
+#' @param wb Openxlsx workbook object.
 #' @param ... Additional arguments to pass.
 #'
 #' @family parameter-helpers
 #'
 #' @return list of all paramaters of this constructor function
-datapackr_params <- function(model_data,
-                             snuxim_model_data,
-                             SNUxIM,
-                             MER,
-                             PSNUxIM_combos,
-                             datapack_name,
-                             country_uids,
-                             template_path,
-                             submission_path,
+datapackr_params <- function(api_call,
+                             cached_mechs_path,
                              cop_year,
-                             output_folder,
-                             results_archive,
+                             country_uids,
                              d2_session,
                              d,
-                             schema,
-                             wb,
+                             dataElements,
+                             datapack_name,
+                             datasets,
+                             MER,
+                             model_data,
+                             model_data_path,
+                             org_units,
+                             output_folder,
                              PSNUs,
-                             tool,
+                             PSNUxIM_combos,
+                             results_archive,
                              season,
+                             schema,
+                             sheet,
+                             sheets,
+                             SNUxIM,
+                             snuxim_model_data,
+                             snuxim_model_data_path,
+                             submission_path,
+                             template_path,
+                             tool,
+                             wb,
                              ...) {
 
   # This function should return something

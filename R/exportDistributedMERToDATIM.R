@@ -147,8 +147,8 @@ autoResolveDuplicates <- function(d, keep_dedup) {
 #'
 #' @description Packs distributed MER data prepared from unPackSNUxIM for import to DATIM.
 #'
-#' @param d Datapackr object
 #' @param keep_dedup T/F as to whether to include Dedupe values in export file.
+#' @inheritParams datapackr_params
 #'
 #' @return Modified d object with  a DATIM compatible data frame for import id d$datim$MER
 #'

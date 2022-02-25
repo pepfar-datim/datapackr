@@ -5,7 +5,7 @@
 #' @param keys character vector - data value set parameter keys (e.g. "dataSet", "period")
 #' @param values character vector - values marching the key from keys (e.g. "Abcde123456", "2019Q1"
 #' @param api_version - api version to use when calling DHIS2
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
 #' @return  tibble with the data requested
 #'
 getDataValueSets <- function(keys, values,

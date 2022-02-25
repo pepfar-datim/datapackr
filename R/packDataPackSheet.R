@@ -4,15 +4,9 @@
 #' @description
 #' Packs data into a specified Data Pack sheet
 #'
-#' @param wb datapackr list object.
-#' @param sheet Specified sheet within wb
-#' @param org_units Org Units to write in.
-#' @param schema Defaults to standard Data Pack schema, but allows for provision
-#' of custom schema if needed.
 #' @param sheet_data Dataset to use as input for packing Data Pack. If left NULL,
 #' will produce a Data Pack with orgUnits and disagg specifications, but no data.
-#' @param cop_year COP year for dating as well as selection of
-#' templates.
+#' @inheritParams datapackr_params
 #'
 #' @return wb with specified sheet packed with data
 #'

@@ -1,5 +1,8 @@
-
-
+#' @export
+#' @title HTS Modalities
+#'
+#' @return List of the HTS Modality codes in the Data Pack
+#'
 htsModalities <- function() {
 c("HTS_INDEX_COM.New.Pos.T",
           "HTS_INDEX_FAC.New.Pos.T",
@@ -539,10 +542,7 @@ analyze_indexpos_ratio <- function(data) {
 #' @description Check data gathered from Data Pack to identify
 #' validation concerns at the PSNU level.
 #'
-#' @param d datapackr object
-#' @param model_data_path Filepath to model data produced from most recent DATIM
-#' sync.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'

@@ -1,14 +1,13 @@
 #' @export
-#' @title validationSummary(d)
+#' @title Validation Summary
 #'
 #' @description Produce an output of tests.
 #'
-#' @param d Datapackr object
+#' @inheritParams datapackr_params
 #'
 #' @return Data frame consisting of ou, ou_id, country_name, country_uid, validation_issue_category, count
 #'
 #'
-
 validationSummary <- function(d) {
 
   tests_rows <- purrr::map(d$tests, NROW) %>%

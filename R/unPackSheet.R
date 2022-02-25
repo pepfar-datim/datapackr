@@ -5,8 +5,7 @@
 #'    \code{d$keychain$submission_path}), extract data from a single sheet specified
 #'    in \code{d$data$sheet}.
 #'
-#' @param d Datapackr object.
-#' @param sheet Sheet to unpack.
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'

@@ -5,8 +5,7 @@
 #' Processes a submitted OPU Data Pack (in .xlsx format) by identifying integrity
 #'     issues, checking data against DATIM validations, and extracting data.
 #'
-#' @param d datapackr sidecar
-#' @param d2_session DHIS2 Session id
+#' @inheritParams datapackr_params
 #'
 #' @details
 #' Once this function is called, it will present a dialog box where you can

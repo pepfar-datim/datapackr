@@ -1,11 +1,10 @@
 #' @export
-#' @title checkMissingMetadata(d)
+#' @title Check for Missing Metadata
 #'
 #' @description Checks data pulled from a single sheet in a Data Pack and
 #' alerts where there are NAs instead of valid metadata.
 #'
-#' @param d Datapackr object.
-#' @param sheet Sheet to check
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'

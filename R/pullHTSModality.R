@@ -4,9 +4,8 @@
 #' @description
 #' Map HTS modality to dataElement id
 #'
-#' @param dataElements List of dataElements to filter against. (Optional)
-#' @param cop_year Specifies COP year for selection of correct modalities.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
+#'
 #' @return Dataframe of HTS modalities mapped to dataElements
 #'
 getHTSModality <- function(cop_year = getCurrentCOPYear(), dataElements = NULL,

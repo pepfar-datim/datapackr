@@ -1,9 +1,9 @@
 #' @export
-#' @title compareData_DatapackVsDatim
+#' @title Compare Data Pack Targets to DATIM
 #'
-#' @description Compares the data in a parsed data pack that would be destined for DATIM with target data in in DATIM.
-#' @param d list object - parsed data pack object
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @description Compares the data in a parsed data pack that would be
+#' destined for DATIM with target data in in DATIM.
+#' @inheritParams datapackr_params
 #' @return  list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,
 #' $updates (import to bring DATIM up to date with datapack), $deletes
 #' (import to bring DATIM up to date with datapack)
@@ -201,15 +201,15 @@ compareData_DatapackVsDatim <-
 
 
 #' @export
-#' @title compareData_OpuDatapackVsDatim
+#' @title Compare OPU Data Pack Targets to Datim
 #'
-#' @description Compares the data in a parsed data pack that would be destined for DATIM with target data in in DATIM.
-#' @param d list object - parsed data pack object
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @description Compares the data in a parsed data pack that would be destined
+#' for DATIM with target data in in DATIM.
+#' @inheritParams datapackr_params
 #' @return  list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,
 #' $updates (import to bring DATIM up to date with datapack), $deletes
 #' (import to bring DATIM up to date with datapack)
-
+#'
 compareData_OpuDatapackVsDatim <-
   function(d, d2_session = dynGet("d2_default_session",
                                   inherits = TRUE)) {

@@ -4,8 +4,8 @@
 #' @description
 #' Pulls the DATIM code list for specified datasets.
 #'
-#' @param dataset Dataset uid to query.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
+#'
 #' @return Code list as dataframe.
 #'
 pullDATIMCodeList <- function(dataset,

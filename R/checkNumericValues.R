@@ -4,13 +4,11 @@
 #' @description Checks data pulled from a single sheet in a Data Pack and
 #' alerts where there are non-numeric values instead of valid data.
 #'
-#' @param d Datapackr object.
-#' @param sheet Sheet to check
 #' @param header_cols Header columns to check
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'
-
 checkNumericValues <- function(d, sheet, header_cols = NULL) {
 
   if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {

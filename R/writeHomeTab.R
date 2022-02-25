@@ -1,16 +1,10 @@
 #' @export
-#' @title writeHomeTab(wb, datapack_uid, tool = "Data Pack")
+#' @title Write Home Tab
 #'
 #' @description
 #' Function to write Home tab details into Data Pack as specified.
 #'
-#' @param wb Openxlsx workbook object.
-#' @param datapack_name Name you would like associated with this Data Pack.
-#' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
-#' @param country_uids Character vector of 11 digit alphanumeric DATIM codes
-#' representing countries.
-#' @param cop_year COP Year in format YYYY.
-#' @param tool Defaults to "Data Pack".
+#' @inheritParams datapackr_params
 #'
 #' @return Openxlsx workbook object with added, styled Home tab.
 #'

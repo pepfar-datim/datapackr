@@ -3,8 +3,7 @@
 #'
 #' @description Packs SNUxIM data prepared from unPackSNUxIM for import to DATIM.
 #'
-#' @param snuxim_model_data SNUxIM model data.
-#' @param country_uids One or more country UIDS.
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'

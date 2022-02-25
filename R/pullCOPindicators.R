@@ -4,9 +4,8 @@
 #' @description
 #' Queries DATIM to return list of COP indicators for given COP year.
 #'
-#' @param cop_year Year of COP for which to return indicator list. (e.g., for
-#' COP19 enter 19.) If left blank, will use COP Year as stored in datapackr.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
+#'
 #' @return Dataframe of COP indicators retrieved from DATIM
 #'
 pull_COPindicators <- function(cop_year = datapackr::getCurrentCOPYear(),

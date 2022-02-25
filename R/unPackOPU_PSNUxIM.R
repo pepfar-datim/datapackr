@@ -4,7 +4,7 @@
 #' @description
 #' Extracts data from updated targets in OPU Data Pack PSNUxIM tab.
 #'
-#' @param d Datapackr object
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'
@@ -525,7 +525,7 @@ unPackOPU_PSNUxIM <- function(d) {
 #' @description
 #' Tests for invalid Indicator Codes
 #'
-#' @param d Datapackr object
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'

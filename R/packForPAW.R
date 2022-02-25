@@ -1,10 +1,10 @@
 #' @export
-#' @title packForPAW
+#' @title Pack For PAW
 #'
 #' @description
 #' Prepare dataset for use in PAW.
 #'
-#' @param d Datapackr object.
+#' @inheritParams datapackr_params
 #'
 #' @return Data frame ready for use in PAW
 #'

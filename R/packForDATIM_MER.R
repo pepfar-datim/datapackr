@@ -1,9 +1,9 @@
 #' @export
-#' @title packForDATIM_MER(d)
+#' @title Pack MER Data in DATIM Export File Format
 #'
 #' @description Packs extracted PSNUxIM data from COP Data Pack for DATIM import.
 #'
-#' @param d Datapackr object
+#' @inheritParams datapackr_params
 #'
 #' @return Modified d object with a DATIM compatible data frame for import id d$datim$MER
 #'

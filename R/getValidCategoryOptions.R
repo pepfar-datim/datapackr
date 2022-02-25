@@ -1,11 +1,10 @@
 #' @export
-#' @title getValidCategoryOptions
+#' @title Get Valid Category Options
 #'
 #' @description
 #' Returns full list of all valid categoryOptions for specified FY.
 #'
-#' @param cop_year Specifies COP year for dating as well as selection of
-#' templates.
+#' @inheritParams datapackr_params
 #'
 #' @return Dataframe of all valid categoryOptions for specified FY
 #'

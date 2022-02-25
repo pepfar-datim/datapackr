@@ -5,8 +5,7 @@
 #' Processes a submitted Data Pack (in .xlsx format) by identifying integrity
 #'     issues, checking data against DATIM validations, and extracting data.
 #'
-#' @param d Datapackr object
-#' @param d2_session DHIS2 Session ID
+#' @inheritParams datapackr_params
 #'
 #' @details
 #' Executes the following operations in relation to a submitted Data Pack:

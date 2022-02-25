@@ -5,10 +5,7 @@
 #' When supplied a submission path, will return the list of country_uids
 #' pertaining to the file, as read from the Home tab.
 #'
-#' @param submission_path Local path to the file to import.
-#' @param tool What type of tool is the submission file? Default is "Data Pack".
-#' @param cop_year Specifies COP year for dating as well as selection of
-#' templates.
+#' @inheritParams datapackr_params
 #'
 #' @return Character vector of country_uids.
 #'

@@ -1,12 +1,11 @@
 #' @export
-#' @title defunctDisaggs(d)
+#' @title Check for Defunct Disaggregates
 #'
 #' @description Checks data extracted from a sheet in a submitted Data Pack
 #'    identify cases where invalid Disaggregate combinations have
 #'    been used.
 #'
-#' @param d Datapackr object.
-#' @param sheet Sheet name.
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'

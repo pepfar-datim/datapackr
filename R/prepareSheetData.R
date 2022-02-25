@@ -4,13 +4,8 @@
 #' @description
 #' Prepares provided dataset for writing into specified Data Pack sheet.
 #'
-#' @param sheet Specified sheet within wb.
-#' @param org_units Dataset of org units to include.
-#' @param schema Defaults to standard Data Pack schema, but allows for provision
-#' of custom schema if needed.
 #' @param sheet_data Data to prepare.
-#' @param cop_year COP year for dating as well as selection of
-#' templates.
+#' @inheritParams datapackr_params
 #'
 #' @return dataframe of data prepared for Data Pack
 #'

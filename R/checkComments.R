@@ -5,7 +5,7 @@
 #' Searches an Excel file to detect whether there are any comments that cause
 #' corruption when executing openxlsx::saveWorkbook
 #'
-#' @param d datapackr object
+#' @inheritParams datapackr_params
 #'
 #' @return Logical whether there exists a comments issue in specified Excel file
 #'

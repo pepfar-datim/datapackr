@@ -14,7 +14,7 @@ api_version <- function() {
 #' Constructs URL for DATIM API query against specified table without paging.
 #'
 #' @param endpoint Character. DATIM API endpoint to query.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
 #' @return Web-encoded URL for DATIM API query.
 #'
 api_call <- function(endpoint,
@@ -37,8 +37,6 @@ api_call <- function(endpoint,
 #' @description
 #' Adds filter to DATIM API query and encodes for web.
 #'
-#' @param api_call Base DATIM API query, specifying API table and setting paging
-#' as false.
 #' @param field Endpoint field aginst which to filter.
 #' @param operation Operation to apply as filter. See
 #' \href{https://docs.dhis2.org/2.22/en/developer/html/ch01s08.html}{DHIS2 Web API documentation}
@@ -68,8 +66,6 @@ api_filter <- function(api_call, field, operation, match) {
 #' @description
 #' Specifies fields to return from DATIM API query and encodes for web.
 #'
-#' @param api_call Base DATIM API query, specifying API table and setting paging
-#' as false.
 #' @param fields Fields to return. No need to include \code{&fields=}.
 #'
 #' @return Web-encoded URL for DATIM API query.
@@ -90,9 +86,7 @@ api_fields <- function(api_call, fields) {
 #' @description
 #' Gets and flattens DATIM API query as dataframe.
 #'
-#' @param api_call Base DATIM API query, specifying API table and setting paging
-#' as false.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
 #' @return Result of DATIM API query returned as dataframe.
 #'
 api_get <- function(api_call,
@@ -118,7 +112,7 @@ api_get <- function(api_call,
 #' @param sqlView uid of sqlView table to query.
 #' @param var Variable to substitute into SQL query. Only supply if SQL view is
 #' of type query.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
 #'
 #' @return Web-encoded URL for DATIM API query.
 #'

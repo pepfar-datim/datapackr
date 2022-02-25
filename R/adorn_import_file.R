@@ -5,12 +5,11 @@
 #' object, similar to the MER Structured Datasets
 #'
 #' @param psnu_import_file DHIS2 import file to convert
-#' @param cop_year COP Year
 #' @param psnu_prioritizations List of orgUnit, value containing prioritization
 #' values for each PSNU. If not included, blank prioritizations shown.
 #' @param filter_rename_output T/F Should this function output the final data in
 #' the new, more complete format?
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
 #'
 #' @return data
 #'

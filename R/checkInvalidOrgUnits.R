@@ -1,11 +1,10 @@
 #' @export
-#' @title checkInvalidOrgUnits(d)
+#' @title Check Invalid Org Units
 #'
 #' @description Checks data pulled from a single sheet in a Data Pack and
 #' alerts where there are unallowed org units based on current DATIM PSNU level.
 #'
-#' @param d Datapackr object.
-#' @param sheet Sheet to check
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'

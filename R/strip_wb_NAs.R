@@ -6,7 +6,7 @@
 #' blank cell values, and replaces these with true blanks to prevent cascading
 #' issues.
 #'
-#' @param d datapackr object
+#' @inheritParams datapackr_params
 #'
 #' @return Updated datapackr object with NAs removed from d$tool$wb
 #'

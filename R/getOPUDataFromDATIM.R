@@ -4,12 +4,7 @@
 #' @description
 #' Pulls data from DATIM API needed to pack OPU Data Pack.
 #'
-#' @param cop_year COP Year. Remember, COP20 = FY21 targets.
-#' @param country_uids DATIM UIDs of Countries to return data for. Can supply either
-#' this or Country Names.
-#' @param country_names Names of Countries to return data for. Can supply either this
-#' or DATIM Country UIDs.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
 #'
 #' @return Returns dataset needed for use in \code{\link{packOPUDataPack}}.
 #'

@@ -44,7 +44,7 @@ round_trunc <- function(x, digits = 0) {
 #' @description
 #' Queries DATIM to retrieve the latest version of
 #' \code{/api/dataStore/dataSetAssignments/ous}
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
 #' @return Dataframe of country metadata, including prioritization, planning,
 #' country, community, and facility levels in DATIM organization hierarchy.
 #'
@@ -184,6 +184,7 @@ interactive_warning <- function(x) {
 #' @param datapack_uid A unique ID specifying the PEPFAR Operating Unit or
 #' specific Data Pack country grouping. If left unspecified, will pull all
 #' Country Names.
+#' @inheritParams datapackr_params
 #'
 #' @return Data frame of Countries
 #'
@@ -486,7 +487,7 @@ rowMax <- function(df, cn, regex) {
 #' @export
 #' @title get_Map_DataPack_DATIM_DEs_COCs
 #'
-#' @param cop_year cop year to pull get map for
+#' @inheritParams datapackr_params
 #'
 #' @return {cop20, cop21}_map_DataPack_DATIM_DEs_COCs
 #'

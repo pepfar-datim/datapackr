@@ -1,12 +1,12 @@
 #' @export
-#' @title separateDataSets(d)
+#' @title Separate Datasets
 #'
 #' @description After data has been extracted from all sheets in a Data Pack,
 #'     this function separates datasets by either \code{MER} or
 #'     \code{SUBNAT/IMPATT} and removes elements of \code{d} that are no longer
 #'     necessary (\code{targets}, \code{extract}, and \code{sheet})
 #'
-#' @param d Datapackr object.
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'

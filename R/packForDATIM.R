@@ -1,13 +1,13 @@
 #' @export
-#' @title packForDATIM(data)
+#' @title Pack Data Pack Data For DATIM
 #'
 #' @description
 #' Flexible function that allows packaging of a variety of datapackr outputs as
 #' DATIM import files.
 #'
-#' @param d Datapackr object.
 #' @param type Type of dataset to prep for DATIM. Choose from \code{PSNUxIM},
 #' \code{SUBNAT_IMPATT}, \code{OPU PSNUxIM}, or \code{Site}.
+#' @inheritParams datapackr_params
 #'
 #' @return Data frame ready for DATIM import
 #'

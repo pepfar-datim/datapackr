@@ -9,10 +9,9 @@
 #' @param datastream At least one
 #' of "mer_targets", "mer_results", "subnat_targets", "subnat_results" or "impatt".
 #' If left will return a code list for the specified COP Year of all streams
-#' @param datasets Character vector of dataSet IDs to pull code lists for.
 #' @param expanded If TRUE, will add dataset, period, period_dataset, and
 #' targets_results, related categoryOption metadata,  as additional columns
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
 #' @return Combined code list as dataframe.
 #'
 pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,

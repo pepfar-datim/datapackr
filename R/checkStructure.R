@@ -3,7 +3,7 @@
 #'
 #' @description Checks structural integrity of sheets for submitted tool.
 #'
-#' @param d Datapackr object
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'

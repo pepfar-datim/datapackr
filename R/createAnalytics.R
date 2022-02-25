@@ -1,7 +1,6 @@
-
-#' @title getFY22Prioritizations(d)
+#' @title Get FY22 Prioritizations
 #'
-#' @param  d Datapackr object
+#' @inheritParams datapackr_params
 #'
 #' @return Dataframe of psnu_uid and value
 #' @export
@@ -33,15 +32,13 @@ getFY22Prioritizations <- function(d) {
 
 
 #' @export
-#' @title createAnalytics(d)
+#' @title Create Analytics
 #'
 #' @description Wrapper function for creation of d$data$analytics object
 #' which is suitable for export to external analytics sytems.
 #'
-#' @param d Datapackr object
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
 #' @return Modified d object with d$data$analytics
-#'
 #'
 createAnalytics <- function(d,
                             d2_session = dynGet("d2_default_session",

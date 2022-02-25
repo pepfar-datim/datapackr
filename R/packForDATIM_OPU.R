@@ -1,9 +1,9 @@
 #' @export
-#' @title packForDATIM_OPU(d)
+#' @title Pack OPU Data for DATIM Import
 #'
 #' @description Packs extracted PSNUxIM data from OPU Data Pack for DATIM import.
 #'
-#' @param d Datapackr object
+#' @inheritParams datapackr_params
 #'
 #' @return Modified d object with a DATIM compatible data frame for import id d$datim$OPU
 #'

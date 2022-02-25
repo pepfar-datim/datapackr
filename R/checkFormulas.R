@@ -4,8 +4,7 @@
 #' @description Checks formulas to make sure they are up to date and have not
 #' been tampered with.
 #'
-#' @param d Datapackr object.
-#' @param sheet Sheet to unpack.
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'

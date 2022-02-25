@@ -1,5 +1,5 @@
 #' @export
-#' @title packForDATIM_UndistributedMER(d)
+#' @title Pack Undistributed MER Data for DATIM (NOT IMPORT)
 #'
 #' @description Packs undistributed MER data from Data Pack for use in analytics (NOT IMPORT).
 #'

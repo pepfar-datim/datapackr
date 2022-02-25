@@ -4,7 +4,7 @@
 #' @description Packs SNUxIM data prepared from unPackSNUxIM for import to DATIM.
 #' Only works for COP20 Data Packs.
 #'
-#' @param d Datapackr object
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'

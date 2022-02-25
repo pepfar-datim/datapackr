@@ -5,7 +5,7 @@
 #' Loops through all critical sheets in a submitted Data Pack
 #' and extracts data, then compiles into single flat dataframe.
 #'
-#' @param d Datapackr object
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'

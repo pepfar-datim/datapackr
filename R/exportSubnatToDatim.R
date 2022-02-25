@@ -1,11 +1,11 @@
 #' @export
-#' @title exportSubnatToDATIM(d)
+#' @title Prepare SUBNAT Data as a DATIM Import File
 #'
 #' @description Takes the outputs of the \code{\link{unPackSheets}} function and
-#'     adds  a dataframe containing SUBNAT and IMPATT data,
+#'     adds a dataframe containing SUBNAT and IMPATT data,
 #'     \code{d$data$SUBNAT_IMPATT} into a standard DATIM import file.
 #'
-#' @param d Datapackr object
+#' @inheritParams datapackr_params
 #'
 #' @return Datapackr d object
 #'

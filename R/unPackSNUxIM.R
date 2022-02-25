@@ -1,5 +1,5 @@
 #' @export
-#' @title unPackSNUxIM(d)
+#' @title Unpack SNUxIM tab
 #'
 #' @description Looks inside submitted Data Pack to extract SNU x IM data from
 #'     \code{SNU x IM} tab and restructure this to be ready for cross-
@@ -8,8 +8,8 @@
 #'     structural or data anomalies and print any issues into running Warning
 #'     Message queue.
 #'
-#' @param d Datapackr object
-
+#' @inheritParams datapackr_params
+#'
 #' @return d
 #'
 unPackSNUxIM <- function(d) {

@@ -4,13 +4,7 @@
 #' @description
 #' Creates Keychain info needed for use across most datapackr unPack functions.
 #'
-#' @param submission_path Local path to the file to import.
-#' @param tool What type of tool is the submission file? Default is "Data Pack".
-#' @param country_uids List of 11 digit alphanumeric DATIM codes representing
-#' countries. If not provided, will check file for these codes. If not in file,
-#' will flag error.
-#' @param cop_year Specifies COP year for dating as well as selection of
-#' templates.
+#' @inheritParams datapackr_params
 #'
 createKeychainInfo <- function(submission_path = NULL,
                                tool = NULL,

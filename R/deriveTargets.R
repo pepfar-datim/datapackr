@@ -5,7 +5,7 @@
 #' set during COP.
 #'
 #' @param data Dataframe with either Data Pack data.
-#' @param type Type of data, either \code{Data Pack}.
+#' @inheritParams datapackr_params
 #'
 #' @return Dataframe with added, derived targets.
 #'

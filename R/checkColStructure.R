@@ -4,8 +4,7 @@
 #' @description Checks structural integrity of columns on critical sheets for
 #'    submitted Data Pack.
 #'
-#' @param d Datapackr object.
-#' @param sheet Sheet to check
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'

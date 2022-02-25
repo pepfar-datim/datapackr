@@ -1,9 +1,9 @@
 #' @export
-#' @title packSNUxIM_OPU(d)
+#' @title Pack SNUxIM tab for OPU Data Pack (COP20)
 #'
 #' @description Packs SNUxIM tab for OPU Data Packs.
 #'
-#' @param d Datapackr sidecar
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'

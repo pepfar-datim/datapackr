@@ -6,7 +6,7 @@
 #' categoryOptions associated with that dataElement.
 #'
 #' @param data_element_group.id DATIM dataElementGroup id to filter against.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
 #' @return validCategoryOptions
 #'
 getValidCOs <- function(data_element_group.id = NULL,
