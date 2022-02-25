@@ -583,7 +583,7 @@ packPSNUxIM <- function(wb,
                       x = paste("Last Updated on:", Sys.time()),
                       xy = c(1, 2),
                       colNames = F)
-  
+
   #Make the PSNUxIM visible
   openxlsx::sheetVisibility(r$wb)[which(openxlsx::sheets(d$tool$wb) == "PSNUxIM")] <- TRUE
   # Package Version ####
@@ -593,8 +593,8 @@ packPSNUxIM <- function(wb,
                                 as.character(utils::packageVersion("datapackr"))),
                       xy = c(2, 2),
                       colNames = F)
-  
-  
+
+
 
   # Warning Messages ####
   interactive_print("Compiling alert messages...")
