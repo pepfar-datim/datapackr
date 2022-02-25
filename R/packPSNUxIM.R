@@ -585,7 +585,7 @@ packPSNUxIM <- function(wb,
                       colNames = F)
 
   #Make the PSNUxIM visible
-  openxlsx::sheetVisibility(r$wb)[which(openxlsx::sheets(d$tool$wb) == "PSNUxIM")] <- TRUE
+  openxlsx::sheetVisibility(r$wb)[which(openxlsx::sheets(r$wb) == "PSNUxIM")] <- TRUE
   # Package Version ####
   openxlsx::writeData(r$wb,
                       sheet = "PSNUxIM",
