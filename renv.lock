@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.1.1",
+    "Version": "4.1.2",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -664,12 +664,10 @@
     },
     "openxlsx": {
       "Package": "openxlsx",
-      "Version": "4.2.3",
-      "Source": "URL",
+      "Version": "4.2.5",
+      "Source": "Repository",
       "Repository": "CRAN",
-      "RemoteType": "url",
-      "RemoteUrl": "https://cran.r-project.org/src/contrib/Archive/openxlsx/openxlsx_4.2.3.tar.gz",
-      "Hash": "5d70bb3a67baaa87f9ed7eb74eed1886"
+      "Hash": "fc5e0e85d3a1e4282f04f303627b7e72"
     },
     "pillar": {
       "Package": "pillar",
