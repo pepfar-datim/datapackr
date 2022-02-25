@@ -111,7 +111,7 @@ swapColumns <- function(to, from) {
               ~ magrittr::use_series(from, x), x = as.name(col)
             )), col)
           to <- to %>%
-            dplyr::mutate(.dots = dots)
+            dplyr::mutate_(.dots = dots)
         } else {
           next
         }
