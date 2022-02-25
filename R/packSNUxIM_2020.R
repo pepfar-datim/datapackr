@@ -1,5 +1,5 @@
 #' @export
-#' @title packSNUxIM(data)
+#' @title Pack SNUxIM Data (COP20 Only)
 #'
 #' @description Packs SNUxIM data prepared from unPackSNUxIM for import to DATIM.
 #' Only works for COP20 Data Packs.

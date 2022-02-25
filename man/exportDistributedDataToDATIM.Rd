@@ -2,7 +2,7 @@
 % Please edit documentation in R/exportDistributedMERToDATIM.R
 \name{exportDistributedDataToDATIM}
 \alias{exportDistributedDataToDATIM}
-\title{exportDistributedDataToDATIM(data)}
+\title{Export Distributed Data To DATIM}
 \usage{
 exportDistributedDataToDATIM(d, keep_dedup = FALSE)
 }

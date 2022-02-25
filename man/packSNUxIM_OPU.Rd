@@ -2,7 +2,7 @@
 % Please edit documentation in R/packSNUxIM_OPU.R
 \name{packSNUxIM_OPU}
 \alias{packSNUxIM_OPU}
-\title{Pack SNUxIM tab for OPU Data Pack (COP20)}
+\title{Pack SNUxIM tab for OPU Data Pack (COP20 Only)}
 \usage{
 packSNUxIM_OPU(d)
 }

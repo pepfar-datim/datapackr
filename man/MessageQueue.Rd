@@ -2,7 +2,7 @@
 % Please edit documentation in R/messageQueue.R
 \name{MessageQueue}
 \alias{MessageQueue}
-\title{Title MessageQueue}
+\title{Message Queue}
 \usage{
 MessageQueue(message = character(), level = character())
 }

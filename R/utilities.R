@@ -289,7 +289,7 @@ addcols <- function(data, cnames, type = "character") {
 
 
 #' @export
-#' @title getDatasetUids
+#' @title Get Dataset UIDs
 #'
 #' @description returns character vector of dataset uids for a given FY:
 #' {"2019", "2020", ... , "2023"}
@@ -487,7 +487,7 @@ rowMax <- function(df, cn, regex) {
 }
 
 #' @export
-#' @title get_Map_DataPack_DATIM_DEs_COCs
+#' @title Get Map of Data Elements and Category Options from Data Pack to DATIM
 #'
 #' @inheritParams datapackr_params
 #'

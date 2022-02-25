@@ -1,12 +1,12 @@
-#' Title MessageQueue
+#' @export
+#' @title Message Queue
 #' @description A simple S3 object to deal with messages created during
 #' DataPack processing
 #' @param message One or more character strings
 #' @param level One of ERROR, WARNING, INFO
 #'
 #' @return Object of class data.frame and Message queue.
-#' @export
-
+#'
 MessageQueue <- function(message=character(), level=character()) {
 
   messages <- data.frame(
@@ -22,27 +22,27 @@ MessageQueue <- function(message=character(), level=character()) {
 }
 
 
-#' Title appendMessage
+#' @export
+#' @title Append Message
 #' @description Generic function to handle appending messages to a MessageQueue
 #' @param x A message queue
 #' @param message A string or vector of strings of messages.
 #' @param level A string or vector of strings of
 #' message levels (ERROR, WARNING, INFO)
 #' @return A MessageQueue class.
-#' @export
-
+#'
 appendMessage <- function(x, message, level) {
   UseMethod("appendMessage", x)
 }
 
-#' Title appendMessage.MessageQueue
+#' @export
+#' @title Append Message - Message Queue S3 method
 #' @description Internal S3 method to deal with appending messages
 #' @param x A MessageQueue object
 #' @param message  A message or vector of messages.
 #' @param level  A string or vector of message levels (ERROR, WARNING, INFO)
 #' @return A MessageQueue object
-#' @export
-
+#'
 appendMessage.MessageQueue <- function(x, message=NA, level=NA) {
 
   if (length(message) != length(level)) {
@@ -63,26 +63,26 @@ appendMessage.MessageQueue <- function(x, message=NA, level=NA) {
   return(new_me)
 }
 
-#' Title printMessages
+#' @export
+#' @title Print Messages
 #' @description Generic function to handle printing messages of a MessageQueue
 #'
 #' @param x A MessageQueue object
 #'
 #' @return Returns a formatted output to the console
-#' @export
 #'
 printMessages <- function(x) {
   UseMethod("printMessages", x)
 }
 
 
-#' Title printMessage.MessageQueue
+#' @export
+#' @title Print Message - Message Queue S3 method
 #' @description Internal S3 method to deal with printing messages
 #'
 #' @param x A MessageQueue object
 #'
 #' @return Returns a formatted output to the console
-#' @export
 #'
 printMessages.MessageQueue <- function(x) {
   # If warnings, show all grouped by sheet and issue

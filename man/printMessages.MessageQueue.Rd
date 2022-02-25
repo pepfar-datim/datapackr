@@ -2,7 +2,7 @@
 % Please edit documentation in R/messageQueue.R
 \name{printMessages.MessageQueue}
 \alias{printMessages.MessageQueue}
-\title{Title printMessage.MessageQueue}
+\title{Print Message - Message Queue S3 method}
 \usage{
 \method{printMessages}{MessageQueue}(x)
 }

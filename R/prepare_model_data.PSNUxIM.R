@@ -1,7 +1,7 @@
 #' @export
-#' @title packSNUxIM(data)
+#' @title Prepare PSNUxIM Model Data
 #'
-#' @description Packs SNUxIM data prepared from unPackSNUxIM for import to DATIM.
+#' @description Prepare PSNUxIM Model Data
 #'
 #' @inheritParams datapackr_params
 #'

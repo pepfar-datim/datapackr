@@ -2,7 +2,7 @@
 % Please edit documentation in R/adornPSNUs.R
 \name{adornPSNUs}
 \alias{adornPSNUs}
-\title{adornPSNUs(d)}
+\title{Adorn PSNUs}
 \usage{
 adornPSNUs(d)
 }

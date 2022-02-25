@@ -1,5 +1,5 @@
 #' @export
-#' @title getDataValueSets
+#' @title Get Data Value Sets
 #'
 #' @description Used to read DHIS 2 data using the data value set endpoint
 #' @param keys character vector - data value set parameter keys (e.g. "dataSet", "period")

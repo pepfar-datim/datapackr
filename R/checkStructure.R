@@ -1,5 +1,5 @@
 #' @export
-#' @title Check tab structure of submitted tool.=
+#' @title Check tab structure of submitted tool
 #'
 #' @description Checks structural integrity of sheets for submitted tool.
 #'

@@ -2,7 +2,7 @@
 % Please edit documentation in R/utilities.R
 \name{getMapDataPack_DATIM_DEs_COCs}
 \alias{getMapDataPack_DATIM_DEs_COCs}
-\title{get_Map_DataPack_DATIM_DEs_COCs}
+\title{Get Map of Data Elements and Category Options from Data Pack to DATIM}
 \usage{
 getMapDataPack_DATIM_DEs_COCs(cop_year)
 }
@@ -14,5 +14,5 @@ FY22 targets = COP21.}
 {cop20, cop21}_map_DataPack_DATIM_DEs_COCs
 }
 \description{
-get_Map_DataPack_DATIM_DEs_COCs
+Get Map of Data Elements and Category Options from Data Pack to DATIM
 }

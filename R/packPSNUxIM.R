@@ -1,5 +1,5 @@
 #' @export
-#' @title packPSNUxIM
+#' @title Pack PSNUxIM Tab
 #'
 #' @description Packs the PSNUxIM tab in either a COP or OPU Data Pack.
 #'

@@ -2,7 +2,7 @@
 % Please edit documentation in R/messageQueue.R
 \name{printMessages}
 \alias{printMessages}
-\title{Title printMessages}
+\title{Print Messages}
 \usage{
 printMessages(x)
 }

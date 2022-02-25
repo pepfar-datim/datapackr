@@ -2,7 +2,7 @@
 % Please edit documentation in R/utilities.R
 \name{getDatasetUids}
 \alias{getDatasetUids}
-\title{getDatasetUids}
+\title{Get Dataset UIDs}
 \usage{
 getDatasetUids(
   fiscal_year,

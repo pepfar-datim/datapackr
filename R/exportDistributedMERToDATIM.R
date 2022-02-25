@@ -143,7 +143,7 @@ autoResolveDuplicates <- function(d, keep_dedup) {
 
 
 #' @export
-#' @title exportDistributedDataToDATIM(data)
+#' @title Export Distributed Data To DATIM
 #'
 #' @description Packs distributed MER data prepared from unPackSNUxIM for import to DATIM.
 #'

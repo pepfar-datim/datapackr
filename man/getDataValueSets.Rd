@@ -2,7 +2,7 @@
 % Please edit documentation in R/getDataValueSets.R
 \name{getDataValueSets}
 \alias{getDataValueSets}
-\title{getDataValueSets}
+\title{Get Data Value Sets}
 \usage{
 getDataValueSets(
   keys,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/checkStructure.R
 \name{checkStructure}
 \alias{checkStructure}
-\title{Check tab structure of submitted tool.=}
+\title{Check tab structure of submitted tool}
 \usage{
 checkStructure(d)
 }

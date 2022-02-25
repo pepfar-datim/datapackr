@@ -2,7 +2,7 @@
 % Please edit documentation in R/packPSNUxIM.R
 \name{packPSNUxIM}
 \alias{packPSNUxIM}
-\title{packPSNUxIM}
+\title{Pack PSNUxIM Tab}
 \usage{
 packPSNUxIM(
   wb,

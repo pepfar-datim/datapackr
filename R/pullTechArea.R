@@ -1,5 +1,5 @@
 #' @export
-#' @title getTechArea
+#' @title Get  Map of Tech Areas to Data Element IDs
 #'
 #' @description
 #' Map Tech Area to dataElement id

@@ -2,7 +2,7 @@
 % Please edit documentation in R/pullTechArea.R
 \name{getTechArea}
 \alias{getTechArea}
-\title{getTechArea}
+\title{Get  Map of Tech Areas to Data Element IDs}
 \usage{
 getTechArea(
   dataElements = NULL,

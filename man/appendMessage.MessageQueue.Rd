@@ -2,7 +2,7 @@
 % Please edit documentation in R/messageQueue.R
 \name{appendMessage.MessageQueue}
 \alias{appendMessage.MessageQueue}
-\title{Title appendMessage.MessageQueue}
+\title{Append Message - Message Queue S3 method}
 \usage{
 \method{appendMessage}{MessageQueue}(x, message = NA, level = NA)
 }

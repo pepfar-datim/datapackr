@@ -2,7 +2,7 @@
 % Please edit documentation in R/messageQueue.R
 \name{appendMessage}
 \alias{appendMessage}
-\title{Title appendMessage}
+\title{Append Message}
 \usage{
 appendMessage(x, message, level)
 }

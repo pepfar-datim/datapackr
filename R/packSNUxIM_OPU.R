@@ -1,5 +1,5 @@
 #' @export
-#' @title Pack SNUxIM tab for OPU Data Pack (COP20)
+#' @title Pack SNUxIM tab for OPU Data Pack (COP20 Only)
 #'
 #' @description Packs SNUxIM tab for OPU Data Packs.
 #'

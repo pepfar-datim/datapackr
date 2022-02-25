@@ -2,7 +2,7 @@
 % Please edit documentation in R/packSNUxIM_2020.R
 \name{packSNUxIM_2020}
 \alias{packSNUxIM_2020}
-\title{packSNUxIM(data)}
+\title{Pack SNUxIM Data (COP20 Only)}
 \usage{
 packSNUxIM_2020(d)
 }

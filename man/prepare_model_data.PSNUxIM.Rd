@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_model_data.PSNUxIM.R
 \name{prepare_model_data.PSNUxIM}
 \alias{prepare_model_data.PSNUxIM}
-\title{packSNUxIM(data)}
+\title{Prepare PSNUxIM Model Data}
 \usage{
 prepare_model_data.PSNUxIM(snuxim_model_data, country_uids)
 }
@@ -17,5 +17,5 @@ For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 d
 }
 \description{
-Packs SNUxIM data prepared from unPackSNUxIM for import to DATIM.
+Prepare PSNUxIM Model Data
 }

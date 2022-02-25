@@ -2,7 +2,7 @@
 % Please edit documentation in R/getNumeratorDenominator.R
 \name{getNumeratorDenominator}
 \alias{getNumeratorDenominator}
-\title{getNumeratorDenominator}
+\title{Get Map of Numerator and Denominator to Data Element IDs}
 \usage{
 getNumeratorDenominator(
   dataElements = NULL,

@@ -1,5 +1,5 @@
 #' @export
-#' @title adornPSNUs(d)
+#' @title Adorn PSNUs
 #'
 #' @description Creates an analtyical dimension for planning prioritization from SUBNAT data
 #' contained in the datapack

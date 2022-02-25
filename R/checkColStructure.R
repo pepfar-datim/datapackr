@@ -1,5 +1,5 @@
 #' @export
-#' @title checkColStructure(d)
+#' @title Check Column Structure
 #'
 #' @description Checks structural integrity of columns on critical sheets for
 #'    submitted Data Pack.

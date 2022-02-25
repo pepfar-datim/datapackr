@@ -2,7 +2,7 @@
 % Please edit documentation in R/checkColStructure.R
 \name{checkColStructure}
 \alias{checkColStructure}
-\title{checkColStructure(d)}
+\title{Check Column Structure}
 \usage{
 checkColStructure(d, sheet)
 }

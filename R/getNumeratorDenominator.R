@@ -1,5 +1,5 @@
 #' @export
-#' @title getNumeratorDenominator
+#' @title Get Map of Numerator and Denominator to Data Element IDs
 #'
 #' @description
 #' Map Numerator and Denominator to dataElement id
