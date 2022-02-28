@@ -24,7 +24,7 @@ checkColStructure <- function(d, sheet) {
       submission_order = as.integer(1:(dplyr::n()))) %>%
       purrr::when(sheet == "PSNUxIM" ~ dplyr::filter(.,
         !stringr::str_detect(indicator_code, "\\d{4,}_(DSD|TA)|^$|^(Not PEPFAR)$")),
-        ~ .) 
+        ~ .)
 
   col_check <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet) %>%
