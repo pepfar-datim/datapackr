@@ -112,7 +112,7 @@ pick_schema <- function(cop_year, tool) {
   }
 
   cop_year %<>% check_cop_year()
-  invisible(capture.output(tool %<>% check_tool(tool = ., cop_year = cop_year)))
+  invisible(utils::capture.output(tool %<>% check_tool(tool = ., cop_year = cop_year)))
 
   if (tool == "OPU Data Pack") {
     if (cop_year == 2020) {

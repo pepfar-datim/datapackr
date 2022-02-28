@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title checkColStructure(d)
 #'
 #' @description Checks structural integrity of columns on critical sheets for

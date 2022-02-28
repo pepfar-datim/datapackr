@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title Pack data into a Data Pack sheet
 #'
 #' @description

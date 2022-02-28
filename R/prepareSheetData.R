@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title Prepare sheet-specific dataset for writing into a Data Pack sheet.
 #'
 #' @description

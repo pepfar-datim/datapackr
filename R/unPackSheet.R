@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom utils capture.output
 #' @title Unpack a Data Pack sheet.
 #'
 #' @description Within a submitted Data Pack (directed to by

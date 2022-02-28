@@ -127,7 +127,7 @@ unPackSNUxIM <- function(d) {
     attr(d$tests$duplicate_rows, "test_name") <- "Duplicated rows"
 
     dupes_msg <-
-      capture.output(
+      utils::capture.output(
         print(as.data.frame(duplicates), row.names = FALSE)
       )
 
