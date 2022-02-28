@@ -9,9 +9,9 @@ generateMemoTemplate <- function(draft=TRUE) {
 
 
     if (draft) {
-      doc <- read_docx(path = "inst/extdata/draft_memo_template.docx")
+      doc <- officer::read_docx(path = "inst/extdata/draft_memo_template.docx")
     } else {
-      doc <- read_docx()
+      doc <- officer::read_docx()
     }
 
 
@@ -190,6 +190,9 @@ generateApprovalMemo <-
            remove_empty_columns = TRUE,
            include_no_prio = TRUE) {
 
+    require(officer)
+    require(flextable)
+    
     d <- prepareMemoData(d, d2_session, memo_type, include_no_prio)
 
     doc <- generateMemoTemplate(draft)
