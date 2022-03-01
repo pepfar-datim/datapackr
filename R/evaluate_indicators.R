@@ -1,18 +1,20 @@
-#' Title
+#' @export
+#' @title Evaluate Indicators
 #'
 #' @param combis A vector of data element and category option combo UIDs
 #' of the form #{dataelement_id.categoryoptioncombo_id}
 #' @param values A vector of values
-#' @param inds A dataframe consisting of indicator UIDs,name,numerator and denominator expression.
+#' @param inds A dataframe consisting of indicator UIDs, name,
+#' numerator, and denominator expression.
 #'
 #' @return
-#' @export
 #'
-evaluateIndicators <- function(combis, values, inds) {
+evaluate_indicators <- function(combis, values, inds) {
 
   if (is.null(inds)) {
     stop("No indicator metadata found")
   }
+
   indicators_empty <- data.frame(id = character(),
                                  name = character(),
                                  numerator = numeric(),
@@ -26,7 +28,8 @@ evaluateIndicators <- function(combis, values, inds) {
     }, FUN.VALUE = character(1))
 
   #Calculate data element totals
-  totals_df <- data.frame(exp = this.des, values = values, stringsAsFactors = FALSE) %>%
+  totals_df <-
+    data.frame(exp = this.des, values = values, stringsAsFactors = FALSE) %>%
     dplyr::group_by(exp) %>%
     dplyr::summarise(values = sum(values)) %>%
     dplyr::ungroup() %>%
@@ -51,33 +54,41 @@ evaluateIndicators <- function(combis, values, inds) {
     return(indicators_empty)
   }
 
-  #Function to substitute values based on the dataelement_id.categoryoptioncombo_id
-  replaceCombisWithValues <- function(x, combis.this=combis, values.this=values) {
+  #Function to substitute values based on the
+  #dataelement_id.categoryoptioncombo_id
+  replace_combis_with_values <- function(x,
+                                         combis.this = combis,
+                                         values.this = values) {
     stringi::stri_replace_all_fixed(x,
-                                    combis.this, values.this, vectorize_all =
-                                      FALSE)
+                                    combis.this,
+                                    values.this,
+                                    vectorize_all = FALSE)
   }
 
   # Function to replace missing totals with zeros
-  replaceTotalsWithValues <- function(x) replaceCombisWithValues(x, combis = totals_df$exp, values = totals_df$values)
+  replace_totals_with_values <- function(x) {
+    replace_combis_with_values(x,
+                               combis = totals_df$exp,
+                               values = totals_df$values)
+  }
 
   #Function to replace missing combis with zeros
-  replaceExpressionsWithZeros <- function(x) {
+  replace_expressions_with_zeros <- function(x) {
     expression.pattern <- "#\\{[a-zA-Z][a-zA-Z0-9]{10}(\\.[a-zA-Z][a-zA-Z0-9]{10})?\\}"
     gsub(expression.pattern, "0", x)
   }
 
   #Function to parse and evalulate the expression to return a numeric value
-  evaluateExpression <- function(exp) {
+  evaluate_expression <- function(exp) {
     vapply(exp, function(x) eval(parse(text = x)), FUN.VALUE = double(1))
   }
 
   matches %<>%
-    purrr::modify_at(., c("numerator", "denominator"), replaceCombisWithValues) %>%
-    purrr::modify_at(., c("numerator", "denominator"), replaceTotalsWithValues) %>%
-    purrr::modify_at(., c("numerator", "denominator"), replaceExpressionsWithZeros) %>%
-    purrr::modify_at(., c("numerator", "denominator"), evaluateExpression) %>%
+    purrr::modify_at(., c("numerator", "denominator"), replace_combis_with_values) %>%
+    purrr::modify_at(., c("numerator", "denominator"), replace_totals_with_values) %>%
+    purrr::modify_at(., c("numerator", "denominator"), replace_expressions_with_zeros) %>%
+    purrr::modify_at(., c("numerator", "denominator"), evaluate_expression) %>%
     dplyr::mutate(value = numerator / denominator)
 
-  return(matches)
+  matches
 }

@@ -19,9 +19,8 @@ getMechanismView(
 include countries. Regional Operating Unit uids will not be accepted. If not
 supplied, returns entire mechanism list, trimmed to user's DATIM permissions.}
 
-\item{cop_year}{Numeric value of COP Fiscal Year to filter mechanism list by.
-Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
-\code{2019}. If a FY is not supplied, returns entire mechanism list.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
 \item{include_dedupe}{Logical. If TRUE will include deduplication mechanisms.
 Default is FALSE.}
@@ -30,6 +29,9 @@ Default is FALSE.}
 FALSE.}
 
 \item{d2_session}{DHIS2 Session id}
+
+\item{cached_mechs_path}{Local file path to an RDS file containing
+a cached copy of the mechanisms SQL view.}
 
 \item{update_stale_cache}{If the cached_mechs_path file is outdated or unreadable,
 should a new cache be saved?}

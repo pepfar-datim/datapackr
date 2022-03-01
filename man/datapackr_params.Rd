@@ -23,8 +23,15 @@ datapackr_params(
   schema,
   wb,
   PSNUs,
+  psnus,
   tool,
   season,
+  draft_memo,
+  memo_type,
+  memo_doc,
+  memo_structure,
+  include_no_prio,
+  remove_empty_columns,
   ...
 )
 }
@@ -78,10 +85,31 @@ processes to output_folder.}
 \item{PSNUs}{Dataframe of PSNUs to use in this function, containing at least
 \code{psnu_uid}.}
 
+\item{psnus}{Dataframe of PSNUs to use in this function, containing at least
+\code{psnu_uid}.}
+
 \item{tool}{Type of tool this function will create or interact with. Either
 \code{OPU Data Pack} or \code{Data Pack}}
 
 \item{season}{Either \code{COP} or \code{OPU}.}
+
+\item{draft_memo}{Boolean indicating whether the memo being written is a
+draft or final memo.}
+
+\item{memo_type}{memo_type One of the following:
+datapack: Create the memo based on the data in the datapack or OPU datapack
+datim: Create the memo based on data currently in DATIM
+comparison: Create a comparison memo with data from both DATIM and datapack}
+
+\item{memo_doc}{\code{Officer} document object containing
+the target memo tables.}
+
+\item{memo_structure}{Structure of the memo d$memo$structure}
+
+\item{include_no_prio}{If TRUE, include \code{"No Prioritiation"}
+as a column in the output.}
+
+\item{remove_empty_columns}{Should empty columns be removed from memos?}
 
 \item{...}{Additional arguments to pass.}
 }
