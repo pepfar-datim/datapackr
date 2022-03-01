@@ -230,9 +230,23 @@ pick_template_path <- function(cop_year, tool) {
 #' @param wb Openxlsx workbook object.
 #' @param PSNUs Dataframe of PSNUs to use in this function, containing at least
 #' \code{psnu_uid}.
+#' @param psnus Dataframe of PSNUs to use in this function, containing at least
+#' \code{psnu_uid}.
 #' @param tool Type of tool this function will create or interact with. Either
 #' \code{OPU Data Pack} or \code{Data Pack}
 #' @param season Either \code{COP} or \code{OPU}.
+#' @param draft_memo Boolean indicating whether the memo being written is a
+#' draft or final memo.
+#' @param memo_type memo_type One of the following:
+#' datapack: Create the memo based on the data in the datapack or OPU datapack
+#' datim: Create the memo based on data currently in DATIM
+#' comparison: Create a comparison memo with data from both DATIM and datapack
+#' @param memo_doc \code{Officer} document object containing
+#' the target memo tables.
+#' @param memo_structure Structure of the memo d$memo$structure
+#' @param include_no_prio If TRUE, include \code{"No Prioritiation"}
+#' as a column in the output.
+#' @param remove_empty_columns Should empty columns be removed from memos?
 #' @param ... Additional arguments to pass.
 #'
 #' @family parameter-helpers
@@ -256,8 +270,15 @@ datapackr_params <- function(model_data,
                              schema,
                              wb,
                              PSNUs,
+                             psnus,
                              tool,
                              season,
+                             draft_memo,
+                             memo_type,
+                             memo_doc,
+                             memo_structure,
+                             include_no_prio,
+                             remove_empty_columns,
                              ...) {
 
   # This function should return something

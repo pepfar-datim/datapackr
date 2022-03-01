@@ -5,14 +5,13 @@
 #' @return d object with d$memo$structure
 #' @export
 #'
+memo_structure <- function(d, d2_session = dynGet("d2_default_session",
+                                                  inherits = TRUE)) {
 
-memoStructure <- function(d, d2_session) {
-
-
-if (!(d$info$cop_year %in% c("2020","2021","2022"))) {
-  warning("COP Memo structure unknown for given COP year")
-  return(d)
-}
+  if (!(d$info$cop_year %in% c("2020", "2021", "2022"))) {
+    warning("COP Memo structure unknown for given COP year")
+    return(d)
+  }
 
   if (d$info$cop_year == "2020") {
     row_order <- tibble::tribble(
@@ -92,10 +91,10 @@ if (!(d$info$cop_year %in% c("2020","2021","2022"))) {
       "TX_NEW", "<15", 1,
       "TX_NEW", "15+", 1,
       "TX_NEW", "Total", NA,
-      "TX_CURR", "<15",1,
+      "TX_CURR", "<15", 1,
       "TX_CURR", "15+", 1,
       "TX_CURR", "Total", NA,
-      "TX_PVLS", "<15",1,
+      "TX_PVLS", "<15", 1,
       "TX_PVLS", "15+", 1,
       "TX_PVLS", "Total", NA,
       "CXCA_SCRN", "Total", 2,
@@ -161,7 +160,7 @@ if (!(d$info$cop_year %in% c("2020","2021","2022"))) {
       "HTS_TST_POS", "<15", 2,
       "HTS_TST_POS", "15+", 2,
       "HTS_TST_POS", "Total", NA,
-      "HTS_RECENT","Total", 2,
+      "HTS_RECENT", "Total", 2,
       "HTS_INDEX", "<15", 2,
       "HTS_INDEX", "15+", 2,
       "HTS_INDEX", "Total", NA,
@@ -213,12 +212,12 @@ if (!(d$info$cop_year %in% c("2020","2021","2022"))) {
     5, "Centrally Supported", 5, "pibJV72pMyW",
     6, "Sustained: Commodities", 6, "ma6CQUVQRWI",
     7, "Attained", 1, "ATX2xv8PsrX",
-    8, "Not PEPFAR Supported", 8,"p0JrTY2hLii") %>%
+    8, "Not PEPFAR Supported", 8, "p0JrTY2hLii") %>%
     dplyr::mutate(Prioritization = paste0(value, " - ", name))
 
   d$memo$structure <- list(row_order = row_order, col_order = col_order)
 
-  d$memo$inds <- getMemoIndicators(d$info$cop_year, d2_session)
+  d$memo$inds <- get_memo_indicators(d$info$cop_year, d2_session)
 
   d
 }
