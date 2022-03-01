@@ -179,9 +179,9 @@ prepareMemoDataByPSNU <- function(analytics,
     dplyr::left_join(partners_agencies,
                      by = c(mechanism_code = "Mechanism")) %>%
     dplyr::inner_join(psnus, by = c("psnu_uid")) %>%
-    dplyr::rename("Mechanism" = mechanism_code) %>% 
+    dplyr::rename("Mechanism" = mechanism_code) %>%
     dplyr::mutate(`Partner` = dplyr::case_when(is.na(`Partner`) ~ "Unallocated",
-                                         TRUE ~ `Mechanism`)) %>% 
+                                         TRUE ~ `Mechanism`)) %>%
     dplyr::mutate(`Agency` = dplyr::case_when(is.na(`Agency`) ~ "Unallocated",
                                          TRUE ~ `Agency`))
 
@@ -284,13 +284,13 @@ prepareMemoDataByAgency <- function(df, memo_structure) {
     dplyr::select(ind, options)
 
   df_cols <-
-    df %>% 
-    dplyr::select(Agency) %>% 
-    dplyr::distinct() %>% 
+    df %>%
+    dplyr::select(Agency) %>%
+    dplyr::distinct() %>%
     dplyr::arrange()
 
   df_base <-
-    tidyr::crossing(df_rows, df_cols) %>% 
+    tidyr::crossing(df_rows, df_cols) %>%
     dplyr::arrange(ind, options, Agency) %>%
     dplyr::mutate(Value = 0) %>%
     dplyr::rename(Indicator = ind,
