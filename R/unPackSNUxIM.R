@@ -159,6 +159,7 @@ unPackSNUxIM <- function(d) {
   header_cols <- cols_to_keep %>%
     dplyr::filter(col_type == "row_header")
 
+  
   if (d$info$tool == "Data Pack") {
     original_targets <- d$data$MER
   } else {
@@ -178,9 +179,18 @@ unPackSNUxIM <- function(d) {
   }
 
   # Pare down to populated, updated targets only ####
-  d$data$SNUxIM <- d$data$SNUxIM[, cols_to_keep$col]
-
-  d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
+  #Get the additional mechanisms added by the user
+  user_mechanisms <- stringr::str_extract(names(d$data$SNUxIM),"\\d{4,}_(DSD|TA)") %>% 
+    purrr::keep(~ !is.na(.x))
+ #Get the mandatory columns 
+  mandatory_columns <- cols_to_keep %>% 
+    dplyr::filter(!is.na(indicator_code)) %>%
+    dplyr::filter(!indicator_code == "") %>% 
+    dplyr::pull(indicator_code) %>% 
+    purrr::discard(~ .x == "12345_DSD")
+  
+  d$data$SNUxIM <- d$data$SNUxIM %>% 
+    dplyr::select(tidyselect::all_of(c(mandatory_columns,user_mechanisms)))
 
   # TEST: Missing right-side formulas; Warn; Continue ####
   d$tests$psnuxim_missing_rs_fxs <-
