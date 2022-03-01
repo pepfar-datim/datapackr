@@ -152,7 +152,7 @@ renderAgencyTable <- function(memo_doc, agency_table, ou_name) {
                           "the sum of the rows of the data presented due to",
                           "deduplication adjustments.")
 
-  prio_table <- flextable::flextable(agency_table) %>%
+  agency_table_ft <- flextable::flextable(agency_table) %>%
     flextable::add_header_row(top = TRUE, values = header_new) %>%
     flextable::merge_v(part = "header") %>%
     flextable::merge_h(part = "header", i = 1) %>%
@@ -174,11 +174,11 @@ renderAgencyTable <- function(memo_doc, agency_table, ou_name) {
   fontname <- defaultMemoFont()
 
   if (gdtools::font_family_exists(fontname)) {
-    agency_table %<>% flextable::font(fontname = fontname, part = "all")
+    agency_table_ft %<>% flextable::font(fontname = fontname, part = "all")
   }
 
   memo_doc %>%
-    flextable::body_add_flextable(value = agency_table) %>%
+    flextable::body_add_flextable(value = agency_table_ft) %>%
     officer::body_add_break(pos = "after")
 
 

@@ -58,7 +58,7 @@ prepareMemoMetadata <- function(d, memo_type,
 }
 
 
-#' @export
+
 #' @title Prepare Existing Data Analytics
 #'
 #' @description Get existing PSNUxIM raw data from DATIM
@@ -89,7 +89,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
 }
 
 
-#' @export
+
 #' @title Prepare Memo Data By PSNU
 #'
 #' @param analytics Data frame consisting of at least psnu_uid,
@@ -105,7 +105,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
 #'
 #' @return A dataframe of COP indicators aggregated to the PSNU level.
 #'
-prepareMemoData_by_psnu <- function(analytics,
+prepareMemoDataByPSNU <- function(analytics,
                                   memo_type,
                                   inds,
                                   prios,
@@ -179,7 +179,11 @@ prepareMemoData_by_psnu <- function(analytics,
     dplyr::left_join(partners_agencies,
                      by = c(mechanism_code = "Mechanism")) %>%
     dplyr::inner_join(psnus, by = c("psnu_uid")) %>%
-    dplyr::rename("Mechanism" = mechanism_code)
+    dplyr::rename("Mechanism" = mechanism_code) %>% 
+    dplyr::mutate(`Partner` = dplyr::case_when(is.na(`Partner`) ~ "Unallocated",
+                                         TRUE ~ `Mechanism`)) %>% 
+    dplyr::mutate(`Agency` = dplyr::case_when(is.na(`Agency`) ~ "Unallocated",
+                                         TRUE ~ `Agency`))
 
 }
 
@@ -194,7 +198,7 @@ prepareMemoData_by_psnu <- function(analytics,
 #'
 #' @return A dataframe of COP indicators aggregated to the partner level
 #'
-prepareMemoData_by_partner <- function(df,
+prepareMemoDataByPartner <- function(df,
                                          memoStructure,
                                          indicators) {
 
@@ -264,7 +268,7 @@ prepareMemoData_by_partner <- function(df,
 
 
 
-#' @export
+
 #' @title Prepare Memo Data By Agency Level
 #'
 #' @param df An analytics table, either d$memo$datim$analytics or
@@ -273,40 +277,42 @@ prepareMemoData_by_partner <- function(df,
 #'
 #' @return A dataframe of COP indicators aggregated to the prioritization level
 #'
-prepareMemoData_by_agency <- function(df, memoStructure) {
+prepareMemoDataByAgency <- function(df, memo_structure) {
 
-  df_rows <- memoStructure %>%
+  df_rows <- memo_structure %>%
     purrr::pluck("row_order") %>%
     dplyr::select(ind, options)
 
-  df_cols <- dplyr::distinct(unique(df[, "Agency"])) %>%
+  df_cols <-
+    df %>% 
+    dplyr::select(Agency) %>% 
+    dplyr::distinct() %>% 
     dplyr::arrange()
 
   df_base <-
-    tidyr::crossing(df_rows, dplyr::distinct(unique(df[, "Agency"]))) %>%
-    dplyr::arrange(ind, options, col_name) %>%
+    tidyr::crossing(df_rows, df_cols) %>% 
+    dplyr::arrange(ind, options, Agency) %>%
     dplyr::mutate(Value = 0) %>%
     dplyr::rename(Indicator = ind,
                   Age = options)
 
   df <- df %>%
-    dplyr::group_by(`Indicator`, `Age`, `funding_agency`) %>%
-    dplyr::summarise(Value = sum(value), .groups = "drop") %>%
-    dplyr::rename(col_name = `funding_agency`)
+    dplyr::group_by(`Indicator`, `Age`, `Agency`) %>%
+    dplyr::summarise(Value = sum(value), .groups = "drop")
 
   df_totals <- df %>%
     dplyr::filter(Age != "Total") %>%
-    dplyr::group_by(Indicator, col_name) %>%
+    dplyr::group_by(Indicator, Agency) %>%
     dplyr::summarise(Value = sum(Value), .groups = "drop") %>%
     dplyr::mutate(Age = "Total") %>%
     dplyr::select(names(df))
 
   df_final <- dplyr::bind_rows(df, df_totals) %>%
     dplyr::mutate(
-      col_name = factor(col_name, levels = df_cols$name),
+      Agency = factor(Agency, levels = df_cols$Agency),
       Indicator = factor(Indicator, levels = unique(df_rows$ind))) %>%
-    dplyr::arrange(Indicator, col_name) %>%
-    tidyr::pivot_wider(names_from = col_name,
+    dplyr::arrange(Indicator, Age, Agency) %>%
+    tidyr::pivot_wider(names_from = Agency,
                        values_from = "Value",
                        values_fill = 0) %>%
     suppressWarnings()
@@ -314,12 +320,12 @@ prepareMemoData_by_agency <- function(df, memoStructure) {
   df_final %<>%
     dplyr::mutate(
       "Total" = rowSums(dplyr::across(where(is.numeric)), na.rm = TRUE)) %>%
-    dplyr::select("Indicator", "Age", 3:dim(.)[2]) %>%
-    dplyr::select(tidyselect::where(~ any(. != 0))) # Remove all columns which are completely zero
+    dplyr::select("Indicator", "Age", 2:dim(.)[2]) %>%
+    dplyr::select(where(~ any(. != 0))) # Remove all columns which are completely zero
 }
 
 
-#' @export
+
 #' @title Prepare Memo Data By Prioritization Level
 #'
 #' @param df An analytics table, either d$memo$datim$analytics or
@@ -329,15 +335,15 @@ prepareMemoData_by_agency <- function(df, memoStructure) {
 #' @return A dataframe of COP indicators aggregated
 #' to the prioritization level.
 #'
-prepareMemoData_by_prio <- function(df,
-                                      memoStructure,
+prepareMemoDataByPrio <- function(df,
+                                  memo_structure,
                                       include_no_prio = TRUE) {
 
-  df_rows <- memoStructure %>%
+  df_rows <- memo_structure %>%
     purrr::pluck("row_order") %>%
     dplyr::select(ind, options)
 
-  df_cols <- memoStructure %>%
+  df_cols <- memo_structure %>%
     purrr::pluck("col_order") %>%
     dplyr::select(name)
 
@@ -379,7 +385,7 @@ prepareMemoData_by_prio <- function(df,
     df_final <- dplyr::select(df_final, -`No Prioritization`) # nolint
   }
 
-  df_final %>% dplyr::select(tidyselect::where(~ any(. != 0))) # Remove all columns which are completely zero
+  df_final %>% dplyr::select(where(~ any(. != 0))) # Remove all columns which are completely zero
 }
 
 
@@ -413,7 +419,7 @@ prepareMemoData <- function(d,
     d <- prepareExistingDataAnalytics(d, d2_session)
 
     d$memo$datim$by_psnu <-
-      prepareMemoData_by_psnu(d$memo$datim$analytics,
+      prepareMemoDataByPSNU(d$memo$datim$analytics,
                                 "datim",
                                 d$memo$inds,
                                 d$memo$datim$prios,
@@ -421,14 +427,14 @@ prepareMemoData <- function(d,
                                 d$info$psnus)
 
     d$memo$datim$by_partner <-
-      prepareMemoData_by_partner(d$memo$datapack$by_psnu,
+      prepareMemoDataByPartner(d$memo$datapack$by_psnu,
                                    d$memo$structure,
                                    d$memo$inds)
 
-    d$memo$datim$by_agency <- prepareMemoData_by_agency(d$memo$datim$by_psnu,
+    d$memo$datim$by_agency <- prepareMemoDataByAgency(d$memo$datim$by_psnu,
                                                           d$memo$structure)
 
-    d$memo$datim$by_prio <- prepareMemoData_by_prio(d$memo$datim$by_psnu,
+    d$memo$datim$by_prio <- prepareMemoDataByPrio(d$memo$datim$by_psnu,
                                                       d$memo$structure,
                                                       include_no_prio)
   }
@@ -437,7 +443,7 @@ prepareMemoData <- function(d,
   if (memo_type %in% c("datapack", "comparison")) {
 
     d$memo$datapack$by_psnu <-
-      prepareMemoData_by_psnu(d$data$analytics,
+      prepareMemoDataByPSNU(d$data$analytics,
                                 "datapack",
                                 d$memo$inds,
                                 d$memo$datapack$prios,
@@ -445,16 +451,16 @@ prepareMemoData <- function(d,
                                 d$info$psnus)
 
     d$memo$datapack$by_partner <-
-      prepareMemoData_by_partner(d$memo$datapack$by_psnu,
+      prepareMemoDataByPartner(d$memo$datapack$by_psnu,
                                    d$memo$structure,
                                    d$memo$inds)
 
     d$memo$datapack$by_agency <-
-      prepareMemoData_by_agency(d$memo$datapack$by_psnu,
+      prepareMemoDataByAgency(d$memo$datapack$by_psnu,
                                   d$memo$structure)
 
     d$memo$datapack$by_prio <-
-      prepareMemoData_by_prio(d$memo$datapack$by_psnu,
+      prepareMemoDataByPrio(d$memo$datapack$by_psnu,
                                 d$memo$structure,
                                 include_no_prio)
   }
