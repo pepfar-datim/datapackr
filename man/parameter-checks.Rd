@@ -17,7 +17,7 @@
 \usage{
 check_country_uids(country_uids, force = TRUE)
 
-check_PSNUs(psnus = NULL, country_uids = NULL)
+check_PSNUs(PSNUs = NULL, country_uids = NULL)
 
 check_cop_year(cop_year)
 
@@ -44,7 +44,7 @@ checkResultsArchive(results_archive = FALSE)
 
 check_params(
   country_uids,
-  psnus,
+  PSNUs,
   cop_year,
   tool,
   season,
@@ -65,7 +65,7 @@ For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
 \item{force}{logical. Should country_uids be required?}
 
-\item{psnus}{Dataframe of PSNUs to use in this function, containing at least
+\item{PSNUs}{Dataframe of PSNUs to use in this function, containing at least
 \code{psnu_uid}.}
 
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
@@ -108,7 +108,7 @@ higher-level \code{check_params}, a list object containing one valid parameter
 value/object for each non-missing parameter supplied.
 \itemize{
 \item \code{check_country_uids}: List of \code{country_uids}.
-\item \code{check_psnus}: Dataframe of valid \code{PSNUs} (uid and names).
+\item \code{check_PSNUs}: Dataframe of valid \code{PSNUs} (uid and names).
 \item \code{check_cop_year}: Valid \code{cop_year} as numeric value.
 \item \code{check_tool}: Valid \code{tool} type as string.
 \item \code{check_season}: Valid \code{season} as string.

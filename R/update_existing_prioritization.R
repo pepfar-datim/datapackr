@@ -5,7 +5,7 @@
 #'
 #' @return
 #'
-update_existing_prioritization <- function(d, d2_session =
+updateExistingPrioritization <- function(d, d2_session =
                                              dynGet("d2_default_session",
                                                     inherits = TRUE)) {
 
@@ -25,7 +25,7 @@ update_existing_prioritization <- function(d, d2_session =
   prios <- n_groups %>% purrr::map_dfr(getPrioTable)
 
   if (NROW(prios) > 0 & any(is.na(prios$Value))) {
-    msg <- paste("ERROR! Missing prioriziation PSNU prioritization levels",
+    msg <- paste("ERROR! Missing prioritization PSNU prioritization levels",
                  "have been detected. Affected PSNUs will be classified as No",
                  "Prioritization but may lead to inconsistencies",
                  "in the draft memo generation and comparison")

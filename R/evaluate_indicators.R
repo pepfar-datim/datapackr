@@ -9,7 +9,7 @@
 #'
 #' @return
 #'
-evaluate_indicators <- function(combis, values, inds) {
+evaluateIndicators <- function(combis, values, inds) {
 
   if (is.null(inds)) {
     stop("No indicator metadata found")
@@ -37,7 +37,7 @@ evaluate_indicators <- function(combis, values, inds) {
 
   #Define a function for any expressions which match
   #either the numerator or denominator
-  matches_indicator <- function(x) {
+  matchesIndicator <- function(x) {
     agrepl(x, inds$numerator) |
       agrepl(x, inds$denominator)
   }
@@ -45,7 +45,7 @@ evaluate_indicators <- function(combis, values, inds) {
   #Determine which indicator formulas match our supplied data
   matches <- this.des %>%
     unique(.) %>%
-    purrr::map(., matches_indicator) %>%
+    purrr::map(., matchesIndicator) %>%
     Reduce("|", .) %>%
     dplyr::filter(inds, .)
 
@@ -56,39 +56,38 @@ evaluate_indicators <- function(combis, values, inds) {
 
   #Function to substitute values based on the
   #dataelement_id.categoryoptioncombo_id
-  replace_combis_with_values <- function(x,
-                                         combis.this = combis,
-                                         values.this = values) {
+  replaceCombisWithValues <- function(x,
+                                         expressions = combis,
+                                         v = values) {
     stringi::stri_replace_all_fixed(x,
-                                    combis.this,
-                                    values.this,
+                                    expressions,
+                                    v,
                                     vectorize_all = FALSE)
   }
 
   # Function to replace missing totals with zeros
-  replace_totals_with_values <- function(x) {
-    replace_combis_with_values(x,
-                               combis = totals_df$exp,
-                               values = totals_df$values)
+  replaceTotalsWithValues <- function(x) {
+    replaceCombisWithValues(x,
+                               expressions = totals_df$exp,
+                               v = totals_df$values)
   }
 
   #Function to replace missing combis with zeros
-  replace_expressions_with_zeros <- function(x) {
+  replaceExpressionsWithZeros <- function(x) {
     expression.pattern <- "#\\{[a-zA-Z][a-zA-Z0-9]{10}(\\.[a-zA-Z][a-zA-Z0-9]{10})?\\}"
     gsub(expression.pattern, "0", x)
   }
 
-  #Function to parse and evalulate the expression to return a numeric value
-  evaluate_expression <- function(exp) {
+  #Function to parse and evaluate the expression to return a numeric value
+  evaluateExpression <- function(exp) {
     vapply(exp, function(x) eval(parse(text = x)), FUN.VALUE = double(1))
   }
 
-  matches %<>%
-    purrr::modify_at(., c("numerator", "denominator"), replace_combis_with_values) %>%
-    purrr::modify_at(., c("numerator", "denominator"), replace_totals_with_values) %>%
-    purrr::modify_at(., c("numerator", "denominator"), replace_expressions_with_zeros) %>%
-    purrr::modify_at(., c("numerator", "denominator"), evaluate_expression) %>%
+  matches %>%
+    purrr::modify_at(., c("numerator", "denominator"), replaceCombisWithValues) %>%
+    purrr::modify_at(., c("numerator", "denominator"), replaceTotalsWithValues) %>%
+    purrr::modify_at(., c("numerator", "denominator"), replaceExpressionsWithZeros) %>%
+    purrr::modify_at(., c("numerator", "denominator"), evaluateExpression) %>%
     dplyr::mutate(value = numerator / denominator)
 
-  matches
 }

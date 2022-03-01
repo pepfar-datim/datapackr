@@ -15,7 +15,7 @@ test_that("Can calculate a simple indicator",{
             combis <- c(paste0("#{",de1,".",coc1,"}"),c(paste0("#{",de1,".",coc2,"}")))
             values <- c(10,20)
 
-            test_values <- evaluate_indicators(combis, values, inds)
+            test_values <- evaluateIndicators(combis, values, inds)
             expect_equal(class(test_values), "data.frame")
             expect_setequal(names(test_values), c("id", "name", "numerator", "denominator", "value"))
             expect_equal(NROW(test_values),1)
@@ -46,7 +46,7 @@ test_that("Handle empty indicator calculations",{
             combis <- c(paste0("#{",de2,".",coc1,"}"),c(paste0("#{",de2,".",coc2,"}")))
             values <- c(10,20)
 
-            test_values <- evaluate_indicators(combis,values,inds)
+            test_values <- evaluateIndicators(combis,values,inds)
             expect_equal(class(test_values),"data.frame")
             expect_setequal(names(test_values),c("id","name","numerator","denominator","value"))
             expect_equal(NROW(test_values),0)

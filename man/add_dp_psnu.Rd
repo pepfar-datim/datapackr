@@ -4,11 +4,10 @@
 \alias{add_dp_psnu}
 \title{Modify PSNU list to add datapackr IDs.}
 \usage{
-add_dp_psnu(psnus)
+add_dp_psnu(PSNUs)
 }
 \arguments{
-\item{psnus}{Dataframe of PSNUs to use in this function, containing at least
-\code{psnu_uid}.}
+\item{PSNUs}{Data frame of PSNUs produced by \code{\link{getPSNUs}}.}
 }
 \value{
 Data frame of PSNUs with added Data Pack label, \code{dp_psnu}.

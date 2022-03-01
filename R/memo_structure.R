@@ -5,7 +5,7 @@
 #' @return d object with d$memo$structure
 #' @export
 #'
-memo_structure <- function(d, d2_session = dynGet("d2_default_session",
+memoStructure <- function(d, d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
 
   if (!(d$info$cop_year %in% c("2020", "2021", "2022"))) {
@@ -217,7 +217,7 @@ memo_structure <- function(d, d2_session = dynGet("d2_default_session",
 
   d$memo$structure <- list(row_order = row_order, col_order = col_order)
 
-  d$memo$inds <- get_memo_indicators(d$info$cop_year, d2_session)
+  d$memo$inds <- getMemoIndicators(d$info$cop_year, d2_session)
 
   d
 }

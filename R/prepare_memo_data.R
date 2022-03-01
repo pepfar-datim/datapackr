@@ -5,7 +5,7 @@
 #'
 #' @return Datapackr d object
 #'
-prepare_memo_metadata <- function(d, memo_type,
+prepareMemoMetadata <- function(d, memo_type,
                                   d2_session = dynGet("d2_default_session",
                                                       inherits = TRUE)) {
 
@@ -17,7 +17,7 @@ prepare_memo_metadata <- function(d, memo_type,
     dplyr::select(ou, country_name, snu1, psnu, psnu_uid)
 
   #Get the memo structure
-  d <- memo_structure(d, d2_session)
+  d <- memoStructure(d, d2_session)
 
   if (is.null(d$memo$partners_agencies)) {
     d$memo$partners_agencies <-
@@ -49,7 +49,7 @@ prepare_memo_metadata <- function(d, memo_type,
 
   if (memo_type %in% c("datim", "comparison")) {
     #Get the existing prioritizations
-    d$memo$datim$prios <- fetch_prioritization_table(d$info$psnus$psnu_uid,
+    d$memo$datim$prios <- fetchPrioritizationTable(d$info$psnus$psnu_uid,
                                                      d$info$cop_year,
                                                      d2_session)
   }
@@ -66,7 +66,7 @@ prepare_memo_metadata <- function(d, memo_type,
 #' @inheritParams datapackr_params
 #' @return  Datapackr d object
 #'
-prepare_existing_data_analytics <- function(d, d2_session =
+prepareExistingDataAnalytics <- function(d, d2_session =
                                               dynGet("d2_default_session",
                                                      inherits = TRUE)) {
 
@@ -94,7 +94,7 @@ prepare_existing_data_analytics <- function(d, d2_session =
 #'
 #' @param analytics Data frame consisting of at least psnu_uid,
 #' categoryoptioncombo_id, mechanism_code and target value
-#' @param inds Data frame of indicators from get_memo_indicators
+#' @param inds Data frame of indicators from getMemoIndicators
 #' @param prios Data frame of prioritization levels depending on the memo type
 #' @param partners_agencies Result of getMechanismView
 #' @inheritParams datapackr_params
@@ -105,7 +105,7 @@ prepare_existing_data_analytics <- function(d, d2_session =
 #'
 #' @return A dataframe of COP indicators aggregated to the PSNU level.
 #'
-prepare_memo_data_by_psnu <- function(analytics,
+prepareMemoData_by_psnu <- function(analytics,
                                   memo_type,
                                   inds,
                                   prios,
@@ -128,12 +128,12 @@ prepare_memo_data_by_psnu <- function(analytics,
   if ("parallel" %in% rownames(installed.packages()) == TRUE) {
     df$indicator_results <-
       parallel::mclapply(df$data, function(x)
-        evaluate_indicators(x$combi, x$value, inds),
+        evaluateIndicators(x$combi, x$value, inds),
         mc.cores = parallel::detectCores())
   } else {
     df$indicator_results <-
       lapply(df$data, function(x)
-        evaluate_indicators(x$combi, x$value, inds))
+        evaluateIndicators(x$combi, x$value, inds))
   }
 
 
@@ -194,8 +194,8 @@ prepare_memo_data_by_psnu <- function(analytics,
 #'
 #' @return A dataframe of COP indicators aggregated to the partner level
 #'
-prepare_memo_data_by_partner <- function(df,
-                                         memo_structure,
+prepareMemoData_by_partner <- function(df,
+                                         memoStructure,
                                          indicators) {
 
   if (is.null(df) | NROW(df) == 0) {
@@ -207,7 +207,7 @@ prepare_memo_data_by_partner <- function(df,
     dplyr::summarise(Value = sum(value), .groups = "drop")
 
   #We need to pad for zeros
-  df_rows <- memo_structure %>%
+  df_rows <- memoStructure %>%
     purrr::pluck("row_order") %>%
     dplyr::filter(!is.na(partner_chunk)) %>%
     dplyr::select(ind, options)
@@ -231,7 +231,7 @@ prepare_memo_data_by_partner <- function(df,
   #Remove dedupe
   d_partners <- dplyr::filter(d_partners, !(`Mechanism` %in% c("00001", "00000"))) #nolint
 
-  d_indicators <- memo_structure %>%
+  d_indicators <- memoStructure %>%
     purrr::pluck("row_order") %>%
     dplyr::filter(!is.na(partner_chunk)) %>%
     dplyr::select(ind, options) %>%
@@ -273,9 +273,9 @@ prepare_memo_data_by_partner <- function(df,
 #'
 #' @return A dataframe of COP indicators aggregated to the prioritization level
 #'
-prepare_memo_data_by_agency <- function(df, memo_structure) {
+prepareMemoData_by_agency <- function(df, memoStructure) {
 
-  df_rows <- memo_structure %>%
+  df_rows <- memoStructure %>%
     purrr::pluck("row_order") %>%
     dplyr::select(ind, options)
 
@@ -319,7 +319,7 @@ prepare_memo_data_by_agency <- function(df, memo_structure) {
 }
 
 
-#' @export 
+#' @export
 #' @title Prepare Memo Data By Prioritization Level
 #'
 #' @param df An analytics table, either d$memo$datim$analytics or
@@ -329,15 +329,15 @@ prepare_memo_data_by_agency <- function(df, memo_structure) {
 #' @return A dataframe of COP indicators aggregated
 #' to the prioritization level.
 #'
-prepare_memo_data_by_prio <- function(df,
-                                      memo_structure,
+prepareMemoData_by_prio <- function(df,
+                                      memoStructure,
                                       include_no_prio = TRUE) {
 
-  df_rows <- memo_structure %>%
+  df_rows <- memoStructure %>%
     purrr::pluck("row_order") %>%
     dplyr::select(ind, options)
 
-  df_cols <- memo_structure %>%
+  df_cols <- memoStructure %>%
     purrr::pluck("col_order") %>%
     dplyr::select(name)
 
@@ -396,7 +396,7 @@ prepare_memo_data_by_prio <- function(df,
 #'
 #' @return
 #'
-prepare_memo_data <- function(d,
+prepareMemoData <- function(d,
                               memo_type,
                               include_no_prio = TRUE,
                               d2_session = dynGet("d2_default_session",
@@ -406,14 +406,14 @@ prepare_memo_data <- function(d,
     stop("Memo type must be one of datapack,datim,comparison")
   }
 
-  d <- prepare_memo_metadata(d, memo_type, d2_session)
+  d <- prepareMemoMetadata(d, memo_type, d2_session)
 
   if (memo_type %in% c("datim", "comparison")) {
 
-    d <- prepare_existing_data_analytics(d, d2_session)
+    d <- prepareExistingDataAnalytics(d, d2_session)
 
     d$memo$datim$by_psnu <-
-      prepare_memo_data_by_psnu(d$memo$datim$analytics,
+      prepareMemoData_by_psnu(d$memo$datim$analytics,
                                 "datim",
                                 d$memo$inds,
                                 d$memo$datim$prios,
@@ -421,14 +421,14 @@ prepare_memo_data <- function(d,
                                 d$info$psnus)
 
     d$memo$datim$by_partner <-
-      prepare_memo_data_by_partner(d$memo$datapack$by_psnu,
+      prepareMemoData_by_partner(d$memo$datapack$by_psnu,
                                    d$memo$structure,
                                    d$memo$inds)
 
-    d$memo$datim$by_agency <- prepare_memo_data_by_agency(d$memo$datim$by_psnu,
+    d$memo$datim$by_agency <- prepareMemoData_by_agency(d$memo$datim$by_psnu,
                                                           d$memo$structure)
 
-    d$memo$datim$by_prio <- prepare_memo_data_by_prio(d$memo$datim$by_psnu,
+    d$memo$datim$by_prio <- prepareMemoData_by_prio(d$memo$datim$by_psnu,
                                                       d$memo$structure,
                                                       include_no_prio)
   }
@@ -437,7 +437,7 @@ prepare_memo_data <- function(d,
   if (memo_type %in% c("datapack", "comparison")) {
 
     d$memo$datapack$by_psnu <-
-      prepare_memo_data_by_psnu(d$data$analytics,
+      prepareMemoData_by_psnu(d$data$analytics,
                                 "datapack",
                                 d$memo$inds,
                                 d$memo$datapack$prios,
@@ -445,16 +445,16 @@ prepare_memo_data <- function(d,
                                 d$info$psnus)
 
     d$memo$datapack$by_partner <-
-      prepare_memo_data_by_partner(d$memo$datapack$by_psnu,
+      prepareMemoData_by_partner(d$memo$datapack$by_psnu,
                                    d$memo$structure,
                                    d$memo$inds)
 
     d$memo$datapack$by_agency <-
-      prepare_memo_data_by_agency(d$memo$datapack$by_psnu,
+      prepareMemoData_by_agency(d$memo$datapack$by_psnu,
                                   d$memo$structure)
 
     d$memo$datapack$by_prio <-
-      prepare_memo_data_by_prio(d$memo$datapack$by_psnu,
+      prepareMemoData_by_prio(d$memo$datapack$by_psnu,
                                 d$memo$structure,
                                 include_no_prio)
   }

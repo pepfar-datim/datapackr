@@ -5,7 +5,7 @@
 #'
 #' @return A data frame consisting of Organisation unit, Value, prioritization
 #'
-fetch_prioritization_table <- function(psnus, cop_year,
+fetchPrioritizationTable <- function(psnus, cop_year,
                                        d2_session = dynGet("d2_default_session",
                                                            inherits = TRUE)) {
   period <- paste0(cop_year, "Oct")

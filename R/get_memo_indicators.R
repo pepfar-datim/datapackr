@@ -6,7 +6,7 @@
 #' @return A dataframe consisting of indicator UIDs, name, numerator, and
 #' denominator expression. If a given COP year does not exist, NULL is returned.
 #'
-get_memo_indicators <- function(cop_year,
+getMemoIndicators <- function(cop_year,
                                 d2_session = dynGet("d2_default_session",
                                                     inherits = TRUE)) {
   #Fetch indicators from the COP21 memo group

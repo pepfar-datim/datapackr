@@ -1,14 +1,13 @@
-#' @export
 #' @title Default Memo Font
 #' @return String with default font for memo target tables
-default_memo_font <- function() {
+defaultMemoFont <- function() {
   "Arial"
 }
 
-#' @export
+
 #' @title Default Memo Paragraph Style
 #' @return Officer list object defining default style for memo table bodies
-default_memo_style_para <- function() {
+defaultMemoStylePara <- function() {
   officer::fp_par(text.align = "right",
                   padding.right = 0.04,
                   padding.bottom = 0,
@@ -16,10 +15,10 @@ default_memo_style_para <- function() {
                   line_spacing = 1)
 }
 
-#' @export
+
 #' @title Default Memo Header Style
 #' @return Officer list object defining default style for memo table headers
-default_memo_style_header <- function() {
+defaultMemoStyleHeader <- function() {
   officer::fp_par(text.align = "center",
                   padding.right = 0,
                   padding.bottom = 0,
@@ -28,22 +27,22 @@ default_memo_style_header <- function() {
 }
 
 
-#' @export
+
 #' @title Zeroes to Dashes
 #' @param x Target value to be formatted.
 #' @return
-zeros_to_dashes <- function(x) {
+zerosToDashes <- function(x) {
   ifelse(x == 0, "-", formatC(x, format = "f", big.mark = ",", digits = 0))
 }
 
 
-#' @export
+
 #' @title Generate Memo Template File
 #'
 #' @inheritParams datapackr_params
 #'
 #' @return
-generate_memo_template <- function(draft_memo = TRUE) {
+generateMemoTemplate <- function(draft_memo = TRUE) {
 
   if (draft_memo) {
     memo_doc <- officer::read_docx(path = "inst/extdata/draft_memo_template.docx")
@@ -54,7 +53,7 @@ generate_memo_template <- function(draft_memo = TRUE) {
   memo_doc
 }
 
-#' @export
+
 #' @title Render Prioritization-Level Memo Target Table
 #'
 #' @param prio_table A table of target data aggregated to the Prioritization
@@ -64,7 +63,7 @@ generate_memo_template <- function(draft_memo = TRUE) {
 #'
 #' @return
 #'
-render_prio_table <- function(memo_doc, prio_table, ou_name) {
+renderPrioTable <- function(memo_doc, prio_table, ou_name) {
 
   if (is.null(prio_table)) {
     return(memo_doc)
@@ -72,11 +71,11 @@ render_prio_table <- function(memo_doc, prio_table, ou_name) {
 
   #Transform all zeros to dashes
   prio_table %<>%
-    dplyr::mutate_if(is.numeric, zeros_to_dashes)
+    dplyr::mutate_if(is.numeric, zerosToDashes)
 
-  style_para <- default_memo_style_para()
+  style_para <- defaultMemoStylePara()
 
-  style_header <- default_memo_style_header()
+  style_header <- defaultMemoStyleHeader()
 
   header_old <- names(prio_table)
   header_new <- c(ou_name, ou_name, header_old[3:dim(prio_table)[2]])
@@ -107,7 +106,7 @@ render_prio_table <- function(memo_doc, prio_table, ou_name) {
     flextable::align(j = 1:2, align = "center") %>% #Center first two columns
     flextable::add_footer_lines(values = footer_message)
 
-  fontname <- default_memo_font()
+  fontname <- defaultMemoFont()
 
   if (gdtools::font_family_exists(fontname)) {
     prio_table %<>% flextable::font(fontname = fontname, part = "all")
@@ -121,7 +120,7 @@ render_prio_table <- function(memo_doc, prio_table, ou_name) {
 }
 
 
-#' @export
+
 #' @title Render Agency-Level Memo Target Table
 #'
 #' @param agency_table A table of target data aggregated to the agency
@@ -131,7 +130,7 @@ render_prio_table <- function(memo_doc, prio_table, ou_name) {
 #'
 #' @return
 #'
-render_agency_table <- function(memo_doc, agency_table, ou_name) {
+renderAgencyTable <- function(memo_doc, agency_table, ou_name) {
 
   if (is.null(agency_table)) {
     return(memo_doc)
@@ -139,11 +138,11 @@ render_agency_table <- function(memo_doc, agency_table, ou_name) {
 
   #Transform all zeros to dashes
   agency_table %<>%
-    dplyr::mutate_if(is.numeric, zeros_to_dashes)
+    dplyr::mutate_if(is.numeric, zerosToDashes)
 
-  style_para <- default_memo_style_para()
+  style_para <- defaultMemoStylePara()
 
-  style_header <- default_memo_style_header()
+  style_header <- defaultMemoStyleHeader()
 
   header_new <- c("Indicator", "Age",
                   rep("Duplicated Agency Totals", dim(agency_table)[2] - 3),
@@ -172,21 +171,21 @@ render_agency_table <- function(memo_doc, agency_table, ou_name) {
     flextable::align(j = 1:2, align = "center") %>% #Center first two columns
     flextable::add_footer_lines(values = footer_message)
 
-  fontname <- default_memo_font()
+  fontname <- defaultMemoFont()
 
   if (gdtools::font_family_exists(fontname)) {
     agency_table %<>% flextable::font(fontname = fontname, part = "all")
   }
 
-  memo_doc %<>%
+  memo_doc %>%
     flextable::body_add_flextable(value = agency_table) %>%
     officer::body_add_break(pos = "after")
 
-  memo_doc
+
 }
 
 
-#' @export
+
 #' @title Render Partner-Level Memo Target Tables
 #'
 #' @param partners_table A table of target data aggregated to the partner and
@@ -196,11 +195,11 @@ render_agency_table <- function(memo_doc, agency_table, ou_name) {
 #'
 #' @return
 #'
-render_partner_table <- function(memo_doc, partners_table, memo_structure) {
+renderPartnerTable <- function(memo_doc, partners_table, memoStructure) {
 
-  style_para <- default_memo_style_para()
+  style_para <- defaultMemoStylePara()
 
-  style_header <- default_memo_style_header()
+  style_header <- defaultMemoStyleHeader()
 
   #Partners tables
   partners_table <- partners_table %>%
@@ -218,7 +217,7 @@ render_partner_table <- function(memo_doc, partners_table, memo_structure) {
     unlist() %>%
     c("Funding Agency", "Partner", "Mechanism", .)
 
-  chunks <- memo_structure %>%
+  chunks <- memoStructure %>%
     purrr::pluck("row_order") %>%
     dplyr::filter(!is.na(partner_chunk))
 
@@ -238,7 +237,7 @@ render_partner_table <- function(memo_doc, partners_table, memo_structure) {
       flextable::width(j = 1:3, 0.75) %>%
       flextable::width(j = 4:(length(chunk)), 0.4)
 
-    fontname <- default_memo_font()
+    fontname <- defaultMemoFont()
     if (gdtools::font_family_exists(fontname)) {
       partner_table %<>% flextable::font(fontname = fontname, part = "all")
     }
@@ -272,7 +271,7 @@ render_partner_table <- function(memo_doc, partners_table, memo_structure) {
 #'
 #' @return Returns a COP Memo DOCX object suitable for download
 #'
-generate_approval_memo <-
+generateApprovalMemo <-
   function(d,
            memo_type,
            draft_memo = TRUE,
@@ -281,42 +280,42 @@ generate_approval_memo <-
            d2_session = dynGet("d2_default_session",
                                inherits = TRUE)) {
 
-    d <- prepare_memo_data(d, memo_type, include_no_prio, d2_session)
+    d <- prepareMemoData(d, memo_type, include_no_prio, d2_session)
 
-    memo_doc <- generate_memo_template(draft_memo)
+    memo_doc <- generateMemoTemplate(draft_memo)
 
     if (memo_type %in% c("datapack", "comparison")) {
-      memo_doc <- render_prio_table(memo_doc,
+      memo_doc <- renderPrioTable(memo_doc,
                                     d$memo$datapack$by_prio,
                                     d$info$datapack_name)
     }
 
     if (memo_type %in% c("datim", "comparison")) {
-      memo_doc <- render_prio_table(memo_doc,
+      memo_doc <- renderPrioTable(memo_doc,
                                     d$memo$datim$by_prio,
                                     d$info$datapack_name)
     }
 
     if (memo_type %in% c("datapack", "comparison")) {
-      memo_doc <- render_agency_table(memo_doc,
+      memo_doc <- renderAgencyTable(memo_doc,
                                       d$memo$datapack$by_agency,
                                       d$info$datapack_name)
     }
 
     if (memo_type %in% c("datim", "comparison")) {
-      memo_doc <- render_agency_table(memo_doc,
+      memo_doc <- renderAgencyTable(memo_doc,
                                       d$memo$datim$by_agency,
                                       d$info$datapack_name)
     }
 
     if (memo_type %in% c("datapack", "comparison")) {
-      memo_doc <- render_partner_table(memo_doc,
+      memo_doc <- renderPartnerTable(memo_doc,
                                        d$memo$datapack$by_partner,
                                        d$memo$structure)
     }
 
     if (memo_type %in% c("datim", "comparison")) {
-      memo_doc <- render_partner_table(memo_doc,
+      memo_doc <- renderPartnerTable(memo_doc,
                                        d$memo$datim$by_partner,
                                        d$memo$structure)
     }

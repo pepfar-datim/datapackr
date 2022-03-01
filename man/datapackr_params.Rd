@@ -29,7 +29,7 @@ datapackr_params(
   draft_memo,
   memo_type,
   memo_doc,
-  memo_structure,
+  memoStructure,
   include_no_prio,
   remove_empty_columns,
   ...
@@ -104,7 +104,7 @@ comparison: Create a comparison memo with data from both DATIM and datapack}
 \item{memo_doc}{\code{Officer} document object containing
 the target memo tables.}
 
-\item{memo_structure}{Structure of the memo d$memo$structure}
+\item{memoStructure}{Structure of the memo d$memo$structure}
 
 \item{include_no_prio}{If TRUE, include \code{"No Prioritiation"}
 as a column in the output.}
