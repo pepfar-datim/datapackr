@@ -23,7 +23,6 @@ canReadFile <- function(path) {
 
 
 #' @export
-#' @importFrom tools file_ext
 #' @title Test an input file for read access and type. Prompt if issues.
 #'
 #' @description

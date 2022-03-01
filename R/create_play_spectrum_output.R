@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title Create fake Spectrum output for testing
 #'
 #' @description

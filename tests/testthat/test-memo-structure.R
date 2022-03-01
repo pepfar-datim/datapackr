@@ -8,6 +8,7 @@ test_that("We can warn on an invalid COP year", {
   expect_identical(d, d2)
 })
 
+with_mock_api({
 test_that("We can create a memo structure", {
   d <- list()
   d$info$cop_year <- "2022"
@@ -26,4 +27,7 @@ test_that("We can create a memo structure", {
                                                        "col_order",
                                                        "id",
                                                        "Prioritization"))
-})
+  expect_false(is.null(d$memo$inds))
+  
+  }) })
+

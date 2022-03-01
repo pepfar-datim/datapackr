@@ -33,7 +33,6 @@ getMechanismViewFromDATIM <- function(cop_year = NULL,
 
 
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title getMechanismView
 #'
 #' @description Retrieves a view of mechanisms with partners and agencies
@@ -160,7 +159,6 @@ getMechanismView <- function(country_uids = NULL,
 
 
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title adornMechanisms(data)
 #'
 #' @description Join analytical dimensions with d$data$analtyics related
