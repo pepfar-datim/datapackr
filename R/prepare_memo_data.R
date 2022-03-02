@@ -33,7 +33,7 @@ prepareMemoMetadata <- function(d, memo_type,
                     "Agency" = agency)
   }
 
-  if (memo_type == "datapack") {
+  if (memo_type %in% c("datapack","comparison")) {
 
     d$memo$datapack$prios <- d$data$analytics %>%
       dplyr::select(psnu_uid, prioritization) %>%
@@ -69,21 +69,24 @@ prepareMemoMetadata <- function(d, memo_type,
 prepareExistingDataAnalytics <- function(d, d2_session =
                                               dynGet("d2_default_session",
                                                      inherits = TRUE)) {
-
-  #Fetch the raw data from DATIM
-  d$memo$datim$analytics <- getCOPDataFromDATIM(d$info$country_uids,
-                                                d$info$cop_year,
-                                                streams = "mer_targets",
-                                                d2_session = d2_session) %>%
-
-    adorn_import_file(
-      .,
-      cop_year = d$info$cop_year,
-      psnu_prioritizations = dplyr::select(d$memo$datim$prios,
-                                           "orgUnit" = psnu_uid,
-                                           value),
-      d2_session = d2_session
-    )
+  #Fetch the existing data from DATIM
+  df <- getCOPDataFromDATIM(d$info$country_uids,
+                      d$info$cop_year,
+                      streams = "mer_targets",
+                      d2_session = d2_session)
+  
+  if (NROW(d) > 0 ) {
+    d$memo$datim$analytics <- df %>%
+      
+      adorn_import_file(
+        .,
+        cop_year = d$info$cop_year,
+        psnu_prioritizations = dplyr::select(d$memo$datim$prios,
+                                             "orgUnit" = psnu_uid,
+                                             value),
+        d2_session = d2_session
+      )
+  }
 
   d
 }
@@ -413,56 +416,68 @@ prepareMemoData <- function(d,
   }
 
   d <- prepareMemoMetadata(d, memo_type, d2_session)
-
+  
+  
   if (memo_type %in% c("datim", "comparison")) {
 
     d <- prepareExistingDataAnalytics(d, d2_session)
-
-    d$memo$datim$by_psnu <-
-      prepareMemoDataByPSNU(d$memo$datim$analytics,
-                                "datim",
-                                d$memo$inds,
-                                d$memo$datim$prios,
-                                d$memo$partners_agencies,
-                                d$info$psnus)
-
-    d$memo$datim$by_partner <-
-      prepareMemoDataByPartner(d$memo$datapack$by_psnu,
-                                   d$memo$structure,
-                                   d$memo$inds)
-
-    d$memo$datim$by_agency <- prepareMemoDataByAgency(d$memo$datim$by_psnu,
-                                                          d$memo$structure)
-
-    d$memo$datim$by_prio <- prepareMemoDataByPrio(d$memo$datim$by_psnu,
-                                                      d$memo$structure,
-                                                      include_no_prio)
+    
+    if (NROW(d$memo$datim$analytics) > 0) {
+      d$memo$datim$by_psnu <-
+        prepareMemoDataByPSNU(
+          d$memo$datim$analytics,
+          "datim",
+          d$memo$inds,
+          d$memo$datim$prios,
+          d$memo$partners_agencies,
+          d$info$psnus
+        )
+      
+      d$memo$datim$by_partner <-
+        prepareMemoDataByPartner(d$memo$datapack$by_psnu,
+                                 d$memo$structure,
+                                 d$memo$inds)
+      
+      d$memo$datim$by_agency <-
+        prepareMemoDataByAgency(d$memo$datim$by_psnu,
+                                d$memo$structure)
+      
+      d$memo$datim$by_prio <-
+        prepareMemoDataByPrio(d$memo$datim$by_psnu,
+                              d$memo$structure,
+                              include_no_prio)
+    }
+    
+    d
+    
   }
-
 
   if (memo_type %in% c("datapack", "comparison")) {
 
-    d$memo$datapack$by_psnu <-
-      prepareMemoDataByPSNU(d$data$analytics,
-                                "datapack",
-                                d$memo$inds,
-                                d$memo$datapack$prios,
-                                d$memo$partners_agencies,
-                                d$info$psnus)
+    if (NROW(d$data$analytics) > 0) {
+      d$memo$datapack$by_psnu <-
+        prepareMemoDataByPSNU(d$data$analytics,
+                              "datapack",
+                              d$memo$inds,
+                              d$memo$datapack$prios,
+                              d$memo$partners_agencies,
+                              d$info$psnus)
+      
+      d$memo$datapack$by_partner <-
+        prepareMemoDataByPartner(d$memo$datapack$by_psnu,
+                                 d$memo$structure,
+                                 d$memo$inds)
+      
+      d$memo$datapack$by_agency <-
+        prepareMemoDataByAgency(d$memo$datapack$by_psnu,
+                                d$memo$structure)
+      
+      d$memo$datapack$by_prio <-
+        prepareMemoDataByPrio(d$memo$datapack$by_psnu,
+                              d$memo$structure,
+                              include_no_prio)
+    }
 
-    d$memo$datapack$by_partner <-
-      prepareMemoDataByPartner(d$memo$datapack$by_psnu,
-                                   d$memo$structure,
-                                   d$memo$inds)
-
-    d$memo$datapack$by_agency <-
-      prepareMemoDataByAgency(d$memo$datapack$by_psnu,
-                                  d$memo$structure)
-
-    d$memo$datapack$by_prio <-
-      prepareMemoDataByPrio(d$memo$datapack$by_psnu,
-                                d$memo$structure,
-                                include_no_prio)
   }
 
   d
