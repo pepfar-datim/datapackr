@@ -35,6 +35,8 @@ prepareMemoMetadata <- function(d, memo_type,
 
   if (memo_type %in% c("datapack","comparison")) {
 
+    #TODO: If this is an OPU, use the existing prioritizations
+    #from DATIM.
     d$memo$datapack$prios <- d$data$analytics %>%
       dplyr::select(psnu_uid, prioritization) %>%
       dplyr::distinct() %>%
@@ -434,7 +436,7 @@ prepareMemoData <- function(d,
         )
       
       d$memo$datim$by_partner <-
-        prepareMemoDataByPartner(d$memo$datapack$by_psnu,
+        prepareMemoDataByPartner(d$memo$datim$by_psnu,
                                  d$memo$structure,
                                  d$memo$inds)
       
