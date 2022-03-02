@@ -9,26 +9,25 @@ fetchPrioritizationTable <- function(psnus, cop_year,
                                        d2_session = dynGet("d2_default_session",
                                                            inherits = TRUE)) {
   period <- paste0(cop_year, "Oct")
-  ous <- paste(psnus, sep = "", collapse = ";")
+
 
   #We need to split up the requests if there are many PSNUs
   getPriosFromDatim <- function(x) {
     datimutils::getAnalytics(
       dx = "r4zbW3owX9n",
       pe_f = period,
-      ou = ous,
+      ou = x,
       d2_session = d2_session
     )
   }
 
   n_requests <- ceiling(nchar(paste(psnus, sep = "", collapse = ";")) / 2048)
-  n_groups <- split(psnus, ceiling(seq_along(psnus) /
-                                     (length(psnus) / n_requests)))
+  n_groups <- split(psnus, cut(seq_along(psnus), breaks = n_requests, labels = FALSE))
 
   prios <- n_groups %>%
     purrr::map_dfr(function(x) getPriosFromDatim(x))
 
-  if (is.null(prios)) {
+  if (is.null(prios) | NROW(prios) == 0) {
     return(data.frame("psnu_uid" = psnus,
                       "prioritization" = "No Prioritization",
                       value = 0))
