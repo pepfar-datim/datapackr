@@ -319,12 +319,8 @@ generateApprovalMemo <-
   function(d,
            memo_type,
            draft_memo = TRUE,
-           remove_empty_columns = TRUE,
-           include_no_prio = TRUE,
            d2_session = dynGet("d2_default_session",
                                inherits = TRUE)) {
-
-    d <- prepareMemoData(d, memo_type, include_no_prio, d2_session)
 
     memo_doc <- generateMemoTemplate(draft_memo)
 
