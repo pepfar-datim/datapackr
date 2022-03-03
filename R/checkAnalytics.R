@@ -604,7 +604,7 @@ checkAnalytics <- function(d,
     dplyr::mutate(age = dplyr::case_when(age == "5-9" ~ "05-09",
                                          age == "1-4" ~ "01-04",
                                          age == "<1" ~ "<01",
-                                         TRUE ~ age)) %>% 
+                                         TRUE ~ age)) %>%
     dplyr::select(names(data))
 
   # Add model_data to analytics dataset ####
