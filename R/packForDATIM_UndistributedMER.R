@@ -34,7 +34,7 @@ packForDATIM_UndistributedMER <- function(data,
   datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = cop_year)
   UndistributedMER <- data %>%
     dplyr::mutate(
-      support_type = "DSD",
+      support_type = "No Support Type",
       mech_code = default_catOptCombo()
     ) %>%
     dplyr::left_join(., (datim_map %>%
