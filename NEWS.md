@@ -1,3 +1,10 @@
+# datapackr 5.1.4
+
+## Bug Fixes
+
+* Ignore duplicated Not PEPFAR columns in PSNUxIM
+* Fixes for handling 50+ age bands in PSNUxIM packing and unpacking
+
 # datapackr 5.1.3
 
 ## Bug Fixes
