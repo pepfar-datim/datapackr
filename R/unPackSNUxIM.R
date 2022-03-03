@@ -76,7 +76,7 @@ unPackSNUxIM <- function(d) {
           "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
     dplyr::distinct() %>%
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop)
-  
+
   if (d$info$tool == "Data Pack") {
     d$data$missingCombos <- d$data$MER %>%
       dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
