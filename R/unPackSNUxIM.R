@@ -80,8 +80,18 @@ unPackSNUxIM <- function(d) {
   if (d$info$tool == "Data Pack") {
     d$data$missingCombos <- d$data$MER %>%
       dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
-      dplyr::anti_join(d$data$PSNUxIM_combos,
-                       by =  c("PSNU", "psnuid", "indicator_code", "Age", "Sex", "KeyPop"))
+      #Special handling for 50+ age bands
+      dplyr::mutate(Age = dplyr::case_when(
+        stringr::str_detect(Age, "(50-54|55-59|60-64|65+)") &
+          !stringr::str_detect(indicator_code, "TX_CURR.T") ~ "50+",
+        TRUE ~ Age
+      )) %>%
+      dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
+      dplyr::distinct() %>% 
+      dplyr::anti_join(
+        d$data$PSNUxIM_combos,
+        by =  c("PSNU", "psnuid", "indicator_code", "Age", "Sex", "KeyPop")
+      )
 
     d$tests$missing_combos <- d$data$missingCombos
     attr(d$tests$missing_combos, "test_name") <- "Missing target combinations"
