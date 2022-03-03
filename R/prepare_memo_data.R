@@ -76,10 +76,10 @@ prepareExistingDataAnalytics <- function(d, d2_session =
                       d$info$cop_year,
                       streams = "mer_targets",
                       d2_session = d2_session)
-  
-  if (NROW(d) > 0 ) {
+
+  if (NROW(d) > 0) {
     d$memo$datim$analytics <- df %>%
-      
+
       adorn_import_file(
         .,
         cop_year = d$info$cop_year,
@@ -418,12 +418,12 @@ prepareMemoData <- function(d,
   }
 
   d <- prepareMemoMetadata(d, memo_type, d2_session)
-  
-  
+
+
   if (memo_type %in% c("datim", "comparison")) {
 
     d <- prepareExistingDataAnalytics(d, d2_session)
-    
+
     if (NROW(d$memo$datim$analytics) > 0) {
       d$memo$datim$by_psnu <-
         prepareMemoDataByPSNU(
@@ -434,24 +434,24 @@ prepareMemoData <- function(d,
           d$memo$partners_agencies,
           d$info$psnus
         )
-      
+
       d$memo$datim$by_partner <-
         prepareMemoDataByPartner(d$memo$datim$by_psnu,
                                  d$memo$structure,
                                  d$memo$inds)
-      
+
       d$memo$datim$by_agency <-
         prepareMemoDataByAgency(d$memo$datim$by_psnu,
                                 d$memo$structure)
-      
+
       d$memo$datim$by_prio <-
         prepareMemoDataByPrio(d$memo$datim$by_psnu,
                               d$memo$structure,
                               include_no_prio)
     }
-    
+
     d
-    
+
   }
 
   if (memo_type %in% c("datapack", "comparison")) {
@@ -464,16 +464,16 @@ prepareMemoData <- function(d,
                               d$memo$datapack$prios,
                               d$memo$partners_agencies,
                               d$info$psnus)
-      
+
       d$memo$datapack$by_partner <-
         prepareMemoDataByPartner(d$memo$datapack$by_psnu,
                                  d$memo$structure,
                                  d$memo$inds)
-      
+
       d$memo$datapack$by_agency <-
         prepareMemoDataByAgency(d$memo$datapack$by_psnu,
                                 d$memo$structure)
-      
+
       d$memo$datapack$by_prio <-
         prepareMemoDataByPrio(d$memo$datapack$by_psnu,
                               d$memo$structure,

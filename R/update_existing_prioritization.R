@@ -13,11 +13,11 @@ updateExistingPrioritization <- function(d, d2_session =
 
   #Break up into 2048 character URLS (approximately)
   n_requests <- ceiling(nchar(paste(psnus, sep = "", collapse = ";")) / 2048)
-  
+
   if (n_requests > 1) {
     n_groups <- split(psnus, cut(seq_along(psnus), breaks = n_requests + 1  , labels = FALSE))
   } else {
-    n_groups <- list("1"=psnus)
+    n_groups <- list("1" = psnus)
   }
 
   getPrioTable <- function(x) {

@@ -69,19 +69,19 @@ renderPrioTable <- function(memo_doc, prio_table, ou_name, source_type) {
   fig_caption <- switch(source_type,
                         "datapack" = "Table 1a: Prioritization Table (Proposed)",
                         "datim" = "Table 1b: Prioritization Table (Current)")
-  
-  memo_doc  %<>% officer::body_add(fig_caption,style="Normal")
-  
-  
+
+  memo_doc  %<>% officer::body_add(fig_caption,style = "Normal")
+
+
   if (is.null(prio_table)) {
     memo_doc  %<>%
-      officer::body_add(value="This page left intentionally blank. No data was found.") %>% 
+      officer::body_add(value = "This page left intentionally blank. No data was found.") %>%
       officer::body_add_break(pos = "after")
     return(memo_doc)
   }
 
-  
-  
+
+
   #Transform all zeros to dashes
   prio_table %<>%
     dplyr::mutate_if(is.numeric, zerosToDashes)
@@ -118,10 +118,10 @@ renderPrioTable <- function(memo_doc, prio_table, ou_name, source_type) {
     flextable::style(pr_p = style_para, part = "body") %>%
     flextable::align(j = 1:2, align = "center") %>% #Center first two columns
     flextable::add_footer_lines(values = footer_message)
-    
 
 
-  
+
+
   fontname <- defaultMemoFont()
 
   if (gdtools::font_family_exists(fontname)) {
@@ -152,13 +152,13 @@ renderAgencyTable <- function(memo_doc, agency_table, ou_name, source_type) {
   fig_caption <- switch(source_type,
                         "datapack" = "Table 2a: Agency Table (Proposed)",
                         "datim" = "Table 2b: Agency Table (Current)")
-  
-  memo_doc  %<>% officer::body_add(fig_caption,style="Normal")
-  
+
+  memo_doc  %<>% officer::body_add(fig_caption,style = "Normal")
+
   if (is.null(agency_table)) {
     memo_doc  %<>%
-      officer::body_add_break(pos = "before") %>% 
-      officer::body_add(value="This page left intentionally blank. No data was found.") %>% 
+      officer::body_add_break(pos = "before") %>%
+      officer::body_add(value = "This page left intentionally blank. No data was found.") %>%
       officer::body_add_break(pos = "after")
     return(memo_doc)
   }
@@ -198,7 +198,7 @@ renderAgencyTable <- function(memo_doc, agency_table, ou_name, source_type) {
     flextable::align(j = 1:2, align = "center") %>% #Center first two columns
     flextable::add_footer_lines(values = footer_message)
 
-  
+
   fontname <- defaultMemoFont()
 
   if (gdtools::font_family_exists(fontname)) {
@@ -229,18 +229,18 @@ renderPartnerTable <- function(memo_doc, partners_table, memoStructure,source_ty
   fig_caption <- switch(source_type,
                         "datapack" = "Table 3a: Partners Table (Proposed)",
                         "datim" = "Table 3b: Partners Table (Current)")
-  
-  memo_doc  %<>% officer::body_add(fig_caption,style="Normal")
-  
+
+  memo_doc  %<>% officer::body_add(fig_caption,style = "Normal")
+
   if (is.null(partners_table)) {
     memo_doc  %<>%
-      officer::body_add_break(pos = "before") %>% 
-      officer::body_add(value="This page left intentionally blank. No data was found.") %>% 
+      officer::body_add_break(pos = "before") %>%
+      officer::body_add(value = "This page left intentionally blank. No data was found.") %>%
       officer::body_add_break(pos = "after")
     return(memo_doc)
   }
-  
-  
+
+
   style_para <- defaultMemoStylePara()
 
   style_header <- defaultMemoStyleHeader()
@@ -337,28 +337,28 @@ generateApprovalMemo <-
                                   d$info$datapack_name,
                                   "datim")
     }
-    
+
     if (memo_type %in% c("datapack", "comparison")) {
       memo_doc <- renderAgencyTable(memo_doc,
                                     d$memo$datapack$by_agency,
                                     d$info$datapack_name,
                                     "datapack")
     }
-    
+
     if (memo_type %in% c("datim", "comparison")) {
       memo_doc <- renderAgencyTable(memo_doc,
                                     d$memo$datim$by_agency,
                                     d$info$datapack_name,
                                     "datim")
     }
-    
+
     if (memo_type %in% c("datapack", "comparison")) {
       memo_doc <- renderPartnerTable(memo_doc,
                                      d$memo$datapack$by_partner,
                                      d$memo$structure,
                                      "datapack")
     }
-    
+
     if (memo_type %in% c("datim", "comparison")) {
       memo_doc <- renderPartnerTable(memo_doc,
                                      d$memo$datim$by_partner,

@@ -22,13 +22,13 @@ fetchPrioritizationTable <- function(psnus, cop_year,
   }
 
   n_requests <- ceiling(nchar(paste(psnus, sep = "", collapse = ";")) / 2048)
-  
+
   if (n_requests > 1) {
     n_groups <- split(psnus, cut(seq_along(psnus), breaks = n_requests + 1  , labels = FALSE))
   } else {
-    n_groups <- list("1"=psnus)
+    n_groups <- list("1" = psnus)
   }
-   
+
   prios <- n_groups %>%
     purrr::map_dfr(function(x) getPriosFromDatim(x))
 
