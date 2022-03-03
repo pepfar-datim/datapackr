@@ -33,15 +33,24 @@ packForDATIM_UndistributedMER <- function(data,
   # Add dataElement & categoryOptionCombo ####
   datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = cop_year)
   UndistributedMER <- data %>%
+    dplyr::mutate(support_type = "DSD",
+                  mech_code = default_catOptCombo()) %>%
+    #Special handling for AGYW_PREV
     dplyr::mutate(
-      support_type = "No Support Type",
-      mech_code = default_catOptCombo()
+      support_type = dplyr::case_when(
+        stringr::str_detect(indicator_code, "AGYW_PREV") ~ "No Support Type",
+      TRUE ~ support_type
+    )) %>%
+    dplyr::left_join(
+      .,
+      (
+        datim_map %>%
+          dplyr::rename(Age = valid_ages.name,
+                        Sex = valid_sexes.name,
+                        KeyPop = valid_kps.name)
+      ),
+      by = c("indicator_code", "Age", "Sex", "KeyPop", "support_type")
     ) %>%
-    dplyr::left_join(., (datim_map %>%
-                           dplyr::rename(Age = valid_ages.name,
-                                         Sex = valid_sexes.name,
-                                         KeyPop = valid_kps.name)),
-                     by = c("indicator_code", "Age", "Sex", "KeyPop", "support_type")) %>%
     tidyr::drop_na(dataelementuid, categoryoptioncombouid) %>%
 
     # Add period ####
