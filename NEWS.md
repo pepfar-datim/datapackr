@@ -1,9 +1,51 @@
 # datapackr 5.1.4
 
 ## Bug Fixes
-
 * Ignore duplicated Not PEPFAR columns in PSNUxIM
 * Fixes for handling 50+ age bands in PSNUxIM packing and unpacking
+
+## New Features
+* Adds COP Approval Memo target table generation to the package and enables COP22 Approvale Memo target table generation support (DP-503, DP-528, DP-534, DP-536)
+  * Creates the following new functions to aid in the fetching, cleaning, and formatting of data used in the various target tables of COP approval memos:
+    - `evaluateIndicators`
+    - `fetchPrioritizationTable`
+    - `generateComparisonTable`
+    - `getMemoIndicators`
+    - `memoStructure`
+    - `prepareExistingDataAnalytics`
+    - `prepareMemoData`
+    - `prepareMemoDataByAgency`
+    - `prepareMemoDataByPSNU`
+    - `prepareMemoDataByPartner`
+    - `prepareMemoDataByPrio`
+    - `prepareMemoMetadata`
+    - `updateExistingPrioritization`
+  * Creates the following new functions to aid in the creation and formatting of COP Approval Memo target tables:
+    - `getMemoTemplate` selects whether to supply a watermarked "Draft Memo" Word document or a blank document for final memo tables.
+    - `renderAgencyTable`, `renderPartnerTable`, and `renderPrioTable` each generate formatted tables for their respective sections of the memo.
+    - `generateApprovalMemo` compiles all target tables together in a single document.
+    - `default_memo_font`, `default_memo_style_header`, and `default_memo_style_para` contain information on standard memo formatting.
+    - `zeros_to_dashes` is a utility function used in formatting memos appropriately.
+  * Adds `cop_validation_rules` as new dataset object within package
+    - Adds `data-raw` file to create and update `cop_validation_rules` object
+  * Adds `draft_memo_template.docx` under `inst/extdata` folder for use in draft memo generation
+  * Adds tests for new functions:
+    - Adds `test-get-memo-indicators` to test `getMemoIndicators`
+    - Adds `test-indicators` to test `evaluateIndicators`
+    - Adds `test-memo-structure` to test `memoStructure`
+* Adds additional non-memo related functionality from the `datapackr-app` into the package (DP-504)
+  * Creates `checkMechanisms` and `checkPSNUData` to replace `validateMechanisms` and `validatePSNUData` from the `datapackr-app`, respectively. These functions are used in validating and analyzing Data Pack targets.
+  * Adds `sane_name`, `source_user`, and `operating_unit` as new variables under `d$info` in keychain
+    - Creates `getSaneName` and `getOUFromCountryUIDs` as new functions
+    - Modifies `createKeychainInfo` to create new variables under `d$info`
+    - Modifies `packDataPack` to create new variables under `d$info`
+    - Adds `d2_session` argument to `createKeychainInfo`
+    - Updates relevant tests to incorporate new elements of keychain
+* Enables the ability to get COP22 data using `getCOPDataFromDATIM` (DP-536)
+    
+## Minor improvements and fixes
+* Adds `parallel`, `gdtools`, `flextable`, and `officer` as suggested packages
+
 
 # datapackr 5.1.3
 
