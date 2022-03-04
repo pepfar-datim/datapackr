@@ -4,19 +4,13 @@
 \alias{updateExistingPrioritization}
 \title{Update Existing Prioritization}
 \usage{
-updateExistingPrioritization(
-  d,
-  d2_session = dynGet("d2_default_session", inherits = TRUE)
-)
-}
-\arguments{
-\item{d}{Datapackr sidecar object}
-
-\item{d2_session}{DHIS2 Session id}
+updateExistingPrioritization(prios, analytics_table)
 }
 \value{
 
 }
 \description{
-Update Existing Prioritization
+Provided a data frame of priorization levels and an analytics
+table, replace the existing prioritizations. This is normally
+used with an OPU DataPack.
 }

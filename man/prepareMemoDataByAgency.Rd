@@ -4,13 +4,11 @@
 \alias{prepareMemoDataByAgency}
 \title{Prepare Memo Data By Agency Level}
 \usage{
-prepareMemoDataByAgency(df, memoStructure)
+prepareMemoDataByAgency(df, memo_structure)
 }
 \arguments{
 \item{df}{An analytics table, either d$memo$datim$analytics or
 d$memo$datapack$analytics}
-
-\item{memoStructure}{Structure of the memo d$memo$structure}
 }
 \value{
 A dataframe of COP indicators aggregated to the prioritization level

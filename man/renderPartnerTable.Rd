@@ -4,7 +4,7 @@
 \alias{renderPartnerTable}
 \title{Render Partner-Level Memo Target Tables}
 \usage{
-renderPartnerTable(memo_doc, partners_table, memoStructure)
+renderPartnerTable(memo_doc, partners_table, memoStructure, source_type)
 }
 \arguments{
 \item{memo_doc}{\code{Officer} document object containing

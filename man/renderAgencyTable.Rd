@@ -4,7 +4,7 @@
 \alias{renderAgencyTable}
 \title{Render Agency-Level Memo Target Table}
 \usage{
-renderAgencyTable(memo_doc, agency_table, ou_name)
+renderAgencyTable(memo_doc, agency_table, ou_name, source_type)
 }
 \arguments{
 \item{memo_doc}{\code{Officer} document object containing

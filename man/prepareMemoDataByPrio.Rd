@@ -4,13 +4,11 @@
 \alias{prepareMemoDataByPrio}
 \title{Prepare Memo Data By Prioritization Level}
 \usage{
-prepareMemoDataByPrio(df, memoStructure, include_no_prio = TRUE)
+prepareMemoDataByPrio(df, memo_structure, include_no_prio = TRUE)
 }
 \arguments{
 \item{df}{An analytics table, either d$memo$datim$analytics or
 d$memo$datapack$analytics}
-
-\item{memoStructure}{Structure of the memo d$memo$structure}
 
 \item{include_no_prio}{If TRUE, include \code{"No Prioritiation"}
 as a column in the output.}

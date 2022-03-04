@@ -8,8 +8,6 @@ generateApprovalMemo(
   d,
   memo_type,
   draft_memo = TRUE,
-  remove_empty_columns = TRUE,
-  include_no_prio = TRUE,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
@@ -23,11 +21,6 @@ comparison: Create a comparison memo with data from both DATIM and datapack}
 
 \item{draft_memo}{Boolean indicating whether the memo being written is a
 draft or final memo.}
-
-\item{remove_empty_columns}{Should empty columns be removed from memos?}
-
-\item{include_no_prio}{If TRUE, include \code{"No Prioritiation"}
-as a column in the output.}
 
 \item{d2_session}{DHIS2 Session id}
 }

@@ -4,7 +4,7 @@
 \alias{renderPrioTable}
 \title{Render Prioritization-Level Memo Target Table}
 \usage{
-renderPrioTable(memo_doc, prio_table, ou_name)
+renderPrioTable(memo_doc, prio_table, ou_name, source_type)
 }
 \arguments{
 \item{memo_doc}{\code{Officer} document object containing
