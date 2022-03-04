@@ -465,6 +465,13 @@ prepareMemoData <- function(d,
                               d$memo$partners_agencies,
                               d$info$psnus)
 
+      #Update the PSNU prioritization levels with those in DATIM
+      if (d$info$tool =="OPU Data Pack") {
+
+        d$memo$datapack$by_psnu <- updateExistingPrioritization(d$memo$datim$prios,d$memo$datapack$by_psnu)
+
+         }
+
       d$memo$datapack$by_partner <-
         prepareMemoDataByPartner(d$memo$datapack$by_psnu,
                                  d$memo$structure,
