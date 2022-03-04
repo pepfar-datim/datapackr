@@ -1,8 +1,4 @@
-# datapackr 5.1.4
-
-## Bug Fixes
-* Ignore duplicated Not PEPFAR columns in PSNUxIM
-* Fixes for handling 50+ age bands in PSNUxIM packing and unpacking
+# datapackr 5.1.5
 
 ## New Features
 * Adds COP Approval Memo target table generation to the package and enables COP22 Approvale Memo target table generation support (DP-503, DP-528, DP-534, DP-536)
@@ -45,6 +41,14 @@
     
 ## Minor improvements and fixes
 * Adds `parallel`, `gdtools`, `flextable`, and `officer` as suggested packages
+
+
+# datapackr 5.1.4
+
+## Bug Fixes
+
+* Ignore duplicated Not PEPFAR columns in PSNUxIM
+* Fixes for handling 50+ age bands in PSNUxIM packing and unpacking
 
 
 # datapackr 5.1.3
