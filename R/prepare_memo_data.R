@@ -466,7 +466,7 @@ prepareMemoData <- function(d,
                               d$info$psnus)
 
       #Update the PSNU prioritization levels with those in DATIM
-      if (d$info$tool =="OPU Data Pack") {
+      if (d$info$tool == "OPU Data Pack") {
 
         d$memo$datapack$by_psnu <- updateExistingPrioritization(d$memo$datim$prios,d$memo$datapack$by_psnu)
 
