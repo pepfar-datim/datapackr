@@ -7,7 +7,7 @@
 #'
 #' @return
 #'
-updateExistingPrioritization <- function(prios,analytics_table) {
+updateExistingPrioritization <- function(prios, analytics_table) {
 
   prios <- prios %>%  dplyr::select(-value)
 

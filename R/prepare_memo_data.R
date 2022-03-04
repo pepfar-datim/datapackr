@@ -61,6 +61,7 @@ prepareMemoMetadata <- function(d, memo_type,
 
 
 
+#' @export
 #' @title Prepare Existing Data Analytics
 #'
 #' @description Get existing PSNUxIM raw data from DATIM
@@ -95,6 +96,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
 
 
 
+#' @export
 #' @title Prepare Memo Data By PSNU
 #'
 #' @param analytics Data frame consisting of at least psnu_uid,
@@ -274,6 +276,7 @@ prepareMemoDataByPartner <- function(df,
 
 
 
+#' @export
 #' @title Prepare Memo Data By Agency Level
 #'
 #' @param df An analytics table, either d$memo$datim$analytics or
@@ -331,6 +334,7 @@ prepareMemoDataByAgency <- function(df, memo_structure) {
 
 
 
+#' @export
 #' @title Prepare Memo Data By Prioritization Level
 #'
 #' @param df An analytics table, either d$memo$datim$analytics or

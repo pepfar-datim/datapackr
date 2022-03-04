@@ -1,16 +1,14 @@
-#' Title
+#' @export
+#' @title Generate Comparison Table
 #'
-#' @param d
+#' @inheritParams datapackr_params
 #' @description Generates a PSNUxIM level comparison between
 #' the values in the (OPU) DataPack and what is currently
 #' present in DATIM.
 #'
 #' @return A comparison table
-#' @export
 #'
-
 generateComparisonTable <- function(d) {
-
 
   if (is.null(d$memo$datapack$by_psnu)) {
     d_datapack <- data.frame("psnu_uid" = character(),

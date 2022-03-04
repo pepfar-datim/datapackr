@@ -1,3 +1,4 @@
+#' @export
 #' @title Default Memo Font
 #' @return String with default font for memo target tables
 defaultMemoFont <- function() {
@@ -5,6 +6,7 @@ defaultMemoFont <- function() {
 }
 
 
+#' @export
 #' @title Default Memo Paragraph Style
 #' @return Officer list object defining default style for memo table bodies
 defaultMemoStylePara <- function() {
@@ -16,6 +18,7 @@ defaultMemoStylePara <- function() {
 }
 
 
+#' @export
 #' @title Default Memo Header Style
 #' @return Officer list object defining default style for memo table headers
 defaultMemoStyleHeader <- function() {
@@ -27,7 +30,7 @@ defaultMemoStyleHeader <- function() {
 }
 
 
-
+#' @export
 #' @title Zeroes to Dashes
 #' @param x Target value to be formatted.
 #' @return
@@ -37,10 +40,9 @@ zerosToDashes <- function(x) {
 
 
 
+#' @export
 #' @title Generate Memo Template File
-#'
 #' @inheritParams datapackr_params
-#'
 #' @return
 generateMemoTemplate <- function(draft_memo = TRUE) {
 
@@ -54,6 +56,7 @@ generateMemoTemplate <- function(draft_memo = TRUE) {
 }
 
 
+#' @export
 #' @title Render Prioritization-Level Memo Target Table
 #'
 #' @param prio_table A table of target data aggregated to the Prioritization
@@ -137,6 +140,7 @@ renderPrioTable <- function(memo_doc, prio_table, ou_name, source_type) {
 
 
 
+#' @export
 #' @title Render Agency-Level Memo Target Table
 #'
 #' @param agency_table A table of target data aggregated to the agency
@@ -209,11 +213,11 @@ renderAgencyTable <- function(memo_doc, agency_table, ou_name, source_type) {
     flextable::body_add_flextable(value = agency_table_ft) %>%
     officer::body_add_break(pos = "after")
 
-
 }
 
 
 
+#' @export
 #' @title Render Partner-Level Memo Target Tables
 #'
 #' @param partners_table A table of target data aggregated to the partner and

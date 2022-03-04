@@ -2,18 +2,18 @@
 % Please edit documentation in R/generateComparisonTable.R
 \name{generateComparisonTable}
 \alias{generateComparisonTable}
-\title{Title}
+\title{Generate Comparison Table}
 \usage{
 generateComparisonTable(d)
 }
 \arguments{
-\item{d}{}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 A comparison table
 }
 \description{
-Generates a PSNUxIM level comparison between 
-the values in the (OPU) DataPack and what is currently 
+Generates a PSNUxIM level comparison between
+the values in the (OPU) DataPack and what is currently
 present in DATIM.
 }
