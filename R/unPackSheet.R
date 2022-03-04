@@ -184,7 +184,8 @@ unPackDataPackSheet <- function(d, sheet) {
     d$data$extract %<>%
       dplyr::filter(!stringr::str_detect(PSNU, "^_Military"),
                     # Excuse valid NA Prioritizations
-                    value != "NA")
+                    #value != "NA"
+                    )
 
     blank_prioritizations <- d$data$extract %>%
       dplyr::filter(is.na(value)) %>%
@@ -207,7 +208,7 @@ unPackDataPackSheet <- function(d, sheet) {
           paste(blank_prioritizations$PSNU, collapse = "\n\t* "),
           "\n")
 
-      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
       d$info$has_error <- TRUE
 
     }
@@ -272,7 +273,7 @@ unPackDataPackSheet <- function(d, sheet) {
 
     warning_msg <-
       paste0(
-        "WARNING! In tab ",
+        "ERROR! In tab ",
         sheet,
         ": NON-NUMERIC VALUES found! Please ensure all values entered against",
         " Target columns include numeric values only - no letters or punctuation.",

@@ -365,7 +365,7 @@ unPackSNUxIM <- function(d) {
         paste(missing_cols_fatal, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 
@@ -539,7 +539,7 @@ unPackSNUxIM <- function(d) {
         paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
 
   d$data$SNUxIM %<>%
@@ -730,7 +730,7 @@ unPackSNUxIM <- function(d) {
         paste(imbalanced_distribution_inds, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 
@@ -781,7 +781,7 @@ unPackSNUxIM <- function(d) {
         paste(unallocated_inds, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 
