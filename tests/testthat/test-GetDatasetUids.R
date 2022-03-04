@@ -14,29 +14,29 @@ test_that("GetDatasetUids", {
                                                     "iJ4d5HdGiqG",
                                                     "pTuDWXzkAkJ")
   )
-  testthat::expect_setequal(getDatasetUids(2020), c("sBv1dj90IX6", 
-                                                    "nIHNMxuPUOR", 
+  testthat::expect_setequal(getDatasetUids(2020), c("sBv1dj90IX6",
+                                                    "nIHNMxuPUOR",
                                                     "C2G7IyPPrvD",
                                                     "HiJieecLXxN",
                                                     "qzVASYuaIey",
-                                                    "BPEyzcDb8fT", 
+                                                    "BPEyzcDb8fT",
                                                     "jKdHXpBfWop",
-                                                    "em1U5x9hhXh", 
-                                                    "mbdbMiLZ4AA", 
-                                                    "N4X89PgW01w", 
-                                                    "ctKXzmv2CVu", 
+                                                    "em1U5x9hhXh",
+                                                    "mbdbMiLZ4AA",
+                                                    "N4X89PgW01w",
+                                                    "ctKXzmv2CVu",
                                                     "pTuDWXzkAkJ")
   )
   testthat::expect_setequal(getDatasetUids(2021), c("s1sxJuqXsvV",
                                                     "Pmc0yYAIi1t",
                                                     "zL8TlPVzEBZ",
                                                     "TBcmmtoaCBC",
-                                                    "qHyrHc4zwx4", 
+                                                    "qHyrHc4zwx4",
                                                     "j7jzezIhgPj",
                                                     "xiTCzZJ2GPP",
                                                     "jxnjnBAb1VD")
   )
-  
+
   testthat::expect_setequal(getDatasetUids(2022, "mer_targets"), c("YfZot37BbTm",
                                                                    "cihuwjoY5xP",
                                                                    "wvnouBMuLuE")
