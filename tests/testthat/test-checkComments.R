@@ -2,7 +2,7 @@ context("test-checkComments")
 
 #test passing of template
 test_that("Can pass a COP21 DP Template", {
-  d  <-   datapackr:::createKeychainInfo(submission_path = test_sheet("COP21_Data_Pack_Template.xlsx"),
+  d  <-   datapackr::createKeychainInfo(submission_path = test_sheet("COP21_Data_Pack_Template.xlsx"),
                                          tool = "Data Pack",
                                          country_uids = NULL,
                                          cop_year = NULL)

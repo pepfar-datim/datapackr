@@ -5,7 +5,7 @@ d_data_tests_types <- c("tbl_df", "tbl", "data.frame")
 
 with_mock_api({
   test_that("Can unpack all data pack sheets", {
-    d <- datapackr:::createKeychainInfo(
+    d <- datapackr::createKeychainInfo(
       submission_path = test_sheet("COP21_DP_random_no_psnuxim.xlsx"),
       tool = "Data Pack",
       country_uids = NULL,
@@ -38,7 +38,7 @@ with_mock_api({
 
 with_mock_api({
   test_that("Can unpack and separate data sets", {
-    d <- datapackr:::createKeychainInfo(
+    d <- datapackr::createKeychainInfo(
       submission_path = test_sheet("COP21_DP_random_no_psnuxim.xlsx"),
       tool = "Data Pack",
       country_uids = NULL,
