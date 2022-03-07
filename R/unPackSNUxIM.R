@@ -87,11 +87,11 @@ unPackSNUxIM <- function(d) {
         stringr::str_detect(Age, "(50-54|55-59|60-64|65+)") &
           !stringr::str_detect(indicator_code, "TX_CURR.T") ~ "50+",
         TRUE ~ Age
-      )) %>% 
+      )) %>%
       dplyr::anti_join(
         d$data$PSNUxIM_combos,
         by =  c("PSNU", "psnuid", "indicator_code", "Age_snuxim" = "Age", "Sex", "KeyPop")
-      ) %>% 
+      ) %>%
       dplyr::select(-Age_snuxim)
 
     d$tests$missing_combos <- d$data$missingCombos
