@@ -122,7 +122,7 @@ checkFormulas <- function(d, sheet) {
         ", ", NROW(cols_affected), " ALTERED FORMULAS:",
         " Altering formulas in the Grey colored columns without DUIT and PPM approval may lead to programmatic",
         " and technical issues in your Data Pack. Green colored columns however may be altered without permission. ",
-        " Note that this warning  may be triggered due to a formula being deleted",
+        " Note that this warning may be triggered due to a formula being deleted",
         " or overwritten, or a manual fix not being applied.",
         " Affected columns and the number of violations are listed below. ->  \n\t* ",
         paste(cols_affected$fx_violations, collapse = "\n\t* "),
