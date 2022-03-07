@@ -86,8 +86,9 @@ unPackSNUxIM <- function(d) {
           !stringr::str_detect(indicator_code, "TX_CURR.T") ~ "50+",
         TRUE ~ Age
       )) %>%
-      dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
-      dplyr::distinct() %>% 
+      ## Aggregate across 50+ age bands ####
+      dplyr::group_by(dplyr::across(c(-value))) %>%
+      dplyr::summarise(value = sum(value), .groups = "drop") %>%
       dplyr::anti_join(
         d$data$PSNUxIM_combos,
         by =  c("PSNU", "psnuid", "indicator_code", "Age", "Sex", "KeyPop")

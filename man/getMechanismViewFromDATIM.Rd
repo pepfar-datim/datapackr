@@ -10,8 +10,8 @@ getMechanismViewFromDATIM(
 )
 }
 \arguments{
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
 \item{d2_session}{DHIS2 Session id}
 }
