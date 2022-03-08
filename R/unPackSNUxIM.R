@@ -365,7 +365,7 @@ unPackSNUxIM <- function(d) {
         paste(missing_cols_fatal, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 
@@ -533,7 +533,7 @@ unPackSNUxIM <- function(d) {
 
     warning_msg <-
       paste0(
-        "ERROR! In tab ",
+        "WARNING! In tab ",
         sheet,
         ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
         paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
@@ -719,7 +719,7 @@ unPackSNUxIM <- function(d) {
 
     warning_msg <-
       paste0(
-        "ERROR!: ",
+        "WARNING!: ",
         NROW(d$tests$imbalanced_distribution),
         " cases where distributed total across all mechanisms and Dedupe is",
         " either more or less than PSNU-level Target.",
@@ -781,7 +781,7 @@ unPackSNUxIM <- function(d) {
         paste(unallocated_inds, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 
