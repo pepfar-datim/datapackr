@@ -184,7 +184,7 @@ unPackDataPackSheet <- function(d, sheet) {
     d$data$extract %<>%
       dplyr::filter(!stringr::str_detect(PSNU, "^_Military"),
                     # Excuse valid NA Prioritizations
-                    #value != "NA"
+                    value != "NA"
                     )
 
     blank_prioritizations <- d$data$extract %>%

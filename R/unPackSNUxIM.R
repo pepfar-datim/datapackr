@@ -533,13 +533,13 @@ unPackSNUxIM <- function(d) {
 
     warning_msg <-
       paste0(
-        "ERROR! In tab ",
+        "WARNING! In tab ",
         sheet,
         ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
         paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
   d$data$SNUxIM %<>%
