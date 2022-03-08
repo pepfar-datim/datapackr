@@ -719,7 +719,7 @@ unPackSNUxIM <- function(d) {
 
     warning_msg <-
       paste0(
-        "ERROR!: ",
+        "WARNING!: ",
         NROW(d$tests$imbalanced_distribution),
         " cases where distributed total across all mechanisms and Dedupe is",
         " either more or less than PSNU-level Target.",
@@ -730,7 +730,7 @@ unPackSNUxIM <- function(d) {
         paste(imbalanced_distribution_inds, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
     d$info$has_error <- TRUE
   }
 
