@@ -22,9 +22,9 @@ validationSummary <- function(d) {
 
   dplyr::left_join(tests_names, tests_rows, by = "test_name") %>%
     dplyr::mutate(ou = d$info$datapack_name,
-                  ou_id = d$info$country_uids,
+                  ou_id = d$info$operating_unit$ou_id,
                   country_name = d$info$datapack_name,
-                  country_uid = d$info$country_uids) %>%
+                  country_uid = paste(d$info$country_uids,sep="",collapse=";")) %>%
     dplyr::filter(count > 0)
 
 }
