@@ -21,7 +21,7 @@ checkMissingMetadata <- function(d, sheet) {
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
 
   missing_metadata <- data %>%
-    dplyr::ungroup() %>% 
+    dplyr::ungroup() %>%
     dplyr::mutate(row = dplyr::n() + header_row,
                   sheet = sheet) %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("^PSNU$|^ID$|^indicator_code$")),
