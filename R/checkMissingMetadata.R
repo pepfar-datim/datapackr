@@ -22,7 +22,7 @@ checkMissingMetadata <- function(d, sheet) {
 
   missing_metadata <- data %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(row = dplyr::n() + header_row,
+    dplyr::mutate(row = dplyr::row_number() + header_row,
                   sheet = sheet) %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("^PSNU$|^ID$|^indicator_code$")),
                      dplyr::any_vars(is.na(.)))
