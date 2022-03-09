@@ -80,6 +80,7 @@ writePSNUxIM <- function(d,
 
     # Prepare targets to distribute ####
     if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
+
       targets_data <- packForDATIM_UndistributedMER(data = d$data$missingCombos,
                                                     cop_year = d$info$cop_year)
     } else {
