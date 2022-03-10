@@ -194,7 +194,7 @@ prepareMemoDataByPSNU <- function(analytics,
     dplyr::inner_join(psnus, by = c("psnu_uid")) %>%
     dplyr::rename("Mechanism" = mechanism_code) %>%
     dplyr::mutate(`Partner` = dplyr::case_when(is.na(`Partner`) ~ "Unallocated",
-                                         TRUE ~ `Mechanism`)) %>%
+                                         TRUE ~ `Partner`)) %>%
     dplyr::mutate(`Agency` = dplyr::case_when(is.na(`Agency`) ~ "Unallocated",
                                          TRUE ~ `Agency`))
 
