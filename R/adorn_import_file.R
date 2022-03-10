@@ -23,7 +23,9 @@ adorn_import_file <- function(psnu_import_file,
 
   # TODO: Generalize this outside the context of COP
   data <- psnu_import_file %>%
-
+  #Map default attr
+    
+    
   # Adorn PSNUs
     dplyr::left_join(
       (valid_PSNUs %>%
@@ -79,7 +81,24 @@ adorn_import_file <- function(psnu_import_file,
         "[A-Za-z][A-Za-z0-9]{10}")) %>%
     dplyr::left_join(mechs, by = c("attributeOptionCombo" = "attributeOptionCombo"))
 
-  data <- dplyr::bind_rows(data_codes, data_ids)
+  #Handle data which has been assigned to the default mechanism
+  #like AGWY_PREV
+  default_mechanism_metadata <- data.frame(
+    mechanism_desc = "None",
+    mechanism_code = "None",
+    attributeOptionCombo = "HllvX50cXC0",
+    partner_desc = "None",
+    partner_id = "None",
+    agency = "None"
+  )
+  
+  data_default <- data %>%
+    dplyr::filter(
+      stringr::str_detect(
+        attributeOptionCombo,
+        "default"))
+  
+  data <- dplyr::bind_rows(data_codes, data_ids,data_default)
 
   # Adorn dataElements & categoryOptionCombos ####
 
