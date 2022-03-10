@@ -144,7 +144,7 @@ prepareMemoDataByPSNU <- function(analytics,
   }
 
 
- foo <-  df %>%
+  df %>%
     dplyr::select(-data) %>%
     tidyr::unnest(indicator_results) %>%
     dplyr::ungroup() %>%
