@@ -26,7 +26,8 @@ prepareMemoMetadata <- function(d, memo_type,
         cop_year = d$info$cop_year,
         include_dedupe = TRUE,
         include_MOH = FALSE,
-        d2_session = d2_session
+        d2_session = d2_session,
+        include_default = TRUE
       ) %>%
       dplyr::select("Mechanism" = mechanism_code,
                     "Partner" = partner_desc,
@@ -87,7 +88,8 @@ prepareExistingDataAnalytics <- function(d, d2_session =
         psnu_prioritizations = dplyr::select(d$memo$datim$prios,
                                              "orgUnit" = psnu_uid,
                                              value),
-        d2_session = d2_session
+        d2_session = d2_session,
+        include_default = TRUE
       )
   }
 
