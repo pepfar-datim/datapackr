@@ -1,3 +1,23 @@
+#' @title Caps row and cell counts to excel limits
+#' @param x List
+#' @export
+apply_excel_limits <- function(x) {
+  
+  # cap rows and piped to cap cell limits to a hardcoded 3000
+  new_list <-lapply(x, function(x) { 
+    if(nrow(x) > 1048575) {
+      x[1:1048575,] 
+    } else {
+      x
+    }
+  }
+  ) %>% map(., ~ .x %>% 
+        mutate(across(where(is.list), ~  map(.x, ~ head(.x, 3000L)))))
+  
+  return(new_list)
+  
+}
+
 #' @export
 #' @title Returns `default` categoryOptionCombo uid.
 #'
