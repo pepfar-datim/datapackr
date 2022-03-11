@@ -221,6 +221,7 @@ prepareMemoDataByPartner <- function(df,
   }
 
   d_partners <- df   %>%
+    dplyr::filter(Mechanism != "default") %>%
     dplyr::group_by(Indicator, Age, Agency, Partner, Mechanism) %>%
     dplyr::summarise(Value = sum(value), .groups = "drop")
 
@@ -298,8 +299,12 @@ prepareMemoDataByAgency <- function(df, memo_structure) {
     purrr::pluck("row_order") %>%
     dplyr::select(ind, options)
 
-  df_cols <-
-    df %>%
+  df <- df %>%
+    dplyr::filter(Mechanism != "default") %>%
+    dplyr::group_by(`Indicator`, `Age`, `Agency`) %>%
+    dplyr::summarise(Value = sum(value), .groups = "drop")
+
+  df_cols <- df %>%
     dplyr::select(Agency) %>%
     dplyr::distinct() %>%
     dplyr::arrange()
@@ -310,10 +315,6 @@ prepareMemoDataByAgency <- function(df, memo_structure) {
     dplyr::mutate(Value = 0) %>%
     dplyr::rename(Indicator = ind,
                   Age = options)
-
-  df <- df %>%
-    dplyr::group_by(`Indicator`, `Age`, `Agency`) %>%
-    dplyr::summarise(Value = sum(value), .groups = "drop")
 
   df_totals <- df %>%
     dplyr::filter(Age != "Total") %>%
