@@ -38,11 +38,15 @@ unPackDataPack <- function(d,
 
   # Check whether there exist any troublesome comments in the file
   interactive_print("Checking comments...")
-  d <- checkComments(d)
+  d <- checkToolComments(d)
 
   # Check integrity of Workbook tabs ####
   interactive_print("Checking structure...")
-  d <- checkStructure(d)
+  d <- checkToolStructure(d)
+  
+  # Load all the sheets ----
+  interactive_print("Loading sheets...")
+  d <- loadSheets(d)
 
   # Unpack the Targets ####
   interactive_print("Unpacking sheets...")

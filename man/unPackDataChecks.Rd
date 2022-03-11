@@ -3,35 +3,56 @@
 \name{unPackDataChecks}
 \alias{unPackDataChecks}
 \alias{checkDupeRows}
+\alias{checkColumnStructure}
+\alias{checkToolStructure}
+\alias{checkToolComments}
+\alias{checkValuesNumeric}
+\alias{checkData}
 \title{Perform various data quality checks on in-process data from Data Packs.}
 \usage{
-checkDupeRows(data, tool, cop_year, sheet)
+checkDupeRows(d, sheet, quiet = TRUE)
+
+checkColumnStructure(d, sheet, quiet = TRUE)
+
+checkToolStructure(d, quiet = TRUE)
+
+checkToolComments(d, quiet = TRUE)
+
+checkValuesNumeric(d, quiet = TRUE)
+
+checkData(d, sheet, quiet = TRUE, ...)
 }
 \arguments{
-\item{data}{Dataset to be validated.}
+\item{d}{DataPack object loaded via \code{loadDataPack}.}
 
-\item{tool}{Type of tool this function will create or interact with. Either
-\code{OPU Data Pack} or \code{Data Pack}}
+\item{sheet}{String. Name of DataPack sheet to check data from. Default is
+first sheet.}
 
-\item{cop_year}{COP Year to use for tailoring functions. Remember,
-FY22 targets = COP21.}
+\item{quiet}{Logical. Should warning messages be printed? Default is TRUE.}
 
-\item{sheet}{Name of sheet from Data Pack from which \code{data} was extracted.}
+\item{compile}{Logical. Should results be compiled back into the d object, or
+returned as a test results object containing \code{test_results}, \code{messages},
+and \code{error} flag? Default is TRUE}
 }
 \value{
-These functions each return a list object, \code{t} containing three components:
-\enumerate{
-\item \code{message}: A message describing any issues encountered in the check.
-\item \code{test_result}: A tibble of data flagged by the check, useful in data
-quality forensics.
-\item \code{has_error}: A \code{TRUE/FALSE} flag indicating whether any fatal errors
-have been observed.
-}
+If \code{compile = TRUE}, a DataPack object, with updated tests and warnings.
+If \code{compile = FALSE}, a test results object containing \code{test_results},
+\code{messages}, and \code{error} flag.
 }
 \description{
 A series of functions to check and validate quality & integrity
-of data encountered in various \code{unPack...} functions across \code{datapackr}.
+of data encountered in various \code{unPack...} functions across \code{datapackr}. Note
+that these functions do not attempt to correct issues identified, but only to
+identify them.
 
 \code{checkDupeRows} checks for any rows with duplicates across PSNU and other key
 disaggregates.
+
+\code{checkColumnStructure} checks structural integrity of columns on critical sheets for
+a submitted Data Pack.
+
+\code{checkToolStructure} checks structural integrity of sheets for submitted tool.
+
+\code{checkToolComments} searches Data Pack for any comments that cause
+corruption when executing openxlsx::saveWorkbook.
 }

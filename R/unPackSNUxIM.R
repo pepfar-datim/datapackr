@@ -42,7 +42,7 @@ unPackSNUxIM <- function(d) {
           " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
           " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack, ",
           " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
-          " all changes to other tabs of your Data Pack are complete.  Once all other updates",
+          " all changes to other tabs of your Data Pack are complete. Once all other updates",
           " are complete, you may return here to update your PSNUxIM tab at any time.",
           "\n")
     } else if (d$info$tool == "OPU Data Pack") {
@@ -60,11 +60,11 @@ unPackSNUxIM <- function(d) {
     d$info$has_psnuxim <- TRUE
   }
 
-  # PATCH: Remove hard-coded FYs
+  # PATCH: Remove hard-coded FYs. Remove after COP21 OPUs deprecated.
   names(d$data$SNUxIM) <- stringr::str_replace(names(d$data$SNUxIM), " \\(FY22\\)", "")
 
   # Document all combos used in submitted PSNUxIM tab ####
-  # This ensures tests for new combinations are correctly matched
+  ## This ensures tests for new combinations are correctly matched
   d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
     dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop) %>%
     dplyr::mutate(
@@ -106,17 +106,10 @@ unPackSNUxIM <- function(d) {
   }
 
   # TEST: Duplicate Rows; Warn; Combine ####
-  t <- checkDupeRows(data = d$data$SNUxIM,
-                     tool = d$info$tool,
-                     cop_year = d$info$cop_year,
-                     sheet = sheet)
-  
-  d$info$messages <- appendMessage(d$info$messages, t$warning_msg, "ERROR")
-  d$info$has_error <- (d$info$has_error | t$has_error)
-  d$tests$duplicate_rows %<>% dplyr::bind_rows(t$test_result)
+  d <- checkDupeRows(d = d, sheet = sheet)
 
-  # TEST: Structural checks; WARNING; Continue ####
-  d <- checkColStructure(d, sheet)
+  # TEST: Structural checks; WARNING/ERROR; Continue ####
+  d <- checkColumnStructure(d = d, sheet = sheet)
 
   # Save snapshot of original targets ####
   cols_to_keep <- d$info$schema %>%

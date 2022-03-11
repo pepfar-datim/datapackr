@@ -5,36 +5,35 @@
 #' Loops through all critical sheets in a submitted Data Pack
 #' and extracts data, then compiles into single flat dataframe.
 #'
-#' @param d Datapackr object
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'
-unPackSheets <- function(d) {
-
-  # Get sheets list
-  sheets <- d$info$schema %>%
-    dplyr::filter(
-      !sheet_name %in% c(skip_tabs(tool = d$info$tool, cop_year = d$info$cop_year),
-                         "SNU x IM", "PSNUxIM")) %>%
-    dplyr::pull(sheet_name) %>%
-    unique()
+unPackSheets <- function(d, sheets = NULL) {
+  
+  if (d$info$tool != "Data Pack") {
+    stop("Cannot unpack sheets for that kind of tool.")
+  }
 
   actual_sheets <- readxl::excel_sheets(d$keychain$submission_path)
-  sheets_to_read <- sheets[sheets %in% actual_sheets]
-
-  d$data$targets <- NULL
+  skip = c(skip_tabs(tool = d$info$tool, cop_year = d$info$cop_year), "PSNUxIM")
+  sheets_to_read <- actual_sheets[!actual_sheets %in% skip]
+  sheets <- sheets %||% sheets_to_read
+  
+  # Check Parameters
+  sheets <- checkSheets(sheets = sheets,
+                        cop_year = d$info$cop_year, 
+                        tool = d$info$tool,
+                        all_sheets = FALSE,
+                        psnuxim = FALSE)
 
   for (sheet in sheets_to_read) {
     interactive_print(sheet)
 
-    if (d$info$tool == "Data Pack") {
-      d <- unPackDataPackSheet(d, sheet = sheet)
-    } else {
-      stop("Cannot process that kind of tool. :(")
-    }
+    d <- unPackDataPackSheet(d, sheet = sheet)
 
-    if (!is.null(d$data$extract)) {
-      d$data$targets <- dplyr::bind_rows(d$data$targets, d$data$extract)
+    if (!is.null(d$data[[as.character(sheet)]])) {
+      d$data$targets <- dplyr::bind_rows(d$data$targets, d$data[[as.character(sheet)]])
     }
   }
 

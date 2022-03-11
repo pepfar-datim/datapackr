@@ -12,26 +12,26 @@
 #' @return d
 #'
 unPackDataPackSheet <- function(d, sheet) {
-  header_row <- headerRow(tool = "Data Pack", cop_year = d$info$cop_year)
-
-  d$data$extract <-
-    readxl::read_excel(
-      path = d$keychain$submission_path,
-      sheet = sheet,
-      range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
-      col_types = "text",
-      .name_repair = "minimal"
-    )
+  
+  # Check parameters
+  sheet <- checkSheets(sheets = sheet,
+                       cop_year = d$info$cop_year,
+                       tool = d$info$tool,
+                       all_sheets = FALSE,
+                       psnuxim = FALSE)
+  
+  # Read data loaded via loadSheets
+  data <- d$sheets[[as.character(sheet)]]
 
   # If sheet is totally empty, skip
-  if (all(is.na(d$data$extract$PSNU))) {
-    d$data$extract <- NULL
+  if (all(is.na(data$PSNU))) {
+    d$data[[as.character(sheet)]] <- NULL
 
     return(d)
   }
 
-  # Run structural checks ####
-  d <- checkColStructure(d, sheet)
+  # Run Data Checks ----
+  d <- checkData(d, sheet = sheet)
 
   # Remove duplicate columns (Take the first example) ####
   duplicate_cols <- duplicated(names(d$data$extract))
