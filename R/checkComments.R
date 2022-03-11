@@ -11,13 +11,19 @@
 #'
 checkComments <- function(d) {
 
-  wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
+  if (is.null(d$tool$wb)) {
+    wb <- openxlsx::loadWorkbook(file = d$keychain$submission_path)
+  } else {
+    wb <- d$tool$wb
+  }
 
-  d$info$has_comments_issue <- any(
-    unlist(
-      lapply(wb$comments, function(x) is.null(x["style"]))
-      )
-    )
+  # d$info$has_comments_issue <- any(
+  #   unlist(
+  #     lapply(wb$comments, function(x) is.null(x["style"]))
+  #     )
+  #   )
+  
+  d$info$has_comments_issue <- any(sapply(wb$threadComments, length) != 0)
 
   if (d$info$has_comments_issue) {
     warning_msg <-
