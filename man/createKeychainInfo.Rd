@@ -2,7 +2,7 @@
 % Please edit documentation in R/createKeychainInfo.R
 \name{createKeychainInfo}
 \alias{createKeychainInfo}
-\title{Create Keychain Info for use in datapackr sidecar.}
+\title{Create Keychain Info for use in DataPack object.}
 \usage{
 createKeychainInfo(
   submission_path = NULL,
@@ -11,18 +11,9 @@ createKeychainInfo(
   cop_year = NULL
 )
 }
-\arguments{
-\item{submission_path}{Local path to the file to import.}
-
-\item{tool}{What type of tool is the submission file? Default is "Data Pack".}
-
-\item{country_uids}{List of 11 digit alphanumeric DATIM codes representing
-countries. If not provided, will check file for these codes. If not in file,
-will flag error.}
-
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
+\value{
+DataPack object
 }
 \description{
-Creates Keychain info needed for use across most datapackr unPack functions.
+Creates Keychain info needed for use across many \code{datapackr} functions.
 }
