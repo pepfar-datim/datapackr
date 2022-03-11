@@ -12,6 +12,7 @@
 \alias{checkTemplatePath}
 \alias{checkWB}
 \alias{checkResultsArchive}
+\alias{checkSheets}
 \alias{check_params}
 \title{Standardized Parameter Defaults}
 \usage{
@@ -42,6 +43,8 @@ checkWB(
 
 checkResultsArchive(results_archive = FALSE)
 
+checkSheets(sheets, cop_year, tool, all_sheets = FALSE, psnuxim = FALSE)
+
 check_params(
   country_uids,
   PSNUs,
@@ -56,6 +59,7 @@ check_params(
   snuxim_model_data,
   output_folder,
   results_archive,
+  sheets,
   ...
 )
 }
@@ -91,6 +95,9 @@ This file MUST NOT have any data validation formats present. If left
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}
 
+\item{all_sheets}{Logical. Return/check against all sheets (as opposed to only
+those with targets)?}
+
 \item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
 
 \item{snuxim_model_data}{Export from DATIM needed to allocate data across
@@ -99,6 +106,8 @@ mechanisms in the PSNUxIM tab}
 \item{output_folder}{Local folder where you would like your Data Pack to be
 saved upon export. If left as \code{NULL}, will output to
 \code{Working Directory}.}
+
+\item{psuxim}{Logical. Return/check against PSNUxIM tab as well?}
 }
 \value{
 For lower-level functions, a valid function parameter value/object. For the
