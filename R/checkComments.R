@@ -22,7 +22,7 @@ checkComments <- function(d) {
   #     lapply(wb$comments, function(x) is.null(x["style"]))
   #     )
   #   )
-  
+
   d$info$has_comments_issue <- any(sapply(wb$threadComments, length) != 0)
 
   if (d$info$has_comments_issue) {
