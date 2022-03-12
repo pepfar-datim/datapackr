@@ -15,7 +15,8 @@ writePSNUxIM <- function(d,
                         snuxim_model_data_path = NULL,
                         output_folder = NULL,
                         d2_session = dynGet("d2_default_session",
-                                            inherits = TRUE)) {
+                                            inherits = TRUE),
+                        append = TRUE) {
 
   if (is.null(output_folder)) {
     interactive_warning("If no output_folder is provided, new Data Packs will not be written.")
@@ -88,7 +89,13 @@ writePSNUxIM <- function(d,
     }
 
     # Prepare d$tool$wb ####
-    d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
+    if ( append == TRUE) {
+      d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
+      openxlsx::removeFilter(d$tool$wb, names(d$tool$wb))
+    } else {
+      #TODO: Load the correct template here
+      d$tool$wb <- openxlsx::loadWorkbook("inst/extdata/COP22_Data_Pack_Template.xlsx")
+    }
 
     # Prepare d$data$snuxim_model_data ####
     smd <- readRDS(d$keychain$snuxim_model_data_path)
