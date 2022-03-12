@@ -89,11 +89,12 @@ writePSNUxIM <- function(d,
     }
 
     # Prepare d$tool$wb ####
-    if ( append == TRUE) {
+    # If append is true, add the missing PSNUxIM combos to the existing
+    # workbook, otherwise, use a template.
+    if (append == TRUE) {
       d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
       openxlsx::removeFilter(d$tool$wb, names(d$tool$wb))
     } else {
-      #TODO: Load the correct template here
       d$tool$wb <- openxlsx::loadWorkbook("inst/extdata/COP22_Data_Pack_Template.xlsx")
     }
 
