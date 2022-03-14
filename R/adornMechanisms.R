@@ -53,7 +53,7 @@ getMechanismViewFromDATIM <- function(cop_year = NULL,
 #' FALSE.
 #' @param update_stale_cache If the cached_mechs_path file is outdated or unreadable,
 #' should a new cache be saved?
-#' @param include_default Should the default mechanism also be included? 
+#' @param include_default Should the default mechanism also be included?
 #' @inheritParams unPackTool
 #'
 #' @return Mechs
@@ -152,7 +152,7 @@ getMechanismView <- function(country_uids = NULL,
   }
 
   if (include_default) {
-    
+
     default_mech <- list(
       mechanism_desc = "default",
       mechanism_code = "default",
@@ -164,11 +164,11 @@ getMechanismView <- function(country_uids = NULL,
       startdate = NA,
       enddate = NA
     )
-    
+
     mechs <- rbind(mechs,default_mech)
   }
-  
-  
+
+
   structure_ok <- dplyr::setequal(names(empty_mechs_view), names(mechs))
 
   if (!structure_ok) warning("Mechanism view names are not correct!")

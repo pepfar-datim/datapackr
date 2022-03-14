@@ -11,7 +11,7 @@
 #' @param filter_rename_output T/F Should this function output the final data in
 #' the new, more complete format?
 #' @param d2_session R6 datimutils object which handles authentication with DATIM
-#' @param include_default Should default mechanisms be included? 
+#' @param include_default Should default mechanisms be included?
 #'
 #' @return data
 #'
@@ -83,14 +83,14 @@ adorn_import_file <- function(psnu_import_file,
 
   #Handle data which has been assigned to the default mechanism
   #like AGWY_PREV
-  
+
   data_default <- data %>%
     dplyr::filter(
       stringr::str_detect(
         attributeOptionCombo, "default|HllvX50cXC0")) %>%
-    dplyr::mutate(attributeOptionCombo = "HllvX50cXC0") %>% 
+    dplyr::mutate(attributeOptionCombo = "HllvX50cXC0") %>%
     dplyr::left_join(mechs, by = c("attributeOptionCombo" = "attributeOptionCombo"))
-  
+
   data <- dplyr::bind_rows(data_codes, data_ids,data_default)
 
   # Adorn dataElements & categoryOptionCombos ####
