@@ -48,7 +48,7 @@ checkPSNUData  <-  function(d, d2_session = dynGet("d2_default_session",
         parallel::mclapply(vr_data$data, function(x)
           datimvalidation::evaluateValidation(x$combi,
           x$value, vr = vr_rules,return_violations_only = FALSE),
-          mc.cores = parallel::detectCores())
+          mc.cores = getMaxCores())
     } else {
       vr_data$vr_results <-
         lapply(vr_data$data, function(x)
