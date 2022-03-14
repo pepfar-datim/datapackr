@@ -9,13 +9,16 @@
 #' @param output_folder Local folder where you would like your Data Pack to be
 #' saved upon export.
 #' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @param append If TRUE append rows to the existing DataPack otherwise, 
+#' output a Missing PSNUxIM targets workbook.
 #' @return d
 #'
 writePSNUxIM <- function(d,
                         snuxim_model_data_path = NULL,
                         output_folder = NULL,
                         d2_session = dynGet("d2_default_session",
-                                            inherits = TRUE)) {
+                                            inherits = TRUE),
+                        append = TRUE) {
 
   if (is.null(output_folder)) {
     interactive_warning("If no output_folder is provided, new Data Packs will not be written.")
@@ -32,7 +35,7 @@ writePSNUxIM <- function(d,
   d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
 
-  if (d$info$has_comments_issue) {
+  if (d$info$has_comments_issue & append) {
     warning_msg <-
       paste0(
         "ERROR! Cannot update PSNUxIM information in a Data Pack with Threaded
@@ -88,7 +91,27 @@ writePSNUxIM <- function(d,
     }
 
     # Prepare d$tool$wb ####
-    d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
+    # If append is true, add the missing PSNUxIM combos to the existing
+    # workbook, otherwise, use a template.
+    if (append == TRUE) {
+      d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
+      openxlsx::removeFilter(d$tool$wb, names(d$tool$wb))
+    } else {
+      template_file <- "inst/extdata/COP22_Data_Pack_Template.xlsx"
+      wb <- openxlsx::loadWorkbook(template_file)
+      sheets <- openxlsx::getSheetNames(template_file)
+      sheets_to_keep <- which(sheets %in% c("Home","PSNUxIM"))
+      sheets_to_delete <- seq_along(sheets)[!(seq_along(sheets) %in% sheets_to_keep)]
+      for (i in seq_along(sheets_to_delete)) {
+            openxlsx::sheetVisibility(wb)[sheets_to_delete[i]] <- "veryHidden"
+      }
+
+      #These hard coded values are maybe present in the schema???
+      openxlsx::writeData(wb,"Home","Missing PSNUxIM Targets",startCol=2,startRow = 10)
+      openxlsx::writeData(wb,"Home",d$info$datapack_name,startCol=2,startRow = 20)
+      openxlsx::writeData(wb,"Home",d$info$country_uids,startCol=2,startRow = 25)
+      d$tool$wb <- wb
+    }
 
     # Prepare d$data$snuxim_model_data ####
     smd <- readRDS(d$keychain$snuxim_model_data_path)
