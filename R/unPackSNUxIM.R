@@ -80,19 +80,19 @@ unPackSNUxIM <- function(d) {
   if (d$info$tool == "Data Pack") {
     d$data$missingCombos <- d$data$MER %>%
       dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
-      #Special handling for 50+ age bands
-      dplyr::mutate(Age = dplyr::case_when(
+      #Special handling for differences between main tab and PSNUxIM tab age bands
+      #The data should not be aggregated at this point. This will happen
+      #when the data is repacked by packForDATIM_UndistributedMER
+      dplyr::mutate(Age_snuxim = dplyr::case_when(
         stringr::str_detect(Age, "(50-54|55-59|60-64|65+)") &
           !stringr::str_detect(indicator_code, "TX_CURR.T") ~ "50+",
         TRUE ~ Age
       )) %>%
-      ## Aggregate across 50+ age bands ####
-      dplyr::group_by(dplyr::across(c(-value))) %>%
-      dplyr::summarise(value = sum(value), .groups = "drop") %>%
       dplyr::anti_join(
         d$data$PSNUxIM_combos,
-        by =  c("PSNU", "psnuid", "indicator_code", "Age", "Sex", "KeyPop")
-      )
+        by =  c("PSNU", "psnuid", "indicator_code", "Age_snuxim" = "Age", "Sex", "KeyPop")
+      ) %>%
+      dplyr::select(-Age_snuxim)
 
     d$tests$missing_combos <- d$data$missingCombos
     attr(d$tests$missing_combos, "test_name") <- "Missing target combinations"
