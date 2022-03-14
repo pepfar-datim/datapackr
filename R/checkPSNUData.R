@@ -44,18 +44,32 @@ checkPSNUData  <-  function(d, d2_session = dynGet("d2_default_session",
 
     #Evaluate the indicators in parallel if possible
     if ("parallel" %in% rownames(installed.packages()) == TRUE) {
+      n_cores <-
+        ifelse(Sys.getenv("MAX_CORES") != "",
+               Sys.getenv("MAX_CORES"),
+               parallel::detectCores())
+
       vr_data$vr_results <-
         parallel::mclapply(vr_data$data, function(x)
-          datimvalidation::evaluateValidation(x$combi,
-          x$value, vr = vr_rules,return_violations_only = FALSE),
-          mc.cores = parallel::detectCores())
+          datimvalidation::evaluateValidation(
+            x$combi,
+            x$value,
+            vr = vr_rules,
+            return_violations_only = FALSE
+          ),
+          mc.cores = n_cores)
     } else {
       vr_data$vr_results <-
         lapply(vr_data$data, function(x)
-          datimvalidation::evaluateValidation(x$combi, x$value, vr = vr_rules ,return_violations_only = FALSE))
+          datimvalidation::evaluateValidation(
+            x$combi,
+            x$value,
+            vr = vr_rules ,
+            return_violations_only = FALSE
+          ))
     }
 
-  #Unnest the data
+    #Unnest the data
   vr_data <- vr_data %>%
     tidyr::unnest(vr_results) %>%
     dplyr::inner_join(valid_PSNUs[,c("psnu","psnu_uid")], by = c("orgUnit" = "psnu_uid")) %>%

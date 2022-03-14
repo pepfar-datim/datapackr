@@ -133,10 +133,16 @@ prepareMemoDataByPSNU <- function(analytics,
 
   #Evaluate the indicators in parallel if possible
   if ("parallel" %in% rownames(installed.packages()) == TRUE) {
+
+    n_cores <-
+      ifelse(Sys.getenv("MAX_CORES") != "",
+             Sys.getenv("MAX_CORES"),
+             parallel::detectCores())
+
     df$indicator_results <-
       parallel::mclapply(df$data, function(x)
         evaluateIndicators(x$combi, x$value, inds),
-        mc.cores = parallel::detectCores())
+        mc.cores = n_cores)
   } else {
     df$indicator_results <-
       lapply(df$data, function(x)
