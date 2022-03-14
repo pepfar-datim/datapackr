@@ -1,3 +1,47 @@
+#' Title
+#'
+#' @param d
+#' @description Internal function to determine if a PSNUxIM tab exists
+#'
+#' @return d object list with additional flags for PSNUxIM state.
+
+checkHasPSNUxIM <- function(d) {
+
+  stopifnot(is.data.frame(d$data$SNUxIM))
+
+  if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1, 1]])) {
+    d$info$has_psnuxim <- FALSE
+
+    if (d$info$tool == "Data Pack") {
+      d$info$needs_psnuxim <- TRUE
+
+      warning_msg <-
+        paste0(
+          "WARNING! Your Data Pack needs a new PSNUxIM tab. Please select `Regenerate PSNUxIM`",
+          " to receive an updated copy of your Data Pack with new rows added",
+          " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
+          " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack, ",
+          " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
+          " all changes to other tabs of your Data Pack are complete.  Once all other updates",
+          " are complete, you may return here to update your PSNUxIM tab at any time.",
+          "\n")
+    } else if (d$info$tool == "OPU Data Pack") {
+      warning_msg <- paste0(
+        "WARNING! Your OPU Data Pack's PSNUxIM tab appears to be empty. Please",
+        " investigate and resubmit."
+      )
+    }
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+
+    return(d)
+
+  } else {
+    d$info$has_psnuxim <- TRUE
+
+    return(d)
+  }
+}
 #' @export
 #' @title unPackSNUxIM(d)
 #'
@@ -31,36 +75,7 @@ unPackSNUxIM <- function(d) {
       .name_repair = "minimal"
     )
 
-  if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1, 1]])) {
-    d$info$has_psnuxim <- FALSE
-
-    if (d$info$tool == "Data Pack") {
-      d$info$needs_psnuxim <- TRUE
-
-      warning_msg <-
-        paste0(
-          "WARNING! Your Data Pack needs a new PSNUxIM tab. Please select `Regenerate PSNUxIM`",
-          " to receive an updated copy of your Data Pack with new rows added",
-          " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
-          " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack, ",
-          " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
-          " all changes to other tabs of your Data Pack are complete.  Once all other updates",
-          " are complete, you may return here to update your PSNUxIM tab at any time.",
-          "\n")
-    } else if (d$info$tool == "OPU Data Pack") {
-      warning_msg <- paste0(
-        "WARNING! Your OPU Data Pack's PSNUxIM tab appears to be empty. Please",
-        " investigate and resubmit."
-      )
-    }
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
-
-    return(d)
-
-  } else {
-    d$info$has_psnuxim <- TRUE
-  }
+  d <- checkHasPSNUxIM(d)
 
   # PATCH: Remove hard-coded FYs
   names(d$data$SNUxIM) <- stringr::str_replace(names(d$data$SNUxIM), " \\(FY22\\)", "")

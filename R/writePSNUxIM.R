@@ -9,7 +9,7 @@
 #' @param output_folder Local folder where you would like your Data Pack to be
 #' saved upon export.
 #' @param d2_session R6 datimutils object which handles authentication with DATIM
-#' @param append If TRUE append rows to the existing DataPack otherwise, 
+#' @param append If TRUE append rows to the existing DataPack otherwise,
 #' output a Missing PSNUxIM targets workbook.
 #' @return d
 #'
@@ -97,6 +97,7 @@ writePSNUxIM <- function(d,
       d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
       openxlsx::removeFilter(d$tool$wb, names(d$tool$wb))
     } else {
+
       template_file <- "inst/extdata/COP22_Data_Pack_Template.xlsx"
       wb <- openxlsx::loadWorkbook(template_file)
       sheets <- openxlsx::getSheetNames(template_file)
@@ -107,10 +108,11 @@ writePSNUxIM <- function(d,
       }
 
       #These hard coded values are maybe present in the schema???
-      openxlsx::writeData(wb,"Home","Missing PSNUxIM Targets",startCol=2,startRow = 10)
-      openxlsx::writeData(wb,"Home",d$info$datapack_name,startCol=2,startRow = 20)
-      openxlsx::writeData(wb,"Home",d$info$country_uids,startCol=2,startRow = 25)
+      openxlsx::writeData(wb,"Home","Missing PSNUxIM Targets",startCol = 2,startRow = 10)
+      openxlsx::writeData(wb,"Home",d$info$datapack_name,startCol = 2,startRow = 20)
+      openxlsx::writeData(wb,"Home",d$info$country_uids,startCol = 2,startRow = 25)
       d$tool$wb <- wb
+
     }
 
     # Prepare d$data$snuxim_model_data ####
