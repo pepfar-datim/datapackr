@@ -35,6 +35,9 @@ writePSNUxIM <- function(d,
   d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
 
+  #We normally cannot process PSNUxIM tabs with threaded comments
+  #However, if we are not appending to the existing data pack, we 
+  #should be able to proceed.
   if (d$info$has_comments_issue & append) {
     warning_msg <-
       paste0(
@@ -100,6 +103,7 @@ writePSNUxIM <- function(d,
 
       template_file <- "inst/extdata/COP22_Data_Pack_Template.xlsx"
       wb <- openxlsx::loadWorkbook(template_file)
+      openxlsx::activeSheet(wb) <- "PSNUxIM"
       sheets <- openxlsx::getSheetNames(template_file)
       sheets_to_keep <- which(sheets %in% c("Home","PSNUxIM"))
       sheets_to_delete <- seq_along(sheets)[!(seq_along(sheets) %in% sheets_to_keep)]
