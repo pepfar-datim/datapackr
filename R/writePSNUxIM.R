@@ -100,8 +100,8 @@ writePSNUxIM <- function(d,
       d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
       openxlsx::removeFilter(d$tool$wb, names(d$tool$wb))
     } else {
-
-      template_file <- "inst/extdata/COP22_Data_Pack_Template.xlsx"
+      
+      template_file <- system.file("extdata", "COP22_Data_Pack_Template.xlsx", package = "datapackr")
       wb <- openxlsx::loadWorkbook(template_file)
       openxlsx::activeSheet(wb) <- "PSNUxIM"
       sheets <- openxlsx::getSheetNames(template_file)
