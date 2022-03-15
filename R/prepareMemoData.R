@@ -136,7 +136,7 @@ prepareMemoDataByPSNU <- function(analytics,
     df$indicator_results <-
       parallel::mclapply(df$data, function(x)
         evaluateIndicators(x$combi, x$value, inds),
-        mc.cores = parallel::detectCores())
+        mc.cores = getMaxCores())
   } else {
     df$indicator_results <-
       lapply(df$data, function(x)

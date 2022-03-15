@@ -735,6 +735,28 @@ parse_maybe_number <- function(x, default = NULL) {
 }
 
 
+#' Title
+#' @description Determine the number of cores to be used for parallel processing
+#' operations using the environment variable MAX_CORES. If not specified
+#' the total number of cores will be used.
+#' @return An integer number of cores to use in parallel processing
+#'
+getMaxCores <- function() {
+  n_cores <-
+    ifelse(Sys.getenv("MAX_CORES") != "",
+           as.numeric(Sys.getenv("MAX_CORES")),
+           parallel::detectCores())
+
+  stopifnot("MAX_CORES environment variable must be a whole integer" != is.integer(n_cores))
+
+    if (n_cores > parallel::detectCores()) {
+      n_cores <- parallel::detectCores()
+      warning("MAX_CORES cannot be greater than available cores. Using available cores only.")
+    }
+
+  n_cores
+}
+
 #' @export
 #' @title Is UID-ish
 #' @md
