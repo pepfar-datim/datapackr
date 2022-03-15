@@ -96,30 +96,20 @@ getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
 #'
 swapColumns <- function(to, from) {
   # Grab column names from `from`
-    cols <- colnames(from)
+  cols <- colnames(from)
 
   # If `from` is a null dataframe, skip and return `to`
-    if (length(cols) != 0) {
+  if (length(cols) != 0) {
 
-  # Loop through `from` columns and if there's a match in `to`, copy and paste
-  #   it into `to`
-      for (i in seq_along(cols)) {
-        col <- cols[i]
-        if (col %in% colnames(to)) {
-          dots <-
-            stats::setNames(list(lazyeval::interp(
-              ~ magrittr::use_series(from, x), x = as.name(col)
-            )), col)
-          to <- to %>%
-            dplyr::mutate_(.dots = dots)
-        } else {
-          next
-        }
+    # Loop through `from` columns and if there's a match in `to`, copy and paste
+    #   it into `to`
+    for (col in cols) {
+      if (col %in% colnames(to)) {
+        to[,col] <- from[,col]
       }
     }
-
+  }
   return(to)
-
 }
 
 
