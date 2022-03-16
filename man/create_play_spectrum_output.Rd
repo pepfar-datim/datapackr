@@ -13,15 +13,15 @@ create_play_spectrum_output(
 }
 \arguments{
 \item{country_uids}{Unique IDs for countries to include in the Data Pack.
-For full list of these IDs, see \code{datapackr::dataPackMap}.}
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
-\item{cop_year}{Specifies COP year for dating as well as selection of
-templates.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
 \item{output_folder}{Local folder where you would like your Data Pack to be
-saved upon export. If left as \code{NULL}, will not output externally.}
+saved upon export.}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Fake Spectrum dataset
