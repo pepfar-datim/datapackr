@@ -47,7 +47,7 @@ checkMechanisms <- function(d,
     msg <- paste0("ERROR!: Invalid mechanisms found in the PSNUxIM tab.
                   These MUST be reallocated to a valid mechanism
                   ", paste(bad_mechs, sep = "", collapse = ", "))
-    d$tests$bad_mechs <- bad_mechs
+    d$tests$bad_mechs <- data.frame(mechanism_code = bad_mechs)
     d$info$messages <- appendMessage(d$info$messages, msg, "ERROR")
     d$info$has_error <- TRUE
   }
