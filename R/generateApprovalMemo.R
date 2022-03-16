@@ -47,7 +47,8 @@ zerosToDashes <- function(x) {
 generateMemoTemplate <- function(draft_memo = TRUE) {
 
   if (draft_memo) {
-    memo_doc <- officer::read_docx(path = "inst/extdata/draft_memo_template.docx")
+    draft_memo_template <- system.file("extdata", "draft_memo_template.docx", package = "datapackr")
+    memo_doc <- officer::read_docx(path = draft_memo_template)
   } else {
     memo_doc <- officer::read_docx()
   }
