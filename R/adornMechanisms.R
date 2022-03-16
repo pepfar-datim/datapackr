@@ -53,6 +53,7 @@ getMechanismViewFromDATIM <- function(cop_year = NULL,
 #' FALSE.
 #' @param update_stale_cache If the cached_mechs_path file is outdated or unreadable,
 #' should a new cache be saved?
+#' @param include_default Should the default mechanism also be included?
 #' @inheritParams unPackTool
 #'
 #' @return Mechs
@@ -64,7 +65,8 @@ getMechanismView <- function(country_uids = NULL,
                              d2_session = dynGet("d2_default_session",
                                                  inherits = TRUE),
                              cached_mechs_path = paste0(Sys.getenv("support_files_directory"), "mechs.rds"),
-                             update_stale_cache = FALSE) {
+                             update_stale_cache = FALSE,
+                             include_default = TRUE) {
 
   empty_mechs_view <- tibble::tibble(
     "mechanism_desc" = character(),
@@ -148,6 +150,24 @@ getMechanismView <- function(country_uids = NULL,
     mechs %<>%
       dplyr::filter(!attributeOptionCombo %in% dedupe)
   }
+
+  if (include_default) {
+
+    default_mech <- list(
+      mechanism_desc = "default",
+      mechanism_code = "default",
+      attributeOptionCombo = datapackr::default_catOptCombo(),
+      partner_desc = "None",
+      partner_id = "None",
+      agency = "None",
+      ou = NA,
+      startdate = NA,
+      enddate = NA
+    )
+
+    mechs <- rbind(mechs,default_mech)
+  }
+
 
   structure_ok <- dplyr::setequal(names(empty_mechs_view), names(mechs))
 

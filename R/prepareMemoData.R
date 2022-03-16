@@ -26,7 +26,8 @@ prepareMemoMetadata <- function(d, memo_type,
         cop_year = d$info$cop_year,
         include_dedupe = TRUE,
         include_MOH = FALSE,
-        d2_session = d2_session
+        d2_session = d2_session,
+        include_default = TRUE
       ) %>%
       dplyr::select("Mechanism" = mechanism_code,
                     "Partner" = partner_desc,
@@ -87,7 +88,8 @@ prepareExistingDataAnalytics <- function(d, d2_session =
         psnu_prioritizations = dplyr::select(d$memo$datim$prios,
                                              "orgUnit" = psnu_uid,
                                              value),
-        d2_session = d2_session
+        d2_session = d2_session,
+        include_default = TRUE
       )
   }
 
@@ -192,7 +194,7 @@ prepareMemoDataByPSNU <- function(analytics,
     dplyr::inner_join(psnus, by = c("psnu_uid")) %>%
     dplyr::rename("Mechanism" = mechanism_code) %>%
     dplyr::mutate(`Partner` = dplyr::case_when(is.na(`Partner`) ~ "Unallocated",
-                                         TRUE ~ `Mechanism`)) %>%
+                                         TRUE ~ `Partner`)) %>%
     dplyr::mutate(`Agency` = dplyr::case_when(is.na(`Agency`) ~ "Unallocated",
                                          TRUE ~ `Agency`))
 
@@ -219,6 +221,7 @@ prepareMemoDataByPartner <- function(df,
   }
 
   d_partners <- df   %>%
+    dplyr::filter(Mechanism != "default") %>%
     dplyr::group_by(Indicator, Age, Agency, Partner, Mechanism) %>%
     dplyr::summarise(Value = sum(value), .groups = "drop")
 
@@ -296,8 +299,12 @@ prepareMemoDataByAgency <- function(df, memo_structure) {
     purrr::pluck("row_order") %>%
     dplyr::select(ind, options)
 
-  df_cols <-
-    df %>%
+  df <- df %>%
+    dplyr::filter(Mechanism != "default") %>%
+    dplyr::group_by(`Indicator`, `Age`, `Agency`) %>%
+    dplyr::summarise(Value = sum(value), .groups = "drop")
+
+  df_cols <- df %>%
     dplyr::select(Agency) %>%
     dplyr::distinct() %>%
     dplyr::arrange()
@@ -308,10 +315,6 @@ prepareMemoDataByAgency <- function(df, memo_structure) {
     dplyr::mutate(Value = 0) %>%
     dplyr::rename(Indicator = ind,
                   Age = options)
-
-  df <- df %>%
-    dplyr::group_by(`Indicator`, `Age`, `Agency`) %>%
-    dplyr::summarise(Value = sum(value), .groups = "drop")
 
   df_totals <- df %>%
     dplyr::filter(Age != "Total") %>%

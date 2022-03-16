@@ -11,7 +11,8 @@ getMechanismView(
   include_MOH = FALSE,
   d2_session = dynGet("d2_default_session", inherits = TRUE),
   cached_mechs_path = paste0(Sys.getenv("support_files_directory"), "mechs.rds"),
-  update_stale_cache = FALSE
+  update_stale_cache = FALSE,
+  include_default = TRUE
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ FALSE.}
 
 \item{update_stale_cache}{If the cached_mechs_path file is outdated or unreadable,
 should a new cache be saved?}
+
+\item{include_default}{Should the default mechanism also be included?}
 }
 \value{
 Mechs
