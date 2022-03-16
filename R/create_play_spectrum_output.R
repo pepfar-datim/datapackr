@@ -59,7 +59,7 @@ create_play_spectrum_output <- function(country_uids,
 
   data_datim <- suppressWarnings(datapackr::getCOPDataFromDATIM(country_uids,
                                                cop_year = (cop_year - 1),
-                                               streams = c("subnat_targets", "impatt"),
+                                               datastreams = c("subnat_targets", "impatt"),
                                                d2_session = d2_session)) %>%
   # Accommodate DUIT decision to map IMPATT to cop_year+1 ####
     dplyr::mutate(
