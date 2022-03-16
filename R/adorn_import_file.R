@@ -91,7 +91,7 @@ adorn_import_file <- function(psnu_import_file,
     dplyr::mutate(attributeOptionCombo = "HllvX50cXC0") %>%
     dplyr::left_join(mechs, by = c("attributeOptionCombo" = "attributeOptionCombo"))
 
-  data <- dplyr::bind_rows(data_codes, data_ids,data_default)
+  data <- dplyr::bind_rows(data_codes, data_ids, data_default)
 
   # Adorn dataElements & categoryOptionCombos ####
 

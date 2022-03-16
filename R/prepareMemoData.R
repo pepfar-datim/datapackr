@@ -34,7 +34,7 @@ prepareMemoMetadata <- function(d, memo_type,
                     "Agency" = agency)
   }
 
-  if (memo_type %in% c("datapack","comparison")) {
+  if (memo_type %in% c("datapack", "comparison")) {
 
     #TODO: If this is an OPU, use the existing prioritizations
     #from DATIM.
@@ -480,7 +480,7 @@ prepareMemoData <- function(d,
       #Update the PSNU prioritization levels with those in DATIM
       if (d$info$tool == "OPU Data Pack") {
 
-        d$memo$datapack$by_psnu <- updateExistingPrioritization(d$memo$datim$prios,d$memo$datapack$by_psnu)
+        d$memo$datapack$by_psnu <- updateExistingPrioritization(d$memo$datim$prios, d$memo$datapack$by_psnu)
 
          }
 

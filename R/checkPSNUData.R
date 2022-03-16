@@ -37,8 +37,8 @@ checkPSNUData  <-  function(d, d2_session = dynGet("d2_default_session",
   }
 
     vr_data <- datimvalidation::prepDataForValidation(vr_data) %>%
-      dplyr::select(-dataElement,-period,-categoryOptionCombo) %>%
-      dplyr::group_by(orgUnit,attributeOptionCombo) %>%
+      dplyr::select(-dataElement, -period, -categoryOptionCombo) %>%
+      dplyr::group_by(orgUnit, attributeOptionCombo) %>%
       tidyr::nest()
 
 
@@ -47,18 +47,18 @@ checkPSNUData  <-  function(d, d2_session = dynGet("d2_default_session",
       vr_data$vr_results <-
         parallel::mclapply(vr_data$data, function(x)
           datimvalidation::evaluateValidation(x$combi,
-          x$value, vr = vr_rules,return_violations_only = FALSE),
+          x$value, vr = vr_rules, return_violations_only = FALSE),
           mc.cores = getMaxCores())
     } else {
       vr_data$vr_results <-
         lapply(vr_data$data, function(x)
-          datimvalidation::evaluateValidation(x$combi, x$value, vr = vr_rules ,return_violations_only = FALSE))
+          datimvalidation::evaluateValidation(x$combi, x$value, vr = vr_rules, return_violations_only = FALSE))
     }
 
   #Unnest the data
   vr_data <- vr_data %>%
     tidyr::unnest(vr_results) %>%
-    dplyr::inner_join(valid_PSNUs[,c("psnu","psnu_uid")], by = c("orgUnit" = "psnu_uid")) %>%
+    dplyr::inner_join(valid_PSNUs[, c("psnu", "psnu_uid")], by = c("orgUnit" = "psnu_uid")) %>%
     dplyr::ungroup()
 
 

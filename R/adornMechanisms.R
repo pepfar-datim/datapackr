@@ -93,10 +93,10 @@ getMechanismView <- function(country_uids = NULL,
   }
 
   if (file.exists(cached_mechs_path) & can_read_file) {
-    is_lt <- function(x,y)  x < y
+    is_lt <- function(x, y)  x < y
     cache_age_dur <- lubridate::as.duration(lubridate::interval(file.info(cached_mechs_path)$mtime, Sys.time()))
     max_cache_age_dur <- lubridate::duration(max_cache_age)
-    is_fresh <- is_lt(cache_age_dur , max_cache_age_dur)
+    is_fresh <- is_lt(cache_age_dur, max_cache_age_dur)
   } else{
     is_fresh <- FALSE
   }
@@ -165,7 +165,7 @@ getMechanismView <- function(country_uids = NULL,
       enddate = NA
     )
 
-    mechs <- rbind(mechs,default_mech)
+    mechs <- rbind(mechs, default_mech)
   }
 
 

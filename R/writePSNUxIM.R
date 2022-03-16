@@ -105,16 +105,16 @@ writePSNUxIM <- function(d,
       wb <- openxlsx::loadWorkbook(template_file)
       openxlsx::activeSheet(wb) <- "PSNUxIM"
       sheets <- openxlsx::getSheetNames(template_file)
-      sheets_to_keep <- which(sheets %in% c("Home","PSNUxIM"))
+      sheets_to_keep <- which(sheets %in% c("Home", "PSNUxIM"))
       sheets_to_delete <- seq_along(sheets)[!(seq_along(sheets) %in% sheets_to_keep)]
       for (i in seq_along(sheets_to_delete)) {
             openxlsx::sheetVisibility(wb)[sheets_to_delete[i]] <- "veryHidden"
       }
 
       #These hard coded values are maybe present in the schema???
-      openxlsx::writeData(wb,"Home","Missing PSNUxIM Targets",startCol = 2,startRow = 10)
-      openxlsx::writeData(wb,"Home",d$info$datapack_name,startCol = 2,startRow = 20)
-      openxlsx::writeData(wb,"Home",d$info$country_uids,startCol = 2,startRow = 25)
+      openxlsx::writeData(wb, "Home", "Missing PSNUxIM Targets", startCol = 2, startRow = 10)
+      openxlsx::writeData(wb, "Home", d$info$datapack_name, startCol = 2, startRow = 20)
+      openxlsx::writeData(wb, "Home", d$info$country_uids, startCol = 2, startRow = 25)
       d$tool$wb <- wb
 
     }
@@ -129,7 +129,7 @@ writePSNUxIM <- function(d,
     ## Address issues with PMTCT_EID ####
       dplyr::mutate_at(
         c("age_option_name", "age_option_uid"),
-        ~dplyr::case_when(indicator_code %in% c("PMTCT_EID.N.2.T","PMTCT_EID.N.12.T")
+        ~dplyr::case_when(indicator_code %in% c("PMTCT_EID.N.2.T", "PMTCT_EID.N.12.T")
                           ~ NA_character_,
                           TRUE ~ .)) %>%
     ## Convert to import file format ####

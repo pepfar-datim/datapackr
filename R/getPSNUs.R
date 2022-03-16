@@ -32,8 +32,8 @@ getPSNUs <- function(country_uids = NULL,
       "in",
       paste0(
         "AVy8gJXym2D",
-        dplyr::if_else(include_mil, ",nwQbMeALRjL",""),
-        dplyr::if_else(include_DREAMS, ",mRRlkbZolDR","")
+        dplyr::if_else(include_mil, ",nwQbMeALRjL", ""),
+        dplyr::if_else(include_DREAMS, ",mRRlkbZolDR", "")
       )
     ) %>%
     purrr::when(all(!is.null(country_uids)) ~ api_filter(., "ancestors.id", "in",

@@ -207,7 +207,7 @@ unPackSNUxIM <- function(d) {
 
   # Pare down to populated, updated targets only ####
   #Get the additional mechanisms added by the user
-  user_mechanisms <- stringr::str_extract(names(d$data$SNUxIM),"\\d{4,}_(DSD|TA)") %>%
+  user_mechanisms <- stringr::str_extract(names(d$data$SNUxIM), "\\d{4,}_(DSD|TA)") %>%
     purrr::keep(~ !is.na(.x))
  #Get the mandatory columns
   mandatory_columns <- cols_to_keep %>%
@@ -217,7 +217,7 @@ unPackSNUxIM <- function(d) {
     purrr::discard(~ .x == "12345_DSD")
 
   d$data$SNUxIM <- d$data$SNUxIM %>%
-    dplyr::select(tidyselect::all_of(c(mandatory_columns,user_mechanisms)))
+    dplyr::select(tidyselect::all_of(c(mandatory_columns, user_mechanisms)))
 
   # TEST: Missing right-side formulas; Warn; Continue ####
   d$tests$psnuxim_missing_rs_fxs <-
