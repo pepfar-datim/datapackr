@@ -16,6 +16,8 @@ checkColStructure <- function(d, sheet) {
     data <- d$data$extract
   }
 
+  to_keep_regex <- "\\d{4,}_(DSD|TA)|^$|^(Not PEPFAR)$"
+
   submission_cols <- names(data) %>%
     tibble::enframe(name = NULL) %>%
     dplyr::select(indicator_code = value) %>%
@@ -23,19 +25,24 @@ checkColStructure <- function(d, sheet) {
       sheet = sheet,
       submission_order = as.integer(1:(dplyr::n()))) %>%
       purrr::when(sheet == "PSNUxIM" ~ dplyr::filter(.,
-        !stringr::str_detect(indicator_code, "\\d{4,}_(DSD|TA)|^$|^(Not PEPFAR)$")),
+        !stringr::str_detect(indicator_code, to_keep_regex)),
         ~ .)
 
   col_check <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet) %>%
     dplyr::select(indicator_code, template_order = col) %>%
-    purrr::when(sheet == "PSNUxIM" ~ dplyr::filter(., !stringr::str_detect(indicator_code, "\\d{4,}_(DSD|TA)|^$")),
+    purrr::when(sheet == "PSNUxIM" ~ dplyr::filter(., !stringr::str_detect(indicator_code, to_keep_regex)),
     ~ .) %>%
     dplyr::left_join(submission_cols, by = c("indicator_code" = "indicator_code")) %>%
     dplyr::mutate(order_check = template_order == submission_order)
 
-  d[["info"]][["col_check"]][[as.character(sheet)]] <- character()
-  d[["info"]][["col_check"]][[as.character(sheet)]] <- col_check
+  #Create the list if its null
+  if (is.null(d$info$col_check)) {
+    d$info$col_check <- list()
+  }
+  #Append the new col_check data frame to it
+  d$info$col_check <-  purrr::list_modify(d$info$col_check, {{sheet}} := col_check)
+
 
   # Alert to missing cols ####
   if (any(is.na(col_check$submission_order))) {
@@ -49,14 +56,14 @@ checkColStructure <- function(d, sheet) {
 
     warning_msg <-
       paste0(
-        "WARNING! In tab ",
+        "ERROR! In tab ",
         sheet,
         ", MISSING COLUMNS: Please ensure no columns have been deleted or renamed from",
         " the original Data Pack you have received. ->  \n\t* ",
         paste(missing_cols$indicator_code, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
 
   # Alert to duplicate columns ####

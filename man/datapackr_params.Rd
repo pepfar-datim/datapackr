@@ -29,7 +29,10 @@ datapackr_params(
   draft_memo,
   memo_type,
   memo_doc,
+  memo_structure,
   memoStructure,
+  source_type,
+  prios,
   include_no_prio,
   remove_empty_columns,
   ...
@@ -104,7 +107,15 @@ comparison: Create a comparison memo with data from both DATIM and datapack}
 \item{memo_doc}{\code{Officer} document object containing
 the target memo tables.}
 
+\item{memo_structure}{Structure of the memo d$memo$structure}
+
 \item{memoStructure}{Structure of the memo d$memo$structure}
+
+\item{source_type}{Indicates whether the data for a COP Approval Memo table
+should come from the Data Pack or from DATIM. Values can be either
+\code{datapack} or \code{datim}.}
+
+\item{prios}{Data frame of prioritization levels.}
 
 \item{include_no_prio}{If TRUE, include \code{"No Prioritiation"}
 as a column in the output.}

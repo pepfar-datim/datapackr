@@ -243,7 +243,12 @@ pick_template_path <- function(cop_year, tool) {
 #' comparison: Create a comparison memo with data from both DATIM and datapack
 #' @param memo_doc \code{Officer} document object containing
 #' the target memo tables.
+#' @param memo_structure Structure of the memo d$memo$structure
 #' @param memoStructure Structure of the memo d$memo$structure
+#' @param source_type Indicates whether the data for a COP Approval Memo table
+#' should come from the Data Pack or from DATIM. Values can be either
+#' \code{datapack} or \code{datim}.
+#' @param prios Data frame of prioritization levels.
 #' @param include_no_prio If TRUE, include \code{"No Prioritiation"}
 #' as a column in the output.
 #' @param remove_empty_columns Should empty columns be removed from memos?
@@ -276,7 +281,10 @@ datapackr_params <- function(model_data,
                              draft_memo,
                              memo_type,
                              memo_doc,
+                             memo_structure,
                              memoStructure,
+                             source_type,
+                             prios,
                              include_no_prio,
                              remove_empty_columns,
                              ...) {

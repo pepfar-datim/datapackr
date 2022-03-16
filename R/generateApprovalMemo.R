@@ -47,7 +47,8 @@ zerosToDashes <- function(x) {
 generateMemoTemplate <- function(draft_memo = TRUE) {
 
   if (draft_memo) {
-    memo_doc <- officer::read_docx(path = "inst/extdata/draft_memo_template.docx")
+    draft_memo_template <- system.file("extdata", "draft_memo_template.docx", package = "datapackr")
+    memo_doc <- officer::read_docx(path = draft_memo_template)
   } else {
     memo_doc <- officer::read_docx()
   }
@@ -73,7 +74,7 @@ renderPrioTable <- function(memo_doc, prio_table, ou_name, source_type) {
                         "datapack" = "Table 1a: Prioritization Table (Proposed)",
                         "datim" = "Table 1b: Prioritization Table (Current)")
 
-  memo_doc  %<>% officer::body_add(fig_caption,style = "Normal")
+  memo_doc  %<>% officer::body_add(fig_caption, style = "Normal")
 
 
   if (is.null(prio_table)) {
@@ -157,7 +158,7 @@ renderAgencyTable <- function(memo_doc, agency_table, ou_name, source_type) {
                         "datapack" = "Table 2a: Agency Table (Proposed)",
                         "datim" = "Table 2b: Agency Table (Current)")
 
-  memo_doc  %<>% officer::body_add(fig_caption,style = "Normal")
+  memo_doc  %<>% officer::body_add(fig_caption, style = "Normal")
 
   if (is.null(agency_table)) {
     memo_doc  %<>%
@@ -227,14 +228,14 @@ renderAgencyTable <- function(memo_doc, agency_table, ou_name, source_type) {
 #'
 #' @return
 #'
-renderPartnerTable <- function(memo_doc, partners_table, memoStructure,source_type) {
+renderPartnerTable <- function(memo_doc, partners_table, memoStructure, source_type) {
 
   #Set the caption based on the source_type
   fig_caption <- switch(source_type,
                         "datapack" = "Table 3a: Partners Table (Proposed)",
                         "datim" = "Table 3b: Partners Table (Current)")
 
-  memo_doc  %<>% officer::body_add(fig_caption,style = "Normal")
+  memo_doc  %<>% officer::body_add(fig_caption, style = "Normal")
 
   if (is.null(partners_table)) {
     memo_doc  %<>%

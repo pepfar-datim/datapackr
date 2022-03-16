@@ -222,7 +222,7 @@ check_cop_year <- function(cop_year) {
 
   if (!cop_year %in% supported_cop_years) {
     stop(paste0("Sorry, datapackr only supports tools from ",
-                paste_oxford(paste0("COP",supported_cop_years - 2000))))
+                paste_oxford(paste0("COP", supported_cop_years - 2000))))
   }
 
   cop_year

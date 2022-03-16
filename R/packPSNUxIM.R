@@ -215,7 +215,7 @@ packPSNUxIM <- function(wb,
 
   # Prep Targets dataset ####
   data %<>%
-    adorn_import_file(cop_year = cop_year, filter_rename_output = FALSE,d2_session = d2_session) %>%
+    adorn_import_file(cop_year = cop_year, filter_rename_output = FALSE, d2_session = d2_session) %>%
     dplyr::select(PSNU = dp_psnu, orgUnit, indicator_code, Age, Sex, KeyPop,
                   DataPackTarget = value) %>%
     dplyr::group_by(dplyr::across(c(-DataPackTarget))) %>%
@@ -302,7 +302,7 @@ packPSNUxIM <- function(wb,
                          by = c("indicator_code", "sheet_name"))
 
       id <- ifelse("ID" %in% subm_cols$indicator_code, "ID", "PSNU")
-      id_cols <- subm_cols[subm_cols$indicator_code == id,] %>%
+      id_cols <- subm_cols[subm_cols$indicator_code == id, ] %>%
         dplyr::select(sheet_name, id_col = col_ltr)
 
       col_ltrs <- subm_cols %>%

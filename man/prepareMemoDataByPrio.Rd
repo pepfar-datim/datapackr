@@ -10,6 +10,8 @@ prepareMemoDataByPrio(df, memo_structure, include_no_prio = TRUE)
 \item{df}{An analytics table, either d$memo$datim$analytics or
 d$memo$datapack$analytics}
 
+\item{memo_structure}{Structure of the memo d$memo$structure}
+
 \item{include_no_prio}{If TRUE, include \code{"No Prioritiation"}
 as a column in the output.}
 }

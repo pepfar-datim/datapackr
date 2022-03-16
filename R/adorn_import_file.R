@@ -11,6 +11,7 @@
 #' @param filter_rename_output T/F Should this function output the final data in
 #' the new, more complete format?
 #' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @param include_default Should default mechanisms be included?
 #'
 #' @return data
 #'
@@ -19,11 +20,11 @@ adorn_import_file <- function(psnu_import_file,
                               psnu_prioritizations = NULL,
                               filter_rename_output = TRUE,
                               d2_session = dynGet("d2_default_session",
-                                                  inherits = TRUE)) {
+                                                  inherits = TRUE),
+                              include_default = FALSE) {
 
   # TODO: Generalize this outside the context of COP
   data <- psnu_import_file %>%
-
   # Adorn PSNUs
     dplyr::left_join(
       (valid_PSNUs %>%
@@ -63,7 +64,8 @@ adorn_import_file <- function(psnu_import_file,
       cop_year = cop_year,
       include_dedupe = TRUE,
       include_MOH = TRUE,
-      d2_session = d2_session) %>%
+      d2_session = d2_session,
+      include_default = TRUE) %>%
     dplyr::select(-ou, -startdate, -enddate)
 
   # Allow mapping of either numeric codes or alphanumeric uids
@@ -79,7 +81,17 @@ adorn_import_file <- function(psnu_import_file,
         "[A-Za-z][A-Za-z0-9]{10}")) %>%
     dplyr::left_join(mechs, by = c("attributeOptionCombo" = "attributeOptionCombo"))
 
-  data <- dplyr::bind_rows(data_codes, data_ids)
+  #Handle data which has been assigned to the default mechanism
+  #like AGWY_PREV
+
+  data_default <- data %>%
+    dplyr::filter(
+      stringr::str_detect(
+        attributeOptionCombo, "default|HllvX50cXC0")) %>%
+    dplyr::mutate(attributeOptionCombo = "HllvX50cXC0") %>%
+    dplyr::left_join(mechs, by = c("attributeOptionCombo" = "attributeOptionCombo"))
+
+  data <- dplyr::bind_rows(data_codes, data_ids, data_default)
 
   # Adorn dataElements & categoryOptionCombos ####
 

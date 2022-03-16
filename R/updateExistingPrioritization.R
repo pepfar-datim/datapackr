@@ -3,6 +3,7 @@
 #' @description Provided a data frame of priorization levels and an analytics
 #' table, replace the existing prioritizations. This is normally
 #' used with an OPU DataPack.
+#' @param analytics_table A table of COP memo indicators at the PSNU level.
 #' @inheritParams datapackr_params
 #'
 #' @return

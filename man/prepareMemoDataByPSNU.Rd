@@ -24,7 +24,7 @@ comparison: Create a comparison memo with data from both DATIM and datapack}
 
 \item{inds}{Data frame of indicators from getMemoIndicators}
 
-\item{prios}{Data frame of prioritization levels depending on the memo type}
+\item{prios}{Data frame of prioritization levels.}
 
 \item{partners_agencies}{Result of getMechanismView}
 
