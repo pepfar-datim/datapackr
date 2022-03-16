@@ -1,3 +1,23 @@
+# datapackr 5.1.6
+
+## Bug fixes
+- Fixes mismatch between text and metadata on certain validation messages that caused some warnings to be highlighted red as if they were errors and caused some errors not to be highlighted red. (DP-523)
+- Fixes missing PrEP_CT data on approval memo target tables. (DP-561)
+- Fixes missing AGYW_PREV data on approval memo target tables. (DP-562)
+- Fixes reference to memo template in `generateMemoTemplate`.
+
+## New Features
+- Adds a system environment variable `MAX_CORES` which will limit the number of cores to be used in parallel processing. This environment variable is detected by the new function `getMaxCores`.
+- Adds parameter `append` to `writePSNUxIM`. This parameter is `TRUE` by default and will append new rows to the existing PSNUxIM tab. If `FALSE`, a new PSNUxIM tab will be output only containing the new rows needed in the validated tool.
+- Adds parameter `include_default` to `getMechanismView` and `adorn_import_file` that will include the default mechanism to the dataframe that is returned.
+- Adds new function `checkHasPSNUxIM` to detect whether a COP Data Pack has a PSNUxIM tab.
+
+## Minor improvements and fixes
+- Updates alterned formula warning from `checkFormulas` to clarify that users may edit formulas in Green columns without permission, but need to receive clearance from DUIT prior to editing formulas in Grey columns. (DP-241)
+- Makes `checkColStructure` more robust.
+- Adds back `stringi` dependency due to new use of `stringi::stri_replace_all`. This will be replaced with a `stringr` function in a later version to reduce dependencies.
+
+
 # datapackr 5.1.5
 
 ## New Features
