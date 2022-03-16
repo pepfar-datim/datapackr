@@ -105,7 +105,11 @@ swapColumns <- function(to, from) {
     #   it into `to`
     for (col in cols) {
       if (col %in% colnames(to)) {
+        # base version
         to[,col] <- from[,col]
+
+        # dplyr version -  would go base but not sure if there was a reason for the old code using lazyeval etc.
+        #to <- to %>% dplyr::mutate({{col}} := from[[col]])
       }
     }
   }
