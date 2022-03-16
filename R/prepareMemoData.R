@@ -104,7 +104,6 @@ prepareExistingDataAnalytics <- function(d, d2_session =
 #' @param analytics Data frame consisting of at least psnu_uid,
 #' categoryoptioncombo_id, mechanism_code and target value
 #' @param inds Data frame of indicators from getMemoIndicators
-#' @param prios Data frame of prioritization levels depending on the memo type
 #' @param partners_agencies Result of getMechanismView
 #' @inheritParams datapackr_params
 #'

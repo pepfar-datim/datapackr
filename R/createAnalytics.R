@@ -87,9 +87,9 @@ createAnalytics <- function(d,
                   is.na(.x) &
                     stringr::str_detect(support_type, "DSD|TA") ~ "Unallocated",
                   is.na(.x) &
-                    stringr:::str_detect(support_type, "Sub-National") ~ "default",
+                    stringr::str_detect(support_type, "Sub-National") ~ "default",
                   is.na(.x) &
-                    stringr:::str_detect(support_type, "No Support Type") ~ "default",
+                    stringr::str_detect(support_type, "No Support Type") ~ "default",
                   TRUE ~ .x
                 )
               ))

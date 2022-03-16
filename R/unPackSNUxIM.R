@@ -1,10 +1,9 @@
-#' Title
+#' Check that a Data Pack tool has a PSNUxIM tab
 #'
-#' @param d
+#' @inheritParams datapackr_params
 #' @description Internal function to determine if a PSNUxIM tab exists
 #'
 #' @return d object list with additional flags for PSNUxIM state.
-
 checkHasPSNUxIM <- function(d) {
 
   stopifnot(is.data.frame(d$data$SNUxIM))

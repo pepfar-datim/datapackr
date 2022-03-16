@@ -16,13 +16,11 @@ getMechanismView(
 )
 }
 \arguments{
-\item{country_uids}{Character vector of DATIM country IDs. This can only
-include countries. Regional Operating Unit uids will not be accepted. If not
-supplied, returns entire mechanism list, trimmed to user's DATIM permissions.}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
-\item{cop_year}{Numeric value of COP Fiscal Year to filter mechanism list by.
-Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
-\code{2019}. If a FY is not supplied, returns entire mechanism list.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
 \item{include_dedupe}{Logical. If TRUE will include deduplication mechanisms.
 Default is FALSE.}
@@ -31,6 +29,9 @@ Default is FALSE.}
 FALSE.}
 
 \item{d2_session}{DHIS2 Session id}
+
+\item{cached_mechs_path}{Local file path to an RDS file containing
+a cached copy of the mechanisms SQL view.}
 
 \item{update_stale_cache}{If the cached_mechs_path file is outdated or unreadable,
 should a new cache be saved?}
@@ -46,4 +47,7 @@ The function will attempt to read from a cached file, if defined in
 the support_files_directory option has been set, and the mechs.rds file
 is available to be read. Otherwise, if the user is logged in, the view
 will be obtained from DATIM. Otherwise, an empty dataframe is returned.
+
+Note that only country UIDs are accepted. If Regional Operating Unit uids
+are supplied, returns entire mechanism list, trimmed to user's DATIM permissions.
 }

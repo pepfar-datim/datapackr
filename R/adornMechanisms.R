@@ -1,8 +1,7 @@
 #' @export
 #' @title getMechanismViewFromDATIM
 #'
-#' @inheritParams unPackTool
-#' @inheritParams getMechanismViewFromDATIM
+#' @inheritParams datapackr_params
 #'
 #' @return Mechanism List
 #'
@@ -41,12 +40,9 @@ getMechanismViewFromDATIM <- function(cop_year = NULL,
 #' is available to be read. Otherwise, if the user is logged in, the view
 #' will be obtained from DATIM. Otherwise, an empty dataframe is returned.
 #'
-#' @param country_uids Character vector of DATIM country IDs. This can only
-#' include countries. Regional Operating Unit uids will not be accepted. If not
-#' supplied, returns entire mechanism list, trimmed to user's DATIM permissions.
-#' @param cop_year Numeric value of COP Fiscal Year to filter mechanism list by.
-#' Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
-#' \code{2019}. If a FY is not supplied, returns entire mechanism list.
+#' Note that only country UIDs are accepted. If Regional Operating Unit uids
+#' are supplied, returns entire mechanism list, trimmed to user's DATIM permissions.
+#'
 #' @param include_dedupe Logical. If TRUE will include deduplication mechanisms.
 #' Default is FALSE.
 #' @param include_MOH Logical. If TRUE will include MOH mechanisms. Default is
@@ -54,7 +50,7 @@ getMechanismViewFromDATIM <- function(cop_year = NULL,
 #' @param update_stale_cache If the cached_mechs_path file is outdated or unreadable,
 #' should a new cache be saved?
 #' @param include_default Should the default mechanism also be included?
-#' @inheritParams unPackTool
+#' @inheritParams datapackr_params
 #'
 #' @return Mechs
 #'

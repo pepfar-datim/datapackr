@@ -59,6 +59,7 @@ evaluateIndicators <- function(combis, values, inds) {
   replaceCombisWithValues <- function(x,
                                          expressions = combis,
                                          v = values) {
+    # TODO: replace with `stringr` function to remove `stringi` dependency
     stringi::stri_replace_all_fixed(x,
                                     expressions,
                                     v,

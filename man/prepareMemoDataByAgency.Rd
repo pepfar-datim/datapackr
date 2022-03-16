@@ -9,6 +9,8 @@ prepareMemoDataByAgency(df, memo_structure)
 \arguments{
 \item{df}{An analytics table, either d$memo$datim$analytics or
 d$memo$datapack$analytics}
+
+\item{memo_structure}{Structure of the memo d$memo$structure}
 }
 \value{
 A dataframe of COP indicators aggregated to the prioritization level
