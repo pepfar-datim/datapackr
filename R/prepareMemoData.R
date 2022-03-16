@@ -177,6 +177,10 @@ prepareMemoDataByPSNU <- function(analytics,
                                                    "PrEP_CURR",
                                                    "GEND_GBV") ~ "Total",
                                   TRUE ~ Age)) %>%
+   #Special handling for PrEP_CT. The indicator is listed as 15+ but we will
+   #Treat it as a total
+   dplyr::mutate(Age = dplyr::case_when(Indicator == "PrEP_CT" & Age == "15+" ~ "Total",
+                 TRUE ~ Age)) %>%
     dplyr::select(-id, -numerator, -denominator) %>%
     dplyr::left_join(dplyr::select(prios, psnu_uid, prioritization),
                      by = c("psnu_uid")) %>%
@@ -191,6 +195,7 @@ prepareMemoDataByPSNU <- function(analytics,
                                          TRUE ~ `Mechanism`)) %>%
     dplyr::mutate(`Agency` = dplyr::case_when(is.na(`Agency`) ~ "Unallocated",
                                          TRUE ~ `Agency`))
+
 
 }
 

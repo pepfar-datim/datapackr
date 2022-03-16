@@ -42,6 +42,7 @@ checkHasPSNUxIM <- function(d) {
     return(d)
   }
 }
+
 #' @export
 #' @title unPackSNUxIM(d)
 #'
