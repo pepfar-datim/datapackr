@@ -191,11 +191,14 @@ prepareMemoDataByPSNU <- function(analytics,
     dplyr::left_join(partners_agencies,
                      by = c(mechanism_code = "Mechanism")) %>%
     dplyr::inner_join(psnus, by = c("psnu_uid")) %>%
-    dplyr::rename("Mechanism" = mechanism_code) %>%
-    dplyr::mutate(`Partner` = dplyr::case_when(is.na(`Partner`) ~ "Unallocated",
-                                         TRUE ~ `Partner`)) %>%
-    dplyr::mutate(`Agency` = dplyr::case_when(is.na(`Agency`) ~ "Unallocated",
-                                         TRUE ~ `Agency`))
+    dplyr::rename("Mechanism" = mechanism_code)
+    # Commenting this out, as the partner and mechanism are "None" at this point
+    # for Unallocated data. See adornMechanisms for more info on where
+    # this is coming from.
+    # dplyr::mutate(`Partner` = dplyr::case_when(is.na(`Partner`) ~ "Unallocated",
+    #                                      TRUE ~ `Partner`)) %>%
+    # dplyr::mutate(`Agency` = dplyr::case_when(is.na(`Agency`) ~ "Unallocated",
+    #                                      TRUE ~ `Agency`))
 
 
 }
@@ -220,7 +223,7 @@ prepareMemoDataByPartner <- function(df,
   }
 
   d_partners <- df   %>%
-    dplyr::filter(Mechanism != "default") %>%
+    #dplyr::filter(Mechanism != "default") %>%
     dplyr::group_by(Indicator, Age, Agency, Partner, Mechanism) %>%
     dplyr::summarise(Value = sum(value), .groups = "drop")
 
@@ -299,7 +302,7 @@ prepareMemoDataByAgency <- function(df, memo_structure) {
     dplyr::select(ind, options)
 
   df <- df %>%
-    dplyr::filter(Mechanism != "default") %>%
+    #dplyr::filter(Mechanism != "default") %>%
     dplyr::group_by(`Indicator`, `Age`, `Agency`) %>%
     dplyr::summarise(Value = sum(value), .groups = "drop")
 
