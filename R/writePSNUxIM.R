@@ -89,26 +89,29 @@ writePSNUxIM <- function(d,
       
       targets_data <- packForDATIM_UndistributedMER(data = d$data$missingCombos,
                                                     cop_year = d$info$cop_year)
+      
     } else {
       targets_data <- d$data$UndistributedMER
-      #Mirror the data in TA as well 
-      dsd_ta_map <- datapackr::cop22_map_DataPack_DATIM_DEs_COCs %>% 
-        dplyr::select(indicator_code,
-                                                                       dataelementuid,
-                                                                       support_type,
-                                                                       numerator_denominator,
-                                                                       disagg_type)  %>% 
+
+    }
+    
+    #Mirror the data in TA as well 
+    dsd_ta_map <- datapackr::cop22_map_DataPack_DATIM_DEs_COCs %>% 
+      dplyr::select(indicator_code,
+                    dataelementuid,
+                    support_type,
+                    numerator_denominator,
+                    disagg_type)  %>% 
       dplyr::filter(support_type %in% c("DSD", "TA")) %>% 
       dplyr::distinct() %>% 
       tidyr::pivot_wider(names_from = "support_type", values_from = "dataelementuid") %>% 
       dplyr::select(DSD,TA)
-      
-      ta_targets_data <- dplyr::inner_join(targets_data,dsd_ta_map,by=c("dataElement" = "DSD")) %>% 
-        dplyr::select(-dataElement) %>% 
-        dplyr::rename(dataElement = TA)
-      
-      targets_data <- dplyr::bind_rows(targets_data, ta_targets_data)
-    }
+    
+    ta_targets_data <- dplyr::inner_join(targets_data,dsd_ta_map,by=c("dataElement" = "DSD")) %>% 
+      dplyr::select(-dataElement) %>% 
+      dplyr::rename(dataElement = TA)
+    
+    targets_data <- dplyr::bind_rows(targets_data, ta_targets_data)
 
     # Prepare d$tool$wb ####
     # If append is true, add the missing PSNUxIM combos to the existing
