@@ -61,22 +61,17 @@ packPSNUxIM <- function(wb,
   #for analytics and display purposes, but when we distribute
   #the data with the model, the model should decide
   #how the data gets spread between DSD and TA.
-  # ## Filter to match targets data ####
-  # snuxim_model_data %<>%
-  #   dplyr::right_join(
-  #     data %>% dplyr::select(-value, -attributeOptionCombo) %>% dplyr::distinct(),
-  #     by = c("dataElement" = "dataElement",
-  #            "period" = "period",
-  #            "orgUnit" = "orgUnit",
-  #            "categoryOptionCombo" = "categoryOptionCombo"))
 
   ## Translate from import format ####
-  snuxim_model_data %>%
-    dplyr::select(indicator_code, psnu_uid, mechanism_code,
-                  type,
-                  age_option_name, age_option_uid,
-                  sex_option_name, sex_option_uid,
-                  kp_option_name, kp_option_uid,
+  snuxim_model_data %<>%
+    datapackr::adorn_import_file(cop_year = cop_year,
+                                 filter_rename_output = FALSE,
+                                 d2_session = d2_session) %>%
+    dplyr::select(indicator_code, psnu_uid = orgUnit, mechanism_code,
+                  type = support_type,
+                  age_option_name = Age, age_option_uid = valid_ages.id,
+                  sex_option_name = Sex, sex_option_uid = valid_sexes.id,
+                  kp_option_name = KeyPop, kp_option_uid = valid_kps.id,
                   value) %>%
     dplyr::group_by(dplyr::across(c(-mechanism_code, -type, -value))) %>%
     dplyr::mutate(

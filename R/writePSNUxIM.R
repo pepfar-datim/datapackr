@@ -124,43 +124,33 @@ writePSNUxIM <- function(d,
     d$data$snuxim_model_data <- smd[d$info$country_uids] %>%
       dplyr::bind_rows()
     rm(smd)
-
+    dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
+    
     d$data$snuxim_model_data %<>%
     ## Address issues with PMTCT_EID ####
       dplyr::mutate_at(
         c("age_option_name", "age_option_uid"),
         ~dplyr::case_when(indicator_code %in% c("PMTCT_EID.N.2.T", "PMTCT_EID.N.12.T")
                           ~ NA_character_,
-                          TRUE ~ .))
-    # ## Aggregate across 50+ age bands ####
-    #   dplyr::group_by(dplyr::across(c(-value))) %>%
-    #   dplyr::summarise(value = sum(value)) %>%
-    #   dplyr::ungroup()
-
-
-
-    targets_data_filter <- d$data$UndistributedMER %>%
-      dplyr::inner_join(
-        cop22_map_adorn_import_file,
-        by = c(
-          "dataElement" = "dataelementuid",
-          "categoryOptionCombo" = "categoryoptioncombouid",
-          "period" = "period"
-        )
-      ) %>%
-      dplyr::select(dataElement, orgUnit, indicator_code, valid_ages.name,
-      valid_sexes.name, valid_kps.name) %>%
-      dplyr::distinct()
-
-    ## Filter model data to match targets_data ####
-    d$data$snuxim_model_data %<>%
-      dplyr::right_join(
-        targets_data_filter,
-        by = c("psnu_uid" = "orgUnit",
-               "indicator_code" = "indicator_code",
-               "age_option_name" = "valid_ages.name",
-               "sex_option_name" = "valid_sexes.name",
-               "kp_option_name" = "valid_kps.name"))
+                          TRUE ~ .)) %>%
+    ## Convert to import file format ####
+      dplyr::left_join(
+        dp_datim_map,
+        by = c("indicator_code" = "indicator_code",
+               "age_option_uid" = "valid_ages.id",
+               "sex_option_uid" = "valid_sexes.id",
+               "kp_option_uid" = "valid_kps.id",
+               "type" = "support_type")) %>%
+      dplyr::select(dataElement = dataelementuid,
+                    period,
+                    orgUnit = psnu_uid,
+                    categoryOptionCombo = categoryoptioncombouid,
+                    attributeOptionCombo = mechanism_uid,
+                    value) %>%
+    ## Aggregate across 50+ age bands ####
+      dplyr::group_by(dplyr::across(c(-value))) %>%
+      dplyr::summarise(value = sum(value)) %>%
+      dplyr::ungroup()
 
     r <- packPSNUxIM(wb = d$tool$wb,
                      data = targets_data,
