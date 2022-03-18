@@ -125,7 +125,7 @@ writePSNUxIM <- function(d,
       dplyr::bind_rows()
     rm(smd)
     dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
-    
+
     d$data$snuxim_model_data %<>%
     ## Address issues with PMTCT_EID ####
       dplyr::mutate_at(

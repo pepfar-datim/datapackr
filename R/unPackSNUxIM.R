@@ -36,9 +36,9 @@ checkHasPSNUxIM <- function(d) {
   } else {
     d$info$has_psnuxim <- TRUE
   }
-  
+
   return(d)
-  
+
 }
 
 #' @export
@@ -75,7 +75,7 @@ unPackSNUxIM <- function(d) {
     )
 
   d <- checkHasPSNUxIM(d)
-  
+
   if (!d$info$has_psnuxim) {
     return(d)
   }
