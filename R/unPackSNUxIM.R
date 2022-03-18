@@ -33,13 +33,12 @@ checkHasPSNUxIM <- function(d) {
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
 
-    return(d)
-
   } else {
     d$info$has_psnuxim <- TRUE
-
-    return(d)
   }
+  
+  return(d)
+  
 }
 
 #' @export
@@ -76,6 +75,10 @@ unPackSNUxIM <- function(d) {
     )
 
   d <- checkHasPSNUxIM(d)
+  
+  if (!d$info$has_psnuxim) {
+    return(d)
+  }
 
   # PATCH: Remove hard-coded FYs
   names(d$data$SNUxIM) <- stringr::str_replace(names(d$data$SNUxIM), " \\(FY22\\)", "")
