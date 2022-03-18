@@ -52,14 +52,15 @@ packPSNUxIM <- function(wb,
     snuxim_model_data <- NULL
   }
 
-  ## Filter to match targets data ####
-  snuxim_model_data %<>%
-    dplyr::right_join(
-      data %>% dplyr::select(-value, -attributeOptionCombo) %>% dplyr::distinct(),
-      by = c("dataElement" = "dataElement",
-             "period" = "period",
-             "orgUnit" = "orgUnit",
-             "categoryOptionCombo" = "categoryOptionCombo"))
+  #TODO: Clean this section up. Notes from Slack on March 18 2022.
+  #Join with the adorn map to pull in indicator codes
+  #Join snuxim_model_data to get inidcator codes
+  #Join snxuim_model data and data by indicator code
+  #The unallocated data at this point needs to be agnostic
+  #to DSD/TA. We represent the unallocated data as DSD
+  #for analytics and display purposes, but when we distribute
+  #the data with the model, the model should decide
+  #how the data gets spread between DSD and TA.
 
   ## Translate from import format ####
   snuxim_model_data %<>%
