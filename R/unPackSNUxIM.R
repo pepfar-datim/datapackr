@@ -207,7 +207,7 @@ unPackSNUxIM <- function(d) {
  #  TODO: Reverting this to 5.1.5. We ended up selecting
  #  the FIRST set of mechanism columns which contained the decimal
  #  percentage allocations instead of the second set of columns
- #  which contain the actual values. 
+ #  which contain the actual values.
  #  #Get the additional mechanisms added by the user
  #  user_mechanisms <- stringr::str_extract(names(d$data$SNUxIM), "\\d{4,}_(DSD|TA)") %>%
  #    purrr::keep(~ !is.na(.x))
@@ -217,7 +217,7 @@ unPackSNUxIM <- function(d) {
  #    dplyr::filter(!indicator_code == "") %>%
  #    dplyr::pull(indicator_code) %>%
  #    purrr::discard(~ .x == "12345_DSD")
- # 
+ #
  #  d$data$SNUxIM <- d$data$SNUxIM %>%
  #    dplyr::select(mandatory_columns,user_mechanisms)
 
