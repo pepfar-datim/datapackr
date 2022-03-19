@@ -766,9 +766,9 @@ getMaxCores <- function() {
 #' @export
 #'
 formatSetStrings <- function(vec) {
-  if (!is.vector(vec)) return(NA)
+  if (!is.vector(vec)) return(NA_character_)
   vec <- vec[!is.na(vec)]
-  if( length(vec) == 0) return(NA)
+  if( length(vec) == 0) return(NA_character_)
   vec <- sort(vec)
   groups <- cumsum(c(0, diff(vec) > 1))
   sets <- split(vec, groups)
