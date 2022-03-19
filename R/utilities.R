@@ -757,6 +757,24 @@ getMaxCores <- function() {
   n_cores
 }
 
+#' Title
+#' @note Lifted from https://stackoverflow.com/questions/16800803/
+#' @description Format a vector of numbers into a string of ranges
+#' @param vec A vector of numbers
+#'
+#' @return
+#' @export
+#'
+formatSetStrings <- function(vec) {
+  vec <- sort(vec)
+  groups <- cumsum(c(0, diff(vec) > 1))
+  sets <- split(vec, groups)
+  set_strings <- sapply(sets, function(x) paste0(min(x),":",max(x)))
+  paste0(set_strings,collapse=",")
+}
+
+
+
 #' @export
 #' @title Is UID-ish
 #' @md
