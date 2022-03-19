@@ -12,7 +12,7 @@ test_that("Can return formatted set string", {
 })
 
 test_that("Can filter NAs in vector", {
-  vec <- c(1,2,3,5,7,8,9)
+  vec <- c(1,2,3,5,NA,7,8,NA,9)
   expect_identical(formatSetStrings(vec),"1:3,5,7:9")
   
 })
