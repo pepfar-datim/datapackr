@@ -764,10 +764,10 @@ getMaxCores <- function() {
 #'
 #' @return
 #' @export
-#' @examples 
+#' @examples
 #' formatSetStrings(c(1,2,3,5,6,7,8))
 #' formatSetStrings(c(8,7,6,5,3,2,1))
-#' 
+#'
 formatSetStrings <- function(vec) {
 
   if (!is.vector(vec)) return(NA_character_)
