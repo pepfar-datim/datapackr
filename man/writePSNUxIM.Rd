@@ -15,6 +15,9 @@ writePSNUxIM(
 \arguments{
 \item{d}{Datapackr sidecar object}
 
+\item{snuxim_model_data_path}{Export from DATIM needed to allocate data
+across mechanisms in the PSNUxIM tab}
+
 \item{output_folder}{Local folder where you would like your Data Pack to be
 saved upon export.}
 

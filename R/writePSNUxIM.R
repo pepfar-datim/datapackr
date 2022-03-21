@@ -6,6 +6,8 @@
 #'
 #' @param append If TRUE append rows to the existing DataPack otherwise,
 #' output a Missing PSNUxIM targets workbook.
+#' @param snuxim_model_data_path Export from DATIM needed to allocate data
+#' across mechanisms in the PSNUxIM tab
 #' @inheritParams datapackr_params
 #' @return d
 #'
