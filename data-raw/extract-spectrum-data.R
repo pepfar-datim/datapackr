@@ -57,7 +57,7 @@ for (i in 1:length(spectrum_extracts)) {
   data <- spectrum_extracts[[i]]$data
   
   output_file_name <- 
-    paste0(output_path, "COP21SpectrumExtract_", country, ".csv")
+    paste0(output_folder, "COP21SpectrumExtract_", country, ".csv")
   
   readr::write_csv(data, output_file_name)
 }

@@ -6,6 +6,11 @@
 \usage{
 updateExistingPrioritization(prios, analytics_table)
 }
+\arguments{
+\item{prios}{Data frame of prioritization levels.}
+
+\item{analytics_table}{A table of COP memo indicators at the PSNU level.}
+}
 \value{
 
 }

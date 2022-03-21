@@ -19,6 +19,6 @@ d <- unPackTool(tool = "OPU Data Pack", cop_year = 2021)
 
 # Export DATIM import files ####
   exportPackr(data = d$datim$MER,
-              output_path = output_folder,
+              output_folder = output_folder,
               type = "DATIM Export File",
               datapack_name = d$info$datapack_name)

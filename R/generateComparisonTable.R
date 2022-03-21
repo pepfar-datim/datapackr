@@ -37,7 +37,7 @@ generateComparisonTable <- function(d) {
       dplyr::filter(!Identical) %>%
       tidyr::pivot_longer(cols = c(Current, Proposed, Diff, `Percent diff`), names_to = "Data Type")  %>%
       dplyr::mutate(`Data Type` = factor(`Data Type`, levels = c("Proposed", "Current", "Diff", "Percent diff"))) %>%
-      dplyr::select(-psnu_uid,-Identical)
+      dplyr::select(-psnu_uid, -Identical)
 
   }
 

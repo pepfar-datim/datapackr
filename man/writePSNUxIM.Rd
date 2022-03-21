@@ -8,18 +8,23 @@ writePSNUxIM(
   d,
   snuxim_model_data_path = NULL,
   output_folder = NULL,
-  d2_session = dynGet("d2_default_session", inherits = TRUE)
+  d2_session = dynGet("d2_default_session", inherits = TRUE),
+  append = TRUE
 )
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{d}{Datapackr sidecar object}
 
-\item{snuxim_model_data_path}{Filepath where SNU x IM distribution model is stored.}
+\item{snuxim_model_data_path}{Export from DATIM needed to allocate data
+across mechanisms in the PSNUxIM tab}
 
 \item{output_folder}{Local folder where you would like your Data Pack to be
 saved upon export.}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id}
+
+\item{append}{If TRUE append rows to the existing DataPack otherwise,
+output a Missing PSNUxIM targets workbook.}
 }
 \value{
 d

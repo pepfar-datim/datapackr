@@ -14,6 +14,10 @@ the target memo tables.}
 level, either d$memo$datim$by_agency or d$memo$datapack$by_agency.}
 
 \item{ou_name}{Name of the organisation unit.}
+
+\item{source_type}{Indicates whether the data for a COP Approval Memo table
+should come from the Data Pack or from DATIM. Values can be either
+\code{datapack} or \code{datim}.}
 }
 \value{
 

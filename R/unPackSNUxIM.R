@@ -1,3 +1,47 @@
+#' Check that a Data Pack tool has a PSNUxIM tab
+#'
+#' @inheritParams datapackr_params
+#' @description Internal function to determine if a PSNUxIM tab exists
+#'
+#' @return d object list with additional flags for PSNUxIM state.
+checkHasPSNUxIM <- function(d) {
+
+  stopifnot(is.data.frame(d$data$SNUxIM))
+
+  if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1, 1]])) {
+    d$info$has_psnuxim <- FALSE
+
+    if (d$info$tool == "Data Pack") {
+      d$info$needs_psnuxim <- TRUE
+
+      warning_msg <-
+        paste0(
+          "WARNING! Your Data Pack needs a new PSNUxIM tab. Please select `Regenerate PSNUxIM`",
+          " to receive an updated copy of your Data Pack with new rows added",
+          " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
+          " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack, ",
+          " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
+          " all changes to other tabs of your Data Pack are complete.  Once all other updates",
+          " are complete, you may return here to update your PSNUxIM tab at any time.",
+          "\n")
+    } else if (d$info$tool == "OPU Data Pack") {
+      warning_msg <- paste0(
+        "WARNING! Your OPU Data Pack's PSNUxIM tab appears to be empty. Please",
+        " investigate and resubmit."
+      )
+    }
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+
+    return(d)
+
+  } else {
+    d$info$has_psnuxim <- TRUE
+
+    return(d)
+  }
+}
+
 #' @export
 #' @title unPackSNUxIM(d)
 #'
@@ -31,36 +75,7 @@ unPackSNUxIM <- function(d) {
       .name_repair = "minimal"
     )
 
-  if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1, 1]])) {
-    d$info$has_psnuxim <- FALSE
-
-    if (d$info$tool == "Data Pack") {
-      d$info$needs_psnuxim <- TRUE
-
-      warning_msg <-
-        paste0(
-          "WARNING! Your Data Pack needs a new PSNUxIM tab. Please select `Regenerate PSNUxIM`",
-          " to receive an updated copy of your Data Pack with new rows added",
-          " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
-          " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack, ",
-          " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
-          " all changes to other tabs of your Data Pack are complete.  Once all other updates",
-          " are complete, you may return here to update your PSNUxIM tab at any time.",
-          "\n")
-    } else if (d$info$tool == "OPU Data Pack") {
-      warning_msg <- paste0(
-        "WARNING! Your OPU Data Pack's PSNUxIM tab appears to be empty. Please",
-        " investigate and resubmit."
-      )
-    }
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
-
-    return(d)
-
-  } else {
-    d$info$has_psnuxim <- TRUE
-  }
+  d <- checkHasPSNUxIM(d)
 
   # PATCH: Remove hard-coded FYs
   names(d$data$SNUxIM) <- stringr::str_replace(names(d$data$SNUxIM), " \\(FY22\\)", "")
@@ -80,9 +95,9 @@ unPackSNUxIM <- function(d) {
   if (d$info$tool == "Data Pack") {
     d$data$missingCombos <- d$data$MER %>%
       dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
-      #Special handling for differences between main tab and PSNUxIM tab age bands
-      #The data should not be aggregated at this point. This will happen
-      #when the data is repacked by packForDATIM_UndistributedMER
+      # Special handling for differences between main tab and PSNUxIM tab age bands
+      # The data should not be aggregated at this point. This will happen
+      # when the data is repacked by packForDATIM_UndistributedMER
       dplyr::mutate(Age_snuxim = dplyr::case_when(
         stringr::str_detect(Age, "(50-54|55-59|60-64|65+)") &
           !stringr::str_detect(indicator_code, "TX_CURR.T") ~ "50+",
@@ -170,6 +185,7 @@ unPackSNUxIM <- function(d) {
   header_cols <- cols_to_keep %>%
     dplyr::filter(col_type == "row_header")
 
+
   if (d$info$tool == "Data Pack") {
     original_targets <- d$data$MER
   } else {
@@ -187,6 +203,23 @@ unPackSNUxIM <- function(d) {
       dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop,
                     value = DataPackTarget)
   }
+
+ #  TODO: Reverting this to 5.1.5. We ended up selecting
+ #  the FIRST set of mechanism columns which contained the decimal
+ #  percentage allocations instead of the second set of columns
+ #  which contain the actual values.
+ #  #Get the additional mechanisms added by the user
+ #  user_mechanisms <- stringr::str_extract(names(d$data$SNUxIM), "\\d{4,}_(DSD|TA)") %>%
+ #    purrr::keep(~ !is.na(.x))
+ # #Get the mandatory columns
+ #  mandatory_columns <- cols_to_keep %>%
+ #    dplyr::filter(!is.na(indicator_code)) %>%
+ #    dplyr::filter(!indicator_code == "") %>%
+ #    dplyr::pull(indicator_code) %>%
+ #    purrr::discard(~ .x == "12345_DSD")
+ #
+ #  d$data$SNUxIM <- d$data$SNUxIM %>%
+ #    dplyr::select(mandatory_columns,user_mechanisms)
 
   # Pare down to populated, updated targets only ####
   d$data$SNUxIM <- d$data$SNUxIM[, cols_to_keep$col]
@@ -336,7 +369,7 @@ unPackSNUxIM <- function(d) {
     d <- checkNumericValues(d, sheet, header_cols)
   }
 
-  #sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
+  # sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
 
   d$data$SNUxIM %<>%
     { suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)), #nolint
