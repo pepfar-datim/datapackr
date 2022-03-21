@@ -4,7 +4,7 @@
 #' @description
 #' Pulls data from DATIM API needed to pack OPU Data Pack.
 #'
-#' @inherit_params datapackr_params
+#' @inheritParams datapackr_params
 #'
 #' @return Returns dataset needed for use in \code{\link{packOPUDataPack}}.
 #'
