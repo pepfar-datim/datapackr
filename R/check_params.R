@@ -130,14 +130,14 @@ check_country_uids <- function(country_uids, force = TRUE) {
 
   # If any country_uids are invalid, warn but remove and still move on.
   if (any(!country_uids %in% valid_PSNUs$country_uid)) {
-    #subset submitted list base on it values NOT being in valid_PSNUs
+    # subset submitted list base on it values NOT being in valid_PSNUs
     invalid_country_uids <- country_uids[!country_uids %in% valid_PSNUs$country_uid]
 
     interactive_message(
       paste0("The following supplied country_uids appear to be invalid and will be removed: ",
              paste_oxford(invalid_country_uids, final = "&"))
     )
-    #subset submitted list base on it values being in valid_PSNUs
+    # subset submitted list base on it values being in valid_PSNUs
     country_uids <- country_uids[country_uids %in% valid_PSNUs$country_uid]
 
     if (length(country_uids) == 0) {
@@ -497,7 +497,8 @@ checkTemplatePath <- function(template_path,
   # provided. Default here is the template_path for the most recent/current COP
   # Year for the Data Pack.
   invisible(
-    utils::capture.output( #Found in packageSetup.R
+    utils::capture.output(
+      # pick_template_path found in packageSetup.R
       expected_template_path <- pick_template_path(cop_year = cop_year, tool = tool)))
 
   template_path <- template_path %||% expected_template_path

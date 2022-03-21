@@ -317,7 +317,7 @@ getOUFromCountryUIDs <- function(country_uids) {
 #' @return Dataframe \code{data} with added columns listed in \code{cnames}.
 #'
 addcols <- function(data, cnames, type = "character") {
-  add <- cnames[!cnames %in% names(data)] #Subsets column name list BY only
+  add <- cnames[!cnames %in% names(data)] # Subsets column name list BY only
   # keeping names that are NOT in the supplied dataframes column names already.
 
   if (length(add) != 0) { #If their are columns that need to be filled in THEN

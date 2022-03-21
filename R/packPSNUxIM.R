@@ -9,7 +9,7 @@
 #'
 #' @return r Sidecar object containing both an openxlsx Workbook and alert messages
 #'
-packPSNUxIM <- function(wb,# Workbook object
+packPSNUxIM <- function(wb, # Workbook object
                         data,
                         snuxim_model_data,
                         cop_year = NULL, # Cop year based on the file
@@ -35,8 +35,8 @@ packPSNUxIM <- function(wb,# Workbook object
 
   # Create data sidecar to eventually compile and return ####
   r <- list(
-    wb = wb,#Workbook object xlsx
-    info = list(messages = MessageQueue(), #Found in messagesQueue.R
+    wb = wb, # Workbook object xlsx
+    info = list(messages = MessageQueue(), # Found in messagesQueue.R
     has_error = FALSE))
 
   # Prep model data ####
@@ -108,29 +108,29 @@ packPSNUxIM <- function(wb,# Workbook object
     )
 
   percents <- snuxim_model_data %>%
-    dplyr::select(-value) %>% #Drops value column
-    tidyr::pivot_wider(names_from = mechcode_supporttype, #pivots data to be wide with more columns
+    dplyr::select(-value) %>% # Drops value column
+    tidyr::pivot_wider(names_from = mechcode_supporttype, # pivots data to be wide with more columns
                        values_from = percent)
 
   values <- snuxim_model_data %>%
-    dplyr::select(-percent, -mechcode_supporttype) %>% #Drops these columns
+    dplyr::select(-percent, -mechcode_supporttype) %>% # Drops these columns
     dplyr::group_by(dplyr::across(c(-value))) %>%
-    dplyr::summarise(value = sum(value)) %>% #Summarize based upon values
+    dplyr::summarise(value = sum(value)) %>% # Summarize based upon values
     dplyr::ungroup()
 
-  #Throws a warning to the user if the number rows do not match after munging.
+  # Throws a warning to the user if the number rows do not match after munging.
   if (NROW(percents) != NROW(values)) {
     stop("Aggregating values and percents led to different row counts!")
   }
 
-  snuxim_model_data <- values %>% #Joins percents to values
+  snuxim_model_data <- values %>% # Joins percents to values
     dplyr::left_join(percents,
                      by = c("psnu_uid", "indicator_code", "Age", "Sex", "KeyPop"))
 
   ## Align EID age bands with Data Pack ####
   snuxim_model_data %<>%
     dplyr::mutate(
-      #If age contains the below values place NA.
+      # If age contains the below values place NA.
       Age = dplyr::if_else(
         indicator_code %in% c("PMTCT_EID.N.2.T", "PMTCT_EID.N.12.T"),
         NA_character_,
@@ -140,7 +140,7 @@ packPSNUxIM <- function(wb,# Workbook object
 
   ## Check Dedupe cols ####
   # Double check that Dedupe cols all exist as expected
-  snuxim_model_data %<>% #Adds the below columns to snuxim_model_data
+  snuxim_model_data %<>% # Adds the below columns to snuxim_model_data
     datapackr::addcols(cnames = c("DSD Dedupe",
                                   "TA Dedupe",
                                   "Crosswalk Dedupe"),
@@ -149,11 +149,11 @@ packPSNUxIM <- function(wb,# Workbook object
   ## Create Deduplicated Rollups ####
   snuxim_model_data %<>%
     dplyr::mutate(
-      #Regex looks for 4 digits or the string "HllvX50cXC0"
+      # Regex looks for 4 digits or the string "HllvX50cXC0"
       `Total Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}|HllvX50cXC0")), na.rm = TRUE),
-      #Regex looks for 4digits followed by _DSD
+      # Regex looks for 4digits followed by _DSD
       `DSD Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_DSD")), na.rm = TRUE),
-      #Regex looks for 4digits followed by _TA
+      # Regex looks for 4digits followed by _TA
       `TA Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_TA")), na.rm = TRUE))
 
   ## Create Duplicated Rollups ####
@@ -177,7 +177,7 @@ packPSNUxIM <- function(wb,# Workbook object
       )
 
   # Create Max columns ####
-  snuxim_model_data %<>% #rowMax found in utilities.R
+  snuxim_model_data %<>% # rowMax found in utilities.R
     datapackr::rowMax(cn = "Max_TA.T_1", regex = "\\d{4,}_TA") %>% # nolint
     datapackr::rowMax(cn = "Max_DSD.T_1", regex = "\\d{4,}_DSD") %>% # nolint
     dplyr::mutate(
@@ -226,7 +226,7 @@ packPSNUxIM <- function(wb,# Workbook object
                   `DSD Dedupe`, `TA Dedupe`, `Crosswalk Dedupe`)
 
   # Prep dataset of targets to allocate ####
-  data %<>% #function found in adorn_import_file.R
+  data %<>% # adorn_import_file found in adorn_import_file.R
     adorn_import_file(cop_year = cop_year, filter_rename_output = FALSE, d2_session = d2_session) %>%
     dplyr::select(PSNU = dp_psnu, orgUnit, indicator_code, Age, Sex, KeyPop,
                   DataPackTarget = value) %>%
@@ -390,8 +390,8 @@ packPSNUxIM <- function(wb,# Workbook object
   ## #We could use map, but I don't think a performance boost will be realized?
 
   data_structure %<>%
-    dplyr::arrange(col) %>% #Arrange rows based upon col values
-    dplyr::mutate(#Sets column names based upon col.im.percents values
+    dplyr::arrange(col) %>% # Arrange rows based upon col values
+    dplyr::mutate(# Sets column names based upon col.im.percents values
       column_names = dplyr::case_when(
         col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_", col),
         col >= col.im.targets[1] & col <= (col.im.targets[1] + count.im.datim - 1) ~ paste0("target_col_", col),
@@ -402,7 +402,7 @@ packPSNUxIM <- function(wb,# Workbook object
     tibble::column_to_rownames(var = "column_names") %>%
     dplyr::select(formula) %>%
     t() %>%
-    tibble::as_tibble() %>% #make tibble
+    tibble::as_tibble() %>% # make tibble
     ## Setup formulas
     dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
     dplyr::mutate(
@@ -424,10 +424,10 @@ packPSNUxIM <- function(wb,# Workbook object
   }
 
   # Combine schema with SNU x IM model dataset ####
-  #TODO: Fix this to not re-add mechanisms removed by the Country Team
-  #(filter snuxim_model_data to only columns with not all NA related to data in missing combos)
+  # TODO: Fix this to not re-add mechanisms removed by the Country Team
+  # (filter snuxim_model_data to only columns with not all NA related to data in missing combos)
   data_structure <- datapackr::swapColumns(data_structure, snuxim_model_data) %>%
-    #swapColumns found in utilities.R
+    # swapColumns found in utilities.R
     dplyr::bind_cols(
       snuxim_model_data %>%
         # Regex matches string that start with 4 digits. Note this can mean

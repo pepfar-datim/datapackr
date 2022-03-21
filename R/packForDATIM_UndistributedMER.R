@@ -35,7 +35,7 @@ packForDATIM_UndistributedMER <- function(data,
   UndistributedMER <- data %>%
     dplyr::mutate(support_type = "DSD",
                   mech_code = default_catOptCombo()) %>%
-    #Special handling for AGYW_PREV
+    # Special handling for AGYW_PREV
     dplyr::mutate(
       support_type = dplyr::case_when(
         stringr::str_detect(indicator_code, "AGYW_PREV") ~ "No Support Type",

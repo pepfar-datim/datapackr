@@ -102,7 +102,7 @@ printMessages.MessageQueue <- function(x) {
         paste(
           seq_along(messages$message),
           ": ", messages$message
-          #stringr::str_squish(gsub("\n", "", d$info$messages))
+          # stringr::str_squish(gsub("\n", "", d$info$messages))
         ),
         sep = "",
         collapse = "\r\n")
