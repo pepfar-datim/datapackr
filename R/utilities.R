@@ -184,10 +184,13 @@ interactive_warning <- function(x) {
 #' @param datapack_uid A unique ID specifying the PEPFAR Operating Unit or
 #' specific Data Pack country grouping. If left unspecified, will pull all
 #' Country Names.
+#' @inheritParams datapackr_params
 #'
 #' @return Data frame of Countries
 #'
-getCountries <- function(datapack_uid = NA) {
+getCountries <- function(datapack_uid = NA,
+                         d2_session = dynGet("d2_default_session",
+                                             inherits = TRUE)) {
 
   # Pull Country List
     countries <-
