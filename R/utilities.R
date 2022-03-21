@@ -107,7 +107,7 @@ swapColumns <- function(to, from) {
     for (col in cols) {
       if (col %in% colnames(to)) {
         # base column swap
-        to[,col] <- from[,col]
+        to[, col] <- from[, col]
       }
     }
   }
