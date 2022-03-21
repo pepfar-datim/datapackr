@@ -7,20 +7,8 @@
 getOPUDataFromDATIM(
   cop_year,
   country_uids = NULL,
-  country_names = NULL,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
-}
-\arguments{
-\item{cop_year}{COP Year. Remember, COP20 = FY21 targets.}
-
-\item{country_uids}{DATIM UIDs of Countries to return data for. Can supply either
-this or Country Names.}
-
-\item{country_names}{Names of Countries to return data for. Can supply either this
-or DATIM Country UIDs.}
-
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
 }
 \value{
 Returns dataset needed for use in \code{\link{packOPUDataPack}}.
