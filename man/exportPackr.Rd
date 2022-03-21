@@ -4,14 +4,14 @@
 \alias{exportPackr}
 \title{Export output.}
 \usage{
-exportPackr(data, output_path, tool, datapack_name)
+exportPackr(data, output_folder, tool, datapack_name)
 }
 \arguments{
 \item{data}{Data object to export. Can be either a dataframe or an Openxlsx
 Workbook object.}
 
-\item{output_path}{A local path directing to the folder where you would like
-outputs to be saved. If not supplied, will output to working directory.}
+\item{output_folder}{Local folder where you would like your Data Pack to be
+saved upon export.}
 
 \item{tool}{File prefix to be applied in output filename, as follows:
   \describe{

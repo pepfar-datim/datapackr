@@ -13,14 +13,12 @@ writePSNUxIM(
 )
 }
 \arguments{
-\item{d}{Datapackr object}
-
-\item{snuxim_model_data_path}{Filepath where SNU x IM distribution model is stored.}
+\item{d}{Datapackr sidecar object}
 
 \item{output_folder}{Local folder where you would like your Data Pack to be
 saved upon export.}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id}
 
 \item{append}{If TRUE append rows to the existing DataPack otherwise,
 output a Missing PSNUxIM targets workbook.}

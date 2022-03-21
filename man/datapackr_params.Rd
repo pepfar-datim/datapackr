@@ -71,8 +71,7 @@ a cached copy of the mechanisms SQL view.}
 FY22 targets = COP21.}
 
 \item{output_folder}{Local folder where you would like your Data Pack to be
-saved upon export. If left as \code{NULL}, will output to
-\code{Working Directory}.}
+saved upon export.}
 
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}

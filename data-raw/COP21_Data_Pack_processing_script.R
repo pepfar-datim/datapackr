@@ -24,7 +24,7 @@ d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
 
 # Export DATIM import files ####
   exportPackr(data = d$datim$MER,
-              output_path = output_folder,
+              output_folder = output_folder,
               type = "DATIM Export File",
               datapack_name = d$info$datapack_name)
 
@@ -180,7 +180,7 @@ d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
 
   exportPackr(
     data = d$datim$MER,
-    output_path = d$keychain$output_folder,
+    output_folder = d$keychain$output_folder,
     type = "DATIM Export File",
     datapack_name = d$info$datapack_name
   )

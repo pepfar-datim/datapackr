@@ -4,13 +4,9 @@
 #' @description Checks a Data Pack for need of new or appended PSNUxIM data, then
 #' writes this into the Data Pack supplied. unPackTool must be run as prerequisite.
 #'
-#' @param d Datapackr object
-#' @param snuxim_model_data_path Filepath where SNU x IM distribution model is stored.
-#' @param output_folder Local folder where you would like your Data Pack to be
-#' saved upon export.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @param append If TRUE append rows to the existing DataPack otherwise,
 #' output a Missing PSNUxIM targets workbook.
+#' @inheritParams datapackr_params
 #' @return d
 #'
 writePSNUxIM <- function(d,
@@ -184,7 +180,7 @@ writePSNUxIM <- function(d,
     interactive_print("Exporting your new Data Pack...")
     exportPackr(
       data = d$tool$wb,
-      output_path = d$keychain$output_folder,
+      output_folder = d$keychain$output_folder,
       tool = "Data Pack",
       datapack_name = d$info$datapack_name)
 
