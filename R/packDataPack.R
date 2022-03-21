@@ -1,26 +1,11 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title Pack a Data Pack
 #'
 #' @description
 #' Takes a Data Pack template, combines it with data pulled from DATIM API, and
 #' produces a Data Pack ready for distribution.
 #'
-#' @param model_data Data from DATIM needed to pack into Data Pack
-#' @param datapack_name Name you would like associated with this Data Pack.
-#' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
-#' @param country_uids Unique IDs for countries to include in the Data Pack.
-#' For full list of these IDs, see \code{datapackr::dataPackMap}.
-#' @param template_path Local filepath to Data Pack template Excel (XLSX) file.
-#' This file MUST NOT have any data validation formats present. If left
-#' \code{NULL}, will prompt for file selection via window.
-#' @param  cop_year Specifies COP year for dating as well as selection of
-#' templates.
-#' @param output_folder Local folder where you would like your Data Pack to be
-#' saved upon export.
-#' @param results_archive If TRUE, will export compiled results of all tests and
-#' processes to output_folder.
-#' @param d2_session DHIS2 Session id
+#' @inheritParams datapackr_params
 #'
 #' @return Exports a Data Pack to Excel within \code{output_folder}.
 #'
@@ -49,9 +34,12 @@ packDataPack <- function(model_data,
     ),
     info = list(
       datapack_name = datapack_name,
+      sane_name = getSaneName(datapack_name),
       country_uids = country_uids,
       tool = "Data Pack",
-      cop_year =  cop_year
+      cop_year =  cop_year,
+      source_user = d2_session$me$userCredentials$username,
+      operating_unit = getOUFromCountryUIDs(country_uids)
     ),
     data = list(
       model_data = model_data
@@ -89,7 +77,7 @@ packDataPack <- function(model_data,
   interactive_print("Checking template against schema and DATIM...")
   schema <-
     unPackSchema_datapack(
-      filepath = d$keychain$template,
+      template_path = d$keychain$template,
       skip = skip_tabs(tool = "Data Pack Template", cop_year = cop_year),
       cop_year = cop_year)
 
@@ -101,7 +89,7 @@ packDataPack <- function(model_data,
   d$tool$wb <- openxlsx::loadWorkbook(d$keychain$template_path)
 
   # Set global numeric format ####
-  options("openxlsx.numFmt" = "#, ##0")
+  options("openxlsx.numFmt" = "#,##0")
 
   # Write Home Sheet info ####
   d$tool$wb <- writeHomeTab(wb = d$tool$wb,
@@ -133,8 +121,8 @@ packDataPack <- function(model_data,
                                   cop_year = d$info$cop_year)
 
   # Hide unneeded sheets ####
-  # sheets_to_hide <- which(stringr::str_detect(names(d$tool$wb), "PSNUxIM|Summary"))
-  # openxlsx::sheetVisibility(d$tool$wb)[sheets_to_hide] <- "hidden"
+  sheets_to_hide <- which(stringr::str_detect(names(d$tool$wb), "PSNUxIM"))
+  openxlsx::sheetVisibility(d$tool$wb)[sheets_to_hide] <- "hidden"
 
   # Add Styles ####
   interactive_print("Cleaning up Styles...")
@@ -144,7 +132,7 @@ packDataPack <- function(model_data,
   # openxlsx::addStyle(d$tool$wb, sheet = "Summary",
   #summaryStyle, cols = 1:2, rows = 1:62, gridExpand = TRUE, stack = TRUE)
 
-    ## Add styles to Spectrum tab
+    ## Add styles to Spectrum tab ####
   #TODO: See if new openxlsx release addresses this issue
   spectrumStyle1 <- openxlsx::createStyle(fgFill = "#9CBEBD")
   spectrumStyle2 <- openxlsx::createStyle(fgFill = "#FFEB84")
@@ -176,14 +164,14 @@ packDataPack <- function(model_data,
   # Save & Export Workbook
   interactive_print("Saving...")
   exportPackr(data = d$tool$wb,
-              output_path = d$keychain$output_folder,
+              output_folder = d$keychain$output_folder,
               tool = d$info$tool,
               datapack_name = d$info$datapack_name)
 
   # Save & Export Archive
   if (results_archive) {
     exportPackr(data = d,
-                output_path = d$keychain$output_folder,
+                output_folder = d$keychain$output_folder,
                 tool = "Results Archive",
                 datapack_name = d$info$datapack_name)
   }

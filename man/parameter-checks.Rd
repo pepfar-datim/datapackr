@@ -97,8 +97,9 @@ processes to output_folder.}
 mechanisms in the PSNUxIM tab}
 
 \item{output_folder}{Local folder where you would like your Data Pack to be
-saved upon export. If left as \code{NULL}, will output to
-\code{Working Directory}.}
+saved upon export.}
+
+\item{...}{Additional arguments to pass.}
 }
 \value{
 For lower-level functions, a valid function parameter value/object. For the

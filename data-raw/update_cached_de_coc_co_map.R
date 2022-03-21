@@ -2,21 +2,23 @@
 # metadata, then combines this with the Data Pack schema to create a full map between
 # Data Packs and DATIM for the purpose of generating import and analytics tables.
 
-datapackr::loginToDATIM("~/.secrets/datim.json")
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
+datimutils::loginToDATIM(secrets)
 
 cop_year = getCurrentCOPYear()
 
 # Pull Code Lists for FY22 data (MER Targets, IMPATT, SUBNAT Targets) ####
-  mer.T <- pullFullCodeList(FY = cop_year +1, datastream = c("mer_targets"))
-  subnat.T <- pullFullCodeList(FY = cop_year +1, datastream = c("subnat_targets"))
-  impatt.T <- pullFullCodeList(FY = cop_year +1, datastream = c("impatt"))
+  mer.T <- pullFullCodeList(FY = cop_year +1, datastreams = c("mer_targets"))
+  subnat.T <- pullFullCodeList(FY = cop_year +1, datastreams = c("subnat_targets"))
+  impatt.T <- pullFullCodeList(FY = cop_year +1, datastreams = c("impatt"))
 
 # Pull Code Lists for FY21 data (IMPATT, SUBNAT Targets) ####
-  impatt.T_1 <- pullFullCodeList(FY = cop_year, datastream = c("impatt"))
-  subnat.T_1 <- pullFullCodeList(FY = cop_year, datastream = c("subnat_targets"))
+  impatt.T_1 <- pullFullCodeList(FY = cop_year, datastreams = c("impatt"))
+  subnat.T_1 <- pullFullCodeList(FY = cop_year, datastreams = c("subnat_targets"))
 
 # Pull Code Lists for FY20 Results (SUBNAT Results) ####
-  subnat.R <- pullFullCodeList(FY = cop_year -1, datastream = c("subnat_results"))
+  subnat.R <- pullFullCodeList(FY = cop_year -1, datastreams = c("subnat_results"))
   
 # Pull categoryOption metadata ####
   categoryoptions <- datimutils::getMetadata("categoryOptionCombos", fields = "id, categoryOptions")

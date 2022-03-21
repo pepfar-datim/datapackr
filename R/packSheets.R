@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title Loop through and populate normal Data Pack sheets
 #'
 #' @description
@@ -28,7 +27,7 @@ packDataPackSheets <- function(wb,
                                ou_level = "Prioritization",
                                org_units = NULL, #TODO: Any way we could use PEPFARlandia here?
                                model_data = NULL, #TODO: Could we load a play dataset here?
-                               schema = datapackr::data_pack_schema,
+                               schema = datapackr::data_pack_schema, # Load in base schema from package
                                sheets = NULL,
                                cop_year = getCurrentCOPYear()) {
 
@@ -41,7 +40,7 @@ packDataPackSheets <- function(wb,
   # Get org_units to write into Data Pack based on provided parameters. ####
   if (is.null(org_units)) {
     if (ou_level == "Prioritization") {
-      org_units <- datapackr::valid_PSNUs %>%
+      org_units <- datapackr::valid_PSNUs %>% # Load in valid_PSNUs list from package
         dplyr::filter(country_uid %in% country_uids) %>%
         add_dp_psnu(.) %>%
         dplyr::arrange(dp_psnu) %>%
@@ -64,7 +63,7 @@ packDataPackSheets <- function(wb,
   }
 
   # Prepare data ####
-  if (!all(country_uids %in% names(model_data))) {
+  if (!all(country_uids %in% names(model_data))) {#Checks if all country_uids are in model data.
     missing <- country_uids[!country_uids %in% names(model_data)]
     stop(
       paste0(
@@ -77,7 +76,7 @@ packDataPackSheets <- function(wb,
   data <- model_data[country_uids] %>%
     dplyr::bind_rows() %>%
     tidyr::drop_na(value) %>%
-    dplyr::select(-period)
+    dplyr::select(-period) # Drops period column
 
   # Get sheets to loop if not provided as parameter. ####
   if (is.null(sheets)) {
@@ -86,7 +85,7 @@ packDataPackSheets <- function(wb,
       dplyr::filter(data_structure == "normal"
                     & !(sheet_name %in% c("SNU x IM", "PSNUxIM"))
                     & sheet_name %in% names(wb)) %>%
-      dplyr::pull(sheet_name) %>%
+      dplyr::pull(sheet_name) %>% # Extracts the column sheet_name
       unique()
 
     sheets <- wb_sheets[wb_sheets %in% schema_sheets]
@@ -105,7 +104,7 @@ packDataPackSheets <- function(wb,
     sheet_codes <- schema %>%
       dplyr::filter(sheet_name == sheet
                     & col_type %in% c("past", "calculation")) %>%
-      dplyr::pull(indicator_code)
+      dplyr::pull(indicator_code)# Extracts the column indicator_code
 
     ## If no model data needed for a sheet, forward a NULL dataset to prevent errors
     if (length(sheet_codes) != 0) {
@@ -116,12 +115,12 @@ packDataPackSheets <- function(wb,
     }
 
     if (sheet == "AGYW") {
-      org_units_sheet <- datapackr::valid_PSNUs %>%
+      org_units_sheet <- datapackr::valid_PSNUs %>% # Load in valid_PSNUs list from package
         dplyr::filter(country_uid %in% country_uids) %>%
         add_dp_psnu(.) %>%
-        dplyr::arrange(dp_psnu) %>%
+        dplyr::arrange(dp_psnu) %>% # Order rows based on dp_psnu col values
         dplyr::filter(!is.na(DREAMS)) %>%
-        dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)
+        dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)# Only keep these columns
 
       if (NROW(org_units_sheet) == 0) {
         next

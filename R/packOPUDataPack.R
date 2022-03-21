@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title Pack an OPU Data Pack
 #'
 #' @description
@@ -104,7 +103,7 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
     # Save & Export Workbook
     print("Saving...")
     exportPackr(data = d$tool$wb,
-                output_path = d$keychain$output_folder,
+                output_folder = d$keychain$output_folder,
                 tool = d$info$tool,
                 datapack_name = d$info$datapack_name)
 
@@ -112,7 +111,7 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
     if (results_archive) {
       print("Archiving...")
       exportPackr(data = d,
-                  output_path = d$keychain$output_folder,
+                  output_folder = d$keychain$output_folder,
                   tool = "Results Archive",
                   datapack_name = d$info$datapack_name)
     }

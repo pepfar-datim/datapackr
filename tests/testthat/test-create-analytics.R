@@ -5,7 +5,7 @@ with_mock_api({
   test_that("We can create analytics", {
 
     d <-
-      datapackr:::createKeychainInfo(
+      datapackr::createKeychainInfo(
         submission_path = test_sheet("COP21_DP_random_with_psnuxim.xlsx"),
         tool = "Data Pack",
         country_uids = NULL,

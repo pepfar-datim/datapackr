@@ -1,8 +1,7 @@
 #' @export
 #' @title getMechanismViewFromDATIM
 #'
-#' @inheritParams unPackTool
-#' @inheritParams getMechanismViewFromDATIM
+#' @inheritParams datapackr_params
 #'
 #' @return Mechanism List
 #'
@@ -10,9 +9,10 @@ getMechanismViewFromDATIM <- function(cop_year = NULL,
                                   d2_session = dynGet("d2_default_session",
                                                       inherits = TRUE)) {
 
-  url_filter <-  ifelse(is.null(cop_year),"",
-  paste0("&filter=startdate:lt:", cop_year + 1, "-10-01",
-             "&filter=enddate:gt:", cop_year, "-09-30"))
+  url_filter <-
+    ifelse(is.null(cop_year), "",
+            paste0("&filter=startdate:lt:", cop_year + 1, "-10-01",
+                   "&filter=enddate:gt:", cop_year, "-09-30"))
 
   paste0(d2_session$base_url,
          "api/sqlViews/fgUtV6e9YIX/data.csv?paging=false", url_filter) %>%
@@ -32,7 +32,6 @@ getMechanismViewFromDATIM <- function(cop_year = NULL,
 
 
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title getMechanismView
 #'
 #' @description Retrieves a view of mechanisms with partners and agencies
@@ -41,22 +40,17 @@ getMechanismViewFromDATIM <- function(cop_year = NULL,
 #' is available to be read. Otherwise, if the user is logged in, the view
 #' will be obtained from DATIM. Otherwise, an empty dataframe is returned.
 #'
-#' @param country_uids Character vector of DATIM country IDs. This can only
-#' include countries. Regional Operating Unit uids will not be accepted. If not
-#' supplied, returns entire mechanism list, trimmed to user's DATIM permissions.
-#' @param cop_year Numeric value of COP Fiscal Year to filter mechanism list by.
-#' Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
-#' \code{2019}. If a FY is not supplied, returns entire mechanism list.
+#' Note that only country UIDs are accepted. If Regional Operating Unit uids
+#' are supplied, returns entire mechanism list, trimmed to user's DATIM permissions.
+#'
 #' @param include_dedupe Logical. If TRUE will include deduplication mechanisms.
 #' Default is FALSE.
 #' @param include_MOH Logical. If TRUE will include MOH mechanisms. Default is
 #' FALSE.
-#' @param cached_mechs_path Local file path to the cached mechanisms file.
-#' @param cached_mechs_path Filepath to an RDS file containing a cached copy of the
-#' SQL view used defined via a envionment variable.
 #' @param update_stale_cache If the cached_mechs_path file is outdated or unreadable,
 #' should a new cache be saved?
-#' @inheritParams unPackTool
+#' @param include_default Should the default mechanism also be included?
+#' @inheritParams datapackr_params
 #'
 #' @return Mechs
 #'
@@ -67,7 +61,8 @@ getMechanismView <- function(country_uids = NULL,
                              d2_session = dynGet("d2_default_session",
                                                  inherits = TRUE),
                              cached_mechs_path = paste0(Sys.getenv("support_files_directory"), "mechs.rds"),
-                             update_stale_cache = FALSE) {
+                             update_stale_cache = FALSE,
+                             include_default = TRUE) {
 
   empty_mechs_view <- tibble::tibble(
     "mechanism_desc" = character(),
@@ -86,22 +81,21 @@ getMechanismView <- function(country_uids = NULL,
   can_read_file <- file.access(cached_mechs_path, 4) == 0
   can_write_file <- file.access(dirname(cached_mechs_path), 2) == 0
 
-    # Check whether Cached Mech List is stale
-    if (is.null(d2_session$max_cache_age)) {
-      max_cache_age <- "1 day"
-    } else {
-      max_cache_age <- d2_session$max_cache_age
-    }
+  # Check whether Cached Mech List is stale
+  if (is.null(d2_session$max_cache_age)) {
+    max_cache_age <- "1 day"
+  } else {
+    max_cache_age <- d2_session$max_cache_age
+  }
 
   if (file.exists(cached_mechs_path) & can_read_file) {
-    is_lt <- function(x,y)  x < y
+    is_lt <- function(x, y)  x < y
     cache_age_dur <- lubridate::as.duration(lubridate::interval(file.info(cached_mechs_path)$mtime, Sys.time()))
     max_cache_age_dur <- lubridate::duration(max_cache_age)
-    is_fresh <- is_lt(cache_age_dur , max_cache_age_dur)
+    is_fresh <- is_lt(cache_age_dur, max_cache_age_dur)
   } else{
     is_fresh <- FALSE
   }
-
 
   if (is_fresh & can_read_file) {
     interactive_print("Loading cached mechs file")
@@ -111,18 +105,15 @@ getMechanismView <- function(country_uids = NULL,
   if (!is_fresh) {
     interactive_print("Fetching new mechs file from DATIM")
     mechs <-
-      getMechanismViewFromDATIM(
-                                d2_session = d2_session)
+      getMechanismViewFromDATIM(d2_session = d2_session)
     if (can_write_file) {
       interactive_print(paste0("Overwriting stale mechanisms view to ", cached_mechs_path))
       saveRDS(mechs, file = cached_mechs_path)
     }
   }
 
-
   # Filter by OU from a vector of country UIDs
   if (!is.null(country_uids)) {
-
     ous <- datapackr::valid_PSNUs %>%
       dplyr::select(ou, ou_id, country_uid) %>%
       dplyr::distinct() %>%
@@ -130,27 +121,49 @@ getMechanismView <- function(country_uids = NULL,
       dplyr::pull(ou) %>%
       unique(.)
 
-    mechs %<>% dplyr::filter(ou %in% ous)
-    }
+    mechs %<>%
+      dplyr::filter(ou %in% ous | is.na(ou))
+  }
 
+  # Filter by COP Year ####
   if (!is.null(cop_year)) {
     mechs %<>%
         dplyr::filter(
-                      startdate < paste0(cop_year + 1, "-10-01"),
-                      enddate > paste0(cop_year, "-09-30"))
+          (startdate < paste0(max(as.numeric(cop_year)) + 1, "-10-01") &
+            enddate > paste0(min(as.numeric(cop_year)), "-09-30"))
+          | is.na(startdate))
   }
 
-    # Include Dedupe or MOH
-      if (!include_dedupe) {
-        dedupe <- c("X8hrDf6bLDC", "YGT1o7UxfFu")
-        mechs %<>%  dplyr::filter((attributeOptionCombo %in% dedupe) == FALSE)
-      }
+  # Include Dedupe or MOH ####
+  if (!include_MOH) {
+    MOH <- c("QCJpv5aDCJU", "TRX0yuTsJA9")
+    mechs %<>%
+      dplyr::filter(!attributeOptionCombo %in% MOH)
+  }
 
-      # Include Dedupe or MOH
-      if (!include_MOH) {
-        MOH <- c("QCJpv5aDCJU", "TRX0yuTsJA9")
-        mechs %<>%  dplyr::filter((attributeOptionCombo %in% MOH) == FALSE)
-      }
+  if (!include_dedupe) {
+    dedupe <- c("X8hrDf6bLDC", "YGT1o7UxfFu")
+    mechs %<>%
+      dplyr::filter(!attributeOptionCombo %in% dedupe)
+  }
+
+  if (include_default) {
+
+    default_mech <- list(
+      mechanism_desc = "default",
+      mechanism_code = "default",
+      attributeOptionCombo = datapackr::default_catOptCombo(),
+      partner_desc = "None",
+      partner_id = "None",
+      agency = "None",
+      ou = NA,
+      startdate = NA,
+      enddate = NA
+    )
+
+    mechs <- rbind(mechs, default_mech)
+  }
+
 
   structure_ok <- dplyr::setequal(names(empty_mechs_view), names(mechs))
 
@@ -162,7 +175,6 @@ getMechanismView <- function(country_uids = NULL,
 
 
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title adornMechanisms(data)
 #'
 #' @description Join analytical dimensions with d$data$analtyics related

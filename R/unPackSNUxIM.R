@@ -1,35 +1,12 @@
-#' @export
-#' @title unPackSNUxIM(d)
+#' Check that a Data Pack tool has a PSNUxIM tab
 #'
-#' @description Looks inside submitted Data Pack to extract SNU x IM data from
-#'     \code{SNU x IM} tab and restructure this to be ready for cross-
-#'     pollination with PSNU-level MER data coming from
-#'     \code{\link{unPackSheets}}. This data is also analyzed to identify
-#'     structural or data anomalies and print any issues into running Warning
-#'     Message queue.
+#' @inheritParams datapackr_params
+#' @description Internal function to determine if a PSNUxIM tab exists
 #'
-#' @param d Datapackr object
+#' @return d object list with additional flags for PSNUxIM state.
+checkHasPSNUxIM <- function(d) {
 
-#' @return d
-#'
-unPackSNUxIM <- function(d) {
-
-  if (d$info$cop_year %in% c(2020, 2021)) {
-    sheet <- "PSNUxIM"
-  } else {
-    sheet <- "SNU x IM"
-  }
-
-  header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
-
-  d$data$SNUxIM <-
-    readxl::read_excel(
-      path = d$keychain$submission_path,
-      sheet = sheet,
-      range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
-      col_types = "text",
-      .name_repair = "minimal"
-    )
+  stopifnot(is.data.frame(d$data$SNUxIM))
 
   if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1, 1]])) {
     d$info$has_psnuxim <- FALSE
@@ -60,6 +37,100 @@ unPackSNUxIM <- function(d) {
 
   } else {
     d$info$has_psnuxim <- TRUE
+
+    return(d)
+  }
+}
+
+#' @export
+#' @title unPackSNUxIM(d)
+#'
+#' @description Looks inside submitted Data Pack to extract SNU x IM data from
+#'     \code{SNU x IM} tab and restructure this to be ready for cross-
+#'     pollination with PSNU-level MER data coming from
+#'     \code{\link{unPackSheets}}. This data is also analyzed to identify
+#'     structural or data anomalies and print any issues into running Warning
+#'     Message queue.
+#'
+#' @param d Datapackr object
+
+#' @return d
+#'
+unPackSNUxIM <- function(d) {
+
+  if (d$info$cop_year %in% c(2020, 2021, 2022)) {
+    sheet <- "PSNUxIM"
+  } else {
+    sheet <- "SNU x IM"
+  }
+
+  header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
+
+  d$data$SNUxIM <-
+    readxl::read_excel(
+      path = d$keychain$submission_path,
+      sheet = sheet,
+      range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
+      col_types = "text",
+      .name_repair = "minimal"
+    )
+
+  d <- checkHasPSNUxIM(d)
+
+  # PATCH: Remove hard-coded FYs
+  names(d$data$SNUxIM) <- stringr::str_replace(names(d$data$SNUxIM), " \\(FY22\\)", "")
+
+  # Document all combos used in submitted PSNUxIM tab ####
+  # This ensures tests for new combinations are correctly matched
+  d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
+    dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop) %>%
+    dplyr::mutate(
+      psnuid =
+        stringr::str_extract(
+          PSNU,
+          "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
+    dplyr::distinct() %>%
+    dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop)
+
+  if (d$info$tool == "Data Pack") {
+    d$data$missingCombos <- d$data$MER %>%
+      dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
+      #Special handling for differences between main tab and PSNUxIM tab age bands
+      #The data should not be aggregated at this point. This will happen
+      #when the data is repacked by packForDATIM_UndistributedMER
+      dplyr::mutate(Age_snuxim = dplyr::case_when(
+        stringr::str_detect(Age, "(50-54|55-59|60-64|65+)") &
+          !stringr::str_detect(indicator_code, "TX_CURR.T") ~ "50+",
+        TRUE ~ Age
+      )) %>%
+      dplyr::anti_join(
+        d$data$PSNUxIM_combos,
+        by =  c("PSNU", "psnuid", "indicator_code", "Age_snuxim" = "Age", "Sex", "KeyPop")
+      ) %>%
+      dplyr::select(-Age_snuxim)
+
+    d$tests$missing_combos <- d$data$missingCombos
+    attr(d$tests$missing_combos, "test_name") <- "Missing target combinations"
+
+    d$info$missing_psnuxim_combos <- (NROW(d$data$missingCombos) > 0)
+
+    if (d$info$missing_psnuxim_combos) {
+      d$info$needs_psnuxim <- TRUE
+
+      warning_msg <-
+        paste0(
+          "WARNING! Your Data Pack may need a new PSNUxIM tab. Along with this warning, ",
+          " you should also receive an updated copy of your Data Pack with new rows added",
+          " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
+          " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack, ",
+          " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
+          " all changes to other tabs of your Data Pack are complete.  Once all other updates",
+          " are complete, you may return here to update your PSNUxIM tab at any time.",
+          "\n")
+
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+
+    }
   }
 
   # TEST: Duplicate Rows; Warn; Combine ####
@@ -82,7 +153,7 @@ unPackSNUxIM <- function(d) {
     attr(d$tests$duplicate_rows, "test_name") <- "Duplicated rows"
 
     dupes_msg <-
-      capture.output(
+      utils::capture.output(
         print(as.data.frame(duplicates), row.names = FALSE)
       )
 
@@ -114,6 +185,7 @@ unPackSNUxIM <- function(d) {
   header_cols <- cols_to_keep %>%
     dplyr::filter(col_type == "row_header")
 
+
   if (d$info$tool == "Data Pack") {
     original_targets <- d$data$MER
   } else {
@@ -131,6 +203,23 @@ unPackSNUxIM <- function(d) {
       dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop,
                     value = DataPackTarget)
   }
+
+ #  TODO: Reverting this to 5.1.5. We ended up selecting
+ #  the FIRST set of mechanism columns which contained the decimal
+ #  percentage allocations instead of the second set of columns
+ #  which contain the actual values.
+ #  #Get the additional mechanisms added by the user
+ #  user_mechanisms <- stringr::str_extract(names(d$data$SNUxIM), "\\d{4,}_(DSD|TA)") %>%
+ #    purrr::keep(~ !is.na(.x))
+ # #Get the mandatory columns
+ #  mandatory_columns <- cols_to_keep %>%
+ #    dplyr::filter(!is.na(indicator_code)) %>%
+ #    dplyr::filter(!indicator_code == "") %>%
+ #    dplyr::pull(indicator_code) %>%
+ #    purrr::discard(~ .x == "12345_DSD")
+ #
+ #  d$data$SNUxIM <- d$data$SNUxIM %>%
+ #    dplyr::select(mandatory_columns,user_mechanisms)
 
   # Pare down to populated, updated targets only ####
   d$data$SNUxIM <- d$data$SNUxIM[, cols_to_keep$col]
@@ -287,7 +376,7 @@ unPackSNUxIM <- function(d) {
                                        as.numeric))
     }
 
-  # TEST: Missing Dedupe Rollup cols; Error; Add ####
+  # TEST: Missing Dedupe Rollup or Not PEPFAR cols; Error; Add ####
   dedupe_rollup_cols <- cols_to_keep %>%
     dplyr::filter(dataset == "mer" & col_type == "target" & !indicator_code %in% c("", "12345_DSD")) %>%
     dplyr::pull(indicator_code)
@@ -309,7 +398,7 @@ unPackSNUxIM <- function(d) {
         paste(missing_cols_fatal, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
 
@@ -320,9 +409,9 @@ unPackSNUxIM <- function(d) {
 
   # Recalculate dedupes ####
     ## Other than IM cols, only the following should be considered safe for reuse here:
-    # - Deduplicated DSD Rollup (FY22)
-    # - Deduplicated TA Rollup (FY22)
-    # - Total Deduplicated Rollup (FY22)
+    # - Deduplicated DSD Rollup
+    # - Deduplicated TA Rollup
+    # - Total Deduplicated Rollup
     ## All others must be recalculated to protect against formula breakers.
 
   d$data$SNUxIM %<>%
@@ -335,17 +424,16 @@ unPackSNUxIM <- function(d) {
       `SUM - DSD` = `DSD Duplicated Rollup`,
       `SUM - Crosswalk Total` =
         rowSums(dplyr::select(.,
-                              `Deduplicated DSD Rollup (FY22)`, `Deduplicated TA Rollup (FY22)`),
+                              `Deduplicated DSD Rollup`, `Deduplicated TA Rollup`),
                 na.rm = TRUE),
       `MAX - Crosswalk Total` =
-        pmax(`Deduplicated DSD Rollup (FY22)`, `Deduplicated TA Rollup (FY22)`, na.rm = T),
-      `DSD Dedupe` = `Deduplicated DSD Rollup (FY22)` - `SUM - DSD`,
-      `TA Dedupe` = `Deduplicated TA Rollup (FY22)` - `SUM - TA`,
-      `Crosswalk Dedupe` = `Total Deduplicated Rollup (FY22)` - `SUM - Crosswalk Total`
+        pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = T),
+      `DSD Dedupe` = `Deduplicated DSD Rollup` - `SUM - DSD`,
+      `TA Dedupe` = `Deduplicated TA Rollup` - `SUM - TA`,
+      `Crosswalk Dedupe` = `Total Deduplicated Rollup` - `SUM - Crosswalk Total`
     )
 
   # TEST: Improper dedupe values; Error; Continue ####
-
   dedupe_cols <- names(d$data$SNUxIM)[which(grepl("Deduplicated", names(d$data$SNUxIM)))]
 
     # Deduplicated DSD within range
@@ -355,18 +443,18 @@ unPackSNUxIM <- function(d) {
     ) %>%
     dplyr::mutate(
       `issues.Deduplicated DSD Rollup` =
-        !(`Deduplicated DSD Rollup (FY22)` >= `MAX - DSD`
-          & `Deduplicated DSD Rollup (FY22)` <= `SUM - DSD`),
+        !(`Deduplicated DSD Rollup` >= `MAX - DSD`
+          & `Deduplicated DSD Rollup` <= `SUM - DSD`),
 
       # Deduplicated TA within range
       `issues.Deduplicated TA Rollup` =
-        !(`Deduplicated TA Rollup (FY22)` >= `MAX - TA`
-          & `Deduplicated TA Rollup (FY22)` <= `SUM - TA`),
+        !(`Deduplicated TA Rollup` >= `MAX - TA`
+          & `Deduplicated TA Rollup` <= `SUM - TA`),
 
       # Crosswalk dedupe within range
       `issues.Total Deduplicated Rollup` =
-        !(`Total Deduplicated Rollup (FY22)` >= `MAX - Crosswalk Total`
-          & `Total Deduplicated Rollup (FY22)` <= `SUM - Crosswalk Total`)
+        !(`Total Deduplicated Rollup` >= `MAX - Crosswalk Total`
+          & `Total Deduplicated Rollup` <= `SUM - Crosswalk Total`)
     ) %>%
     dplyr::select(dplyr::all_of(c(header_cols$indicator_code, dedupe_cols)),
                   `MAX - DSD`, `SUM - DSD`, `MAX - TA`, `SUM - TA`,
@@ -443,7 +531,6 @@ unPackSNUxIM <- function(d) {
   # TEST: Formula changes; Warning; Continue ####
   d <- checkFormulas(d, sheet)
 
-
   # Remove all unneeded columns ####
   d$data$SNUxIM %<>%
     dplyr::select(-dplyr::matches("Rollup|Total|MAX|SUM"))
@@ -456,41 +543,6 @@ unPackSNUxIM <- function(d) {
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
                   dplyr::everything())
 
-  # Document all combos used in submitted PSNUxIM tab, prior to gathering. ####
-    # This ensures tests for new combinations are correctly matched
-  d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
-    dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop) %>%
-    dplyr::distinct()
-
-  if (d$info$tool == "Data Pack") {
-    d$data$missingCombos <- d$data$MER %>%
-      dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
-      dplyr::anti_join(d$data$PSNUxIM_combos,
-                       by =  c("PSNU", "psnuid", "indicator_code", "Age", "Sex", "KeyPop"))
-
-    d$tests$missing_combos <- d$data$missingCombos
-    attr(d$tests$missing_combos, "test_name") <- "Missing target combinations"
-
-    d$info$missing_psnuxim_combos <- (NROW(d$data$missingCombos) > 0)
-
-    if (d$info$missing_psnuxim_combos) {
-      d$info$needs_psnuxim <- TRUE
-
-      warning_msg <-
-        paste0(
-          "WARNING! Your Data Pack may need a new PSNUxIM tab. Along with this warning, ",
-          " you should also receive an updated copy of your Data Pack with new rows added",
-          " to the bottom of your PSNUxIM tab containing any previously missing data combinations.",
-          " NOTE that adding data to your PSNUxIM tab could significantly increase the size of your Data Pack, ",
-          " so it is recommended to wait to update your Data Pack's PSNUxIM tab until after",
-          " all changes to other tabs of your Data Pack are complete.  Once all other updates",
-          " are complete, you may return here to update your PSNUxIM tab at any time.",
-          "\n")
-
-      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
-
-    }
-  }
 
   # Gather all values in single column ####
   d$data$SNUxIM %<>%
@@ -514,7 +566,7 @@ unPackSNUxIM <- function(d) {
 
     warning_msg <-
       paste0(
-        "ERROR! In tab ",
+        "WARNING! In tab ",
         sheet,
         ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
         paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
@@ -553,7 +605,7 @@ unPackSNUxIM <- function(d) {
   d$data$SNUxIM %<>%
     dplyr::mutate(
       mechCode_supportType = dplyr::case_when(
-        stringr::str_detect(mechCode_supportType, "Dedupe") ~ mechCode_supportType,
+        stringr::str_detect(mechCode_supportType, "Dedupe|Not PEPFAR") ~ mechCode_supportType,
         TRUE ~ paste0(stringr::str_extract(mechCode_supportType, "\\d{4,}"),
                       "_",
                       stringr::str_extract(mechCode_supportType, "DSD|TA"))
@@ -569,9 +621,9 @@ unPackSNUxIM <- function(d) {
   #d <- defunctDisaggs(d, sheet)
 
   # Drop all zeros against IMs ####
-  d$data$SNUxIM %<>%
-    dplyr::filter(!(!stringr::str_detect(mechCode_supportType, "Dedupe")
-                    & value == 0))
+  # d$data$SNUxIM %<>%
+  #   dplyr::filter(!(!stringr::str_detect(mechCode_supportType, "Dedupe")
+  #                   & value == 0))
 
   # Drop unneeded Dedupes ####
   d$data$SNUxIM %<>%
@@ -621,22 +673,46 @@ unPackSNUxIM <- function(d) {
 
   # TEST: Rounding Errors; Warn; Continue ####
   #TODO: For OPUs, create d$data$MER from DataPackTarget col? Use above for missing_combos step?
+  original_targets %<>%
+    dplyr::mutate(
+      Age =
+        dplyr::case_when(
+          (sheet_name %in% c("Cascade", "PMTCT", "TB", "VMMC")
+            & indicator_code != "TX_CURR.T"
+            & Age %in% c("50-54", "55-59", "60-64", "65+")) ~ "50+",
+          TRUE ~ Age)
+    ) %>%
+    dplyr::group_by(dplyr::across(c(-value))) %>%
+    dplyr::summarise(value = sum(value)) %>%
+    dplyr::ungroup()
 
   comparison <- d$data$SNUxIM %>%
     dplyr::select(-mechCode_supportType, PSNUxIM_value = value) %>%
     dplyr::group_by(dplyr::across(c(tidyselect::everything(), -PSNUxIM_value))) %>%
     dplyr::summarise(PSNUxIM_value = sum(PSNUxIM_value, na.rm = TRUE), .groups = "drop") %>%
+    tidyr::replace_na(list(PSNUxIM_value = 0)) %>%
     dplyr::full_join(.,
       original_targets %>%
-        dplyr::select(-sheet_name, DataPackTarget = value) %>%
+        dplyr::select(-sheet_name, DataPack_value = value) %>%
         dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T"))
     ) %>%
-    dplyr::filter(is.na(PSNUxIM_value) | is.na(DataPackTarget) | PSNUxIM_value != DataPackTarget) %>%
-    dplyr::mutate(diff = PSNUxIM_value - DataPackTarget)
+    #tidyr::replace_na(list(PSNUxIM_value = 0, DataPack_value = 0)) %>%
+    dplyr::filter(is.na(PSNUxIM_value) | is.na(DataPack_value) | PSNUxIM_value != DataPack_value) %>%
+    dplyr::mutate(
+      diff = dplyr::if_else(is.na(PSNUxIM_value), 0, PSNUxIM_value)
+              - dplyr::if_else(is.na(DataPack_value), 0, DataPack_value),
+      type =
+        dplyr::case_when(
+          (is.na(DataPack_value) | DataPack_value == 0)
+            & !is.na(PSNUxIM_value) & PSNUxIM_value != 0  ~ "Missing in DP",
+          !is.na(DataPack_value) & DataPack_value != 0 & abs(diff) <= 2 ~ "Rounding",
+          !is.na(DataPack_value) & DataPack_value != 0 & diff > 2 ~ "Overallocation",
+          !is.na(DataPack_value) & DataPack_value != 0 & diff < -2 ~ "Underallocation"
+        ))
 
   d$tests$PSNUxIM_rounding_diffs <- comparison %>%
-    tidyr::drop_na(PSNUxIM_value, DataPackTarget) %>%
-    dplyr::filter(abs(diff) <= 2)
+    dplyr::filter(type == "Rounding") %>%
+    dplyr::select(-type)
 
   attr(d$tests$PSNUxIM_rounding_diffs, "test_name") <- "PSNUxIM Rounding diffs"
 
@@ -651,7 +727,7 @@ unPackSNUxIM <- function(d) {
         " target-setting process. You can review these cases in the FlatPack",
         " provided as an output from this app.",
         " To resolve these cases, please review the PSNUxIM tab to identify and address cases where multiplication of",
-        " distribution percentages against FY22 Targets has caused rounding error. You may",
+        " distribution percentages against Targets has caused rounding error. You may",
         " address this by gradually altering distribution percentages to fine tune",
         " allocations against one or more mechanisms. For additional guidance, see the Data Pack User Guide.",
         "\n"
@@ -662,7 +738,8 @@ unPackSNUxIM <- function(d) {
 
   # TEST: Data Pack total not fully distributed to IM ####
   d$tests$imbalanced_distribution <- comparison %>%
-    dplyr::filter(is.na(PSNUxIM_value) | is.na(DataPackTarget) | abs(diff) > 2)
+    dplyr::filter(type %in% c("Underallocation", "Overallocation")) %>%
+    dplyr::select(-type)
 
   attr(d$tests$imbalanced_distribution, "test_name") <- "Imbalanced distribution"
 
@@ -675,7 +752,7 @@ unPackSNUxIM <- function(d) {
 
     warning_msg <-
       paste0(
-        "ERROR!: ",
+        "WARNING!: ",
         NROW(d$tests$imbalanced_distribution),
         " cases where distributed total across all mechanisms and Dedupe is",
         " either more or less than PSNU-level Target.",
@@ -699,6 +776,47 @@ unPackSNUxIM <- function(d) {
         mechCode_supportType == "Crosswalk Dedupe" ~ "00001_TA",
         TRUE ~ mechCode_supportType)
     )
+
+  # Drop `Not PEPFAR` data ####
+  d$data$SNUxIM %<>%
+    dplyr::filter(mechCode_supportType != "Not PEPFAR")
+
+  # Add Unallocated Data to bottom ####
+  d$tests$unallocatedIMs <- comparison %>%
+    dplyr::filter(type == "Underallocation") %>%
+    dplyr::mutate(value = abs(diff)) %>%
+    dplyr::mutate(mechCode_supportType = "Unallocated_DSD") %>%
+    dplyr::select(-type, -PSNUxIM_value, -DataPack_value, -diff)
+
+  attr(d$tests$unallocatedIMs, "test_name") <- "Data not yet allocated to IM"
+
+  if (NROW(d$tests$unallocatedIMs) > 0) {
+    d$data$SNUxIM %<>%
+      rbind(d$tests$unallocatedIMs)
+
+    d$info$unallocatedIMs <- TRUE
+
+    unallocated_inds <-  d$tests$unallocatedIMs %>%
+      dplyr::pull(indicator_code) %>%
+      unique() %>%
+      sort()
+
+    warning_msg <-
+      paste0(
+        "ERROR!: ",
+        NROW(d$tests$unallocatedIMs),
+        " cases where targets have not yet been fully allocated to IMs",
+        " (excluding AGYW_PREV & cases possibly due to rounding). These data will be",
+        " viewable alongside other data in the Data Pack Self-Service App & PAW",
+        " Dossiers, but these cannot be imported into DATIM until fully",
+        " allocated to IM.",
+        " For reference, this has affected the following indicators. -> \n\t* ",
+        paste(unallocated_inds, collapse = "\n\t* "),
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$has_error <- TRUE
+  }
 
   # Get mech codes and support types ####
   d$data$SNUxIM %<>%

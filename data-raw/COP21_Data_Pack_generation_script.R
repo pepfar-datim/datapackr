@@ -1,11 +1,12 @@
 library(datapackr)
 library(magrittr)
 
-datapackr::loginToDATIM("~/.secrets/datim.json")
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
+datimutils::loginToDATIM(secrets)
 
-output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/Mock Data Pack"
-
-model_data_path <- file.choose()
+output_folder <- Sys.getenv("OUTPUT_FOLDER") %>% paste0(., "Mock Data Pack/")
+model_data_path <- Sys.getenv("MODEL_DATA_PATH")
 
 model_data <- readRDS(model_data_path)
 

@@ -12,17 +12,20 @@
 #'
 #' @family schema-helpers
 validateSchema <- function(schema,
-                           filepath,
+                           template_path,
                            cop_year,
                            tool,
                            season) {
+
+  stopifnot("Package \"waldo\" must be installed to use this function." =
+              requireNamespace("waldo", quietly = TRUE))
 
   # Collect parameters ####
   schema <- schema %missing% NULL
   schema_provided <- !is.null(schema)
 
-  filepath <- filepath %missing% NULL
-  filepath_provided <- !is.null(filepath)
+  template_path <- template_path %missing% NULL
+  filepath_provided <- !is.null(template_path)
 
   # Validate parameters ####
   cop_year <- cop_year %missing% NULL
@@ -37,16 +40,16 @@ validateSchema <- function(schema,
     assign(p, purrr::pluck(params, p))
   }
 
-  # If filepath provided, check it and unpack it to create comparison schema.
+  # If template_path provided, check it and unpack it to create comparison schema.
   if (filepath_provided) {
-    filepath %<>% checkTemplatePath(template_path = .,
+    template_path %<>% checkTemplatePath(template_path = .,
                                     cop_year = cop_year,
                                     tool = tool,
                                     season = season)
 
     filepath_schema <-
       unPackSchema_datapack(
-        filepath = filepath,
+        template_path = template_path,
         skip = skip_tabs(tool = tool, cop_year = cop_year),
         cop_year = cop_year)
 
@@ -170,7 +173,7 @@ validateSchema <- function(schema,
     dplyr::select(sheet_name, col, indicator_code, dataset, dataelement_dsd, dataelement_ta)
 
   uid_pattern <- "[A-Za-z][A-Za-z0-9]{10}"
-  multi_uid_pattern <- paste0("^(",uid_pattern,")(\\.((",uid_pattern,")))*$")
+  multi_uid_pattern <- paste0("^(", uid_pattern, ")(\\.((", uid_pattern, ")))*$")
 
   DEs_DSD_syntax_invalid <- DEs_schema %>%
     dplyr::select(-dataelement_ta) %>%
@@ -288,13 +291,13 @@ validateSchema <- function(schema,
 
 #' @export
 #' @importFrom data.table :=
+#' @importFrom methods as
 #' @title Extract and save schema from Data Pack template.
 #'
 #' @description
 #' Supplied a filepath to a Data Pack template (XLSX), will extract and save a
 #' schema based on the template.
 #'
-#' @param filepath Local filepath for a Data Pack template (XLSX).
 #' @param skip Character vector of Sheet Names to label for skipping in schema.
 #' @inheritParams datapackr_params
 #'
@@ -302,7 +305,7 @@ validateSchema <- function(schema,
 #'
 #' @family schema-helpers
 #'
-unPackSchema_datapack <- function(filepath = NULL,
+unPackSchema_datapack <- function(template_path = NULL,
                                   skip = NULL,
                                   tool = "Data Pack Template",
                                   cop_year = getCurrentCOPYear()) {
@@ -313,7 +316,7 @@ unPackSchema_datapack <- function(filepath = NULL,
   }
 
   # Check the filepath is valid. If NA, request via window. ####
-  filepath <- handshakeFile(path = filepath,
+  filepath <- handshakeFile(path = template_path,
                             tool = tool)
 
   if (tool == "OPU Data Pack Template" & cop_year %in% c(2020, 2021)) {
@@ -490,7 +493,7 @@ unPackSchema_datapack <- function(filepath = NULL,
   # Add skipped sheets ####
   skipped_schema <- matrix(nrow = 0, ncol = NCOL(schema)) %>%
     as.data.frame() %>%
-    setNames(names(schema))
+    stats::setNames(names(schema))
 
   skipped_schema[] <- mapply(FUN = as, skipped_schema, sapply(schema, class), SIMPLIFY = FALSE)
 

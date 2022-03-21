@@ -1,12 +1,12 @@
 
-datapackr::loginToDATIM("~/.secrets/datim.json")
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
+datimutils::loginToDATIM(secrets)
 
-# snuxim_model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/PSNUxIM_20200207.rds"
-# output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment"
-# model_data_path <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 20/3) Testing & Deployment/model_data_pack_input_20_20200220_1_flat.rds"
+output_folder <- Sys.getenv("OUTPUT_FOLDER") %>% paste0(., "COP20 OPUs/")
+model_data_path <- Sys.getenv("MODEL_DATA_PATH")
+snuxim_model_data_path <- Sys.getenv("SNUXIM_MODEL_DATA_PATH")
 
 d <- unPackTool(tool = "OPU Data Pack")
 
-d <- checkAnalytics(d,
-                   model_data_path)
-
+d <- checkAnalytics(d, model_data_path)

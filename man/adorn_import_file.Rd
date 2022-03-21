@@ -9,7 +9,8 @@ adorn_import_file(
   cop_year = getCurrentCOPYear(),
   psnu_prioritizations = NULL,
   filter_rename_output = TRUE,
-  d2_session = dynGet("d2_default_session", inherits = TRUE)
+  d2_session = dynGet("d2_default_session", inherits = TRUE),
+  include_default = FALSE
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ values for each PSNU. If not included, blank prioritizations shown.}
 the new, more complete format?}
 
 \item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+
+\item{include_default}{Should default mechanisms be included?}
 }
 \value{
 data

@@ -5,14 +5,7 @@
 #' Processes a submitted Data Pack by identifying integrity issues, checking
 #' data against DATIM validations, and extracting data.
 #'
-#' @param submission_path Local path to the file to import.
-#' @param tool What type of tool is the submission file? Default is "Data Pack".
-#' @param country_uids List of 11 digit alphanumeric DATIM codes representing
-#' countries. If not provided, will check file for these codes. If not in file,
-#' will flag error.
-#' @param cop_year Specifies COP year for dating as well as selection of
-#' templates.
-#' @param d2_session DHIS2 Session id
+#' @inheritParams datapackr_params
 #'
 #' @details
 #' Executes the following operations in relation to a submitted tool
@@ -27,9 +20,10 @@ unPackTool <- function(submission_path = NULL,
                        d2_session = dynGet("d2_default_session",
                                            inherits = TRUE)) {
   d <- createKeychainInfo(submission_path,
-                           tool,
-                           country_uids,
-                           cop_year)
+                          tool,
+                          country_uids,
+                          cop_year,
+                          d2_session)
 
   #TODO: Are we sure we want to make this change ? If so, the object must be cloned.
 

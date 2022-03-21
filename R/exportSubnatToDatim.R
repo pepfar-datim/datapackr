@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title exportSubnatToDATIM(d)
 #'
 #' @description Takes the outputs of the \code{\link{unPackSheets}} function and
@@ -12,8 +11,10 @@
 #'
 exportSubnatToDATIM <- function(d) {
 
+  datim_map <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
+
   SUBNAT_IMPATT <- d$data$SUBNAT_IMPATT %>%
-    dplyr::left_join(datapackr::map_DataPack_DATIM_DEs_COCs,
+    dplyr::left_join(datim_map,
                      by = c("indicator_code" = "indicator_code",
                             "Age" = "valid_ages.name",
                             "Sex" = "valid_sexes.name",
@@ -35,8 +36,11 @@ exportSubnatToDATIM <- function(d) {
       orgUnit = psnuid,
       categoryOptionCombo = categoryoptioncombouid,
       attributeOptionCombo,
-      value
-    )
+      value) %>%
+  # Aggregate across 50+ age bands ####
+    dplyr::group_by(dplyr::across(c(-value))) %>%
+    dplyr::summarise(value = sum(value)) %>%
+    dplyr::ungroup()
 
  # TEST: Duplicate Rows; Error; Continue ####
   duplicated_rows <- SUBNAT_IMPATT %>%
@@ -55,7 +59,6 @@ exportSubnatToDATIM <- function(d) {
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
   }
-
 
   # TEST: Blank Rows; Error;
   blank_rows <- SUBNAT_IMPATT %>%
@@ -93,7 +96,7 @@ exportSubnatToDATIM <- function(d) {
     dplyr::filter(
       period == "2020Q3",
       dataElement %in%
-        (datapackr::map_DataPack_DATIM_DEs_COCs %>%
+        (datim_map %>%
            dplyr::filter(period_dataset == "FY20 SUBNAT Results" & !is.na(indicator_code)) %>%
            dplyr::pull(dataelementuid)
         )
@@ -103,7 +106,7 @@ exportSubnatToDATIM <- function(d) {
     dplyr::filter(
       period == "2020Oct",
       dataElement %in%
-        (datapackr::map_DataPack_DATIM_DEs_COCs %>%
+        (datim_map %>%
            dplyr::filter(period_dataset == "FY21 SUBNAT Targets" & !is.na(indicator_code)) %>%
            dplyr::pull(dataelementuid)
         )
@@ -113,7 +116,7 @@ exportSubnatToDATIM <- function(d) {
     dplyr::filter(
       period == "2021Oct",
       dataElement %in%
-        (datapackr::map_DataPack_DATIM_DEs_COCs %>%
+        (datim_map %>%
            dplyr::filter(period_dataset == "FY22 SUBNAT Targets" & !is.na(indicator_code)) %>%
            dplyr::pull(dataelementuid)
         )
@@ -123,7 +126,7 @@ exportSubnatToDATIM <- function(d) {
     dplyr::filter(
       period == "2021Oct",
       dataElement %in%
-        (datapackr::map_DataPack_DATIM_DEs_COCs %>%
+        (datim_map %>%
            dplyr::filter(period_dataset == "FY22 IMPATT" & !is.na(indicator_code)) %>%
            dplyr::pull(dataelementuid)
       )
@@ -131,12 +134,9 @@ exportSubnatToDATIM <- function(d) {
 
   d$datim$fy22_prioritizations <- SUBNAT_IMPATT %>%
     dplyr::filter(
-      period == "2021Oct",
+      #period == "2021Oct",
       dataElement %in%
-        (datapackr::map_DataPack_DATIM_DEs_COCs %>%
-           dplyr::filter(period_dataset == "FY22 IMPATT" & indicator_code == "IMPATT.PRIORITY_SNU.T") %>%
-           dplyr::pull(dataelementuid)
-        )
+        datim_map$dataelementuid[which(datim_map$indicator_code == "IMPATT.PRIORITY_SNU.T")]
     )
 
   return(d)

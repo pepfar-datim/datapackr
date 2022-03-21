@@ -3,29 +3,36 @@
 \docType{data}
 \name{cop20_data_pack_schema}
 \alias{cop20_data_pack_schema}
-\title{Schema describing correct structure of COP20 Data Pack template.}
+\title{Schema describing correct structure of the COP20 Data Pack template.}
 \format{
 \describe{
   \item{sheet_num}{Lists the index value associated with the sheet name
   listed in \code{sheet_name}.}
-  \item{sheet_name}{Lists the sheet/tab name as used in both the Data Pack.}
-  \item{data_structure}{}
+  \item{sheet_name}{Lists the sheet/tab name as used in the Data Pack.}
+  \item{data_structure}{Binary column describing the structure of the data
+   These values consist of "skip" or "normal"}
   \item{col}{Value describing the column position of each
   \code{indicator_code}.}
   \item{indicator_code}{Code used in the Data Pack to uniquely
   identify each distinct programmatic area of target setting.}
   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
   in the \code{col_type} field, documents the dataset, either \code{MER},
-  \code{IMPATT}, or \code{SUBNAT}.}
+  \code{IMPATT},\code{datapack}, or \code{SUBNAT}.}
   \item{col_type}{Flags whether an \code{indicator_code} is a Target
-  (\code{"Target"}), row header (\code{Row Header}) or not (\code{NA}).}
-  \item{value_type}{}
-  \item{dataelement_dsd}{}
-  \item{dataelement_ta}{}
-  \item{categoryoption_specified}{}
-  \item{valid_ages}{}
-  \item{valid_sexes}{}
-  \item{valid_kps}{}
+  (\code{target}), historic data (\code{past}), reference figure
+  (\code{reference}), row header (\code{row_header}), or not (\code{NA}).}
+  \item{value_type}{Category column describing the type of measure for the
+   \code{indicator_code}. The values consist of "string", "integer",
+    "percentage", or NA}
+  \item{dataelement_dsd}{Denotes whether this element has a
+   "Direct Service Delivery" support type}
+  \item{dataelement_ta}{Denotes whether this element has a
+   "Technical Assistance" support type}
+  \item{categoryoption_specified}{Categoryoption disaggregate of the data
+   element}
+  \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
+  \item{valid_sexes}{Compised of Sex disaggregate and the assoicated UID}
+  \item{valid_kps}{Compised of KP disaggregate and the assoicated UID}
   \item{formula}{Excel formula defined for \code{indicator_code}.}
 }
 }
@@ -34,7 +41,7 @@ cop20_data_pack_schema
 }
 \description{
 This schema describes the correct structure of a COP20 Data Pack
-file, generated from the template used to produce Data Packs and useful in
-validating Data Packs passed through datapackr.
+file.It is generated from the template used to produce Data Packs, and is
+also useful in validating Data Packs passed through datapackr.
 }
 \keyword{datasets}

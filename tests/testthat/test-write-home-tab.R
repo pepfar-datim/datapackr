@@ -13,9 +13,11 @@ test_that("Can write a home tab", {
     names(d$info),
     c(
       "datapack_name",
+      "sane_name",
       "tool",
       "country_uids",
       "cop_year",
+      "operating_unit",
       "schema",
       "has_error",
       "newSNUxIM",
@@ -23,6 +25,7 @@ test_that("Can write a home tab", {
       "missing_psnuxim_combos",
       "missing_DSNUs",
       "needs_psnuxim",
+      "unallocatedIMs",
       "messages"
     )
   )
@@ -33,10 +36,15 @@ test_that("Can write a home tab", {
   expect_false(d$info$newSNUxIM)
   expect_equal(d$info$country_uids, "qllxzIjjurr")
   expect_equal(d$info$datapack_name, "Lesotho")
+  expect_equal(d$info$sane_name, "Lesotho")
+  expect_equal(d$info$operating_unit, data.frame(ou = "Lesotho",
+                                                    ou_id = "qllxzIjjurr",
+                                                    row.names = "organisationUnits.42"))
   expect_false(d$info$newSNUxIM)
   expect_false(d$info$has_error)
   expect_false(d$info$missing_DSNUs)
   expect_false(d$info$missing_psnuxim_combos)
+  expect_false(d$info$unallocatedIMs)
   expect_equal(d$info$tool, "Data Pack")
   expect_equal(d$info$cop_year, 2021)
   expect_false(d$info$needs_psnuxim)

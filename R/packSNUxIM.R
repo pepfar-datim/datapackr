@@ -1,6 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
-#' @importFrom stats complete.cases
 #' @title packSNUxIM(data)
 #'
 #' @description Packs SNUxIM data prepared from unPackSNUxIM for import to DATIM.
@@ -206,7 +204,7 @@ packSNUxIM <- function(d,
         ~stringr::str_replace_all(
           .,
           pattern = paste0("(?<=[:upper:])", top_rows + 1),
-          replacement = as.character(seq_along(snuxim_model_data) + existing_rows)
+          replacement = as.character(seq_len(NROW(snuxim_model_data)) + existing_rows)
           )
         )
       )
@@ -247,7 +245,7 @@ packSNUxIM <- function(d,
   right_side <- data_structure %>%
     dplyr::select(
       -tidyselect::all_of(names(left_side)),
-      -tidyselect::matches("percent_col_\\d{1, 3}")
+      -tidyselect::matches("percent_col_\\d{1,3}") #nolint
     )
 
   # Write data to sheet ####

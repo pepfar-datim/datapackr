@@ -1,20 +1,23 @@
 library(datapackr)
 library(magrittr)
 
-datapackr::loginToDATIM("~/.secrets/datim.json")
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
+datimutils::loginToDATIM(secrets)
 
-output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 22/3) Testing & Deployment/Beta Packs"
-
-model_data_path <- file.choose()
-
+output_folder <- Sys.getenv("OUTPUT_FOLDER") %>% paste0(., "Beta Packs/")
+model_data_path <- Sys.getenv("MODEL_DATA_PATH")
 model_data <- readRDS(model_data_path)
 
 #Beta Packs ####
 betapack_countries <- c("Malawi", "Namibia", "Nigeria", "South Africa",
                         "Uganda", "Zambia", "Zimbabwe", "India") 
 
+cascade_rework <- c("Malawi", "Namibia", "South Africa",
+                        "Zimbabwe", "Mozambique")
+
 pick <- datapackr::COP21_datapacks_countries %>%
-  dplyr::filter(datapack_name %in% betapack_countries)
+  dplyr::filter(datapack_name %in% cascade_rework)
 
 # Dedupe Testing ####
 # pick <- datapackr::COP21_datapacks_countries %>%

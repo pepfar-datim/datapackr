@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title packSNUxIM(data)
 #'
 #' @description Packs SNUxIM data prepared from unPackSNUxIM for import to DATIM.
@@ -20,6 +19,8 @@ prepare_model_data.PSNUxIM <- function(snuxim_model_data,
     snuxim_model_data <- snuxim_model_data[country_uids] %>%
       dplyr::bind_rows()
   }
+
+
 
   # Drop all data that can't be allocated across mech & DSD/TA ####
   snuxim_model_data %<>%

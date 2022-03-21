@@ -29,8 +29,9 @@ checkStructure <- function(d) {
   if (any(NROW(d$tests$missing_sheets))) {
     warning_msg <-
       paste0(
-        "WARNING! MISSING SHEETS: Please ensure no original sheets have",
-        " been deleted or renamed in your Data Pack. -> \n  * ",
+        "ERROR! MISSING SHEETS: Please ensure no original sheets have",
+        " been deleted or renamed in your Data Pack. No targets will be",
+        " imported for any tabs that have been deleted -> \n  * ",
         paste0(d$tests$missing_sheets$sheet_name, collapse = "\n  * "),
         "\n")
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")

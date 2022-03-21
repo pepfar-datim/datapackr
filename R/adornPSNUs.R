@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title adornPSNUs(d)
 #'
 #' @description Creates an analtyical dimension for planning prioritization from SUBNAT data

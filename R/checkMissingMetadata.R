@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title checkMissingMetadata(d)
 #'
 #' @description Checks data pulled from a single sheet in a Data Pack and
@@ -22,7 +21,8 @@ checkMissingMetadata <- function(d, sheet) {
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
 
   missing_metadata <- data %>%
-    dplyr::mutate(row = (1:dplyr::n()) + header_row,
+    dplyr::ungroup() %>%
+    dplyr::mutate(row = dplyr::row_number() + header_row,
                   sheet = sheet) %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("^PSNU$|^ID$|^indicator_code$")),
                      dplyr::any_vars(is.na(.)))

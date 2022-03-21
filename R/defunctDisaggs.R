@@ -1,6 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
-#' @importFrom utils capture.output
 #' @title defunctDisaggs(d)
 #'
 #' @description Checks data extracted from a sheet in a submitted Data Pack
@@ -42,7 +40,7 @@ defunctDisaggs <- function(d, sheet) {
   if (NROW(defunct_disaggs) > 0) {
 
     defunct_msg <-
-      capture.output(
+      utils::capture.output(
         print(as.data.frame(defunct_disaggs), row.names = FALSE)
       )
 

@@ -1,8 +1,8 @@
 ## Save Valid COs ####
 
-secrets <- "/Users/scott/.secrets/test-mer2.json"
-
-loginToDATIM(secrets)
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "test-mer2.json")
+datimutils::loginToDATIM(secrets)
 
 valid_category_options <- getValidCategoryOptions(cop_year = getCurrentCOPYear())
 

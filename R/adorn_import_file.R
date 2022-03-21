@@ -11,6 +11,7 @@
 #' @param filter_rename_output T/F Should this function output the final data in
 #' the new, more complete format?
 #' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @param include_default Should default mechanisms be included?
 #'
 #' @return data
 #'
@@ -19,14 +20,15 @@ adorn_import_file <- function(psnu_import_file,
                               psnu_prioritizations = NULL,
                               filter_rename_output = TRUE,
                               d2_session = dynGet("d2_default_session",
-                                                  inherits = TRUE)) {
+                                                  inherits = TRUE),
+                              include_default = FALSE) {
 
   # TODO: Generalize this outside the context of COP
   data <- psnu_import_file %>%
-
   # Adorn PSNUs
     dplyr::left_join(
       (valid_PSNUs %>% #Comes from file data/valid_PSNUs.rda
+         dplyr::filter(psnu_uid %in% psnu_import_file$orgUnit) %>%
         add_dp_psnu() %>% #Found in getPSNUs.R
         dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id,
                       psnu, psnu_uid, dp_psnu, psnu_type, DREAMS)),#cols to keep
@@ -57,15 +59,14 @@ adorn_import_file <- function(psnu_import_file,
   }
 
   # Adorn Mechanisms ####
-  country_uids <- unique(data$country_uid) #Creates a list of country uids
-
   mechs <-
-    getMechanismView(# details can be found in adornMechanism.R
-      country_uids = country_uids,
+    getMechanismView( # details can be found in adornMechanism.R
+      country_uids = unique(data$country_uid),
       cop_year = cop_year,
       include_dedupe = TRUE,
       include_MOH = TRUE,
-      d2_session = d2_session) %>%
+      d2_session = d2_session,
+      include_default = TRUE) %>%
     dplyr::select(-ou, -startdate, -enddate)
 
   # Allow mapping of either numeric codes or alphanumeric uids
@@ -87,12 +88,22 @@ adorn_import_file <- function(psnu_import_file,
     #Join data with mechs based on column attributeOptionCombo
     dplyr::left_join(mechs, by = c("attributeOptionCombo" = "attributeOptionCombo"))
 
-  # Stack data_codes and data_ids on top of one another.
-  data <- dplyr::bind_rows(data_codes, data_ids)
+  #Handle data which has been assigned to the default mechanism
+  #like AGWY_PREV
 
-  map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year)# Found in utilities.R
+  data_default <- data %>%
+    dplyr::filter(
+      stringr::str_detect(
+        attributeOptionCombo, "default|HllvX50cXC0")) %>%
+    dplyr::mutate(attributeOptionCombo = "HllvX50cXC0") %>%
+    dplyr::left_join(mechs, by = c("attributeOptionCombo" = "attributeOptionCombo"))
+
+  # Stack data_codes and data_ids on top of one another.
+  data <- dplyr::bind_rows(data_codes, data_ids, data_default)
 
   # Adorn dataElements & categoryOptionCombos ####
+
+  map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year) # Found in utilities.R
 
   # TODO: Is this munging still required with the map being a function of fiscal year?
    if (cop_year == 2020) {# If cop year equal 2020 modify entries in
@@ -112,8 +123,11 @@ adorn_import_file <- function(psnu_import_file,
                      dataelementname = dataelement.y,
                      categoryoptioncomboname = categoryoptioncombo) %>%
        # Modify period based upon FY column
-       dplyr::mutate(FY = 2021,period = paste0(cop_year, "Oct"))
-     }
+       dplyr::mutate(FY = 2021,
+                       period = paste0(cop_year, "Oct"))
+   } else if (cop_year == 2022) {
+     map_des_cocs <- datapackr::cop22_map_adorn_import_file
+   }
 
   data %<>%
     dplyr::mutate(
@@ -137,8 +151,7 @@ adorn_import_file <- function(psnu_import_file,
       by = c("dataElement" = "dataelementuid",
              "categoryOptionCombo" = "categoryoptioncombouid",
              "fiscal_year" = "FY",
-             "period" = "period")
-    )
+             "period" = "period"))
 
   # Select/order columns ####
   #Flag set in original function, approx line 20
@@ -180,6 +193,6 @@ adorn_import_file <- function(psnu_import_file,
                      indicator_code)
   }
 
-  return(data)
+  data
 
 }

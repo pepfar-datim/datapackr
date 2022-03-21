@@ -4,18 +4,13 @@
 #' @description
 #' Creates Keychain info needed for use across most datapackr unPack functions.
 #'
-#' @param submission_path Local path to the file to import.
-#' @param tool What type of tool is the submission file? Default is "Data Pack".
-#' @param country_uids List of 11 digit alphanumeric DATIM codes representing
-#' countries. If not provided, will check file for these codes. If not in file,
-#' will flag error.
-#' @param cop_year Specifies COP year for dating as well as selection of
-#' templates.
+#' @inheritParams datapackr_params
 #'
 createKeychainInfo <- function(submission_path = NULL,
                                tool = NULL,
                                country_uids = NULL,
-                               cop_year = NULL) {
+                               cop_year = NULL,
+                               d2_session = NULL) {
 
   # Create data sidecar for use across remainder of program
   d <- list(
@@ -26,6 +21,11 @@ createKeychainInfo <- function(submission_path = NULL,
       country_uids = country_uids,
       cop_year = cop_year)
   )
+
+  # Pulls username if `d2_session` object provided
+  d$info$source_user <- switch(!is.null(d2_session),
+                               d2_session$me$userCredentials$username,
+                               NULL)
 
   # Start running log of all warning and information messages
   d$info$messages <- MessageQueue()
@@ -103,6 +103,7 @@ createKeychainInfo <- function(submission_path = NULL,
     if (tool_type %in% c("Data Pack", "Data Pack Template")) {
       result <- switch(
         as.character(cop_year),
+        "2022" = datapackr::cop22_data_pack_schema,
         "2021" = datapackr::cop21_data_pack_schema,
         "2020" = datapackr::cop20_data_pack_schema,
         "2019" = datapackr::data_pack_schema,
@@ -142,6 +143,9 @@ createKeychainInfo <- function(submission_path = NULL,
       submission_path = d$keychain$submission_path,
       tool = d$info$tool)
 
+  # Generate sane_name for tool
+  d$info$sane_name <- getSaneName(d$info$datapack_name)
+
   # Determine country uids ####
   if (is.null(d$info$country_uids)) {
     d$info$country_uids <-
@@ -149,18 +153,23 @@ createKeychainInfo <- function(submission_path = NULL,
                         tool = d$info$tool)
   }
 
+  ## Determine additional Organisation Unit information and save
+  ## under `d$info$operating_unit` for use in validating mechanisms
+  d$info$operating_unit <- getOUFromCountryUIDs(d$info$country_uids)
+
   # Check the submission file exists and prompt for user input if not
   d$keychain$submission_path <- handshakeFile(path = d$keychain$submission_path,
                                               tool = d$info$tool)
 
   # Add placeholders for info messages ####
   if (d$info$tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack", "OPU Data Pack Template")
-      & d$info$cop_year %in% c("2020", "2021")) {
+      & d$info$cop_year %in% c("2020", "2021", "2022")) {
     d$info$needs_psnuxim <- FALSE
     d$info$newSNUxIM <- FALSE
     d$info$has_psnuxim <- FALSE
     d$info$missing_psnuxim_combos <- FALSE
     d$info$missing_DSNUs <- FALSE
+    d$info$unallocatedIMs <- FALSE
   }
 
   return(d)

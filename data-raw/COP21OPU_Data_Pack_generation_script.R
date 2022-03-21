@@ -1,9 +1,11 @@
 library(datapackr)
 library(magrittr)
 
-datapackr::loginToDATIM("~/.secrets/datim.json")
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
+datimutils::loginToDATIM(secrets)
 
-output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 21/3) Testing & Deployment/COP21 OPUs"
+output_folder <- Sys.getenv("OUTPUT_FOLDER") %>% paste0(., "COP21 OPUs/")
 
 # batch <- tibble::tribble(
 #   ~datapack_name, ~country_uids,

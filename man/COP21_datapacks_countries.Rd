@@ -6,14 +6,14 @@
 \title{Datapack country groupings}
 \format{
 \describe{
-  \item{datapack_name}{Name on home tab of datapack}
-  \item{country_uids}{countries uids listed on home tab}
+  \item{datapack_name}{Country name on home tab of datapack}
+  \item{country_uids}{Country's UIDs listed on the home tab}
 }
 }
 \usage{
 COP21_datapacks_countries
 }
 \description{
-Tibble of data pack names and
+Tibble of data pack country names and their UIDs.
 }
 \keyword{datasets}

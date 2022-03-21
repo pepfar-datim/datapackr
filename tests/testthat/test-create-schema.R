@@ -34,29 +34,29 @@ with_mock_api({
       ),
       ignore.order = TRUE
     )
-    expect_type(test_dataset$sheet_num,"integer")
-    expect_type(test_dataset$sheet_name,"character")
-    expect_type(test_dataset$data_structure,"character")
-    expect_type(test_dataset$col,"integer")
-    expect_type(test_dataset$indicator_code,"character")
-    expect_type(test_dataset$dataset,"character")
-    expect_type(test_dataset$col_type,"character")
-    expect_type(test_dataset$value_type,"character")
-    expect_type(test_dataset$dataelement_dsd,"character")
-    expect_type(test_dataset$dataelement_ta,"character")
-    expect_type(test_dataset$categoryoption_specified,"character")
-    expect_type(test_dataset$valid_ages,"list")
-    expect_type(test_dataset$valid_sexes,"list")
-    expect_type(test_dataset$valid_kps,"list")
-    expect_type(test_dataset$formula,"character")
-    expect_type(test_dataset$FY,"double")
-    expect_type(test_dataset$period,"character")
+    expect_type(test_dataset$sheet_num, "integer")
+    expect_type(test_dataset$sheet_name, "character")
+    expect_type(test_dataset$data_structure, "character")
+    expect_type(test_dataset$col, "integer")
+    expect_type(test_dataset$indicator_code, "character")
+    expect_type(test_dataset$dataset, "character")
+    expect_type(test_dataset$col_type, "character")
+    expect_type(test_dataset$value_type, "character")
+    expect_type(test_dataset$dataelement_dsd, "character")
+    expect_type(test_dataset$dataelement_ta, "character")
+    expect_type(test_dataset$categoryoption_specified, "character")
+    expect_type(test_dataset$valid_ages, "list")
+    expect_type(test_dataset$valid_sexes, "list")
+    expect_type(test_dataset$valid_kps, "list")
+    expect_type(test_dataset$formula, "character")
+    expect_type(test_dataset$FY, "double")
+    expect_type(test_dataset$period, "character")
   })
 
   test_that("COP20 opu template and schema match", {
     schema <-
       datapackr::unPackSchema_datapack(
-        filepath =  system.file("extdata", "COP20_OPU_Data_Pack_Template.xlsx", package = "datapackr"),
+        template_path =  system.file("extdata", "COP20_OPU_Data_Pack_Template.xlsx", package = "datapackr"),
         skip = datapackr::skip_tabs(tool = "OPU Data Pack Template",
                                     cop_year = 2020),
         tool = "OPU Data Pack Template",

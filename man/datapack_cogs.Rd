@@ -5,7 +5,10 @@
 \alias{datapack_cogs}
 \title{Datapack Category option groups}
 \format{
-An object of class \code{list} of length 2.
+\describe{
+  \item{name}{Name of the Category Option Group for example "01-04 Only"}
+  \item{id}{Category Option Group UID}
+}
 }
 \usage{
 datapack_cogs

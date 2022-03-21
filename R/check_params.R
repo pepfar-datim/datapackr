@@ -224,7 +224,7 @@ check_cop_year <- function(cop_year) {
 
   if (!cop_year %in% supported_cop_years) {# If cop year isn't supported.
     stop(paste0("Sorry, datapackr only supports tools from ",
-                paste_oxford(paste0("COP",supported_cop_years - 2000))))
+                paste_oxford(paste0("COP", supported_cop_years - 2000))))
   }
 
   cop_year
@@ -382,7 +382,7 @@ check_schema <- function(schema, cop_year, tool, season) {
   # For NULL schemas, attempt to deduce from other parameters, if provided.
   # Default here is the COP schema for the most recent/current COP Year
   invisible(
-    capture.output(
+    utils::capture.output(
       expected_schema <- pick_schema(tool = tool, cop_year = cop_year)))
 
   schema <- schema %||% expected_schema
@@ -497,9 +497,8 @@ checkTemplatePath <- function(template_path,
   # provided. Default here is the template_path for the most recent/current COP
   # Year for the Data Pack.
   invisible(
-    capture.output(#Found in packageSetup.R
-      expected_template_path <- pick_template_path(cop_year = cop_year,
-                                                   tool = tool)))
+    utils::capture.output( #Found in packageSetup.R
+      expected_template_path <- pick_template_path(cop_year = cop_year, tool = tool)))
 
   template_path <- template_path %||% expected_template_path
   template_path %<>%
@@ -522,7 +521,7 @@ checkTemplatePath <- function(template_path,
   input_tool <- paste0(tool, " Template")
   template_schema <-
     unPackSchema_datapack(
-      filepath = template_path,
+      template_path = template_path,
       skip = skip_tabs(tool = input_tool, cop_year = cop_year),
       tool = input_tool,
       cop_year = cop_year)
@@ -548,7 +547,7 @@ checkWB <- function(wb = NULL,
     country_uids <- check_country_uids(country_uids)
     cop_year <- check_cop_year(cop_year)
     tool <- check_tool(tool)
-    datapack_name <- checkDatapackName(datapack_name, country_uids)
+    datapack_name <- checkDataPackName(datapack_name, country_uids)
     template_path <- checkTemplatePath(template_path, cop_year, tool)
 
     d <- createDataPack(datapack_name = datapack_name,
