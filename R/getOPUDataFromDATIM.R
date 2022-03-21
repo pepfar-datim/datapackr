@@ -28,7 +28,7 @@ getOPUDataFromDATIM <- function(cop_year,
   # Pull data from DATIM ####
   data_datim <- datapackr::getCOPDataFromDATIM(country_uids,
                                                cop_year,
-                                               streams = "mer_targets",
+                                               datastreams = "mer_targets",
                                                d2_session = d2_session)
 
   # Filter data by required indicator_codes ####

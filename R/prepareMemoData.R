@@ -76,7 +76,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
   #Fetch the existing data from DATIM
   df <- getCOPDataFromDATIM(d$info$country_uids,
                       d$info$cop_year,
-                      streams = "mer_targets",
+                      datastreams = "mer_targets",
                       d2_session = d2_session)
 
   if (NROW(d) > 0) {

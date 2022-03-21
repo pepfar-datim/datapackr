@@ -144,7 +144,7 @@ d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
     dplyr::mutate(support_type = toupper(support_type))
 
   fullCodeList <- pullFullCodeList(FY = 2022,
-                                   datastream = c("mer_targets", "subnat_targets", "impatt")) %>%
+                                   datastreams = c("mer_targets", "subnat_targets", "impatt")) %>%
     dplyr::left_join(
       datimutils::getMetadata(categoryOptionCombos,
                               fields = "id,categoryOptions",
