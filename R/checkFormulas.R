@@ -98,7 +98,7 @@ checkFormulas <- function(d, sheet) {
     dplyr::group_by(indicator_code, correct_fx, submitted_fx) %>%
     dplyr::mutate(count = dplyr::n()) %>%
     dplyr::group_by(indicator_code, correct_fx, submitted_fx, count) %>%
-    dplyr::summarise(affected_rows = formatSetStrings(row)) %>%
+    dplyr::summarise(affected_rows = list(unique(row))) %>%
     dplyr::ungroup()
 
   d$tests$altered_formulas <-
