@@ -69,9 +69,9 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 }
 
 #' @export
-#' @title Tool header rows
+#' @title Tool to assist with formatting the header rows
 #'
-#' @param tool "Data Pack", "Data Pack Template".
+#' @param tool "Data Pack", "Data Pack Template",""OPU Data Pack".
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
 #'
@@ -79,7 +79,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 #'
 headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
 
-  if (cop_year %in% c(2020, 2021, 2022)) {
+  if (cop_year %in% c(2020:2022)) {
     if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
       header_row <- 14
     } else stop("That tool type is not supported for that cop_year.")

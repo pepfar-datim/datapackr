@@ -84,27 +84,28 @@ getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
 
 
 #' @export
-#' @title Swap columns between dataframes
+#' @title Swap columns between two dataframes
 #'
 #' @description
-#' Replaces columns in \code{to} with those with identical names in \code{from}.
+#' Replaces columns in the dataframe \code{to} with those with identical names
+#'  in the dataframe \code{from}.
 #'
 #' @param to Dataframe to pull columns into
-#' @param from Data frame to pull columns from
+#' @param from Dataframe to pull columns from
 #'
-#' @return dataframe with swapped columns
+#' @return A dataframe with the swapped columns
 #'
 swapColumns <- function(to, from) {
-  # Grab column names from `from`
+  # Grab column names from the `from` df
     cols <- colnames(from)
 
-  # If `from` is a null dataframe, skip and return `to`
+  # If the `from` df is a null dataframe, skip and return the `to` df
     if (length(cols) != 0) {
 
   # Loop through `from` columns and if there's a match in `to`, copy and paste
   #   it into `to`
       for (i in seq_along(cols)) {
-        col <- cols[i]
+        col <- cols[i] #For each column in the 'from' df
         if (col %in% colnames(to)) {
           dots <-
             stats::setNames(list(lazyeval::interp(
@@ -113,7 +114,7 @@ swapColumns <- function(to, from) {
           to <- to %>%
             dplyr::mutate_(.dots = dots)
         } else {
-          next
+          next #if the column is not in the 'to' df go to the next column[i]
         }
       }
     }
@@ -308,7 +309,7 @@ getOUFromCountryUIDs <- function(country_uids) {
 #' will add one new, \code{NULL} column to \code{data} for each element of
 #' \code{cnames} and name it after the corresponding element of \code{cnames}.
 #'
-#' @param data Dataframe to add columns.
+#' @param data The dataframe to add the columns to.
 #' @param cnames Character vector of one or more column names to be added to
 #' \code{data}.
 #' @param type \code{character}, \code{numeric}, \code{logical}
@@ -316,9 +317,12 @@ getOUFromCountryUIDs <- function(country_uids) {
 #' @return Dataframe \code{data} with added columns listed in \code{cnames}.
 #'
 addcols <- function(data, cnames, type = "character") {
-  add <- cnames[!cnames %in% names(data)]
+  add <- cnames[!cnames %in% names(data)] # Subsets column name list BY only
+  # keeping names that are NOT in the supplied dataframes column names already.
 
-  if (length(add) != 0) {
+  if (length(add) != 0) { #If their are columns that need to be filled in THEN
+    #Impute the NA value based upon the type provided in the function.
+    # TODO: #Automate the character type or at least a list variable for type.
     if (type == "character") {
       data[add] <- NA_character_
     } else if (type == "numeric") {
@@ -507,25 +511,28 @@ prioritization_dict <- function() {
 }
 
 #' @export
-#' @title Take Max along row among columns matching regex
-#'
-#' @param df Dataframe
-#' @param cn Name (character string) of Max column to create
-#' @param regex String of regex to use in identifying columns.
+#' @title Extracts the desired columns for analysis via regular expression, then
+#'  takes the maximum value row-wise. Ultimately resulting in a new column
+#'  containing the max values.
+#' @param df The dataframe to be analyzed.
+#' @param cn The column name (character string) of the Max column that is
+#'  created after execution of this function.
+#' @param regex A regular expression used in identifying the columns of
+#'  interest.
 #'
 #' @return df
 #'
 rowMax <- function(df, cn, regex) {
-  df_filtered <- df %>%
+  df_filtered <- df %>% # Filters df based on regex
     dplyr::select(tidyselect::matches(match = regex))
-
+# If the number of columns is 0, return the provided df without new columns.
   if (NCOL(df_filtered) == 0) {
     df[[cn]] <- NA_integer_
     return(df)
   }
-
+# Create the new column in the dataframe, and ensure its column type is numeric.
   df[[cn]] <- df_filtered %>%
-    purrr::pmap(pmax, na.rm = T) %>%
+    purrr::pmap(pmax, na.rm = T) %>% # Row-wise Calculations.
     as.numeric
 
   return(df)

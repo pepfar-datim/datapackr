@@ -95,9 +95,9 @@ unPackSNUxIM <- function(d) {
   if (d$info$tool == "Data Pack") {
     d$data$missingCombos <- d$data$MER %>%
       dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
-      #Special handling for differences between main tab and PSNUxIM tab age bands
-      #The data should not be aggregated at this point. This will happen
-      #when the data is repacked by packForDATIM_UndistributedMER
+      # Special handling for differences between main tab and PSNUxIM tab age bands
+      # The data should not be aggregated at this point. This will happen
+      # when the data is repacked by packForDATIM_UndistributedMER
       dplyr::mutate(Age_snuxim = dplyr::case_when(
         stringr::str_detect(Age, "(50-54|55-59|60-64|65+)") &
           !stringr::str_detect(indicator_code, "TX_CURR.T") ~ "50+",
@@ -369,7 +369,7 @@ unPackSNUxIM <- function(d) {
     d <- checkNumericValues(d, sheet, header_cols)
   }
 
-  #sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
+  # sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
 
   d$data$SNUxIM %<>%
     { suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)), #nolint

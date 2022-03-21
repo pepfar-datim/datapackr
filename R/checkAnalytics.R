@@ -599,8 +599,8 @@ checkAnalytics <- function(d,
                      by = c("sex_option_uid" = "id")) %>%
     dplyr::left_join(dplyr::rename(category_options, key_population = name),
                      by = c("kp_option_uid" = "id")) %>%
-    #Special handling for certain category options which
-    #have leading zeros in the Datapack
+    # Special handling for certain category options which
+    # have leading zeros in the Datapack
     dplyr::mutate(age = dplyr::case_when(age == "5-9" ~ "05-09",
                                          age == "1-4" ~ "01-04",
                                          age == "<1" ~ "<01",
@@ -659,7 +659,7 @@ checkAnalytics <- function(d,
         paste(
           seq_len(NROW(d$info$analytics_warning_msg)),
           ": ", d$info$analytics_warning_msg
-          #stringr::str_squish(gsub("\n", "", d$info$analytics_warning_msg))
+          # stringr::str_squish(gsub("\n", "", d$info$analytics_warning_msg))
         ),
         sep = "",
         collapse = "\r\n")

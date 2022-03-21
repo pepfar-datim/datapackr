@@ -33,9 +33,9 @@ writePSNUxIM <- function(d,
   d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
 
-  #We normally cannot process PSNUxIM tabs with threaded comments
-  #However, if we are not appending to the existing data pack, we
-  #should be able to proceed.
+  # We normally cannot process PSNUxIM tabs with threaded comments
+  # However, if we are not appending to the existing data pack, we
+  # should be able to proceed.
   if (d$info$has_comments_issue & append) {
     warning_msg <-
       paste0(

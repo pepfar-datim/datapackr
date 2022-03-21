@@ -130,7 +130,7 @@ packDataPack <- function(model_data,
   #   ## Add styles to Summary tab
   # summaryStyle = openxlsx::createStyle(fgFill = "#404040")
   # openxlsx::addStyle(d$tool$wb, sheet = "Summary",
-  #summaryStyle, cols = 1:2, rows = 1:62, gridExpand = TRUE, stack = TRUE)
+  # summaryStyle, cols = 1:2, rows = 1:62, gridExpand = TRUE, stack = TRUE)
 
     ## Add styles to Spectrum tab ####
   #TODO: See if new openxlsx release addresses this issue
