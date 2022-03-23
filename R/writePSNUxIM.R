@@ -123,6 +123,7 @@ writePSNUxIM <- function(d,
       dplyr::bind_rows()
     rm(smd)
     dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
+
     d$data$snuxim_model_data %<>%
     ## Address issues with PMTCT_EID ####
       dplyr::mutate_at(
@@ -148,15 +149,6 @@ writePSNUxIM <- function(d,
       dplyr::group_by(dplyr::across(c(-value))) %>%
       dplyr::summarise(value = sum(value)) %>%
       dplyr::ungroup()
-
-    ## Filter model data to match targets_data ####
-    d$data$snuxim_model_data %<>%
-      dplyr::right_join(
-        targets_data %>% dplyr::select(-value, -attributeOptionCombo) %>% dplyr::distinct(),
-        by = c("dataElement" = "dataElement",
-               "period" = "period",
-               "orgUnit" = "orgUnit",
-               "categoryOptionCombo" = "categoryOptionCombo"))
 
     r <- packPSNUxIM(wb = d$tool$wb,
                      data = targets_data,
