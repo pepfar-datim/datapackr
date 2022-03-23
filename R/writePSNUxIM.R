@@ -4,13 +4,11 @@
 #' @description Checks a Data Pack for need of new or appended PSNUxIM data, then
 #' writes this into the Data Pack supplied. unPackTool must be run as prerequisite.
 #'
-#' @param d Datapackr object
-#' @param snuxim_model_data_path Filepath where SNU x IM distribution model is stored.
-#' @param output_folder Local folder where you would like your Data Pack to be
-#' saved upon export.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @param append If TRUE append rows to the existing DataPack otherwise,
 #' output a Missing PSNUxIM targets workbook.
+#' @param snuxim_model_data_path Export from DATIM needed to allocate data
+#' across mechanisms in the PSNUxIM tab
+#' @inheritParams datapackr_params
 #' @return d
 #'
 writePSNUxIM <- function(d,
@@ -35,9 +33,9 @@ writePSNUxIM <- function(d,
   d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
 
-  #We normally cannot process PSNUxIM tabs with threaded comments
-  #However, if we are not appending to the existing data pack, we
-  #should be able to proceed.
+  # We normally cannot process PSNUxIM tabs with threaded comments
+  # However, if we are not appending to the existing data pack, we
+  # should be able to proceed.
   if (d$info$has_comments_issue & append) {
     warning_msg <-
       paste0(
@@ -105,16 +103,16 @@ writePSNUxIM <- function(d,
       wb <- openxlsx::loadWorkbook(template_file)
       openxlsx::activeSheet(wb) <- "PSNUxIM"
       sheets <- openxlsx::getSheetNames(template_file)
-      sheets_to_keep <- which(sheets %in% c("Home","PSNUxIM"))
+      sheets_to_keep <- which(sheets %in% c("Home", "PSNUxIM"))
       sheets_to_delete <- seq_along(sheets)[!(seq_along(sheets) %in% sheets_to_keep)]
       for (i in seq_along(sheets_to_delete)) {
             openxlsx::sheetVisibility(wb)[sheets_to_delete[i]] <- "veryHidden"
       }
 
       #These hard coded values are maybe present in the schema???
-      openxlsx::writeData(wb,"Home","Missing PSNUxIM Targets",startCol = 2,startRow = 10)
-      openxlsx::writeData(wb,"Home",d$info$datapack_name,startCol = 2,startRow = 20)
-      openxlsx::writeData(wb,"Home",d$info$country_uids,startCol = 2,startRow = 25)
+      openxlsx::writeData(wb, "Home", "Missing PSNUxIM Targets", startCol = 2, startRow = 10)
+      openxlsx::writeData(wb, "Home", d$info$datapack_name, startCol = 2, startRow = 20)
+      openxlsx::writeData(wb, "Home", d$info$country_uids, startCol = 2, startRow = 25)
       d$tool$wb <- wb
 
     }
@@ -129,7 +127,7 @@ writePSNUxIM <- function(d,
     ## Address issues with PMTCT_EID ####
       dplyr::mutate_at(
         c("age_option_name", "age_option_uid"),
-        ~dplyr::case_when(indicator_code %in% c("PMTCT_EID.N.2.T","PMTCT_EID.N.12.T")
+        ~dplyr::case_when(indicator_code %in% c("PMTCT_EID.N.2.T", "PMTCT_EID.N.12.T")
                           ~ NA_character_,
                           TRUE ~ .)) %>%
     ## Convert to import file format ####
@@ -184,7 +182,7 @@ writePSNUxIM <- function(d,
     interactive_print("Exporting your new Data Pack...")
     exportPackr(
       data = d$tool$wb,
-      output_path = d$keychain$output_folder,
+      output_folder = d$keychain$output_folder,
       tool = "Data Pack",
       datapack_name = d$info$datapack_name)
 

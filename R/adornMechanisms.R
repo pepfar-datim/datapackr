@@ -1,8 +1,7 @@
 #' @export
 #' @title getMechanismViewFromDATIM
 #'
-#' @inheritParams unPackTool
-#' @inheritParams getMechanismViewFromDATIM
+#' @inheritParams datapackr_params
 #'
 #' @return Mechanism List
 #'
@@ -41,19 +40,17 @@ getMechanismViewFromDATIM <- function(cop_year = NULL,
 #' is available to be read. Otherwise, if the user is logged in, the view
 #' will be obtained from DATIM. Otherwise, an empty dataframe is returned.
 #'
-#' @param country_uids Character vector of DATIM country IDs. This can only
-#' include countries. Regional Operating Unit uids will not be accepted. If not
-#' supplied, returns entire mechanism list, trimmed to user's DATIM permissions.
-#' @param cop_year Numeric value of COP Fiscal Year to filter mechanism list by.
-#' Ex: For mechanisms active in FY 2020, pertaining to COP 2019, enter
-#' \code{2019}. If a FY is not supplied, returns entire mechanism list.
+#' Note that only country UIDs are accepted. If Regional Operating Unit uids
+#' are supplied, returns entire mechanism list, trimmed to user's DATIM permissions.
+#'
 #' @param include_dedupe Logical. If TRUE will include deduplication mechanisms.
 #' Default is FALSE.
 #' @param include_MOH Logical. If TRUE will include MOH mechanisms. Default is
 #' FALSE.
 #' @param update_stale_cache If the cached_mechs_path file is outdated or unreadable,
 #' should a new cache be saved?
-#' @inheritParams unPackTool
+#' @param include_default Should the default mechanism also be included?
+#' @inheritParams datapackr_params
 #'
 #' @return Mechs
 #'
@@ -64,7 +61,8 @@ getMechanismView <- function(country_uids = NULL,
                              d2_session = dynGet("d2_default_session",
                                                  inherits = TRUE),
                              cached_mechs_path = paste0(Sys.getenv("support_files_directory"), "mechs.rds"),
-                             update_stale_cache = FALSE) {
+                             update_stale_cache = FALSE,
+                             include_default = TRUE) {
 
   empty_mechs_view <- tibble::tibble(
     "mechanism_desc" = character(),
@@ -91,10 +89,10 @@ getMechanismView <- function(country_uids = NULL,
   }
 
   if (file.exists(cached_mechs_path) & can_read_file) {
-    is_lt <- function(x,y)  x < y
+    is_lt <- function(x, y)  x < y
     cache_age_dur <- lubridate::as.duration(lubridate::interval(file.info(cached_mechs_path)$mtime, Sys.time()))
     max_cache_age_dur <- lubridate::duration(max_cache_age)
-    is_fresh <- is_lt(cache_age_dur , max_cache_age_dur)
+    is_fresh <- is_lt(cache_age_dur, max_cache_age_dur)
   } else{
     is_fresh <- FALSE
   }
@@ -148,6 +146,24 @@ getMechanismView <- function(country_uids = NULL,
     mechs %<>%
       dplyr::filter(!attributeOptionCombo %in% dedupe)
   }
+
+  if (include_default) {
+
+    default_mech <- list(
+      mechanism_desc = "default",
+      mechanism_code = "default",
+      attributeOptionCombo = datapackr::default_catOptCombo(),
+      partner_desc = "None",
+      partner_id = "None",
+      agency = "None",
+      ou = NA,
+      startdate = NA,
+      enddate = NA
+    )
+
+    mechs <- rbind(mechs, default_mech)
+  }
+
 
   structure_ok <- dplyr::setequal(names(empty_mechs_view), names(mechs))
 

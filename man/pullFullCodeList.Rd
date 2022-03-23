@@ -6,7 +6,7 @@
 \usage{
 pullFullCodeList(
   FY = getCurrentCOPYear() + 1,
-  datastream = c("mer_targets", "mer_results", "subnat_targets", "subnat_results",
+  datastreams = c("mer_targets", "mer_results", "subnat_targets", "subnat_results",
     "impatt"),
   datasets,
   expanded = FALSE,
@@ -16,16 +16,17 @@ pullFullCodeList(
 \arguments{
 \item{FY}{Reporting FY for which to filter active code lists.}
 
-\item{datastream}{At least one
-of "mer_targets", "mer_results", "subnat_targets", "subnat_results" or "impatt".
-If left will return a code list for the specified COP Year of all streams}
+\item{datastreams}{Data stream or streams. One or more of \code{mer_targets},
+\code{mer_results}, \code{subnat_targets}, \code{subnat_results}, or
+\code{impatt}. If not specified, then all data streams
+are returned.}
 
 \item{datasets}{Character vector of dataSet IDs to pull code lists for.}
 
 \item{expanded}{If TRUE, will add dataset, period, period_dataset, and
 targets_results, related categoryOption metadata,  as additional columns}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Combined code list as dataframe.

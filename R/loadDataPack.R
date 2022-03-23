@@ -15,7 +15,7 @@ loadDataPack <- function(submission_path = NULL) {
 
   if (interactive()) {
     msg <- paste0("Congratulations. You have loaded a ",
-                  "COP", stringr::str_sub(d$info$cop_year, -2,-1),
+                  "COP", stringr::str_sub(d$info$cop_year, -2, -1),
                   " ", d$info$tool,
                   " for ", d$info$datapack_name, ".")
 

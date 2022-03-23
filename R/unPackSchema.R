@@ -173,7 +173,7 @@ validateSchema <- function(schema,
     dplyr::select(sheet_name, col, indicator_code, dataset, dataelement_dsd, dataelement_ta)
 
   uid_pattern <- "[A-Za-z][A-Za-z0-9]{10}"
-  multi_uid_pattern <- paste0("^(",uid_pattern,")(\\.((",uid_pattern,")))*$")
+  multi_uid_pattern <- paste0("^(", uid_pattern, ")(\\.((", uid_pattern, ")))*$")
 
   DEs_DSD_syntax_invalid <- DEs_schema %>%
     dplyr::select(-dataelement_ta) %>%

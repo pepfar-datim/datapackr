@@ -15,6 +15,10 @@ mechanism level, either d$memo$datim$by_partner or
 d$memo$datapack$by_partner.}
 
 \item{memoStructure}{Structure of the memo d$memo$structure}
+
+\item{source_type}{Indicates whether the data for a COP Approval Memo table
+should come from the Data Pack or from DATIM. Values can be either
+\code{datapack} or \code{datim}.}
 }
 \value{
 

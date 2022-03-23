@@ -34,7 +34,7 @@ packDataPackSheet <- function(wb,
   openxlsx::writeData(wb = wb,
                       sheet = sheet,
                       x = sheet_data, # Object to be written.
-                      xy = c(1, headerRow("Data Pack Template", cop_year)),# Defines start column and start row.
+                      xy = c(1, headerRow("Data Pack Template", cop_year)), # Defines start column and start row.
                       colNames = T,
                       rowNames = F,
                       withFilter = FALSE)# Filters are not applied to column name row
@@ -73,7 +73,7 @@ packDataPackSheet <- function(wb,
                        percentStyle,
                        rows = (seq_len(NROW(sheet_data))) + headerRow("Data Pack Template", cop_year),
                        cols = percentCols,
-                       gridExpand = TRUE,# styling applied to all rows and cols.
+                       gridExpand = TRUE, # styling applied to all rows and cols.
                        stack = TRUE)# New style is merged with existing cell styles.
   }
 
@@ -93,7 +93,7 @@ packDataPackSheet <- function(wb,
                        percentDecimalStyle,
                        rows = (seq_len(NROW(sheet_data))) + headerRow("Data Pack Template", cop_year),
                        cols = percentDecimalCols,
-                       gridExpand = TRUE,# styling applied to all rows and cols.
+                       gridExpand = TRUE, # styling applied to all rows and cols.
                        stack = TRUE)# New style is merged with existing cell styles.
   }
 
@@ -111,7 +111,7 @@ packDataPackSheet <- function(wb,
                        integerStyle,
                        rows = (seq_len(NROW(sheet_data))) + headerRow("Data Pack Template", cop_year),
                        cols = integerCols,
-                       gridExpand = TRUE,# styling applied to all rows and cols.
+                       gridExpand = TRUE, # styling applied to all rows and cols.
                        stack = TRUE)# New style is merged with existing cell styles.
   }
 

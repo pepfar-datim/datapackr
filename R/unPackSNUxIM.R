@@ -1,10 +1,9 @@
-#' Title
+#' Check that a Data Pack tool has a PSNUxIM tab
 #'
-#' @param d
+#' @inheritParams datapackr_params
 #' @description Internal function to determine if a PSNUxIM tab exists
 #'
 #' @return d object list with additional flags for PSNUxIM state.
-
 checkHasPSNUxIM <- function(d) {
 
   stopifnot(is.data.frame(d$data$SNUxIM))
@@ -42,6 +41,7 @@ checkHasPSNUxIM <- function(d) {
     return(d)
   }
 }
+
 #' @export
 #' @title unPackSNUxIM(d)
 #'
@@ -95,9 +95,9 @@ unPackSNUxIM <- function(d) {
   if (d$info$tool == "Data Pack") {
     d$data$missingCombos <- d$data$MER %>%
       dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
-      #Special handling for differences between main tab and PSNUxIM tab age bands
-      #The data should not be aggregated at this point. This will happen
-      #when the data is repacked by packForDATIM_UndistributedMER
+      # Special handling for differences between main tab and PSNUxIM tab age bands
+      # The data should not be aggregated at this point. This will happen
+      # when the data is repacked by packForDATIM_UndistributedMER
       dplyr::mutate(Age_snuxim = dplyr::case_when(
         stringr::str_detect(Age, "(50-54|55-59|60-64|65+)") &
           !stringr::str_detect(indicator_code, "TX_CURR.T") ~ "50+",
@@ -204,19 +204,27 @@ unPackSNUxIM <- function(d) {
                     value = DataPackTarget)
   }
 
-  # Pare down to populated, updated targets only ####
-  #Get the additional mechanisms added by the user
-  user_mechanisms <- stringr::str_extract(names(d$data$SNUxIM), "\\d{4,}_(DSD|TA)") %>%
-    purrr::keep(~ !is.na(.x))
- #Get the mandatory columns
-  mandatory_columns <- cols_to_keep %>%
-    dplyr::filter(!is.na(indicator_code)) %>%
-    dplyr::filter(!indicator_code == "") %>%
-    dplyr::pull(indicator_code) %>%
-    purrr::discard(~ .x == "12345_DSD")
+ #  TODO: Reverting this to 5.1.5. We ended up selecting
+ #  the FIRST set of mechanism columns which contained the decimal
+ #  percentage allocations instead of the second set of columns
+ #  which contain the actual values.
+ #  #Get the additional mechanisms added by the user
+ #  user_mechanisms <- stringr::str_extract(names(d$data$SNUxIM), "\\d{4,}_(DSD|TA)") %>%
+ #    purrr::keep(~ !is.na(.x))
+ # #Get the mandatory columns
+ #  mandatory_columns <- cols_to_keep %>%
+ #    dplyr::filter(!is.na(indicator_code)) %>%
+ #    dplyr::filter(!indicator_code == "") %>%
+ #    dplyr::pull(indicator_code) %>%
+ #    purrr::discard(~ .x == "12345_DSD")
+ #
+ #  d$data$SNUxIM <- d$data$SNUxIM %>%
+ #    dplyr::select(mandatory_columns,user_mechanisms)
 
-  d$data$SNUxIM <- d$data$SNUxIM %>%
-    dplyr::select(tidyselect::all_of(c(mandatory_columns, user_mechanisms)))
+  # Pare down to populated, updated targets only ####
+  d$data$SNUxIM <- d$data$SNUxIM[, cols_to_keep$col]
+
+  d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
 
   # TEST: Missing right-side formulas; Warn; Continue ####
   d$tests$psnuxim_missing_rs_fxs <-
@@ -361,7 +369,7 @@ unPackSNUxIM <- function(d) {
     d <- checkNumericValues(d, sheet, header_cols)
   }
 
-  #sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
+  # sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
 
   d$data$SNUxIM %<>%
     { suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)), #nolint

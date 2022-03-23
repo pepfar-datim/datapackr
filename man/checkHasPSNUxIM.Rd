@@ -2,9 +2,12 @@
 % Please edit documentation in R/unPackSNUxIM.R
 \name{checkHasPSNUxIM}
 \alias{checkHasPSNUxIM}
-\title{Title}
+\title{Check that a Data Pack tool has a PSNUxIM tab}
 \usage{
 checkHasPSNUxIM(d)
+}
+\arguments{
+\item{d}{Datapackr sidecar object}
 }
 \value{
 d object list with additional flags for PSNUxIM state.
