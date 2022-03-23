@@ -2,6 +2,7 @@
 
 ## Bug fixes
 * Removes `PrEP_CT >= PrEP_NEW` validation rule from checks. (DP-552)
+* Removes `DIAGNOSED_SUBNAT (N, SUBNAT, HIVStatus) TARGET >= DIAGNOSED_SUBNAT (N, SUBNAT, Age/Sex/HIV) TARGET + DIAGNOSED_SUBNAT (N, SUBNAT, HIV/Sex) TARGET` validation rule from checks. (DP-554)
 * Restores "affected_rows" column to the altered formula tab in the validation rules output file. (DP-572)
 * Fixes bug that prevented Technical Assistance (TA) only implementing mechanisms (IMs) from populating in the PSNUxIM tab. (DP-575)
 * Fixes bug in `checkMechanisms`.
