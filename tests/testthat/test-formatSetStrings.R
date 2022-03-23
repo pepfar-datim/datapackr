@@ -22,5 +22,5 @@ test_that("Can order the set string", {
 test_that("Can return NA if not a vector", {
   vec <- list(foo = "A", bar = "B")
   expect_warning(formatSetStrings(vec))
-  expect_identical(supprdessWarnings(formatSetStrings(vec)), NA_character_)
+  expect_identical(suppressWarnings(formatSetStrings(vec)), NA_character_)
 })
