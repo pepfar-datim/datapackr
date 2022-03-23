@@ -11,7 +11,7 @@ cop_year = 2022
 datasets_to_pull <- tibble::tribble(
   ~dataset_uid, ~dataset_name, ~FY, ~targets_results, ~datastream, ~org_unit,
   "iADcaCD5YXh", "FY23 MER Targets", 2023, "targets", "mer", "psnu",
-  "o71WtN5JrUu", "FY23 MER DOD Targets", 2023, "targets", "mer", "_mil",
+  "cihuwjoY5xP", "FY23 MER DOD Targets", 2023, "targets", "mer", "_mil",
   "vzhO50taykm", "FY23 DREAMS Targets", 2023, "targets", "dreams", "dsnu",
   "CxMsvlKepvE", "FY23 IMPATT", 2023, "targets", "impatt", "psnu",
   "Zn27xns9Fmx", "FY22 IMPATT", 2022, "targets", "impatt", "psnu",
@@ -35,7 +35,7 @@ fullCodeList <-
     by = c("dataset_uid" = "dataset_uid"))
 
 dod_des <- fullCodeList %>%
-  dplyr::filter(dataset_uid == "o71WtN5JrUu") %>%
+  dplyr::filter(dataset_uid == "cihuwjoY5xP") %>%
   dplyr::pull(dataelementuid) %>%
   unique()
 
