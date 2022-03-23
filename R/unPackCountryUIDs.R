@@ -42,7 +42,7 @@ unPackCountryUIDs <- function(submission_path,
           ifelse(tool %in% c("Data Pack", "Data Pack Template"), "Prioritization", "SNUxIM"),
         " tab instead."))
 
-    PSNUs <- parsePSNUs(submission_path,tool,cop_year)
+    PSNUs <- parsePSNUs(submission_path, tool, cop_year)
 
     if (NROW(PSNUs) == 0) {
       blank_psnus <- TRUE
@@ -115,7 +115,7 @@ unPackCountryUIDs <- function(submission_path,
     stop(msg)
   }
 
-  PSNUs <- parsePSNUs(submission_path,tool,cop_year)
+  PSNUs <- parsePSNUs(submission_path, tool, cop_year)
 
   if (NROW(PSNUs) > 0) {
     # TEST: Check country_uids and PSNUs in Data Pack match
@@ -146,7 +146,7 @@ unPackCountryUIDs <- function(submission_path,
 #'
 #' @return Data frame of parsed PSNUs.
 #'
-parsePSNUs <- function(submission_path,tool,cop_year) {
+parsePSNUs <- function(submission_path, tool, cop_year) {
   PSNUs <-
     readxl::read_excel(
       path = submission_path,
@@ -172,7 +172,7 @@ parsePSNUs <- function(submission_path,tool,cop_year) {
 
   if (NROW(malformed_psnu_uids) > 0) {
     msg <- paste("ERROR: The PSNUxIM tab contains malformed PSNU identifiers. The following
-      rows were affected: ",paste(malformed_psnu_uids$PSNU,sep = "",collapse = ";"),". This error
+      rows were affected: ", paste(malformed_psnu_uids$PSNU, sep = "", collapse = ";"), ". This error
       must be fixed in order to proceed.")
     stop(msg)
   }

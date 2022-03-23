@@ -8,7 +8,8 @@ writePSNUxIM(
   d,
   snuxim_model_data_path = NULL,
   output_folder = NULL,
-  d2_session = dynGet("d2_default_session", inherits = TRUE)
+  d2_session = dynGet("d2_default_session", inherits = TRUE),
+  append = TRUE
 )
 }
 \arguments{
@@ -20,6 +21,9 @@ writePSNUxIM(
 saved upon export.}
 
 \item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+
+\item{append}{If TRUE append rows to the existing DataPack otherwise,
+output a Missing PSNUxIM targets workbook.}
 }
 \value{
 d

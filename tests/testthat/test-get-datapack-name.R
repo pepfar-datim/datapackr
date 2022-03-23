@@ -53,13 +53,13 @@ test_that("Can parse valid PSNU UIDs for COP21 OPU Datapack", {
                       startRow = 15)
 
   openxlsx::saveWorkbook(wb = wb, file = template_copy, overwrite = TRUE)
-  foo <- parsePSNUs(template_copy,"OPU Data Pack","2021")
-  expect_equal(typeof(foo),"list")
-  expect_setequal(names(foo),c("PSNU","psnu_uid","country_name","country_uid"))
-  expect_equal(foo$PSNU,"Lesotho >Berea [#SNU] [wpg5evyl1OL]")
-  expect_equal(foo$psnu_uid,"wpg5evyl1OL")
-  expect_equal(foo$country_name,"Lesotho")
-  expect_equal(foo$country_uid,"qllxzIjjurr")
+  foo <- parsePSNUs(template_copy, "OPU Data Pack", "2021")
+  expect_equal(typeof(foo), "list")
+  expect_setequal(names(foo), c("PSNU", "psnu_uid", "country_name", "country_uid"))
+  expect_equal(foo$PSNU, "Lesotho >Berea [#SNU] [wpg5evyl1OL]")
+  expect_equal(foo$psnu_uid, "wpg5evyl1OL")
+  expect_equal(foo$country_name, "Lesotho")
+  expect_equal(foo$country_uid, "qllxzIjjurr")
   unlink(template_copy)
 })
 
@@ -75,7 +75,7 @@ test_that("Can error on  invlid PSNU UIDs for COP21 OPU Datapack", {
                       startRow = 15)
 
   openxlsx::saveWorkbook(wb = wb, file = template_copy, overwrite = TRUE)
-  expect_error(parsePSNUs(template_copy,"OPU Data Pack","2021"))
+  expect_error(parsePSNUs(template_copy, "OPU Data Pack", "2021"))
 
   unlink(template_copy)
 })
