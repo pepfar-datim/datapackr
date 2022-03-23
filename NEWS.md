@@ -1,3 +1,51 @@
+# datapackr 5.1.7
+
+## Bug fixes
+* Removes `PrEP_CT >= PrEP_NEW` validation rule from checks. (DP-552)
+* Restores "affected_rows" column to the altered formula tab in the validation rules output file. (DP-572)
+* Fixes bug that prevented Technical Assistance (TA) only implementing mechanisms (IMs) from populating in the PSNUxIM tab. (DP-575)
+* Fixes bug in `checkMechanisms`.
+* Ensures that `default/unallocated` data is included in COP Approval Memo tables.
+* Reverts changes to function `unPackSNUxIM` in `R/unPackSNUxIM.R` back to 5.1.5.
+
+## New features
+* Adds new utility function `formatSetStrings` to assist in the `checkFormulas` function. Formats a vector of numbers into a string of ranges.
+
+## Minor improvements and fixes
+* Cleans up code and adds documentation to functions in the packPSNUxIM` tree. (DP-473)
+* Strengthens validation of PSNUs: (DP-509)
+    * Creates new function parsePSNUs
+    * Errors out invalid PSNU strings are detected
+    * Provides a warning only if NO PSNUs are detected
+    * Adds unit tests
+* Replaces deprecated code in `swapColumns` function located in `R/utilities.R`: (DP-547)
+    * Replaces `mutate_` with base R fix to remove deprecation warning when writing PSNUXIM tab.
+    * Added tests for `swapColumns` in `tests/testthat/test-utilities.R`
+* Update FY23 MER DOD Targets COC UID to "o71WtN5JrUu" in the following locations: (DP-576 and DP-577)
+    * `R/utilities.R`
+    * `tests/testthat/test-GetDatasetUids.R`
+    * `data-raw/update_cop22_de_coc_co_map.R`
+    * `data/cop22_map_DataPack_DATIM_DEs_COCs.rda`
+    * `data/cop22_map_adorn_import_file.rda`
+* Adding whole package to linting checks. Lints `data-raw` and `tests` folders now in addition to `R` folder. (DP-578)
+* Aligns on `datastreams` parameter to consolidate parameter names across functions (DP-579)
+    * Changes `datastream` parameter for `pullFullCodeList` to `datastreams`
+    * Changes `streams` parameter for `getCOPDataFromDATIM` to `datastreams`
+    * Changes parameters in all relevant locations
+    * Moves definition of `datastreams` parameter to `datapackr_params`
+    * Removes duplicative parameter definitions from `getCOPDataFromDATIM` and inherits them from `datapackr_params` instead
+* Adds missing `d2_session` parameter to `getCountries` function in `R/utilities.R` (DP-580)
+* Aligns on `output_folder` as parameter for all functions that export files (DP-581)
+    * Changes `output_path` parameter in `exportPackr` to `output_folder`
+    * Replaces parameter names for `exportPackr` in all relevant locations
+    * Modifies `output_folder` definition in `datapackr_params` to remove outdated reference to defaulting to working directory.
+    * Removes duplicative parameter definitions in functions that were touched and replaces with inheritance from `datapackr_params`
+* Remove unused parameters (DP-582)
+    * Removes `type` argument from `deriveTargets`.
+    * Removes `country_names` argument from `getOPUDataFromDATIM`.
+    * Removes duplicative parameter definitions from `getOPUDataFromDATIM` and inherits definitions from `datapackr_params`.
+
+
 # datapackr 5.1.6
 
 ## Bug fixes

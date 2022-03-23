@@ -2,18 +2,19 @@
 % Please edit documentation in R/utilities.R
 \name{swapColumns}
 \alias{swapColumns}
-\title{Swap columns between dataframes}
+\title{Swap columns between two dataframes}
 \usage{
 swapColumns(to, from)
 }
 \arguments{
 \item{to}{Dataframe to pull columns into}
 
-\item{from}{Data frame to pull columns from}
+\item{from}{Dataframe to pull columns from}
 }
 \value{
-dataframe with swapped columns
+A dataframe with the swapped columns
 }
 \description{
-Replaces columns in \code{to} with those with identical names in \code{from}.
+Replaces columns in the dataframe \code{to} with those with identical names
+ in the dataframe \code{from}.
 }

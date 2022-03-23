@@ -122,7 +122,8 @@ each non-missing parameter supplied.
 }
 }
 \description{
-Standardized package function parameter defaults and checks.
+Standardized package functions,in terms of parameter defaults
+and checks.
 These can be run individually (e.g., \code{check_country_uids}), or in bulk (e.g.,
 \code{check_params(country_uids = "abcdefgh123", tool = "Data Pack")}).
 }
@@ -191,7 +192,7 @@ example_function3(arg1 = test_arg2, arg2 = 3)
 }
 
 So, within this package, we alternatively use \verb{\%||\%} and \verb{\%missing\%} to
-determine default parameters based on this situation and package usage.
+determine default parameters based on the situation and package usage.
 
 Because of the sometimes complicated manner in determining default parameters,
 which can often change from year to year, we have attempted to centralize and

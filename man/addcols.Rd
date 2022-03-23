@@ -7,7 +7,7 @@
 addcols(data, cnames, type = "character")
 }
 \arguments{
-\item{data}{Dataframe to add columns.}
+\item{data}{The dataframe to add the columns to.}
 
 \item{cnames}{Character vector of one or more column names to be added to
 \code{data}.}
