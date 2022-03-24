@@ -8,7 +8,7 @@ htsModalities <- function(cop_year) {
     # a reference to the cop year. Since the modalities
     # differ from year to year though, this list needs
     # to be determined based on the year we are dealing with.
-    datapackr::cop22_map_DataPack_DATIM_DEs_COCs %>%
+    datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year) %>%
     dplyr::select(indicator_code, hts_modality) %>%
     dplyr::filter(!is.na(hts_modality)) %>%
     dplyr::distinct() %>%
