@@ -1,6 +1,6 @@
 
 
-htsModalities <- function(cop_year) {
+HTS_POS_Modalities <- function(cop_year) {
     #TODO: This function needs a parameter based on COP year.
     #More work further down, so I am not going to fix it
     #at the moment. Each of the checks is being fed a
@@ -9,8 +9,9 @@ htsModalities <- function(cop_year) {
     # differ from year to year though, this list needs
     # to be determined based on the year we are dealing with.
     datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year) %>%
-    dplyr::select(indicator_code, hts_modality) %>%
+    dplyr::select(indicator_code, hts_modality,resultstatus) %>%
     dplyr::filter(!is.na(hts_modality)) %>%
+    dplyr::filter(resultstatus %in% c("Newly Tested Positives", "Positive")) %>% 
     dplyr::distinct() %>%
     dplyr::pull(indicator_code)
 }
@@ -367,7 +368,7 @@ analyze_retention <- function(data) {
 analyze_linkage <- function(data) {
   a <- NULL
 
-  hts_modalities <- htsModalities(data$cop_year[1])
+  hts_modalities <- HTS_POS_Modalities(data$cop_year[1])
 
   analysis <- data %>%
     dplyr::mutate(
@@ -463,7 +464,7 @@ analyze_linkage <- function(data) {
 analyze_indexpos_ratio <- function(data) {
   a <- NULL
 
-  hts_modalities <- data$cop_year[1]
+  hts_modalities <- HTS_POS_Modalities(data$cop_year[1])
 
   analysis <- data %>%
     dplyr::filter(is.na(key_population)) %>%
