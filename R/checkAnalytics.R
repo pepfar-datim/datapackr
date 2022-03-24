@@ -1,21 +1,18 @@
 
 
 htsModalities <- function() {
-c("HTS_INDEX_COM.New.Pos.T",
-          "HTS_INDEX_FAC.New.Pos.T",
-          "HTS_TST.EW.Pos.T",
-          "HTS_TST.Inpat.Pos.T",
-          "HTS_TST.Maln.Pos.T",
-          "HTS_TST.MobileCom.Pos.T",
-          "HTS_TST.OtherCom.Pos.T",
-          "HTS_TST.Other.Pos.T",
-          "HTS_TST.Peds.Pos.T",
-          "HTS_TST.PostANC1.Pos.T",
-          "HTS_TST.STI.Pos.T",
-          "HTS_TST.VCT.Pos.T",
-          "PMTCT_STAT.N.New.Pos.T",
-          "TB_STAT.N.New.Pos.T",
-          "VMMC_CIRC.Pos.T")
+    #TODO: This function needs a paramater based on COP year.
+    #More work further down, so I am not going to fix it
+    #at the moment. Each of the checks is being fed a
+    # data object, but this object does not seem to contain
+    # a reference to the cop year. Since the modalities
+    # differ from year to year though, this list needs
+    # to be determined based on the year we are dealing with.
+    datapackr::cop22_map_DataPack_DATIM_DEs_COCs %>%
+    dplyr::select(indicator_code, hts_modality) %>%
+    dplyr::filter(!is.na(hts_modality)) %>%
+    dplyr::distinct() %>%
+    dplyr::pull(indicator_code)
 }
 #' @export
 #' @title Check Data Pack for <90\% PMTCT_EID from ≤02 months
