@@ -1,21 +1,19 @@
 
 
-htsModalities <- function() {
-c("HTS_INDEX_COM.New.Pos.T",
-          "HTS_INDEX_FAC.New.Pos.T",
-          "HTS_TST.EW.Pos.T",
-          "HTS_TST.Inpat.Pos.T",
-          "HTS_TST.Maln.Pos.T",
-          "HTS_TST.MobileCom.Pos.T",
-          "HTS_TST.OtherCom.Pos.T",
-          "HTS_TST.Other.Pos.T",
-          "HTS_TST.Peds.Pos.T",
-          "HTS_TST.PostANC1.Pos.T",
-          "HTS_TST.STI.Pos.T",
-          "HTS_TST.VCT.Pos.T",
-          "PMTCT_STAT.N.New.Pos.T",
-          "TB_STAT.N.New.Pos.T",
-          "VMMC_CIRC.Pos.T")
+HTS_POS_Modalities <- function(cop_year) {
+    #TODO: This function needs a parameter based on COP year.
+    #More work further down, so I am not going to fix it
+    #at the moment. Each of the checks is being fed a
+    # data object, but this object does not seem to contain
+    # a reference to the cop year. Since the modalities
+    # differ from year to year though, this list needs
+    # to be determined based on the year we are dealing with.
+    datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year) %>%
+    dplyr::select(indicator_code, hts_modality, resultstatus) %>%
+    dplyr::filter(!is.na(hts_modality)) %>%
+    dplyr::filter(resultstatus %in% c("Newly Tested Positives", "Positive")) %>%
+    dplyr::distinct() %>%
+    dplyr::pull(indicator_code)
 }
 #' @export
 #' @title Check Data Pack for <90\% PMTCT_EID from ≤02 months
@@ -298,6 +296,13 @@ analyze_retention <- function(data) {
   a <- NULL
 
   analysis <- data %>%
+    #For COP22, we need to collapse the finer 50+ age bands back to 50+
+    # since TX_NEW is not allocated at these finer age bands
+    dplyr::mutate(age = dplyr::case_when(age %in% c("50-54", "55-59", "60-64", "65+") ~ "50+",
+                                          TRUE ~ age)) %>%
+    dplyr::group_by(psnu, psnu_uid, age, sex, key_population, cop_year) %>%
+    dplyr::summarise_all(sum) %>%
+    dplyr::ungroup() %>%
     dplyr::mutate(
       TX.Retention.T =
         (TX_CURR.T)
@@ -370,9 +375,13 @@ analyze_retention <- function(data) {
 analyze_linkage <- function(data) {
   a <- NULL
 
+  hts_modalities <- HTS_POS_Modalities(data$cop_year[1])
+
   analysis <- data %>%
+    dplyr::mutate(age = dplyr::case_when(age %in% c("50-54", "55-59", "60-64", "65+") ~ "50+",
+                                         TRUE ~ age)) %>%
     dplyr::mutate(
-      HTS_TST_POS.T  = rowSums(dplyr::select(., tidyselect::any_of(htsModalities()))),
+      HTS_TST_POS.T  = rowSums(dplyr::select(., tidyselect::any_of(hts_modalities))),
       HTS_TST.Linkage.T =
         dplyr::case_when(
           HTS_TST_POS.T == 0 ~ NA_real_,
@@ -464,6 +473,8 @@ analyze_linkage <- function(data) {
 analyze_indexpos_ratio <- function(data) {
   a <- NULL
 
+  hts_modalities <- HTS_POS_Modalities(data$cop_year[1])
+
   analysis <- data %>%
     dplyr::filter(is.na(key_population)) %>%
     dplyr::select(-age, -sex, -key_population) %>%
@@ -471,7 +482,7 @@ analyze_indexpos_ratio <- function(data) {
     dplyr::summarise(dplyr::across(dplyr::everything(), sum)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(
-      HTS_TST_POS.T = rowSums(dplyr::select(., tidyselect::any_of(htsModalities()))),
+      HTS_TST_POS.T = rowSums(dplyr::select(., tidyselect::any_of(hts_modalities))),
       HTS_INDEX.total =
         HTS_INDEX_COM.New.Pos.T
         + HTS_INDEX_FAC.New.Pos.T,
@@ -619,7 +630,8 @@ checkAnalytics <- function(d,
                 dplyr::pull(indicator_code)),
             type = "numeric") %>%
     dplyr::mutate(dplyr::across(c(-psnu, -psnu_uid, -age, -sex, -key_population),
-                     ~tidyr::replace_na(.x, 0)))
+                     ~tidyr::replace_na(.x, 0))) %>%
+    dplyr::mutate(cop_year = d$info$cop_year)
 
 
 
