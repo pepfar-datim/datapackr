@@ -1,7 +1,7 @@
 
 
-htsModalities <- function() {
-    #TODO: This function needs a paramater based on COP year.
+htsModalities <- function(cop_year) {
+    #TODO: This function needs a parameter based on COP year.
     #More work further down, so I am not going to fix it
     #at the moment. Each of the checks is being fed a
     # data object, but this object does not seem to contain
@@ -367,9 +367,11 @@ analyze_retention <- function(data) {
 analyze_linkage <- function(data) {
   a <- NULL
 
+  hts_modalities <- htsModalities(data$cop_year[1])
+
   analysis <- data %>%
     dplyr::mutate(
-      HTS_TST_POS.T  = rowSums(dplyr::select(., tidyselect::any_of(htsModalities()))),
+      HTS_TST_POS.T  = rowSums(dplyr::select(., tidyselect::any_of(hts_modalities))),
       HTS_TST.Linkage.T =
         dplyr::case_when(
           HTS_TST_POS.T == 0 ~ NA_real_,
@@ -461,6 +463,8 @@ analyze_linkage <- function(data) {
 analyze_indexpos_ratio <- function(data) {
   a <- NULL
 
+  hts_modalities <- data$cop_year[1]
+
   analysis <- data %>%
     dplyr::filter(is.na(key_population)) %>%
     dplyr::select(-age, -sex, -key_population) %>%
@@ -468,7 +472,7 @@ analyze_indexpos_ratio <- function(data) {
     dplyr::summarise(dplyr::across(dplyr::everything(), sum)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(
-      HTS_TST_POS.T = rowSums(dplyr::select(., tidyselect::any_of(htsModalities()))),
+      HTS_TST_POS.T = rowSums(dplyr::select(., tidyselect::any_of(hts_modalities))),
       HTS_INDEX.total =
         HTS_INDEX_COM.New.Pos.T
         + HTS_INDEX_FAC.New.Pos.T,
@@ -616,7 +620,8 @@ checkAnalytics <- function(d,
                 dplyr::pull(indicator_code)),
             type = "numeric") %>%
     dplyr::mutate(dplyr::across(c(-psnu, -psnu_uid, -age, -sex, -key_population),
-                     ~tidyr::replace_na(.x, 0)))
+                     ~tidyr::replace_na(.x, 0))) %>%
+    dplyr::mutate(cop_year = d$info$cop_year)
 
 
 
