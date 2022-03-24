@@ -296,11 +296,13 @@ analyze_retention <- function(data) {
   a <- NULL
 
   analysis <- data %>%
-    dplyr::mutate(age = dplyr::case_when( age %in% c('50-54','55-59','60-64','65+') ~ '50+',
-                                          TRUE ~ age)) %>% 
-    dplyr::group_by(psnu,psnu_uid,age,sex,key_population,cop_year) %>% 
-    dplyr::summarise_all(sum) %>% 
-    dplyr::ungroup() %>% 
+    #For COP22, we need to collapse the finer 50+ age bands back to 50+
+    # since TX_NEW is not allocated at these finer age bands
+    dplyr::mutate(age = dplyr::case_when(age %in% c("50-54", "55-59", "60-64", "65+") ~ "50+",
+                                          TRUE ~ age)) %>%
+    dplyr::group_by(psnu, psnu_uid, age, sex, key_population, cop_year) %>%
+    dplyr::summarise_all(sum) %>%
+    dplyr::ungroup() %>%
     dplyr::mutate(
       TX.Retention.T =
         (TX_CURR.T)
@@ -376,7 +378,7 @@ analyze_linkage <- function(data) {
   hts_modalities <- HTS_POS_Modalities(data$cop_year[1])
 
   analysis <- data %>%
-    dplyr::mutate(age = dplyr::case_when( age %in% c('50-54','55-59','60-64','65+') ~ '50+',
+    dplyr::mutate(age = dplyr::case_when(age %in% c("50-54", "55-59", "60-64", "65+") ~ "50+",
                                          TRUE ~ age)) %>%
     dplyr::mutate(
       HTS_TST_POS.T  = rowSums(dplyr::select(., tidyselect::any_of(hts_modalities))),
