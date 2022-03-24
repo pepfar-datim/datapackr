@@ -9,9 +9,9 @@ HTS_POS_Modalities <- function(cop_year) {
     # differ from year to year though, this list needs
     # to be determined based on the year we are dealing with.
     datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year) %>%
-    dplyr::select(indicator_code, hts_modality,resultstatus) %>%
+    dplyr::select(indicator_code, hts_modality, resultstatus) %>%
     dplyr::filter(!is.na(hts_modality)) %>%
-    dplyr::filter(resultstatus %in% c("Newly Tested Positives", "Positive")) %>% 
+    dplyr::filter(resultstatus %in% c("Newly Tested Positives", "Positive")) %>%
     dplyr::distinct() %>%
     dplyr::pull(indicator_code)
 }
