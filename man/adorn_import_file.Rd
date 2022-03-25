@@ -2,7 +2,8 @@
 % Please edit documentation in R/adorn_import_file.R
 \name{adorn_import_file}
 \alias{adorn_import_file}
-\title{Convert PSNU-level DATIM import file into analytics-friendly object}
+\title{Convert a 'PSNU-level' DATIM import file into an analytics-friendly
+ object.}
 \usage{
 adorn_import_file(
   psnu_import_file,
@@ -32,6 +33,6 @@ the new, more complete format?}
 data
 }
 \description{
-Convert PSNU-level DATIM import file into analytics-friendly
-object, similar to the MER Structured Datasets
+Convert a 'PSNU-level' DATIM import file into an
+ analytics-friendly object, similar to the MER Structured Datasets
 }

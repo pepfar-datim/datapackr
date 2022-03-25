@@ -2,12 +2,12 @@
 % Please edit documentation in R/packageSetup.R
 \name{headerRow}
 \alias{headerRow}
-\title{Tool header rows}
+\title{Tool to assist with formatting the header rows}
 \usage{
 headerRow(tool, cop_year = getCurrentCOPYear())
 }
 \arguments{
-\item{tool}{"Data Pack", "Data Pack Template".}
+\item{tool}{"Data Pack", "Data Pack Template",""OPU Data Pack".}
 
 \item{cop_year}{Specifies COP year for dating as well as selection of
 templates.}
@@ -16,5 +16,5 @@ templates.}
 Header row
 }
 \description{
-Tool header rows
+Tool to assist with formatting the header rows
 }

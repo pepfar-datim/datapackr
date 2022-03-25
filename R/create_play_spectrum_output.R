@@ -5,13 +5,7 @@
 #' Creates a fake Spectrum Data Pack export for use in testing with Data Packs.
 #' Requires login to DATIM.
 #'
-#' @param country_uids Unique IDs for countries to include in the Data Pack.
-#' For full list of these IDs, see \code{datapackr::dataPackMap}.
-#' @param  cop_year Specifies COP year for dating as well as selection of
-#' templates.
-#' @param output_folder Local folder where you would like your Data Pack to be
-#' saved upon export. If left as \code{NULL}, will not output externally.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
 #'
 #' @return Fake Spectrum dataset
 #'
@@ -59,7 +53,7 @@ create_play_spectrum_output <- function(country_uids,
 
   data_datim <- suppressWarnings(datapackr::getCOPDataFromDATIM(country_uids,
                                                cop_year = (cop_year - 1),
-                                               streams = c("subnat_targets", "impatt"),
+                                               datastreams = c("subnat_targets", "impatt"),
                                                d2_session = d2_session)) %>%
   # Accommodate DUIT decision to map IMPATT to cop_year+1 ####
     dplyr::mutate(
@@ -185,7 +179,7 @@ create_play_spectrum_output <- function(country_uids,
     country_name <- datimutils::getOrgUnits(country_uids,
                                             d2_session = d2_session)
     exportPackr(data = play_spectrum_output,
-                output_path = output_folder,
+                output_folder = output_folder,
                 tool = "Spectrum Example",
                 datapack_name = country_name)
   }

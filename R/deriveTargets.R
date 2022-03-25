@@ -5,11 +5,10 @@
 #' set during COP.
 #'
 #' @param data Dataframe with either Data Pack data.
-#' @param type Type of data, either \code{Data Pack}.
 #'
 #' @return Dataframe with added, derived targets.
 #'
-deriveTargets <- function(data, type) {
+deriveTargets <- function(data) {
   derived <- data %>%
     dplyr::filter(
       stringr::str_detect(

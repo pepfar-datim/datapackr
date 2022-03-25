@@ -76,7 +76,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
   #Fetch the existing data from DATIM
   df <- getCOPDataFromDATIM(d$info$country_uids,
                       d$info$cop_year,
-                      streams = "mer_targets",
+                      datastreams = "mer_targets",
                       d2_session = d2_session)
 
   if (NROW(d) > 0) {
@@ -178,8 +178,8 @@ prepareMemoDataByPSNU <- function(analytics,
                                                    "PrEP_CURR",
                                                    "GEND_GBV") ~ "Total",
                                   TRUE ~ Age)) %>%
-   #Special handling for PrEP_CT. The indicator is listed as 15+ but we will
-   #Treat it as a total
+   # Special handling for PrEP_CT. The indicator is listed as 15+ but we will
+   # Treat it as a total
    dplyr::mutate(Age = dplyr::case_when(Indicator == "PrEP_CT" & Age == "15+" ~ "Total",
                  TRUE ~ Age)) %>%
     dplyr::select(-id, -numerator, -denominator) %>%
