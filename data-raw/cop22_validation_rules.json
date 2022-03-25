@@ -196,6 +196,21 @@
             }
         },
         {
+            "name": "PMTCT_ART_SUBNAT (N, SUBNAT, A/S/HIV/Art) TARGET <= PMTCT_ART_SUBNAT (D, SUBNAT, Age/Sex/HIV) TARGET",
+            "id": "IpMXcjBUnnz",
+            "periodType": "FinancialOct",
+            "description": "PMTCT_ART_SUBNAT (N, SUBNAT, A/S/HIV/Art) TARGET <= PMTCT_ART_SUBNAT (D, SUBNAT, Age/Sex/HIV) TARGET",
+            "operator": "less_than_or_equal_to",
+            "leftSide": {
+                "expression": "#{LvwJYdp0Jmr}",
+                "missingValueStrategy": "NEVER_SKIP"
+            },
+            "rightSide": {
+                "expression": "#{jaX3SUTcIki}",
+                "missingValueStrategy": "NEVER_SKIP"
+            }
+        },
+        {
             "name": "PMTCT_STAT_NAT (N, NAT) TARGET <= PMTCT_STAT_NAT (D, NAT) TARGET",
             "id": "sNgjXtv40WI",
             "periodType": "FinancialOct",
@@ -237,6 +252,21 @@
             },
             "rightSide": {
                 "expression": "#{bu3sosk4HWn}",
+                "missingValueStrategy": "NEVER_SKIP"
+            }
+        },
+        {
+            "name": "PMTCT_STAT_SUBNAT (N, SUBNAT, Age/Sex) TARGET <= PMTCT_STAT_SUBNAT (D, SUBNAT, Age/Sex) TARGET",
+            "id": "NwE2ti43IqL",
+            "periodType": "FinancialOct",
+            "description": "PMTCT_STAT_SUBNAT (N, SUBNAT, Age/Sex) TARGET <= PMTCT_STAT_SUBNAT (D, SUBNAT, Age/Sex) TARGET",
+            "operator": "less_than_or_equal_to",
+            "leftSide": {
+                "expression": "#{rJjmeacbvid}",
+                "missingValueStrategy": "NEVER_SKIP"
+            },
+            "rightSide": {
+                "expression": "#{jdFCj4dEvIK}",
                 "missingValueStrategy": "NEVER_SKIP"
             }
         },
@@ -642,6 +672,21 @@
             },
             "rightSide": {
                 "expression": "#{eTV3FznMU6C}",
+                "missingValueStrategy": "SKIP_IF_ALL_VALUES_MISSING"
+            }
+        },
+        {
+            "name": "VMMC_TOTALCIRC_SUBNAT (N, SUBNAT, Age/Sex) TARGET <= VMMC_TOTALCIRC_SUBNAT (N, SUBNAT, Sex) TARGET",
+            "id": "cbQKx5u5Tlo",
+            "periodType": "FinancialOct",
+            "description": "VMMC_TOTALCIRC_SUBNAT (N, SUBNAT, Age/Sex) TARGET <= VMMC_TOTALCIRC_SUBNAT (N, SUBNAT, Sex) TARGET",
+            "operator": "less_than_or_equal_to",
+            "leftSide": {
+                "expression": "#{ZayJeEa6pCa}",
+                "missingValueStrategy": "SKIP_IF_ALL_VALUES_MISSING"
+            },
+            "rightSide": {
+                "expression": "#{ywCrpZgX1P9}",
                 "missingValueStrategy": "SKIP_IF_ALL_VALUES_MISSING"
             }
         }
