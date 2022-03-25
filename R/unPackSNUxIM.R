@@ -98,9 +98,9 @@ unPackSNUxIM <- function(d) {
   if (d$info$tool == "Data Pack") {
     d$data$missingCombos <- d$data$MER %>%
       dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
-      #Special handling for differences between main tab and PSNUxIM tab age bands
-      #The data should not be aggregated at this point. This will happen
-      #when the data is repacked by packForDATIM_UndistributedMER
+      # Special handling for differences between main tab and PSNUxIM tab age bands
+      # The data should not be aggregated at this point. This will happen
+      # when the data is repacked by packForDATIM_UndistributedMER
       dplyr::mutate(Age_snuxim = dplyr::case_when(
         stringr::str_detect(Age, "(50-54|55-59|60-64|65+)") &
           !stringr::str_detect(indicator_code, "TX_CURR.T") ~ "50+",
@@ -372,7 +372,7 @@ unPackSNUxIM <- function(d) {
     d <- checkNumericValues(d, sheet, header_cols)
   }
 
-  #sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
+  # sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
 
   d$data$SNUxIM %<>%
     { suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)), #nolint
@@ -546,6 +546,32 @@ unPackSNUxIM <- function(d) {
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
                   dplyr::everything())
 
+  #Test for invalid PSNUs
+
+  possible_psnus <- datapackr::valid_PSNUs %>%
+    dplyr::filter(country_uid %in% d$info$country_uids) %>%
+    dplyr::pull(psnu_uid)
+
+  d$tests$invalid_psnus <- d$data$SNUxIM %>%
+    dplyr::filter(!(psnuid %in% possible_psnus)) %>%
+    dplyr::select(PSNU) %>%
+    dplyr::distinct() %>%
+    dplyr::pull(PSNU)
+
+  attr(d$tests$invalid_psnus, "test_name") <- "Invalid PSNUs"
+
+  if (length(d$tests$invalid_psnus) > 0) {
+    d$info$has_error <- TRUE
+
+    warning_msg <-
+      paste0(
+        "ERROR!: ",
+        NROW(d$tests$invalid_psnus),
+        " invalid PSNU identifiers were detected. Please check the UID and fix the following PSNUs:",
+        paste(d$tests$invalid_psnus, sep = "", collapse = ";"))
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+  }
 
   # Gather all values in single column ####
   d$data$SNUxIM %<>%

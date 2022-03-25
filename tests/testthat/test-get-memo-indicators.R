@@ -12,7 +12,7 @@ with_mock_api({
 with_mock_api({
   test_that("We can get a data frame of memo indicators", {
     inds <- datapackr::getMemoIndicators("2022", d2_session = training)
-    expect_type(inds,"list")
-    expect_setequal(names(inds),c("id","name","numerator","denominator"))
+    expect_type(inds, "list")
+    expect_setequal(names(inds), c("id", "name", "numerator", "denominator"))
   })
 })

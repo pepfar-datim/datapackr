@@ -1,4 +1,5 @@
 library(testthat)
+library(httptest)
 library(datapackr)
 library(tibble)
 library(cellranger)

@@ -20,6 +20,7 @@ datapackr_params(
   results_archive,
   d2_session,
   d,
+  datastreams,
   schema,
   wb,
   PSNUs,
@@ -70,8 +71,7 @@ a cached copy of the mechanisms SQL view.}
 FY22 targets = COP21.}
 
 \item{output_folder}{Local folder where you would like your Data Pack to be
-saved upon export. If left as \code{NULL}, will output to
-\code{Working Directory}.}
+saved upon export.}
 
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}
@@ -79,6 +79,11 @@ processes to output_folder.}
 \item{d2_session}{DHIS2 Session id}
 
 \item{d}{Datapackr sidecar object}
+
+\item{datastreams}{Data stream or streams. One or more of \code{mer_targets},
+\code{mer_results}, \code{subnat_targets}, \code{subnat_results}, or
+\code{impatt}. If not specified, then all data streams
+are returned.}
 
 \item{schema}{Which datapackr schema to use in guiding this function. If left
 \code{NULL} will select the default based on \code{cop_year} and \code{tool}.}

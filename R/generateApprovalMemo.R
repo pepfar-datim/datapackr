@@ -69,7 +69,7 @@ generateMemoTemplate <- function(draft_memo = TRUE) {
 #'
 renderPrioTable <- function(memo_doc, prio_table, ou_name, source_type) {
 
-  #Set the caption based on the source_type
+  # Set the caption based on the source_type
   fig_caption <- switch(source_type,
                         "datapack" = "Table 1a: Prioritization Table (Proposed)",
                         "datim" = "Table 1b: Prioritization Table (Current)")
@@ -153,7 +153,7 @@ renderPrioTable <- function(memo_doc, prio_table, ou_name, source_type) {
 #'
 renderAgencyTable <- function(memo_doc, agency_table, ou_name, source_type) {
 
-  #Set the caption based on the source_type
+  # Set the caption based on the source_type
   fig_caption <- switch(source_type,
                         "datapack" = "Table 2a: Agency Table (Proposed)",
                         "datim" = "Table 2b: Agency Table (Current)")
@@ -230,7 +230,7 @@ renderAgencyTable <- function(memo_doc, agency_table, ou_name, source_type) {
 #'
 renderPartnerTable <- function(memo_doc, partners_table, memoStructure, source_type) {
 
-  #Set the caption based on the source_type
+  # Set the caption based on the source_type
   fig_caption <- switch(source_type,
                         "datapack" = "Table 3a: Partners Table (Proposed)",
                         "datim" = "Table 3b: Partners Table (Current)")

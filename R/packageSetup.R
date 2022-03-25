@@ -69,9 +69,9 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 }
 
 #' @export
-#' @title Tool header rows
+#' @title Tool to assist with formatting the header rows
 #'
-#' @param tool "Data Pack", "Data Pack Template".
+#' @param tool "Data Pack", "Data Pack Template",""OPU Data Pack".
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
 #'
@@ -79,7 +79,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 #'
 headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
 
-  if (cop_year %in% c(2020, 2021, 2022)) {
+  if (cop_year %in% c(2020:2022)) {
     if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
       header_row <- 14
     } else stop("That tool type is not supported for that cop_year.")
@@ -219,12 +219,15 @@ pick_template_path <- function(cop_year, tool) {
 #' @param cop_year COP Year to use for tailoring functions. Remember,
 #' FY22 targets = COP21.
 #' @param output_folder Local folder where you would like your Data Pack to be
-#' saved upon export. If left as \code{NULL}, will output to
-#' \code{Working Directory}.
+#' saved upon export.
 #' @param results_archive If TRUE, will export compiled results of all tests and
 #' processes to output_folder.
 #' @param d2_session DHIS2 Session id
 #' @param d Datapackr sidecar object
+#' @param datastreams Data stream or streams. One or more of \code{mer_targets},
+#' \code{mer_results}, \code{subnat_targets}, \code{subnat_results}, or
+#' \code{impatt}. If not specified, then all data streams
+#' are returned.
 #' @param schema Which datapackr schema to use in guiding this function. If left
 #' \code{NULL} will select the default based on \code{cop_year} and \code{tool}.
 #' @param wb Openxlsx workbook object.
@@ -272,6 +275,7 @@ datapackr_params <- function(model_data,
                              results_archive,
                              d2_session,
                              d,
+                             datastreams,
                              schema,
                              wb,
                              PSNUs,
