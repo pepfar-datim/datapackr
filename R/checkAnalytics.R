@@ -1,6 +1,4 @@
 
-
-
 HTS_POS_Modalities <- function(cop_year) {
     #TODO: This function needs a parameter based on COP year.
     #More work further down, so I am not going to fix it

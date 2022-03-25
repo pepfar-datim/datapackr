@@ -131,13 +131,47 @@ exportSubnatToDATIM <- function(d) {
            dplyr::pull(dataelementuid)
       )
     )
-
-  d$datim$fy22_prioritizations <- SUBNAT_IMPATT %>%
-    dplyr::filter(
-      #period == "2021Oct",
-      dataElement %in%
-        datim_map$dataelementuid[which(datim_map$indicator_code == "IMPATT.PRIORITY_SNU.T")]
+  
+  #Add the following top level targets by aggregation
+  appendTotals <- function(data) {
+    totals_map <- tibble::tribble(
+      ~from, ~to, ~categoryoptioncomboid,
+      'SSun4i7nHlV','BLUT96oHPxO','QXtyoEEa0I7',  # VMMC_CIRC_SUBNAT (N, SUBNAT, Sex) TARGET
+      'ZayJeEa6pCa','ywCrpZgX1P9', 'QXtyoEEa0I7',   # VMMC_TOTALCIRC_SUBNAT (N, SUBNAT, Sex) TARGET
+      'ctGo7s0K63z', 'CShdIv7wNUB','HllvX50cXC0', # #KP_MAT_SUBNAT (N, SUBNAT) 
+      'xghQXueYJxu', 'qjBMdjQFy26', 'HllvX50cXC0', #T X_CURR_SUBNAT (N, SUBNAT) TARGET
+      'zoKiMGRucOY', 'qXWRBZTRrUm', 'LVcCRCAVjwj', #VL_SUPPRESSION_SUBNAT (N, SUBNAT, HIVStatus) TARGET
+      'nF19GOjcnoD', 'mcDTjVP9B0e', 'LVcCRCAVjwj' #DIAGNOSED_SUBNAT (N, SUBNAT, Age/Sex/HIVStatus) TARGET
     )
-
+    
+    createAggregatedTotals <-
+      function (data, from, to, categoryoptioncomboid) {
+        data %>% dplyr::filter(`dataElement` == from) %>%
+          dplyr::mutate(`dataElement` = to) %>%
+          dplyr::mutate(categoryOptionCombo = categoryoptioncomboid) %>%
+          dplyr::group_by(across(c(-value))) %>%
+          dplyr::summarise(value = sum(value), .groups = "drop")
+      }
+    
+    total_results <- data[0, ]
+    for (i in seq_len(NROW(totals_map))) {
+      these_totals <-
+        createAggregatedTotals(data,
+                               totals_map$from[i],
+                               totals_map$to[i],
+                               totals_map$categoryoptioncomboid[i])
+      total_results <- dplyr::bind_rows(total_results, these_totals)
+    }
+    
+    dplyr::bind_rows(data, total_results)
+  }
+  
+  d$datim$impatt_fy22 <- appendTotals(d$datim$impatt_fy22)
+  
+  d$datim$fy22_prioritizations <- SUBNAT_IMPATT %>%
+    dplyr::filter(#period == "2021Oct",
+      dataElement %in%
+        datim_map$dataelementuid[which(datim_map$indicator_code == "IMPATT.PRIORITY_SNU.T")])
+  
   return(d)
 }
