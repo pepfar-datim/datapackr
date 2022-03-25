@@ -61,21 +61,6 @@
             }
         },
         {
-            "name": "DIAGNOSED_SUBNAT (N, SUBNAT, HIVStatus) TARGET >= DIAGNOSED_SUBNAT (N, SUBNAT, Age/Sex/HIV) TARGET + DIAGNOSED_SUBNAT (N, SUBNAT, HIV/Sex) TARGET",
-            "id": "h6ACV56qnvz",
-            "periodType": "FinancialOct",
-            "description": "DIAGNOSED_SUBNAT (N, SUBNAT, HIVStatus) TARGET >= DIAGNOSED_SUBNAT (N, SUBNAT, Age/Sex/HIV) TARGET + DIAGNOSED_SUBNAT (N, SUBNAT, HIV/Sex) TARGET",
-            "operator": "greater_than_or_equal_to",
-            "leftSide": {
-                "expression": "#{mcDTjVP9B0e}",
-                "missingValueStrategy": "NEVER_SKIP"
-            },
-            "rightSide": {
-                "expression": "#{nF19GOjcnoD}+#{xVPaflQHwEP}",
-                "missingValueStrategy": "NEVER_SKIP"
-            }
-        },
-        {
             "name": "HTS_RECENT (N, DSD, KeyPop/HIVStatus) TARGET <= HTS_RECENT (N, DSD, Index/Age/Sex/RTRI/HIV) TARGET options 15-19, 20-24, 25-29, 30-34, 35-39, 40-44, 45-49, 50+ + HTS_RECENT (N, DSD, EM/Age/Sex/RTRI/HIV) TARGET options 15-19, 20-24",
             "id": "hcBPUh5yuX4",
             "periodType": "FinancialOct",
@@ -211,21 +196,6 @@
             }
         },
         {
-            "name": "PMTCT_ART_SUBNAT (N, SUBNAT, A/S/HIV/Art) TARGET <= PMTCT_ART_SUBNAT (D, SUBNAT, Age/Sex/HIV) TARGET",
-            "id": "IpMXcjBUnnz",
-            "periodType": "FinancialOct",
-            "description": "PMTCT_ART_SUBNAT (N, SUBNAT, A/S/HIV/Art) TARGET <= PMTCT_ART_SUBNAT (D, SUBNAT, Age/Sex/HIV) TARGET",
-            "operator": "less_than_or_equal_to",
-            "leftSide": {
-                "expression": "#{LvwJYdp0Jmr}",
-                "missingValueStrategy": "NEVER_SKIP"
-            },
-            "rightSide": {
-                "expression": "#{jaX3SUTcIki}",
-                "missingValueStrategy": "NEVER_SKIP"
-            }
-        },
-        {
             "name": "PMTCT_STAT_NAT (N, NAT) TARGET <= PMTCT_STAT_NAT (D, NAT) TARGET",
             "id": "sNgjXtv40WI",
             "periodType": "FinancialOct",
@@ -267,21 +237,6 @@
             },
             "rightSide": {
                 "expression": "#{bu3sosk4HWn}",
-                "missingValueStrategy": "NEVER_SKIP"
-            }
-        },
-        {
-            "name": "PMTCT_STAT_SUBNAT (N, SUBNAT, Age/Sex) TARGET <= PMTCT_STAT_SUBNAT (D, SUBNAT, Age/Sex) TARGET",
-            "id": "NwE2ti43IqL",
-            "periodType": "FinancialOct",
-            "description": "PMTCT_STAT_SUBNAT (N, SUBNAT, Age/Sex) TARGET <= PMTCT_STAT_SUBNAT (D, SUBNAT, Age/Sex) TARGET",
-            "operator": "less_than_or_equal_to",
-            "leftSide": {
-                "expression": "#{rJjmeacbvid}",
-                "missingValueStrategy": "NEVER_SKIP"
-            },
-            "rightSide": {
-                "expression": "#{jdFCj4dEvIK}",
                 "missingValueStrategy": "NEVER_SKIP"
             }
         },
@@ -481,21 +436,6 @@
             }
         },
         {
-            "name": "TX_CURR_SUBNAT (N, SUBNAT) TARGET >= TX_CURR_SUBNAT (N, SUBNAT, Age/Sex/HIV) TARGET + TX_CURR_SUBNAT (N, SUBNAT, Sex/HIV) TARGET",
-            "id": "uqIAPhRjDJw",
-            "periodType": "FinancialOct",
-            "description": "TX_CURR_SUBNAT (N, SUBNAT) TARGET >= TX_CURR_SUBNAT (N, SUBNAT, Age/Sex/HIV) TARGET + TX_CURR_SUBNAT (N, SUBNAT, Sex/HIV) TARGET",
-            "operator": "greater_than_or_equal_to",
-            "leftSide": {
-                "expression": "#{qjBMdjQFy26}",
-                "missingValueStrategy": "NEVER_SKIP"
-            },
-            "rightSide": {
-                "expression": "#{xghQXueYJxu}+#{IwYoTvC2tof}",
-                "missingValueStrategy": "NEVER_SKIP"
-            }
-        },
-        {
             "name": "TX_NEW (N, DSD, Age/Sex/HIVStatus) TARGET <= TX_CURR (N, DSD, Age/Sex/HIVStatus) TARGET",
             "id": "iESaQHWhmnz",
             "periodType": "FinancialOct",
@@ -676,21 +616,6 @@
             }
         },
         {
-            "name": "VL_SUPPRESSION_SUBNAT (N, SUBNAT, HIV) TARGET >= VL_SUPPRESSION_SUBNAT (N, SUBNAT, Age/S/H) TARGET",
-            "id": "yAqxvfZhOxi",
-            "periodType": "FinancialOct",
-            "description": "VL_SUPPRESSION_SUBNAT (N, SUBNAT, HIV) TARGET >= VL_SUPPRESSION_SUBNAT (N, SUBNAT, Age/S/H) TARGET",
-            "operator": "greater_than_or_equal_to",
-            "leftSide": {
-                "expression": "#{qXWRBZTRrUm}",
-                "missingValueStrategy": "NEVER_SKIP"
-            },
-            "rightSide": {
-                "expression": "#{zoKiMGRucOY}",
-                "missingValueStrategy": "NEVER_SKIP"
-            }
-        },
-        {
             "name": "VL_SUPPRESSION_SUBNAT (N, SUBNAT, RT/HIV) TARGET <= VL_SUPPRESSION_SUBNAT (N, SUBNAT, HIV) TARGET",
             "id": "X4wf9o4SE2L",
             "periodType": "FinancialOct",
@@ -717,21 +642,6 @@
             },
             "rightSide": {
                 "expression": "#{eTV3FznMU6C}",
-                "missingValueStrategy": "SKIP_IF_ALL_VALUES_MISSING"
-            }
-        },
-        {
-            "name": "VMMC_TOTALCIRC_SUBNAT (N, SUBNAT, Age/Sex) TARGET <= VMMC_TOTALCIRC_SUBNAT (N, SUBNAT, Sex) TARGET",
-            "id": "cbQKx5u5Tlo",
-            "periodType": "FinancialOct",
-            "description": "VMMC_TOTALCIRC_SUBNAT (N, SUBNAT, Age/Sex) TARGET <= VMMC_TOTALCIRC_SUBNAT (N, SUBNAT, Sex) TARGET",
-            "operator": "less_than_or_equal_to",
-            "leftSide": {
-                "expression": "#{ZayJeEa6pCa}",
-                "missingValueStrategy": "SKIP_IF_ALL_VALUES_MISSING"
-            },
-            "rightSide": {
-                "expression": "#{ywCrpZgX1P9}",
                 "missingValueStrategy": "SKIP_IF_ALL_VALUES_MISSING"
             }
         }
