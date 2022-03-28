@@ -1,5 +1,6 @@
 
 
+
 HTS_POS_Modalities <- function(cop_year) {
     #TODO: This function needs a parameter based on COP year.
     #More work further down, so I am not going to fix it
@@ -8,6 +9,7 @@ HTS_POS_Modalities <- function(cop_year) {
     # a reference to the cop year. Since the modalities
     # differ from year to year though, this list needs
     # to be determined based on the year we are dealing with.
+
     datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year) %>%
     dplyr::select(indicator_code, hts_modality, resultstatus) %>%
     dplyr::filter(!is.na(hts_modality)) %>%

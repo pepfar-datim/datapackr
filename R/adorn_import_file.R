@@ -22,17 +22,22 @@ adorn_import_file <- function(psnu_import_file,
                               d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE),
                               include_default = FALSE) {
+  # Establishes the number of rows in the import file to use downstream.
+  start_rows <- NROW(psnu_import_file)
 
   # TODO: Generalize this outside the context of COP
   data <- psnu_import_file %>%
-  # Adorn PSNUs
+    # Adorn PSNUs
     dplyr::left_join(
       (valid_PSNUs %>% # Comes from file data/valid_PSNUs.rda
          dplyr::filter(psnu_uid %in% psnu_import_file$orgUnit) %>%
-        add_dp_psnu() %>% #Found in getPSNUs.R
-        dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id,
-                      psnu, psnu_uid, dp_psnu, psnu_type, DREAMS)), #cols to keep
+         add_dp_psnu() %>% #Found in getPSNUs.R
+         dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id,
+                       psnu, psnu_uid, dp_psnu, psnu_type, DREAMS)), #cols to keep
       by = c("orgUnit" = "psnu_uid")) #Columns to join on
+
+  # Utilizes start_rows to ensure the join worked as expected
+  assertthat::are_equal(NROW(data), start_rows)
 
   # Add Prioritizations ####
   if (is.null(psnu_prioritizations)) {
@@ -58,6 +63,9 @@ adorn_import_file <- function(psnu_import_file,
         prioritization = # If col prioritization is 'na' replace with a value
           dplyr::case_when(is.na(prioritization) ~ "No Prioritization",
                            TRUE ~ prioritization))
+
+    # Utilizes start_rows to ensure the join worked as expected
+    assertthat::are_equal(NROW(data), start_rows)
   }
 
   # Adorn Mechanisms ####
@@ -102,100 +110,106 @@ adorn_import_file <- function(psnu_import_file,
     dplyr::left_join(mechs, by = c("attributeOptionCombo" = "attributeOptionCombo"))
 
   # Stack data_codes and data_ids on top of one another.
-  data <- dplyr::bind_rows(data_codes, data_ids, data_default)
+  data <- dplyr::bind_rows(data_codes, data_ids, data_default) %>% dplyr::distinct()
+  # Utilizes start_rows to ensure the join,filter,stack worked as expected
+  assertthat::are_equal(NROW(data), start_rows)
 
   # Adorn dataElements & categoryOptionCombos ####
 
   map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year) # Found in utilities.R
 
   # TODO: Is this munging still required with the map being a function of fiscal year?
-   if (cop_year == 2020) {# If cop year equal 2020 modify entries in
-                            # valid_sexes.name as follows
-     map_des_cocs$valid_sexes.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
-                                                          map_des_cocs$valid_kps.name == "Male PWID"] <- "Male"
-     map_des_cocs$valid_sexes.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
-                                                          map_des_cocs$valid_kps.name == "Female PWID"] <- "Female"
-     map_des_cocs$valid_kps.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
-                                                        map_des_cocs$valid_kps.name == "Male PWID"] <- NA_character_
-     map_des_cocs$valid_kps.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
-                                                        map_des_cocs$valid_kps.name == "Female PWID"] <- NA_character_
-     # TODO: Fix inconsistent naming of dataelement/dataelementuid
-     map_des_cocs %<>%
-       # rename the columns in map_des_cocs
-       dplyr::rename(dataelementuid = dataelement,
-                     dataelementname = dataelement.y,
-                     categoryoptioncomboname = categoryoptioncombo) %>%
-       # Modify period based upon FY column
-       dplyr::mutate(FY = 2021,
-                       period = paste0(cop_year, "Oct"))
-   } else if (cop_year == 2022) {
-     map_des_cocs <- datapackr::cop22_map_adorn_import_file
-   }
+  if (cop_year == 2020) {# If cop year equal 2020 modify entries in
+    # valid_sexes.name as follows
+    map_des_cocs$valid_sexes.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
+                                    map_des_cocs$valid_kps.name == "Male PWID"] <- "Male"
+    map_des_cocs$valid_sexes.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
+                                    map_des_cocs$valid_kps.name == "Female PWID"] <- "Female"
+    map_des_cocs$valid_kps.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
+                                  map_des_cocs$valid_kps.name == "Male PWID"] <- NA_character_
+    map_des_cocs$valid_kps.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
+                                  map_des_cocs$valid_kps.name == "Female PWID"] <- NA_character_
+    # TODO: Fix inconsistent naming of dataelement/dataelementuid
+    map_des_cocs %<>%
+      # rename the columns in map_des_cocs
+      dplyr::rename(dataelementuid = dataelement,
+                    dataelementname = dataelement.y,
+                    categoryoptioncomboname = categoryoptioncombo) %>%
+      # Modify period based upon FY column
+      dplyr::mutate(FY = 2021,
+                    period = paste0(cop_year, "Oct"))
+  } else if (cop_year == 2022) {
+    map_des_cocs <- datapackr::cop22_map_adorn_import_file
+  }
 
   data %<>%
     dplyr::mutate(
       # Create a time stamp column based on the the servers system time
-      upload_timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+      # Mon Mar 28 13:53:50 2022 --- Removed due to duplicates being created
+      #upload_timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S", tz = "UTC"),
       # Create a fiscal year column based on the period column values using regex
       fiscal_year = suppressWarnings(dplyr::if_else(stringr::str_detect(period, "Oct"),
                                                     as.numeric(stringr::str_replace(period, "Oct", "")) + 1,
                                                     as.numeric(stringr::str_replace(period, "Q3", ""))
-                                                    )
-                                     )
-      ) %>% #Join to map_des_cocs
+      )
+      )
+    ) %>% #Join to map_des_cocs
     dplyr::left_join(
       (map_des_cocs %>%
          # Rename columns
-          dplyr::rename(
-            Age = valid_ages.name,
-            Sex = valid_sexes.name,
-            KeyPop = valid_kps.name)),
+         dplyr::rename(
+           Age = valid_ages.name,
+           Sex = valid_sexes.name,
+           KeyPop = valid_kps.name)),
       # Columns to match on
       by = c("dataElement" = "dataelementuid",
              "categoryOptionCombo" = "categoryoptioncombouid",
              "fiscal_year" = "FY",
              "period" = "period"))
-
+  # Utilizes start_rows to ensure the join worked as expected
+  assertthat::are_equal(NROW(data), start_rows)
   # Select/order columns ####
   # Flag set in original function, approx line 20
   if (filter_rename_output) {# If flag is true, Keep the below columns from data
-                             # and rename where necessary with =.
+    # and rename where necessary with =.
     data %<>%
       dplyr::select(ou,
-                     ou_id,
-                     country_name,
-                     country_uid,
-                     snu1,
-                     snu1_id,
-                     psnu,
-                     psnu_uid = orgUnit,
-                     prioritization,
-                     mechanism_code,
-                     mechanism_desc,
-                     partner_id,
-                     partner_desc,
-                     funding_agency  = agency,
-                     fiscal_year,
-                     dataelement_id  = dataElement,
-                     dataelement_name = dataelementname,
-                     indicator = technical_area,
-                     numerator_denominator,
-                     support_type,
-                     hts_modality,
-                     categoryoptioncombo_id = categoryOptionCombo,
-                     categoryoptioncombo_name = categoryoptioncomboname,
-                     age = Age,
-                     sex = Sex,
-                     key_population = KeyPop,
-                     resultstatus_specific = resultstatus,
-                     upload_timestamp,
-                     disagg_type,
-                     resultstatus_inclusive,
-                     top_level,
-                     target_value = value,
-                     indicator_code)
+                    ou_id,
+                    country_name,
+                    country_uid,
+                    snu1,
+                    snu1_id,
+                    psnu,
+                    psnu_uid = orgUnit,
+                    prioritization,
+                    mechanism_code,
+                    mechanism_desc,
+                    partner_id,
+                    partner_desc,
+                    funding_agency  = agency,
+                    fiscal_year,
+                    dataelement_id  = dataElement,
+                    dataelement_name = dataelementname,
+                    indicator = technical_area,
+                    numerator_denominator,
+                    support_type,
+                    hts_modality,
+                    categoryoptioncombo_id = categoryOptionCombo,
+                    categoryoptioncombo_name = categoryoptioncomboname,
+                    age = Age,
+                    sex = Sex,
+                    key_population = KeyPop,
+                    resultstatus_specific = resultstatus,
+                    # Mon Mar 28 13:56:08 2022 Removed due to duplication
+                    #upload_timestamp,
+                    disagg_type,
+                    resultstatus_inclusive,
+                    top_level,
+                    target_value = value,
+                    indicator_code)
   }
-
+  # Utilizes start_rows to ensure the join,filter,stack worked as expected
+  assertthat::are_equal(NROW(data), start_rows)
   data
 
 }
