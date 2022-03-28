@@ -39,7 +39,7 @@ with_mock_api({
         "partner_desc", "funding_agency", "fiscal_year", "dataelement_id", "dataelement_name",
         "indicator", "numerator_denominator", "support_type", "hts_modality",
         "categoryoptioncombo_id", "categoryoptioncombo_name", "age", "sex",
-        "key_population", "resultstatus_specific", "upload_timestamp",
+        "key_population", "resultstatus_specific",# "upload_timestamp",
         "disagg_type", "resultstatus_inclusive", "top_level",
         "target_value",
         "indicator_code"

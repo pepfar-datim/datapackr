@@ -23,6 +23,7 @@ adorn_import_file <- function(psnu_import_file,
                                                   inherits = TRUE),
                               include_default = FALSE) {
   
+  # Establishes the number of rows in the import file to use downstream.
   start_rows <- NROW(psnu_import_file)
   
   # TODO: Generalize this outside the context of COP
@@ -36,6 +37,7 @@ adorn_import_file <- function(psnu_import_file,
                        psnu, psnu_uid, dp_psnu, psnu_type, DREAMS)), #cols to keep
       by = c("orgUnit" = "psnu_uid")) #Columns to join on
   
+  # Utilizes start_rows to ensure the join worked as expected
   assertthat::are_equal(NROW(data),start_rows)
   
   # Add Prioritizations ####
@@ -63,6 +65,7 @@ adorn_import_file <- function(psnu_import_file,
           dplyr::case_when(is.na(prioritization) ~ "No Prioritization",
                            TRUE ~ prioritization))
     
+    # Utilizes start_rows to ensure the join worked as expected
     assertthat::are_equal(NROW(data),start_rows)
   }
   
@@ -109,6 +112,7 @@ adorn_import_file <- function(psnu_import_file,
   
   # Stack data_codes and data_ids on top of one another.
   data <- dplyr::bind_rows(data_codes, data_ids, data_default) %>% dplyr::distinct()
+  # Utilizes start_rows to ensure the join,filter,stack worked as expected
   assertthat::are_equal(NROW(data),start_rows)
   
   
@@ -143,6 +147,7 @@ adorn_import_file <- function(psnu_import_file,
   data %<>%
     dplyr::mutate(
       # Create a time stamp column based on the the servers system time
+      # Mon Mar 28 13:53:50 2022 --- Removed due to duplicates being created
       #upload_timestamp = format(Sys.time(), "%Y-%m-%d %H:%M:%S", tz = "UTC"),
       # Create a fiscal year column based on the period column values using regex
       fiscal_year = suppressWarnings(dplyr::if_else(stringr::str_detect(period, "Oct"),
@@ -163,6 +168,7 @@ adorn_import_file <- function(psnu_import_file,
              "categoryOptionCombo" = "categoryoptioncombouid",
              "fiscal_year" = "FY",
              "period" = "period"))
+  # Utilizes start_rows to ensure the join worked as expected
   assertthat::are_equal(NROW(data),start_rows)
   # Select/order columns ####
   # Flag set in original function, approx line 20
@@ -196,6 +202,7 @@ adorn_import_file <- function(psnu_import_file,
                     sex = Sex,
                     key_population = KeyPop,
                     resultstatus_specific = resultstatus,
+                    # Mon Mar 28 13:56:08 2022 Removed due to duplication
                     #upload_timestamp,
                     disagg_type,
                     resultstatus_inclusive,
@@ -203,6 +210,7 @@ adorn_import_file <- function(psnu_import_file,
                     target_value = value,
                     indicator_code)
   }
+  # Utilizes start_rows to ensure the join,filter,stack worked as expected
   assertthat::are_equal(NROW(data),start_rows)
   data
   
