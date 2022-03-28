@@ -31,7 +31,7 @@ with_mock_api({
 
     d %<>% createAnalytics(d2_session = training)
 
-
+    # "upload_timestamp", removed form below to alleviate duplicates
     analytics_column_names <-
       c(
         "ou", "ou_id", "country_name", "country_uid", "snu1", "snu1_id", "psnu",
@@ -39,7 +39,7 @@ with_mock_api({
         "partner_desc", "funding_agency", "fiscal_year", "dataelement_id", "dataelement_name",
         "indicator", "numerator_denominator", "support_type", "hts_modality",
         "categoryoptioncombo_id", "categoryoptioncombo_name", "age", "sex",
-        "key_population", "resultstatus_specific",# "upload_timestamp",
+        "key_population", "resultstatus_specific",
         "disagg_type", "resultstatus_inclusive", "top_level",
         "target_value",
         "indicator_code"
