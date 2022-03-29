@@ -15,7 +15,7 @@ checkComments <- function(d) {
     d <- listWorkbookContents(d)
   }
 
-    d$info$has_comments_issue <- any(grepl("threadedComments\\.xml", d$info$worbook_contents))
+    d$info$has_comments_issue <- any(grepl("xl/threadedComments/", d$info$worbook_contents))
 
   if (d$info$has_comments_issue) {
     warning_msg <-

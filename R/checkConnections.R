@@ -15,7 +15,7 @@ checkConnections <- function(d) {
     d <- listWorkbookContents(d)
   }
 
-  d$info$has_connections <- any(grepl("connections\\.xml", d$info$worbook_contents))
+  d$info$has_connections <- any(grepl("xl/connections.xml", d$info$worbook_contents))
 
   if (d$info$has_connections) {
     warning_msg <-
