@@ -11,12 +11,11 @@
 #'
 checkComments <- function(d) {
 
-  if (is.null(d$info$has_extract)) {
-    d <- extractWorkbook(d)
+  if (is.null(d$info$worbook_contents)) {
+    d <- listWorkbookContents(d)
   }
 
-    d$info$has_comments_issue <-
-      any(list.files(paste0(d$keychain$extract_path, "/xl")) == "threadedComments.xml")
+    d$info$has_comments_issue <- any(grepl("threadedComments\\.xml", d$info$worbook_contents))
 
   if (d$info$has_comments_issue) {
     warning_msg <-

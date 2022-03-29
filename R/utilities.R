@@ -825,7 +825,13 @@ extractWorkbook <- function(d) {
   d
 }
 
+listWorkbookContents <- function(d) {
 
+  d$info$worbook_contents <- unzip(d$keychain$submission_path, list = TRUE) %>%
+    dplyr::pull(`Name`)
+
+  d
+}
 
 
 commas <- function(...) paste0(..., collapse = ", ")

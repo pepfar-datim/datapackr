@@ -11,12 +11,11 @@
 #'
 checkConnections <- function(d) {
 
-  if (is.null(d$info$has_extract)) {
-    d <- extractWorkbook(d)
+  if (is.null(d$info$worbook_contents)) {
+    d <- listWorkbookContents(d)
   }
 
-  d$info$has_connections <-
-    any(list.files(paste0(d$keychain$extract_path, "/xl")) == "connections.xml")
+  d$info$has_connections <- any(grepl("connections\\.xml", d$info$worbook_contents))
 
   if (d$info$has_connections) {
     warning_msg <-
@@ -26,9 +25,9 @@ checkConnections <- function(d) {
         to final submission.\n")
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
-    d$info$has_error <- TRUE
+    d$info$has_error <- FALSE
   }
 
-  return(d)
+  d
 
 }
