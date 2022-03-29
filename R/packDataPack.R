@@ -89,7 +89,7 @@ packDataPack <- function(model_data,
   if (is.null(d$tool$wb)) {
     d$tool$wb <- openxlsx::loadWorkbook(d$keychain$template_path)
   }
-  
+
   # Set global numeric format ####
   options("openxlsx.numFmt" = "#,##0")
 
