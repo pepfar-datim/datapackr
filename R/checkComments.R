@@ -13,6 +13,7 @@ checkComments <- function(d) {
 
   if (is.null(d$tool$wb)) {
     wb <- openxlsx::loadWorkbook(file = d$keychain$submission_path)
+    d$tool$wb <- wb
   } else {
     wb <- d$tool$wb
   }

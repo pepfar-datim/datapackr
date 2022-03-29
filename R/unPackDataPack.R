@@ -40,6 +40,10 @@ unPackDataPack <- function(d,
   interactive_print("Checking comments...")
   d <- checkComments(d)
 
+  # Check whether there exist any troublesome connections in the file
+  interactive_print("Checking connections...")
+  d <- checkConnections(d)
+  
   # Check integrity of Workbook tabs ####
   interactive_print("Checking structure...")
   d <- checkStructure(d)
