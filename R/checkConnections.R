@@ -11,14 +11,12 @@
 #'
 checkConnections <- function(d) {
 
-  if (is.null(d$tool$wb)) {
-    wb <- openxlsx::loadWorkbook(file = d$keychain$submission_path)
-    d$tool$wb <- wb
-  } else {
-    wb <- d$tool$wb
-  }
+  if (is.null(d$info$has_extract)) {
+    d <- extractWorkbook(d)
+  } 
 
-  d$info$has_connections <- any(sapply(wb$connections, length) != 0)
+  d$info$has_connections <-
+    any(list.files(paste0(d$keychain$extract_path , "/xl")) == "connections.xml")
 
   if (d$info$has_connections) {
     warning_msg <-

@@ -11,20 +11,12 @@
 #'
 checkComments <- function(d) {
 
-  if (is.null(d$tool$wb)) {
-    wb <- openxlsx::loadWorkbook(file = d$keychain$submission_path)
-    d$tool$wb <- wb
-  } else {
-    wb <- d$tool$wb
-  }
-
-  # d$info$has_comments_issue <- any(
-  #   unlist(
-  #     lapply(wb$comments, function(x) is.null(x["style"]))
-  #     )
-  #   )
-
-  d$info$has_comments_issue <- any(sapply(wb$threadComments, length) != 0)
+  if (is.null(d$info$has_extract)) {
+    d <- extractWorkbook(d)
+  } 
+  
+    d$info$has_comments_issue <-
+      any(list.files(paste0(d$keychain$extract_path , "/xl")) == "threadedComments.xml")
 
   if (d$info$has_comments_issue) {
     warning_msg <-

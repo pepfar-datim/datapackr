@@ -810,6 +810,24 @@ is_uidish <- function(string) {
 }
 
 
+extractWorkbook <- function(d) {
+  #Create a temporary director to extract the XL object
+  temp_dir <- file.path(tempdir(), "datapackR")
+  #Save this in the keychain for later reuse
+  d$keychain$extract_path <- temp_dir
+  
+  suppressWarnings(dir.create(temp_dir))
+  file.copy(d$keychain$submission_path, temp_dir)
+  
+  new_file <- list.files(temp_dir, full.name = TRUE, pattern = basename(d$keychain$submission_path))
+  d$info$has_extract <- unzip(new_file, exdir = temp_dir)
+  #Return the object
+  d
+}
+
+
+
+
 commas <- function(...) paste0(..., collapse = ", ")
 
 names2 <- function(x) {
