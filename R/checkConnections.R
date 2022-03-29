@@ -7,7 +7,7 @@
 #'
 #' @param d datapackr object
 #'
-#' @return Logical whether there exists a connection in a specified Excel file
+#' @return datapackr d object
 #'
 checkConnections <- function(d) {
 
@@ -21,11 +21,11 @@ checkConnections <- function(d) {
   if (d$info$has_connections) {
     warning_msg <-
       paste0(
-        "ERROR! Your workbook contains at least one external connection.
-        This connection or external link must be removed prior to final
+        "WARNING! Your workbook contains at least one external connection.
+        This connection or external link should be removed prior to final
         to final submission.\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
     d$info$has_error <- TRUE
   }
 

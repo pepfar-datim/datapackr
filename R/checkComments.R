@@ -14,7 +14,7 @@ checkComments <- function(d) {
   if (is.null(d$info$has_extract)) {
     d <- extractWorkbook(d)
   } 
-  
+
     d$info$has_comments_issue <-
       any(list.files(paste0(d$keychain$extract_path , "/xl")) == "threadedComments.xml")
 
