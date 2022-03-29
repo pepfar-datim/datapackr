@@ -1,3 +1,5 @@
+library(httptest)
+library(tibble)
 test_sheet <-
   function(fname)
     testthat::test_path("sheets", fname)
