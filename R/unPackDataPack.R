@@ -78,7 +78,7 @@ unPackDataPack <- function(d,
   interactive_print("Cleaning up...")
   #Cleanup the extracted XLSX directory
   unlink(d$keychain$extract_path, recursive = TRUE)
-  
+
   # Same test is already being called unPackCountryUIDs
   # # TEST: Check that country_uids matches observed data
   # observed_country_uids <-
