@@ -816,11 +816,13 @@ extractWorkbook <- function(d) {
   #Save this in the keychain for later reuse
   d$keychain$extract_path <- temp_dir
 
-  suppressWarnings(dir.create(temp_dir))
+  unlink(temp_dir,recursive = TRUE)
+  dir.create(temp_dir)
   file.copy(d$keychain$submission_path, temp_dir)
 
   new_file <- list.files(temp_dir, full.name = TRUE, pattern = basename(d$keychain$submission_path))
-  d$info$has_extract <- unzip(new_file, exdir = temp_dir)
+  unzip(new_file, exdir = temp_dir)
+  d$info$has_extract <- TRUE
   #Return the object
   d
 }
