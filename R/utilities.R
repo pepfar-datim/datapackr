@@ -816,7 +816,7 @@ extractWorkbook <- function(d) {
   #Save this in the keychain for later reuse
   d$keychain$extract_path <- temp_dir
 
-  unlink(temp_dir,recursive = TRUE)
+  unlink(temp_dir, recursive = TRUE)
   dir.create(temp_dir)
   file.copy(d$keychain$submission_path, temp_dir)
 
