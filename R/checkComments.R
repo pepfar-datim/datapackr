@@ -11,19 +11,11 @@
 #'
 checkComments <- function(d) {
 
-  if (is.null(d$tool$wb)) {
-    wb <- openxlsx::loadWorkbook(file = d$keychain$submission_path)
-  } else {
-    wb <- d$tool$wb
+  if (is.null(d$info$worbook_contents)) {
+    d <- listWorkbookContents(d)
   }
 
-  # d$info$has_comments_issue <- any(
-  #   unlist(
-  #     lapply(wb$comments, function(x) is.null(x["style"]))
-  #     )
-  #   )
-
-  d$info$has_comments_issue <- any(sapply(wb$threadComments, length) != 0)
+    d$info$has_comments_issue <- any(grepl("xl/threadedComments/", d$info$worbook_contents))
 
   if (d$info$has_comments_issue) {
     warning_msg <-

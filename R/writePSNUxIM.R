@@ -95,7 +95,9 @@ writePSNUxIM <- function(d,
     # If append is true, add the missing PSNUxIM combos to the existing
     # workbook, otherwise, use a template.
     if (append == TRUE) {
-      d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
+      if (is.null(d$tool$wb)) {
+        d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
+      }
       openxlsx::removeFilter(d$tool$wb, names(d$tool$wb))
     } else {
 

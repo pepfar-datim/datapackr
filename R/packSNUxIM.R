@@ -250,7 +250,9 @@ packSNUxIM <- function(d,
 
   # Write data to sheet ####
   interactive_print("Writing your new PSNUxIM data to your Data Pack...")
-  d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
+  if (is.null(d$tool$wb)) {
+    d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
+  }
   openxlsx::removeFilter(d$tool$wb, names(d$tool$wb))
 
   # Write data to new PSNUxIM tab ####
