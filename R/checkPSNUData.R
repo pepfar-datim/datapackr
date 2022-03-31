@@ -18,7 +18,7 @@ checkPSNUData  <-  function(d, d2_session = dynGet("d2_default_session",
 
   vr_data <- d$data$analytics %>%
     #Ignore dedupe in validation rule analysis
-    dplyr::filter(mechanism_code %in% c("00000","00001")) %>%
+    dplyr::filter(!(mechanism_code %in% c("00000","00001"))) %>%
     dplyr::select(
       dataElement = dataelement_id,
       period = fiscal_year,
