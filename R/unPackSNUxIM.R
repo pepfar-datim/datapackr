@@ -65,20 +65,27 @@ unPackSNUxIM <- function(d) {
 
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
 
-  d$data$SNUxIM <-
-    readxl::read_excel(
-      path = d$keychain$submission_path,
-      sheet = sheet,
-      range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
-      col_types = "text",
-      .name_repair = "minimal"
-    )
+  #Check to see if the object already. If its NULL read it from
+  # Excel, otherwise, use the existing object. This is just the
+  # first step to be able to functionalize and test everything else
+  # below.
+  if (is.null(d$data$SNUxIM)) {
+    d$data$SNUxIM <-
+      readxl::read_excel(
+        path = d$keychain$submission_path,
+        sheet = sheet,
+        range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
+        col_types = "text",
+        .name_repair = "minimal"
+      )
+  }
 
   d <- checkHasPSNUxIM(d)
 
   if (!d$info$has_psnuxim) {
     return(d)
   }
+
 
   # PATCH: Remove hard-coded FYs
   names(d$data$SNUxIM) <- stringr::str_replace(names(d$data$SNUxIM), " \\(FY22\\)", "")
@@ -163,6 +170,7 @@ unPackSNUxIM <- function(d) {
     warning_msg <-
       paste0(
         "ERROR! In tab ",
+
         sheet,
         ": DUPLICATE ROWS found. Ensure rows are all unique, and the SNU Disaggregates",
         " are not repeated within tabs. This issue may have been caused by inadvertent",
@@ -224,12 +232,38 @@ unPackSNUxIM <- function(d) {
  #  d$data$SNUxIM <- d$data$SNUxIM %>%
  #    dplyr::select(mandatory_columns,user_mechanisms)
 
+ #  Missing right side columns.
+ #  TODO: This should really be moved in to checkColStructure.
+ #  However, at the moment, we are not really validating the user mechanism columns there.
+ #  Users may delete columns on the right side resulting in fewer columns
+ #  in d$data$SNUxIM than are stated in the cols_to_keep. If this situation
+ #  occurs, end with a hard stop and inform the user.
+ #  Realistically, we should be able to handle missing columns, but for now,
+ # the check will remain strict until further changes are made here.
+
+  if (NCOL(d$data$SNUxIM) != max(cols_to_keep$col)) {
+    stop(
+      paste(
+        "ERROR: Missing columns in the PSNUxIM tab. Please ensure that there are exactly",
+        max(cols_to_keep$col), "columns in the PSNUxIM tab.",
+        "Please check columns",
+        cellranger::num_to_letter(NCOL(d$data$SNUxIM) + 1),
+        "to",
+        cellranger::num_to_letter(max(cols_to_keep$col)),
+        "."
+      )
+    )
+  }
+
   # Pare down to populated, updated targets only ####
+
   d$data$SNUxIM <- d$data$SNUxIM[, cols_to_keep$col]
 
   d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
 
   # TEST: Missing right-side formulas; Warn; Continue ####
+  # TODO: This seems not particularly efficient to
+  # again read the Excel sheet from disk.
   d$tests$psnuxim_missing_rs_fxs <-
     tidyxl::xlsx_cells(path = d$keychain$submission_path,
                        sheets = "PSNUxIM",
@@ -532,6 +566,9 @@ unPackSNUxIM <- function(d) {
     )
 
   # TEST: Formula changes; Warning; Continue ####
+  # TODO: We have already read in the sheet with tidyxl
+  # in an earlier test but in this test we read it yet again
+  # Lets recycle from above?
   d <- checkFormulas(d, sheet)
 
   # Remove all unneeded columns ####
@@ -807,6 +844,8 @@ unPackSNUxIM <- function(d) {
     )
 
   # Drop `Not PEPFAR` data ####
+  #TODO: Is there anyway we can get rid of this earlier if we are just
+  # dropping the entire column?
   d$data$SNUxIM %<>%
     dplyr::filter(mechCode_supportType != "Not PEPFAR")
 
