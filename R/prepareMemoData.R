@@ -79,6 +79,14 @@ prepareExistingDataAnalytics <- function(d, d2_session =
                       datastreams = "mer_targets",
                       d2_session = d2_session)
 
+  if (d$info$tool == "OPU Data Pack") {
+    ### OPU DataPacks only include data with a funding mechanism
+    ### drop data with default attribute option combo
+    df <- dplyr::filter(df,
+                        !(attributeOptionCombo %in% c("default",
+                                                      "HllvX50cXC0")))
+  }
+
   if (NROW(d) > 0) {
     d$memo$datim$analytics <- df %>%
 
