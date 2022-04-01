@@ -43,3 +43,4 @@ generateComparisonTable <- function(d) {
 
  d
 }
+
