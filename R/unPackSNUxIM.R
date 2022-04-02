@@ -241,7 +241,7 @@ unPackSNUxIM <- function(d) {
  #  Realistically, we should be able to handle missing columns, but for now,
  # the check will remain strict until further changes are made here.
 
-  if (NCOL(d$data$SNUxIM) != max(cols_to_keep$col)) {
+  if (NCOL(d$data$SNUxIM) < max(cols_to_keep$col)) {
     stop(
       paste(
         "ERROR: Missing columns in the PSNUxIM tab. Please ensure that there are exactly",
@@ -254,6 +254,19 @@ unPackSNUxIM <- function(d) {
       )
     )
   }
+
+  if (NCOL(d$data$SNUxIM) > max(cols_to_keep$col)) {
+        warning_msg <-
+          paste(
+            "WARNING: Extra columns in the PSNUxIM tab. Please ensure that there are exactly",
+            max(cols_to_keep$col), "columns in the PSNUxIM tab for your final submissions. Please review columns",
+            cellranger::num_to_letter(max(cols_to_keep$col) + 1), "to columns",
+            cellranger::num_to_letter(NCOL(d$data$SNUxIM))
+            )
+
+        d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+  }
+
 
   # Pare down to populated, updated targets only ####
 
