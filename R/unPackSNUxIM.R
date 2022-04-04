@@ -272,7 +272,7 @@ unPackSNUxIM <- function(d) {
     #matches the data in the main tabs
 
     main_tab_data <- original_targets %>%
-      dplyr::select(PSNU,indicator_code, Age, Sex, KeyPop, MainTabsTarget = value) %>%
+      dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, MainTabsTarget = value) %>%
       dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
       # Special handling for differences between main tab and PSNUxIM tab age bands
       # and the original tabs
@@ -285,9 +285,9 @@ unPackSNUxIM <- function(d) {
       dplyr::summarise(MainTabsTarget = sum(MainTabsTarget, na.rm = TRUE), .groups = "drop")
 
     d$tests$non_equal_targets  <- d$data$SNUxIM %>%
-      dplyr::select(PSNU,indicator_code,Age,Sex,KeyPop,DataPackTarget) %>%
+      dplyr::select(PSNU, indicator_code ,Age, Sex, KeyPop, DataPackTarget) %>%
       dplyr::mutate(DataPackTarget = as.numeric(DataPackTarget)) %>%
-      dplyr::full_join(main_tab_data, by=c("PSNU", "indicator_code", "Age", "Sex", "KeyPop")) %>%
+      dplyr::full_join(main_tab_data, by = c("PSNU", "indicator_code", "Age", "Sex", "KeyPop")) %>%
       dplyr::mutate(are_equal = dplyr::near(DataPackTarget, MainTabsTarget, tol = 0.1)) %>%
       #If the main tab value is missing and the DataPackTarget is zero, ignore
       dplyr::mutate(are_equal = dplyr::case_when(is.na(MainTabsTarget) & DataPackTarget == 0 ~ TRUE,
