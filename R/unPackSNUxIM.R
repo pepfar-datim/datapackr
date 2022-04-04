@@ -268,6 +268,57 @@ unPackSNUxIM <- function(d) {
   }
 
 
+  if (d$info$tool == "Data Pack") {
+    #Check to ensure that the value in column G (DataPack Target) actually
+    #matches the data in the main tabs
+    
+    main_tab_data <- original_targets %>% 
+      dplyr::select(PSNU,indicator_code,Age,Sex,KeyPop,MainTabsTarget = value) %>%
+      dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
+      # Special handling for differences between main tab and PSNUxIM tab age bands
+      # and the original tabs
+      dplyr::mutate(Age = dplyr::case_when(
+        stringr::str_detect(Age, "(50-54|55-59|60-64|65+)") &
+          !stringr::str_detect(indicator_code, "TX_CURR.T") ~ "50+",
+        TRUE ~ Age
+      )) %>% 
+      dplyr::group_by(dplyr::across(c(-MainTabsTarget))) %>% 
+      dplyr::summarise(MainTabsTarget = sum(MainTabsTarget, na.rm = TRUE), .groups="drop")
+    
+    d$tests$non_equal_targets  <- d$data$SNUxIM %>%
+      dplyr::select(PSNU,indicator_code,Age,Sex,KeyPop,DataPackTarget) %>% 
+      dplyr::mutate(DataPackTarget = as.numeric(DataPackTarget)) %>% 
+      dplyr::full_join(main_tab_data, by=c("PSNU","indicator_code","Age","Sex","KeyPop")) %>% 
+      dplyr::mutate(are_equal = dplyr::near(DataPackTarget,MainTabsTarget, tol=0.1) ) %>% 
+      #If the main tab value is missing and the DataPackTarget is zero, ignore
+      dplyr::mutate(are_equal = dplyr::case_when(is.na(MainTabsTarget) & DataPackTarget == 0 ~ TRUE,
+                                                 is.na(MainTabsTarget) & DataPackTarget != 0 ~ FALSE,
+                                                 TRUE ~ are_equal)) %>% 
+      dplyr::filter(!are_equal | is.na(are_equal)) %>% 
+      #Filter non-allocated data to prevent false positives with this test
+      #Other tests should catch whether there is data in the main tabs
+      #but which has not been allocated
+      dplyr::filter(!is.na(DataPackTarget))
+    
+    attr(d$tests$non_equal_targets, "test_name") <- "Non-equal targets"
+    
+    if (NROW(d$tests$non_equal_targets) > 0) {
+      warning_msg <-
+        paste0(
+          "ERROR! In tab PSNUxIM:",NROW(d$tests$non_equal_targets), 
+          "instances of values in column G (DataPackTargets) which do not
+          equal the targets set in the main tabs. Please check to ensure 
+          that the formulas in column G are correct. Please
+          download a copy of the validation report from the sel and 
+          consult the tab non_equal_targets for details.\n")
+      
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    }
+    
+  }
+
+  
+
   # Pare down to populated, updated targets only ####
 
   d$data$SNUxIM <- d$data$SNUxIM[, cols_to_keep$col]
