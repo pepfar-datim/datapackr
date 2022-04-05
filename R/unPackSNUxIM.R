@@ -285,7 +285,7 @@ unPackSNUxIM <- function(d) {
       dplyr::summarise(MainTabsTarget = sum(MainTabsTarget, na.rm = TRUE), .groups = "drop")
 
     d$tests$non_equal_targets  <- d$data$SNUxIM %>%
-      dplyr::select(PSNU, indicator_code ,Age, Sex, KeyPop, DataPackTarget) %>%
+      dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget) %>%
       dplyr::mutate(DataPackTarget = as.numeric(DataPackTarget)) %>%
       dplyr::full_join(main_tab_data, by = c("PSNU", "indicator_code", "Age", "Sex", "KeyPop")) %>%
       dplyr::mutate(are_equal = dplyr::near(DataPackTarget, MainTabsTarget, tol = 0.1)) %>%
