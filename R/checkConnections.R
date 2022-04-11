@@ -21,7 +21,7 @@ checkConnections <- function(d) {
     warning_msg <-
       paste0(
         "WARNING! Your workbook contains at least one external connection.
-        This connection or external link should be removed prior to final
+        It is recommened that this connection be removed prior to final
         to final submission.\n")
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
