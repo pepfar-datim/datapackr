@@ -43,7 +43,7 @@ unPackDataPack <- function(d,
   # Check whether there exist any troublesome connections in the file
   interactive_print("Checking external links...")
   d <- checkExternalLinks(d)
-  
+
   # Check integrity of Workbook tabs ####
   interactive_print("Checking structure...")
   d <- checkStructure(d)
