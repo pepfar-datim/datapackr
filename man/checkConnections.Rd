@@ -10,7 +10,7 @@ checkConnections(d)
 \item{d}{datapackr object}
 }
 \value{
-Logical whether there exists a connection in a specified Excel file
+datapackr d object
 }
 \description{
 Searches an Excel workbook for any external connections.
