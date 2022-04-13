@@ -52,15 +52,27 @@ getCOPDataFromDATIM <- function(country_uids,
   # get data from datim using dataValueSets
   # rename to standard names
   datim_data <-
-    getDataValueSets(parameters$key,
+    tryCatch({getDataValueSets(parameters$key,
                      parameters$value,
-                     d2_session = d2_session) %>%
+                     d2_session = d2_session)},
+             error = function(cond) {
+               message(cond)
+               warning("Could not retreive COP data from DATIM")
+               return(NULL)
+             })
+
+  if (is.null(datim_data)) {
+    return(NULL)
+  } else {
+    datim_data %>%
     dplyr::rename(
       dataElement = data_element,
       orgUnit = org_unit,
       categoryOptionCombo = category_option_combo,
       attributeOptionCombo = attribute_option_combo
     )
+  }
 
-  return(datim_data)
+
+
 }

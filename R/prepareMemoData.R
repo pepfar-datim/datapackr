@@ -87,9 +87,8 @@ prepareExistingDataAnalytics <- function(d, d2_session =
                                                       "HllvX50cXC0")))
   }
 
-  if (NROW(d) > 0) {
+  if (!is.null(df) & NROW(df) > 0) {
     d$memo$datim$analytics <- df %>%
-
       adorn_import_file(
         .,
         cop_year = d$info$cop_year,

@@ -13,13 +13,19 @@ fetchPrioritizationTable <- function(psnus, cop_year,
 
   #We need to split up the requests if there are many PSNUs
   getPriosFromDatim <- function(x) {
-    datimutils::getAnalytics(
-      dx = "r4zbW3owX9n",
-      pe_f = period,
-      ou = x,
-      d2_session = d2_session
-    )
-  }
+
+    tryCatch({
+      datimutils::getAnalytics(
+        dx = "r4zbW3owX9n",
+        pe_f = period,
+        ou = x,
+        d2_session = d2_session)
+    },
+    error = function(cond) {
+      message(cond)
+      warning("Could not retrieve prioritization levels")
+      return(NULL)
+    })}
 
   n_requests <- ceiling(nchar(paste(psnus, sep = "", collapse = ";")) / 2048)
 
@@ -29,8 +35,7 @@ fetchPrioritizationTable <- function(psnus, cop_year,
     n_groups <- list("1" = psnus)
   }
 
-  prios <- n_groups %>%
-    purrr::map_dfr(function(x) getPriosFromDatim(x))
+  prios <- n_groups %>% purrr::map_dfr(function(x) getPriosFromDatim(x))
 
   if (NROW(prios) == 0) {
     return(data.frame("psnu_uid" = psnus,
