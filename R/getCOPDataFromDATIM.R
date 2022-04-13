@@ -52,7 +52,8 @@ getCOPDataFromDATIM <- function(country_uids,
   # get data from datim using dataValueSets
   # rename to standard names
   datim_data <-
-    tryCatch({getDataValueSets(parameters$key,
+    tryCatch({
+      getDataValueSets(parameters$key,
                      parameters$value,
                      d2_session = d2_session)},
              error = function(cond) {
