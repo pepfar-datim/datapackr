@@ -332,10 +332,10 @@ prepareMemoDataByAgency <- function(df, memo_structure) {
     dplyr::mutate(Age = "Total") %>%
     dplyr::select(names(df))
 
-  #Drop dedupe from the agency table. 
+  #Drop dedupe from the agency table.
   #Any contribution will be still in the totals though
-  df <- df %>% dplyr::filter(!stringr::str_detect(Agency,"^Dedupe"))
-  
+  df <- df %>% dplyr::filter(!stringr::str_detect(Agency, "^Dedupe"))
+
   df_final <- dplyr::bind_rows(df, df_totals) %>%
     dplyr::mutate(
       Agency = factor(Agency, levels = df_cols$Agency),
