@@ -332,10 +332,6 @@ prepareMemoDataByAgency <- function(df, memo_structure) {
     dplyr::mutate(Age = "Total") %>%
     dplyr::select(names(df))
 
-  #Drop dedupe from the agency table.
-  #Any contribution will be still in the totals though
-  df <- df %>% dplyr::filter(!stringr::str_detect(Agency, "^Dedupe"))
-
   df_final <- dplyr::bind_rows(df, df_totals) %>%
     dplyr::mutate(
       Agency = factor(Agency, levels = df_cols$Agency),
@@ -350,7 +346,9 @@ prepareMemoDataByAgency <- function(df, memo_structure) {
     dplyr::mutate(
       "Total" = rowSums(dplyr::across(where(is.numeric)), na.rm = TRUE)) %>%
     dplyr::select("Indicator", "Age", 2:dim(.)[2]) %>%
-    dplyr::select(where(~ any(. != 0))) # Remove all columns which are completely zero
+    dplyr::select(where(~ any(. != 0))) %>%  # Remove all columns which are completely zero
+    dplyr::select(!tidy_select::starts_with("Dedupe")) #Suppress the dedupe column
+
 }
 
 
