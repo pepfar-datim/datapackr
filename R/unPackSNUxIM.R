@@ -379,7 +379,7 @@ unPackSNUxIM <- function(d) {
 
 
   # Drop rows where entire row is NA ####
-  d$data$SNUxIM %>%
+  d$data$SNUxIM %<>%
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
 
   # TEST: Missing key metadata; Error; Drop ####
