@@ -357,6 +357,27 @@ unPackSNUxIM <- function(d) {
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
+  #Test for duplicate columns
+  dup_cols <- names(d$data$SNUxIM)[duplicated(names(d$data$SNUxIM))]
+
+  if (length(dup_cols) > 0) {
+    warning_msg <-
+      paste0(
+        "ERROR! In tab PSNUxIM: DUPLICATE MECHANISM COLUMNS",
+        " Ensure that all mechanisms columns are unique in both the percentage",
+        " allocation section as well as the value section of the PSNUxIM tab.",
+        " The following columns are implicated. -> \n\t",
+        paste(dup_cols, sep = "", collapse = ","),
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+  }
+
+  #Drop the duplicated columns and continue
+  d$data$SNUxIM <- d$data$SNUxIM[, !duplicated(names(d$data$SNUxIM))]
+  warning("Dropping duplicated columns in the PSNUxIM tab.")
+
+
   # Drop rows where entire row is NA ####
   d$data$SNUxIM %<>%
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
