@@ -222,7 +222,7 @@ prepareMemoDataByPSNU <- function(analytics,
 #' @return A dataframe of COP indicators aggregated to the partner level
 #'
 prepareMemoDataByPartner <- function(df,
-                                         memoStructure,
+                                         memo_structure,
                                          indicators) {
 
   if (is.null(df) | NROW(df) == 0) {
@@ -235,7 +235,7 @@ prepareMemoDataByPartner <- function(df,
     dplyr::summarise(Value = sum(value), .groups = "drop")
 
   #We need to pad for zeros
-  df_rows <- memoStructure %>%
+  df_rows <- memo_structure %>%
     purrr::pluck("row_order") %>%
     dplyr::filter(!is.na(partner_chunk)) %>%
     dplyr::select(ind, options)
@@ -259,7 +259,7 @@ prepareMemoDataByPartner <- function(df,
   #Remove dedupe
   d_partners <- dplyr::filter(d_partners, !(`Mechanism` %in% c("00001", "00000"))) #nolint
 
-  d_indicators <- memoStructure %>%
+  d_indicators <- memo_structure %>%
     purrr::pluck("row_order") %>%
     dplyr::filter(!is.na(partner_chunk)) %>%
     dplyr::select(ind, options) %>%
