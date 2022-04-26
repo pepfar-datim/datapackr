@@ -347,7 +347,7 @@ prepareMemoDataByAgency <- function(df, memo_structure) {
       "Total" = rowSums(dplyr::across(where(is.numeric)), na.rm = TRUE)) %>%
     dplyr::select("Indicator", "Age", 2:dim(.)[2]) %>%
     dplyr::select(where(~ any(. != 0))) %>%  # Remove all columns which are completely zero
-    dplyr::select(!tidy_select::starts_with("Dedupe")) #Suppress the dedupe column
+    dplyr::select(!tidyselect::starts_with("Dedupe")) #Suppress the dedupe column
 
 }
 
