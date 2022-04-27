@@ -371,12 +371,12 @@ unPackSNUxIM <- function(d) {
         "\n")
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+
+    #Drop the duplicated columns and continue
+    d$data$SNUxIM <- d$data$SNUxIM[, !duplicated(names(d$data$SNUxIM))]
+    warning("Dropping duplicated columns in the PSNUxIM tab.")
+
   }
-
-  #Drop the duplicated columns and continue
-  d$data$SNUxIM <- d$data$SNUxIM[, !duplicated(names(d$data$SNUxIM))]
-  warning("Dropping duplicated columns in the PSNUxIM tab.")
-
 
   # Drop rows where entire row is NA ####
   d$data$SNUxIM %<>%
