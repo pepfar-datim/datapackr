@@ -13,7 +13,6 @@ prepareMemoMetadata <- function(d, memo_type,
   #TODO: maybe valid_PSNUs a function of the COP year
   d$info$psnus <- datapackr::valid_PSNUs %>%
     dplyr::filter(country_uid %in% d$info$country_uids) %>%
-    dplyr::filter(!is.na(psnu_type)) %>%
     dplyr::select(ou, country_name, snu1, psnu, psnu_uid)
 
   #Get the memo structure
@@ -52,7 +51,7 @@ prepareMemoMetadata <- function(d, memo_type,
 
   if (memo_type %in% c("datim", "comparison")) {
     #Get the existing prioritizations
-    d$memo$datim$prios <- fetchPrioritizationTable(d$info$psnus$psnu_uid,
+    d$memo$datim$prios <- fetchPrioritizationTable(d$info$psnus,
                                                      d$info$cop_year,
                                                      d2_session)
   }
@@ -92,9 +91,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
       adorn_import_file(
         .,
         cop_year = d$info$cop_year,
-        psnu_prioritizations = dplyr::select(d$memo$datim$prios,
-                                             "orgUnit" = psnu_uid,
-                                             value),
+        psnu_prioritizations = d$memo$datim$prios,
         d2_session = d2_session,
         include_default = TRUE
       )
@@ -190,8 +187,8 @@ prepareMemoDataByPSNU <- function(analytics,
    dplyr::mutate(Age = dplyr::case_when(Indicator == "PrEP_CT" & Age == "15+" ~ "Total",
                  TRUE ~ Age)) %>%
     dplyr::select(-id, -numerator, -denominator) %>%
-    dplyr::left_join(dplyr::select(prios, psnu_uid, prioritization),
-                     by = c("psnu_uid")) %>%
+    dplyr::left_join(dplyr::select(prios, orgUnit, prioritization),
+                     by = c("psnu_uid" = "orgUnit")) %>%
     dplyr::mutate(prioritization = dplyr::case_when(
       is.na(prioritization) ~ "No Prioritization",
       TRUE ~ prioritization)) %>%
