@@ -36,20 +36,6 @@ with_mock_api({
 
 
 with_mock_api({
-  test_that("We can get dataset assignment levels from DATIM", {
-
-    test_dataset <-  getIMPATTLevels(d2_session = training)
-    expect_type(test_dataset, "list")
-    expect_true("data.frame" %in% class(test_dataset))
-    expect_true(NROW(test_dataset) > 0)
-    expect_setequal(names(test_dataset), c("operating_unit", "country_name", "country_uid",
-    "iso3", "iso4", "country", "facility", "community", "prioritization"))
-
-  })
-})
-
-
-with_mock_api({
   test_that("We can get a list of PSNUs from DATIM", {
 
     test_dataset <-  getPSNUs(country_uids = "qllxzIjjurr", include_mil = FALSE,
