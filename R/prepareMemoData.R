@@ -91,9 +91,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
       adorn_import_file(
         .,
         cop_year = d$info$cop_year,
-        psnu_prioritizations = dplyr::select(d$memo$datim$prios,
-                                             "orgUnit" = psnu_uid,
-                                             value),
+        psnu_prioritizations = d$memo$datim$prios,
         d2_session = d2_session,
         include_default = TRUE
       )
