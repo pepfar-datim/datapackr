@@ -13,7 +13,6 @@ prepareMemoMetadata <- function(d, memo_type,
   #TODO: maybe valid_PSNUs a function of the COP year
   d$info$psnus <- datapackr::valid_PSNUs %>%
     dplyr::filter(country_uid %in% d$info$country_uids) %>%
-    dplyr::filter(!is.na(psnu_type)) %>%
     dplyr::select(ou, country_name, snu1, psnu, psnu_uid)
 
   #Get the memo structure
