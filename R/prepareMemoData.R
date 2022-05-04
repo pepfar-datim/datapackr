@@ -187,8 +187,8 @@ prepareMemoDataByPSNU <- function(analytics,
    dplyr::mutate(Age = dplyr::case_when(Indicator == "PrEP_CT" & Age == "15+" ~ "Total",
                  TRUE ~ Age)) %>%
     dplyr::select(-id, -numerator, -denominator) %>%
-    dplyr::left_join(dplyr::select(prios, psnu_uid, prioritization),
-                     by = c("psnu_uid")) %>%
+    dplyr::left_join(dplyr::select(prios, orgUnit, prioritization),
+                     by = c("psnu_uid" = "orgUnit")) %>%
     dplyr::mutate(prioritization = dplyr::case_when(
       is.na(prioritization) ~ "No Prioritization",
       TRUE ~ prioritization)) %>%
