@@ -1,3 +1,4 @@
+
 #' @export
 #' @title Convert a 'PSNU-level' DATIM import file into an analytics-friendly
 #'  object.
@@ -56,6 +57,43 @@ adorn_import_file <- function(psnu_import_file,
       dplyr::select(orgUnit, value) %>% # Columns to keep
       dplyr::left_join(prio_defined, by = "value") %>% # Columns to join on
       dplyr::select(-value) # Drop 'value' column
+
+    #Special handling for prioritizations which are not at
+    #the same level as the defined prioritizations
+    dreams_orgunits <- valid_PSNUs %>%
+      dplyr::filter(DREAMS == "Y") %>%
+      dplyr::filter(psnu_uid %in% psnu_import_file$orgUnit) %>%
+      dplyr::select(psnu_uid,ancestors) %>%
+      dplyr::filter(!psnu_uid %in% prio$orgUnit)
+
+    if (NROW(dreams_orgunits) > 0) {
+
+      dreams_out <- data.frame(matrix(ncol = 2, nrow = NROW(dreams_orgunits)))
+      names(dreams_out) <- names(prio)
+
+      for (i in seq_len(NROW(dreams_orgunits))) {
+        #Get all of the ancestors
+        foo <- dreams_orgunits[i,"ancestors"][[1]]$id
+        #Fetch the prioritization
+        dreams_prio <- prio %>%
+          dplyr::filter(orgUnit %in% foo) %>%
+          dplyr::pull(prioritization) %>%
+          unique(.)
+
+        if (length(dreams_prio) > 1){
+
+          warning("Multiple parent prioritizations detected")
+          dreams_prio <- dreams_prio[1]
+        }
+
+        dreams_prio <- ifelse(length(dreams_prio) == 0,"No Prioritization",
+                              dreams_prio)
+        dreams_out$orgUnit[i] <- dreams_orgunits$psnu_uid[i]
+        dreams_out$prioritization <- dreams_prio
+
+      }
+      prio <- dplyr::bind_rows(prio,dreams_out)
+    }
 
     data %<>%
       dplyr::left_join(prio, by = "orgUnit") %>% # Join data and prio
