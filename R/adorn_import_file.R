@@ -1,3 +1,62 @@
+#' @title imputePrioritizations
+#'
+#' @description Utility function to handle situations where DREAMS PSNUs
+#' do not have an explicitly defined prioritization level. The prioritization
+#' of the parent organisation unit will be used.
+#' @param psnu_import_file DHIS2 import file to convert
+#' @param prio Data frame consisting of orgUnit (as a uid) and prioritization
+#' as a character.
+#' @return prio
+#'
+
+  imputePrioritizations <- function(prio, psnu_import_file) {
+    #Special handling for prioritization of PSNUs which are not at
+    #the same level as the defined prioritization.
+    #This can occur when DREAMS PSNUs are at a different
+    #level than the PSNU level.
+    dreams_orgunits <- valid_PSNUs %>%
+      dplyr::filter(DREAMS == "Y") %>%
+      dplyr::filter(psnu_uid %in% psnu_import_file$orgUnit) %>%
+      dplyr::select(psnu_uid, ancestors) %>%
+      dplyr::filter(!psnu_uid %in% prio$orgUnit)
+
+    if (NROW(dreams_orgunits) > 0) {
+
+      dreams_out <- data.frame(matrix(ncol = 2, nrow = NROW(dreams_orgunits)))
+      names(dreams_out) <- names(prio)
+
+      for (i in seq_len(NROW(dreams_orgunits))) {
+        #Get all of the ancestors
+        foo <- dreams_orgunits[i, "ancestors"][[1]]$id
+        #Fetch the prioritization
+        dreams_prio <- prio %>%
+          dplyr::filter(orgUnit %in% foo) %>%
+          dplyr::pull(prioritization) %>%
+          unique(.)
+        # This should never happen. The DREAMS orgunit
+        # should have a unique parent prioritization.
+        # If its not unique, take the first one, warn and move on.
+        if (length(dreams_prio) > 1) {
+          warning("Multiple parent prioritizations detected")
+          dreams_prio <- dreams_prio[1]
+        }
+        # This should never happen. The DREAMS parent orgunit
+        # prioritization level should exist. If not, issue
+        # a warning and assign "No Prioritization"
+        if (length(dreams_prio) == 0) {
+          warning("No parent prioritizations detected")
+          dreams_prio <- "No Prioritization"
+        }
+
+        dreams_out$orgUnit[i] <- dreams_orgunits$psnu_uid[i]
+        dreams_out$prioritization <- dreams_prio
+
+      }
+      prio <- dplyr::bind_rows(prio, dreams_out)
+    }
+    prio
+  }
+
 
 #' @export
 #' @title Convert a 'PSNU-level' DATIM import file into an analytics-friendly
@@ -56,44 +115,8 @@ adorn_import_file <- function(psnu_import_file,
     prio <- psnu_prioritizations %>%
       dplyr::select(orgUnit, value) %>% # Columns to keep
       dplyr::left_join(prio_defined, by = "value") %>% # Columns to join on
-      dplyr::select(-value) # Drop 'value' column
-
-    #Special handling for prioritizations which are not at
-    #the same level as the defined prioritizations
-    dreams_orgunits <- valid_PSNUs %>%
-      dplyr::filter(DREAMS == "Y") %>%
-      dplyr::filter(psnu_uid %in% psnu_import_file$orgUnit) %>%
-      dplyr::select(psnu_uid,ancestors) %>%
-      dplyr::filter(!psnu_uid %in% prio$orgUnit)
-
-    if (NROW(dreams_orgunits) > 0) {
-
-      dreams_out <- data.frame(matrix(ncol = 2, nrow = NROW(dreams_orgunits)))
-      names(dreams_out) <- names(prio)
-
-      for (i in seq_len(NROW(dreams_orgunits))) {
-        #Get all of the ancestors
-        foo <- dreams_orgunits[i,"ancestors"][[1]]$id
-        #Fetch the prioritization
-        dreams_prio <- prio %>%
-          dplyr::filter(orgUnit %in% foo) %>%
-          dplyr::pull(prioritization) %>%
-          unique(.)
-
-        if (length(dreams_prio) > 1){
-
-          warning("Multiple parent prioritizations detected")
-          dreams_prio <- dreams_prio[1]
-        }
-
-        dreams_prio <- ifelse(length(dreams_prio) == 0,"No Prioritization",
-                              dreams_prio)
-        dreams_out$orgUnit[i] <- dreams_orgunits$psnu_uid[i]
-        dreams_out$prioritization <- dreams_prio
-
-      }
-      prio <- dplyr::bind_rows(prio,dreams_out)
-    }
+      dplyr::select(-value) %>%  # Drop 'value' column
+      imputePrioritizations(., psnu_import_file)
 
     data %<>%
       dplyr::left_join(prio, by = "orgUnit") %>% # Join data and prio
