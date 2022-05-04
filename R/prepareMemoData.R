@@ -51,7 +51,7 @@ prepareMemoMetadata <- function(d, memo_type,
 
   if (memo_type %in% c("datim", "comparison")) {
     #Get the existing prioritizations
-    d$memo$datim$prios <- fetchPrioritizationTable(d$info$psnus$psnu_uid,
+    d$memo$datim$prios <- fetchPrioritizationTable(d$info$psnus,
                                                      d$info$cop_year,
                                                      d2_session)
   }
