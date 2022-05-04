@@ -20,18 +20,6 @@ with_mock_api({
   })
 })
 
-with_mock_api({
-  test_that("We can fetch a map of technical areas from DATIM", {
-    test_dataset <-  getTechArea(d2_session = training)
-    expect_type(test_dataset, "list")
-    expect_equal(length(test_dataset), 2)
-    expect_setequal(names(test_dataset), c("dataElement", "tech_area"))
-    expect_true(length(test_dataset$dataElement) > 0)
-    expect_true(length(test_dataset$tech_area) > 0)
-    expect_true(length(test_dataset$dataElement) == length(test_dataset$tech_area))
-
-  })
-})
 
 with_mock_api({
   test_that("We can fetch a map of HTS modalities from DATIM", {
