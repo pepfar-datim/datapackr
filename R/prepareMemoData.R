@@ -38,7 +38,7 @@ prepareMemoMetadata <- function(d, memo_type,
     #TODO: If this is an OPU, use the existing prioritizations
     #from DATIM.
     d$memo$datapack$prios <- d$data$analytics %>%
-      dplyr::select(psnu_uid, prioritization) %>%
+      dplyr::select(orgUnit = psnu_uid, prioritization) %>%
       dplyr::distinct() %>%
       dplyr::left_join(datapackr::prioritization_dict(),
                        by = c("prioritization" = "name")) %>%
@@ -469,8 +469,6 @@ prepareMemoData <- function(d,
                               d$memo$structure,
                               include_no_prio)
     }
-
-    d
 
   }
 
