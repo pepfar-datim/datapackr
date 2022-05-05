@@ -469,7 +469,7 @@ prepareMemoData <- function(d,
                               d$memo$structure,
                               include_no_prio)
     }
-    
+
   }
 
   if (memo_type %in% c("datapack", "comparison")) {
