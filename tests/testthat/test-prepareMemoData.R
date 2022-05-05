@@ -16,7 +16,7 @@ with_mock_api({
     expect_setequal(names(d$info$psnus), c("ou", "country_name", "snu1", "psnu", "psnu_uid"))
 
     expect_true(is.list(d$memo$datapack$prios))
-    expect_setequal(names(d$memo$datapack$prios), c("psnu_uid", "prioritization", "value"))
+    expect_setequal(names(d$memo$datapack$prios), c("orgUnit", "prioritization", "value"))
     expect_setequal(names(d$memo$partners_agencies), c("Mechanism", "Partner", "Agency"))
 
     expect_true(is.list(d$memo$inds))
