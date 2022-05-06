@@ -29,8 +29,6 @@ getMechanismViewFromDATIM <- function(cop_year = NULL,
 }
 
 
-
-
 #' @export
 #' @title getMechanismView
 #'
@@ -171,44 +169,4 @@ getMechanismView <- function(country_uids = NULL,
 
   return(mechs)
 
-}
-
-
-#' @export
-#' @title adornMechanisms(data)
-#'
-#' @description Join analytical dimensions with d$data$analtyics related
-#' to partner, agency and mechanism information.
-#'
-#' @param data Dataset to adorn, typically d$data$analytics
-#' @inheritParams unPackTool
-#'
-#' @return Modified data object
-#'
-adornMechanisms <- function(data,
-                            d2_session = dynGet("d2_default_session",
-                                                inherits = TRUE)) {
-
-  mechs <-
-    getMechanismView(
-      country_uids = NULL,
-      cop_year = NULL,
-      include_dedupe = FALSE,
-      include_MOH = FALSE,
-      d2_session = d2_session) %>%
-    dplyr::select(-ou, -startdate, -enddate)
-
-  data %<>%
-    dplyr::left_join(mechs, by = "mechanism_code") %>%
-    dplyr::mutate(
-      mechanism_desc = dplyr::case_when(mechanism_code == "99999" ~ "Dedupe approximation",
-                                        TRUE ~ mechanism_desc),
-      partner_desc = dplyr::case_when(mechanism_code == "99999" ~ "Dedupe approximation",
-                                      TRUE ~ partner_desc),
-      partner_id = dplyr::case_when(mechanism_code == "99999" ~ "99999",
-                                    TRUE ~ partner_id),
-      agency = dplyr::case_when(mechanism_code == "99999" ~ "Dedupe approximation",
-                                TRUE ~ agency))
-
-  data
 }
