@@ -39,7 +39,6 @@ Imports:
     magrittr (>= 1.5),
     crayon (>= 1.3.4),
     openxlsx,
-    lazyeval,
     methods,
     stats,
     lubridate (>= 1.7.4),
