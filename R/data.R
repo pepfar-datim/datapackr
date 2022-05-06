@@ -417,22 +417,6 @@
 #' }
 "cop22_valid_PSNUs"
 
-#' @docType data
-#' @title List of valid categoryoptions based on current COP Target Code List.
-#'
-#' @description List of valid categoryoptions based on current COP Target Code
-#' List. Must be synced and saved manually.
-#'
-#' @format
-#' \describe{
-#'   \item{name}{Name of the Category Option}
-#'   \item{id}{Category Option UID}
-#'   \item{categoryoptiongroup}{The group by which the category option belongs}
-#'   \item{datapack_disagg}{Name of the Category option in the Data Pack}
-#'   \item{datapack_schema_group}{Identifies the set of category options that
-#'    are mapped to a particular column in the DataPack}
-#' }
-"valid_category_options"
 
 #' @docType data
 #' @title Datapack country groupings
