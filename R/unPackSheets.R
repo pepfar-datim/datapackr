@@ -15,17 +15,23 @@ unPackSheets <- function(d, sheets = NULL) {
     stop("Cannot unpack sheets for that kind of tool.")
   }
 
-  actual_sheets <- readxl::excel_sheets(d$keychain$submission_path)
-  skip = c(skip_tabs(tool = d$info$tool, cop_year = d$info$cop_year), "PSNUxIM")
-  sheets_to_read <- actual_sheets[!actual_sheets %in% skip]
-  sheets <- sheets %||% sheets_to_read
+  sheets_to_read <- names(d$sheets)
+  sheets_to_read <- sheets_to_read[!sheets_to_read %in% c("PSNUxIM")]
   
-  # Check Parameters
-  sheets <- checkSheets(sheets = sheets,
-                        cop_year = d$info$cop_year, 
-                        tool = d$info$tool,
-                        all_sheets = FALSE,
-                        psnuxim = FALSE)
+  if (!is.null(sheets)) {
+    sheets_to_read <- sheets_to_read[sheets_to_read %in% sheets]
+    
+    unreadable_sheets <- sheets[!sheets %in% sheets_to_read]
+    
+    if (length(unreadable_sheets) > 0) {
+      interactive_warning(
+        paste0(
+          "The following sheets provided to unPackSheets were either not present",
+          " or are invalid. ->  \n\t* ",
+          paste(unreadable_sheets, collapse = "\n\t* "),
+          "\n"))
+    }
+  }
 
   for (sheet in sheets_to_read) {
     interactive_print(sheet)

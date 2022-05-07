@@ -530,6 +530,9 @@ checkData <- function(d,
     stop("In checkData, sheet not valid!")
   }
   
+  
+  # TODO: Apply method used in checkAnalytics line 631
+  
   # Col Structure ----
   d <- checkColumnStructure(d, sheet)
   

@@ -46,7 +46,9 @@ unPackDataPack <- function(d,
   
   # Load all the sheets ----
   interactive_print("Loading sheets...")
-  d <- loadSheets(d)
+  if (is.null(d$sheets)) {
+    d <- loadSheets(d)
+  }
 
   # Unpack the Targets ####
   interactive_print("Unpacking sheets...")

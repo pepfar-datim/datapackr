@@ -6,7 +6,7 @@
 \alias{checkColumnStructure}
 \alias{checkToolStructure}
 \alias{checkToolComments}
-\alias{checkValuesNumeric}
+\alias{checkValues}
 \alias{checkData}
 \title{Perform various data quality checks on in-process data from Data Packs.}
 \usage{
@@ -18,7 +18,7 @@ checkToolStructure(d, quiet = TRUE)
 
 checkToolComments(d, quiet = TRUE)
 
-checkValuesNumeric(d, quiet = TRUE)
+checkValues(d, quiet = TRUE)
 
 checkData(d, sheet, quiet = TRUE, ...)
 }

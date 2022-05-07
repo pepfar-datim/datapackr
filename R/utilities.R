@@ -674,6 +674,7 @@ readSheet <- function(d,
 loadSheets <- function(d,
                        sheets = NULL) {
   
+  sheets <- sheets %missing% NULL
   actual_sheets <- readxl::excel_sheets(d$keychain$submission_path)
   skip = skip_tabs(tool = d$info$tool, cop_year = d$info$cop_year)
   sheets_to_read <- actual_sheets[!actual_sheets %in% skip]
