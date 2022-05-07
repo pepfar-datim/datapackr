@@ -55,7 +55,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
     } else if (cop_year %in% c(2021)) {
       skip <- c("Home", "Summary", "Spectrum")
     } else if (cop_year %in% c(2022)) {
-      skip <- c("Home", "Spectrum")
+      skip <- c("Home", "Spectrum", "KP Validation")
     }
   }
   else if (tool == "OPU Data Pack Template" &
