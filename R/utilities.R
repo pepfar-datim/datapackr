@@ -318,7 +318,7 @@ getDatasetUids <-  function(fiscal_year,
     if ("impatt" %in% type) {
       datasets <- c(datasets,
                     "pTuDWXzkAkJ") # Planning Attributes: COP Prioritization SNU FY2020
-    } 
+    }
   } else {
     stop(paste("FY", fiscal_year, "input not supported by getDatasetUids"))
   }

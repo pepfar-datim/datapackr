@@ -7,7 +7,6 @@
 \format{
 The following COP years are included in this dataset:
 \describe{
-\item{2020}{A list object containing the validation rules for COP20/FY21.}
 \item{2021}{A list object containing the validation rules for COP21/FY22.}
 \item{2022}{A list object containing the validation rules for COP22/FY23.}
 }
@@ -22,9 +21,9 @@ cop_validation_rules
 A nested list of validation rules for both current and past
 COP years.
 }
-\section{Structure for COP20 and COP21 data sets}{
+\section{Structure for COP21 data set}{
 
-Data sets for 2020 and 2021 conforms to the following structure:
+The data set for 2021 conforms to the following structure:
 \itemize{
 \item \code{description}: A description of the DATIM validation rule, showing the
 relationship required between two indicators. Synonymous to
