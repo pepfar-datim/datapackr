@@ -32,7 +32,7 @@ test_that("We can pick template file", {
   expect_true(grepl("COP21_Data_Pack_Template.xlsx",
                     test_template))
   expect_true(file.exists(test_template))
-  
+
   test_template <-  pick_template_path(2022, "Data Pack")
   expect_true(grepl("COP22_Data_Pack_Template.xlsx",
                     test_template))
