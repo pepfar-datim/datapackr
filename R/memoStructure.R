@@ -8,71 +8,9 @@
 memoStructure <- function(d, d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
 
-  if (!(d$info$cop_year %in% c("2020", "2021", "2022"))) {
+  if (!(d$info$cop_year %in% c("2021", "2022"))) {
     warning("COP Memo structure unknown for given COP year")
     return(d)
-  }
-
-  if (d$info$cop_year == "2020") {
-    row_order <- tibble::tribble(
-      ~ind, ~options, ~partner_chunk,
-      "HTS_INDEX", "<15", 1,
-      "HTS_INDEX", "15+", 1,
-      "HTS_INDEX", "Total", NA,
-      "HTS_TST", "<15", 1,
-      "HTS_TST", "15+", 1,
-      "HTS_TST", "Total", NA,
-      "HTS_TST_POS", "<15", 1,
-      "HTS_TST_POS", "15+", 1,
-      "HTS_TST_POS", "Total", NA,
-      "TX_NEW", "<15", 1,
-      "TX_NEW", "15+", 1,
-      "TX_NEW", "Total", NA,
-      "TX_CURR", "<15", 1,
-      "TX_CURR", "15+", 1,
-      "TX_CURR", "Total", NA,
-      "TX_PVLS", "<15", 1,
-      "TX_PVLS", "15+", 1,
-      "TX_PVLS", "Total", NA,
-      "CXCA_SCRN", "Total", 2,
-      "OVC_SERV", "<18", 2,
-      "OVC_SERV", "18+", 2,
-      "OVC_SERV", "Total", NA,
-      "OVC_HIVSTAT", "Total", 2,
-      "PMTCT_STAT", "<15", 2,
-      "PMTCT_STAT", "15+", 2,
-      "PMTCT_STAT", "Total", NA,
-      "PMTCT_STAT_POS", "<15", 2,
-      "PMTCT_STAT_POS", "15+", 2,
-      "PMTCT_STAT_POS", "Total", NA,
-      "PMTCT_ART", "<15", 2,
-      "PMTCT_ART", "15+", 2,
-      "PMTCT_ART", "Total", NA,
-      "PMTCT_EID", "Total", 2,
-      "PP_PREV", "<15", 3,
-      "PP_PREV", "15+", 3,
-      "PP_PREV", "Total", NA,
-      "KP_PREV", "Total", 3,
-      "KP_MAT", "Total", 3,
-      "VMMC_CIRC", "Total", 3,
-      "HTS_SELF", "<15", 3,
-      "HTS_SELF", "15+", 3,
-      "HTS_SELF", "Total", NA,
-      "PrEP_NEW", "Total", 3,
-      "PrEP_CURR", "Total", 3,
-      "TB_STAT", "<15", 4,
-      "TB_STAT", "15+", 4,
-      "TB_STAT", "Total", NA,
-      "TB_ART", "<15", 4,
-      "TB_ART", "15+", 4,
-      "TB_ART", "Total", NA,
-      "TB_PREV", "<15", 4,
-      "TB_PREV", "15+", 4,
-      "TB_PREV", "Total", NA,
-      "TX_TB", "<15", 4,
-      "TX_TB", "15+", 4,
-      "TX_TB", "Total", NA,
-      "GEND_GBV", "Total", 4)
   }
 
   #TOOD: Confirm the memo structure for 2022
