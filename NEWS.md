@@ -1,3 +1,81 @@
+# datapackr 5.2.0
+
+## Breaking Changes
+* Removes the following content as part of the deprecation of COP20 OPU handling:
+   * `R/packSNUxIM_2020.R`
+   * `R/packSNUxIM_OPU.R`
+   * `R/unPackOPU_PSNUxIM.R`
+   * `data/cop20_data_pack_schema.rda`
+   * `data/cop20_map_DataPack_DATIM_DEs_COCs.rda`
+   * `data/cop20OPU_data_pack_schema.rda`
+   * `data/data_pack_schema.rda`
+   * `data/updated_indicator_codes.rda`
+   * `data/valid_category_options.rda`
+   * `data-raw/cop20_validation_rules.json`
+   * `data-raw/COP20OPU_Data_Pack_generation_script.R`
+   * `data-raw/COP20OPU_Data_Pack_processing_script.R`
+   * `data-raw/COP20OPU_Data_Pack_validation_script.R`
+   * `data-raw/cop21_datapack_indicator_code_updates.csv`
+   * `data-raw/TEST_COP20_OPU_Data_Pack_Template.xlsx`
+   * `data-raw/update_cop20_datapack_template.R`
+   * `data-raw/update_cop20OPU_datapack_schema.R`
+   * `data-raw/update_cached_valid_COs.R`
+   * `data-raw/valid_COCs_COs.rda`
+   * `inst/extdata/COP20_Data_Pack_Template_Final.xlsx`
+   * `inst/extdata/COP20_OPU_Data_Pack_Template.xlsx`
+* Removes the following legacy content from COP19:
+   * `data/data_pack_schema.rda`
+   * `data-raw/checkTX_CURR.R`
+   * `data-raw/produceConfigFile.R`
+* Removes COP20 processing in the following functions:
+   * `adorn_import_file`
+   * `check_cop_year`
+   * `check_tool`
+   * `checkMechanisms`
+   * `createAnalytics`
+   * `createKeychainInfo`
+   * `createTestDataset`
+   * `compareData_OpuDatapackVsDatim`
+   * `getCOPDataFromDATIM`
+   * `getDataSetUids`
+   * `getHTSModality`
+   * `getMapDataPack_DATIM_DEs_COCs`
+   * `getMemoIndicators`
+   * `getOPUDataFromDATIM`
+   * `headerRow`
+   * `memoStructure`
+   * `packDataPack`
+   * `packForDATIM_OPU`
+   * `pick_schema`
+   * `pick_template_path`
+   * `skip_tabs`
+   * `unPackOPUDataPack`
+   * `unPackSNUxIM`
+   * `unPackSchema_datapack`
+   * `writePSNUxIM`
+* Removes the following functions that are no longer used anywhere in the package:
+   * `adornMechanisms`
+   * `adornPSNUs`
+   * `deriveTargets`
+   * `getCountries`
+   * `getIMPATTLevels`
+   * `getNumeratorDenominator`
+   * `getTechArea`
+   * `getValidCategoryOptions`
+   * `getValidCOs`
+   * `packForPAW`
+   * `pull_COPindicators`
+
+## Minor improvements and fixes
+* Changes default schema parameter from `data_pack_schema` to `pick_schema()` for the following functions:
+   * `packDataPackSheet`
+   * `packSheets`
+   * `prepareSheetData`
+* Updates package dependencies:
+   * Moves `datapackcommons` from a required to a suggested package
+   * Removes `lazyeval` as a required package as it is not used anywhere in the package
+
+
 # datapackr 5.1.7
 
 ## Bug fixes
