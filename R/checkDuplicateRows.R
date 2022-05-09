@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title checkDuplicateRows(d)
 #'
 #' @description Checks data pulled from a single sheet in a Data Pack and
@@ -47,7 +46,7 @@ checkDuplicateRows <- function(d, sheet) {
     attr(d$tests$duplicate_rows, "test_name") <- "Duplicated rows"
 
     dupes_msg <-
-      capture.output(
+      utils::capture.output(
         print(as.data.frame(duplicates), row.names = FALSE)
       )
 

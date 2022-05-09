@@ -67,9 +67,9 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 }
 
 #' @export
-#' @title Tool header rows
+#' @title Tool to assist with formatting the header rows
 #'
-#' @param tool "Data Pack", "Data Pack Template".
+#' @param tool "Data Pack", "Data Pack Template",""OPU Data Pack".
 #' @param cop_year Specifies COP year for dating as well as selection of
 #' templates.
 #'
@@ -110,7 +110,7 @@ pick_schema <- function(cop_year, tool) {
   }
 
   cop_year %<>% check_cop_year()
-  invisible(capture.output(tool %<>% check_tool(tool = ., cop_year = cop_year)))
+  invisible(utils::capture.output(tool %<>% check_tool(tool = ., cop_year = cop_year)))
 
   if (tool == "OPU Data Pack") {
     if (cop_year == 2021) {
@@ -204,23 +204,47 @@ pick_template_path <- function(cop_year, tool) {
 #' This file MUST NOT have any data validation formats present. If left
 #' \code{NULL}, will select the default based on \code{cop_year} and \code{tool}.
 #' @param submission_path Local path to the file to import.
+#' @param cached_mechs_path Local file path to an RDS file containing
+#' a cached copy of the mechanisms SQL view.
 #' @param cop_year COP Year to use for tailoring functions. Remember,
 #' FY22 targets = COP21.
 #' @param output_folder Local folder where you would like your Data Pack to be
-#' saved upon export. If left as \code{NULL}, will output to
-#' \code{Working Directory}.
+#' saved upon export.
 #' @param results_archive If TRUE, will export compiled results of all tests and
 #' processes to output_folder.
 #' @param d2_session DHIS2 Session id
 #' @param d Datapackr sidecar object
+#' @param datastreams Data stream or streams. One or more of \code{mer_targets},
+#' \code{mer_results}, \code{subnat_targets}, \code{subnat_results}, or
+#' \code{impatt}. If not specified, then all data streams
+#' are returned.
 #' @param schema Which datapackr schema to use in guiding this function. If left
 #' \code{NULL} will select the default based on \code{cop_year} and \code{tool}.
 #' @param wb Openxlsx workbook object.
 #' @param PSNUs Dataframe of PSNUs to use in this function, containing at least
 #' \code{psnu_uid}.
+#' @param psnus Dataframe of PSNUs to use in this function, containing at least
+#' \code{psnu_uid}.
 #' @param tool Type of tool this function will create or interact with. Either
 #' \code{OPU Data Pack} or \code{Data Pack}
 #' @param season Either \code{COP} or \code{OPU}.
+#' @param draft_memo Boolean indicating whether the memo being written is a
+#' draft or final memo.
+#' @param memo_type memo_type One of the following:
+#' datapack: Create the memo based on the data in the datapack or OPU datapack
+#' datim: Create the memo based on data currently in DATIM
+#' comparison: Create a comparison memo with data from both DATIM and datapack
+#' @param memo_doc \code{Officer} document object containing
+#' the target memo tables.
+#' @param memo_structure Structure of the memo d$memo$structure
+#' @param memoStructure Structure of the memo d$memo$structure
+#' @param source_type Indicates whether the data for a COP Approval Memo table
+#' should come from the Data Pack or from DATIM. Values can be either
+#' \code{datapack} or \code{datim}.
+#' @param prios Data frame of prioritization levels.
+#' @param include_no_prio If TRUE, include \code{"No Prioritiation"}
+#' as a column in the output.
+#' @param remove_empty_columns Should empty columns be removed from memos?
 #' @param ... Additional arguments to pass.
 #'
 #' @family parameter-helpers
@@ -235,16 +259,28 @@ datapackr_params <- function(model_data,
                              country_uids,
                              template_path,
                              submission_path,
+                             cached_mechs_path,
                              cop_year,
                              output_folder,
                              results_archive,
                              d2_session,
                              d,
+                             datastreams,
                              schema,
                              wb,
                              PSNUs,
+                             psnus,
                              tool,
                              season,
+                             draft_memo,
+                             memo_type,
+                             memo_doc,
+                             memo_structure,
+                             memoStructure,
+                             source_type,
+                             prios,
+                             include_no_prio,
+                             remove_empty_columns,
                              ...) {
 
   # This function should return something

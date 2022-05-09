@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title Pack an OPU Data Pack
 #'
 #' @description

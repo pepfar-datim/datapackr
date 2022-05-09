@@ -1,6 +1,7 @@
 #' Standardized Parameter Defaults
 #'
-#' @description Standardized package function parameter defaults and checks.
+#' @description Standardized package functions,in terms of parameter defaults
+#' and checks.
 #' These can be run individually (e.g., `check_country_uids`), or in bulk (e.g.,
 #' `check_params(country_uids = "abcdefgh123", tool = "Data Pack")`).
 #'
@@ -108,7 +109,7 @@
 #' ```
 #'
 #' So, within this package, we alternatively use `%||%` and `%missing%` to
-#' determine default parameters based on this situation and package usage.
+#' determine default parameters based on the situation and package usage.
 #'
 #' Because of the sometimes complicated manner in determining default parameters,
 #' which can often change from year to year, we have attempted to centralize and
@@ -129,14 +130,14 @@ check_country_uids <- function(country_uids, force = TRUE) {
 
   # If any country_uids are invalid, warn but remove and still move on.
   if (any(!country_uids %in% valid_PSNUs$country_uid)) {
-
+    # subset submitted list base on it values NOT being in valid_PSNUs
     invalid_country_uids <- country_uids[!country_uids %in% valid_PSNUs$country_uid]
 
     interactive_message(
       paste0("The following supplied country_uids appear to be invalid and will be removed: ",
              paste_oxford(invalid_country_uids, final = "&"))
     )
-
+    # subset submitted list base on it values being in valid_PSNUs
     country_uids <- country_uids[country_uids %in% valid_PSNUs$country_uid]
 
     if (length(country_uids) == 0) {
@@ -179,13 +180,14 @@ check_PSNUs <- function(PSNUs = NULL, country_uids = NULL) {
 
   # If PSNUs not provided, fill with all PSNUs
   if (is.null(PSNUs)) {
-    PSNUs <- datapackr::valid_PSNUs %>%
+    PSNUs <- datapackr::valid_PSNUs %>% #found in data/
       dplyr::filter(., country_uid %in% country_uids) %>%
       add_dp_psnu(.) %>%
       dplyr::arrange(dp_psnu) %>%
       dplyr::select(PSNU = dp_psnu, psnu_uid)
   } else {
-    # If PSNUs is provided, check to make sure these are all valid. Warn and remove
+    # If PSNUs is provided, check to make sure these are all valid.
+    # Warn and remove invalid PSNu's as needed.
     if (any(!PSNUs$psnu_uid %in% valid_PSNUs$psnu_uid)) {
       invalid_PSNUs <- PSNUs %>%
         dplyr::filter(!psnu_uid %in% valid_PSNUs$psnu_uid) %>%
@@ -217,12 +219,12 @@ check_cop_year <- function(cop_year) {
   cop_year <- cop_year %missing% NULL
   cop_year <- cop_year %||% getCurrentCOPYear()
 
-  # Check type & parse if character and resembling numeric
-  cop_year %<>% parse_maybe_number()
+  # Check type & parse if character and resembles a numeric
+  cop_year %<>% parse_maybe_number()# Found in utilities.R
 
-  if (!cop_year %in% supported_cop_years) {
+  if (!cop_year %in% supported_cop_years) {# If cop year isn't supported.
     stop(paste0("Sorry, datapackr only supports tools from ",
-                paste_oxford(paste0("COP",supported_cop_years - 2000))))
+                paste_oxford(paste0("COP", supported_cop_years - 2000))))
   }
 
   cop_year
@@ -237,7 +239,7 @@ check_tool <- function(tool, season, cop_year) {
   supported_tools <- c("Data Pack", "OPU Data Pack")
   default_tool <- "Data Pack"
 
-  # Collect parameters
+  # Collect parameters.
   tool <- tool %missing% NULL
   tool_provided <- !is.null(tool)
 
@@ -255,7 +257,7 @@ check_tool <- function(tool, season, cop_year) {
   }
 
   # Validate cop_year and season, if provided.
-  if (cop_year_provided) cop_year %<>% check_cop_year()
+  if (cop_year_provided) cop_year %<>% check_cop_year()# Can be seen above.
   if (season_provided) {
     season %<>% check_season(season = ., tool = tool)
     deduced_tool <- switch(season, "OPU" = "OPU Data Pack", "COP" = "Data Pack")
@@ -380,7 +382,7 @@ check_schema <- function(schema, cop_year, tool, season) {
   # For NULL schemas, attempt to deduce from other parameters, if provided.
   # Default here is the COP schema for the most recent/current COP Year
   invisible(
-    capture.output(
+    utils::capture.output(
       expected_schema <- pick_schema(tool = tool, cop_year = cop_year)))
 
   schema <- schema %||% expected_schema
@@ -495,7 +497,8 @@ checkTemplatePath <- function(template_path,
   # provided. Default here is the template_path for the most recent/current COP
   # Year for the Data Pack.
   invisible(
-    capture.output(
+    utils::capture.output(
+      # pick_template_path found in packageSetup.R
       expected_template_path <- pick_template_path(cop_year = cop_year, tool = tool)))
 
   template_path <- template_path %||% expected_template_path
@@ -564,7 +567,7 @@ checkWB <- function(wb = NULL,
 #' @export
 #' @rdname parameter-checks
 checkResultsArchive <- function(results_archive = FALSE) {
-
+  # IF results_archive parameter is not set throw error message.
   if (!isTRUE(results_archive) & !isFALSE(results_archive)) {
     stop("results_archive must be either TRUE or FALSE.")
   }

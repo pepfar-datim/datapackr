@@ -1,0 +1,247 @@
+{
+  "validationRules": [
+    {
+      "description": "TX_CURR_SUBNAT (N, SUBNAT) TARGET >= TX_CURR_SUBNAT (N, SUBNAT, Age/Sex/HIV) TARGET + TX_CURR_SUBNAT (N, SUBNAT, Sex/HIV) TARGET",
+      "id": "xEoqfaoSobk",
+      "importance": "MEDIUM",
+      "instruction": "TX_CURR_SUBNAT (N, SUBNAT) TARGET >= TX_CURR_SUBNAT (N, SUBNAT, Age/Sex/HIV) TARGET + TX_CURR_SUBNAT (N, SUBNAT, Sex/HIV) TARGET",
+      "leftSide": {
+        "dataElements": [
+          {
+            "id": "qjBMdjQFy26"
+          }
+        ],
+        "description": "Value of element qjBMdjQFy26 (TX_CURR_SUBNAT (N, SUBNAT) TARGET: Receiving ART)",
+        "expression": "#{qjBMdjQFy26}",
+        "missingValueStrategy": "NEVER_SKIP"
+      },
+      "name": "TX_CURR_SUBNAT (N, SUBNAT) TARGET >= TX_CURR_SUBNAT (N, SUBNAT, Age/Sex/HIV) TARGET + TX_CURR_SUBNAT (N, SUBNAT, Sex/HIV) TARGET",
+      "operator": "greater_than_or_equal_to",
+      "periodType": "FinancialOct",
+      "rightSide": {
+        "dataElements": [
+          {
+            "id": "IwYoTvC2tof"
+          },
+          {
+            "id": "xghQXueYJxu"
+          }
+        ],
+        "description": "Value of element xghQXueYJxu (TX_CURR_SUBNAT (N, SUBNAT, Age/Sex/HIVStatus) TARGET: Receiving ART) + value of element IwYoTvC2tof (TX_CURR_SUBNAT (N, SUBNAT, Sex/HIVStatus) TARGET: Receiving ART)",
+        "expression": "#{xghQXueYJxu}+#{IwYoTvC2tof}",
+        "missingValueStrategy": "NEVER_SKIP"
+      },
+      "ruleType": "VALIDATION"
+    },
+    {
+      "description": "TX_CURR_SUBNAT (N, SUBNAT, Age/Sex/HIV) TARGET :OR: TX_CURR_SUBNAT (N, SUBNAT, Sex/HIV) TARGET",
+      "id": "orX6dOvJGgw",
+      "importance": "MEDIUM",
+      "instruction": "TX_CURR_SUBNAT (N, SUBNAT, Age/Sex/HIV) TARGET :OR: TX_CURR_SUBNAT (N, SUBNAT, Sex/HIV) TARGET",
+      "leftSide": {
+        "dataElements": [
+          {
+            "id": "xghQXueYJxu"
+          }
+        ],
+        "description": "Value of element xghQXueYJxu (TX_CURR_SUBNAT (N, SUBNAT, Age/Sex/HIVStatus) TARGET: Receiving ART)",
+        "expression": "#{xghQXueYJxu}",
+        "missingValueStrategy": "SKIP_IF_ALL_VALUES_MISSING"
+      },
+      "name": "TX_CURR_SUBNAT (N, SUBNAT, Age/Sex/HIV) TARGET :OR: TX_CURR_SUBNAT (N, SUBNAT, Sex/HIV) TARGET",
+      "operator": "exclusive_pair",
+      "periodType": "FinancialOct",
+      "rightSide": {
+        "dataElements": [
+          {
+            "id": "IwYoTvC2tof"
+          }
+        ],
+        "description": "Value of element IwYoTvC2tof (TX_CURR_SUBNAT (N, SUBNAT, Sex/HIVStatus) TARGET: Receiving ART)",
+        "expression": "#{IwYoTvC2tof}",
+        "missingValueStrategy": "SKIP_IF_ALL_VALUES_MISSING"
+      },
+      "ruleType": "VALIDATION"
+    },
+    {
+      "description": "HTS_TST (N, DSD, PMTCT P/Age/Sex/Result) TARGET <= PMTCT_STAT (N, DSD, Age/Sex/KnownNewResult) TARGET option Newly Identified Negative",
+      "id": "YPaueqpuvbc",
+      "importance": "MEDIUM",
+      "instruction": "HTS_TST (N, DSD, PMTCT P/Age/Sex/Result) TARGET <= PMTCT_STAT (N, DSD, Age/Sex/KnownNewResult) TARGET option Newly Identified Negative",
+      "leftSide": {
+        "dataElements": [
+          {
+            "id": "dd2WtJJxFYj"
+          }
+        ],
+        "description": "Value of element dd2WtJJxFYj (HTS_TST (N, DSD, PMTCT PostANC/Age/Sex/Result) TARGET: HTS received results)",
+        "expression": "#{dd2WtJJxFYj}",
+        "missingValueStrategy": "NEVER_SKIP"
+      },
+      "name": "HTS_TST (N, DSD, PMTCT P/Age/Sex/Result) TARGET <= PMTCT_STAT (N, DSD, Age/Sex/KnownNewResult) TARGET option Newly Identified Negative",
+      "operator": "less_than_or_equal_to",
+      "periodType": "FinancialOct",
+      "rightSide": {
+        "dataElements": [
+          {
+            "id": "Qdn0vmNSflO"
+          }
+        ],
+        "description": "Value of element Qdn0vmNSflO (PMTCT_STAT (N, DSD, Age/Sex/KnownNewResult) TARGET: Known Results) / Newly Identified Negative + value of element Qdn0vmNSflO (PMTCT_STAT (N, DSD, Age/Sex/KnownNewResult) TARGET: Known Results) / Newly Identified Negative + v",
+        "expression": "#{Qdn0vmNSflO.bUYmK0arvXS}+#{Qdn0vmNSflO.lvtUEyjc6Pr}+#{Qdn0vmNSflO.jzATmmu61Pq}+#{Qdn0vmNSflO.t6J1nthxMhI}+#{Qdn0vmNSflO.Xp2K5be2iC6}+#{Qdn0vmNSflO.aBPjNhCPVGG}+#{Qdn0vmNSflO.k8DCBpp9FK9}+#{Qdn0vmNSflO.v1SkxpwKWND}+#{Qdn0vmNSflO.DFzggejPePH}+#{Qdn0vmNSflO.fAuEkRp7Do4}+#{Qdn0vmNSflO.mFpk2mIJQzt}",
+        "missingValueStrategy": "NEVER_SKIP"
+      },
+      "ruleType": "VALIDATION"
+    },
+    {
+      "description": "HTS_TST (N, TA, PMTCT P/Age/Sex/Result) TARGET <= PMTCT_STAT (N, TA, Age/Sex/KnownNewResult) TARGET option Newly Identified Negative",
+      "id": "Ftn06JXceVX",
+      "importance": "MEDIUM",
+      "instruction": "HTS_TST (N, TA, PMTCT P/Age/Sex/Result) TARGET <= PMTCT_STAT (N, TA, Age/Sex/KnownNewResult) TARGET option Newly Identified Negative",
+      "leftSide": {
+        "dataElements": [
+          {
+            "id": "CrhtWrSnb2D"
+          }
+        ],
+        "description": "Value of element CrhtWrSnb2D (HTS_TST (N, TA, PMTCT PostANC/Age/Sex/Result) TARGET: HTS received results)",
+        "expression": "#{CrhtWrSnb2D}",
+        "missingValueStrategy": "NEVER_SKIP"
+      },
+      "name": "HTS_TST (N, TA, PMTCT P/Age/Sex/Result) TARGET <= PMTCT_STAT (N, TA, Age/Sex/KnownNewResult) TARGET option Newly Identified Negative",
+      "operator": "less_than_or_equal_to",
+      "periodType": "FinancialOct",
+      "rightSide": {
+        "dataElements": [
+          {
+            "id": "mfYq3HGUIX3"
+          }
+        ],
+        "description": "Value of element mfYq3HGUIX3 (PMTCT_STAT (N, TA, Age/Sex/KnownNewResult) TARGET: Known Results) / Newly Identified Negative + value of element mfYq3HGUIX3 (PMTCT_STAT (N, TA, Age/Sex/KnownNewResult) TARGET: Known Results) / Newly Identified Negative + val",
+        "expression": "#{mfYq3HGUIX3.bUYmK0arvXS}+#{mfYq3HGUIX3.lvtUEyjc6Pr}+#{mfYq3HGUIX3.jzATmmu61Pq}+#{mfYq3HGUIX3.t6J1nthxMhI}+#{mfYq3HGUIX3.Xp2K5be2iC6}+#{mfYq3HGUIX3.aBPjNhCPVGG}+#{mfYq3HGUIX3.k8DCBpp9FK9}+#{mfYq3HGUIX3.v1SkxpwKWND}+#{mfYq3HGUIX3.DFzggejPePH}+#{mfYq3HGUIX3.fAuEkRp7Do4}+#{mfYq3HGUIX3.mFpk2mIJQzt}",
+        "missingValueStrategy": "NEVER_SKIP"
+      },
+      "ruleType": "VALIDATION"
+    },
+    {
+      "description": "OVC_HIVSTAT (N, DSD) TARGET <= OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET options <1, 1-4, 5-9, 10-14, 15-17",
+      "id": "tO3LkcaPuli",
+      "importance": "MEDIUM",
+      "instruction": "OVC_HIVSTAT (N, DSD) TARGET <= OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET options <1, 1-4, 5-9, 10-14, 15-17",
+      "leftSide": {
+        "dataElements": [
+          {
+            "id": "TqpIEl7LfV7"
+          }
+        ],
+        "description": "Value of element TqpIEl7LfV7 (OVC_HIVSTAT (N, DSD) TARGET: OVC Disclosed Known HIV Status)",
+        "expression": "#{TqpIEl7LfV7}",
+        "missingValueStrategy": "NEVER_SKIP"
+      },
+      "name": "OVC_HIVSTAT (N, DSD) TARGET <= OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET options <1, 1-4, 5-9, 10-14, 15-17",
+      "operator": "less_than_or_equal_to",
+      "periodType": "FinancialOct",
+      "rightSide": {
+        "dataElements": [
+          {
+            "id": "HVzzfyVVIs1"
+          }
+        ],
+        "description": "Value of element HVzzfyVVIs1 (OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET: Beneficiaries Served) / <1 + value of element HVzzfyVVIs1 (OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET: Beneficiaries Served) / <1 + value of element HVzzfyVVIs1 (OVC_SERV ",
+        "expression": "#{HVzzfyVVIs1.UivSTzTfqSE}+#{HVzzfyVVIs1.fUNv9tnH0yE}+#{HVzzfyVVIs1.tW3awq3NZ5C}+#{HVzzfyVVIs1.i9vuAWTT8vQ}+#{HVzzfyVVIs1.QvHUFyVGpWD}+#{HVzzfyVVIs1.O1CHxlXcB3F}+#{HVzzfyVVIs1.yaRYLDFGGvW}+#{HVzzfyVVIs1.VN6waUEWUTN}+#{HVzzfyVVIs1.AE3jgQYHowk}+#{HVzzfyVVIs1.Ysdr0ArSUta}+#{HVzzfyVVIs1.OgfbQcML1KT}+#{HVzzfyVVIs1.N9AYCFtg5wW}+#{HVzzfyVVIs1.GXz9M1UeGTW}+#{HVzzfyVVIs1.PI1jmadSZra}+#{HVzzfyVVIs1.GrL9qy3Ohxu}+#{HVzzfyVVIs1.oq0C1UNrL9I}+#{HVzzfyVVIs1.T1BuDhdCWQo}+#{HVzzfyVVIs1.IyLJlErr9G0}+#{HVzzfyVVIs1.D6wSlbseHcS}+#{HVzzfyVVIs1.lWgd7h6IVzO}",
+        "missingValueStrategy": "NEVER_SKIP"
+      },
+      "ruleType": "VALIDATION"
+    },
+    {
+      "description": "TX_NEW (N, DSD, KeyPop/HIVStatus) TARGET <= TX_NEW (N, DSD, Age/Sex/HIVStatus) TARGET",
+      "id": "ee1uuywRCVx",
+      "importance": "MEDIUM",
+      "instruction": "TX_NEW (N, DSD, KeyPop/HIVStatus) TARGET <= TX_NEW (N, DSD, Age/Sex/HIVStatus) TARGET",
+      "leftSide": {
+        "dataElements": [
+          {
+            "id": "ktZYUSS0Zjo"
+          }
+        ],
+        "description": "Value of element ktZYUSS0Zjo (TX_NEW (N, DSD, KeyPop/HIVStatus) TARGET: New on ART)",
+        "expression": "#{ktZYUSS0Zjo}",
+        "missingValueStrategy": "NEVER_SKIP"
+      },
+      "name": "TX_NEW (N, DSD, KeyPop/HIVStatus) TARGET <= TX_NEW (N, DSD, Age/Sex/HIVStatus) TARGET",
+      "operator": "less_than_or_equal_to",
+      "periodType": "FinancialOct",
+      "rightSide": {
+        "dataElements": [
+          {
+            "id": "vmfKLKi1NBA"
+          }
+        ],
+        "description": "Value of element vmfKLKi1NBA (TX_NEW (N, DSD, Age/Sex/HIVStatus) TARGET: New on ART)",
+        "expression": "#{vmfKLKi1NBA}",
+        "missingValueStrategy": "NEVER_SKIP"
+      },
+      "ruleType": "VALIDATION"
+    },
+    {
+      "description": "TX_NEW (N, TA, KeyPop/HIVStatus) TARGET <= TX_NEW (N, TA, Age/Sex/HIVStatus) TARGET",
+      "id": "NDtVGEw1nQJ",
+      "importance": "MEDIUM",
+      "instruction": "TX_NEW (N, TA, KeyPop/HIVStatus) TARGET <= TX_NEW (N, TA, Age/Sex/HIVStatus) TARGET",
+      "leftSide": {
+        "dataElements": [
+          {
+            "id": "SyQHN3Jpcww"
+          }
+        ],
+        "description": "Value of element SyQHN3Jpcww (TX_NEW (N, TA, KeyPop/HIVStatus) TARGET: New on ART)",
+        "expression": "#{SyQHN3Jpcww}",
+        "missingValueStrategy": "NEVER_SKIP"
+      },
+      "name": "TX_NEW (N, TA, KeyPop/HIVStatus) TARGET <= TX_NEW (N, TA, Age/Sex/HIVStatus) TARGET",
+      "operator": "less_than_or_equal_to",
+      "periodType": "FinancialOct",
+      "rightSide": {
+        "dataElements": [
+          {
+            "id": "DhrLCUBm3bK"
+          }
+        ],
+        "description": "Value of element DhrLCUBm3bK (TX_NEW (N, TA, Age/Sex/HIVStatus) TARGET: New on ART)",
+        "expression": "#{DhrLCUBm3bK}",
+        "missingValueStrategy": "NEVER_SKIP"
+      },
+      "ruleType": "VALIDATION"
+    },
+    {
+      "description": "TX_CURR (N, TA, KeyPop/HIVStatus) TARGET <= TX_CURR (N, TA, Age/Sex/HIVStatus) TARGET",
+      "id": "ksJbftgbY9P",
+      "importance": "MEDIUM",
+      "instruction": "TX_CURR (N, TA, KeyPop/HIVStatus) TARGET <= TX_CURR (N, TA, Age/Sex/HIVStatus) TARGET",
+      "leftSide": {
+        "dataElements": [
+          {
+            "id": "uIqAr4ev05I"
+          }
+        ],
+        "description": "Value of element uIqAr4ev05I (TX_CURR (N, TA, KeyPop/HIVStatus) TARGET: Receiving ART)",
+        "expression": "#{uIqAr4ev05I}",
+        "missingValueStrategy": "NEVER_SKIP"
+      },
+      "name": "TX_CURR (N, TA, KeyPop/HIVStatus) TARGET <= TX_CURR (N, TA, Age/Sex/HIVStatus) TARGET",
+      "operator": "less_than_or_equal_to",
+      "periodType": "FinancialOct",
+      "rightSide": {
+        "dataElements": [
+          {
+            "id": "HGZY9RNZjRd"
+          }
+        ],
+        "description": "Value of element HGZY9RNZjRd (TX_CURR (N, TA, Age/Sex/HIVStatus) TARGET: Receiving ART)",
+        "expression": "#{HGZY9RNZjRd}",
+        "missingValueStrategy": "NEVER_SKIP"
+      },
+      "ruleType": "VALIDATION"
+    }
+  ]
+}

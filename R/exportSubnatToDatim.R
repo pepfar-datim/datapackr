@@ -1,5 +1,4 @@
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title exportSubnatToDATIM(d)
 #'
 #' @description Takes the outputs of the \code{\link{unPackSheets}} function and

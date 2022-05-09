@@ -86,7 +86,7 @@ test_that("Provide info only for  over-allocated pure dupes", {
 
 test_that("Can resolve non-overallocated crosswalk dupes", {
   foo <- list(data = list(), info = list())
-  foo$info$messages <- datapackr:::MessageQueue()
+  foo$info$messages <- datapackr::MessageQueue()
 
 
   foo$data$distributedMER <- tibble::tribble(
@@ -149,7 +149,7 @@ test_that("Provide info only for over-allocated crosswalk dupes", {
 
 test_that("Preserve non-deduplicated data when having over-allocated crosswalk dupes", {
   foo <- list(data = list(), info = list())
-  foo$info$messages <- datapackr:::MessageQueue()
+  foo$info$messages <- datapackr::MessageQueue()
 
 
   foo$data$distributedMER <- tibble::tribble(

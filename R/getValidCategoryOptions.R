@@ -13,9 +13,9 @@ getValidCategoryOptions <- function(cop_year = getCurrentCOPYear()) {
 
   ## Pull full Code List from DATIM ####
   fullCodeList <- datapackr::pullFullCodeList(FY = cop_year + 1,
-                                              datastream = c("mer_targets",
-                                                             "subnat_targets",
-                                                             "impatt"))
+                                              datastreams = c("mer_targets",
+                                                              "subnat_targets",
+                                                              "impatt"))
 
   ## Map COCs from Code List to COs
   valid_COCs_COs <- map_COCs_to_COs() %>%

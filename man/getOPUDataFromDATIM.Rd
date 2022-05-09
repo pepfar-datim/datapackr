@@ -7,20 +7,17 @@
 getOPUDataFromDATIM(
   cop_year,
   country_uids = NULL,
-  country_names = NULL,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{
-\item{cop_year}{COP Year. Remember, COP22 = FY23 targets.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
-\item{country_uids}{DATIM UIDs of Countries to return data for. Can supply either
-this or Country Names.}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 
-\item{country_names}{Names of Countries to return data for. Can supply either this
-or DATIM Country UIDs.}
-
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Returns dataset needed for use in \code{\link{packOPUDataPack}}.

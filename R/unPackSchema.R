@@ -17,6 +17,9 @@ validateSchema <- function(schema,
                            tool,
                            season) {
 
+  stopifnot("Package \"waldo\" must be installed to use this function." =
+              requireNamespace("waldo", quietly = TRUE))
+
   # Collect parameters ####
   schema <- schema %missing% NULL
   schema_provided <- !is.null(schema)
@@ -170,7 +173,7 @@ validateSchema <- function(schema,
     dplyr::select(sheet_name, col, indicator_code, dataset, dataelement_dsd, dataelement_ta)
 
   uid_pattern <- "[A-Za-z][A-Za-z0-9]{10}"
-  multi_uid_pattern <- paste0("^(",uid_pattern,")(\\.((",uid_pattern,")))*$")
+  multi_uid_pattern <- paste0("^(", uid_pattern, ")(\\.((", uid_pattern, ")))*$")
 
   DEs_DSD_syntax_invalid <- DEs_schema %>%
     dplyr::select(-dataelement_ta) %>%
@@ -288,6 +291,7 @@ validateSchema <- function(schema,
 
 #' @export
 #' @importFrom data.table :=
+#' @importFrom methods as
 #' @title Extract and save schema from Data Pack template.
 #'
 #' @description
@@ -489,7 +493,7 @@ unPackSchema_datapack <- function(template_path = NULL,
   # Add skipped sheets ####
   skipped_schema <- matrix(nrow = 0, ncol = NCOL(schema)) %>%
     as.data.frame() %>%
-    setNames(names(schema))
+    stats::setNames(names(schema))
 
   skipped_schema[] <- mapply(FUN = as, skipped_schema, sapply(schema, class), SIMPLIFY = FALSE)
 

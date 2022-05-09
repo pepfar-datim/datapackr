@@ -1,3 +1,154 @@
+# datapackr 5.1.7
+
+## Bug fixes
+* Removes `PrEP_CT >= PrEP_NEW` validation rule from checks. (DP-552)
+* Removes `DIAGNOSED_SUBNAT (N, SUBNAT, HIVStatus) TARGET >= DIAGNOSED_SUBNAT (N, SUBNAT, Age/Sex/HIV) TARGET + DIAGNOSED_SUBNAT (N, SUBNAT, HIV/Sex) TARGET` validation rule from checks. (DP-554)
+* Restores "affected_rows" column to the altered formula tab in the validation rules output file. (DP-572)
+* Fixes bug that prevented Technical Assistance (TA) only implementing mechanisms (IMs) from populating in the PSNUxIM tab. (DP-575)
+* Fixes bug in `checkMechanisms`.
+* Ensures that `default/unallocated` data is included in COP Approval Memo tables.
+* Reverts changes to function `unPackSNUxIM` in `R/unPackSNUxIM.R` back to 5.1.5.
+
+## New features
+* Adds new utility function `formatSetStrings` to assist in the `checkFormulas` function. Formats a vector of numbers into a string of ranges.
+
+## Minor improvements and fixes
+* Cleans up code and adds documentation to functions in the packPSNUxIM` tree. (DP-473)
+* Strengthens validation of PSNUs: (DP-509)
+    * Creates new function parsePSNUs
+    * Errors out invalid PSNU strings are detected
+    * Provides a warning only if NO PSNUs are detected
+    * Adds unit tests
+* Replaces deprecated code in `swapColumns` function located in `R/utilities.R`: (DP-547)
+    * Replaces `mutate_` with base R fix to remove deprecation warning when writing PSNUXIM tab.
+    * Added tests for `swapColumns` in `tests/testthat/test-utilities.R`
+* Update FY23 MER DOD Targets COC UID to "o71WtN5JrUu" in the following locations: (DP-576 and DP-577)
+    * `R/utilities.R`
+    * `tests/testthat/test-GetDatasetUids.R`
+    * `data-raw/update_cop22_de_coc_co_map.R`
+    * `data/cop22_map_DataPack_DATIM_DEs_COCs.rda`
+    * `data/cop22_map_adorn_import_file.rda`
+* Adding whole package to linting checks. Lints `data-raw` and `tests` folders now in addition to `R` folder. (DP-578)
+* Aligns on `datastreams` parameter to consolidate parameter names across functions (DP-579)
+    * Changes `datastream` parameter for `pullFullCodeList` to `datastreams`
+    * Changes `streams` parameter for `getCOPDataFromDATIM` to `datastreams`
+    * Changes parameters in all relevant locations
+    * Moves definition of `datastreams` parameter to `datapackr_params`
+    * Removes duplicative parameter definitions from `getCOPDataFromDATIM` and inherits them from `datapackr_params` instead
+* Adds missing `d2_session` parameter to `getCountries` function in `R/utilities.R` (DP-580)
+* Aligns on `output_folder` as parameter for all functions that export files (DP-581)
+    * Changes `output_path` parameter in `exportPackr` to `output_folder`
+    * Replaces parameter names for `exportPackr` in all relevant locations
+    * Modifies `output_folder` definition in `datapackr_params` to remove outdated reference to defaulting to working directory.
+    * Removes duplicative parameter definitions in functions that were touched and replaces with inheritance from `datapackr_params`
+* Remove unused parameters (DP-582)
+    * Removes `type` argument from `deriveTargets`.
+    * Removes `country_names` argument from `getOPUDataFromDATIM`.
+    * Removes duplicative parameter definitions from `getOPUDataFromDATIM` and inherits definitions from `datapackr_params`.
+
+
+# datapackr 5.1.6
+
+## Bug fixes
+- Fixes mismatch between text and metadata on certain validation messages that caused some warnings to be highlighted red as if they were errors and caused some errors not to be highlighted red. (DP-523)
+- Fixes missing PrEP_CT data on approval memo target tables. (DP-561)
+- Fixes missing AGYW_PREV data on approval memo target tables. (DP-562)
+- Fixes reference to memo template in `generateMemoTemplate`.
+
+## New Features
+- Adds a system environment variable `MAX_CORES` which will limit the number of cores to be used in parallel processing. This environment variable is detected by the new function `getMaxCores`.
+- Adds parameter `append` to `writePSNUxIM`. This parameter is `TRUE` by default and will append new rows to the existing PSNUxIM tab. If `FALSE`, a new PSNUxIM tab will be output only containing the new rows needed in the validated tool.
+- Adds parameter `include_default` to `getMechanismView` and `adorn_import_file` that will include the default mechanism to the dataframe that is returned.
+- Adds new function `checkHasPSNUxIM` to detect whether a COP Data Pack has a PSNUxIM tab.
+
+## Minor improvements and fixes
+- Updates alterned formula warning from `checkFormulas` to clarify that users may edit formulas in Green columns without permission, but need to receive clearance from DUIT prior to editing formulas in Grey columns. (DP-241)
+- Makes `checkColStructure` more robust.
+- Adds back `stringi` dependency due to new use of `stringi::stri_replace_all`. This will be replaced with a `stringr` function in a later version to reduce dependencies.
+
+
+# datapackr 5.1.5
+
+## New Features
+* Adds COP Approval Memo target table generation to the package and enables COP22 Approvale Memo target table generation support (DP-503, DP-528, DP-534, DP-536)
+  * Creates the following new functions to aid in the fetching, cleaning, and formatting of data used in the various target tables of COP approval memos:
+    - `evaluateIndicators`
+    - `fetchPrioritizationTable`
+    - `generateComparisonTable`
+    - `getMemoIndicators`
+    - `memoStructure`
+    - `prepareExistingDataAnalytics`
+    - `prepareMemoData`
+    - `prepareMemoDataByAgency`
+    - `prepareMemoDataByPSNU`
+    - `prepareMemoDataByPartner`
+    - `prepareMemoDataByPrio`
+    - `prepareMemoMetadata`
+    - `updateExistingPrioritization`
+  * Creates the following new functions to aid in the creation and formatting of COP Approval Memo target tables:
+    - `getMemoTemplate` selects whether to supply a watermarked "Draft Memo" Word document or a blank document for final memo tables.
+    - `renderAgencyTable`, `renderPartnerTable`, and `renderPrioTable` each generate formatted tables for their respective sections of the memo.
+    - `generateApprovalMemo` compiles all target tables together in a single document.
+    - `default_memo_font`, `default_memo_style_header`, and `default_memo_style_para` contain information on standard memo formatting.
+    - `zeros_to_dashes` is a utility function used in formatting memos appropriately.
+  * Adds `cop_validation_rules` as new dataset object within package
+    - Adds `data-raw` file to create and update `cop_validation_rules` object
+  * Adds `draft_memo_template.docx` under `inst/extdata` folder for use in draft memo generation
+  * Adds tests for new functions:
+    - Adds `test-get-memo-indicators` to test `getMemoIndicators`
+    - Adds `test-indicators` to test `evaluateIndicators`
+    - Adds `test-memo-structure` to test `memoStructure`
+* Adds additional non-memo related functionality from the `datapackr-app` into the package (DP-504)
+  * Creates `checkMechanisms` and `checkPSNUData` to replace `validateMechanisms` and `validatePSNUData` from the `datapackr-app`, respectively. These functions are used in validating and analyzing Data Pack targets.
+  * Adds `sane_name`, `source_user`, and `operating_unit` as new variables under `d$info` in keychain
+    - Creates `getSaneName` and `getOUFromCountryUIDs` as new functions
+    - Modifies `createKeychainInfo` to create new variables under `d$info`
+    - Modifies `packDataPack` to create new variables under `d$info`
+    - Adds `d2_session` argument to `createKeychainInfo`
+    - Updates relevant tests to incorporate new elements of keychain
+* Enables the ability to get COP22 data using `getCOPDataFromDATIM` (DP-536)
+    
+## Minor improvements and fixes
+* Adds `parallel`, `gdtools`, `flextable`, and `officer` as suggested packages
+
+
+# datapackr 5.1.4
+
+## Bug Fixes
+
+* Ignore duplicated Not PEPFAR columns in PSNUxIM
+* Fixes for handling 50+ age bands in PSNUxIM packing and unpacking
+
+
+# datapackr 5.1.3
+
+## Bug Fixes
+* Downgrades `openxslx` to version 4.2.3 to prevent error with PSNUxIM packing.
+* Changes the HTS modality group set to `HTS Modality (USE ONLY for FY22 Results/FY23 Targets)`. 
+* Change `compareData_OpuDatapackVsDatim` to NOT compare AGYW data which are not part of OPU data packs.
+
+## Breaking changes
+* Changes arguments for `unPackSchema_datapack` and `validateSchema` to use standard argument names. Replaces `filepath` with `template_path` and replaces their usage in all relevant locations.
+
+## Minor improvements and fixes
+* Reexports magrittr `%<>%` function.
+* Adds missing function `interactive_warning`.
+* Removes function `getPass` since this code is commented out and functionality has been replaced by `datimutils`.
+* Cleans up mismatched brackets in `data.R` file and allows for creation of documentation for all datasets.
+* Updates `.Rbuildignore` to include all appropriate files and folder.
+* Clears error with R dependency by downgrading required version to R 4.1.0.
+* Updates package dependencies:
+    - Adds dependency and remote for `datimutils`.
+    - Adds dependency for `methods`.
+    - Suggests `waldo` package.
+    - Removes `scales` and `stringi` as dependencies as they are not used.
+    - Moves `assertthat` from `Imports` to `Suggests` since it is only used in `data-raw` files.
+* Moves the following variables from `data-raw` files to environment variables. Users can add these to an `.Rprofile` to streamline their workflow:
+    - `SECRETS_FOLDER`
+    - `OUTPUT_FOLDER`
+    - `MODEL_DATA_PATH`
+    - `SNUXIM_MODEL_DATA_PATH`
+
 # datapackr 5.1.2
 
 ## Bug Fixes

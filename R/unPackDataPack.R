@@ -40,6 +40,10 @@ unPackDataPack <- function(d,
   interactive_print("Checking comments...")
   d <- checkComments(d)
 
+  # Check whether there exist any troublesome connections in the file
+  interactive_print("Checking external links...")
+  d <- checkExternalLinks(d)
+
   # Check integrity of Workbook tabs ####
   interactive_print("Checking structure...")
   d <- checkStructure(d)
@@ -71,7 +75,7 @@ unPackDataPack <- function(d,
   interactive_print("Creating analytics...")
   d <- createAnalytics(d, d2_session = d2_session)
 
-  #Same test is already being called unPackCountryUIDs
+  # Same test is already being called unPackCountryUIDs
   # # TEST: Check that country_uids matches observed data
   # observed_country_uids <-
   #   dplyr::bind_rows(d$datim) %>%

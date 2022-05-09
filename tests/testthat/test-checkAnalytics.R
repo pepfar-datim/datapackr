@@ -169,9 +169,9 @@ test_that("PMTCT Known Pos/PMTCT Total all zeros expect null", {
 
 test_that(" Test retention < 98% expect message", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TX_CURR.T, ~TX_CURR.T_1, ~TX_NEW.T,
-    "a", 1, "<1", "F", NA, 97, 97, 3,
-    "b", 2, "<1", "M", NA, 0, 0, 0
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TX_CURR.T, ~TX_CURR.T_1, ~TX_NEW.T, ~ cop_year,
+    "a", 1, "<1", "F", NA, 97, 97, 3, 2021,
+    "b", 2, "<1", "M", NA, 0, 0, 0, 2021
   )
 
   foo <- analyze_retention(data)
@@ -184,9 +184,9 @@ test_that(" Test retention < 98% expect message", {
 
 test_that(" Test retention > 100% expect message", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TX_CURR.T, ~TX_CURR.T_1, ~TX_NEW.T,
-    "a", 1, "<1", "F", NA, 101, 10, 90,
-    "b", 2, "<1", "M", NA, 100, 10, 90
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TX_CURR.T, ~TX_CURR.T_1, ~TX_NEW.T, ~cop_year,
+    "a", 1, "<1", "F", NA, 101, 10, 90, 2021,
+    "b", 2, "<1", "M", NA, 100, 10, 90, 2021
   )
 
   foo <- analyze_retention(data)
@@ -199,9 +199,9 @@ test_that(" Test retention > 100% expect message", {
 
 test_that(" Test retention  =  99% expect NULL", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TX_CURR.T, ~TX_CURR.T_1, ~TX_NEW.T,
-    "a", 1, "<1", "F", NA, 99, 100, 0,
-    "b", 2, "<1", "M", NA, 0, 0, 0
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TX_CURR.T, ~TX_CURR.T_1, ~TX_NEW.T, ~cop_year,
+    "a", 1, "<1", "F", NA, 99, 100, 0, 2021,
+    "b", 2, "<1", "M", NA, 0, 0, 0, 2021
   )
 
   expect_null(analyze_retention(data))
@@ -210,9 +210,9 @@ test_that(" Test retention  =  99% expect NULL", {
 
 test_that(" Test retention all zeros expect NULL", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TX_CURR.T, ~TX_CURR.T_1, ~TX_NEW.T,
-    "a", 1, "<1", "F", NA, 0, 0, 0,
-    "b", 2, "<1", "M", NA, 0, 0, 0
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TX_CURR.T, ~TX_CURR.T_1, ~TX_NEW.T, ~cop_year,
+    "a", 1, "<1", "F", NA, 0, 0, 0, 2021,
+    "b", 2, "<1", "M", NA, 0, 0, 0, 201
   )
 
   expect_null(analyze_retention(data))
@@ -222,9 +222,9 @@ test_that(" Test retention all zeros expect NULL", {
 test_that(" Test linkage < 95% expect message", {
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
-     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
-    "a", 1, "25-49", "F", NA, 95, 5, 94, 0, 0,
-    "b", 2, "25-49", "M", NA, 95, 5, 95, 0, 0
+     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T, ~cop_year,
+    "a", 1, "25-49", "F", NA, 95, 5, 94, 0, 0, 2021,
+    "b", 2, "25-49", "M", NA, 95, 5, 95, 0, 0, 2021
   )
 
   foo <- analyze_linkage(data)
@@ -237,9 +237,9 @@ test_that(" Test linkage < 95% expect message", {
 test_that(" Test KP linkage < 95% expect message", {
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
-     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
-    "a", 1, NA, NA, "PWID", 0, 0, 0, 100, 94,
-    "b", 2, NA, NA, "PWID", 0, 0, 0, 100, 95
+     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T, ~cop_year,
+    "a", 1, NA_character_, NA_character_, "PWID", 0, 0, 0, 100, 94, 2021,
+    "b", 2, NA_character_, NA_character_, "PWID", 0, 0, 0, 100, 95, 2021
   )
 
   foo <- analyze_linkage(data)
@@ -252,9 +252,9 @@ test_that(" Test KP linkage < 95% expect message", {
 test_that(" Test linkage > 100% expect message", {
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
-    ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
-    "a", 1, "25-49", "F", NA, 50, 50, 100, 0, 0,
-    "b", 2, "25-49", "M", NA, 50, 50, 101, 0, 0
+    ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T, ~cop_year,
+    "a", 1, "25-49", "F", NA, 50, 50, 100, 0, 0, 2021,
+    "b", 2, "25-49", "M", NA, 50, 50, 101, 0, 0, 2021
   )
 
   foo <- analyze_linkage(data)
@@ -267,9 +267,9 @@ test_that(" Test linkage > 100% expect message", {
 test_that(" Test KP linkage > 100% expect message", {
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
-     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
-    "a", 1, NA, NA, "PWID", 0, 0, 0, 100, 100,
-    "b", 2, NA, NA, "PWID", 0, 0, 0, 100, 101
+     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T, ~cop_year,
+    "a", 1, NA_character_, NA, "PWID", 0, 0, 0, 100, 100, 2021,
+    "b", 2, NA_character_, NA, "PWID", 0, 0, 0, 100, 101, 2021
   )
 
   foo <- analyze_linkage(data)
@@ -282,9 +282,9 @@ test_that(" Test KP linkage > 100% expect message", {
 test_that(" Test linkage = 98% expect NULL", {
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
-     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
-    "a", 1, "25-49", "F", NA, 20, 20, 39, 0, 0,
-    "b", 2, "25-49", "M", NA, 0, 0, 0, 0, 0
+     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T, ~cop_year,
+    "a", 1, "25-49", "F", NA, 20, 20, 39, 0, 0, 2021,
+    "b", 2, "25-49", "M", NA, 0, 0, 0, 0, 0, 2021
   )
 
   expect_null(analyze_linkage(data))
@@ -294,9 +294,9 @@ test_that(" Test linkage = 98% expect NULL", {
 test_that(" Test KP linkage = 98% expect NULL", {
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
-     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
-    "a", 1, NA, NA, "PWID", 0, 0, 0, 100, 98,
-    "b", 2, NA, NA, "PWID", 0, 0, 0, 0, 0
+     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T, ~cop_year,
+    "a", 1, NA_character_, NA, "PWID", 0, 0, 0, 100, 98, 2021,
+    "b", 2, NA_character_, NA, "PWID", 0, 0, 0, 0, 0, 2021
   )
 
   expect_null(analyze_linkage(data))
@@ -306,9 +306,9 @@ test_that(" Test KP linkage = 98% expect NULL", {
 test_that(" Test linkage all zeros expect NULL", {
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
-    ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
-    "a", 1, "25-49", "F", NA, 0, 0, 0, 0, 0,
-    "b", 2, "25-49", "M", NA, 0, 0, 0, 0, 0
+    ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T, ~cop_year,
+    "a", 1, "25-49", "F", NA, 0, 0, 0, 0, 0, 2021,
+    "b", 2, "25-49", "M", NA, 0, 0, 0, 0, 0, 2021
   )
 
   expect_null(analyze_linkage(data))
@@ -318,9 +318,9 @@ test_that(" Test linkage all zeros expect NULL", {
 test_that(" Test linkage with age <1", {
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
-     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T,
-    "a", 1, "<01", "M", NA, 50, 50, 101, 100, 100,
-    "b", 2, NA, NA, "PWID", 0, 0, 0, 100, 101
+     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T, ~cop_year,
+    "a", 1, "<01", "M", NA, 50, 50, 101, 100, 100, 2021,
+    "b", 2, NA, NA, "PWID", 0, 0, 0, 100, 101, 2021
   )
 
   foo <- analyze_linkage(data)

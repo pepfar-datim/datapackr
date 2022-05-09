@@ -2,14 +2,16 @@
 % Please edit documentation in R/adorn_import_file.R
 \name{adorn_import_file}
 \alias{adorn_import_file}
-\title{Convert PSNU-level DATIM import file into analytics-friendly object}
+\title{Convert a 'PSNU-level' DATIM import file into an analytics-friendly
+ object.}
 \usage{
 adorn_import_file(
   psnu_import_file,
   cop_year = getCurrentCOPYear(),
   psnu_prioritizations = NULL,
   filter_rename_output = TRUE,
-  d2_session = dynGet("d2_default_session", inherits = TRUE)
+  d2_session = dynGet("d2_default_session", inherits = TRUE),
+  include_default = FALSE
 )
 }
 \arguments{
@@ -24,11 +26,13 @@ values for each PSNU. If not included, blank prioritizations shown.}
 the new, more complete format?}
 
 \item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+
+\item{include_default}{Should default mechanisms be included?}
 }
 \value{
 data
 }
 \description{
-Convert PSNU-level DATIM import file into analytics-friendly
-object, similar to the MER Structured Datasets
+Convert a 'PSNU-level' DATIM import file into an
+ analytics-friendly object, similar to the MER Structured Datasets
 }

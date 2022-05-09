@@ -2,20 +2,26 @@
 % Please edit documentation in R/utilities.R
 \name{rowMax}
 \alias{rowMax}
-\title{Take Max along row among columns matching regex}
+\title{Extracts the desired columns for analysis via regular expression, then
+ takes the maximum value row-wise. Ultimately resulting in a new column
+ containing the max values.}
 \usage{
 rowMax(df, cn, regex)
 }
 \arguments{
-\item{df}{Dataframe}
+\item{df}{The dataframe to be analyzed.}
 
-\item{cn}{Name (character string) of Max column to create}
+\item{cn}{The column name (character string) of the Max column that is
+created after execution of this function.}
 
-\item{regex}{String of regex to use in identifying columns.}
+\item{regex}{A regular expression used in identifying the columns of
+interest.}
 }
 \value{
 df
 }
 \description{
-Take Max along row among columns matching regex
+Extracts the desired columns for analysis via regular expression, then
+ takes the maximum value row-wise. Ultimately resulting in a new column
+ containing the max values.
 }

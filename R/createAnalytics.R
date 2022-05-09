@@ -33,7 +33,6 @@ getFY22Prioritizations <- function(d) {
 
 
 #' @export
-#' @importFrom magrittr %>% %<>%
 #' @title createAnalytics(d)
 #'
 #' @description Wrapper function for creation of d$data$analytics object
@@ -72,18 +71,21 @@ createAnalytics <- function(d,
                           psnu_prioritizations = prioritizations,
                           d2_session = d2_session)
 
-      if (d$info$unallocatedIMs) {
+      if (d$info$unallocatedIMs | !d$info$has_psnuxim) {
         d$data$analytics %<>%
-          dplyr::mutate(
-            mechanism_code =
-              dplyr::case_when(
-                is.na(mechanism_code)
-                  & !indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")
-                  & support_type != "Sub-National"
-                  ~ "Unallocated",
-                TRUE ~ mechanism_code)
-          )
-      }
+              dplyr::mutate(across(
+                c(mechanism_code, mechanism_desc, partner_desc, funding_agency),
+                ~ dplyr::case_when(
+                  is.na(.x) &
+                    stringr::str_detect(support_type, "DSD|TA") ~ "Unallocated",
+                  is.na(.x) &
+                    stringr::str_detect(support_type, "Sub-National") ~ "default",
+                  is.na(.x) &
+                    stringr::str_detect(support_type, "No Support Type") ~ "default",
+                  TRUE ~ .x
+                )
+              ))
+          }
 
     } else {
       stop("createAnalytics does not work on Data Packs for that COP Year.")

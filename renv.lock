@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.1.1",
+    "Version": "4.1.2",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -361,6 +361,13 @@
       "Repository": "CRAN",
       "Hash": "38ec653c2613bed60052ba3787bd8a2c"
     },
+    "flextable": {
+      "Package": "flextable",
+      "Version": "0.6.10",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "4d80053f3159dff0b2c741350d7c2c9c"
+    },
     "forcats": {
       "Package": "forcats",
       "Version": "0.5.1",
@@ -388,6 +395,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "9d234e6a87a6f8181792de6dc4a00e39"
+    },
+    "gdtools": {
+      "Package": "gdtools",
+      "Version": "0.2.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "12a524de5a491ff39debb9311fc0763f"
     },
     "generics": {
       "Package": "generics",
@@ -655,6 +669,13 @@
       "Repository": "CRAN",
       "Hash": "2d632e0d963a653a0329756ce701ecdd"
     },
+    "officer": {
+      "Package": "officer",
+      "Version": "0.4.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0a93ccc072f566f8a65fe75b5b6f81e7"
+    },
     "openssl": {
       "Package": "openssl",
       "Version": "1.4.5",
@@ -664,10 +685,10 @@
     },
     "openxlsx": {
       "Package": "openxlsx",
-      "Version": "4.2.4",
+      "Version": "4.2.5",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "f1b1ca1254ccb485dccc9c0dc65a2c36"
+      "Hash": "fc5e0e85d3a1e4282f04f303627b7e72"
     },
     "pillar": {
       "Package": "pillar",
@@ -941,6 +962,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "b227d13e29222b4574486cfcbde077fa"
+    },
+    "systemfonts": {
+      "Package": "systemfonts",
+      "Version": "1.0.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5be9fcf8ef6763e8cb13ab009e273a1d"
     },
     "testthat": {
       "Package": "testthat",

@@ -39,89 +39,34 @@ round_trunc <- function(x, digits = 0) {
 
 
 #' @export
-#' @importFrom magrittr %>% %<>%
-#' @title Pull IMPATT levels from DATIM for all PEPFAR countries
+#' @title Swap columns between two dataframes
 #'
 #' @description
-#' Queries DATIM to retrieve the latest version of
-#' \code{/api/dataStore/dataSetAssignments/ous}
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
-#' @return Dataframe of country metadata, including prioritization, planning,
-#' country, community, and facility levels in DATIM organization hierarchy.
-#'
-getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
-                                                inherits = TRUE)) {
-  impatt_levels <-
-    paste0(d2_session$base_url, "api/", datapackr::api_version(),
-           "/dataStore/dataSetAssignments/orgUnitLevels") %>%
-    httr::GET(httr::timeout(180), handle = d2_session$handle) %>%
-    httr::content(., "text") %>%
-    jsonlite::fromJSON(., flatten = TRUE) %>%
-    do.call(rbind.data.frame, .) %>%
-    dplyr::rename(operating_unit = name3, country_name = name4) %>%
-    dplyr::mutate_if(is.factor, as.character) %>%
-    dplyr::mutate(country_name =
-                    dplyr::case_when(country == 3 ~ operating_unit,
-                                     country == 4 ~ country_name))
-
-  # Add country_uids ####
-  countries <-
-    datapackr::api_call("organisationUnits", d2_session = d2_session) %>%
-    datapackr::api_filter(field = "organisationUnitGroups.id",
-                          operation = "eq",
-                          match = "cNzfcPWEGSH") %>%
-    datapackr::api_fields(fields = "id,name,level,ancestors[id,name]") %>% # nolint
-    datapackr::api_get(d2_session = d2_session)
-
-  impatt_levels %<>%
-    dplyr::left_join(countries, by = c("country_name" = "name")) %>%
-    dplyr::rename(country_uid = id) %>%
-    dplyr::select(operating_unit, country_name, country_uid,
-                  dplyr::everything(), -ancestors, -level)
-
-  return(impatt_levels)
-
-}
-
-
-#' @importFrom lazyeval interp
-#' @export
-#' @title Swap columns between dataframes
-#'
-#' @description
-#' Replaces columns in \code{to} with those with identical names in \code{from}.
+#' Replaces columns in the dataframe \code{to} with those with identical names
+#'  in the dataframe \code{from}.
 #'
 #' @param to Dataframe to pull columns into
-#' @param from Data frame to pull columns from
+#' @param from Dataframe to pull columns from
 #'
-#' @return dataframe with swapped columns
+#' @return A dataframe with the swapped columns
 #'
 swapColumns <- function(to, from) {
-  # Grab column names from `from`
-    cols <- colnames(from)
+  # Grab column names from the `from` df
+  cols <- colnames(from)
 
-  # If `from` is a null dataframe, skip and return `to`
-    if (length(cols) != 0) {
+  # If the `from` df is a null dataframe, skip and return the `to` df
+  if (length(cols) != 0) {
 
   # Loop through `from` columns and if there's a match in `to`, copy and paste
-  #   it into `to`
-      for (i in seq_along(cols)) {
-        col <- cols[i]
-        if (col %in% colnames(to)) {
-          dots <-
-            stats::setNames(list(lazyeval::interp(
-              ~ magrittr::use_series(from, x), x = as.name(col)
-            )), col)
-          to <- to %>%
-            dplyr::mutate_(.dots = dots)
-        } else {
-          next
-        }
+    #   it into `to`
+    for (col in cols) {
+      if (col %in% colnames(to)) {
+        # base column swap
+        to[, col] <- from[, col]
       }
     }
-
+  }
   return(to)
-
 }
 
 
@@ -172,85 +117,53 @@ interactive_message <- function(x) {
 #'
 interactive_warning <- function(x) {
   if (rlang::is_interactive()) {
-    warning(x,call. = FALSE)
+    warning(x, call. = FALSE)
   }
 }
 
+
 #' @export
-#' @title Pull list of Countries from DATIM.
+#' @title Get Sane Name for Data Pack Tool
 #'
-#' @description
-#' Queries DATIM to extract list of Countries for specified Data Pack UID and
-#' adds additional Countries not currently in DATIM as needed.
+#' @description Takes a Data Pack tool name and generates a
+#' "Sane name" for the tool which has no spaces or punctuation.
 #'
-#' @param datapack_uid A unique ID specifying the PEPFAR Operating Unit or
-#' specific Data Pack country grouping. If left unspecified, will pull all
-#' Country Names.
+#' @param datapack_name A string from the \code{d$info$datapack_name} object.
 #'
-#' @return Data frame of Countries
+#' @return String with the sane name.
+
+getSaneName <- function(datapack_name) {
+  sane_name <- datapack_name %>%
+    stringr::str_extract_all(
+      string = .,
+      pattern = "[A-Za-z0-9_]",
+      simplify = TRUE) %>%
+    paste0(., sep = "", collapse = "")
+}
+
+
+#' @export
+#' @title Get Operating Unit from Country UIDs
 #'
-getCountries <- function(datapack_uid = NA) {
+#' @description Takes in a set of Country UIDs and returns an Operating Unit name.
+#'
+#' @param country_uids List of country UIDs from the \code{d$info$country_uids} object.
+#'
+#' @return d
+#'
+getOUFromCountryUIDs <- function(country_uids) {
+  ou <- datapackr::valid_PSNUs %>%
+    dplyr::select(ou, ou_id, country_name, country_uid) %>%
+    dplyr::distinct() %>%
+    dplyr::filter(country_uid %in% country_uids) %>%
+    dplyr::select(ou, ou_id) %>%
+    dplyr::distinct()
 
-  # Pull Country List
-    countries <-
-      datapackr::api_call("organisationUnits", d2_session = d2_session) %>%
-      datapackr::api_filter(field = "organisationUnitGroups.id",
-                            operation = "eq",
-                            match = "cNzfcPWEGSH") %>%
-      datapackr::api_fields(fields = "id, name, level, ancestors[id, name]") %>%
-      datapackr::api_get() %>%
-
-  # Remove countries no longer supported
-      dplyr::filter(
-        !name %in%
-          c("Antigua & Barbuda", "Bahamas", "Belize", "China", "Dominica", "Grenada",
-            "Saint Kitts & Nevis", "Saint Lucia", "Saint Vincent & the Grenadines",
-            "Turkmenistan", "Uzbekistan")) %>%
-      dplyr::select(country_name = name, country_uid = id, dplyr::everything()) %>%
-
-  # Add metadata
-      dplyr::mutate(
-        data_pack_name = dplyr::case_when(
-          country_name %in% c("Burma", "Cambodia", "India", "Indonesia",
-                              "Kazakhstan", "Kyrgyzstan", "Laos",
-                              "Nepal", "Papua New Guinea", "Tajikistan",
-                              "Thailand") ~ "Asia Region",
-          country_name %in% c("Barbados", "Guyana", "Jamaica", "Suriname",
-                              "Trinidad & Tobago") ~ "Caribbean Region",
-          country_name %in% c("Brazil", "Costa Rica", "El Salvador",
-                              "Guatemala", "Honduras", "Nicaragua",
-                              "Panama") ~ "Central America Region",
-          country_name %in% c("Burkina Faso", "Ghana", "Liberia", "Mali",
-                              "Senegal", "Sierra Leone", "Togo")
-                              ~ "West Africa Region",
-          TRUE ~ country_name),
-        model_uid = dplyr::case_when(
-          data_pack_name == "Asia Region" ~ "ptVxnBssua6",
-          data_pack_name == "Caribbean Region" ~ "nBo9Y4yZubB",
-          data_pack_name == "Central America Region" ~ "vSu0nPMbq7b",
-          data_pack_name == "West Africa Region" ~ "G0BT4KrJouu",
-          TRUE ~ country_uid
-        ),
-        is_region = data_pack_name %in% c("Asia Region",
-                                          "Caribbean Region",
-                                          "Central America Region",
-                                          "West Africa Region"),
-        level3name = purrr::map_chr(ancestors, list("name", 3), .default = NA),
-        level3name = dplyr::if_else(level == 3, country_name, level3name),
-        uidlevel3 = purrr::map_chr(ancestors, list("id", 3), .default = NA),
-        uidlevel3 = dplyr::if_else(level == 3, country_uid, uidlevel3),
-        level4name = dplyr::case_when(level == 4 ~ country_name),
-        uidlevel4 = dplyr::case_when(level == 4 ~ country_uid),
-        country_in_datim = TRUE
-      )
-
-  if (!is.na(datapack_uid)) {
-    countries %<>%
-      dplyr::filter(model_uid == datapack_uid)
+  if (NROW(ou) != 1) {
+    stop("Datapacks cannot belong to multiple operating units")
   }
 
-  return(countries)
-
+  return(ou)
 }
 
 
@@ -262,7 +175,7 @@ getCountries <- function(datapack_uid = NA) {
 #' will add one new, \code{NULL} column to \code{data} for each element of
 #' \code{cnames} and name it after the corresponding element of \code{cnames}.
 #'
-#' @param data Dataframe to add columns.
+#' @param data The dataframe to add the columns to.
 #' @param cnames Character vector of one or more column names to be added to
 #' \code{data}.
 #' @param type \code{character}, \code{numeric}, \code{logical}
@@ -270,9 +183,12 @@ getCountries <- function(datapack_uid = NA) {
 #' @return Dataframe \code{data} with added columns listed in \code{cnames}.
 #'
 addcols <- function(data, cnames, type = "character") {
-  add <- cnames[!cnames %in% names(data)]
+  add <- cnames[!cnames %in% names(data)] # Subsets column name list BY only
+  # keeping names that are NOT in the supplied dataframes column names already.
 
-  if (length(add) != 0) {
+  if (length(add) != 0) { #If their are columns that need to be filled in THEN
+    #Impute the NA value based upon the type provided in the function.
+    # TODO: #Automate the character type or at least a list variable for type.
     if (type == "character") {
       data[add] <- NA_character_
     } else if (type == "numeric") {
@@ -309,7 +225,7 @@ getDatasetUids <-  function(fiscal_year,
     if ("mer_targets" %in% type) {
       datasets <- c(datasets,
                     "iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
-                    "cihuwjoY5xP", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
+                    "o71WtN5JrUu", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
                     "vzhO50taykm") # Host Country Targets: DREAMS (USG)
     }
     if ("mer_results" %in% type) {
@@ -461,25 +377,28 @@ prioritization_dict <- function() {
 }
 
 #' @export
-#' @title Take Max along row among columns matching regex
-#'
-#' @param df Dataframe
-#' @param cn Name (character string) of Max column to create
-#' @param regex String of regex to use in identifying columns.
+#' @title Extracts the desired columns for analysis via regular expression, then
+#'  takes the maximum value row-wise. Ultimately resulting in a new column
+#'  containing the max values.
+#' @param df The dataframe to be analyzed.
+#' @param cn The column name (character string) of the Max column that is
+#'  created after execution of this function.
+#' @param regex A regular expression used in identifying the columns of
+#'  interest.
 #'
 #' @return df
 #'
 rowMax <- function(df, cn, regex) {
-  df_filtered <- df %>%
+  df_filtered <- df %>% # Filters df based on regex
     dplyr::select(tidyselect::matches(match = regex))
-
+# If the number of columns is 0, return the provided df without new columns.
   if (NCOL(df_filtered) == 0) {
     df[[cn]] <- NA_integer_
     return(df)
   }
-
+# Create the new column in the dataframe, and ensure its column type is numeric.
   df[[cn]] <- df_filtered %>%
-    purrr::pmap(pmax, na.rm = T) %>%
+    purrr::pmap(pmax, na.rm = T) %>% # Row-wise Calculations.
     as.numeric
 
   return(df)
@@ -649,7 +568,7 @@ paste_oxford <- function(..., final = "and", oxford = TRUE) {
 #' @param x Dataframe to paste
 #' @export
 paste_dataframe <- function(x) {
-  paste(capture.output(print(x)), collapse = "\n")
+  paste(utils::capture.output(print(x)), collapse = "\n")
 }
 
 
@@ -657,9 +576,6 @@ paste_dataframe <- function(x) {
 #' @title Parse a value to numeric
 #' @description If x is character, attempts to parse the first occurence of a
 #' sub-string that looks like a number.
-#'
-#' @importFrom stringr str_extract
-#' @importFrom rlang is_character
 #'
 #' @param x Value to test and coerce
 #' @param default Default value to assign to x if not a character string,
@@ -693,6 +609,65 @@ parse_maybe_number <- function(x, default = NULL) {
 }
 
 
+#' Title
+#' @description Determine the number of cores to be used for parallel processing
+#' operations using the environment variable MAX_CORES. If not specified
+#' the total number of cores will be used.
+#' @return An integer number of cores to use in parallel processing
+#'
+getMaxCores <- function() {
+  n_cores <-
+    ifelse(Sys.getenv("MAX_CORES") != "",
+           as.numeric(Sys.getenv("MAX_CORES")),
+           parallel::detectCores())
+
+  stopifnot("MAX_CORES environment variable must be a whole integer" != is.integer(n_cores))
+
+    if (n_cores > parallel::detectCores()) {
+      n_cores <- parallel::detectCores()
+      warning("MAX_CORES cannot be greater than available cores. Using available cores only.")
+    }
+
+  n_cores
+}
+
+#' Title
+#' @note Lifted from https://stackoverflow.com/questions/16800803/
+#' @description Format a vector of numbers into a string of ranges
+#' @param vec A vector of numbers
+#'
+#' @return
+#' @export
+#' @examples
+#' formatSetStrings(c(1,2,3,5,6,7,8))
+#' formatSetStrings(c(8,7,6,5,3,2,1))
+#'
+formatSetStrings <- function(vec) {
+
+  if (!is.vector(vec)) return(NA_character_)
+
+  if (is.list(vec)) {
+    warning("Can only accept simple vectors")
+    return(NA_character_)
+    }
+
+  vec <- vec[!is.na(vec)]
+
+  if (length(vec) == 0) return(NA_character_)
+
+  if (!all(is.numeric(vec))) {
+     warning("Ensure that all values are numeric")
+     return(NA_character_)
+  }
+
+  vec <- sort(vec)
+  groups <- cumsum(c(0, diff(vec) > 1))
+  sets <- split(vec, groups)
+  set_strings <- sapply(sets, function(x) {
+    ifelse(min(x) == max(x), x, paste0(min(x), ":", max(x))) })
+  paste0(set_strings, collapse = ",")
+}
+
 #' @export
 #' @title Is UID-ish
 #' @md
@@ -702,11 +677,35 @@ parse_maybe_number <- function(x, default = NULL) {
 #' @param string Input vector. Either a character vector, or something coercible
 #' to one.
 #'
-#' @importFrom stringr str_detect
-#'
 #' @return A logical vector.
 is_uidish <- function(string) {
   stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")
+}
+
+
+extractWorkbook <- function(d) {
+  #Create a temporary director to extract the XL object
+  temp_dir <- file.path(tempdir(), "datapackR")
+  #Save this in the keychain for later reuse
+  d$keychain$extract_path <- temp_dir
+
+  unlink(temp_dir, recursive = TRUE)
+  dir.create(temp_dir)
+  file.copy(d$keychain$submission_path, temp_dir)
+
+  new_file <- list.files(temp_dir, full.name = TRUE, pattern = basename(d$keychain$submission_path))
+  unzip(new_file, exdir = temp_dir)
+  d$info$has_extract <- TRUE
+  #Return the object
+  d
+}
+
+listWorkbookContents <- function(d) {
+
+  d$info$worbook_contents <- unzip(d$keychain$submission_path, list = TRUE) %>%
+    dplyr::pull(`Name`)
+
+  d
 }
 
 
@@ -748,3 +747,7 @@ rlang::`%|%`
 #' @importFrom magrittr `%>%`
 #' @export
 magrittr::`%>%`
+
+#' @importFrom magrittr `%<>%`
+#' @export
+magrittr::`%<>%`
