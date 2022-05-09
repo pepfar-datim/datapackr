@@ -4,12 +4,14 @@
 \alias{checkMissingMetadata}
 \title{checkMissingMetadata(d)}
 \usage{
-checkMissingMetadata(d, sheet)
+checkMissingMetadata(d, sheet, quiet = T)
 }
 \arguments{
 \item{d}{Datapackr object.}
 
-\item{sheet}{Sheet to check}
+\item{sheet}{Sheet to check.}
+
+\item{quiet}{If true, function runs without displaying messages while processing.}
 }
 \value{
 d

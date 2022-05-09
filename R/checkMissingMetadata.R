@@ -5,11 +5,12 @@
 #' alerts where there are NAs instead of valid metadata.
 #'
 #' @param d Datapackr object.
-#' @param sheet Sheet to check
+#' @param sheet Sheet to check.
+#' @param quiet If true, function runs without displaying messages while processing.
 #'
 #' @return d
 #'
-checkMissingMetadata <- function(d, sheet) {
+checkMissingMetadata <- function(d, sheet, quiet = T) {
 
   if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
 
@@ -17,24 +18,32 @@ checkMissingMetadata <- function(d, sheet) {
   } else {
     data <- d$data$extract
   }
-
+  
+  # BELOW IS THE TRANSITION to LOAD DATAPACK ONCE THAT IS ADDED TO CREATEKEYCHAININFO
+  # if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
+  #   
+  #   data <- d$sheets[["PSNUxIM"]]
+  # } else {
+  #   data <- d$sheets[[sheet]]
+  # }
+  
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
-
+  
   missing_metadata <- data %>%
     dplyr::ungroup() %>%
     dplyr::mutate(row = dplyr::row_number() + header_row,
                   sheet = sheet) %>%
     dplyr::filter_at(dplyr::vars(dplyr::matches("^PSNU$|^ID$|^indicator_code$")),
                      dplyr::any_vars(is.na(.)))
-
+  
   # Alert to missing metadata
   if (NROW(missing_metadata) > 0) {
-
+    
     d$tests$missing_metadata <- dplyr::bind_rows(d$tests$missing_metadata, missing_metadata)
-
+    
     attr(d$tests$missing_metadata, "test_name") <- "Missing metadata"
-
-
+    
+    
     warning_msg <-
       paste0(
         "ERROR! In tab ",
@@ -48,13 +57,13 @@ checkMissingMetadata <- function(d, sheet) {
         " data in that row. The following rows are affected: ",
         paste(missing_metadata$row, collapse = ", "),
         "\n")
-
-
+    
+    
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-
+    
     d$info$has_error <- TRUE
   }
-
+  
   return(d)
-
+  
 }
