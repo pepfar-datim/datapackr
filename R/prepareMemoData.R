@@ -425,7 +425,7 @@ prepareMemoDataByPrio <- function(df,
 #' by_partner: Dataframe of indicators aggregate to the partner level
 #' @inheritParams datapackr_params
 #'
-#' @return
+#' @return Datapackr d object
 #'
 prepareMemoData <- function(d,
                               memo_type,

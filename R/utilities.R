@@ -638,7 +638,7 @@ getMaxCores <- function() {
 #' @description Format a vector of numbers into a string of ranges
 #' @param vec A vector of numbers
 #'
-#' @return
+#' @return Formatted string of ranges
 #' @export
 #' @examples
 #' formatSetStrings(c(1,2,3,5,6,7,8))

@@ -6,7 +6,7 @@
 #' @param analytics_table A table of COP memo indicators at the PSNU level.
 #' @inheritParams datapackr_params
 #'
-#' @return
+#' @return Data frame of joined analytics table and prioritization levels
 #'
 updateExistingPrioritization <- function(prios, analytics_table) {
 

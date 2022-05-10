@@ -21,7 +21,7 @@ should come from the Data Pack or from DATIM. Values can be either
 \code{datapack} or \code{datim}.}
 }
 \value{
-
+Formatted partner-level memo target table
 }
 \description{
 Render Partner-Level Memo Target Tables
