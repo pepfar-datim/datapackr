@@ -81,7 +81,7 @@ createAnalytics <- function(d,
 
       if (d$info$unallocatedIMs | !d$info$has_psnuxim) {
         d$data$analytics %<>%
-              dplyr::mutate(across(
+              dplyr::mutate(dplyr::across(
                 c(mechanism_code, mechanism_desc, partner_desc, funding_agency),
                 ~ dplyr::case_when(
                   is.na(.x) &

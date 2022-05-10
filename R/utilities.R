@@ -663,7 +663,7 @@ formatSetStrings <- function(vec) {
   }
 
   vec <- sort(vec)
-  groups <- cumsum(c(0, diff(vec) > 1))
+  groups <- cumsum(c(0, base::diff(vec) > 1))
   sets <- split(vec, groups)
   set_strings <- sapply(sets, function(x) {
     ifelse(min(x) == max(x), x, paste0(min(x), ":", max(x))) })
@@ -695,8 +695,8 @@ extractWorkbook <- function(d) {
   dir.create(temp_dir)
   file.copy(d$keychain$submission_path, temp_dir)
 
-  new_file <- list.files(temp_dir, full.name = TRUE, pattern = basename(d$keychain$submission_path))
-  unzip(new_file, exdir = temp_dir)
+  new_file <- list.files(temp_dir, full.names = TRUE, pattern = basename(d$keychain$submission_path))
+  utils::unzip(new_file, exdir = temp_dir)
   d$info$has_extract <- TRUE
   #Return the object
   d
@@ -704,7 +704,7 @@ extractWorkbook <- function(d) {
 
 listWorkbookContents <- function(d) {
 
-  d$info$worbook_contents <- unzip(d$keychain$submission_path, list = TRUE) %>%
+  d$info$worbook_contents <- utils::unzip(d$keychain$submission_path, list = TRUE) %>%
     dplyr::pull(`Name`)
 
   d
