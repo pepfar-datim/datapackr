@@ -10,9 +10,10 @@
 #'
 updateExistingPrioritization <- function(prios, analytics_table) {
 
-  prios <- prios %>%  dplyr::select(-value)
+  prios <- prios %>%
+    dplyr::select(-value)
 
-    analytics_table %>%
+  analytics_table %>%
     dplyr::select(-prioritization) %>%
     dplyr::left_join(prios, by = "psnu_uid") %>%
     dplyr::mutate(prioritization = dplyr::case_when(
