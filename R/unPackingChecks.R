@@ -16,6 +16,8 @@
 #' 
 #' `checkToolComments` searches Data Pack for any comments that cause
 #' corruption when executing openxlsx::saveWorkbook.
+#' 
+#' `checkConnections` detects the presence of any external links in a Tool. 
 #'
 #' @name unPackDataChecks
 #' @md
@@ -378,7 +380,7 @@ checkToolComments <- function(d, quiet = TRUE) {
     
     msg <-
       paste0(
-        "ERROR! Your workbook contains at least one case of a new type of comment
+        lvl, "! Your workbook contains at least one case of a new type of comment
         introduced in Office 365 called a 'Threaded Comment'. This type of comment,
         as opposed to the previous type of Notes used in Microsoft Excel, causes
         corruption issues when this app attempts to update your PSNUxIM tab.
@@ -403,6 +405,47 @@ checkToolComments <- function(d, quiet = TRUE) {
   
   return(d)
   
+}
+
+
+#' @export
+#' @rdname unPackDataChecks
+#'
+checkConnections <- function(d, quiet = TRUE) {
+
+  d$info$workbook_contents <- unzip(d$keychain$submission_path, list = TRUE) %>%
+    dplyr::pull(`Name`)
+
+  d$info$has_external_links <-
+    any(grepl("xl/externalLinks/externalLink\\d+\\.xml", d$info$workbook_contents))
+
+  if (d$info$has_external_links) {
+
+    lvl <- "WARNING"
+
+    msg <-
+      paste0(
+        lvl, "! Your workbook contains at least one external link. ",
+        "This usually results from copying and pasting from another workbook. ",
+        "Please find and remove the external links in your DataPack. ",
+        "This error may result in other validation checks failing to run properly ",
+        "and should be fixed immediately.",
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
+
+    if (!quiet) {
+      messages <- appendMessage(messages, msg, lvl)
+    }
+
+  }
+
+  if (!quiet) {
+    printMessages(messages)
+  }
+
+  d
+
 }
 
 

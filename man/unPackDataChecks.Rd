@@ -6,6 +6,7 @@
 \alias{checkColumnStructure}
 \alias{checkToolStructure}
 \alias{checkToolComments}
+\alias{checkConnections}
 \alias{checkValues}
 \alias{checkData}
 \title{Perform various data quality checks on in-process data from Data Packs.}
@@ -17,6 +18,8 @@ checkColumnStructure(d, sheet, quiet = TRUE)
 checkToolStructure(d, quiet = TRUE)
 
 checkToolComments(d, quiet = TRUE)
+
+checkConnections(d, quiet = TRUE)
 
 checkValues(d, quiet = TRUE)
 
@@ -55,4 +58,6 @@ a submitted Data Pack.
 
 \code{checkToolComments} searches Data Pack for any comments that cause
 corruption when executing openxlsx::saveWorkbook.
+
+\code{checkConnections} detects the presence of any external links in a Tool.
 }
