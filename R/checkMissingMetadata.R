@@ -6,12 +6,17 @@
 #'
 #' @param d Datapackr object.
 #' @param sheet Sheet to check.
-#' @param quiet If true, function runs without displaying messages while processing.
+#' @param quiet Logical. Should warning messages be printed? Default is TRUE.
 #'
 #' @return d
 #'
 checkMissingMetadata <- function(d, sheet, quiet = T) {
+  
+  if (!quiet) {
+    messages <- MessageQueue()
+  }
 
+  # Get data ----
   if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
 
     data <- d$data$SNUxIM
@@ -24,9 +29,10 @@ checkMissingMetadata <- function(d, sheet, quiet = T) {
   #   
   #   data <- d$sheets[["PSNUxIM"]]
   # } else {
-  #   data <- d$sheets[[sheet]]
+  #   data <- d$sheets[[as.character(sheet)]]
   # }
   
+  # mung ----
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
   
   missing_metadata <- data %>%
@@ -36,17 +42,13 @@ checkMissingMetadata <- function(d, sheet, quiet = T) {
     dplyr::filter_at(dplyr::vars(dplyr::matches("^PSNU$|^ID$|^indicator_code$")),
                      dplyr::any_vars(is.na(.)))
   
-  # Alert to missing metadata
+  # test ----
   if (NROW(missing_metadata) > 0) {
+    lvl <- "ERROR"
     
-    d$tests$missing_metadata <- dplyr::bind_rows(d$tests$missing_metadata, missing_metadata)
-    
-    attr(d$tests$missing_metadata, "test_name") <- "Missing metadata"
-    
-    
-    warning_msg <-
+    msg <-
       paste0(
-        "ERROR! In tab ",
+        lvl,"! In tab ",
         sheet,
         ", MISSING PSNU, INDICATOR_CODE, OR ID: Review any tabs flagged by this test",
         " to investigate whether PSNU, Age, Sex, or Key Population identifier",
@@ -59,9 +61,19 @@ checkMissingMetadata <- function(d, sheet, quiet = T) {
         "\n")
     
     
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-    
+    d$tests$missing_metadata <- dplyr::bind_rows(d$tests$missing_metadata, missing_metadata)
+    attr(d$tests$missing_metadata, "test_name") <- "Missing metadata"
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
     d$info$has_error <- TRUE
+    
+    if (!quiet) {
+      messages <- appendMessage(messages, msg, lvl)
+    }
+    
+  }
+  
+  if (!quiet) {
+    printMessages(messages)
   }
   
   return(d)
