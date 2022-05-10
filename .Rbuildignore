@@ -18,3 +18,4 @@
 ^\.github$
 ^\.circleci$
 ^data-raw$
+^.*mechs\.rds$
