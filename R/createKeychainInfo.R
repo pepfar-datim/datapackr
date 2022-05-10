@@ -64,7 +64,7 @@ createKeychainInfo <- function(submission_path = NULL,
 
   # Is this even a DataPack tool? ----
   if (!tool_metadata$cop_year[1] %in% c(2018:2030)
-        | !tool_metadata$type[1] %in% c("Data Pack", "OPU Data Pack")) {
+        | !tool_metadata$tool[1] %in% c("Data Pack", "OPU Data Pack")) {
     stop(paste0("Based on a quick scan, the file submitted does not appear to",
                 " be a Data Pack."))
   }

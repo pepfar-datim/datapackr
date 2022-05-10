@@ -10,7 +10,8 @@ loadDataPack(
   country_uids = NULL,
   cop_year = NULL,
   load_wb = FALSE,
-  load_sheets = FALSE
+  load_sheets = FALSE,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 FY22 targets = COP21.}
 
 \item{load_sheets}{Logical. Should all data sheets be loaded too?}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 DataPack object.
