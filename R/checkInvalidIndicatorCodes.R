@@ -2,16 +2,16 @@
 # integrated into the rest of the package or gotten rid of?
 
 #' @export
-#' @title Test for invalid Indicator Codes
+#' @title Check for invalid Indicator Codes
 #'
 #' @description
-#' Tests for invalid Indicator Codes
+#' Check for invalid Indicator Codes
 #'
 #' @param d Datapackr object
 #'
 #' @return d
 #'
-.testInvalidIndicatorCodes <- function(d) {
+checkInvalidIndicatorCodes <- function(d) {
   #Test any invalid indicator codes
 
   indicator_codes_sheet <- d$data$extract %>%

@@ -66,6 +66,7 @@
    * `getValidCOs`
    * `packForPAW`
    * `pull_COPindicators`
+* Renames `.testInvalidIndicatorCodes` to `checkInvalidIndicatorCodes`
 
 ## Minor improvements and fixes
 * Changes default schema parameter from `data_pack_schema` to `pick_schema()` for the following functions:
