@@ -53,7 +53,6 @@ Imports:
     fuzzyjoin (>= 0.1.6),
     R6
 Suggests:
-    datapackcommons (>= 0.2.0),
     devtools (>= 2.0.1),
     httptest,
     testthat,
@@ -66,8 +65,7 @@ Suggests:
     officer
 Remotes:
     pepfar-datim/datimutils,
-    pepfar-datim/datim-validation,
-    pepfar-datim/data-pack-commons
+    pepfar-datim/datim-validation
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true

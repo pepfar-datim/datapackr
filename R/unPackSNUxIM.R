@@ -57,11 +57,7 @@ checkHasPSNUxIM <- function(d) {
 #'
 unPackSNUxIM <- function(d) {
 
-  if (d$info$cop_year %in% c(2020, 2021, 2022)) {
-    sheet <- "PSNUxIM"
-  } else {
-    sheet <- "SNU x IM"
-  }
+  sheet <- "PSNUxIM"
 
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
 

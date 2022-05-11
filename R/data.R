@@ -31,85 +31,6 @@
 "styleGuide"
 
 #' @docType data
-#' @title Schema describing correct structure of Data Pack template.
-#'
-#' @description This schema describes the correct structure of a Data Pack
-#' file, generated from the template used to produce Data Packs and useful in
-#' validating Data Packs passed through datapackr.
-#'
-#' @format
-#' \describe{
-#'   \item{sheet_num}{Lists the index value associated with the sheet name
-#'   listed in \code{sheet_name}.}
-#'   \item{sheet_name}{Lists the sheet/tab name as used in the Data Pack.}
-#'   \item{col}{Value describing the column position of each
-#'   \code{indicator_code}.}
-#'   \item{label}{String label used to describe \code{indicator_code}.}
-#'   \item{indicator_code}{Code used in the Data Pack to uniquely
-#'   identify each distinct programmatic area of target setting.}
-#'   \item{formula}{Excel formula defined for the \code{indicator_code}.}
-#'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
-#'   (\code{target}), historic data (\code{past}), reference figure
-#'   (\code{reference}), row header (\code{row_header}) or not (\code{NA}).}
-#'   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
-#'   in the \code{col_type} field, documents the dataset, either \code{MER},
-#'   \code{IMPATT},DATAPACK, or \code{SUBNAT}.}
-#' }
-"data_pack_schema"
-
-#' @docType data
-#' @title Map of COP20 indicators from Data Pack indicator codes to
-#' DATIM dataelements and categoryoptioncombos
-#'
-#' @description
-#' Dataset that maps COP20 Data Pack indicators to dataelements and
-#' categoryoptioncombos in DATIM, used for mapping datasets
-#' extracted from Data Packs to DATIM, with the necessary import file structure.
-#'
-#' @format
-#' \describe{
-#'   \item{indicator_code}{Code used in the Data Pack to uniquely identify each
-#'   distinct programmatic area of target setting.}
-#'   \item{col_type}{Values can be "target", "result" or NA}
-#'   \item{value_type}{Describes what type of measure the indicator code is
-#'    represented by. Values can be "integer", "percentage", or NA}
-#'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
-#'    element}
-#'   \item{valid_ages.name}{Age disaggregate}
-#'   \item{valid_ages.id}{Age disaggregate UID}
-#'   \item{valid_sexes.name}{Sex disaggregate}
-#'   \item{valid_sexes.id}{Sex disaggregate UID}
-#'   \item{valid_kps.name}{KP disaggregate}
-#'   \item{valid_kps.id}{KP disaggregate UID}
-#'   \item{FY}{Fiscal Year}
-#'   \item{period}{DHIS2 period for example "2021Oct"}
-#'   \item{categoryOptions.ids}{Categoryoption UID}
-#'   \item{dataelementuid}{DATIM UID for dataElements.}
-#'   \item{hts_modality}{HIV Testing service type}
-#'   \item{period_dataset}{Fiscal year dataset results}
-#'   \item{dataelementname}{The name of the data element being described}
-#'   \item{categoryoptioncomboname}{The name of the various combinations of
-#'    categories and options}
-#'   \item{categoryoptioncombouid}{DATIM uid for categoryOptionCombos.}
-#'   \item{targets_results}{Category variable denoting "targets" or "results"}
-#'   \item{dataset}{Category variable denoting where the dateset stems from:
-#'    "impatt","subnat", "mer"}
-#'   \item{resultstatus}{Category variable denoting the status of the results}
-#'   \item{resultststaus_inclusive}{Category variable denoting
-#'    "Positive", "Negative", "Unknown"}
-#'   \item{disagg_type}{Category variable denoting the dissagregate}
-#'   \item{technical_area}{Category variable denoting the tecnical area}
-#'   \item{top_level}{Denotes if the top level is a numerator or denominator}
-#'   \item{support_type}{Category variable denoting "Sub-National", "DSD", "TA",
-#'    or "No Support Type". The crossing of these with \code{indicatorCode}
-#'    roughly corresponds to DATIM dataelements.}
-#'   \item{numerator_denominator}{Category variable denoting numerator or
-#'    denominator}
-#' }
-#'
-"cop20_map_DataPack_DATIM_DEs_COCs"
-
-#' @docType data
 #' @title Map of COP21 indicators from Data Pack indicator codes to
 #' DATIM dataelements and categoryoptioncombos
 #'
@@ -316,46 +237,6 @@
 "cop22_map_adorn_import_file"
 
 #' @docType data
-#' @title Schema describing correct structure of the COP20 Data Pack template.
-#'
-#' @description This schema describes the correct structure of a COP20 Data Pack
-#' file.It is generated from the template used to produce Data Packs, and is
-#' also useful in validating Data Packs passed through datapackr.
-#'
-#' @format
-#' \describe{
-#'   \item{sheet_num}{Lists the index value associated with the sheet name
-#'   listed in \code{sheet_name}.}
-#'   \item{sheet_name}{Lists the sheet/tab name as used in the Data Pack.}
-#'   \item{data_structure}{Binary column describing the structure of the data
-#'    These values consist of "skip" or "normal"}
-#'   \item{col}{Value describing the column position of each
-#'   \code{indicator_code}.}
-#'   \item{indicator_code}{Code used in the Data Pack to uniquely
-#'   identify each distinct programmatic area of target setting.}
-#'   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
-#'   in the \code{col_type} field, documents the dataset, either \code{MER},
-#'   \code{IMPATT},\code{datapack}, or \code{SUBNAT}.}
-#'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
-#'   (\code{target}), historic data (\code{past}), reference figure
-#'   (\code{reference}), row header (\code{row_header}), or not (\code{NA}).}
-#'   \item{value_type}{Category column describing the type of measure for the
-#'    \code{indicator_code}. The values consist of "string", "integer",
-#'     "percentage", or NA}
-#'   \item{dataelement_dsd}{Denotes whether this element has a
-#'    "Direct Service Delivery" support type}
-#'   \item{dataelement_ta}{Denotes whether this element has a
-#'    "Technical Assistance" support type}
-#'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
-#'    element}
-#'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
-#'   \item{valid_sexes}{Compised of Sex disaggregate and the assoicated UID}
-#'   \item{valid_kps}{Compised of KP disaggregate and the assoicated UID}
-#'   \item{formula}{Excel formula defined for \code{indicator_code}.}
-#' }
-"cop20_data_pack_schema"
-
-#' @docType data
 #' @title List of valid PSNUs used for generating Data Packs.
 #'
 #' @description List of valid PSNUs used for generating Data Packs. Must be
@@ -432,47 +313,6 @@
 
 
 #' @docType data
-#' @title Schema describing correct the structure of the COP20 OPU Data Pack
-#'  template.
-#'
-#' @description This schema describes the correct structure of a COP20 OPU
-#' Data Pack file, generated from the template used to produce Data Packs and
-#'  useful in validating Data Packs passed through datapackr.
-#'
-#' @format
-#' \describe{
-#'   \item{sheet_num}{Lists the index value associated with the sheet name
-#'   listed in \code{sheet_name}.}
-#'   \item{sheet_name}{Lists the sheet/tab name as used in the Data Pack.}
-#'   \item{data_structure}{Binary column describing the structure of the data
-#'    These values consist of "skip" or "normal"}
-#'   \item{col}{Value describing the column position of each
-#'   \code{indicator_code}.}
-#'   \item{indicator_code}{Code used in the Data Pack to uniquely
-#'   identify each distinct programmatic area of target setting.}
-#'   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
-#'   in the \code{col_type} field, documents the dataset, either \code{MER},
-#'   \code{IMPATT},\code{datapack}, or \code{SUBNAT}.}
-#'   \item{col_type}{Flags whether an \code{indicator_code} is a Target
-#'   (\code{target}), historic data (\code{past}), reference figure
-#'   (\code{reference}), row header (\code{row_header}) or not (\code{NA}).}
-#'   \item{value_type}{Category column describing the type of measure for the
-#'    \code{indicator_code}. The values consist of "string", "integer",
-#'     "percentage", or NA}
-#'   \item{dataelement_dsd}{Denotes whether this element has a
-#'    "Direct Service Delivery" support type}
-#'   \item{dataelement_ta}{Denotes whether this element has a
-#'    "Technical Assistance" support type}
-#'   \item{categoryoption_specified}{Categoryoption disaggregate of the data
-#'    element}
-#'   \item{valid_ages}{Comprised of Age disaggregate and the associated UID}
-#'   \item{valid_sexes}{Compised of Sex disaggregate and the assoicated UID}
-#'   \item{valid_kps}{Compised of KP disaggregate and the assoicated UID}
-#'   \item{formula}{Excel formula defined for \code{indicator_code}.}
-#' }
-"cop20OPU_data_pack_schema"
-
-#' @docType data
 #' @title Schema describing the correct structure of the COP21 OPU Data Pack
 #'  template.
 #'
@@ -526,21 +366,6 @@
 #'   \item{id}{Category Option Group UID}
 #' }
 "datapack_cogs"
-
-#' @docType data
-#' @title Data Pack Updated Indicator Codes
-#'
-#' @description Data frame showing the relationship between COP20 and COP21
-#' Data Pack indicator codes.
-#'
-#' @format
-#' \describe{
-#'   \item{indicator_code}{Old Data Pack indicator code for COP20.}
-#'   \item{indicator_code_updated}{New Data Pack indicator code for COP21.}
-#'   \item{finalized}{Binary of 0 or 1 indicating if the new indicator code
-#'   has been finalized or may be subject to further revisions.}
-#' }
-"updated_indicator_codes"
 
 #' @docType data
 #' @title Schema describing the correct structure of the COP21 Data Pack template.
@@ -635,13 +460,12 @@
 #'
 #' @format The following COP years are included in this dataset:
 #' \describe{
-#'   \item{2020}{A list object containing the validation rules for COP20/FY21.}
 #'   \item{2021}{A list object containing the validation rules for COP21/FY22.}
 #'   \item{2022}{A list object containing the validation rules for COP22/FY23.}
 #' }
 #'
-#' @section Structure for COP20 and COP21 data sets:
-#' Data sets for 2020 and 2021 conforms to the following structure:
+#' @section Structure for COP21 data set:
+#' The data set for 2021 conforms to the following structure:
 #'
 #' * `description`: A description of the DATIM validation rule, showing the
 #' relationship required between two indicators. Synonymous to

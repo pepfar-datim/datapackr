@@ -10,7 +10,7 @@ packDataPackSheets(
   ou_level = "Prioritization",
   org_units = NULL,
   model_data = NULL,
-  schema = datapackr::data_pack_schema,
+  schema = pick_schema(),
   sheets = NULL,
   cop_year = getCurrentCOPYear()
 )
