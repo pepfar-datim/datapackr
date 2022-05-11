@@ -212,7 +212,7 @@ test_that(" Test retention all zeros expect NULL", {
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TX_CURR.T, ~TX_CURR.T_1, ~TX_NEW.T, ~cop_year,
     "a", 1, "<1", "F", NA, 0, 0, 0, 2021,
-    "b", 2, "<1", "M", NA, 0, 0, 0, 201
+    "b", 2, "<1", "M", NA, 0, 0, 0, 2021
   )
 
   expect_null(analyze_retention(data))
