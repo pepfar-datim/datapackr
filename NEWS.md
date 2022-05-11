@@ -16,6 +16,7 @@
    * `data-raw/COP20OPU_Data_Pack_processing_script.R`
    * `data-raw/COP20OPU_Data_Pack_validation_script.R`
    * `data-raw/cop21_datapack_indicator_code_updates.csv`
+   * `data-raw/GetDataForGlobalFund.R`
    * `data-raw/TEST_COP20_OPU_Data_Pack_Template.xlsx`
    * `data-raw/update_cop20_datapack_template.R`
    * `data-raw/update_cop20OPU_datapack_schema.R`
@@ -71,9 +72,7 @@
    * `packDataPackSheet`
    * `packSheets`
    * `prepareSheetData`
-* Updates package dependencies:
-   * Moves `datapackcommons` from a required to a suggested package
-   * Removes `lazyeval` as a required package as it is not used anywhere in the package
+* Removes `lazyeval` and `datapackcommons` as required packages as neither are used in the package anywhere
 
 
 # datapackr 5.1.7
