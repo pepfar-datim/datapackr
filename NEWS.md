@@ -68,6 +68,9 @@
    * `pull_COPindicators`
 * Renames `.testInvalidIndicatorCodes` to `checkInvalidIndicatorCodes`
 
+## Bug Fixes
+* Fixes a bug in `updateExistingPrioritization` that was preventing tools from being unpacked or memos from being generated in the apps
+
 ## Minor improvements and fixes
 * Changes default schema parameter from `data_pack_schema` to `pick_schema()` for the following functions:
    * `packDataPackSheet`
