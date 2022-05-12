@@ -35,26 +35,34 @@ unPackDataPack <- function(d,
                            d2_session = dynGet("d2_default_session",
                                                inherits = TRUE)) {
 
+  # Load Sheets ----
+  d <- loadSheets(d)
 
   # Check whether there exist any troublesome comments in the file
   interactive_print("Checking comments...")
-  d <- checkComments(d)
+  d <- checkToolComments(d)
 
   # Check whether there exist any troublesome connections in the file
   interactive_print("Checking external links...")
-  d <- checkExternalLinks(d)
+  d <- checkConnections(d)
 
   # Check integrity of Workbook tabs ####
   interactive_print("Checking structure...")
-  d <- checkStructure(d)
+  d <- checkToolStructure(d)
 
   # Unpack the Targets ####
   interactive_print("Unpacking sheets...")
   d <- unPackSheets(d)
-
+  
   # Separate Data Sets ####
   interactive_print("Separating datasets...")
-  d <- separateDataSets(d)
+  datasets <- separateDataSets(data = d$data$targets,
+                               cop_year = d$info$cop_year,
+                               tool = d$info$tool)
+  
+  d$data$MER <- datasets$MER
+  d$data$SUBNAT_IMPATT <- datasets$SUBNAT_IMPATT
+  d$data <- within(d$data, rm("targets"))
 
   # Unpack the SNU x IM sheet ####
   interactive_print("Unpacking the PSNUxIM tab...")
