@@ -46,12 +46,12 @@ processValidationRules <- function(r) {
   return(vr)
 }
 
-cop20 <- processValidationRules("./data-raw/cop20_validation_rules.json")
+
 cop21 <- processValidationRules("./data-raw/cop21_validation_rules.json")
 cop22 <- processValidationRules("./data-raw/cop22_validation_rules.json") %>%
   dplyr::filter(id != "h6ACV56qnvz") # Patch for DP-552
 
 
-cop_validation_rules <- list("2020" = cop20, "2021" = cop21, "2022" = cop22)
+cop_validation_rules <- list("2021" = cop21, "2022" = cop22)
 
 usethis::use_data(cop_validation_rules, overwrite = TRUE)

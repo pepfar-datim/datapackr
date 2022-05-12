@@ -213,7 +213,7 @@ check_PSNUs <- function(PSNUs = NULL, country_uids = NULL) {
 #' @export
 #' @rdname parameter-checks
 check_cop_year <- function(cop_year) {
-  supported_cop_years <- c(2020, 2021, 2022)
+  supported_cop_years <- c(2021, 2022)
 
   # If cop_year is NULL or missing, use default from package
   cop_year <- cop_year %missing% NULL
@@ -294,7 +294,7 @@ check_tool <- function(tool, season, cop_year) {
       switch(
         tool,
         "Data Pack" = 2021:2022,
-        "OPU Data Pack" = 2020:2021
+        "OPU Data Pack" = 2021
       )
 
     if (!cop_year %in% valid_cop_years) {

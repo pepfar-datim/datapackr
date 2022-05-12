@@ -1,19 +1,7 @@
 context("Test GetDatasetUids")
 
 test_that("GetDatasetUids", {
-  testthat::expect_setequal(getDatasetUids(2019), c("BWBS39fydnX",
-                                                    "l796jk9SW7q",
-                                                    "X8sn5HE5inC",
-                                                    "eyI0UOWJnDk",
-                                                    "KWRj80vEfHU",
-                                                    "fi9yMqWLWVy",
-                                                    "zUoy5hk8r0q",
-                                                    "PyD4x9oFwxJ",
-                                                    "EbZrNIkuPtc",
-                                                    "Ncq22MRC6gd",
-                                                    "iJ4d5HdGiqG",
-                                                    "pTuDWXzkAkJ")
-  )
+
   testthat::expect_setequal(getDatasetUids(2020), c("sBv1dj90IX6",
                                                     "nIHNMxuPUOR",
                                                     "C2G7IyPPrvD",
@@ -27,6 +15,7 @@ test_that("GetDatasetUids", {
                                                     "ctKXzmv2CVu",
                                                     "pTuDWXzkAkJ")
   )
+
   testthat::expect_setequal(getDatasetUids(2021), c("s1sxJuqXsvV",
                                                     "Pmc0yYAIi1t",
                                                     "zL8TlPVzEBZ",

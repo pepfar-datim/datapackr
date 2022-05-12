@@ -4,13 +4,13 @@
 \alias{prepareMemoDataByPartner}
 \title{Prepare Memo Data By Partner}
 \usage{
-prepareMemoDataByPartner(df, memoStructure, indicators)
+prepareMemoDataByPartner(df, memo_structure, indicators)
 }
 \arguments{
 \item{df}{An analytics table, either d$memo$datim$analytics
 or d$memo$datapack$analytics}
 
-\item{memoStructure}{Structure of the memo d$memo$structure}
+\item{memo_structure}{Structure of the memo d$memo$structure}
 
 \item{indicators}{A dataframe of indicators d$memo$inds}
 }

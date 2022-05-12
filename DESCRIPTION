@@ -1,7 +1,7 @@
 Package: datapackr
 Type: Package
 Title: A Package that Packs and Unpacks all Data Packs
-Version: 5.1.13
+Version: 5.2.0
 Date: 2022-04-21
 Authors@R: c(
     person("Scott", "Jackson", email = "sjackson@baosystems.com",
@@ -39,14 +39,12 @@ Imports:
     magrittr (>= 1.5),
     crayon (>= 1.3.4),
     openxlsx,
-    lazyeval,
     methods,
     stats,
     lubridate (>= 1.7.4),
     data.table (>= 1.12.8),
     datimutils,
     datimvalidation,
-    datapackcommons (>= 0.2.0),
     tidyselect (>= 0.2.5),
     glue (>= 1.3.1),
     rlang (>= 0.4.2),
@@ -67,8 +65,7 @@ Suggests:
     officer
 Remotes:
     pepfar-datim/datimutils,
-    pepfar-datim/datim-validation,
-    pepfar-datim/data-pack-commons
+    pepfar-datim/datim-validation
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true

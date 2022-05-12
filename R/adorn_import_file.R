@@ -1,3 +1,4 @@
+#' @export
 #' @title imputePrioritizations
 #'
 #' @description Utility function to handle situations where DREAMS PSNUs
@@ -180,26 +181,7 @@ adorn_import_file <- function(psnu_import_file,
   map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year) # Found in utilities.R
 
   # TODO: Is this munging still required with the map being a function of fiscal year?
-  if (cop_year == 2020) {# If cop year equal 2020 modify entries in
-    # valid_sexes.name as follows
-    map_des_cocs$valid_sexes.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
-                                    map_des_cocs$valid_kps.name == "Male PWID"] <- "Male"
-    map_des_cocs$valid_sexes.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
-                                    map_des_cocs$valid_kps.name == "Female PWID"] <- "Female"
-    map_des_cocs$valid_kps.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
-                                  map_des_cocs$valid_kps.name == "Male PWID"] <- NA_character_
-    map_des_cocs$valid_kps.name[map_des_cocs$indicator_code == "KP_MAT.N.Sex.T" &
-                                  map_des_cocs$valid_kps.name == "Female PWID"] <- NA_character_
-    # TODO: Fix inconsistent naming of dataelement/dataelementuid
-    map_des_cocs %<>%
-      # rename the columns in map_des_cocs
-      dplyr::rename(dataelementuid = dataelement,
-                    dataelementname = dataelement.y,
-                    categoryoptioncomboname = categoryoptioncombo) %>%
-      # Modify period based upon FY column
-      dplyr::mutate(FY = 2021,
-                    period = paste0(cop_year, "Oct"))
-  } else if (cop_year == 2022) {
+  if (cop_year == 2022) {
     map_des_cocs <- datapackr::cop22_map_adorn_import_file
   }
 

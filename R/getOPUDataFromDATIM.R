@@ -16,11 +16,6 @@ getOPUDataFromDATIM <- function(cop_year,
   stopifnot("ERROR! Must provide country_uids." = !is.null(country_uids))
 
   map_des_cocs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
-  if (cop_year == 2020) {
-    map_des_cocs_local <- dplyr::mutate(map_des_cocs_local,
-                                                       dataelementuid = dataelement,
-                                                       period = "2020Oct")
-  }
 
   options("scipen" = 999)
   options(warning.length = 8170)
@@ -56,29 +51,13 @@ getOPUDataFromDATIM <- function(cop_year,
     dplyr::filter(indicator_code %in% indicator_codes)
 
   # COP21+: Output as DHIS2 import file ####
-  if (cop_year %in% c(2019, 2020)) {
-    data_datim %<>%
-      dplyr::select(indicator_code,
-                    support_type,
-                    period,
-                    psnu_uid = orgUnit,
-                    age_option_uid = valid_ages.id,
-                    Age = valid_ages.name,
-                    sex_option_uid = valid_sexes.id,
-                    Sex = valid_sexes.name,
-                    kp_option_uid = valid_kps.id,
-                    KeyPop = valid_kps.name,
-                    attribute_option = attributeOptionCombo,
-                    value)
-  } else {
-    data_datim %<>%
-      dplyr::select(dataElement,
-                    period,
-                    orgUnit,
-                    categoryOptionCombo,
-                    attributeOptionCombo,
-                    value)
-  }
+  data_datim %<>%
+    dplyr::select(dataElement,
+                  period,
+                  orgUnit,
+                  categoryOptionCombo,
+                  attributeOptionCombo,
+                  value)
 
   return(data_datim)
 

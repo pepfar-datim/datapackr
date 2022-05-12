@@ -220,7 +220,7 @@ compareData_OpuDatapackVsDatim <-
       !any(datapackr::is_uidish(d$datim$OPU$attributeOptionCombo))
     )
 
-    if (!(d$info$cop_year %in% c(2020, 2021))) {
+    if (!(d$info$cop_year %in% c(2021))) {
       stop("Attempting to use compareData_OpuDatapackVsDatim for unsupported COP year")
     }
     datapack_data <- d$datim$OPU

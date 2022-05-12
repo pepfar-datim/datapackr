@@ -20,34 +20,6 @@ with_mock_api({
   })
 })
 
-with_mock_api({
-  test_that("We can fetch a COP21 indicator list from DATIM", {
-    #Hard code the year, as this test may break around Ocotber
-    test_dataset <-  pull_COPindicators(cop_year = 2021,
-                                     d2_session = training)
-    expect_type(test_dataset, "list")
-    expect_identical(class(test_dataset), "data.frame")
-    expect_true(NROW(test_dataset) > 0)
-    test_dataset_names <-  c("name", "id", "denominatorDescription",
-    "numeratorDescription", "numerator", "denominator",
-                           "code", "indicatorType.name", "indicatorType.id")
-    expect_true(setequal(test_dataset_names, names(test_dataset)))
-
-  })
-})
-
-with_mock_api({
-  test_that("We can fetch a map of technical areas from DATIM", {
-    test_dataset <-  getTechArea(d2_session = training)
-    expect_type(test_dataset, "list")
-    expect_equal(length(test_dataset), 2)
-    expect_setequal(names(test_dataset), c("dataElement", "tech_area"))
-    expect_true(length(test_dataset$dataElement) > 0)
-    expect_true(length(test_dataset$tech_area) > 0)
-    expect_true(length(test_dataset$dataElement) == length(test_dataset$tech_area))
-
-  })
-})
 
 with_mock_api({
   test_that("We can fetch a map of HTS modalities from DATIM", {
@@ -62,32 +34,6 @@ with_mock_api({
   })
 })
 
-
-with_mock_api({
-  test_that("We can get dataset assignment levels from DATIM", {
-
-    test_dataset <-  getIMPATTLevels(d2_session = training)
-    expect_type(test_dataset, "list")
-    expect_true("data.frame" %in% class(test_dataset))
-    expect_true(NROW(test_dataset) > 0)
-    expect_setequal(names(test_dataset), c("operating_unit", "country_name", "country_uid",
-    "iso3", "iso4", "country", "facility", "community", "prioritization"))
-
-  })
-})
-
-with_mock_api({
-  test_that("We can get valid category options from DATIM", {
-
-    test_dataset <-  getValidCOs(d2_session = training)
-    expect_type(test_dataset, "list")
-    expect_true("data.frame" %in% class(test_dataset))
-    expect_true(NROW(test_dataset) > 0)
-    expect_setequal(names(test_dataset), c("data_element.name", "data_element.id", "category_combo.name",
-    "category_combo.id", "grp", "category_option.name", "category_option.id"))
-
-  })
-})
 
 with_mock_api({
   test_that("We can get a list of PSNUs from DATIM", {

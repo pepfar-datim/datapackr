@@ -10,7 +10,7 @@ getMapDataPack_DATIM_DEs_COCs(cop_year)
 \item{cop_year}{cop year to pull get map for}
 }
 \value{
-{cop20, cop21}_map_DataPack_DATIM_DEs_COCs
+{cop21, cop22}_map_DataPack_DATIM_DEs_COCs
 }
 \description{
 get_Map_DataPack_DATIM_DEs_COCs

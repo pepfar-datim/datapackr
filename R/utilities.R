@@ -39,51 +39,6 @@ round_trunc <- function(x, digits = 0) {
 
 
 #' @export
-#' @title Pull IMPATT levels from DATIM for all PEPFAR countries
-#'
-#' @description
-#' Queries DATIM to retrieve the latest version of
-#' \code{/api/dataStore/dataSetAssignments/ous}
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
-#' @return Dataframe of country metadata, including prioritization, planning,
-#' country, community, and facility levels in DATIM organization hierarchy.
-#'
-getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
-                                                inherits = TRUE)) {
-  impatt_levels <-
-    paste0(d2_session$base_url, "api/", datapackr::api_version(),
-           "/dataStore/dataSetAssignments/orgUnitLevels") %>%
-    httr::GET(httr::timeout(180), handle = d2_session$handle) %>%
-    httr::content(., "text") %>%
-    jsonlite::fromJSON(., flatten = TRUE) %>%
-    do.call(rbind.data.frame, .) %>%
-    dplyr::rename(operating_unit = name3, country_name = name4) %>%
-    dplyr::mutate_if(is.factor, as.character) %>%
-    dplyr::mutate(country_name =
-                    dplyr::case_when(country == 3 ~ operating_unit,
-                                     country == 4 ~ country_name))
-
-  # Add country_uids ####
-  countries <-
-    datapackr::api_call("organisationUnits", d2_session = d2_session) %>%
-    datapackr::api_filter(field = "organisationUnitGroups.id",
-                          operation = "eq",
-                          match = "cNzfcPWEGSH") %>%
-    datapackr::api_fields(fields = "id,name,level,ancestors[id,name]") %>% # nolint
-    datapackr::api_get(d2_session = d2_session)
-
-  impatt_levels %<>%
-    dplyr::left_join(countries, by = c("country_name" = "name")) %>%
-    dplyr::rename(country_uid = id) %>%
-    dplyr::select(operating_unit, country_name, country_uid,
-                  dplyr::everything(), -ancestors, -level)
-
-  return(impatt_levels)
-
-}
-
-
-#' @export
 #' @title Swap columns between two dataframes
 #'
 #' @description
@@ -164,86 +119,6 @@ interactive_warning <- function(x) {
   if (rlang::is_interactive()) {
     warning(x, call. = FALSE)
   }
-}
-
-#' @export
-#' @title Pull list of Countries from DATIM.
-#'
-#' @description
-#' Queries DATIM to extract list of Countries for specified Data Pack UID and
-#' adds additional Countries not currently in DATIM as needed.
-#'
-#' @param datapack_uid A unique ID specifying the PEPFAR Operating Unit or
-#' specific Data Pack country grouping. If left unspecified, will pull all
-#' Country Names.
-#' @inheritParams datapackr_params
-#'
-#' @return Data frame of Countries
-#'
-getCountries <- function(datapack_uid = NA,
-                         d2_session = dynGet("d2_default_session",
-                                             inherits = TRUE)) {
-
-  # Pull Country List
-    countries <-
-      datapackr::api_call("organisationUnits", d2_session = d2_session) %>%
-      datapackr::api_filter(field = "organisationUnitGroups.id",
-                            operation = "eq",
-                            match = "cNzfcPWEGSH") %>%
-      datapackr::api_fields(fields = "id, name, level, ancestors[id, name]") %>%
-      datapackr::api_get() %>%
-
-  # Remove countries no longer supported
-      dplyr::filter(
-        !name %in%
-          c("Antigua & Barbuda", "Bahamas", "Belize", "China", "Dominica", "Grenada",
-            "Saint Kitts & Nevis", "Saint Lucia", "Saint Vincent & the Grenadines",
-            "Turkmenistan", "Uzbekistan")) %>%
-      dplyr::select(country_name = name, country_uid = id, dplyr::everything()) %>%
-
-  # Add metadata
-      dplyr::mutate(
-        data_pack_name = dplyr::case_when(
-          country_name %in% c("Burma", "Cambodia", "India", "Indonesia",
-                              "Kazakhstan", "Kyrgyzstan", "Laos",
-                              "Nepal", "Papua New Guinea", "Tajikistan",
-                              "Thailand") ~ "Asia Region",
-          country_name %in% c("Barbados", "Guyana", "Jamaica", "Suriname",
-                              "Trinidad & Tobago") ~ "Caribbean Region",
-          country_name %in% c("Brazil", "Costa Rica", "El Salvador",
-                              "Guatemala", "Honduras", "Nicaragua",
-                              "Panama") ~ "Central America Region",
-          country_name %in% c("Burkina Faso", "Ghana", "Liberia", "Mali",
-                              "Senegal", "Sierra Leone", "Togo")
-                              ~ "West Africa Region",
-          TRUE ~ country_name),
-        model_uid = dplyr::case_when(
-          data_pack_name == "Asia Region" ~ "ptVxnBssua6",
-          data_pack_name == "Caribbean Region" ~ "nBo9Y4yZubB",
-          data_pack_name == "Central America Region" ~ "vSu0nPMbq7b",
-          data_pack_name == "West Africa Region" ~ "G0BT4KrJouu",
-          TRUE ~ country_uid
-        ),
-        is_region = data_pack_name %in% c("Asia Region",
-                                          "Caribbean Region",
-                                          "Central America Region",
-                                          "West Africa Region"),
-        level3name = purrr::map_chr(ancestors, list("name", 3), .default = NA),
-        level3name = dplyr::if_else(level == 3, country_name, level3name),
-        uidlevel3 = purrr::map_chr(ancestors, list("id", 3), .default = NA),
-        uidlevel3 = dplyr::if_else(level == 3, country_uid, uidlevel3),
-        level4name = dplyr::case_when(level == 4 ~ country_name),
-        uidlevel4 = dplyr::case_when(level == 4 ~ country_uid),
-        country_in_datim = TRUE
-      )
-
-  if (!is.na(datapack_uid)) {
-    countries %<>%
-      dplyr::filter(model_uid == datapack_uid)
-  }
-
-  return(countries)
-
 }
 
 
@@ -407,15 +282,15 @@ getDatasetUids <-  function(fiscal_year,
     if ("subnat_targets" %in% type) {
       datasets <- c(datasets,
                     "j7jzezIhgPj") #Host Country Targets: COP Prioritization SNU (USG) FY2021
-      }
+    }
     if ("subnat_results" %in% type) {
       datasets <- c(datasets,
                     "xiTCzZJ2GPP") #Host Country Results: COP Prioritization SNU (USG) FY2021Q4
-      }
+    }
     if ("impatt" %in% type) {
       datasets <- c(datasets,
                     "jxnjnBAb1VD") # Planning Attributes: COP Prioritization SNU FY2021
-      }
+    }
   } else if (fiscal_year == "2020") {
     if ("mer_targets" %in% type) {
       datasets <- c(datasets,
@@ -443,34 +318,6 @@ getDatasetUids <-  function(fiscal_year,
     if ("impatt" %in% type) {
       datasets <- c(datasets,
                     "pTuDWXzkAkJ") # Planning Attributes: COP Prioritization SNU FY2020
-    }
-  } else if (fiscal_year == "2019") {
-    if ("mer_targets" %in% type) {
-      datasets <- c(datasets,
-                    "BWBS39fydnX", # MER Targets: Community Based - DoD ONLY FY2019
-                    "l796jk9SW7q", # MER Targets: Community Based FY2019
-                    "X8sn5HE5inC", # MER Targets: Facility Based - DoD ONLY FY2019
-                    "eyI0UOWJnDk") # MER Targets: Facility Based FY2019)
-    }
-    if ("mer_results" %in% type) {
-      datasets <- c(datasets,
-                    "KWRj80vEfHU", # MER Results: Facility Based FY2019Q4
-                    "fi9yMqWLWVy", # MER Results: Facility Based - DoD ONLY FY2019Q4
-                    "zUoy5hk8r0q", # MER Results: Community Based FY2019Q4
-                    "PyD4x9oFwxJ", # MER Results: Community Based - DoD ONLY FY2019Q4
-                    "EbZrNIkuPtc") # Host Country Results: DREAMS (USG) FY2019Q4
-    }
-    if ("subnat_targets" %in% type) {
-      datasets <- c(datasets,
-                    "Ncq22MRC6gd") # Host Country Targets: COP Prioritization SNU (USG) FY2019
-    }
-    if ("subnat_results" %in% type) {
-      # Host Country Results: COP Prioritization SNU (USG) FY2019Q4
-      datasets <- c(datasets, "iJ4d5HdGiqG")
-    }
-    if ("impatt" %in% type) {
-      # Planning Attributes: COP Prioritization SNU FY2020 - last used FY2020 also valid for FY2019
-      datasets <- c(datasets, "pTuDWXzkAkJ")
     }
   } else {
     stop(paste("FY", fiscal_year, "input not supported by getDatasetUids"))
@@ -534,13 +381,11 @@ rowMax <- function(df, cn, regex) {
 #'
 #' @param cop_year cop year to pull get map for
 #'
-#' @return {cop20, cop21}_map_DataPack_DATIM_DEs_COCs
+#' @return {cop21, cop22}_map_DataPack_DATIM_DEs_COCs
 #'
 getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
-  if (cop_year == 2020) {
-      return(datapackr::cop20_map_DataPack_DATIM_DEs_COCs)
-  } else if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
-                                           datapackr::map_DataPack_DATIM_DEs_COCs)) {
+  if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
+                                    datapackr::map_DataPack_DATIM_DEs_COCs)) {
     return(datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
   } else if (cop_year == 2022) {
     return(datapackr::cop22_map_DataPack_DATIM_DEs_COCs)
