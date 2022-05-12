@@ -14,7 +14,7 @@ updateExistingPrioritization <- function(prios, analytics_table) {
 
     analytics_table %>%
     dplyr::select(-prioritization) %>%
-    dplyr::left_join(prios, by = "psnu_uid") %>%
+    dplyr::left_join(prios, by = c("psnu_uid" = "orgUnit")) %>%
     dplyr::mutate(prioritization = dplyr::case_when(
       is.na(prioritization) ~ "No Prioritization",
       TRUE ~ prioritization))
