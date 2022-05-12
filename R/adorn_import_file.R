@@ -1,3 +1,4 @@
+#' @export
 #' @title imputePrioritizations
 #'
 #' @description Utility function to handle situations where DREAMS PSNUs
