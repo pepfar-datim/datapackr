@@ -18,6 +18,8 @@
 #' corruption when executing openxlsx::saveWorkbook.
 #' 
 #' `checkConnections` detects the presence of any external links in a Tool. 
+#' 
+#' `checkNumeric` alerts to non-numeric values instead of valid data.
 #'
 #' @name unPackDataChecks
 #' @md
@@ -452,7 +454,7 @@ checkConnections <- function(d, quiet = TRUE) {
 #' @export
 #' @rdname unPackDataChecks
 #'
-checkValues <- function(d, quiet = TRUE) {
+checkNumeric <- function(d, sheet, quiet = TRUE) {
   
   if (!quiet) {
     messages <- MessageQueue()
@@ -493,7 +495,7 @@ checkValues <- function(d, quiet = TRUE) {
     dplyr::filter(col_type == "row_header") %>%
     dplyr::pull(indicator_code)
   
-  data %<>%
+  non_numeric <- data %>%
     dplyr::select(tidyselect::any_of(keep_cols$indicator_code)) %>%
     tidyr::pivot_longer(cols = !tidyselect::all_of(header_cols),
                         names_to = "indicator_code",
@@ -546,10 +548,10 @@ checkValues <- function(d, quiet = TRUE) {
 
 #' @export
 #' @rdname unPackDataChecks
-checkData <- function(d,
-                      sheet,
-                      quiet = TRUE,
-                      ...) {
+checkSheetData <- function(d,
+                           sheets = NULL,
+                           quiet = TRUE,
+                           ...) {
   
   dots <- list(...)
   
@@ -557,11 +559,9 @@ checkData <- function(d,
   params <- check_params(cop_year = d$info$cop_year,
                          tool = d$info$tool,
                          schema = d$info$schema,
-                         sheets = sheet,
+                         sheets = sheets,
                          all_sheets = dots$all_sheets,
                          psnuxim = dots$psnuxim)
-  
-  names(params) <- stringr::str_replace(names(params), "sheets", "sheet")
   
   for (p in names(params)) {
     assign(p, purrr::pluck(params, p))
@@ -569,21 +569,205 @@ checkData <- function(d,
   
   rm(params, p)
   
-  if (!sheet %in% schema$sheet_name) {
-    stop("In checkData, sheet not valid!")
-  }
-  
-  
   # TODO: Apply method used in checkAnalytics line 631
   
-  # Col Structure ----
-  d <- checkColumnStructure(d, sheet)
-  
-  # Duplicate Rows ----
-  d <- checkDupeRows(d, sheet)
-  
-  # Values ----
-  d <- checkValues(d, sheet)
+  for (sheet in sheets) {
+    # Col Structure ----
+    d <- checkColumnStructure(d, sheet)
+    
+    # Duplicate Rows ----
+    d <- checkDupeRows(d, sheet)
+    
+    # Numeric Values ----
+    d <- checkNumeric(d, sheet)  
+    
+    # Metadata ----
+    #d <- checkMetadata(d, sheet)
+    
+    # TEST AGYW Tab for missing DSNUs ####
+    # if (sheet == "AGYW") {
+    #   DataPack_DSNUs <- d$data$extract %>%
+    #     dplyr::select(PSNU, psnu_uid = psnuid) %>%
+    #     dplyr::distinct() %>%
+    #     dplyr::mutate(DataPack = 1)
+    #   
+    #   DATIM_DSNUs <- datapackr::valid_PSNUs %>%
+    #     dplyr::filter(country_uid %in% d$info$country_uids) %>%
+    #     add_dp_psnu(.) %>%
+    #     dplyr::arrange(dp_psnu) %>%
+    #     dplyr::filter(!is.na(DREAMS)) %>%
+    #     dplyr::select(PSNU = dp_psnu, psnu_uid, snu1) %>%
+    #     dplyr::mutate(DATIM = 1)
+    #   
+    #   DSNU_comparison <- DataPack_DSNUs %>%
+    #     dplyr::full_join(DATIM_DSNUs, by = "psnu_uid")
+    #   
+    #   d$tests$DSNU_comparison <- DSNU_comparison
+    #   attr(d$tests$DSNU_comparison, "test_name") <- "DSNU List Comparison"
+    #   
+    #   if (any(is.na(DSNU_comparison$DataPack))) {
+    #     missing_DSNUs <- DSNU_comparison %>%
+    #       dplyr::filter(is.na(DataPack))
+    #     
+    #     warning_msg <- paste0(
+    #       "WARNING! In tab ",
+    #       sheet,
+    #       ": MISSING DREAMS SNUs found! ->  \n\t* ",
+    #       paste(missing_DSNUs$PSNU.y, collapse = "\n\t* "),
+    #       "\n")
+    #     
+    #     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    #     d$info$missing_DSNUs <- TRUE
+    #   }
+    #   
+    #   if (any(is.na(DSNU_comparison$DATIM))) {
+    #     invalid_DSNUs <- DSNU_comparison %>%
+    #       dplyr::filter(is.na(DATIM))
+    #     
+    #     warning_msg <- paste0(
+    #       "WARNING! In tab ",
+    #       sheet,
+    #       ": INVALID DREAMS SNUs found! ->  \n\t* ",
+    #       paste(invalid_DSNUs$PSNU.x, collapse = "\n\t* "),
+    #       "\n")
+    #     
+    #     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    #   }
+    #   
+    # }
+    
+    # Formulas ----
+    # d <- checkFormulas(d, sheet)
+    
+    # TEST that all Prioritizations completed ####
+    # if (sheet == "Prioritization") {
+    #   
+    #   # Remove _Military district from Prioritization extract as this can't be assigned a prioritization ####
+    #   d$data$extract %<>%
+    #     dplyr::filter(!stringr::str_detect(PSNU, "^_Military"),
+    #                   # Excuse valid NA Prioritizations
+    #                   value != "NA"
+    #     )
+    #   
+    #   blank_prioritizations <- d$data$extract %>%
+    #     dplyr::filter(is.na(value)) %>%
+    #     dplyr::select(PSNU)
+    #   
+    #   if (NROW(blank_prioritizations) > 0) {
+    #     
+    #     d$tests$blank_prioritizations <- blank_prioritizations
+    #     attr(d$tests$blank_prioritizations, "test_name") <- "Blank prioritization levels"
+    #     
+    #     warning_msg <-
+    #       paste0(
+    #         "ERROR! In tab ",
+    #         sheet,
+    #         ": MISSING PRIORITIZATIONS. Ensure a prioritization value is entered in each",
+    #         " row of the column labeled 'SNU Prioritization' on the Prioritization tab.",
+    #         " Refer to guidance on that tab and in the Data Pack User Guide to see",
+    #         " appropriate entry options. You must enter a prioritization value for",
+    #         " the following PSNUs -> \n\t* ",
+    #         paste(blank_prioritizations$PSNU, collapse = "\n\t* "),
+    #         "\n")
+    #     
+    #     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    #     d$info$has_error <- TRUE
+    #     
+    #   }
+    #   
+    #   # Test for valid priortization values
+    #   invalid_prioritizations <- d$data$extract %>%
+    #     dplyr::filter(!(value %in% c("1", "2", "4", "5", "6", "7", "8")))
+    #   
+    #   
+    #   if (NROW(invalid_prioritizations) > 0) {
+    #     d$tests$invalid_prioritizations <- invalid_prioritizations
+    #     attr(d$tests$invalid_prioritizations, "test_name") <- "Invalid prioritizations"
+    #     
+    #     invalid_prio_strings <- invalid_prioritizations %>%
+    #       tidyr::unite(row_id, c(PSNU, value), sep = ":  ") %>%
+    #       dplyr::arrange(row_id) %>%
+    #       dplyr::pull(row_id)
+    #     
+    #     warning_msg <-
+    #       paste0(
+    #         "ERROR! In tab ",
+    #         sheet,
+    #         ": INVALID PRIORITIZATIONS. The following Prioritizations are not valid for",
+    #         " the listed PSNUs. Review the guidance on the Prioritization tab and in the",
+    #         " Data Pack User Guide to understand valid prioritization options. Refer to those",
+    #         " PSNUs flagged by this check and correct their validation values in the 'SNU Prioritization'",
+    #         " column on the Prioritization tab. -> \n\t* ",
+    #         paste(invalid_prio_strings, collapse = "\n\t* "),
+    #         "\n")
+    #     
+    #     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    #     d$info$has_error <- TRUE
+    #   }
+    #   
+    # }
+    
+    # TEST: No invalid org units ####
+    # d <- checkInvalidOrgUnits(d, sheet)
+    
+    # TEST for Negative values ####
+    # negative_values <- d$data$extract %>%
+    #   dplyr::filter(value < 0)
+    # 
+    # d$tests$negative_values <- dplyr::bind_rows(d$test$negative_values, negative_values)
+    # attr(d$tests$negative_values, "test_name") <- "Negative values"
+    # 
+    # if (NROW(negative_values) > 0) {
+    #   
+    #   warning_msg <-
+    #     paste0(
+    #       "ERROR! In tab ",
+    #       sheet,
+    #       ": NEGATIVE VALUES found in the following columns! Ensure all values entered",
+    #       " against Targets are whole, positive, numeric values. These will be removed. -> \n\t* ",
+    #       paste(unique(d$tests$negative_values$indicator_code), collapse = "\n\t* "),
+    #       "\n")
+    #   
+    #   d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    #   d$info$has_error <- TRUE
+    # }
+    
+    # TEST for Decimal values ####
+    # decimals_allowed <- d$info$schema %>%
+    #   dplyr::filter(sheet_name == sheet
+    #                 & col_type == "target"
+    #                 # Filter by what's in submission to avoid unknown column warning messages
+    #                 & indicator_code %in% unique(d$data$extract$indicator_code)
+    #                 & value_type == "percentage") %>%
+    #   dplyr::pull(indicator_code)
+    # 
+    # decimal_cols <- d$data$extract %>%
+    #   dplyr::filter(value %% 1 != 0
+    #                 & !indicator_code %in% decimals_allowed) %>%
+    #   dplyr::rename(sheet = sheet_name)
+    # 
+    # d$tests$decimal_values <- dplyr::bind_rows(d$tests$decimal_cols, decimal_cols)
+    # attr(d$tests$decimal_values, "test_name") <- "Decimal values"
+    # 
+    # if (NROW(decimal_cols) > 0) {
+    #   
+    #   warning_msg <-
+    #     paste0(
+    #       "WARNING! In tab ",
+    #       sheet,
+    #       ": DECIMAL VALUES found in the following columns! Ensure all values entered",
+    #       " against Targets are whole, positive, numeric values. (The only exception",
+    #       " to this rule may be HIV_PREV.) These will be rounded. -> \n\t* ",
+    #       paste(unique(decimal_cols$indicator_code), collapse = "\n\t* "),
+    #       "\n")
+    #   
+    #   d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    # }
+    
+    # TEST for defunct disaggs ####
+    # d <- defunctDisaggs(d, sheet)
+    
+  }
   
   return(d)
   
