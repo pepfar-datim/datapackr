@@ -5,38 +5,45 @@
 #' Loops through all critical sheets in a submitted Data Pack
 #' and extracts data, then compiles into single flat dataframe.
 #'
-#' @param d Datapackr object
+#' @inheritParams datapackr_params
+#' 
 #'
 #' @return d
 #'
-unPackSheets <- function(d) {
+unPackSheets <- function(d, sheets = NULL) {
 
-  # Get sheets list
-  sheets <- d$info$schema %>%
-    dplyr::filter(
-      !sheet_name %in% c(skip_tabs(tool = d$info$tool, cop_year = d$info$cop_year),
-                         "SNU x IM", "PSNUxIM")) %>%
-    dplyr::pull(sheet_name) %>%
-    unique()
+  if (d$info$tool != "Data Pack") {
+    stop("Cannot process that kind of tool. :(")
+  }
+  
+  sheets <- sheets %||% grep("PSNUxIM", names(d$sheets), value = TRUE, invert = TRUE)
+  
+  sheets <- checkSheets(sheets = sheets,
+                        cop_year = d$info$cop_year,
+                        tool = d$info$tool,
+                        all_sheets = FALSE,
+                        psnuxim = FALSE)
+  
+  # Implementing this here instead of in unPackDataPack or unPackTool because 
+  # while you may want to checkSheetData without running unPackSheets, you should
+  # should never unPackSheets without running checkSheetData
+  interactive_print("Checking sheet data...")
+  d <- checkSheetData(d, sheets = sheets)
 
-  actual_sheets <- readxl::excel_sheets(d$keychain$submission_path)
-  sheets_to_read <- sheets[sheets %in% actual_sheets]
+  # Unpack Sheet Data ----
+  targets <- NULL
 
-  d$data$targets <- NULL
-
-  for (sheet in sheets_to_read) {
+  for (sheet in sheets) {
     interactive_print(sheet)
+    
+    extract <- unPackDataPackSheet(d, sheet = sheet)
 
-    if (d$info$tool == "Data Pack") {
-      d <- unPackDataPackSheet(d, sheet = sheet)
-    } else {
-      stop("Cannot process that kind of tool. :(")
-    }
-
-    if (!is.null(d$data$extract)) {
-      d$data$targets <- dplyr::bind_rows(d$data$targets, d$data$extract)
+    if (!is.null(extract)) {
+      targets <- dplyr::bind_rows(targets, extract)
     }
   }
+  
+  d$data$targets <- targets
 
   return(d)
 }
