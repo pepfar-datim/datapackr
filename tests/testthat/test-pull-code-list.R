@@ -1,7 +1,7 @@
 #TODO: Remove all of the mocks related to these tests.
 #The functions themselves were removed as part of the COP20 deprecation.
 # context("pull-code-lists")
-# 
+#
 # with_mock_api({
 #   test_that("We can fetch a code list from DATIM", {
 #     test_dataset <-  pullDATIMCodeList("YfZot37BbTm",
@@ -16,30 +16,30 @@
 #                    "categoryoptioncombo",
 #                    "categoryoptioncombocode", "categoryoptioncombouid")
 #     expect_true(setequal(test_dataset_names, names(test_dataset)))
-# 
+#
 #     #Expect error on a faulty dataset UID
 #     expect_error(pullDATIMCodeList("foo"))
 #   })
 # })
-# 
-# 
+#
+#
 # with_mock_api({
 #   test_that("We can fetch a map of HTS modalities from DATIM", {
-# 
+#
 #     test_dataset <-  getHTSModality(d2_session = training)
 #     expect_type(test_dataset, "list")
 #     expect_true("data.frame" %in% class(test_dataset))
 #     expect_true(NROW(test_dataset) > 0)
 #     expect_setequal(names(test_dataset), c("dataElement", "hts_modality"))
 #     expect_true(all(grepl("FY\\d{2}", test_dataset$hts_modality) == FALSE))
-# 
+#
 #   })
 # })
-# 
-# 
+#
+#
 # with_mock_api({
 #   test_that("We can get a list of PSNUs from DATIM", {
-# 
+#
 #     test_dataset <-  getPSNUs(country_uids = "qllxzIjjurr", include_mil = FALSE,
 #                            include_DREAMS = TRUE,
 #                            d2_session = training)
@@ -65,13 +65,13 @@
 #     )
 #     expect_equal(class(test_dataset$ancestors), "list")
 #     expect_equal(class(test_dataset$organisationUnitGroups), "list")
-# 
+#
 #   })
 # })
-# 
+#
 # with_mock_api({
 #   test_that("We can get a map of COCs to COs", {
-# 
+#
 #     test_dataset  <-   map_COCs_to_COs(d2_session = training)
 #     expect_type(test_dataset, "list")
 #     expect_setequal(names(test_dataset), c("name", "id", "categoryOptions"))
@@ -84,16 +84,16 @@
 #     }))))
 #   })
 # })
-# 
+#
 # with_mock_api({
 #   test_that("We can get a map of Cs to COs", {
-# 
+#
 #     test_dataset  <-   map_Cs_to_COs(d2_session = training)
 #     expect_type(test_dataset, "list")
 #     expect_setequal(names(test_dataset), c("categoryoptiongroup", "categoryoption", "categoryoptionuid"))
 #   })
 # })
-# 
+#
 # test_that("We can get a list of dataset UIDs based on the fiscal year", {
 #   expect_error(getDatasetUids("foo"))
 #   test_dataset <-  getDatasetUids(2021)
@@ -101,10 +101,10 @@
 #   expect_true(length(test_dataset) > 0)
 #   expect_true(all(unlist(lapply(test_dataset, is_uidish))))
 # })
-# 
+#
 # with_mock_api({
 #   test_that("We can get a full code list", {
-# 
+#
 #     test_dataset  <-   pullFullCodeList(FY = 2021, d2_session = training)
 #     expect_type(test_dataset, "list")
 #     expect_setequal(names(test_dataset), c("dataelement", "dataelementuid",
