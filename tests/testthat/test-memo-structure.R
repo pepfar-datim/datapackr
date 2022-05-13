@@ -9,26 +9,35 @@ test_that("We can warn on an invalid COP year", {
 })
 
 with_mock_api({
-test_that("We can create a memo structure", {
-  d <- list()
-  d$info$cop_year <- "2022"
-  d <- memoStructure(d, d2_session = training)
-  #TODO: No idea what the message is or where it is coming from..
-  #This should be silent but is not. testthat suppresses the messages
-  #and cannot reproduce it on the console
-  #expect_silent(d <- memoStructure(d, d2_session = training))
-  expect_false(is.null(d$memo$structure))
-  expect_equal(typeof(d$memo$structure), "list")
-  expect_setequal(names(d$memo$structure), c("row_order", "col_order"))
-  expect_true("data.frame" %in% class(d$memo$structure$row_order))
-  expect_setequal(names(d$memo$structure$row_order), c("ind",
-                                                       "options",
-                                                       "partner_chunk"))
-  expect_true("data.frame" %in% class(d$memo$structure$col_order))
-  expect_setequal(names(d$memo$structure$col_order), c("value",
-                                                       "name",
-                                                       "col_order",
-                                                       "id",
-                                                       "Prioritization"))
-  expect_false(is.null(d$memo$inds))
-}) })
+  test_that("We can create a memo structure", {
+    d <- list()
+    years <- c("2021", "2022")
+    for (year in years) {
+      d$info$cop_year <- year
+      d <- memoStructure(d, d2_session = training)
+      #TODO: No idea what the message is or where it is coming from..
+      #This should be silent but is not. testthat suppresses the messages
+      #and cannot reproduce it on the console
+      #expect_silent(d <- memoStructure(d, d2_session = training))
+      expect_false(is.null(d$memo$structure))
+      expect_equal(typeof(d$memo$structure), "list")
+      expect_setequal(names(d$memo$structure), c("row_order", "col_order"))
+      expect_true("data.frame" %in% class(d$memo$structure$row_order))
+      expect_setequal(names(d$memo$structure$row_order),
+                      c("ind",
+                        "options",
+                        "partner_chunk"))
+      expect_true("data.frame" %in% class(d$memo$structure$col_order))
+      expect_setequal(
+        names(d$memo$structure$col_order),
+        c("value",
+          "name",
+          "col_order",
+          "id",
+          "Prioritization")
+      )
+      expect_false(is.null(d$memo$inds))
+    }
+    
+  })
+})
