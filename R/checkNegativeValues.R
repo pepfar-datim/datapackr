@@ -94,7 +94,7 @@ checkNegativeValues <- function(d, sheet, quiet = T) {
 
     msg <-
       paste0(
-        "ERROR! In tab ",
+        lvl, "! In tab ",
         sheet,
         ": NEGATIVE VALUES found in the following columns! Ensure all values entered",
         " against Targets are whole, positive, numeric values. These will be removed. -> \n\t* ",
