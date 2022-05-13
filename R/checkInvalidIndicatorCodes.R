@@ -18,12 +18,12 @@ checkInvalidIndicatorCodes <- function(d) {
     dplyr::select(indicator_code) %>%
     dplyr::distinct()
 
-  if (d$info$cop_year == 2021) {
-    indicator_codes_schema <- cop21_data_pack_schema %>%
+
+    indicator_codes_schema <- pick_schema() %>%
       dplyr::filter(dataset == "mer", col_type == "target") %>%
       dplyr::select(indicator_code) %>%
       dplyr::mutate(is_valid = TRUE)
-  }
+
 
   invalid_indicator_codes <- dplyr::left_join(indicator_codes_sheet,
                                               indicator_codes_schema) %>%
