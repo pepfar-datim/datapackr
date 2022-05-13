@@ -17,20 +17,20 @@ checkNegativeValues <- function(d, sheet, quiet = T) {
   }
 
   # get data ----
-  if (sheet %in% c("SNU x IM", "PSNUxIM") &
-      d$info$tool == "Data Pack") {
-    data <- d$data$SNUxIM
-  } else {
-    data <- d$data$extract
-  }
+  # if (sheet %in% c("SNU x IM", "PSNUxIM") &
+  #     d$info$tool == "Data Pack") {
+  #   data <- d$data$SNUxIM
+  # } else {
+  #   data <- d$data$extract
+  # }
 
   # BELOW IS THE TRANSITION to LOAD DATAPACK ONCE THAT IS ADDED TO CREATEKEYCHAININFO
-  # if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
-  #
-  #   data <- d$sheets[["PSNUxIM"]]
-  # } else {
-  #   data <- d$sheets[[as.character(sheet)]]
-  # }
+  if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
+
+    data <- d$sheets[["PSNUxIM"]]
+  } else {
+    data <- d$sheets[[as.character(sheet)]]
+  }
 
   # LIFTED OUT OF UNPACK SHEET----
   # List Target Columns ####
@@ -47,7 +47,7 @@ checkNegativeValues <- function(d, sheet, quiet = T) {
   }
 
   # Add cols to allow compiling with other sheets ####
-  data %<>%
+  data <- data %>%
     addcols(c("KeyPop", "Age", "Sex")) %>%
     # Select only target-related columns
     dplyr::select(PSNU, Age, Sex, KeyPop,
@@ -64,22 +64,22 @@ checkNegativeValues <- function(d, sheet, quiet = T) {
                   dplyr::everything())
 
   # If PSNU has been deleted, drop the row ####
-  data %<>%
+  data <- data %>%
     dplyr::filter(!is.na(PSNU))
 
   # Gather all indicators as single column for easier processing ####
-  data %<>%
+  data <- data %>%
     tidyr::gather(key = "indicator_code",
                   value = "value",
                   -PSNU, -psnuid, -Age, -Sex, -KeyPop, -sheet_name) %>%
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value)
 
   # Drop NAs ####
-  data %<>%
+  data <- data %>%
     tidyr::drop_na(value)
 
   # Now that non-numeric cases noted, convert all to numeric & drop non-numeric ####
-  data %<>%
+  data <- data %>%
     dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
     tidyr::drop_na(value) %>%
     # Filter out zeros ####
