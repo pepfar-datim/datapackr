@@ -1,28 +1,40 @@
 context("can-check missing meta data...")
 
-with_mock_api({
-  test_that("Can check missing meta data in all sheets", {
-    
-    d <- datapackr::createKeychainInfo(
-      submission_path = test_sheet("COP21_DP_random_no_psnuxim.xlsx"),
-      tool = "Data Pack",
-      country_uids = NULL,
-      cop_year = NULL,
-      d2_session = NULL
+
+test_that("Can check missing meta data in all sheets", {
+  # base object
+  d <- list()
+  d$info$cop_year <- "2021"
+  d$info$tool <- "Data Pack"
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  
+  # test no false positive
+  d$sheets$Prioritization <-
+    data.frame(matrix(ncol = 5, nrow = 0))
+  cols <-
+    c(
+      "SNU1",
+      "PSNU",
+      "IMPATT.PRIORITY_SNU.T_1",
+      "IMPATT.PRIORITY_SNU.T",
+      "PRIORITY_SNU.translation"
     )
-    
-    # check no errors pop for no missing meta data aka false positive
-    sheets <- sheets <- grep("PSNUxIM", names(d$sheets), value = TRUE, invert = TRUE)
-    for (sheets in sheets) {
-      d <- checkMissingMetadata(d, sheet)
-    }
-    
-    testthat::expect_identical(d$info$messages$message, character(0))
-    
-    # create missing metadata and and test if it gets caught
-    
-    
-    
-    
-  })
+  colnames(d$sheets$Prioritization) <- cols
+  d <- checkMissingMetadata(d, sheet = "Prioritization")
+  testthat::expect_identical(d$info$messages$message, character(0))
+  
+  # test positive error
+  err <-
+    data.frame(
+      "SNU1" = NA,
+      "PSNU" = NA,
+      "IMPATT.PRIORITY_SNU.T_1" = NA,
+      "IMPATT.PRIORITY_SNU.T" = NA,
+      "PRIORITY_SNU.translation" = NA
+    )
+  d$sheets$Prioritization <- rbind(d$sheets$Prioritization, err)
+  d <- checkMissingMetadata(d, sheet = "Prioritization")
+  testthat::is_more_than(d$info$messages$message, 0)
+  
 })
