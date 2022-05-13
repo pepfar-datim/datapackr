@@ -16,3 +16,17 @@ with_mock_api({
     expect_setequal(names(inds), c("id", "name", "numerator", "denominator"))
   })
 })
+
+
+with_mock_api({
+  test_that("We can fetch existing prioritizations", {
+    psnus <- valid_PSNUs %>% dplyr::filter(country_name == "Lesotho") %>% 
+      dplyr::select(psnu_uid)
+    prio_table <- fetchPrioritizationTable(psnus = psnus, cop_year = "2021",d2_session = training)
+    expect_equal(class(prio_table),"data.frame")
+    expect_setequal(names(prio_table),c("orgUnit","prioritization","value"))
+    expect_equal(typeof(prio_table$orgUnit),"character")
+    expect_equal(typeof(prio_table$prioritization),"character")
+    expect_equal(typeof(prio_table$value),"double")
+  })
+})
