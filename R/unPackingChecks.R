@@ -582,7 +582,13 @@ checkSheetData <- function(d,
     d <- checkNumeric(d, sheet)  
     
     # Metadata ----
-    #d <- checkMetadata(d, sheet)
+    d <- checkMissingMetadata(d, sheet)
+    
+    # Negative values ----
+    d <- checkNegativeValues(d, sheet)
+    
+    # Decimal values
+    d <- checkDecimalValues(d, sheet)
     
     # TEST AGYW Tab for missing DSNUs ####
     # if (sheet == "AGYW") {

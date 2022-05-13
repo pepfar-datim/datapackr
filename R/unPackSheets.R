@@ -16,7 +16,8 @@ unPackSheets <- function(d, sheets = NULL) {
     stop("Cannot process that kind of tool. :(")
   }
   
-  sheets <- sheets %||% grep("PSNUxIM", names(d$sheets), value = TRUE, invert = TRUE)
+  #sheets <- sheets %||% grep("PSNUxIM", names(d$sheets), value = TRUE, invert = TRUE)
+  sheets <- grep("PSNUxIM", names(d$sheets), value = TRUE, invert = TRUE)
   
   sheets <- checkSheets(sheets = sheets,
                         cop_year = d$info$cop_year,

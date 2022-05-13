@@ -17,20 +17,20 @@ checkMissingMetadata <- function(d, sheet, quiet = T) {
   }
 
   # Get data ----
-  if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
-
-    data <- d$data$SNUxIM
-  } else {
-    data <- d$data$extract
-  }
+  # if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
+  # 
+  #   data <- d$data$SNUxIM
+  # } else {
+  #   data <- d$data$extract
+  # }
 
   # BELOW IS THE TRANSITION to LOAD DATAPACK ONCE THAT IS ADDED TO CREATEKEYCHAININFO
-  # if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
-  #
-  #   data <- d$sheets[["PSNUxIM"]]
-  # } else {
-  #   data <- d$sheets[[as.character(sheet)]]
-  # }
+  if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
+    
+    data <- d$sheets[["PSNUxIM"]]
+  } else {
+    data <- d$sheets[[as.character(sheet)]]
+  }
 
   # mung ----
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
