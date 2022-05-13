@@ -6,8 +6,9 @@
 \alias{checkColumnStructure}
 \alias{checkToolStructure}
 \alias{checkToolComments}
-\alias{checkValues}
-\alias{checkData}
+\alias{checkConnections}
+\alias{checkNumeric}
+\alias{checkSheetData}
 \title{Perform various data quality checks on in-process data from Data Packs.}
 \usage{
 checkDupeRows(d, sheet, quiet = TRUE)
@@ -18,9 +19,11 @@ checkToolStructure(d, quiet = TRUE)
 
 checkToolComments(d, quiet = TRUE)
 
-checkValues(d, quiet = TRUE)
+checkConnections(d, quiet = TRUE)
 
-checkData(d, sheet, quiet = TRUE, ...)
+checkNumeric(d, sheet, quiet = TRUE)
+
+checkSheetData(d, sheets = NULL, quiet = TRUE, ...)
 }
 \arguments{
 \item{d}{DataPack object loaded via \code{loadDataPack}.}
@@ -55,4 +58,8 @@ a submitted Data Pack.
 
 \code{checkToolComments} searches Data Pack for any comments that cause
 corruption when executing openxlsx::saveWorkbook.
+
+\code{checkConnections} detects the presence of any external links in a Tool.
+
+\code{checkNumeric} alerts to non-numeric values instead of valid data.
 }

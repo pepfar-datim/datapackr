@@ -4,10 +4,10 @@
 \alias{unPackSheets}
 \title{Unpack data from Data Pack sheets.}
 \usage{
-unPackSheets(d)
+unPackSheets(d, sheets = NULL)
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 d

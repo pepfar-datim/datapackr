@@ -17,12 +17,15 @@ loadDataPack <- function(submission_path = NULL,
                          country_uids = NULL,
                          cop_year = NULL,
                          load_wb = FALSE,
-                         load_sheets = FALSE) {
+                         load_sheets = FALSE,
+                         d2_session = dynGet("d2_default_session",
+                                             inherits = TRUE)) {
   
   d <- createKeychainInfo(submission_path = submission_path,
                           tool = tool,
                           country_uids = country_uids,
-                          cop_year = cop_year)
+                          cop_year = cop_year,
+                          d2_session = d2_session)
   
   if (load_wb) {
     d$tool$wb <- openxlsx::loadWorkbook(file = d$keychain$submission_path)
