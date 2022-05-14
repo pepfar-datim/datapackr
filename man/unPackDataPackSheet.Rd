@@ -7,9 +7,7 @@
 unPackDataPackSheet(d, sheet)
 }
 \arguments{
-\item{d}{Datapackr object.}
-
-\item{sheet}{Sheet to unpack.}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 d

@@ -8,6 +8,9 @@
 \alias{checkToolComments}
 \alias{checkConnections}
 \alias{checkNumeric}
+\alias{checkMissingMetadata}
+\alias{checkNegativeValues}
+\alias{checkDecimalValues}
 \alias{checkSheetData}
 \title{Perform various data quality checks on in-process data from Data Packs.}
 \usage{
@@ -22,6 +25,12 @@ checkToolComments(d, quiet = TRUE)
 checkConnections(d, quiet = TRUE)
 
 checkNumeric(d, sheet, quiet = TRUE)
+
+checkMissingMetadata(d, sheet, quiet = T)
+
+checkNegativeValues(d, sheet, quiet = T)
+
+checkDecimalValues(d, sheet, quiet = T)
 
 checkSheetData(d, sheets = NULL, quiet = TRUE, ...)
 }
