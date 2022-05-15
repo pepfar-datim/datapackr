@@ -15,6 +15,7 @@ fetchPrioritizationTable <- function(psnus, cop_year,
 
     tryCatch({
       datimutils::getAnalytics(
+        "filter=mINJi7rR1a6:POHZmzofoVx;PvuaP6YALSA;AookYR4ECPH",
         dx = "r4zbW3owX9n",
         pe_f = period,
         ou = x,
