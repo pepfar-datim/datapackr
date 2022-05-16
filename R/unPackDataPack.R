@@ -75,22 +75,7 @@ unPackDataPack <- function(d,
   interactive_print("Creating analytics...")
   d <- createAnalytics(d, d2_session = d2_session)
 
-  # Same test is already being called unPackCountryUIDs
-  # # TEST: Check that country_uids matches observed data
-  # observed_country_uids <-
-  #   dplyr::bind_rows(d$datim) %>%
-  #   dplyr::select(orgUnit) %>%
-  #   dplyr::distinct() %>%
-  #   dplyr::left_join(datapackr::valid_PSNUs %>%
-  #                      dplyr::select(psnu_uid, country_name, country_uid),
-  #                    by = c("orgUnit" = "psnu_uid")) %>%
-  #   dplyr::pull(country_uid) %>%
-  #   unique()
-  #
-  # if (!all(purrr::map_lgl(observed_country_uids,
-  #                        ~ .x %in% d$info$country_uids))) {
-  #   warning("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
-  # }
+
 
   return(d)
 
