@@ -11,6 +11,11 @@ fetchPrioritizationTable <- function(psnus, cop_year,
   period <- paste0(cop_year, "Oct")
 
   #We need to split up the requests if there are many PSNUs
+  # Explicitly filter Military data which may have an assigned prioritization
+  # level below the PSNU level. This will get aggrevgated in the analytics
+  # call leading to incorrect prioritization levels. All Military data
+  # should always be classified as No prioritization anyway and is handled
+  # later when left joining to the main data.
   getPriosFromDatim <- function(x) {
 
     tryCatch({
