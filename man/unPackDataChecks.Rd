@@ -12,6 +12,8 @@
 \alias{checkNegativeValues}
 \alias{checkDecimalValues}
 \alias{checkInvalidOrgUnits}
+\alias{checkBlankPrioritizations}
+\alias{checkInvalidPrioritizations}
 \alias{checkSheetData}
 \title{Perform various data quality checks on in-process data from Data Packs.}
 \usage{
@@ -34,6 +36,10 @@ checkNegativeValues(d, sheet, quiet = T)
 checkDecimalValues(d, sheet, quiet = T)
 
 checkInvalidOrgUnits(d, sheet, quiet = T)
+
+checkBlankPrioritizations(d, sheet, quiet = T)
+
+checkInvalidPrioritizations(d, sheet, quiet = T)
 
 checkSheetData(d, sheets = NULL, quiet = TRUE, ...)
 }

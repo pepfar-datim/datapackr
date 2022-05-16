@@ -1,10 +1,10 @@
 # test types ----
-# can pass when there are no blank prioritizations
-# can flag blank prioritizations
+# can pass when there are valid prioritizations
+# can flag invalid prioritizations
 
-context("can-check for blank prioritizations ...")
+context("can-check invalid prioritizations ...")
 
-test_that("Can flag blank prioritizations...", {
+test_that("Can flag invalid prioritizations...", {
   
   # base object
   d <- list()
@@ -25,18 +25,18 @@ test_that("Can flag blank prioritizations...", {
     "SNU1" = c("_Military something", "New York", "New York"),
     "PSNU" = c("_Military something", "Something [#SNU] [e29LLJAHdD3]", "Something [#SNU] [e29LLJAHdD1]"),
     "IMPATT.PRIORITY_SNU.T_1" = c(NA, 1, 3),
-    "IMPATT.PRIORITY_SNU.T" = c("M", 2, NA),
+    "IMPATT.PRIORITY_SNU.T" = c("M", "F", 9),
     "PRIORITY_SNU.translation" = c("Military", "Scale-up: Aggressive", "Scale-up: Aggressive")
   )
   
   # test positive error
-  d <- checkBlankPrioritizations(d, sheet = "Prioritization")
-  testthat::expect_gt(nrow(d$tests$blank_prioritizations), 0) # test the tests object
+  d <- checkInvalidPrioritizations(d, sheet = "Prioritization")
+  testthat::expect_gt(nrow(d$tests$invalid_prioritizations), 0) # test the tests object
   testthat::is_more_than(d$info$messages$message, 0) # test the message object
   
 })
 
-test_that("Can pass when prioritizations are not blank...", {
+test_that("Can pass when priotizations are valid ...", {
   
   # base object
   d <- list()
@@ -57,13 +57,13 @@ test_that("Can pass when prioritizations are not blank...", {
     "SNU1" = c("_Military something", "New York", "New York"),
     "PSNU" = c("_Military something", "Something [#SNU] [e29LLJAHdD3]", "Something [#SNU] [e29LLJAHdD1]"),
     "IMPATT.PRIORITY_SNU.T_1" = c(NA, 1, 3),
-    "IMPATT.PRIORITY_SNU.T" = c("M", 2, 1),
+    "IMPATT.PRIORITY_SNU.T" = c(NA, 1, 1),
     "PRIORITY_SNU.translation" = c("Military", "Scale-up: Aggressive", "Scale-up: Aggressive")
   )
   
   # test no false positive
-  d <- checkBlankPrioritizations(d, sheet = "Prioritization")
-  testthat::expect_null(d$tests$blank_prioritizations) # test the tests object
+  d <- checkInvalidPrioritizations(d, sheet = "Prioritization")
+  testthat::expect_null(d$tests$invalid_prioritizations) # test the tests object
   testthat::is_equivalent_to(d$info$messages$message, 0) # test the message object
   
 })

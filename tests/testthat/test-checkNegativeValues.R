@@ -20,7 +20,7 @@ test_that("Can flag neative values...", {
     "SNU1" = c("_Military something", "New York", "New York"),
     "PSNU" = c("_Military something", "Something [#SNU] [e1234]", "Something [#SNU] [e1235]"),
     "IMPATT.PRIORITY_SNU.T_1" = c(NA, 1, 3),
-    "IMPATT.PRIORITY_SNU.T" = c("M", "-1", "F"),
+    "IMPATT.PRIORITY_SNU.T" = c("M", "-1", 1),
     "PRIORITY_SNU.translation" = c("Military", "Scale-up: Aggressive", "Scale-up: Aggressive")
   )
   
@@ -52,7 +52,7 @@ test_that("Can pass valid values...", {
     "SNU1" = c("_Military something", "New York", "New York"),
     "PSNU" = c("_Military something", "Something [#SNU] [e1234]", "Something [#SNU] [e1235]"),
     "IMPATT.PRIORITY_SNU.T_1" = c(NA, 1, 3),
-    "IMPATT.PRIORITY_SNU.T" = c("M", "-1", "F"),
+    "IMPATT.PRIORITY_SNU.T" = c("M", "-1", 1),
     "PRIORITY_SNU.translation" = c("Military", "Scale-up: Aggressive", "Scale-up: Aggressive")
   )
   
