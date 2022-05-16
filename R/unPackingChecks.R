@@ -592,7 +592,6 @@ checkMissingMetadata <- function(d, sheet, quiet = T) {
     d$tests$missing_metadata <- dplyr::bind_rows(d$tests$missing_metadata, missing_metadata)
     attr(d$tests$missing_metadata, "test_name") <- "Missing metadata"
     d$info$messages <- appendMessage(d$info$messages, msg, lvl)
-    d$info$has_error <- TRUE
     
     if (!quiet) {
       messages <- appendMessage(messages, msg, lvl)
@@ -696,7 +695,6 @@ checkNegativeValues <- function(d, sheet, quiet = T) {
     d$tests$negative_values <- dplyr::bind_rows(d$test$negative_values, negative_values)
     attr(d$tests$negative_values, "test_name") <- "Negative values"
     d$info$messages <- appendMessage(d$info$messages, msg, lvl)
-    d$info$has_error <- TRUE
     
     if (!quiet) {
       messages <- appendMessage(messages, msg, lvl)
@@ -841,7 +839,6 @@ checkDecimalValues <- function(d, sheet, quiet = T) {
     d$tests$decimal_values <- dplyr::bind_rows(d$tests$decimal_cols, decimal_cols)
     attr(d$tests$decimal_values, "test_name") <- "Decimal values"
     d$info$messages <- appendMessage(d$info$messages, msg, lvl)
-    d$info$has_error <- TRUE
     
     if (!quiet) {
       messages <- appendMessage(messages, msg, lvl)
