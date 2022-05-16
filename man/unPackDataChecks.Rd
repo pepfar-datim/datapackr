@@ -11,6 +11,7 @@
 \alias{checkMissingMetadata}
 \alias{checkNegativeValues}
 \alias{checkDecimalValues}
+\alias{checkInvalidOrgUnits}
 \alias{checkSheetData}
 \title{Perform various data quality checks on in-process data from Data Packs.}
 \usage{
@@ -31,6 +32,8 @@ checkMissingMetadata(d, sheet, quiet = T)
 checkNegativeValues(d, sheet, quiet = T)
 
 checkDecimalValues(d, sheet, quiet = T)
+
+checkInvalidOrgUnits(d, sheet, quiet = T)
 
 checkSheetData(d, sheets = NULL, quiet = TRUE, ...)
 }
