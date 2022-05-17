@@ -66,18 +66,11 @@ getMechanismView <- function(country_uids = NULL,
 
   if (is_fresh & can_read_file) {
     interactive_print("Loading cached mechs file")
-    
-    interactive_print("Working") # Will REMOVE before PR
-    
     mechs <- readRDS(cached_mechs_path)
   }
 
   if (!is_fresh) {
     interactive_print("Fetching new mechs file from DATIM")
-    
-    ########### REPLACE ############################################################
-    #mechs <-
-    #getMechanismViewFromDATIM(d2_session = d2_session)
     
     mechs <- if (is.null(cop_year)) {
       datimutils::getSqlView(sql_view_uid = "fgUtV6e9YIX",d2_session = d2_session)
@@ -96,12 +89,9 @@ getMechanismView <- function(country_uids = NULL,
         partner_desc = partner,
         partner_id = primeid)
     
-    ###################################################################################
-    
     if (can_write_file) {
       interactive_print(paste0("Overwriting stale mechanisms view to ", cached_mechs_path))
       saveRDS(mechs, file = cached_mechs_path)
-      saveRDS(mechs, file = "~/Documents/Repos/datapackr/data") #Will remove before PR
     }
   }
 
@@ -156,7 +146,6 @@ getMechanismView <- function(country_uids = NULL,
 
     mechs <- rbind(mechs, default_mech)
   }
-
 
   structure_ok <- dplyr::setequal(names(empty_mechs_view), names(mechs))
 
