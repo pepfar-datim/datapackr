@@ -93,7 +93,16 @@ with_mock_api({
     expect_type(test_dataset, "list")
     expect_setequal(names(test_dataset), c("dataelement", "dataelementuid",
     "categoryoptioncombo", "categoryoptioncombouid", "FY"))
-    skip("Not clear why FY22 pullFullCodeList is not working")
-    foo <- pullFullCodeList(FY = 2022, d2_session = training)
+    expect_true(all(is_uidish(test_dataset$dataelementuid)))
+    expect_true(all(is_uidish(test_dataset$categoryoptioncombouid)))
+    expect_true(all(test_dataset$FY == "2021"))
+    
+    test_dataset <- pullFullCodeList(FY = 2022, d2_session = training)
+    expect_type(test_dataset, "list")
+    expect_setequal(names(test_dataset), c("dataelement", "dataelementuid",
+                                           "categoryoptioncombo", "categoryoptioncombouid", "FY"))
+    expect_true(all(is_uidish(test_dataset$dataelementuid)))
+    expect_true(all(is_uidish(test_dataset$categoryoptioncombouid)))
+    expect_true(all(test_dataset$FY == "2022"))
     })
 })
