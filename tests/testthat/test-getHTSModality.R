@@ -6,6 +6,7 @@ with_mock_api({
   foo <- getHTSModality("2021", d2_session = training)
   expect_true(any(class(foo) == "data.frame"))
   expect_setequal(names(foo), c("dataElement", "hts_modality"))
+  expect_true(all(is_uidish(foo$dataElement)))
 
 
   })
