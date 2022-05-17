@@ -25,29 +25,9 @@ pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
   datasets_provided <- !is.null(datasets)
 
   if (!datasets_provided) {
-    datasets <- character(0)
-
-    if ("mer_targets" %in% datastreams) {
-      datasets <- c(datasets,
-                    datapackr::getDatasetUids(FY, type = "mer_targets"))
-    }
-    if ("mer_results" %in% datastreams) {
-      datasets <- c(datasets,
-                    datapackr::getDatasetUids(FY, type = "mer_results"))
-    }
-    if ("subnat_targets" %in% datastreams) {
-      datasets <- c(datasets,
-                    datapackr::getDatasetUids(FY, type = "subnat_targets"))
-    }
-    if ("subnat_results" %in% datastreams) {
-      datasets <- c(datasets,
-                    datapackr::getDatasetUids(FY, type = "subnat_results"))
-    }
-    if ("impatt" %in% datastreams) {
-      datasets <- c(datasets,
-                    datapackr::getDatasetUids(FY, type = "impatt"))
-    }
-
+    
+    datasets <- sapply(datastreams, function(x) getDatasetUids(FY,x)) %>% 
+      unlist() 
   }
 
   datasets <- unique(datasets)
