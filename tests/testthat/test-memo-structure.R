@@ -38,6 +38,6 @@ with_mock_api({
       )
       expect_false(is.null(d$memo$inds))
     }
-    
+
   })
 })

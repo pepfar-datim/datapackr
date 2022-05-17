@@ -25,9 +25,9 @@ pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
   datasets_provided <- !is.null(datasets)
 
   if (!datasets_provided) {
-    
-    datasets <- sapply(datastreams, function(x) getDatasetUids(FY,x)) %>% 
-      unlist() 
+
+    datasets <- sapply(datastreams, function(x) getDatasetUids(FY, x)) %>%
+      unlist()
   }
 
   datasets <- unique(datasets)
@@ -35,7 +35,7 @@ pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
   ds <- data.frame()
 
   fullCodeList <-
-    purrr::map_dfr(datasets,function(x) pullDATIMCodeList(x,d2_session = d2_session)) %>%
+    purrr::map_dfr(datasets, function(x) pullDATIMCodeList(x, d2_session = d2_session)) %>%
     dplyr::select(dataelement, dataelementuid, categoryoptioncombo, categoryoptioncombouid) %>%
     dplyr::mutate(FY = FY) %>%
     dplyr::distinct() %>%
