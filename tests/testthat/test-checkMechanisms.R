@@ -4,7 +4,7 @@ context("Check mechanism validity")
 with_mock_api({
   test_that("Can flag invalid mechanisms", {
 
-    d<-list()
+    d <- list()
     d$info$cop_year <- "2021"
     d$info$operating_unit$ou <- "Western Hemisphere Region"
     d$info$tool <- "Data Pack"
