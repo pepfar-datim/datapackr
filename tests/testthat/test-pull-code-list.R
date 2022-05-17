@@ -96,7 +96,7 @@ with_mock_api({
     expect_true(all(is_uidish(test_dataset$dataelementuid)))
     expect_true(all(is_uidish(test_dataset$categoryoptioncombouid)))
     expect_true(all(test_dataset$FY == "2021"))
-    
+
     test_dataset <- pullFullCodeList(FY = 2022, d2_session = training)
     expect_type(test_dataset, "list")
     expect_setequal(names(test_dataset), c("dataelement", "dataelementuid",
