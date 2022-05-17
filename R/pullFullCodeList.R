@@ -35,7 +35,7 @@ pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
   ds <- data.frame()
 
   fullCodeList <-
-    purrr::map_dfr(datasets,pullDATIMCodeList) %>% 
+    purrr::map_dfr(datasets,pullDATIMCodeList) %>%
     dplyr::select(dataelement, dataelementuid, categoryoptioncombo, categoryoptioncombouid) %>%
     dplyr::mutate(FY = FY) %>%
     dplyr::distinct() %>%
