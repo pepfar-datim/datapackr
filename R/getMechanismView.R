@@ -71,16 +71,16 @@ getMechanismView <- function(country_uids = NULL,
 
   if (!is_fresh) {
     interactive_print("Fetching new mechs file from DATIM")
-    
+
     mechs <- if (is.null(cop_year)) {
-      datimutils::getSqlView(sql_view_uid = "fgUtV6e9YIX",d2_session = d2_session)
+      datimutils::getSqlView(sql_view_uid = "fgUtV6e9YIX", d2_session = d2_session)
     } else {
       url_filter <- c(paste0("startdate:lt:", cop_year + 1, "-10-01"),
                       paste0("enddate:gt:", cop_year, "-09-30"))
-      
-      datimutils::getSqlView(url_filter,sql_view_uid = "fgUtV6e9YIX",d2_session = d2_session)
+
+      datimutils::getSqlView(url_filter, sql_view_uid = "fgUtV6e9YIX", d2_session = d2_session)
     }
-    
+
     mechs <- mechs %>%
       dplyr::rename(
         mechanism_desc = mechanism,
@@ -88,7 +88,7 @@ getMechanismView <- function(country_uids = NULL,
         mechanism_code = code,
         partner_desc = partner,
         partner_id = primeid)
-    
+
     if (can_write_file) {
       interactive_print(paste0("Overwriting stale mechanisms view to ", cached_mechs_path))
       saveRDS(mechs, file = cached_mechs_path)
