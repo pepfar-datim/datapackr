@@ -19,7 +19,8 @@ checkInvalidIndicatorCodes <- function(d) {
     dplyr::distinct()
 
 
-    indicator_codes_schema <- pick_schema() %>%
+    indicator_codes_schema <- pick_schema(cop_year = d$info$cop_year,
+                                          tool = d$info$tool) %>%
       dplyr::filter(dataset == "mer", col_type == "target") %>%
       dplyr::select(indicator_code) %>%
       dplyr::mutate(is_valid = TRUE)
