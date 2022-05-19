@@ -80,7 +80,7 @@ with_mock_api({
 
 test_that("We can get a list of dataset UIDs based on the fiscal year", {
   expect_error(getDatasetUids("foo"))
-  test_dataset <-  getDatasetUids(2021)
+  test_dataset <-  getDatasetUids(2020)
   expect_type(test_dataset, "character")
   expect_true(length(test_dataset) > 0)
   expect_true(all(unlist(lapply(test_dataset, is_uidish))))
