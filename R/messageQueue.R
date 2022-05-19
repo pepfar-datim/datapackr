@@ -57,7 +57,7 @@ appendMessage.MessageQueue <- function(x, message=NA, level=NA) {
     level[is.na(level)] <- "UNKNOWN"
   }
 
-  #Check to see if the message and level match. 
+  #Check to see if the message and level match.
   #If they don't issue a warning
 
   if (!grepl(level, substring(message, first = 0, last = 20))) {
