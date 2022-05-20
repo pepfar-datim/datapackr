@@ -30,10 +30,6 @@ jobs:
           name: Test package
           command: |
                R -e "devtools::check(error_on='error')"
-      -run: 
-         name: Code coverage
-         command: |
-               R -e "covr::coveralls()"
       - run:
           name: Lint packages
           command: |

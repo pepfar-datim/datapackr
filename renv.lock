@@ -156,6 +156,13 @@
       "Repository": "CRAN",
       "Hash": "f61dbaec772ccd2e17705c1e872e9e7c"
     },
+    "checkmate": {
+      "Package": "checkmate",
+      "Version": "2.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "a667800d5f0350371bedeb8b8b950289"
+    },
     "cli": {
       "Package": "cli",
       "Version": "3.1.0",
@@ -183,6 +190,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "0f22be39ec1d141fd03683c06f3a6e67"
+    },
+    "compareDF": {
+      "Package": "compareDF",
+      "Version": "2.3.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "6c00ba3b4cdfb8fe728a8939f67b2620"
     },
     "cpp11": {
       "Package": "cpp11",
@@ -218,6 +232,18 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "36b67b5adf57b292923f5659f5f0c853"
+    },
+    "datapackcommons": {
+      "Package": "datapackcommons",
+      "Version": "0.2.3",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "pepfar-datim",
+      "RemoteRepo": "data-pack-commons",
+      "RemoteRef": "master",
+      "RemoteSha": "fae6b115351dc21a4df2aabdec213475e44dc1fb",
+      "Hash": "23125777b3c9ed46a32cfc41e5f71a12"
     },
     "datimutils": {
       "Package": "datimutils",
@@ -475,12 +501,26 @@
       "Repository": "CRAN",
       "Hash": "5b8a2dd0fdbe2ab4f6081e6c7be6dfca"
     },
+    "htmlTable": {
+      "Package": "htmlTable",
+      "Version": "2.3.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "2b63c1a566e750cf194e6fe72ba24591"
+    },
     "htmltools": {
       "Package": "htmltools",
       "Version": "0.5.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "526c484233f42522278ab06fb185cb26"
+    },
+    "htmlwidgets": {
+      "Package": "htmlwidgets",
+      "Version": "1.5.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "76147821cd3fcd8c4b04e1ef0498e7fb"
     },
     "httptest": {
       "Package": "httptest",
