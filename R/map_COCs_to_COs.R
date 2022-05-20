@@ -10,11 +10,10 @@
 map_COCs_to_COs <- function(d2_session = dynGet("d2_default_session",
                                                 inherits = TRUE)) {
 
-  COCs_to_COs <- api_call("categoryOptionCombos",
-                          d2_session = d2_session) %>%
-    api_filter("categoryCombo.name", "!like", "Funding Mechanism") %>%
-    api_fields("id,name,categoryOptions[id,name],categoryCombos[id,name]") %>% # nolint
-    api_get(d2_session = d2_session)
+  datimutils::getMetadata("categoryOptionCombos",
+                          "categoryCombo.id:!eq:wUpfppgjEza",
+  fields="id,name,categoryOptions[id,name],categoryCombos[id,name]",
+  d2_session = d2_session)
 
-  return(COCs_to_COs)
+
 }
