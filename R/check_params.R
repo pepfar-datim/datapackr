@@ -213,6 +213,7 @@ check_PSNUs <- function(PSNUs = NULL, country_uids = NULL) {
 #' @export
 #' @rdname parameter-checks
 check_cop_year <- function(cop_year) {
+  
   supported_cop_years <- c(2021, 2022)
 
   # If cop_year is NULL or missing, use default from package
@@ -220,13 +221,19 @@ check_cop_year <- function(cop_year) {
   cop_year <- cop_year %||% getCurrentCOPYear()
 
   # Check type & parse if character and resembles a numeric
-  cop_year %<>% parse_maybe_number()# Found in utilities.R
+  cop_year %<>% parse_maybe_number() # Found in utilities.R
 
-  if (!cop_year %in% supported_cop_years) {# If cop year isn't supported.
+  cop_year_error <- function() {
     stop(paste0("Sorry, datapackr only supports tools from ",
                 paste_oxford(paste0("COP", supported_cop_years - 2000))))
   }
-
+  
+  if (is.null(cop_year)) {
+    cop_year_error()
+  } else if (!cop_year %in% supported_cop_years) {
+    cop_year_error()
+  }
+  
   cop_year
 
 }

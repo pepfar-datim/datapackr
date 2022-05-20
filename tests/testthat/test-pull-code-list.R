@@ -79,8 +79,8 @@ with_mock_api({
 })
 
 test_that("We can get a list of dataset UIDs based on the fiscal year", {
-  expect_error(getDatasetUids("foo"))
-  test_dataset <-  getDatasetUids(2020)
+  expect_error(suppressWarnings(getDatasetUids("foo")))
+  test_dataset <-  getDatasetUids(2021)
   expect_type(test_dataset, "character")
   expect_true(length(test_dataset) > 0)
   expect_true(all(unlist(lapply(test_dataset, is_uidish))))
@@ -89,20 +89,21 @@ test_that("We can get a list of dataset UIDs based on the fiscal year", {
 with_mock_api({
   test_that("We can get a full code list", {
 
-    test_dataset  <-   pullFullCodeList(FY = 2021, d2_session = training)
+    #categoryOptionCombos.json-bf5e01.json)
+    test_dataset  <-   pullFullCodeList(2022, d2_session = training)
     expect_type(test_dataset, "list")
     expect_setequal(names(test_dataset), c("dataelement", "dataelementuid",
     "categoryoptioncombo", "categoryoptioncombouid", "FY"))
     expect_true(all(is_uidish(test_dataset$dataelementuid)))
     expect_true(all(is_uidish(test_dataset$categoryoptioncombouid)))
-    expect_true(all(test_dataset$FY == "2021"))
+    expect_true(all(test_dataset$FY == "2022"))
 
-    test_dataset <- pullFullCodeList(FY = 2022, d2_session = training)
+    test_dataset <- pullFullCodeList(2023, d2_session = training)
     expect_type(test_dataset, "list")
     expect_setequal(names(test_dataset), c("dataelement", "dataelementuid",
                                            "categoryoptioncombo", "categoryoptioncombouid", "FY"))
     expect_true(all(is_uidish(test_dataset$dataelementuid)))
     expect_true(all(is_uidish(test_dataset$categoryoptioncombouid)))
-    expect_true(all(test_dataset$FY == "2022"))
+    expect_true(all(test_dataset$FY == "2023"))
     })
 })
