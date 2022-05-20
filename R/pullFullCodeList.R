@@ -25,14 +25,14 @@ pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
   datasets_provided <- !is.null(datasets)
 
   FY_numeric <- parse_maybe_number(FY)
-  
+
   if (!is.null(FY_numeric)) {
     cop_year <- check_cop_year(cop_year = FY_numeric - 1)
   } else {
     stop("Invalid fiscal year paramater specified.")
   }
-  
-  
+
+
   if (!datasets_provided) {
     datasets <- getDatasetUids(cop_year, datastreams)
   }

@@ -2,14 +2,14 @@ context("Test GetDatasetUids")
 
 test_that("GetDatasetUids", {
 
-  
+
   testthat::expect_error(getDatasetUids(2019))
   testthat::expect_error(suppressWarnings(getDatasetUids("foo")))
 
   expect_true(is.vector(getDatasetUids()))
   expect_true(all(is_uidish(getDatasetUids())))
-  expect_identical(getDatasetUids(),getDatasetUids(getCurrentCOPYear()))
-  
+  expect_identical(getDatasetUids(), getDatasetUids(getCurrentCOPYear()))
+
   testthat::expect_setequal(getDatasetUids(2021, "mer_targets"), c("YfZot37BbTm",
                                                                    "cihuwjoY5xP",
                                                                    "wvnouBMuLuE")
