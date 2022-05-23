@@ -663,7 +663,7 @@ formatSetStrings <- function(vec) {
   }
 
   vec <- sort(vec)
-  groups <- cumsum(c(0, base::diff(vec) > 1))
+  groups <- cumsum(c(0, diff(vec) > 1))
   sets <- split(vec, groups)
   set_strings <- sapply(sets, function(x) {
     ifelse(min(x) == max(x), x, paste0(min(x), ":", max(x))) })
