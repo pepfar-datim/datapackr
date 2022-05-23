@@ -45,7 +45,7 @@ checkPSNUData  <-  function(d, d2_session = dynGet("d2_default_session",
 
 
     #Evaluate the indicators in parallel if possible
-    if ("parallel" %in% rownames(installed.packages()) == TRUE & .Platform$OS.type != "windows") {
+    if ("parallel" %in% rownames(utils::installed.packages()) == TRUE & .Platform$OS.type != "windows") {
       vr_data$vr_results <-
         parallel::mclapply(vr_data$data, function(x)
           datimvalidation::evaluateValidation(x$combi,

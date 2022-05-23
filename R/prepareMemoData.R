@@ -137,7 +137,7 @@ prepareMemoDataByPSNU <- function(analytics,
     tidyr::nest()
 
   #Evaluate the indicators in parallel if possible
-  if ("parallel" %in% rownames(installed.packages()) == TRUE & .Platform$OS.type != "windows") {
+  if ("parallel" %in% rownames(utils::installed.packages()) == TRUE & .Platform$OS.type != "windows") {
     df$indicator_results <-
       parallel::mclapply(df$data, function(x)
         evaluateIndicators(x$combi, x$value, inds),
@@ -425,7 +425,7 @@ prepareMemoDataByPrio <- function(df,
 #' by_partner: Dataframe of indicators aggregate to the partner level
 #' @inheritParams datapackr_params
 #'
-#' @return
+#' @return Datapackr d object
 #'
 prepareMemoData <- function(d,
                               memo_type,
