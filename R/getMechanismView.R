@@ -75,7 +75,7 @@ getMechanismView <- function(country_uids = NULL,
     mechs <- if (is.null(cop_year)) {
       datimutils::getSqlView(sql_view_uid = "fgUtV6e9YIX", d2_session = d2_session)
     } else {
-      url_filter <- c(paste0("startdate:lt:", cop_year + 1, "-10-01"),
+      url_filter <- c(paste0("startdate:lt:", as.numeric(cop_year) + 1, "-10-01"),
                       paste0("enddate:gt:", cop_year, "-09-30"))
 
       datimutils::getSqlView(url_filter, sql_view_uid = "fgUtV6e9YIX", d2_session = d2_session)
