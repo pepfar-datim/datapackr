@@ -443,52 +443,14 @@ createDataPack <- function(datapack_name = NULL,
       country_uids = country_uids,
       cop_year = cop_year,
       datapack_name = datapack_name,
-      schema = schema),
+      schema = schema,
+      sane_name = getSaneName(datapack_name),
+      operating_unit = getOUFromCountryUIDs(country_uids)),
     tool = list(
       wb = wb)
     )
 
   return(d)
-}
-
-
-# TODO: To deprecate. Duplicate of check_template_path inside check_params
-
-#' @export
-#' @title Compare Data Pack template against schema
-#'
-#' @param tool Either "Data Pack" or "OPU Data Pack"? Default is "Data Pack".
-#' @inheritParams datapackr_params
-#'
-#' @return Message indicating comparison failure or success.
-#'
-compareTemplateToSchema <- function(template_path = NULL,
-                                   cop_year = getCurrentCOPYear(),
-                                   tool = "Data Pack",
-                                   d2_session = dynGet("d2_default_session",
-                                                       inherits = TRUE)) {
-
-  interactive_print("Checking template against schema and DATIM...")
-
-  if (is.null(template_path)) {
-    template_path <- pick_template_path(cop_year, tool)
-  }
-
-  template_schema <-
-    unPackSchema_datapack(
-      template_path = template_path,
-      skip = skip_tabs(tool = paste0(tool, " Template"), cop_year = cop_year),
-      tool = paste0(tool, " Template"),
-      cop_year = cop_year)
-
-  package_schema <- pick_schema(cop_year, tool)
-
-  if (!identical(package_schema, template_schema)) {
-    stop("Template provided does not match published schema.")
-  } else {
-    print("Template provided matches published schema.")
-  }
-
 }
 
 
