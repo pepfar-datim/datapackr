@@ -28,7 +28,6 @@ with_mock_api({
   })
 })
 
-
 with_mock_api({
   test_that("We can create Datapack memo data", {
     d <-
@@ -63,7 +62,8 @@ with_mock_api({
     d %<>% prepareMemoData(
       memo_type = "datapack",
       include_no_prio = TRUE,
-      d2_session = training
+      d2_session = training,
+      is_parallel = (Sys.getenv("CI") != "") #Be nice to the CI ....
     )
 
 
@@ -136,6 +136,126 @@ with_mock_api({
     #By Partner
     #Only test the structure here....
     expect_identical(names(d$memo$datapack$by_partner)[1:3], c("Agency", "Partner", "Mechanism"))
+
+  })
+})
+
+with_mock_api({
+  test_that("We can prepare existing data analytics", {
+    d <-
+      datapackr::createKeychainInfo(
+        submission_path = test_sheet("COP21_DP_random_with_psnuxim.xlsx"),
+        tool = "Data Pack",
+        country_uids = NULL,
+        cop_year = NULL
+      )
+    d <-  d %>%
+      unPackSheets(.) %>%
+      separateDataSets(.) %>%
+      unPackSNUxIM(.) %>%
+      packForDATIM(., type = "Undistributed MER") %>%
+      packForDATIM(., type = "SUBNAT_IMPATT") %>%
+      packForDATIM(., type = "PSNUxIM")
+    #Datapack analytics
+    d <- createAnalytics(d, training)
+    #DATIM analytics
+    d <- prepareExistingDataAnalytics(d, training)
+
+
+    expect_type(d$memo$datim$analytics, "list")
+    expect_true(NROW(d$memo$datim$analytics) > 0)
+    #They should have the same structure
+    expect_setequal(names(d$data$analytics), names(d$memo$datim$analytics))
+  })
+})
+
+with_mock_api({
+  test_that("We can create DATIM/Comparison memo data", {
+    d <-
+      datapackr::createKeychainInfo(
+        submission_path = test_sheet("COP21_DP_random_with_psnuxim.xlsx"),
+        tool = "Data Pack",
+        country_uids = NULL,
+        cop_year = NULL
+      )
+    d <-  d %>%
+      unPackSheets(.) %>%
+      separateDataSets(.) %>%
+      unPackSNUxIM(.) %>%
+      packForDATIM(., type = "Undistributed MER") %>%
+      packForDATIM(., type = "SUBNAT_IMPATT") %>%
+      packForDATIM(., type = "PSNUxIM")
+    #Datapack analytics
+    d <- createAnalytics(d, training)
+    #DATIM analytics
+    d <-
+      prepareMemoData(d,
+                      "comparison",
+                      d2_session = training,
+                      is_parallel = (Sys.getenv("CI") != ""))
+
+
+    expect_type(d$memo$datim$analytics, "list")
+    expect_true(NROW(d$memo$datim$analytics) > 0)
+    #They should have the same structure
+    expect_setequal(names(d$data$analytics), names(d$memo$datim$analytics))
+
+    expect_setequal(names(d$memo$datim),
+                    c("prios", "by_psnu", "by_agency", "by_prio", "by_partner", "analytics"))
+
+    expect_setequal(names(d$memo$datim$prios),
+                    c("orgUnit", "prioritization", "value"))
+    #By PSNU
+    expect_setequal(
+      names(d$memo$datim$by_psnu),
+      c(
+        "psnu_uid",
+        "Mechanism",
+        "Indicator",
+        "Age",
+        "value",
+        "prioritization",
+        "Partner",
+        "Agency",
+        "ou",
+        "country_name",
+        "snu1",
+        "psnu"
+      ))
+
+    #By Prioritization
+    expect_type(d$memo$datim$by_prio, "list")
+    expect_true(names(d$memo$datim$by_prio)[[1]] == "Indicator")
+    expect_true(names(d$memo$datim$by_prio)[[2]] == "Age")
+    expect_true(names(d$memo$datim$by_prio)[[NCOL(d$memo$datim$by_prio)]] == "Total")
+    prio_cols_end <- NCOL(d$memo$datim$by_prio) - 1
+    expect_true(all(
+      names(d$memo$datim$by_prio[3:prio_cols_end]) %in% prioritization_dict()$name
+    ))
+
+    d <- generateComparisonTable(d)
+    expect_type(d$memo$comparison, "list")
+    expect_true(NROW(d$memo$comparison) > 0)
+    expect_named(
+      d$memo$comparison,
+      c(
+        "Mechanism",
+        "Indicator",
+        "Age",
+        "prioritization",
+        "Partner",
+        "Agency",
+        "ou",
+        "country_name",
+        "snu1",
+        "psnu",
+        "Data Type",
+        "value"
+      ), ignore.order = TRUE
+    )
+
+    expect_setequal(unique(d$memo$comparison$`Data Type`), c("Current", "Proposed", "Percent diff", "Diff"))
+    expect_type(d$memo$comparison$value, "double")
 
   })
 })

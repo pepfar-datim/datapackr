@@ -8,7 +8,7 @@ pullFullCodeList(
   FY = getCurrentCOPYear() + 1,
   datastreams = c("mer_targets", "mer_results", "subnat_targets", "subnat_results",
     "impatt"),
-  datasets,
+  datasets = NULL,
   expanded = FALSE,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
