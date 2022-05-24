@@ -109,7 +109,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
 #' categoryoptioncombo_id, mechanism_code and target value
 #' @param inds Data frame of indicators from getMemoIndicators
 #' @param partners_agencies Result of getMechanismView
-#' @param is_parallel Indicates whether the memo indicators should be 
+#' @param is_parallel Indicates whether the memo indicators should be
 #' computed in parallel. Not supported on Windows or in CI environments.
 #' @inheritParams datapackr_params
 #'
@@ -427,7 +427,7 @@ prepareMemoDataByPrio <- function(df,
 #' by_prio: Dataframe of indicators aggregated to the prioritization level
 #' by_partner: Dataframe of indicators aggregate to the partner level
 #' @inheritParams datapackr_params
-#' @param is_parallel Indicates whether the memo indicators should be 
+#' @param is_parallel Indicates whether the memo indicators should be
 #' computed in parallel. Not supported on Windows or in CI environments.
 #'
 #' @return
