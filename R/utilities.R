@@ -674,14 +674,37 @@ formatSetStrings <- function(vec) {
 #' @title Is UID-ish
 #' @md
 #' @description Tests whether a character string matches the regex of a DHIS2
-#' 11-digit UID. Vectorized over `string` and `pattern`.
+#' 11-digit UID.
 #'
 #' @param string Input vector. Either a character vector, or something coercible
 #' to one.
 #'
 #' @return A logical vector.
-is_uidish <- function(string) {
-  stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")
+is_uidish <- function(string, ish = FALSE) {
+  if (!ish) {
+    stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")  
+  } else {
+    stringr::str_detect(string, "[[:alpha:]][[:alnum:]]{10}")  
+  }
+  
+}
+
+#' @export
+#' @title Extract UID
+#' @md
+#' @description Extracts a DHIS2 11-digit UID from provided string.
+#'
+#' @param string Input vector. Either a character vector, or something coercible
+#' to one.
+#'
+#' @return Character vector of DHIS2 11-digit UIDs found in string.
+extract_uid <- function(string) {
+  if (!is_uidish(string, ish = TRUE)) {
+    stop("No UID detected in string.")
+  }
+  
+  stringr::str_extract_all(string, "[[:alpha:]][[:alnum:]]{10}")
+  
 }
 
 
