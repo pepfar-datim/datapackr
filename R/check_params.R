@@ -217,10 +217,10 @@ check_cop_year <- function(cop_year, tool) {
   # If cop_year is NULL or missing, use default from package
   cop_year <- cop_year %missing% NULL
   cop_year <- cop_year %||% getCurrentCOPYear()
-  
+
   # Check type & parse if character and resembles a numeric
   cop_year %<>% parse_maybe_number() # Found in utilities.R
-  
+
   # Check that provided COP Years are supported ####
   if (!cop_year %in% supportedCOPYears()) {
     stop(paste0("Sorry, datapackr only supports tools from ",
@@ -229,7 +229,7 @@ check_cop_year <- function(cop_year, tool) {
                              oxford = FALSE),
                 "."))
   }
-  
+
   # Check other parameters
   tool <- tool %missing% NULL
   tool_provided <- !is.null(tool)

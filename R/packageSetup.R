@@ -13,7 +13,7 @@ getCurrentCOPYear <- function() {
 #' @export
 #' @title Supported Tools & COP Years
 #' @return Tibble of supported tools mapped to their supported COP Years
-#' 
+#'
 datapackrSupports <- function() {
   tibble::tribble(
     ~tool, ~yrs,
@@ -24,10 +24,10 @@ datapackrSupports <- function() {
 
 #' @export
 #' @title Returns COP Years currently supported by the package for a given tool.
-#' 
+#'
 #' @description If no tool is provided, will supply COP Years supported across
 #' all tools.
-#' 
+#'
 #' @inheritParams datapackr_params
 #' @return Vector of COP Years currently supported by the package for the given tool.
 supportedCOPYears <- function(tool = NULL) {
