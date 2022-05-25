@@ -31,11 +31,11 @@ checkNumeric(d, sheet, quiet = TRUE)
 
 checkMissingMetadata(d, sheet, quiet = T)
 
-checkNegativeValues(d, sheet, quiet = T)
+checkNegativeValues(d, sheet, filter_data = T, quiet = T)
 
-checkDecimalValues(d, sheet, quiet = T)
+checkDecimalValues(d, sheet, filter_data = T, quiet = T)
 
-checkInvalidOrgUnits(d, sheet, quiet = T)
+checkInvalidOrgUnits(d, sheet, filter_data = T, quiet = T)
 
 checkBlankPrioritizations(d, sheet, quiet = T)
 
@@ -50,6 +50,9 @@ checkSheetData(d, sheets = NULL, quiet = TRUE, ...)
 first sheet.}
 
 \item{quiet}{Logical. Should warning messages be printed? Default is TRUE.}
+
+\item{filter_data}{Logical. If TRUE, results will be filtered to remove
+irrelevant data before testing.}
 
 \item{compile}{Logical. Should results be compiled back into the d object, or
 returned as a test results object containing \code{test_results}, \code{messages},
