@@ -8,6 +8,7 @@ prepareMemoData(
   d,
   memo_type,
   include_no_prio = TRUE,
+  is_parallel = TRUE,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
@@ -21,6 +22,9 @@ comparison: Create a comparison memo with data from both DATIM and datapack}
 
 \item{include_no_prio}{If TRUE, include \code{"No Prioritiation"}
 as a column in the output.}
+
+\item{is_parallel}{Indicates whether the memo indicators should be
+computed in parallel. Not supported on Windows or in CI environments.}
 
 \item{d2_session}{DHIS2 Session id}
 }

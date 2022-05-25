@@ -32,7 +32,7 @@ comparison: Create a comparison memo with data from both DATIM and datapack}
 \item{psnus}{Dataframe of PSNUs to use in this function, containing at least
 \code{psnu_uid}.}
 
-\item{is_parallel}{Indicates whether the memo indicators should be 
+\item{is_parallel}{Indicates whether the memo indicators should be
 computed in parallel. Not supported on Windows or in CI environments.}
 }
 \value{
