@@ -29,7 +29,7 @@ computed in parallel. Not supported on Windows or in CI environments.}
 \item{d2_session}{DHIS2 Session id}
 }
 \value{
-
+Datapackr d object
 }
 \description{
 A list of tables is returned in d$memo$datapack

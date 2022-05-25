@@ -566,7 +566,7 @@ getMaxCores <- function() {
 #' @description Format a vector of numbers into a string of ranges
 #' @param vec A vector of numbers
 #'
-#' @return
+#' @return Formatted string of ranges
 #' @export
 #' @examples
 #' formatSetStrings(c(1,2,3,5,6,7,8))
@@ -623,8 +623,8 @@ extractWorkbook <- function(d) {
   dir.create(temp_dir)
   file.copy(d$keychain$submission_path, temp_dir)
 
-  new_file <- list.files(temp_dir, full.name = TRUE, pattern = basename(d$keychain$submission_path))
-  unzip(new_file, exdir = temp_dir)
+  new_file <- list.files(temp_dir, full.names = TRUE, pattern = basename(d$keychain$submission_path))
+  utils::unzip(new_file, exdir = temp_dir)
   d$info$has_extract <- TRUE
   #Return the object
   d
@@ -632,7 +632,7 @@ extractWorkbook <- function(d) {
 
 listWorkbookContents <- function(d) {
 
-  d$info$worbook_contents <- unzip(d$keychain$submission_path, list = TRUE) %>%
+  d$info$worbook_contents <- utils::unzip(d$keychain$submission_path, list = TRUE) %>%
     dplyr::pull(`Name`)
 
   d
