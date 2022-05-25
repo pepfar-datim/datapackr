@@ -461,7 +461,7 @@ paste_oxford <- function(..., final = "and", oxford = TRUE) {
   to_paste <- unlist(list(...))
 
   if (length(to_paste) == 1) {
-    to_paste
+    return(to_paste)
   } else {
     first_bits <- to_paste[1:(length(to_paste) - 1)]
     last <- to_paste[length(to_paste)]
@@ -469,9 +469,11 @@ paste_oxford <- function(..., final = "and", oxford = TRUE) {
     start <- paste(first_bits, collapse = ", ")
     serial <- paste0(final, " ", last)
 
-    start <- ifelse(oxford, paste0(start, ", "), paste0(start, " "))
+    start <- ifelse(oxford & length(to_paste) > 2,
+                    paste0(start, ", "),
+                    paste0(start, " "))
 
-    paste0(start, serial)
+    return(paste0(start, serial))
   }
 }
 
