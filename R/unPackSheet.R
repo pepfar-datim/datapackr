@@ -118,7 +118,8 @@ unPackDataPackSheet <- function(d, sheet) {
       dplyr::filter(
         !value %in% prioritization_dict()$value,
     # Remove _Military district from Prioritization extract as this can't be assigned a prioritization ####
-        !stringr::str_detect(PSNU, "^_Military"))
+        !stringr::str_detect(PSNU, "^_Military"),
+        value != "NA")
   }
 
   # Convert non-numeric to numeric ----
