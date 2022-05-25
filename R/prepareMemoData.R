@@ -140,7 +140,7 @@ prepareMemoDataByPSNU <- function(analytics,
     tidyr::nest()
 
   #Evaluate the indicators in parallel if possible
-  if ("parallel" %in% rownames(installed.packages()) == TRUE & is_parallel) {
+  if ("parallel" %in% rownames(utils::installed.packages()) == TRUE & .Platform$OS.type != "windows") {
     df$indicator_results <-
       parallel::mclapply(df$data, function(x)
         evaluateIndicators(x$combi, x$value, inds),
@@ -430,7 +430,7 @@ prepareMemoDataByPrio <- function(df,
 #' @param is_parallel Indicates whether the memo indicators should be
 #' computed in parallel. Not supported on Windows or in CI environments.
 #'
-#' @return
+#' @return Datapackr d object
 #'
 prepareMemoData <- function(d,
                               memo_type,
