@@ -40,12 +40,23 @@ validateSchema <- function(schema,
     assign(p, purrr::pluck(params, p))
   }
 
-  # If template_path provided, check it and unpack it to create comparison schema.
+  # Checks to perform if schema_provided is TRUE ####
+  if (schema_provided) {
+  # Check if this schema is already one we have archived
+    schema %<>% check_schema(schema = .,
+                             cop_year = cop_year,
+                             tool = tool,
+                             season = season)
+  }
+
+
+  # Checks to perform if filepath_provided is TRUE ####
   if (filepath_provided) {
+    ## If template_path provided, check it and unpack it to create comparison schema.####
     template_path %<>% checkTemplatePath(template_path = .,
-                                    cop_year = cop_year,
-                                    tool = tool,
-                                    season = season)
+                                         cop_year = cop_year,
+                                         tool = tool,
+                                         season = season)
 
     filepath_schema <-
       unPackSchema_datapack(
@@ -53,23 +64,28 @@ validateSchema <- function(schema,
         skip = skip_tabs(tool = tool, cop_year = cop_year),
         cop_year = cop_year)
 
-  # If schema_object not provided, use filepath_schema
+    ## If schema_object is provided, check schema against filepath_schema ####
+    if (schema_provided && !identical(schema, filepath_schema)) {
+      interactive_message(
+        "Provided schema doesn't match the schema at the provided filepath.")
+    }
+
+    ## If schema_object not provided, use filepath_schema ####
     schema <- schema %||% filepath_schema
-  }
 
-  if (schema_provided) {
-  # Check if this schema is already one we have archived
-    schema %<>% check_schema(schema = .,
-                             cop_year = cop_year,
-                             tool = tool,
-                             season = season)
+    ## Sheet Names complete ####
+    observed_sheet_names <- unique(schema$sheet_name)
+    expected_sheet_names <- unique(filepath_schema$sheet_name)
 
-  # Compare schema against filepath_schema
-    if (filepath_provided) {
-      if (!identical(schema, filepath_schema)) {
-        interactive_message(
-          "Provided schema doesn't match the schema at the provided filepath.")
-      }
+    sheet_names_comparison <- waldo::compare(observed_sheet_names,
+                                             expected_sheet_names,
+                                             x_arg = "observed",
+                                             y_arg = "expected")
+
+    if (length(sheet_names_comparison) != 0) {
+      tests$sheet_names_complete <- list(
+        error = length(sheet_names_comparison) != 0,
+        data = sheet_names_comparison)
     }
   }
 
@@ -114,25 +130,9 @@ validateSchema <- function(schema,
       data = sheet_nums_comparison)
   }
 
-    ## Sheet Names complete ####
-  if (filepath_provided) {
-    observed_sheet_names <- unique(schema$sheet_name)
-    expected_sheet_names <- unique(filepath_schema$sheet_name)
-
-    sheet_names_comparison <- waldo::compare(observed_sheet_names,
-                                             expected_sheet_names,
-                                             x_arg = "observed",
-                                             y_arg = "expected")
-
-    if (length(sheet_names_comparison) != 0) {
-      tests$sheet_names_complete <- list(
-        error = length(sheet_names_comparison) != 0,
-        data = sheet_names_comparison)
-    }
-  }
-
-    ## dataset ####
+  ## OPU Schema Specific Checks ####
   if (!grepl("OPU Data Pack", tool)) {
+    ### dataset ####
     datasets_invalid <- schema %>%
       dplyr::mutate(
         invalid_dataset =
@@ -145,13 +145,9 @@ validateSchema <- function(schema,
       dplyr::filter(invalid_dataset == TRUE) %>%
       dplyr::select(sheet_name, data_structure, col, indicator_code, dataset, col_type)
 
-    if (NROW(datasets_invalid) != 0) {
-      tests$datasets_invalid <- datasets_invalid
-    }
-  }
+    tests$datasets_invalid <- datasets_invalid
 
-    ## col_type ####
-  if (!grepl("OPU Data Pack", tool)) {
+    ### col_type ####
     col_type_invalid <- schema %>%
       dplyr::mutate(
         invalid_col_type =
@@ -161,9 +157,18 @@ validateSchema <- function(schema,
       dplyr::filter(invalid_col_type == TRUE) %>%
       dplyr::select(sheet_name, col, indicator_code, data_structure, col_type)
 
-    if (NROW(col_type_invalid) != 0) {
-      tests$col_type_invalid <- col_type_invalid
-    }
+    tests$col_type_invalid <- col_type_invalid
+
+    ### value_type ####
+    value_type_invalid <- schema %>%
+      dplyr::mutate(
+        invalid_value_type =
+          (!value_type %in% c("integer", "percentage", "string"))
+        & (sheet_num %in% skip_sheets$num & !is.na(value_type))) %>%
+      dplyr::filter(invalid_value_type == TRUE) %>%
+      dplyr::select(sheet_name, col, indicator_code, value_type)
+
+    tests$value_type_invalid <- value_type_invalid
   }
 
     ## dataElements ####
@@ -184,9 +189,7 @@ validateSchema <- function(schema,
           !stringr::str_detect(dataelement_dsd, multi_uid_pattern))) %>%
     dplyr::filter(invalid_DSD_DEs == TRUE)
 
-  if (NROW(DEs_DSD_syntax_invalid) != 0) {
-    tests$DEs_DSD_syntax_invalid <- DEs_DSD_syntax_invalid
-  }
+  tests$DEs_DSD_syntax_invalid <- DEs_DSD_syntax_invalid
 
   DEs_TA_syntax_invalid <- DEs_schema %>%
     dplyr::select(-dataelement_dsd) %>%
@@ -197,9 +200,7 @@ validateSchema <- function(schema,
           !stringr::str_detect(dataelement_ta, multi_uid_pattern))) %>%
     dplyr::filter(invalid_TA_DEs == TRUE)
 
-  if (NROW(DEs_TA_syntax_invalid) != 0) {
-    tests$DEs_TA_syntax_invalid <- DEs_TA_syntax_invalid
-  }
+  tests$DEs_TA_syntax_invalid <- DEs_TA_syntax_invalid
 
     ##> Match DATIM (valid UIDs only)
   # DEs_mismatch_DATIM <- DEs_schema %>%
@@ -219,24 +220,8 @@ validateSchema <- function(schema,
           !stringr::str_detect(categoryoption_specified, multi_uid_pattern))) %>%
     dplyr::filter(invalid_COs == TRUE)
 
-  if (NROW(COs_syntax_invalid) != 0) {
-    tests$COs_syntax_invalid <- COs_syntax_invalid
-  }
+  tests$COs_syntax_invalid <- COs_syntax_invalid
 
-    ## value_type ####
-  if (!grepl("OPU Data Pack", tool)) {
-    value_type_invalid <- schema %>%
-      dplyr::mutate(
-        invalid_value_type =
-          (!value_type %in% c("integer", "percentage", "string"))
-          & (sheet_num %in% skip_sheets$num & !is.na(value_type))) %>%
-      dplyr::filter(invalid_value_type == TRUE) %>%
-      dplyr::select(sheet_name, col, indicator_code, value_type)
-
-    if (NROW(value_type_invalid) != 0) {
-      tests$value_type_invalid <- value_type_invalid
-    }
-  }
       # TODO: Update
     ## Test valid_ages ####
       #     valid_ages.test =
@@ -259,9 +244,7 @@ validateSchema <- function(schema,
     dplyr::filter(ref_error_fxs == TRUE) %>%
     dplyr::select(sheet_name, col, indicator_code, formula)
 
-  if (NROW(fxs_ref_error) != 0) {
-    tests$fxs_ref_error <- fxs_ref_error
-  }
+  tests$fxs_ref_error <- fxs_ref_error
 
   # TODO: TESTS to add ####
     # * No duplicate indicator_codes on any single sheet
@@ -276,16 +259,17 @@ validateSchema <- function(schema,
     # * No invalid comment types
     # * Numeric or % formatting correct
 
+  # Filter out any tests with zero rows ####
+  tests <- tests[sapply(tests, nrow) > 0]
+
   # Compile test results ####
   if (length(tests) > 0) {
-
     interactive_message("ERROR! Issues with schema values! See output.")
   } else {
     interactive_message("Schema checks out! Great job!")
   }
 
   tests
-
 }
 
 
