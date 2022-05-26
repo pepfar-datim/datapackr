@@ -16,7 +16,7 @@ of the form #{dataelement_id.categoryoptioncombo_id}}
 numerator, and denominator expression.}
 }
 \value{
-
+Data frame of ids, names, numerators, denominators, and values
 }
 \description{
 Evaluate Indicators

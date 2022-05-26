@@ -25,7 +25,7 @@ as a column in the output.}
 \item{d2_session}{DHIS2 Session id}
 }
 \value{
-
+Datapackr d object
 }
 \description{
 A list of tables is returned in d$memo$datapack
