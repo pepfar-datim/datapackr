@@ -31,8 +31,8 @@ separateDataSets <- function(d) {
           dplyr::pull(indicator_code)
       )
     )
-  
-  to_drop <- names(d$data) %in% c("targets","extract")
+
+  to_drop <- names(d$data) %in% c("targets", "extract")
   d$data <- d$data[!to_drop]
 
 
