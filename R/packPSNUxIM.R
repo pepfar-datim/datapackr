@@ -29,9 +29,8 @@ packPSNUxIM <- function(wb, # Workbook object
 
   rm(params, p)
 
-  if (!cop_year %in% c(2021, 2022)) { # if the cop year is not 2021 or 2022, stops and throws message.
-    stop(paste0("Packing PSNU x IM tabs is not supported for COP", cop_year, " Data Packs."))
-  }
+  # if the cop year is not 2021 or 2022, stops and throws message. ####
+  stopifnot("Packing PSNU x IM tabs is not supported for the requested COP year." = cop_year %in% c(2021, 2022))
 
   # Create data sidecar to eventually compile and return ####
   r <- list(
@@ -120,9 +119,7 @@ packPSNUxIM <- function(wb, # Workbook object
     dplyr::ungroup()
 
   # Throws a warning to the user if the number rows do not match after munging.
-  if (NROW(percents) != NROW(values)) {
-    stop("Aggregating values and percents led to different row counts!")
-  }
+  stopifnot("Aggregating values and percents led to different row counts!" = NROW(percents) == NROW(values))
 
   snuxim_model_data <- values %>% # Joins percents to values
     dplyr::left_join(percents,
