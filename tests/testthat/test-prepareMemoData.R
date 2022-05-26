@@ -63,7 +63,7 @@ with_mock_api({
       memo_type = "datapack",
       include_no_prio = TRUE,
       d2_session = training,
-      is_parallel = FALSE #Be nice to the CI ....
+      ncores = 2L #Be nice to the CI ....
     )
 
 
@@ -192,7 +192,7 @@ with_mock_api({
       prepareMemoData(d,
                       "comparison",
                       d2_session = training,
-                      is_parallel = FALSE)
+                      ncores = 2L)
 
 
     expect_type(d$memo$datim$analytics, "list")
