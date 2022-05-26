@@ -109,8 +109,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
 #' categoryoptioncombo_id, mechanism_code and target value
 #' @param inds Data frame of indicators from getMemoIndicators
 #' @param partners_agencies Result of getMechanismView
-#' @param is_parallel Indicates whether the memo indicators should be
-#' computed in parallel. Not supported on Windows or in CI environments.
+#' @param ncores Indicates how many cores should be used.
 #' @inheritParams datapackr_params
 #'
 #' @description This function calculates COP memo indicators at the PSNU level.
@@ -125,7 +124,7 @@ prepareMemoDataByPSNU <- function(analytics,
                                   prios,
                                   partners_agencies,
                                   psnus,
-                                  is_parallel = TRUE) {
+                                  ncores = getMaxCores()) {
    #Now we need to calculate the indicators
 
    df <-  analytics %>%
@@ -139,12 +138,18 @@ prepareMemoDataByPSNU <- function(analytics,
     dplyr::group_by(psnu_uid, mechanism_code) %>%
     tidyr::nest()
 
+  #Determine whether we can evaluate in parallel
+   can_spawn <-
+     "parallel" %in% rownames(utils::installed.packages()) == TRUE &
+     .Platform$OS.type != "windows" & #Never execute in parallel on Windows
+     Sys.getenv("CI") == "" #Never execute in parallel on a CI
+
   #Evaluate the indicators in parallel if possible
-  if ("parallel" %in% rownames(utils::installed.packages()) == TRUE & .Platform$OS.type != "windows") {
+  if (can_spawn) {
     df$indicator_results <-
       parallel::mclapply(df$data, function(x)
         evaluateIndicators(x$combi, x$value, inds),
-        mc.cores = getMaxCores())
+        mc.cores = ncores)
   } else {
     df$indicator_results <-
       lapply(df$data, function(x)
@@ -427,15 +432,14 @@ prepareMemoDataByPrio <- function(df,
 #' by_prio: Dataframe of indicators aggregated to the prioritization level
 #' by_partner: Dataframe of indicators aggregate to the partner level
 #' @inheritParams datapackr_params
-#' @param is_parallel Indicates whether the memo indicators should be
-#' computed in parallel. Not supported on Windows or in CI environments.
+#' @param ncores Indicates how many cores should be used.
 #'
 #' @return Datapackr d object
 #'
 prepareMemoData <- function(d,
                               memo_type,
                               include_no_prio = TRUE,
-                              is_parallel = TRUE,
+                              ncores = getMaxCores(),
                               d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
 
@@ -459,7 +463,7 @@ prepareMemoData <- function(d,
           prios = d$memo$datim$prios,
           partners_agencies = d$memo$partners_agencies,
           psnus = d$info$psnus,
-          is_parallel = is_parallel
+          ncores = ncores
         )
 
       d$memo$datim$by_partner <-
@@ -489,7 +493,7 @@ prepareMemoData <- function(d,
                               prios = d$memo$datapack$prios,
                               partners_agencies = d$memo$partners_agencies,
                               psnus = d$info$psnus,
-                              is_parallel = is_parallel)
+                              ncores = ncores)
 
       #Update the PSNU prioritization levels with those in DATIM
       if (d$info$tool == "OPU Data Pack") {

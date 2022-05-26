@@ -9,4 +9,7 @@ Icon
 mechs.rds
 .Rprofile
 renv/
+.vscode/
+support_files/
+workspace.code-workspace
 
