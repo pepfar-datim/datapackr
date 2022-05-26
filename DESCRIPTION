@@ -27,7 +27,7 @@ Imports:
     assertthat,
     crayon (>= 1.3.4),
     data.table (>= 1.12.8),
-    datimutils,
+    datimutils (>= 0.3.0),
     datimvalidation,
     dplyr (>= 0.8.3),
     fuzzyjoin (>= 0.1.6),
