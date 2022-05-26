@@ -521,7 +521,7 @@ checkTemplatePath <- function(template_path,
 
   input_tool <- paste0(tool, " Template")
   template_schema <-
-    unPackSchema_datapack(
+    unPackSchema(
       template_path = template_path,
       skip = skip_tabs(tool = input_tool, cop_year = cop_year),
       tool = input_tool,

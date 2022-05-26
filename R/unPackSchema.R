@@ -246,7 +246,7 @@ validateSchema <- function(schema,
   if (filepath_provided) {
     ## If template_path provided, check it and unpack it to create comparison schema.####
     filepath_schema <-
-      unPackSchema_datapack(
+      unPackSchema(
         template_path = template_path,
         skip = skip_tabs(tool = tool, cop_year = cop_year),
         cop_year = cop_year)

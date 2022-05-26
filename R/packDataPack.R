@@ -74,7 +74,7 @@ packDataPack <- function(model_data,
   # Test template against schema ####
   interactive_print("Checking template against schema and DATIM...")
   schema <-
-    unPackSchema_datapack(
+    unPackSchema(
       template_path = d$keychain$template,
       skip = skip_tabs(tool = "Data Pack Template", cop_year = cop_year),
       cop_year = cop_year)
