@@ -7,11 +7,12 @@
 checkNotPEPFARSupportedPSNUs(d)
 }
 \arguments{
-\item{d}{}
+\item{d}{Datapackr object with generated analytics table}
 }
 \value{
-
+d Datapackr object
 }
 \description{
-Title
+Checks whether any MER data has been allocated
+to PSNUs which are prioritized as "Not PEPFAR supported".
 }

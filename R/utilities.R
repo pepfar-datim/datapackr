@@ -210,120 +210,76 @@ addcols <- function(data, cnames, type = "character") {
 #' {"2019", "2020", ... , "2023"}
 #' and type {"mer_targets", "mer_results", "subnat_targets", "subnat_results",
 #' "impatt"}
-#' @param fiscal_year character - one of: {"2019", "2020", "2021", "2022",
-#' "2023"}
 #' @param type character vector - one or more of:
 #' {"mer_targets", "mer_results", "subnat_targets", "subnat_results", "impatt"}
+#' @inheritParams datapackr_params
 #' @return returns a character vector of the related dataset uids
 #'
-getDatasetUids <-  function(fiscal_year,
-                            type = c("mer_targets", "mer_results",
-                                     "subnat_targets", "subnat_results",
-                                     "impatt")) {
-  datasets <- character(0)
-  if  (fiscal_year == "2023") {
-    if ("mer_targets" %in% type) {
-      datasets <- c(datasets,
-                    "iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
-                    "o71WtN5JrUu", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
-                    "vzhO50taykm") # Host Country Targets: DREAMS (USG)
-    }
-    if ("mer_results" %in% type) {
-      stop("FY23 results input not supported by getDatasetUids")
-    }
-    if ("subnat_targets" %in% type) {
-      datasets <- c(datasets,
-                    "J4tdiDEi08O") #Host Country Targets: COP Prioritization SNU (USG)
-    }
-    if ("subnat_results" %in% type) {
-      stop("FY23 results input not supported by getDatasetUids")
-    }
-    if ("impatt" %in% type) {
-      datasets <- c(datasets,
-                    "CxMsvlKepvE") #Planning Attributes: COP Prioritization SNU
-    }
-  } else if  (fiscal_year == "2022") {
-    if ("mer_targets" %in% type) {
-      datasets <- c(datasets,
-                    "YfZot37BbTm", # MER Target Setting: PSNU (Facility and Community Combined) FY2022
-                    "cihuwjoY5xP", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
-                    "wvnouBMuLuE") # Host Country Targets: DREAMS (USG) FY2022
-    }
-    if ("mer_results" %in% type) {
-      datasets <- c(datasets,
-                    "BHlhyPmRTUY", # MER Results: Facility Based
-                    "HfhTPdnRWES", # MER Results: Community Based
-                    "MGNVwVicMVm") # Host Country Results: DREAMS (USG)
-    }
-    if ("subnat_targets" %in% type) {
-      datasets <- c(datasets,
-                    "Va7TYyHraRn") #Host Country Targets: COP Prioritization SNU (USG) FY2022
-    }
-    if ("subnat_results" %in% type) {
-      datasets <- c(datasets,
-                    "IXiORiVFqIv") #Host Country Results: COP Prioritization SNU (USG)
-    }
-    if ("impatt" %in% type) {
-      datasets <- c(datasets,
-                    "Zn27xns9Fmx") #Planning Attributes: COP Prioritization SNU FY2022
-    }
-  } else if (fiscal_year == "2021") {
-    if ("mer_targets" %in% type) {
-      datasets <- c(datasets,
-                    "Pmc0yYAIi1t", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2021
-                    "s1sxJuqXsvV")  # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY) FY2021
-    }
-    if ("mer_results" %in% type) {
-      datasets <- c(datasets,
-                    "zL8TlPVzEBZ", # MER Results: Facility Based FY2021Q4
-                    "TBcmmtoaCBC", # MER Results: Community Based FY2021Q4
-                    "qHyrHc4zwx4") # Host Country Results: DREAMS (USG) FY2021Q4
-    }
-    if ("subnat_targets" %in% type) {
-      datasets <- c(datasets,
-                    "j7jzezIhgPj") #Host Country Targets: COP Prioritization SNU (USG) FY2021
-    }
-    if ("subnat_results" %in% type) {
-      datasets <- c(datasets,
-                    "xiTCzZJ2GPP") #Host Country Results: COP Prioritization SNU (USG) FY2021Q4
-    }
-    if ("impatt" %in% type) {
-      datasets <- c(datasets,
-                    "jxnjnBAb1VD") # Planning Attributes: COP Prioritization SNU FY2021
-    }
-  } else if (fiscal_year == "2020") {
-    if ("mer_targets" %in% type) {
-      datasets <- c(datasets,
-                    "sBv1dj90IX6", # MER Targets: Facility Based FY2020
-                    "nIHNMxuPUOR", # MER Targets: Community Based FY2020
-                    "C2G7IyPPrvD", # MER Targets: Community Based - DoD ONLY FY2020
-                    "HiJieecLXxN") # MER Targets: Facility Based - DoD ONLY FY2020
-    }
-    if ("mer_results" %in% type) {
-      datasets <- c(datasets,
-                    "qzVASYuaIey", # MER Results: Community Based FY2020Q4
-                    "BPEyzcDb8fT", # MER Results: Community Based - DoD ONLY FY2021Q4
-                    "jKdHXpBfWop", # MER Results: Facility Based FY2020Q4
-                    "em1U5x9hhXh", # MER Results: Facility Based - DoD ONLY FY2021Q4
-                    "mbdbMiLZ4AA") # Host Country Results: DREAMS (USG) FY2020Q4
-    }
-    if ("subnat_targets" %in% type) {
-      datasets <- c(datasets,
-                    "N4X89PgW01w") # Host Country Targets: COP Prioritization SNU (USG) FY2020
-    }
-    if ("subnat_results" %in% type) {
-      datasets <- c(datasets,
-                    "ctKXzmv2CVu") # Host Country Results: COP Prioritization SNU (USG) FY2020Q4
-    }
-    if ("impatt" %in% type) {
-      datasets <- c(datasets,
-                    "pTuDWXzkAkJ") # Planning Attributes: COP Prioritization SNU FY2020
-    }
-  } else {
-    stop(paste("FY", fiscal_year, "input not supported by getDatasetUids"))
+getDatasetUids <-  function(cop_year, type) {
+
+  #Convert to cop_year everywhere
+
+  cop_year <- check_cop_year(cop_year = cop_year)
+
+  type <- type %missing% c("mer_targets", "mer_results",
+                           "subnat_targets", "subnat_results",
+                           "impatt")
+
+  datasets_filtered <-
+    list(
+      "2022" = list(
+        "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
+        "o71WtN5JrUu", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
+        "vzhO50taykm"), # Host Country Targets: DREAMS (USG)
+        "mer_results" = NA,
+        "subnat_targets" = "J4tdiDEi08O",
+        "subnat_results" = NA,
+        "impatt" = "CxMsvlKepvE"),
+      "2021" = list(
+        "mer_targets" =   c("YfZot37BbTm", # MER Target Setting: PSNU (Facility and Community Combined) FY2022
+                            "cihuwjoY5xP", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
+                            "wvnouBMuLuE"), # Host Country Targets: DREAMS (USG) FY2022),
+        "mer_results" = c("BHlhyPmRTUY", # MER Results: Facility Based
+                          "HfhTPdnRWES", # MER Results: Community Based
+                          "MGNVwVicMVm"), # Host Country Results: DREAMS (USG),
+        "subnat_targets" = "Va7TYyHraRn",
+        "subnat_results" = "IXiORiVFqIv",
+        "impatt" = "Zn27xns9Fmx"),
+      "2020" = list(
+        "mer_targets" =   c("Pmc0yYAIi1t", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2021
+                             "s1sxJuqXsvV"),  # MER Target Setting: PSNU
+                                              #(Facility and Community Combined) - DoD ONLY) FY2021,
+                                              # Host Country Targets: DREAMS (USG) FY2022),
+        "mer_results" =   c("zL8TlPVzEBZ", # MER Results: Facility Based FY2021Q4
+                            "TBcmmtoaCBC", # MER Results: Community Based FY2021Q4
+                            "qHyrHc4zwx4"), # Host Country Results: DREAMS (USG) FY2021Q4
+        "subnat_targets" = "j7jzezIhgPj",
+        "subnat_results" = "xiTCzZJ2GPP",
+        "impatt" = "jxnjnBAb1VD"),
+      "2019" = list(
+        "mer_targets" = c("sBv1dj90IX6", # MER Targets: Facility Based FY2020
+                        "nIHNMxuPUOR", # MER Targets: Community Based FY2020
+                        "C2G7IyPPrvD", # MER Targets: Community Based - DoD ONLY FY2020
+                        "HiJieecLXxN"), # MER Targets: Facility Based - DoD ONLY FY2020
+          "mer_results" =   c("qzVASYuaIey", # MER Results: Community Based FY2020Q4
+                              "BPEyzcDb8fT", # MER Results: Community Based - DoD ONLY FY2021Q4
+                              "jKdHXpBfWop", # MER Results: Facility Based FY2020Q4
+                               "em1U5x9hhXh", # MER Results: Facility Based - DoD ONLY FY2021Q4
+                               "mbdbMiLZ4AA"), # Host Country Results: DREAMS (USG) FY2020Q4
+          "subnat_targets" = "N4X89PgW01w",
+          "subnat_results" = "ctKXzmv2CVu",
+          "impatt" = "pTuDWXzkAkJ")) %>%
+    purrr::pluck(as.character(cop_year)) %>%
+    .[type] %>%
+    unlist(use.names = FALSE) %>%
+    purrr::discard(~ is.na(.))
+
+  if (is.null(datasets_filtered) | length(datasets_filtered) == 0) {
+    stop(paste("No datasets could be found for cop_year", cop_year, "and type(s)", type))
   }
-  return(datasets)
-}
+
+  datasets_filtered
+  }
 
 #' @export
 #' @title Define prioritization values.
@@ -505,7 +461,7 @@ paste_oxford <- function(..., final = "and", oxford = TRUE) {
   to_paste <- unlist(list(...))
 
   if (length(to_paste) == 1) {
-    to_paste
+    return(to_paste)
   } else {
     first_bits <- to_paste[1:(length(to_paste) - 1)]
     last <- to_paste[length(to_paste)]
@@ -513,9 +469,11 @@ paste_oxford <- function(..., final = "and", oxford = TRUE) {
     start <- paste(first_bits, collapse = ", ")
     serial <- paste0(final, " ", last)
 
-    start <- ifelse(oxford, paste0(start, ", "), paste0(start, " "))
+    start <- ifelse(oxford & length(to_paste) > 2,
+                    paste0(start, ", "),
+                    paste0(start, " "))
 
-    paste0(start, serial)
+    return(paste0(start, serial))
   }
 }
 

@@ -23,7 +23,12 @@ test_that("Can error on bad file location", {
 
 })
 
-test_that("Can error on bad file exstention", {
+test_that("canReadFalse if path is NULL", {
+  expect_false(datapackr::canReadFile())
+})
+
+
+test_that("Can error on bad file exstension", {
 
   foo_file <- tempfile(fileext = ".xlsb")
   file.create(foo_file)
