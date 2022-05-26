@@ -1,4 +1,35 @@
 #' @export
+#' @title getMechanismViewFromDATIM
+#'
+#' @inheritParams datapackr_params
+#'
+#' @return Mechanism List
+#'
+getMechanismViewFromDATIM <- function(cop_year = NULL,
+                                  d2_session = dynGet("d2_default_session",
+                                                      inherits = TRUE)) {
+
+  url_filter <-
+    ifelse(is.null(cop_year), "",
+            paste0("&filter=startdate:lt:", cop_year + 1, "-10-01",
+                   "&filter=enddate:gt:", cop_year, "-09-30"))
+
+  paste0(d2_session$base_url,
+         "api/sqlViews/fgUtV6e9YIX/data.csv?paging=false", url_filter) %>%
+    utils::URLencode() %>%
+    httr::GET(httr::timeout(180), handle = d2_session$handle) %>%
+    httr::content(., "text") %>%
+    readr::read_csv(col_types = readr::cols(.default = "c")) %>%
+    dplyr::rename(
+      mechanism_desc = mechanism,
+      attributeOptionCombo = uid,
+      mechanism_code = code,
+      partner_desc = partner,
+      partner_id = primeid)
+}
+
+
+#' @export
 #' @title getMechanismView
 #'
 #' @description Retrieves a view of mechanisms with partners and agencies
@@ -71,24 +102,8 @@ getMechanismView <- function(country_uids = NULL,
 
   if (!is_fresh) {
     interactive_print("Fetching new mechs file from DATIM")
-
-    mechs <- if (is.null(cop_year)) {
-      datimutils::getSqlView(sql_view_uid = "fgUtV6e9YIX", d2_session = d2_session)
-    } else {
-      url_filter <- c(paste0("startdate:lt:", as.numeric(cop_year) + 1, "-10-01"),
-                      paste0("enddate:gt:", cop_year, "-09-30"))
-
-      datimutils::getSqlView(url_filter, sql_view_uid = "fgUtV6e9YIX", d2_session = d2_session)
-    }
-
-    mechs <- mechs %>%
-      dplyr::rename(
-        mechanism_desc = mechanism,
-        attributeOptionCombo = uid,
-        mechanism_code = code,
-        partner_desc = partner,
-        partner_id = primeid)
-
+    mechs <-
+      getMechanismViewFromDATIM(d2_session = d2_session)
     if (can_write_file) {
       interactive_print(paste0("Overwriting stale mechanisms view to ", cached_mechs_path))
       saveRDS(mechs, file = cached_mechs_path)
@@ -146,6 +161,7 @@ getMechanismView <- function(country_uids = NULL,
 
     mechs <- rbind(mechs, default_mech)
   }
+
 
   structure_ok <- dplyr::setequal(names(empty_mechs_view), names(mechs))
 
