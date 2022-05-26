@@ -12,17 +12,17 @@
 validationSummary <- function(d) {
 
   tests_rows <- t(purrr::map_dfr(d$tests, NROW)) %>%
-    as.data.frame() %>% 
+    as.data.frame() %>%
     dplyr::mutate(test_name = rownames(.),
-                   count = as.numeric(V1)) %>% 
-    dplyr::select(test_name,count) %>% 
+                   count = as.numeric(V1)) %>%
+    dplyr::select(test_name, count) %>%
     tibble::as_tibble()
 
   tests_names <- t(purrr::map_dfr(d$tests, function(x) attr(x, "test_name"))) %>%
-    as.data.frame() %>% 
+    as.data.frame() %>%
     dplyr::mutate(test_name = rownames(.),
-                  validation_issue_category = V1) %>% 
-    dplyr::select(test_name,validation_issue_category) %>% 
+                  validation_issue_category = V1) %>%
+    dplyr::select(test_name, validation_issue_category) %>%
   tibble::as_tibble()
 
 

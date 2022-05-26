@@ -109,7 +109,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
 #' categoryoptioncombo_id, mechanism_code and target value
 #' @param inds Data frame of indicators from getMemoIndicators
 #' @param partners_agencies Result of getMechanismView
-#' @param ncores Indicates how many cores should be used. 
+#' @param ncores Indicates how many cores should be used.
 #' @inheritParams datapackr_params
 #'
 #' @description This function calculates COP memo indicators at the PSNU level.
@@ -143,7 +143,7 @@ prepareMemoDataByPSNU <- function(analytics,
      "parallel" %in% rownames(utils::installed.packages()) == TRUE &
      .Platform$OS.type != "windows" & #Never execute in parallel on Windows
      Sys.getenv("CI") == "" #Never execute in parallel on a CI
-   
+
   #Evaluate the indicators in parallel if possible
   if (can_spawn) {
     df$indicator_results <-
@@ -432,7 +432,7 @@ prepareMemoDataByPrio <- function(df,
 #' by_prio: Dataframe of indicators aggregated to the prioritization level
 #' by_partner: Dataframe of indicators aggregate to the partner level
 #' @inheritParams datapackr_params
-#' @param ncores Indicates how many cores should be used. 
+#' @param ncores Indicates how many cores should be used.
 #'
 #' @return Datapackr d object
 #'
