@@ -2,7 +2,7 @@
 % Please edit documentation in R/writePSNUxIM.R
 \name{writePSNUxIM}
 \alias{writePSNUxIM}
-\title{writePSNUxIM(d)}
+\title{Write PSNUxIM Tab}
 \usage{
 writePSNUxIM(
   d,
