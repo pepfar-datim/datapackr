@@ -12,21 +12,21 @@
 #' @return
 #' For lower-level functions, a list of instances of failed tests. For the
 #' higher-level `validateSchema`, a list object of lists of failed tests.
-#' * `validateSchema_SkippedSheets`: 
-#' * `validateSchema_SheetNums`: 
-#' * `validateSchema_SheetNamesComplete`: 
-#' * `validateSchema_InvalidDatasets`: 
-#' * `validateSchema_InvalidColType`: 
-#' * `validateSchema_InvalidValueType`: 
-#' * `validateSchema_DSDSyntax`: 
-#' * `validateSchema_TASyntax`: 
-#' * `validateSchema_COsSyntax` : 
-#' * `validateSchema_ValidAges` : 
-#' * `validateSchema_ValidSexes` : 
-#' * `validateSchema_ValidKPs` : 
-#' * `validateSchema_Formulas` : 
-#' * `validateSchema` : 
-#' * `unPackSchema` : 
+#' * `validateSchema_SkippedSheets`:
+#' * `validateSchema_SheetNums`:
+#' * `validateSchema_SheetNamesComplete`:
+#' * `validateSchema_InvalidDatasets`:
+#' * `validateSchema_InvalidColType`:
+#' * `validateSchema_InvalidValueType`:
+#' * `validateSchema_DSDSyntax`:
+#' * `validateSchema_TASyntax`:
+#' * `validateSchema_COsSyntax` :
+#' * `validateSchema_ValidAges` :
+#' * `validateSchema_ValidSexes` :
+#' * `validateSchema_ValidKPs` :
+#' * `validateSchema_Formulas` :
+#' * `validateSchema` :
+#' * `unPackSchema` :
 #'
 #' @family schema-helpers
 NULL
@@ -153,7 +153,7 @@ validateSchema_DSDSyntax <- function(DEs_schema, multi_uid_pattern) {
           sheet_name == "PSNUxIM", dataelement_dsd != "NA",
           !stringr::str_detect(dataelement_dsd, multi_uid_pattern))) %>%
     dplyr::filter(invalid_DSD_DEs == TRUE)
-  
+
   DEs_DSD_syntax_invalid
 }
 
@@ -167,7 +167,7 @@ validateSchema_TASyntax <- function(DEs_schema, multi_uid_pattern) {
           sheet_name == "PSNUxIM", dataelement_ta != "NA",
           !stringr::str_detect(dataelement_ta, multi_uid_pattern))) %>%
     dplyr::filter(invalid_TA_DEs == TRUE)
-  
+
   DEs_TA_syntax_invalid
 }
 
@@ -188,17 +188,17 @@ validateSchema_COsSyntax <- function(schema, multi_uid_pattern) {
 
 #' @rdname schema-validations
 validateSchema_ValidAges <- function(schema) {
-  
+
 }
 
 #' @rdname schema-validations
 validateSchema_ValidSexes <- function(schema) {
-  
+
 }
 
 #' @rdname schema-validations
 validateSchema_ValidKPs <- function(schema) {
-  
+
 }
 
 #' @rdname schema-validations
@@ -387,6 +387,10 @@ unPackSchema <- function(template_path = NULL,
   }
 
   # Add sheet number based on order of occurrence in workbook, rather than A-Z ####
+  #TODO: This seems to be the only place we use data.table
+  #Is there a particular reason for this or can we switch to a tibble instead?
+  #Seems better to get rid of this dependency if we are only using it here
+  #and it could be potentially done in a different way.
   data.table::setDT(schema)[, sheet_num := .GRP, by = c("sheet_name")]
 
   # Skip detail on listed sheets. ####
@@ -454,29 +458,31 @@ unPackSchema <- function(template_path = NULL,
 
   if (tool == "Data Pack Template") {
 
-    if (cop_year == 2021) {
-      map_datapack_cogs <- datapackr::datapack_cogs$COP21
-    } else if (cop_year == 2022) {
-      map_datapack_cogs <- datapackr::datapack_cogs$COP22
-    } else {
-      stop("Can't find categoryOptionGroups for that cop_year and tool.")
-    }
+    #TODO: Consider to change the structure of datapack_cogs
+    #to use the COP year instead of COPXX
 
-  # Left-Pad digits with zeros
-    # TODO: Move into utilities.R
-    pad <- function(digit) {
-      padded <- paste0("0", digit)
-    }
+    cop_year_select <- gsub("^20", "COP", as.character(cop_year))
+    map_datapack_cogs <- datapackr::datapack_cogs %>%
+      purrr::pluck(cop_year_select)
+    stopifnot("Can't find categoryOptionGroups for that cop_year and tool." = !is.data.frame(map_datapack_cogs))
+
+  # # Left-Pad digits with zeros
+  #   # TODO: Move into utilities.R
+  #   # Move to utlities R if needed....it seems to only be used here.
+  #  Reimplememnted with an anonymous function below
+  #   pad <- function(digit) {
+  #     padded <- paste0("0", digit)
+  #   }
 
     map_datapack_cogs %<>%
-      dplyr::mutate(
-        categoryOptions = purrr::map(
-          categoryOptions,
-          ~ .x %>%
-            dplyr::mutate(
-              name = stringr::str_replace_all(name, "(?<!\\d)\\d(?!\\d)", pad))
-        )
-      )
+      dplyr::mutate(categoryOptions = purrr::map(
+        categoryOptions,
+        ~ .x %>%
+          dplyr::mutate(
+            name = stringr::str_replace_all(name, "(?<!\\d)\\d(?!\\d)",
+                   function(x) paste0("0", as.character(x)))
+          )
+      ))
 
   # Add disagg lists to schema ####
     map_datapack_cogs %<>%
