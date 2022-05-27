@@ -19,7 +19,7 @@ check_country_uids(country_uids, force = TRUE)
 
 check_PSNUs(PSNUs = NULL, country_uids = NULL)
 
-check_cop_year(cop_year)
+check_cop_year(cop_year, tool)
 
 check_tool(tool, season, cop_year)
 

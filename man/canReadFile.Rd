@@ -4,7 +4,7 @@
 \alias{canReadFile}
 \title{Test for file read access}
 \usage{
-canReadFile(path)
+canReadFile(path = NULL)
 }
 \arguments{
 \item{path}{Filepath to test. Default is NA.}

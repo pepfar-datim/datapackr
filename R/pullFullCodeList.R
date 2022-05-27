@@ -16,7 +16,7 @@ pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
                              datastreams = c("mer_targets", "mer_results",
                                              "subnat_targets", "subnat_results",
                                              "impatt"),
-                             datasets,
+                             datasets = NULL,
                              expanded = FALSE,
                              d2_session = dynGet("d2_default_session",
                                                  inherits = TRUE)) {
@@ -24,30 +24,17 @@ pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
   datasets <- datasets %missing% NULL
   datasets_provided <- !is.null(datasets)
 
+  FY_numeric <- parse_maybe_number(FY)
+
+  if (!is.null(FY_numeric)) {
+    cop_year <- check_cop_year(cop_year = FY_numeric - 1)
+  } else {
+    stop("Invalid fiscal year paramater specified.")
+  }
+
+
   if (!datasets_provided) {
-    datasets <- character(0)
-
-    if ("mer_targets" %in% datastreams) {
-      datasets <- c(datasets,
-                    datapackr::getDatasetUids(FY, type = "mer_targets"))
-    }
-    if ("mer_results" %in% datastreams) {
-      datasets <- c(datasets,
-                    datapackr::getDatasetUids(FY, type = "mer_results"))
-    }
-    if ("subnat_targets" %in% datastreams) {
-      datasets <- c(datasets,
-                    datapackr::getDatasetUids(FY, type = "subnat_targets"))
-    }
-    if ("subnat_results" %in% datastreams) {
-      datasets <- c(datasets,
-                    datapackr::getDatasetUids(FY, type = "subnat_results"))
-    }
-    if ("impatt" %in% datastreams) {
-      datasets <- c(datasets,
-                    datapackr::getDatasetUids(FY, type = "impatt"))
-    }
-
+    datasets <- getDatasetUids(cop_year, datastreams)
   }
 
   datasets <- unique(datasets)
@@ -55,13 +42,7 @@ pullFullCodeList <- function(FY = getCurrentCOPYear() + 1,
   ds <- data.frame()
 
   fullCodeList <-
-    lapply(
-      datasets,
-      function(x) {
-        cl <- pullDATIMCodeList(x, d2_session = d2_session)
-        ds <- rbind(ds, cl)
-        }) %>%
-    do.call(rbind, .) %>%
+    purrr::map_dfr(datasets, function(x) pullDATIMCodeList(x, d2_session = d2_session)) %>%
     dplyr::select(dataelement, dataelementuid, categoryoptioncombo, categoryoptioncombouid) %>%
     dplyr::mutate(FY = FY) %>%
     dplyr::distinct() %>%

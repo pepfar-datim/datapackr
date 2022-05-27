@@ -10,7 +10,7 @@ formatSetStrings(vec)
 \item{vec}{A vector of numbers}
 }
 \value{
-
+Formatted string of ranges
 }
 \description{
 Format a vector of numbers into a string of ranges
