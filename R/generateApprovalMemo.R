@@ -33,7 +33,7 @@ defaultMemoStyleHeader <- function() {
 #' @export
 #' @title Zeroes to Dashes
 #' @param x Target value to be formatted.
-#' @return
+#' @return Formatted target value
 zerosToDashes <- function(x) {
   ifelse(x == 0, "-", formatC(x, format = "f", big.mark = ",", digits = 0))
 }
@@ -43,7 +43,7 @@ zerosToDashes <- function(x) {
 #' @export
 #' @title Generate Memo Template File
 #' @inheritParams datapackr_params
-#' @return
+#' @return Officer docx object
 generateMemoTemplate <- function(draft_memo = TRUE) {
 
   if (draft_memo) {
@@ -65,11 +65,11 @@ generateMemoTemplate <- function(draft_memo = TRUE) {
 #' @param ou_name Name of organisation unit.
 #' @inheritParams datapackr_params
 #'
-#' @return
+#' @return Formatted prioritization-level memo target table
 #'
 renderPrioTable <- function(memo_doc, prio_table, ou_name, source_type) {
 
-  #Set the caption based on the source_type
+  # Set the caption based on the source_type
   fig_caption <- switch(source_type,
                         "datapack" = "Table 1a: Prioritization Table (Proposed)",
                         "datim" = "Table 1b: Prioritization Table (Current)")
@@ -149,11 +149,11 @@ renderPrioTable <- function(memo_doc, prio_table, ou_name, source_type) {
 #' @param ou_name Name of the organisation unit.
 #' @inheritParams datapackr_params
 #'
-#' @return
+#' @return Formatted agency-level memo target table
 #'
 renderAgencyTable <- function(memo_doc, agency_table, ou_name, source_type) {
 
-  #Set the caption based on the source_type
+  # Set the caption based on the source_type
   fig_caption <- switch(source_type,
                         "datapack" = "Table 2a: Agency Table (Proposed)",
                         "datim" = "Table 2b: Agency Table (Current)")
@@ -226,11 +226,11 @@ renderAgencyTable <- function(memo_doc, agency_table, ou_name, source_type) {
 #' d$memo$datapack$by_partner.
 #' @inheritParams datapackr_params
 #'
-#' @return
+#' @return Formatted partner-level memo target table
 #'
 renderPartnerTable <- function(memo_doc, partners_table, memoStructure, source_type) {
 
-  #Set the caption based on the source_type
+  # Set the caption based on the source_type
   fig_caption <- switch(source_type,
                         "datapack" = "Table 3a: Partners Table (Proposed)",
                         "datim" = "Table 3b: Partners Table (Current)")

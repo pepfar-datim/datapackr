@@ -24,7 +24,7 @@ d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
 
 # Export DATIM import files ####
   exportPackr(data = d$datim$MER,
-              output_path = output_folder,
+              output_folder = output_folder,
               type = "DATIM Export File",
               datapack_name = d$info$datapack_name)
 
@@ -144,7 +144,7 @@ d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
     dplyr::mutate(support_type = toupper(support_type))
 
   fullCodeList <- pullFullCodeList(FY = 2022,
-                                   datastream = c("mer_targets", "subnat_targets", "impatt")) %>%
+                                   datastreams = c("mer_targets", "subnat_targets", "impatt")) %>%
     dplyr::left_join(
       datimutils::getMetadata(categoryOptionCombos,
                               fields = "id,categoryOptions",
@@ -180,7 +180,7 @@ d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
 
   exportPackr(
     data = d$datim$MER,
-    output_path = d$keychain$output_folder,
+    output_folder = d$keychain$output_folder,
     type = "DATIM Export File",
     datapack_name = d$info$datapack_name
   )

@@ -39,87 +39,34 @@ round_trunc <- function(x, digits = 0) {
 
 
 #' @export
-#' @title Pull IMPATT levels from DATIM for all PEPFAR countries
+#' @title Swap columns between two dataframes
 #'
 #' @description
-#' Queries DATIM to retrieve the latest version of
-#' \code{/api/dataStore/dataSetAssignments/ous}
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
-#' @return Dataframe of country metadata, including prioritization, planning,
-#' country, community, and facility levels in DATIM organization hierarchy.
-#'
-getIMPATTLevels <- function(d2_session = dynGet("d2_default_session",
-                                                inherits = TRUE)) {
-  impatt_levels <-
-    paste0(d2_session$base_url, "api/", datapackr::api_version(),
-           "/dataStore/dataSetAssignments/orgUnitLevels") %>%
-    httr::GET(httr::timeout(180), handle = d2_session$handle) %>%
-    httr::content(., "text") %>%
-    jsonlite::fromJSON(., flatten = TRUE) %>%
-    do.call(rbind.data.frame, .) %>%
-    dplyr::rename(operating_unit = name3, country_name = name4) %>%
-    dplyr::mutate_if(is.factor, as.character) %>%
-    dplyr::mutate(country_name =
-                    dplyr::case_when(country == 3 ~ operating_unit,
-                                     country == 4 ~ country_name))
-
-  # Add country_uids ####
-  countries <-
-    datapackr::api_call("organisationUnits", d2_session = d2_session) %>%
-    datapackr::api_filter(field = "organisationUnitGroups.id",
-                          operation = "eq",
-                          match = "cNzfcPWEGSH") %>%
-    datapackr::api_fields(fields = "id,name,level,ancestors[id,name]") %>% # nolint
-    datapackr::api_get(d2_session = d2_session)
-
-  impatt_levels %<>%
-    dplyr::left_join(countries, by = c("country_name" = "name")) %>%
-    dplyr::rename(country_uid = id) %>%
-    dplyr::select(operating_unit, country_name, country_uid,
-                  dplyr::everything(), -ancestors, -level)
-
-  return(impatt_levels)
-
-}
-
-
-#' @export
-#' @title Swap columns between dataframes
-#'
-#' @description
-#' Replaces columns in \code{to} with those with identical names in \code{from}.
+#' Replaces columns in the dataframe \code{to} with those with identical names
+#'  in the dataframe \code{from}.
 #'
 #' @param to Dataframe to pull columns into
-#' @param from Data frame to pull columns from
+#' @param from Dataframe to pull columns from
 #'
-#' @return dataframe with swapped columns
+#' @return A dataframe with the swapped columns
 #'
 swapColumns <- function(to, from) {
-  # Grab column names from `from`
-    cols <- colnames(from)
+  # Grab column names from the `from` df
+  cols <- colnames(from)
 
-  # If `from` is a null dataframe, skip and return `to`
-    if (length(cols) != 0) {
+  # If the `from` df is a null dataframe, skip and return the `to` df
+  if (length(cols) != 0) {
 
   # Loop through `from` columns and if there's a match in `to`, copy and paste
-  #   it into `to`
-      for (i in seq_along(cols)) {
-        col <- cols[i]
-        if (col %in% colnames(to)) {
-          dots <-
-            stats::setNames(list(lazyeval::interp(
-              ~ magrittr::use_series(from, x), x = as.name(col)
-            )), col)
-          to <- to %>%
-            dplyr::mutate_(.dots = dots)
-        } else {
-          next
-        }
+    #   it into `to`
+    for (col in cols) {
+      if (col %in% colnames(to)) {
+        # base column swap
+        to[, col] <- from[, col]
       }
     }
-
+  }
   return(to)
-
 }
 
 
@@ -172,83 +119,6 @@ interactive_warning <- function(x) {
   if (rlang::is_interactive()) {
     warning(x, call. = FALSE)
   }
-}
-
-#' @export
-#' @title Pull list of Countries from DATIM.
-#'
-#' @description
-#' Queries DATIM to extract list of Countries for specified Data Pack UID and
-#' adds additional Countries not currently in DATIM as needed.
-#'
-#' @param datapack_uid A unique ID specifying the PEPFAR Operating Unit or
-#' specific Data Pack country grouping. If left unspecified, will pull all
-#' Country Names.
-#'
-#' @return Data frame of Countries
-#'
-getCountries <- function(datapack_uid = NA) {
-
-  # Pull Country List
-    countries <-
-      datapackr::api_call("organisationUnits", d2_session = d2_session) %>%
-      datapackr::api_filter(field = "organisationUnitGroups.id",
-                            operation = "eq",
-                            match = "cNzfcPWEGSH") %>%
-      datapackr::api_fields(fields = "id, name, level, ancestors[id, name]") %>%
-      datapackr::api_get() %>%
-
-  # Remove countries no longer supported
-      dplyr::filter(
-        !name %in%
-          c("Antigua & Barbuda", "Bahamas", "Belize", "China", "Dominica", "Grenada",
-            "Saint Kitts & Nevis", "Saint Lucia", "Saint Vincent & the Grenadines",
-            "Turkmenistan", "Uzbekistan")) %>%
-      dplyr::select(country_name = name, country_uid = id, dplyr::everything()) %>%
-
-  # Add metadata
-      dplyr::mutate(
-        data_pack_name = dplyr::case_when(
-          country_name %in% c("Burma", "Cambodia", "India", "Indonesia",
-                              "Kazakhstan", "Kyrgyzstan", "Laos",
-                              "Nepal", "Papua New Guinea", "Tajikistan",
-                              "Thailand") ~ "Asia Region",
-          country_name %in% c("Barbados", "Guyana", "Jamaica", "Suriname",
-                              "Trinidad & Tobago") ~ "Caribbean Region",
-          country_name %in% c("Brazil", "Costa Rica", "El Salvador",
-                              "Guatemala", "Honduras", "Nicaragua",
-                              "Panama") ~ "Central America Region",
-          country_name %in% c("Burkina Faso", "Ghana", "Liberia", "Mali",
-                              "Senegal", "Sierra Leone", "Togo")
-                              ~ "West Africa Region",
-          TRUE ~ country_name),
-        model_uid = dplyr::case_when(
-          data_pack_name == "Asia Region" ~ "ptVxnBssua6",
-          data_pack_name == "Caribbean Region" ~ "nBo9Y4yZubB",
-          data_pack_name == "Central America Region" ~ "vSu0nPMbq7b",
-          data_pack_name == "West Africa Region" ~ "G0BT4KrJouu",
-          TRUE ~ country_uid
-        ),
-        is_region = data_pack_name %in% c("Asia Region",
-                                          "Caribbean Region",
-                                          "Central America Region",
-                                          "West Africa Region"),
-        level3name = purrr::map_chr(ancestors, list("name", 3), .default = NA),
-        level3name = dplyr::if_else(level == 3, country_name, level3name),
-        uidlevel3 = purrr::map_chr(ancestors, list("id", 3), .default = NA),
-        uidlevel3 = dplyr::if_else(level == 3, country_uid, uidlevel3),
-        level4name = dplyr::case_when(level == 4 ~ country_name),
-        uidlevel4 = dplyr::case_when(level == 4 ~ country_uid),
-        country_in_datim = TRUE
-      )
-
-  if (!is.na(datapack_uid)) {
-    countries %<>%
-      dplyr::filter(model_uid == datapack_uid)
-  }
-
-  return(countries)
-
 }
 
 
@@ -305,7 +175,7 @@ getOUFromCountryUIDs <- function(country_uids) {
 #' will add one new, \code{NULL} column to \code{data} for each element of
 #' \code{cnames} and name it after the corresponding element of \code{cnames}.
 #'
-#' @param data Dataframe to add columns.
+#' @param data The dataframe to add the columns to.
 #' @param cnames Character vector of one or more column names to be added to
 #' \code{data}.
 #' @param type \code{character}, \code{numeric}, \code{logical}
@@ -313,9 +183,12 @@ getOUFromCountryUIDs <- function(country_uids) {
 #' @return Dataframe \code{data} with added columns listed in \code{cnames}.
 #'
 addcols <- function(data, cnames, type = "character") {
-  add <- cnames[!cnames %in% names(data)]
+  add <- cnames[!cnames %in% names(data)] # Subsets column name list BY only
+  # keeping names that are NOT in the supplied dataframes column names already.
 
-  if (length(add) != 0) {
+  if (length(add) != 0) { #If their are columns that need to be filled in THEN
+    #Impute the NA value based upon the type provided in the function.
+    # TODO: #Automate the character type or at least a list variable for type.
     if (type == "character") {
       data[add] <- NA_character_
     } else if (type == "numeric") {
@@ -337,148 +210,76 @@ addcols <- function(data, cnames, type = "character") {
 #' {"2019", "2020", ... , "2023"}
 #' and type {"mer_targets", "mer_results", "subnat_targets", "subnat_results",
 #' "impatt"}
-#' @param fiscal_year character - one of: {"2019", "2020", "2021", "2022",
-#' "2023"}
 #' @param type character vector - one or more of:
 #' {"mer_targets", "mer_results", "subnat_targets", "subnat_results", "impatt"}
+#' @inheritParams datapackr_params
 #' @return returns a character vector of the related dataset uids
 #'
-getDatasetUids <-  function(fiscal_year,
-                            type = c("mer_targets", "mer_results",
-                                     "subnat_targets", "subnat_results",
-                                     "impatt")) {
-  datasets <- character(0)
-  if  (fiscal_year == "2023") {
-    if ("mer_targets" %in% type) {
-      datasets <- c(datasets,
-                    "iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
-                    "cihuwjoY5xP", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
-                    "vzhO50taykm") # Host Country Targets: DREAMS (USG)
-    }
-    if ("mer_results" %in% type) {
-      stop("FY23 results input not supported by getDatasetUids")
-    }
-    if ("subnat_targets" %in% type) {
-      datasets <- c(datasets,
-                    "J4tdiDEi08O") #Host Country Targets: COP Prioritization SNU (USG)
-    }
-    if ("subnat_results" %in% type) {
-      stop("FY23 results input not supported by getDatasetUids")
-    }
-    if ("impatt" %in% type) {
-      datasets <- c(datasets,
-                    "CxMsvlKepvE") #Planning Attributes: COP Prioritization SNU
-    }
-  } else if  (fiscal_year == "2022") {
-    if ("mer_targets" %in% type) {
-      datasets <- c(datasets,
-                    "YfZot37BbTm", # MER Target Setting: PSNU (Facility and Community Combined) FY2022
-                    "cihuwjoY5xP", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
-                    "wvnouBMuLuE") # Host Country Targets: DREAMS (USG) FY2022
-    }
-    if ("mer_results" %in% type) {
-      datasets <- c(datasets,
-                    "BHlhyPmRTUY", # MER Results: Facility Based
-                    "HfhTPdnRWES", # MER Results: Community Based
-                    "MGNVwVicMVm") # Host Country Results: DREAMS (USG)
-    }
-    if ("subnat_targets" %in% type) {
-      datasets <- c(datasets,
-                    "Va7TYyHraRn") #Host Country Targets: COP Prioritization SNU (USG) FY2022
-    }
-    if ("subnat_results" %in% type) {
-      datasets <- c(datasets,
-                    "IXiORiVFqIv") #Host Country Results: COP Prioritization SNU (USG)
-    }
-    if ("impatt" %in% type) {
-      datasets <- c(datasets,
-                    "Zn27xns9Fmx") #Planning Attributes: COP Prioritization SNU FY2022
-    }
-  } else if (fiscal_year == "2021") {
-    if ("mer_targets" %in% type) {
-      datasets <- c(datasets,
-                    "Pmc0yYAIi1t", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2021
-                    "s1sxJuqXsvV")  # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY) FY2021
-    }
-    if ("mer_results" %in% type) {
-      datasets <- c(datasets,
-                    "zL8TlPVzEBZ", # MER Results: Facility Based FY2021Q4
-                    "TBcmmtoaCBC", # MER Results: Community Based FY2021Q4
-                    "qHyrHc4zwx4") # Host Country Results: DREAMS (USG) FY2021Q4
-    }
-    if ("subnat_targets" %in% type) {
-      datasets <- c(datasets,
-                    "j7jzezIhgPj") #Host Country Targets: COP Prioritization SNU (USG) FY2021
-      }
-    if ("subnat_results" %in% type) {
-      datasets <- c(datasets,
-                    "xiTCzZJ2GPP") #Host Country Results: COP Prioritization SNU (USG) FY2021Q4
-      }
-    if ("impatt" %in% type) {
-      datasets <- c(datasets,
-                    "jxnjnBAb1VD") # Planning Attributes: COP Prioritization SNU FY2021
-      }
-  } else if (fiscal_year == "2020") {
-    if ("mer_targets" %in% type) {
-      datasets <- c(datasets,
-                    "sBv1dj90IX6", # MER Targets: Facility Based FY2020
-                    "nIHNMxuPUOR", # MER Targets: Community Based FY2020
-                    "C2G7IyPPrvD", # MER Targets: Community Based - DoD ONLY FY2020
-                    "HiJieecLXxN") # MER Targets: Facility Based - DoD ONLY FY2020
-    }
-    if ("mer_results" %in% type) {
-      datasets <- c(datasets,
-                    "qzVASYuaIey", # MER Results: Community Based FY2020Q4
-                    "BPEyzcDb8fT", # MER Results: Community Based - DoD ONLY FY2021Q4
-                    "jKdHXpBfWop", # MER Results: Facility Based FY2020Q4
-                    "em1U5x9hhXh", # MER Results: Facility Based - DoD ONLY FY2021Q4
-                    "mbdbMiLZ4AA") # Host Country Results: DREAMS (USG) FY2020Q4
-    }
-    if ("subnat_targets" %in% type) {
-      datasets <- c(datasets,
-                    "N4X89PgW01w") # Host Country Targets: COP Prioritization SNU (USG) FY2020
-    }
-    if ("subnat_results" %in% type) {
-      datasets <- c(datasets,
-                    "ctKXzmv2CVu") # Host Country Results: COP Prioritization SNU (USG) FY2020Q4
-    }
-    if ("impatt" %in% type) {
-      datasets <- c(datasets,
-                    "pTuDWXzkAkJ") # Planning Attributes: COP Prioritization SNU FY2020
-    }
-  } else if (fiscal_year == "2019") {
-    if ("mer_targets" %in% type) {
-      datasets <- c(datasets,
-                    "BWBS39fydnX", # MER Targets: Community Based - DoD ONLY FY2019
-                    "l796jk9SW7q", # MER Targets: Community Based FY2019
-                    "X8sn5HE5inC", # MER Targets: Facility Based - DoD ONLY FY2019
-                    "eyI0UOWJnDk") # MER Targets: Facility Based FY2019)
-    }
-    if ("mer_results" %in% type) {
-      datasets <- c(datasets,
-                    "KWRj80vEfHU", # MER Results: Facility Based FY2019Q4
-                    "fi9yMqWLWVy", # MER Results: Facility Based - DoD ONLY FY2019Q4
-                    "zUoy5hk8r0q", # MER Results: Community Based FY2019Q4
-                    "PyD4x9oFwxJ", # MER Results: Community Based - DoD ONLY FY2019Q4
-                    "EbZrNIkuPtc") # Host Country Results: DREAMS (USG) FY2019Q4
-    }
-    if ("subnat_targets" %in% type) {
-      datasets <- c(datasets,
-                    "Ncq22MRC6gd") # Host Country Targets: COP Prioritization SNU (USG) FY2019
-    }
-    if ("subnat_results" %in% type) {
-      # Host Country Results: COP Prioritization SNU (USG) FY2019Q4
-      datasets <- c(datasets, "iJ4d5HdGiqG")
-    }
-    if ("impatt" %in% type) {
-      # Planning Attributes: COP Prioritization SNU FY2020 - last used FY2020 also valid for FY2019
-      datasets <- c(datasets, "pTuDWXzkAkJ")
-    }
-  } else {
-    stop(paste("FY", fiscal_year, "input not supported by getDatasetUids"))
+getDatasetUids <-  function(cop_year, type) {
+
+  #Convert to cop_year everywhere
+
+  cop_year <- check_cop_year(cop_year = cop_year)
+
+  type <- type %missing% c("mer_targets", "mer_results",
+                           "subnat_targets", "subnat_results",
+                           "impatt")
+
+  datasets_filtered <-
+    list(
+      "2022" = list(
+        "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
+        "o71WtN5JrUu", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
+        "vzhO50taykm"), # Host Country Targets: DREAMS (USG)
+        "mer_results" = NA,
+        "subnat_targets" = "J4tdiDEi08O",
+        "subnat_results" = NA,
+        "impatt" = "CxMsvlKepvE"),
+      "2021" = list(
+        "mer_targets" =   c("YfZot37BbTm", # MER Target Setting: PSNU (Facility and Community Combined) FY2022
+                            "cihuwjoY5xP", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
+                            "wvnouBMuLuE"), # Host Country Targets: DREAMS (USG) FY2022),
+        "mer_results" = c("BHlhyPmRTUY", # MER Results: Facility Based
+                          "HfhTPdnRWES", # MER Results: Community Based
+                          "MGNVwVicMVm"), # Host Country Results: DREAMS (USG),
+        "subnat_targets" = "Va7TYyHraRn",
+        "subnat_results" = "IXiORiVFqIv",
+        "impatt" = "Zn27xns9Fmx"),
+      "2020" = list(
+        "mer_targets" =   c("Pmc0yYAIi1t", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2021
+                             "s1sxJuqXsvV"),  # MER Target Setting: PSNU
+                                              #(Facility and Community Combined) - DoD ONLY) FY2021,
+                                              # Host Country Targets: DREAMS (USG) FY2022),
+        "mer_results" =   c("zL8TlPVzEBZ", # MER Results: Facility Based FY2021Q4
+                            "TBcmmtoaCBC", # MER Results: Community Based FY2021Q4
+                            "qHyrHc4zwx4"), # Host Country Results: DREAMS (USG) FY2021Q4
+        "subnat_targets" = "j7jzezIhgPj",
+        "subnat_results" = "xiTCzZJ2GPP",
+        "impatt" = "jxnjnBAb1VD"),
+      "2019" = list(
+        "mer_targets" = c("sBv1dj90IX6", # MER Targets: Facility Based FY2020
+                        "nIHNMxuPUOR", # MER Targets: Community Based FY2020
+                        "C2G7IyPPrvD", # MER Targets: Community Based - DoD ONLY FY2020
+                        "HiJieecLXxN"), # MER Targets: Facility Based - DoD ONLY FY2020
+          "mer_results" =   c("qzVASYuaIey", # MER Results: Community Based FY2020Q4
+                              "BPEyzcDb8fT", # MER Results: Community Based - DoD ONLY FY2021Q4
+                              "jKdHXpBfWop", # MER Results: Facility Based FY2020Q4
+                               "em1U5x9hhXh", # MER Results: Facility Based - DoD ONLY FY2021Q4
+                               "mbdbMiLZ4AA"), # Host Country Results: DREAMS (USG) FY2020Q4
+          "subnat_targets" = "N4X89PgW01w",
+          "subnat_results" = "ctKXzmv2CVu",
+          "impatt" = "pTuDWXzkAkJ")) %>%
+    purrr::pluck(as.character(cop_year)) %>%
+    .[type] %>%
+    unlist(use.names = FALSE) %>%
+    purrr::discard(~ is.na(.))
+
+  if (is.null(datasets_filtered) | length(datasets_filtered) == 0) {
+    stop(paste("No datasets could be found for cop_year", cop_year, "and type(s)", type))
   }
-  return(datasets)
-}
+
+  datasets_filtered
+  }
 
 #' @export
 #' @title Define prioritization values.
@@ -504,25 +305,28 @@ prioritization_dict <- function() {
 }
 
 #' @export
-#' @title Take Max along row among columns matching regex
-#'
-#' @param df Dataframe
-#' @param cn Name (character string) of Max column to create
-#' @param regex String of regex to use in identifying columns.
+#' @title Extracts the desired columns for analysis via regular expression, then
+#'  takes the maximum value row-wise. Ultimately resulting in a new column
+#'  containing the max values.
+#' @param df The dataframe to be analyzed.
+#' @param cn The column name (character string) of the Max column that is
+#'  created after execution of this function.
+#' @param regex A regular expression used in identifying the columns of
+#'  interest.
 #'
 #' @return df
 #'
 rowMax <- function(df, cn, regex) {
-  df_filtered <- df %>%
+  df_filtered <- df %>% # Filters df based on regex
     dplyr::select(tidyselect::matches(match = regex))
-
+# If the number of columns is 0, return the provided df without new columns.
   if (NCOL(df_filtered) == 0) {
     df[[cn]] <- NA_integer_
     return(df)
   }
-
+# Create the new column in the dataframe, and ensure its column type is numeric.
   df[[cn]] <- df_filtered %>%
-    purrr::pmap(pmax, na.rm = T) %>%
+    purrr::pmap(pmax, na.rm = T) %>% # Row-wise Calculations.
     as.numeric
 
   return(df)
@@ -533,13 +337,11 @@ rowMax <- function(df, cn, regex) {
 #'
 #' @param cop_year cop year to pull get map for
 #'
-#' @return {cop20, cop21}_map_DataPack_DATIM_DEs_COCs
+#' @return {cop21, cop22}_map_DataPack_DATIM_DEs_COCs
 #'
 getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
-  if (cop_year == 2020) {
-      return(datapackr::cop20_map_DataPack_DATIM_DEs_COCs)
-  } else if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
-                                           datapackr::map_DataPack_DATIM_DEs_COCs)) {
+  if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
+                                    datapackr::map_DataPack_DATIM_DEs_COCs)) {
     return(datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
   } else if (cop_year == 2022) {
     return(datapackr::cop22_map_DataPack_DATIM_DEs_COCs)
@@ -659,7 +461,7 @@ paste_oxford <- function(..., final = "and", oxford = TRUE) {
   to_paste <- unlist(list(...))
 
   if (length(to_paste) == 1) {
-    to_paste
+    return(to_paste)
   } else {
     first_bits <- to_paste[1:(length(to_paste) - 1)]
     last <- to_paste[length(to_paste)]
@@ -667,9 +469,11 @@ paste_oxford <- function(..., final = "and", oxford = TRUE) {
     start <- paste(first_bits, collapse = ", ")
     serial <- paste0(final, " ", last)
 
-    start <- ifelse(oxford, paste0(start, ", "), paste0(start, " "))
+    start <- ifelse(oxford & length(to_paste) > 2,
+                    paste0(start, ", "),
+                    paste0(start, " "))
 
-    paste0(start, serial)
+    return(paste0(start, serial))
   }
 }
 
@@ -757,6 +561,43 @@ getMaxCores <- function() {
   n_cores
 }
 
+#' Title
+#' @note Lifted from https://stackoverflow.com/questions/16800803/
+#' @description Format a vector of numbers into a string of ranges
+#' @param vec A vector of numbers
+#'
+#' @return Formatted string of ranges
+#' @export
+#' @examples
+#' formatSetStrings(c(1,2,3,5,6,7,8))
+#' formatSetStrings(c(8,7,6,5,3,2,1))
+#'
+formatSetStrings <- function(vec) {
+
+  if (!is.vector(vec)) return(NA_character_)
+
+  if (is.list(vec)) {
+    warning("Can only accept simple vectors")
+    return(NA_character_)
+    }
+
+  vec <- vec[!is.na(vec)]
+
+  if (length(vec) == 0) return(NA_character_)
+
+  if (!all(is.numeric(vec))) {
+     warning("Ensure that all values are numeric")
+     return(NA_character_)
+  }
+
+  vec <- sort(vec)
+  groups <- cumsum(c(0, diff(vec) > 1))
+  sets <- split(vec, groups)
+  set_strings <- sapply(sets, function(x) {
+    ifelse(min(x) == max(x), x, paste0(min(x), ":", max(x))) })
+  paste0(set_strings, collapse = ",")
+}
+
 #' @export
 #' @title Is UID-ish
 #' @md
@@ -769,6 +610,32 @@ getMaxCores <- function() {
 #' @return A logical vector.
 is_uidish <- function(string) {
   stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")
+}
+
+
+extractWorkbook <- function(d) {
+  #Create a temporary director to extract the XL object
+  temp_dir <- file.path(tempdir(), "datapackR")
+  #Save this in the keychain for later reuse
+  d$keychain$extract_path <- temp_dir
+
+  unlink(temp_dir, recursive = TRUE)
+  dir.create(temp_dir)
+  file.copy(d$keychain$submission_path, temp_dir)
+
+  new_file <- list.files(temp_dir, full.names = TRUE, pattern = basename(d$keychain$submission_path))
+  utils::unzip(new_file, exdir = temp_dir)
+  d$info$has_extract <- TRUE
+  #Return the object
+  d
+}
+
+listWorkbookContents <- function(d) {
+
+  d$info$worbook_contents <- utils::unzip(d$keychain$submission_path, list = TRUE) %>%
+    dplyr::pull(`Name`)
+
+  d
 }
 
 

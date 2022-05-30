@@ -12,7 +12,7 @@ updateExistingPrioritization(prios, analytics_table)
 \item{analytics_table}{A table of COP memo indicators at the PSNU level.}
 }
 \value{
-
+Data frame of joined analytics table and prioritization levels
 }
 \description{
 Provided a data frame of priorization levels and an analytics

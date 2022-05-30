@@ -1,31 +1,30 @@
 #' @export
-#' @title writePSNUxIM(d)
+#' @title Write PSNUxIM Tab
 #'
 #' @description Checks a Data Pack for need of new or appended PSNUxIM data, then
 #' writes this into the Data Pack supplied. unPackTool must be run as prerequisite.
 #'
-#' @param d Datapackr object
-#' @param snuxim_model_data_path Filepath where SNU x IM distribution model is stored.
-#' @param output_folder Local folder where you would like your Data Pack to be
-#' saved upon export.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
 #' @param append If TRUE append rows to the existing DataPack otherwise,
 #' output a Missing PSNUxIM targets workbook.
+#' @param snuxim_model_data_path Export from DATIM needed to allocate data
+#' across mechanisms in the PSNUxIM tab
+#' @inheritParams datapackr_params
 #' @return d
 #'
 writePSNUxIM <- function(d,
-                        snuxim_model_data_path = NULL,
-                        output_folder = NULL,
-                        d2_session = dynGet("d2_default_session",
-                                            inherits = TRUE),
-                        append = TRUE) {
+                         snuxim_model_data_path = NULL,
+                         output_folder = NULL,
+                         d2_session = dynGet("d2_default_session",
+                                             inherits = TRUE),
+                         append = TRUE) {
+
+  stopifnot(
+    "Cannot update PSNUxIM tab without model data." = !is.null(snuxim_model_data_path),
+    "Packing SNU x IM tabs is not supported for the requested COP year." = !d$info$cop_year %in% c(2021, 2022)
+  )
 
   if (is.null(output_folder)) {
     interactive_warning("If no output_folder is provided, new Data Packs will not be written.")
-  }
-
-  if (is.null(snuxim_model_data_path)) {
-    stop("Cannot update PSNUxIM tab without model data.")
   }
 
   d$keychain$snuxim_model_data_path <- snuxim_model_data_path
@@ -35,9 +34,9 @@ writePSNUxIM <- function(d,
   d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
 
-  #We normally cannot process PSNUxIM tabs with threaded comments
-  #However, if we are not appending to the existing data pack, we
-  #should be able to proceed.
+  # We normally cannot process PSNUxIM tabs with threaded comments
+  # However, if we are not appending to the existing data pack, we
+  # should be able to proceed.
   if (d$info$has_comments_issue & append) {
     warning_msg <-
       paste0(
@@ -59,12 +58,9 @@ writePSNUxIM <- function(d,
   }
 
   # Check whether to write anything into SNU x IM tab and write if needed ####
-  if (d$info$cop_year == 2020) {
-    d <- packSNUxIM_2020(d)
-  } else if (d$info$cop_year == 2021) {
-    d <- packSNUxIM(d,
-                    d2_session = d2_session)
-  } else if (d$info$cop_year == 2022) {
+  if (d$info$cop_year == 2021) {
+    d <- packSNUxIM(d, d2_session = d2_session)
+  } else {
   # Prepare data to distribute ####
     d$info$has_psnuxim <- !(NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM$PSNU[1]))
 
@@ -114,7 +110,9 @@ writePSNUxIM <- function(d,
     # If append is true, add the missing PSNUxIM combos to the existing
     # workbook, otherwise, use a template.
     if (append == TRUE) {
-      d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
+      if (is.null(d$tool$wb)) {
+        d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
+      }
       openxlsx::removeFilter(d$tool$wb, names(d$tool$wb))
     } else {
 
@@ -142,6 +140,7 @@ writePSNUxIM <- function(d,
       dplyr::bind_rows()
     rm(smd)
     dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
+
     d$data$snuxim_model_data %<>%
     ## Address issues with PMTCT_EID ####
       dplyr::mutate_at(
@@ -168,15 +167,6 @@ writePSNUxIM <- function(d,
       dplyr::summarise(value = sum(value)) %>%
       dplyr::ungroup()
 
-    ## Filter model data to match targets_data ####
-    d$data$snuxim_model_data %<>%
-      dplyr::right_join(
-        targets_data %>% dplyr::select(-value, -attributeOptionCombo) %>% dplyr::distinct(),
-        by = c("dataElement" = "dataElement",
-               "period" = "period",
-               "orgUnit" = "orgUnit",
-               "categoryOptionCombo" = "categoryOptionCombo"))
-
     r <- packPSNUxIM(wb = d$tool$wb,
                      data = targets_data,
                      snuxim_model_data = d$data$snuxim_model_data,
@@ -189,8 +179,6 @@ writePSNUxIM <- function(d,
     d$info$messages <- appendMessage(d$info$messages, r$message, r$level)
     d$info$newSNUxIM <- TRUE
 
-  } else {
-    stop(paste0("Packing SNU x IM tabs is not supported for COP ", d$info$cop_year, " Data Packs."))
   }
 
   # If new information added to SNU x IM tab, reexport Data Pack for user ####
@@ -201,7 +189,7 @@ writePSNUxIM <- function(d,
     interactive_print("Exporting your new Data Pack...")
     exportPackr(
       data = d$tool$wb,
-      output_path = d$keychain$output_folder,
+      output_folder = d$keychain$output_folder,
       tool = "Data Pack",
       datapack_name = d$info$datapack_name)
 

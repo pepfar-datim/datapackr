@@ -33,13 +33,12 @@ checkHasPSNUxIM <- function(d) {
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
 
-    return(d)
-
   } else {
     d$info$has_psnuxim <- TRUE
-
-    return(d)
   }
+
+  return(d)
+
 }
 
 #' @export
@@ -58,24 +57,31 @@ checkHasPSNUxIM <- function(d) {
 #'
 unPackSNUxIM <- function(d) {
 
-  if (d$info$cop_year %in% c(2020, 2021, 2022)) {
-    sheet <- "PSNUxIM"
-  } else {
-    sheet <- "SNU x IM"
-  }
+  sheet <- "PSNUxIM"
 
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
 
-  d$data$SNUxIM <-
-    readxl::read_excel(
-      path = d$keychain$submission_path,
-      sheet = sheet,
-      range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
-      col_types = "text",
-      .name_repair = "minimal"
-    )
+  #Check to see if the object already. If its NULL read it from
+  # Excel, otherwise, use the existing object. This is just the
+  # first step to be able to functionalize and test everything else
+  # below.
+  if (is.null(d$data$SNUxIM)) {
+    d$data$SNUxIM <-
+      readxl::read_excel(
+        path = d$keychain$submission_path,
+        sheet = sheet,
+        range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
+        col_types = "text",
+        .name_repair = "minimal"
+      )
+  }
 
   d <- checkHasPSNUxIM(d)
+
+  if (!d$info$has_psnuxim) {
+    return(d)
+  }
+
 
   # PATCH: Remove hard-coded FYs
   names(d$data$SNUxIM) <- stringr::str_replace(names(d$data$SNUxIM), " \\(FY22\\)", "")
@@ -95,9 +101,9 @@ unPackSNUxIM <- function(d) {
   if (d$info$tool == "Data Pack") {
     d$data$missingCombos <- d$data$MER %>%
       dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
-      #Special handling for differences between main tab and PSNUxIM tab age bands
-      #The data should not be aggregated at this point. This will happen
-      #when the data is repacked by packForDATIM_UndistributedMER
+      # Special handling for differences between main tab and PSNUxIM tab age bands
+      # The data should not be aggregated at this point. This will happen
+      # when the data is repacked by packForDATIM_UndistributedMER
       dplyr::mutate(Age_snuxim = dplyr::case_when(
         stringr::str_detect(Age, "(50-54|55-59|60-64|65+)") &
           !stringr::str_detect(indicator_code, "TX_CURR.T") ~ "50+",
@@ -160,6 +166,7 @@ unPackSNUxIM <- function(d) {
     warning_msg <-
       paste0(
         "ERROR! In tab ",
+
         sheet,
         ": DUPLICATE ROWS found. Ensure rows are all unique, and the SNU Disaggregates",
         " are not repeated within tabs. This issue may have been caused by inadvertent",
@@ -207,7 +214,7 @@ unPackSNUxIM <- function(d) {
  #  TODO: Reverting this to 5.1.5. We ended up selecting
  #  the FIRST set of mechanism columns which contained the decimal
  #  percentage allocations instead of the second set of columns
- #  which contain the actual values. 
+ #  which contain the actual values.
  #  #Get the additional mechanisms added by the user
  #  user_mechanisms <- stringr::str_extract(names(d$data$SNUxIM), "\\d{4,}_(DSD|TA)") %>%
  #    purrr::keep(~ !is.na(.x))
@@ -217,16 +224,105 @@ unPackSNUxIM <- function(d) {
  #    dplyr::filter(!indicator_code == "") %>%
  #    dplyr::pull(indicator_code) %>%
  #    purrr::discard(~ .x == "12345_DSD")
- # 
+ #
  #  d$data$SNUxIM <- d$data$SNUxIM %>%
  #    dplyr::select(mandatory_columns,user_mechanisms)
 
+ #  Missing right side columns.
+ #  TODO: This should really be moved in to checkColStructure.
+ #  However, at the moment, we are not really validating the user mechanism columns there.
+ #  Users may delete columns on the right side resulting in fewer columns
+ #  in d$data$SNUxIM than are stated in the cols_to_keep. If this situation
+ #  occurs, end with a hard stop and inform the user.
+ #  Realistically, we should be able to handle missing columns, but for now,
+ # the check will remain strict until further changes are made here.
+
+  if (NCOL(d$data$SNUxIM) < max(cols_to_keep$col)) {
+    stop(
+      paste(
+        "ERROR: Missing columns in the PSNUxIM tab. Please ensure that there are exactly",
+        max(cols_to_keep$col), "columns in the PSNUxIM tab.",
+        "Please check columns",
+        cellranger::num_to_letter(NCOL(d$data$SNUxIM) + 1),
+        "to",
+        cellranger::num_to_letter(max(cols_to_keep$col)),
+        "."
+      )
+    )
+  }
+
+  if (NCOL(d$data$SNUxIM) > max(cols_to_keep$col)) {
+        warning_msg <-
+          paste(
+            "WARNING: Extra columns in the PSNUxIM tab. Please ensure that there are exactly",
+            max(cols_to_keep$col), "columns in the PSNUxIM tab for your final submissions. Please review columns",
+            cellranger::num_to_letter(max(cols_to_keep$col) + 1), "to columns",
+            cellranger::num_to_letter(NCOL(d$data$SNUxIM))
+            )
+
+        d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+  }
+
+  if (d$info$tool == "Data Pack") {
+    #Check to ensure that the value in column G (DataPack Target) actually
+    #matches the data in the main tabs
+
+    main_tab_data <- original_targets %>%
+      dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, MainTabsTarget = value) %>%
+      dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
+      # Special handling for differences between main tab and PSNUxIM tab age bands
+      # and the original tabs
+      dplyr::mutate(Age = dplyr::case_when(
+        stringr::str_detect(Age, "(50-54|55-59|60-64|65+)") &
+          !stringr::str_detect(indicator_code, "TX_CURR.T") ~ "50+",
+        TRUE ~ Age
+      )) %>%
+      dplyr::group_by(dplyr::across(c(-MainTabsTarget))) %>%
+      dplyr::summarise(MainTabsTarget = sum(MainTabsTarget, na.rm = TRUE), .groups = "drop")
+
+    d$tests$non_equal_targets  <- d$data$SNUxIM %>%
+      dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget) %>%
+      dplyr::mutate(DataPackTarget = as.numeric(DataPackTarget)) %>%
+      dplyr::full_join(main_tab_data, by = c("PSNU", "indicator_code", "Age", "Sex", "KeyPop")) %>%
+      dplyr::mutate(are_equal = dplyr::near(DataPackTarget, MainTabsTarget, tol = 0.1)) %>%
+      #If the main tab value is missing and the DataPackTarget is zero, ignore
+      dplyr::mutate(are_equal = dplyr::case_when(is.na(MainTabsTarget) & DataPackTarget == 0 ~ TRUE,
+                                                 is.na(MainTabsTarget) & DataPackTarget != 0 ~ FALSE,
+                                                 TRUE ~ are_equal)) %>%
+      dplyr::filter(!are_equal | is.na(are_equal)) %>%
+      #Filter non-allocated data to prevent false positives with this test
+      #Other tests should catch whether there is data in the main tabs
+      #but which has not been allocated
+      dplyr::filter(!is.na(DataPackTarget))
+
+    attr(d$tests$non_equal_targets, "test_name") <- "Non-equal targets"
+
+    if (NROW(d$tests$non_equal_targets) > 0) {
+      warning_msg <-
+        paste(
+          "ERROR! In tab PSNUxIM:", NROW(d$tests$non_equal_targets),
+          "instances of values in column G (DataPackTargets) which do not",
+          "equal the targets set in the main tabs. Please check to ensure",
+          "that the formulas in column G are correct. Please",
+          "download a copy of the validation report from the self-service app",
+          "and consult the tab non_equal_targets for details.\n")
+
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    }
+
+  }
+
+
+
   # Pare down to populated, updated targets only ####
+
   d$data$SNUxIM <- d$data$SNUxIM[, cols_to_keep$col]
 
   d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
 
   # TEST: Missing right-side formulas; Warn; Continue ####
+  # TODO: This seems not particularly efficient to
+  # again read the Excel sheet from disk.
   d$tests$psnuxim_missing_rs_fxs <-
     tidyxl::xlsx_cells(path = d$keychain$submission_path,
                        sheets = "PSNUxIM",
@@ -255,6 +351,27 @@ unPackSNUxIM <- function(d) {
         "\n")
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+  }
+
+  #Test for duplicate columns
+  dup_cols <- names(d$data$SNUxIM)[duplicated(names(d$data$SNUxIM))]
+
+  if (length(dup_cols) > 0) {
+    warning_msg <-
+      paste0(
+        "ERROR! In tab PSNUxIM: DUPLICATE MECHANISM COLUMNS",
+        " Ensure that all mechanisms columns are unique in both the percentage",
+        " allocation section as well as the value section of the PSNUxIM tab.",
+        " The following columns are implicated. -> \n\t",
+        paste(dup_cols, sep = "", collapse = ","),
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+
+    #Drop the duplicated columns and continue
+    d$data$SNUxIM <- d$data$SNUxIM[, !duplicated(names(d$data$SNUxIM))]
+    warning("Dropping duplicated columns in the PSNUxIM tab.")
+
   }
 
   # Drop rows where entire row is NA ####
@@ -369,7 +486,7 @@ unPackSNUxIM <- function(d) {
     d <- checkNumericValues(d, sheet, header_cols)
   }
 
-  #sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
+  # sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
 
   d$data$SNUxIM %<>%
     { suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)), #nolint
@@ -529,6 +646,9 @@ unPackSNUxIM <- function(d) {
     )
 
   # TEST: Formula changes; Warning; Continue ####
+  # TODO: We have already read in the sheet with tidyxl
+  # in an earlier test but in this test we read it yet again
+  # Lets recycle from above?
   d <- checkFormulas(d, sheet)
 
   # Remove all unneeded columns ####
@@ -543,6 +663,32 @@ unPackSNUxIM <- function(d) {
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
                   dplyr::everything())
 
+  #Test for invalid PSNUs
+
+  possible_psnus <- datapackr::valid_PSNUs %>%
+    dplyr::filter(country_uid %in% d$info$country_uids) %>%
+    dplyr::pull(psnu_uid)
+
+  d$tests$invalid_psnus <- d$data$SNUxIM %>%
+    dplyr::filter(!(psnuid %in% possible_psnus)) %>%
+    dplyr::select(PSNU) %>%
+    dplyr::distinct() %>%
+    dplyr::pull(PSNU)
+
+  attr(d$tests$invalid_psnus, "test_name") <- "Invalid PSNUs"
+
+  if (length(d$tests$invalid_psnus) > 0) {
+    d$info$has_error <- TRUE
+
+    warning_msg <-
+      paste0(
+        "ERROR!: ",
+        NROW(d$tests$invalid_psnus),
+        " invalid PSNU identifiers were detected. Please check the UID and fix the following PSNUs:",
+        paste(d$tests$invalid_psnus, sep = "", collapse = ";"))
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+  }
 
   # Gather all values in single column ####
   d$data$SNUxIM %<>%
@@ -778,6 +924,8 @@ unPackSNUxIM <- function(d) {
     )
 
   # Drop `Not PEPFAR` data ####
+  #TODO: Is there anyway we can get rid of this earlier if we are just
+  # dropping the entire column?
   d$data$SNUxIM %<>%
     dplyr::filter(mechCode_supportType != "Not PEPFAR")
 

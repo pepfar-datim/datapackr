@@ -9,10 +9,10 @@ jobs:
       - restore_cache:
           key: deps1-{{ checksum "renv.lock" }}
       - run:
-         name: Install curl sytem deps
-         command: |
-             sudo apt-get update
-             sudo apt-get -qq -y install libcurl4-openssl-dev libxml2-dev libsodium-dev libgit2-dev
+          name: Install curl sytem deps
+          command: |
+            sudo apt-get update
+            sudo apt-get -qq -y install libcurl4-openssl-dev libxml2-dev libsodium-dev libgit2-dev
       - run:
           name: Install package dependencies
           command: R -e "install.packages('renv')"
@@ -29,9 +29,11 @@ jobs:
       - run:
           name: Test package
           command: |
-               R -e "devtools::check(error_on='error')"
+            R -e "devtools::check(error_on='error')"
       - run:
           name: Lint packages
           command: |
-                R -e "install.packages('lintr')"
-                R -e "foo<-unique(names(lintr::lint_dir('R/'))); if ( length(foo) > 0 ) stop(foo)"
+            R -e "install.packages('lintr')"
+            R -e "foo<-unique(names(lintr::lint_package())); if ( length(foo) > 0 ) stop(foo)"
+    # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
+    resource_class: large

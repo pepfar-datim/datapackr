@@ -17,6 +17,8 @@ checkPSNUData  <-  function(d, d2_session = dynGet("d2_default_session",
     purrr::pluck(., as.character(d$info$cop_year))
 
   vr_data <- d$data$analytics %>%
+    #Ignore dedupe in validation rule analysis
+    dplyr::filter(!(mechanism_code %in% c("00000", "00001"))) %>%
     dplyr::select(
       dataElement = dataelement_id,
       period = fiscal_year,
@@ -43,7 +45,7 @@ checkPSNUData  <-  function(d, d2_session = dynGet("d2_default_session",
 
 
     #Evaluate the indicators in parallel if possible
-    if ("parallel" %in% rownames(installed.packages()) == TRUE) {
+    if ("parallel" %in% rownames(utils::installed.packages()) == TRUE & .Platform$OS.type != "windows") {
       vr_data$vr_results <-
         parallel::mclapply(vr_data$data, function(x)
           datimvalidation::evaluateValidation(x$combi,

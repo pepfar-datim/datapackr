@@ -7,7 +7,7 @@
 #' @param inds A dataframe consisting of indicator UIDs, name,
 #' numerator, and denominator expression.
 #'
-#' @return
+#' @return Data frame of ids, names, numerators, denominators, and values
 #'
 evaluateIndicators <- function(combis, values, inds) {
 

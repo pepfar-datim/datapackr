@@ -6,8 +6,6 @@
 #'
 #' @param data Data object to export. Can be either a dataframe or an Openxlsx
 #' Workbook object.
-#' @param output_path A local path directing to the folder where you would like
-#' outputs to be saved. If not supplied, will output to working directory.
 #' @param tool File prefix to be applied in output filename, as follows:
 #'   \describe{
 #'     \item{\code{Data Pack}}{Openxlsx Workbook object containing Data Pack.}
@@ -17,14 +15,13 @@
 #'     \item{\code{OPU Data Pack}}{Openxlsx Workbook object containing OPU Data Pack.}
 #'     \item{\code{Spectrum Example}}{Data frame containing example Spectrum output.}
 #' }
-#' @param datapack_name Name you would like associated with this Data Pack.
-#' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
+#' @inheritParams datapackr_params
 #'
-exportPackr <- function(data, output_path, tool, datapack_name) {
-  packName <- function(output_path, tool, datapack_name, extension) {
+exportPackr <- function(data, output_folder, tool, datapack_name) {
+  packName <- function(output_folder, tool, datapack_name, extension) {
     paste0(
-      output_path,
-      if (is.na(stringr::str_extract(output_path, "/$"))) {
+      output_folder,
+      if (is.na(stringr::str_extract(output_folder, "/$"))) {
         "/"
       } else {
       },
@@ -41,7 +38,7 @@ exportPackr <- function(data, output_path, tool, datapack_name) {
       stop("Output type and data do not match!")
     }
 
-    output_file_name <- packName(output_path, tool, datapack_name, extension = ".xlsx")
+    output_file_name <- packName(output_folder, tool, datapack_name, extension = ".xlsx")
 
     openxlsx::saveWorkbook(wb = data, file = output_file_name, overwrite = TRUE)
   }
@@ -51,7 +48,7 @@ exportPackr <- function(data, output_path, tool, datapack_name) {
       stop("Output type and data do not match!")
     }
 
-    output_file_name <- packName(output_path, tool, datapack_name, extension = ".csv")
+    output_file_name <- packName(output_folder, tool, datapack_name, extension = ".csv")
 
     readr::write_csv(data, output_file_name)
   }
@@ -61,7 +58,7 @@ exportPackr <- function(data, output_path, tool, datapack_name) {
       stop("Output type and data do not match!")
     }
 
-    output_file_name <- packName(output_path, tool, datapack_name, extension = ".rds")
+    output_file_name <- packName(output_folder, tool, datapack_name, extension = ".rds")
 
     saveRDS(data, output_file_name)
   }

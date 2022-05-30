@@ -132,7 +132,7 @@ compareData_DatapackVsDatim <-
                           d2_session = d2_session),
       getCOPDataFromDATIM(country_uids = d$info$country_uids,
                           cop_year = d$info$cop_year - 1,
-                          streams = c("subnat_targets"),
+                          datastreams = c("subnat_targets"),
                           d2_session = d2_session)) %>%
       dplyr::filter(value != 0) %>% # we don't import 0s up front so we should ignore any here
       dplyr::filter(value != "") %>%
@@ -220,7 +220,7 @@ compareData_OpuDatapackVsDatim <-
       !any(datapackr::is_uidish(d$datim$OPU$attributeOptionCombo))
     )
 
-    if (!(d$info$cop_year %in% c(2020, 2021))) {
+    if (!(d$info$cop_year %in% c(2021))) {
       stop("Attempting to use compareData_OpuDatapackVsDatim for unsupported COP year")
     }
     datapack_data <- d$datim$OPU
@@ -254,7 +254,7 @@ compareData_OpuDatapackVsDatim <-
 
 
     # Get mer target data from DATIM using data value sets
-    dataset_uids <- getDatasetUids(d$info$cop_year + 1,
+    dataset_uids <- getDatasetUids(d$info$cop_year,
                                    c("mer_targets"))
 
     # package parameters for getDataValueSets function call

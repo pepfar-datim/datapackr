@@ -13,7 +13,6 @@ prepareMemoMetadata <- function(d, memo_type,
   #TODO: maybe valid_PSNUs a function of the COP year
   d$info$psnus <- datapackr::valid_PSNUs %>%
     dplyr::filter(country_uid %in% d$info$country_uids) %>%
-    dplyr::filter(!is.na(psnu_type)) %>%
     dplyr::select(ou, country_name, snu1, psnu, psnu_uid)
 
   #Get the memo structure
@@ -39,7 +38,7 @@ prepareMemoMetadata <- function(d, memo_type,
     #TODO: If this is an OPU, use the existing prioritizations
     #from DATIM.
     d$memo$datapack$prios <- d$data$analytics %>%
-      dplyr::select(psnu_uid, prioritization) %>%
+      dplyr::select(orgUnit = psnu_uid, prioritization) %>%
       dplyr::distinct() %>%
       dplyr::left_join(datapackr::prioritization_dict(),
                        by = c("prioritization" = "name")) %>%
@@ -52,7 +51,7 @@ prepareMemoMetadata <- function(d, memo_type,
 
   if (memo_type %in% c("datim", "comparison")) {
     #Get the existing prioritizations
-    d$memo$datim$prios <- fetchPrioritizationTable(d$info$psnus$psnu_uid,
+    d$memo$datim$prios <- fetchPrioritizationTable(d$info$psnus,
                                                      d$info$cop_year,
                                                      d2_session)
   }
@@ -76,18 +75,23 @@ prepareExistingDataAnalytics <- function(d, d2_session =
   #Fetch the existing data from DATIM
   df <- getCOPDataFromDATIM(d$info$country_uids,
                       d$info$cop_year,
-                      streams = "mer_targets",
+                      datastreams = "mer_targets",
                       d2_session = d2_session)
 
-  if (NROW(d) > 0) {
-    d$memo$datim$analytics <- df %>%
+  if (d$info$tool == "OPU Data Pack") {
+    ### OPU DataPacks only include data with a funding mechanism
+    ### drop data with default attribute option combo
+    df <- dplyr::filter(df,
+                        !(attributeOptionCombo %in% c("default",
+                                                      "HllvX50cXC0")))
+  }
 
+  if (!is.null(df) & NROW(df) > 0) {
+    d$memo$datim$analytics <- df %>%
       adorn_import_file(
         .,
         cop_year = d$info$cop_year,
-        psnu_prioritizations = dplyr::select(d$memo$datim$prios,
-                                             "orgUnit" = psnu_uid,
-                                             value),
+        psnu_prioritizations = d$memo$datim$prios,
         d2_session = d2_session,
         include_default = TRUE
       )
@@ -105,6 +109,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
 #' categoryoptioncombo_id, mechanism_code and target value
 #' @param inds Data frame of indicators from getMemoIndicators
 #' @param partners_agencies Result of getMechanismView
+#' @param ncores Indicates how many cores should be used.
 #' @inheritParams datapackr_params
 #'
 #' @description This function calculates COP memo indicators at the PSNU level.
@@ -118,7 +123,8 @@ prepareMemoDataByPSNU <- function(analytics,
                                   inds,
                                   prios,
                                   partners_agencies,
-                                  psnus) {
+                                  psnus,
+                                  ncores = getMaxCores()) {
    #Now we need to calculate the indicators
 
    df <-  analytics %>%
@@ -132,12 +138,18 @@ prepareMemoDataByPSNU <- function(analytics,
     dplyr::group_by(psnu_uid, mechanism_code) %>%
     tidyr::nest()
 
+  #Determine whether we can evaluate in parallel
+   can_spawn <-
+     "parallel" %in% rownames(utils::installed.packages()) == TRUE &
+     .Platform$OS.type != "windows" & #Never execute in parallel on Windows
+     Sys.getenv("CI") == "" #Never execute in parallel on a CI
+
   #Evaluate the indicators in parallel if possible
-  if ("parallel" %in% rownames(installed.packages()) == TRUE) {
+  if (can_spawn) {
     df$indicator_results <-
       parallel::mclapply(df$data, function(x)
         evaluateIndicators(x$combi, x$value, inds),
-        mc.cores = getMaxCores())
+        mc.cores = ncores)
   } else {
     df$indicator_results <-
       lapply(df$data, function(x)
@@ -178,13 +190,13 @@ prepareMemoDataByPSNU <- function(analytics,
                                                    "PrEP_CURR",
                                                    "GEND_GBV") ~ "Total",
                                   TRUE ~ Age)) %>%
-   #Special handling for PrEP_CT. The indicator is listed as 15+ but we will
-   #Treat it as a total
+   # Special handling for PrEP_CT. The indicator is listed as 15+ but we will
+   # Treat it as a total
    dplyr::mutate(Age = dplyr::case_when(Indicator == "PrEP_CT" & Age == "15+" ~ "Total",
                  TRUE ~ Age)) %>%
     dplyr::select(-id, -numerator, -denominator) %>%
-    dplyr::left_join(dplyr::select(prios, psnu_uid, prioritization),
-                     by = c("psnu_uid")) %>%
+    dplyr::left_join(dplyr::select(prios, orgUnit, prioritization),
+                     by = c("psnu_uid" = "orgUnit")) %>%
     dplyr::mutate(prioritization = dplyr::case_when(
       is.na(prioritization) ~ "No Prioritization",
       TRUE ~ prioritization)) %>%
@@ -215,7 +227,7 @@ prepareMemoDataByPSNU <- function(analytics,
 #' @return A dataframe of COP indicators aggregated to the partner level
 #'
 prepareMemoDataByPartner <- function(df,
-                                         memoStructure,
+                                         memo_structure,
                                          indicators) {
 
   if (is.null(df) | NROW(df) == 0) {
@@ -228,7 +240,7 @@ prepareMemoDataByPartner <- function(df,
     dplyr::summarise(Value = sum(value), .groups = "drop")
 
   #We need to pad for zeros
-  df_rows <- memoStructure %>%
+  df_rows <- memo_structure %>%
     purrr::pluck("row_order") %>%
     dplyr::filter(!is.na(partner_chunk)) %>%
     dplyr::select(ind, options)
@@ -252,7 +264,7 @@ prepareMemoDataByPartner <- function(df,
   #Remove dedupe
   d_partners <- dplyr::filter(d_partners, !(`Mechanism` %in% c("00001", "00000"))) #nolint
 
-  d_indicators <- memoStructure %>%
+  d_indicators <- memo_structure %>%
     purrr::pluck("row_order") %>%
     dplyr::filter(!is.na(partner_chunk)) %>%
     dplyr::select(ind, options) %>%
@@ -339,7 +351,9 @@ prepareMemoDataByAgency <- function(df, memo_structure) {
     dplyr::mutate(
       "Total" = rowSums(dplyr::across(where(is.numeric)), na.rm = TRUE)) %>%
     dplyr::select("Indicator", "Age", 2:dim(.)[2]) %>%
-    dplyr::select(where(~ any(. != 0))) # Remove all columns which are completely zero
+    dplyr::select(where(~ any(. != 0))) %>%  # Remove all columns which are completely zero
+    dplyr::select(!tidyselect::starts_with("Dedupe")) #Suppress the dedupe column
+
 }
 
 
@@ -418,12 +432,14 @@ prepareMemoDataByPrio <- function(df,
 #' by_prio: Dataframe of indicators aggregated to the prioritization level
 #' by_partner: Dataframe of indicators aggregate to the partner level
 #' @inheritParams datapackr_params
+#' @param ncores Indicates how many cores should be used.
 #'
-#' @return
+#' @return Datapackr d object
 #'
 prepareMemoData <- function(d,
                               memo_type,
                               include_no_prio = TRUE,
+                              ncores = getMaxCores(),
                               d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
 
@@ -441,12 +457,13 @@ prepareMemoData <- function(d,
     if (NROW(d$memo$datim$analytics) > 0) {
       d$memo$datim$by_psnu <-
         prepareMemoDataByPSNU(
-          d$memo$datim$analytics,
-          "datim",
-          d$memo$inds,
-          d$memo$datim$prios,
-          d$memo$partners_agencies,
-          d$info$psnus
+          analytics = d$memo$datim$analytics,
+          memo_type = "datim",
+          inds = d$memo$inds,
+          prios = d$memo$datim$prios,
+          partners_agencies = d$memo$partners_agencies,
+          psnus = d$info$psnus,
+          ncores = ncores
         )
 
       d$memo$datim$by_partner <-
@@ -464,20 +481,19 @@ prepareMemoData <- function(d,
                               include_no_prio)
     }
 
-    d
-
   }
 
   if (memo_type %in% c("datapack", "comparison")) {
 
     if (NROW(d$data$analytics) > 0) {
       d$memo$datapack$by_psnu <-
-        prepareMemoDataByPSNU(d$data$analytics,
-                              "datapack",
-                              d$memo$inds,
-                              d$memo$datapack$prios,
-                              d$memo$partners_agencies,
-                              d$info$psnus)
+        prepareMemoDataByPSNU(analytics = d$data$analytics,
+                              memo_type = "datapack",
+                              inds = d$memo$inds,
+                              prios = d$memo$datapack$prios,
+                              partners_agencies = d$memo$partners_agencies,
+                              psnus = d$info$psnus,
+                              ncores = ncores)
 
       #Update the PSNU prioritization levels with those in DATIM
       if (d$info$tool == "OPU Data Pack") {
