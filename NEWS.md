@@ -1,3 +1,8 @@
+# datapackr 5.2.1
+
+## Bug fixes
+* Fix to `packOPUDataPack` by reverting changes to parameter names in `exportPackr` calls that were accidentally made during release v5.2.0.
+
 # datapackr 5.2.0
 
 ## Breaking Changes
