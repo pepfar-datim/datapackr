@@ -16,6 +16,8 @@ getHTSModality <- function(cop_year = getCurrentCOPYear(),
     "2021" = "ra9ZqrTtSQn"
   )
 
+  stopifnot("Requested COP year is not supported." = !is.null(groupSet))
+
   fy_pattern <- "(FY)?\\d{2}(R|T)?|,|/"
 
   modality_map <-
