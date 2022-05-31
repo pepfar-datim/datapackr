@@ -548,7 +548,9 @@ parse_maybe_number <- function(x, default = NULL) {
 getMaxCores <- function() {
 
   #Should never be called on Windows
-  stopifnot(.Platform$OS.type != "windows")
+ if (.Platform$OS.type != "windows") {
+   return(1L)
+ }
 
   n_cores <-
     ifelse(Sys.getenv("MAX_CORES") != "",

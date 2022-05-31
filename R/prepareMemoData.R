@@ -139,12 +139,13 @@ prepareMemoDataByPSNU <- function(analytics,
     tidyr::nest()
 
 
+  n_cores <- getMaxCores()
   #Evaluate the indicators in parallel if possible
-  if (can_spawn()) {
+  if (can_spawn() & n_cores > 1L) {
     df$indicator_results <-
       parallel::mclapply(df$data, function(x)
         evaluateIndicators(x$combi, x$value, inds),
-        mc.cores = getMaxCores())
+        mc.cores = n_cores)
   } else {
     df$indicator_results <-
       lapply(df$data, function(x)
