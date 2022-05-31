@@ -546,6 +546,10 @@ parse_maybe_number <- function(x, default = NULL) {
 #' @return An integer number of cores to use in parallel processing
 #'
 getMaxCores <- function() {
+
+  #Should never be called on Windows
+  stopifnot(.Platform$OS.type != "windows")
+
   n_cores <-
     ifelse(Sys.getenv("MAX_CORES") != "",
            as.numeric(Sys.getenv("MAX_CORES")),
@@ -611,6 +615,26 @@ formatSetStrings <- function(vec) {
 is_uidish <- function(string) {
   stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")
 }
+
+
+
+
+
+#' Title
+#' @description Determines whether processes can be run in parallel.
+#' This is used in indicator and validation rule evaluation, but
+#' should not be run on Windows currently
+#' @return Boolean True or false
+#' @export
+#'
+
+can_spawn <- function() {
+
+  "parallel" %in% rownames(utils::installed.packages()) == TRUE &
+    .Platform$OS.type != "windows"  #Never execute in parallel on Windows
+}
+
+
 
 
 extractWorkbook <- function(d) {
