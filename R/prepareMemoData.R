@@ -138,18 +138,13 @@ prepareMemoDataByPSNU <- function(analytics,
     dplyr::group_by(psnu_uid, mechanism_code) %>%
     tidyr::nest()
 
-  #Determine whether we can evaluate in parallel
-   can_spawn <-
-     "parallel" %in% rownames(utils::installed.packages()) == TRUE &
-     .Platform$OS.type != "windows" & #Never execute in parallel on Windows
-     Sys.getenv("CI") == "" #Never execute in parallel on a CI
 
   #Evaluate the indicators in parallel if possible
-  if (can_spawn) {
+  if (can_spawn()) {
     df$indicator_results <-
       parallel::mclapply(df$data, function(x)
         evaluateIndicators(x$combi, x$value, inds),
-        mc.cores = ncores)
+        mc.cores = getMaxCores())
   } else {
     df$indicator_results <-
       lapply(df$data, function(x)
