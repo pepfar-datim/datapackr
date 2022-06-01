@@ -138,8 +138,6 @@ prepareMemoDataByPSNU <- function(analytics,
     dplyr::group_by(psnu_uid, mechanism_code) %>%
     tidyr::nest()
 
-
-  n_cores <- getMaxCores()
   #Evaluate the indicators in parallel if possible
   if (can_spawn() & n_cores > 1L) {
     df$indicator_results <-
