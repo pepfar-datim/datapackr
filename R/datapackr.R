@@ -79,7 +79,6 @@ if (getRversion() >= "2.15.1")
       "cols",
       "column_names",
       "cop_year",
-      "cop21_data_pack_schema",
       "correct_fx",
       "count",
       "country_name",
