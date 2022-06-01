@@ -124,7 +124,7 @@ prepareMemoDataByPSNU <- function(analytics,
                                   prios,
                                   partners_agencies,
                                   psnus,
-                                  ncores = getMaxCores()) {
+                                  n_cores = getMaxCores()) {
    #Now we need to calculate the indicators
 
    df <-  analytics %>%
