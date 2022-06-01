@@ -53,13 +53,13 @@ unPackDataPack <- function(d,
   # Unpack the Targets ####
   interactive_print("Unpacking sheets...")
   d <- unPackSheets(d)
-  
+
   # Separate Data Sets ####
   interactive_print("Separating datasets...")
   datasets <- separateDataSets(data = d$data$targets,
                                cop_year = d$info$cop_year,
                                tool = d$info$tool)
-  
+
   d$data$MER <- datasets$MER
   d$data$SUBNAT_IMPATT <- datasets$SUBNAT_IMPATT
   d$data <- within(d$data, rm("targets"))

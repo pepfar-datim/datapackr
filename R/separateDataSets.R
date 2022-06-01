@@ -11,28 +11,28 @@
 #' @return List object containing either MER or SUBNAT/IMPATT data.
 #'
 separateDataSets <- function(data, cop_year = NULL, tool = NULL) {
-  
+
   # Check parameters ----
   params <- check_params(cop_year = cop_year,
                          tool = tool,
                          schema = NULL)
-  
+
   for (p in names(params)) {
     assign(p, purrr::pluck(params, p))
   }
-  
+
   rm(params, p)
-  
+
   # Separate data ----
   datasets <- NULL
-  
+
   datasets$data <- data
-  
+
   schema %<>%
     dplyr::filter(col_type %in% c("result", "target"),
                   indicator_code != "") %>%
     dplyr::select(indicator_code, dataset)
-  
+
   datasets$MER <- data %>%
     dplyr::filter(
       indicator_code %in% schema$indicator_code[schema$dataset == "mer"])

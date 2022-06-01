@@ -682,11 +682,11 @@ formatSetStrings <- function(vec) {
 #' @return A logical vector.
 is_uidish <- function(string, ish = FALSE) {
   if (!ish) {
-    stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")  
+    stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")
   } else {
-    stringr::str_detect(string, "[[:alpha:]][[:alnum:]]{10}")  
+    stringr::str_detect(string, "[[:alpha:]][[:alnum:]]{10}")
   }
-  
+
 }
 
 #' Extract UID.

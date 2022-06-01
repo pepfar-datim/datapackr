@@ -581,48 +581,48 @@ checkResultsArchive <- function(results_archive = FALSE) {
 #' @rdname parameter-checks
 checkSheets <- function(sheets, cop_year, tool,
                         all_sheets = FALSE, psnuxim = FALSE) {
-  
+
   # Collect parameters
   sheets <- sheets %missing% NULL
   sheets_provided <- !is.null(sheets)
-  
+
   tool <- tool %missing% NULL
   tool_provided <- !is.null(tool)
-  
+
   cop_year <- cop_year %missing% NULL
   cop_year_provided <- !is.null(cop_year)
-  
+
   # Validate parameters
   cop_year %<>% check_cop_year()
   tool %<>% check_tool(tool = ., cop_year = cop_year)
   schema <- check_schema(schema = NULL, cop_year = cop_year, tool = tool)
-  
+
   all_sheets <- all_sheets %||% FALSE
   psnuxim <- psnuxim %||% FALSE
-  
+
   if (all_sheets) {
     skips <- ""
   } else {
     skips <- skip_tabs(tool = tool, cop_year = cop_year)
   }
-  
+
   sheets_schema <- schema %>%
     dplyr::filter(
       !sheet_name %in% skips) %>%
     dplyr::pull(sheet_name) %>%
     unique()
-  
+
   if (!psnuxim) {
     sheets_schema <- sheets_schema[!sheets_schema %in% c("PSNUxIM")]
   }
-  
+
   if (!sheets_provided) {
     sheets <- sheets_schema
   } else {
     invalid_sheets_param <- sheets[!sheets %in% sheets_schema]
-    
+
     sheets <- sheets[sheets %in% sheets_schema]
-    
+
     if (length(sheets) == 0) {
       stop("All provided sheets were either invalid or not present.\n")
     } else if (length(invalid_sheets_param) > 0) {
@@ -633,11 +633,11 @@ checkSheets <- function(sheets, cop_year, tool,
           paste(invalid_sheets_param, collapse = "\n\t* "),
           "\n"))
     }
-    
+
   }
-  
+
   sheets
-  
+
 }
 
 
@@ -660,7 +660,7 @@ check_params <- function(country_uids,
                          ...) {
 
   params <- list()
-  
+
   dots <- list(...)
 
   # Check Country UIDs ####
@@ -751,7 +751,7 @@ check_params <- function(country_uids,
   if (!missing(results_archive)) {
     params$results_archive <- checkResultsArchive(results_archive)
   }
-  
+
   # Check sheets ----
   if (!missing(sheets)) {
     params$sheets <- checkSheets(sheets = sheets,

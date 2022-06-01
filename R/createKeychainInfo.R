@@ -3,11 +3,11 @@
 #'
 #' @description
 #' Creates Keychain info needed for use across many `datapackr` functions.
-#' 
+#'
 #' @md
 #'
 #' @inheritParams datapackr_params
-#' 
+#'
 #' @return DataPack object
 #'
 createKeychainInfo <- function(submission_path = NULL,
@@ -68,28 +68,28 @@ createKeychainInfo <- function(submission_path = NULL,
     stop(paste0("Based on a quick scan, the file submitted does not appear to",
                 " be a Data Pack."))
   }
-  
+
   # cop_year ----
   d$info$cop_year <- d$info$cop_year %||% tool_metadata$cop_year
-  
+
   if (d$info$cop_year != tool_metadata$cop_year) {
     stop("The file submitted does not seem to match the cop_year you've specified.")
   }
-  
+
   d$info$cop_year %<>% check_cop_year()
-  
+
   # tool ####
   d$info$tool <- d$info$tool %||% tool_metadata$tool
-  
+
   if (d$info$tool != tool_metadata$tool) {
     stop("The file submitted does not seem to match the tool type you've specified.")
   }
-  
+
   d$info$tool %<>% check_tool()
-  
+
   # schema ####
   d$info$schema <- check_schema(cop_year = d$info$cop_year, tool = d$info$tool)
-  
+
   # Template? ####
   header_row <- headerRow(tool = d$info$tool,
                           cop_year = d$info$cop_year)
@@ -106,33 +106,33 @@ createKeychainInfo <- function(submission_path = NULL,
     dplyr::select(PSNU)
 
   is_template <- NROW(check_if_template$PSNU) == 0 | all(is.na(check_if_template$PSNU))
-  
+
   if (is_template) {
     d$info$tool <- paste0(d$info$tool, " Template")
   }
-  
+
   # country_uids ----
   submitted_country_uids <-
     unPackCountryUIDs(submission_path = d$keychain$submission_path,
                       tool = d$info$tool)
-  
+
   d$info$country_uids <- d$info$country_uids %||% submitted_country_uids
-  
+
   if (d$info$country_uids != submitted_country_uids) {
     stop("The file submitted does not seem to match the country_uids you've specified.")
   }
-  
+
   d$info$country_uids %<>% check_country_uids()
-  
+
   # datapack_name ----
   d$info$datapack_name <-
     datapackr::unPackDataPackName(
       submission_path = d$keychain$submission_path,
       tool = d$info$tool)
-  
+
   d$info$datapack_name %<>% checkDataPackName(country_uids = d$info$country_uids)
-  
-  
+
+
   # TEST to make sure tool type matches what we see in the submitted file's structure ####
   # TODO: Improve to use checkColStructure
   # tab_names_expected <- unique(d$info$schema$sheet_name)

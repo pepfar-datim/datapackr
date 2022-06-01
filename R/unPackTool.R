@@ -19,7 +19,7 @@ unPackTool <- function(submission_path = NULL,
                        cop_year = NULL,
                        d2_session = dynGet("d2_default_session",
                                            inherits = TRUE)) {
-  
+
   d <- loadDataPack(submission_path = submission_path,
                     tool = tool,
                     country_uids = country_uids,

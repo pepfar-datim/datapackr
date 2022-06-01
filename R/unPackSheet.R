@@ -65,7 +65,7 @@ unPackDataPackSheet <- function(d,
                         names_to = "indicator_code",
                         values_to = "value") %>%
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value)
-  
+
   # Add ages to PMTCT_EID ####
   if (sheet == "PMTCT_EID") {
     data %<>%
@@ -77,7 +77,7 @@ unPackDataPackSheet <- function(d,
         )
       )
   }
-  
+
   # Convert Sexes for KP_MAT ####
   if (sheet == "KP") {
     data %<>%
@@ -89,7 +89,7 @@ unPackDataPackSheet <- function(d,
                                   TRUE ~ KeyPop)
       )
   }
-  
+
   # Aggregate OVC_HIVSTAT ####
   if (sheet == "OVC") {
     data %<>%
@@ -108,14 +108,14 @@ unPackDataPackSheet <- function(d,
       dplyr::filter(
         psnuid %in% valid_PSNUs$psnu_uid) # Drop if invalid or blank org unit ----
   }
-  
+
   if (clean_disaggs) {
     valid_disaggs <- d$info$schema %>%
       dplyr::filter(
         sheet_name == sheet
         & (col_type == "target" | (col_type == "result" & dataset == "subnat"))) %>%
       dplyr::select(indicator_code, valid_ages, valid_sexes, valid_kps)
-    
+
     data %<>% # Drop invalid disaggs (Age, Sex, KeyPop) ----
       dplyr::left_join(valid_disaggs, by = c("indicator_code" = "indicator_code")) %>%
       dplyr::filter(purrr::map2_lgl(Age, valid_ages, ~.x %in% .y[["name"]])
@@ -123,13 +123,13 @@ unPackDataPackSheet <- function(d,
                     & purrr::map2_lgl(KeyPop, valid_kps, ~.x %in% .y[["name"]])) %>%
       dplyr::select(-valid_ages, -valid_sexes, -valid_kps)
   }
-  
+
   if (clean_values) {
     data %<>%
       dplyr::mutate(
         value = suppressWarnings(as.numeric(value))) %>% # Convert to numeric ----
       tidyr::drop_na(value) # Drop NAs & non-numerics ----
-    
+
     # Clean Prioritizations ----
     if (sheet == "Prioritization") {
       data %<>%
@@ -148,11 +148,11 @@ unPackDataPackSheet <- function(d,
       dplyr::summarise(value = sum(value)) %>%
       dplyr::ungroup()
   }
-  
+
   # TEST TX_NEW <1 from somewhere other than EID ####
   # TODO: Move this to checkAnalytics
   # if (sheet == "TX") {
-  # 
+  #
   #   d$tests$tx_new_invalid_lt1_sources <- d$data$extract %>%
   #     dplyr::select(PSNU, Age, Sex, TX_NEW.N.Age_Sex_HIVStatus.T,
   #       TX_NEW.N.IndexRate, TX_NEW.N.TBRate, TX_NEW.N.PMTCTRate,
@@ -164,8 +164,8 @@ unPackDataPackSheet <- function(d,
   #                                  -TX_NEW.N.Age_Sex_HIVStatus.T),
   #                      dplyr::any_vars(. > 0))
   #   attr(d$tests$tx_new_invalid_lt1_sources, "test_name") <- "Invalid TX <01 data source"
-  # 
-  # 
+  #
+  #
   #   if (NROW(d$tests$tx_new_invalid_lt1_sources) > 0) {
   #     warning_msg <-
   #       paste0(
@@ -173,7 +173,7 @@ unPackDataPackSheet <- function(d,
   #         ": TX_NEW for <01 year olds being targeted through method other than EID.",
   #         " MER Guidance recommends all testing for <01 year olds be performed through EID rather than HTS",
   #         "\n")
-  # 
+  #
   #     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   #   }
   # }

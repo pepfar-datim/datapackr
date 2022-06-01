@@ -6,7 +6,7 @@
 #' necessary for processing and analyzing data in the Data Pack.
 #'
 #' @md
-#' 
+#'
 #' @inheritParams datapackr_params
 #' @param load_sheets Logical. Should all data sheets be loaded too?
 #'
@@ -20,32 +20,32 @@ loadDataPack <- function(submission_path = NULL,
                          load_sheets = FALSE,
                          d2_session = dynGet("d2_default_session",
                                              inherits = TRUE)) {
-  
+
   d <- createKeychainInfo(submission_path = submission_path,
                           tool = tool,
                           country_uids = country_uids,
                           cop_year = cop_year,
                           d2_session = d2_session)
-  
+
   if (load_wb) {
     d$tool$wb <- openxlsx::loadWorkbook(file = d$keychain$submission_path)
   }
-  
+
   if (load_sheets) {
     d <- loadSheets(d)
   }
-  
+
   if (interactive()) {
     msg <- paste0("Congratulations. You have loaded a ",
-                  "COP", stringr::str_sub(d$info$cop_year, -2,-1),
+                  "COP", stringr::str_sub(d$info$cop_year, -2, -1),
                   " ", d$info$tool,
                   " for ", d$info$datapack_name, ".")
-    
+
     print(msg)
   }
-  
+
   d
-  
+
 }
 
 
@@ -53,7 +53,7 @@ loadDataPack <- function(submission_path = NULL,
 #' @title Read data from a DataPack object
 #' @author Scott Jackson
 #' @md
-#' @description Reads data from a sheet in a DataPack object. This function is 
+#' @description Reads data from a sheet in a DataPack object. This function is
 #' essentially a wrapper for `readxl`'s `read_excel` function, but with additional
 #' support for selecting default parameters per DataPack setup.
 #' 
@@ -74,10 +74,10 @@ readSheet <- function(d,
                       guess_max = 1000,
                       progress = readxl_progress(),
                       .name_repair = "minimal") {
-  
+
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
   range <- range %||% readxl::cell_limits(c(header_row, 1), c(NA, NA))
-  
+
   data <-
     readxl::read_excel(
       path = d$keychain$submission_path,
@@ -89,9 +89,9 @@ readSheet <- function(d,
       guess_max = guess_max,
       progress = progress,
       .name_repair = .name_repair)
-  
+
   data
-  
+
 }
 
 
@@ -102,7 +102,7 @@ readSheet <- function(d,
 #' into the DataPack `d` object for use in further functions.
 #'
 #' @md
-#' 
+#'
 #' @inheritParams datapackr_params
 #' @param sheets Character vector of sheet names to load. The default is NULL
 #' which loads all sheets.
@@ -111,26 +111,25 @@ readSheet <- function(d,
 #'
 loadSheets <- function(d,
                        sheets = NULL) {
-  
+
   sheets <- sheets %missing% NULL
   actual_sheets <- readxl::excel_sheets(d$keychain$submission_path)
-  skip = skip_tabs(tool = d$info$tool, cop_year = d$info$cop_year)
+  skip <- skip_tabs(tool = d$info$tool, cop_year = d$info$cop_year)
   sheets_to_read <- actual_sheets[!actual_sheets %in% skip]
   sheets <- sheets %||% sheets_to_read
-  
+
   # Check Parameters
   sheets <- checkSheets(sheets = sheets,
-                        cop_year = d$info$cop_year, 
+                        cop_year = d$info$cop_year,
                         tool = d$info$tool,
                         all_sheets = FALSE,
                         psnuxim = TRUE)
-  
+
   # Load Sheets
   for (sheet in sheets) {
     d[["sheets"]][[as.character(sheet)]] <- readSheet(d, sheet = sheet)
   }
-  
-  d
-  
-}
 
+  d
+
+}

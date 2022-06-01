@@ -5,7 +5,7 @@
 context("can-check for blank prioritizations ...")
 
 test_that("Can flag blank prioritizations...", {
-  
+
   # base object
   d <- list()
   d$info$cop_year <- "2022"
@@ -19,7 +19,7 @@ test_that("Can flag blank prioritizations...", {
     indicator_code = c("IMPATT.PRIORITY_SNU.T"),
     value_type = c("integer")
   )
-  
+
   # variables for munging
   d$sheets$Prioritization <- data.frame(
     "SNU1" = c("_Military something", "New York", "New York"),
@@ -28,16 +28,16 @@ test_that("Can flag blank prioritizations...", {
     "IMPATT.PRIORITY_SNU.T" = c("M", 2, NA),
     "PRIORITY_SNU.translation" = c("Military", "Scale-up: Aggressive", "Scale-up: Aggressive")
   )
-  
+
   # test positive error
   d <- checkBlankPrioritizations(d, sheet = "Prioritization")
   testthat::expect_gt(nrow(d$tests$blank_prioritizations), 0) # test the tests object
   testthat::is_more_than(d$info$messages$message, 0) # test the message object
-  
+
 })
 
 test_that("Can pass when prioritizations are not blank...", {
-  
+
   # base object
   d <- list()
   d$info$cop_year <- "2022"
@@ -51,7 +51,7 @@ test_that("Can pass when prioritizations are not blank...", {
     indicator_code = c("IMPATT.PRIORITY_SNU.T"),
     value_type = c("integer")
   )
-  
+
   # variables for munging
   d$sheets$Prioritization <- data.frame(
     "SNU1" = c("_Military something", "New York", "New York"),
@@ -60,10 +60,10 @@ test_that("Can pass when prioritizations are not blank...", {
     "IMPATT.PRIORITY_SNU.T" = c("M", 2, 1),
     "PRIORITY_SNU.translation" = c("Military", "Scale-up: Aggressive", "Scale-up: Aggressive")
   )
-  
+
   # test no false positive
   d <- checkBlankPrioritizations(d, sheet = "Prioritization")
   testthat::expect_null(d$tests$blank_prioritizations) # test the tests object
   testthat::is_equivalent_to(d$info$messages$message, 0) # test the message object
-  
+
 })

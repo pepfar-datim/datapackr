@@ -5,7 +5,7 @@
 context("can-check invalid prioritizations ...")
 
 test_that("Can flag invalid prioritizations...", {
-  
+
   # base object
   d <- list()
   d$info$cop_year <- "2022"
@@ -19,7 +19,7 @@ test_that("Can flag invalid prioritizations...", {
     indicator_code = c("IMPATT.PRIORITY_SNU.T"),
     value_type = c("integer")
   )
-  
+
   # variables for munging
   d$sheets$Prioritization <- data.frame(
     "SNU1" = c("_Military something", "New York", "New York"),
@@ -28,16 +28,16 @@ test_that("Can flag invalid prioritizations...", {
     "IMPATT.PRIORITY_SNU.T" = c("M", "F", 9),
     "PRIORITY_SNU.translation" = c("Military", "Scale-up: Aggressive", "Scale-up: Aggressive")
   )
-  
+
   # test positive error
   d <- checkInvalidPrioritizations(d, sheet = "Prioritization")
   testthat::expect_gt(nrow(d$tests$invalid_prioritizations), 0) # test the tests object
   testthat::is_more_than(d$info$messages$message, 0) # test the message object
-  
+
 })
 
 test_that("Can pass when priotizations are valid ...", {
-  
+
   # base object
   d <- list()
   d$info$cop_year <- "2022"
@@ -51,7 +51,7 @@ test_that("Can pass when priotizations are valid ...", {
     indicator_code = c("IMPATT.PRIORITY_SNU.T"),
     value_type = c("integer")
   )
-  
+
   # variables for munging
   d$sheets$Prioritization <- data.frame(
     "SNU1" = c("_Military something", "New York", "New York"),
@@ -60,10 +60,10 @@ test_that("Can pass when priotizations are valid ...", {
     "IMPATT.PRIORITY_SNU.T" = c(NA, 1, 1),
     "PRIORITY_SNU.translation" = c("Military", "Scale-up: Aggressive", "Scale-up: Aggressive")
   )
-  
+
   # test no false positive
   d <- checkInvalidPrioritizations(d, sheet = "Prioritization")
   testthat::expect_null(d$tests$invalid_prioritizations) # test the tests object
   testthat::is_equivalent_to(d$info$messages$message, 0) # test the message object
-  
+
 })
