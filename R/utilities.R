@@ -340,16 +340,13 @@ rowMax <- function(df, cn, regex) {
 #' @return {cop21, cop22}_map_DataPack_DATIM_DEs_COCs
 #'
 getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
-  if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
-                                    datapackr::map_DataPack_DATIM_DEs_COCs)) {
-    return(datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
-  } else if (cop_year == 2022) {
-    return(datapackr::cop22_map_DataPack_DATIM_DEs_COCs)
-  } else { # if map_DataPack_DATIM_DEs_COCs has drifted or COP year is invalid this notifies us
-    stop("The COP year and configuration provided is not supported by get_Map_DataPack_DATIM_DEs_COCs")
-  }
-}
 
+  switch(as.character(cop_year),
+         "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
+         "2022" = datapackr::cop22_map_DataPack_DATIM_DEs_COCs,
+         stop("The COP year and configuration provided is not supported by get_Map_DataPack_DATIM_DEs_COCs"))
+
+}
 
 #' @export
 #' @title Create a new Data Pack
