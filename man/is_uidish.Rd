@@ -4,7 +4,7 @@
 \alias{is_uidish}
 \title{Is UID-ish}
 \usage{
-is_uidish(string)
+is_uidish(string, ish = FALSE)
 }
 \arguments{
 \item{string}{Input vector. Either a character vector, or something coercible
@@ -15,5 +15,5 @@ A logical vector.
 }
 \description{
 Tests whether a character string matches the regex of a DHIS2
-11-digit UID. Vectorized over \code{string} and \code{pattern}.
+11-digit UID.
 }

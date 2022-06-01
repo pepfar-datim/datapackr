@@ -6,48 +6,43 @@
 #'    in \code{d$data$sheet}.
 #'
 #' @inheritParams datapackr_params
+#' @param clean_orgs Logical. If TRUE, drops rows with missing or invalid org
+#' units.
+#' @param clean_disaggs Logical. If TRUE, drops rows with missing or incorrect
+#' Age, Sex, or KeyPop.
+#' @param clean_values Logical. If TRUE, will convert values to numeric type,
+#' drop non-numerics, NAs, & negatives; and aggregate all data across duplicate
+#' rows.
 #'
 #' @return d
 #'
-unPackDataPackSheet <- function(d, sheet) {
-  
-  # Check params ----
-  params <- check_params(cop_year = d$info$cop_year,
-                         tool = d$info$tool,
-                         schema = d$info$schema,
-                         sheets = sheet)
-  
-  names(params) <- stringr::str_replace(names(params), "sheets", "sheet")
-  
-  for (p in names(params)) {
-    assign(p, purrr::pluck(params, p))
-  }
-  
-  rm(params, p)
-  
+unPackDataPackSheet <- function(d,
+                                sheet,
+                                clean_orgs = TRUE,
+                                clean_disaggs = TRUE,
+                                clean_values = TRUE) {
+
   # Read in data ----
-  
-  header_row <- headerRow(tool = tool, cop_year = cop_year)
-
   data <- d$sheets[[as.character(sheet)]]
-  
-  # Make sure no blank column names ####
-  data %<>%
-    tibble::as_tibble(.name_repair = "unique")
 
-  # Remove duplicate columns (Take the first example) ####
+  # Remove duplicate columns (Take 1st) ####
   duplicate_cols <- duplicated(names(data))
 
   if (any(duplicate_cols)) {
     data <- data[, -which(duplicate_cols)]
   }
-  
+
+  # Make sure no blank column names ####
+  data %<>%
+    tibble::as_tibble(.name_repair = "unique")
+
   # If tab empty or without targets, send d back ----
-  target_cols <- schema %>%
-    dplyr::filter(sheet_name == sheet
-                  & (col_type == "target" | (col_type == "result" & dataset == "subnat"))
-                  # Filter by what's in submission to avoid unknown column warning messages
-                  & indicator_code %in% colnames(data)) %>%
+  target_cols <- d$info$schema %>%
+    dplyr::filter(
+      sheet_name == sheet
+      & (col_type == "target" | (col_type == "result" & dataset == "subnat"))
+      # Filter by what's in submission to avoid unknown column warning messages
+      & indicator_code %in% colnames(data)) %>%
     dplyr::pull(indicator_code)
 
   # TODO: Is this the best test for whether a sheet is empty??
@@ -55,8 +50,107 @@ unPackDataPackSheet <- function(d, sheet) {
     return(d)
   }
 
+  data %<>%
+    # Add cols to allow compiling with other sheets ----
+    addcols(c("KeyPop", "Age", "Sex")) %>%
+    dplyr::mutate(
+      psnuid = extract_uid(PSNU), # Extract PSNU uid ----
+      sheet_name = sheet) %>% # Tag sheet name ----
+    # Select only target-related columns ----
+    dplyr::select(PSNU, psnuid, sheet_name, Age, Sex, KeyPop,
+                  dplyr::one_of(target_cols)) %>%
+    dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>% # Drop if entire row NA ----
+    # Gather all indicators as single column for easier processing ----
+    tidyr::pivot_longer(cols = -c(PSNU, psnuid, Age, Sex, KeyPop, sheet_name),
+                        names_to = "indicator_code",
+                        values_to = "value") %>%
+    dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value)
+  
+  # Add ages to PMTCT_EID ####
+  if (sheet == "PMTCT_EID") {
+    data %<>%
+      dplyr::mutate(
+        Age = dplyr::case_when(
+          stringr::str_detect(indicator_code, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
+          stringr::str_detect(indicator_code, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
+          TRUE ~ Age
+        )
+      )
+  }
+  
+  # Convert Sexes for KP_MAT ####
+  if (sheet == "KP") {
+    data %<>%
+      dplyr::mutate(
+        Sex = dplyr::case_when(indicator_code == "KP_MAT.N.Sex.T"
+                               ~ stringr::str_replace(KeyPop, " PWID", ""),
+                               TRUE ~ Sex),
+        KeyPop = dplyr::case_when(indicator_code == "KP_MAT.N.Sex.T" ~ NA_character_,
+                                  TRUE ~ KeyPop)
+      )
+  }
+  
+  # Aggregate OVC_HIVSTAT ####
+  if (sheet == "OVC") {
+    data %<>%
+      dplyr::mutate(
+        Age = dplyr::case_when(
+          stringr::str_detect(indicator_code, "OVC_HIVSTAT") ~ NA_character_,
+          TRUE ~ Age),
+        Sex = dplyr::case_when(
+          stringr::str_detect(indicator_code, "OVC_HIVSTAT") ~ NA_character_,
+          TRUE ~ Sex))
+  }
+
+  # Munge ----
+  if (clean_orgs) {
+    data %<>%
+      dplyr::filter(
+        psnuid %in% valid_PSNUs$psnu_uid) # Drop if invalid or blank org unit ----
+  }
+  
+  if (clean_disaggs) {
+    valid_disaggs <- d$info$schema %>%
+      dplyr::filter(
+        sheet_name == sheet
+        & (col_type == "target" | (col_type == "result" & dataset == "subnat"))) %>%
+      dplyr::select(indicator_code, valid_ages, valid_sexes, valid_kps)
+    
+    data %<>% # Drop invalid disaggs (Age, Sex, KeyPop) ----
+      dplyr::left_join(valid_disaggs, by = c("indicator_code" = "indicator_code")) %>%
+      dplyr::filter(purrr::map2_lgl(Age, valid_ages, ~.x %in% .y[["name"]])
+                    & purrr::map2_lgl(Sex, valid_sexes, ~.x %in% .y[["name"]])
+                    & purrr::map2_lgl(KeyPop, valid_kps, ~.x %in% .y[["name"]])) %>%
+      dplyr::select(-valid_ages, -valid_sexes, -valid_kps)
+  }
+  
+  if (clean_values) {
+    data %<>%
+      dplyr::mutate(
+        value = suppressWarnings(as.numeric(value))) %>% # Convert to numeric ----
+      tidyr::drop_na(value) # Drop NAs & non-numerics ----
+    
+    # Clean Prioritizations ----
+    if (sheet == "Prioritization") {
+      data %<>%
+        dplyr::filter(
+          !stringr::str_detect(PSNU, "^_Military"),
+          value != "NA",
+          !value %in% prioritization_dict()$value)
+    } else {
+      data %<>%
+        dplyr::filter(value > 0)# Filter out zeros & negatives ----
+    }
+
+    # Aggregate (esp for OVC_HIVSTAT) ----
+    data %<>%
+      dplyr::group_by(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop) %>%
+      dplyr::summarise(value = sum(value)) %>%
+      dplyr::ungroup()
+  }
+  
   # TEST TX_NEW <1 from somewhere other than EID ####
-    # TODO: Move this to checkAnalytics
+  # TODO: Move this to checkAnalytics
   # if (sheet == "TX") {
   # 
   #   d$tests$tx_new_invalid_lt1_sources <- d$data$extract %>%
@@ -83,90 +177,6 @@ unPackDataPackSheet <- function(d, sheet) {
   #     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   #   }
   # }
-
-  # Add cols to allow compiling with other sheets
-  data %<>%
-    addcols(c("KeyPop", "Age", "Sex")) %>%
-  # Select only target-related columns
-    dplyr::select(PSNU, Age, Sex, KeyPop,
-                  dplyr::one_of(target_cols)) %>%
-  # Drop rows where entire row is NA ----
-    dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
-  # Extract PSNU uid
-    dplyr::mutate(
-      psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)"),
-  # Tag sheet name
-      sheet_name = sheet
-    ) %>%
-    dplyr::select(PSNU, psnuid, sheet_name, Age, Sex, KeyPop,
-                  dplyr::everything())
-
-  # If PSNU has been deleted, drop the row ----
-  data %<>%
-    dplyr::filter(!is.na(PSNU))
-
-  # Gather all indicators as single column for easier processing ####
-  data %<>%
-    tidyr::gather(key = "indicator_code",
-                  value = "value",
-                  -PSNU, -psnuid, -Age, -Sex, -KeyPop, -sheet_name) %>%
-    dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value)
-
-  # Drop invalid Prioritizations, or maybe revert to prev yr prioritization ----
-  if (sheet == "Prioritization") {
-    data %<>%
-      dplyr::filter(
-        !value %in% prioritization_dict()$value,
-    # Remove _Military district from Prioritization extract as this can't be assigned a prioritization ####
-        !stringr::str_detect(PSNU, "^_Military"))
-  }
-
-  # Convert non-numeric to numeric ----
-  data %<>%
-    dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
-  # Drop NAs and irredeemable non-numerics ----
-    tidyr::drop_na(value) %>%
-  # Filter out zeros ####
-    dplyr::filter(value != 0)
-
-  # Aggregate OVC_HIVSTAT ####
-  if (sheet == "OVC") {
-    data %<>%
-      dplyr::mutate(
-        Age = dplyr::case_when(
-          stringr::str_detect(indicator_code, "OVC_HIVSTAT") ~ NA_character_,
-          TRUE ~ Age),
-        Sex = dplyr::case_when(
-          stringr::str_detect(indicator_code, "OVC_HIVSTAT") ~ NA_character_,
-          TRUE ~ Sex)) %>%
-      dplyr::group_by(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop) %>%
-      dplyr::summarise(value = sum(value)) %>%
-      dplyr::ungroup()
-  }
-
-  # Add ages to PMTCT_EID ####
-  if (sheet == "PMTCT_EID") {
-    data %<>%
-      dplyr::mutate(
-        Age = dplyr::case_when(
-          stringr::str_detect(indicator_code, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
-          stringr::str_detect(indicator_code, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
-          TRUE ~ Age
-        )
-      )
-  }
-
-  # Convert Sexes for KP_MAT ####
-  if (sheet == "KP") {
-    data %<>%
-      dplyr::mutate(
-        Sex = dplyr::case_when(indicator_code == "KP_MAT.N.Sex.T"
-            ~ stringr::str_replace(KeyPop, " PWID", ""),
-          TRUE ~ Sex),
-        KeyPop = dplyr::case_when(indicator_code == "KP_MAT.N.Sex.T" ~ NA_character_,
-          TRUE ~ KeyPop)
-      )
-  }
 
   return(data)
 }

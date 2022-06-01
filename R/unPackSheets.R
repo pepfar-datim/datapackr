@@ -16,6 +16,7 @@ unPackSheets <- function(d, sheets = NULL) {
     stop("Cannot process that kind of tool. :(")
   }
   
+  # If sheets parameter not provided, use names of sheets in d$sheets
   sheets <- sheets %||% grep("PSNUxIM", names(d$sheets), value = TRUE, invert = TRUE)
   
   sheets <- checkSheets(sheets = sheets,
@@ -23,6 +24,19 @@ unPackSheets <- function(d, sheets = NULL) {
                         tool = d$info$tool,
                         all_sheets = FALSE,
                         psnuxim = FALSE)
+  
+  # Check sheets against actual sheets found in d$sheets
+  if (!all(sheets %in% names(d$sheets))) {
+    invalid_sheets <- unique(sheets[!sheets %in% names(d$sheets)])
+    
+    sheets <- sheets[sheets %in% names(d$sheets)]
+    
+    interactive_warning(
+      paste0("The following sheets do not seem to be present in ",
+             "your submission, so cannot be unpacked:  -> \n\t* ",
+             paste(invalid_sheets, collapse = "\n\t* "),
+             "\n"))
+  }
   
   # Implementing this here instead of in unPackDataPack or unPackTool because 
   # while you may want to checkSheetData without running unPackSheets, you should
