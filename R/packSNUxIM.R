@@ -119,7 +119,7 @@ packSNUxIM <- function(d,
     dplyr::rename(id_col = V1) %>%
     tibble::rownames_to_column("sheet_name")
 
-  target_cols <- datapackr::cop21_data_pack_schema %>%
+  target_cols <- pick_schema(2021, "Data Pack")%>%
     dplyr::filter(dataset == "mer" & col_type == "target" & (!sheet_name %in% c("PSNUxIM", "AGYW"))) %>%
     dplyr::mutate(
       target_col = openxlsx::int2col(col)
