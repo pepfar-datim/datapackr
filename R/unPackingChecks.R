@@ -23,7 +23,6 @@
 #'
 #' @name unPackDataChecks
 #' @md
-#' @importFrom magrittr %>% %<>%
 #'
 #' @param d DataPack object loaded via `loadDataPack`.
 #' @param sheet String. Name of DataPack sheet to check data from. Default is

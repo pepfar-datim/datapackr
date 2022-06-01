@@ -56,9 +56,6 @@ loadDataPack <- function(submission_path = NULL,
 #' @description Reads data from a sheet in a DataPack object. This function is
 #' essentially a wrapper for `readxl`'s `read_excel` function, but with additional
 #' support for selecting default parameters per DataPack setup.
-#' 
-#' @importFrom readxl cell_limits
-#' @importFrom readxl readxl_progress
 #'
 #' @param d DataPack object, created via `loadDataPack`.
 #' @inheritParams readxl::read_excel
@@ -72,7 +69,7 @@ readSheet <- function(d,
                       col_types = "text",
                       na = "",
                       guess_max = 1000,
-                      progress = readxl_progress(),
+                      progress = readxl::readxl_progress(),
                       .name_repair = "minimal") {
 
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)

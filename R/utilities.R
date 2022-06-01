@@ -695,7 +695,6 @@ is_uidish <- function(string, ish = FALSE) {
 #'
 #' @name extract_uid
 #' @md
-#' @importFrom magrittr %>% %<>%
 #'
 #' @param string Input vector. Either a character vector, or something coercible
 #' to one.

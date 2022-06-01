@@ -12,7 +12,7 @@ readSheet(
   col_types = "text",
   na = "",
   guess_max = 1000,
-  progress = readxl_progress(),
+  progress = readxl::readxl_progress(),
   .name_repair = "minimal"
 )
 }
