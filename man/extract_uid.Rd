@@ -2,9 +2,12 @@
 % Please edit documentation in R/utilities.R
 \name{extract_uid}
 \alias{extract_uid}
-\title{Extract UID}
+\alias{extract_uid_all}
+\title{Extract UID.}
 \usage{
 extract_uid(string)
+
+extract_uid_all(string)
 }
 \arguments{
 \item{string}{Input vector. Either a character vector, or something coercible

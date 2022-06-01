@@ -689,22 +689,33 @@ is_uidish <- function(string, ish = FALSE) {
   
 }
 
-#' @export
-#' @title Extract UID
-#' @md
+#' Extract UID.
+#'
 #' @description Extracts a DHIS2 11-digit UID from provided string.
+#'
+#' @name extract_uid
+#' @md
+#' @importFrom magrittr %>% %<>%
 #'
 #' @param string Input vector. Either a character vector, or something coercible
 #' to one.
 #'
 #' @return Character vector of DHIS2 11-digit UIDs found in string.
+#'
+NULL
+
+#' @export
+#' @rdname extract_uid
+#'
 extract_uid <- function(string) {
-  if (!is_uidish(string, ish = TRUE)) {
-    stop("No UID detected in string.")
-  }
-  
+  stringr::str_extract(string, "[[:alpha:]][[:alnum:]]{10}")
+}
+
+#' @export
+#' @rdname extract_uid
+#'
+extract_uid_all <- function(string) {
   stringr::str_extract_all(string, "[[:alpha:]][[:alnum:]]{10}")
-  
 }
 
 
