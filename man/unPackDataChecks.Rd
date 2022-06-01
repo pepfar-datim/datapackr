@@ -7,12 +7,11 @@
 \alias{checkToolStructure}
 \alias{checkToolComments}
 \alias{checkConnections}
-\alias{checkNumeric}
+\alias{checkNonNumeric}
 \alias{checkMissingMetadata}
 \alias{checkNegativeValues}
 \alias{checkDecimalValues}
 \alias{checkInvalidOrgUnits}
-\alias{checkBlankPrioritizations}
 \alias{checkInvalidPrioritizations}
 \alias{checkSheetData}
 \title{Perform various data quality checks on in-process data from Data Packs.}
@@ -27,17 +26,15 @@ checkToolComments(d, quiet = TRUE)
 
 checkConnections(d, quiet = TRUE)
 
-checkNumeric(d, sheet, quiet = TRUE)
+checkNonNumeric(d, sheet, quiet = TRUE)
 
 checkMissingMetadata(d, sheet, quiet = T)
 
-checkNegativeValues(d, sheet, filter_data = T, quiet = T)
+checkNegativeValues(d, sheet, quiet = T)
 
-checkDecimalValues(d, sheet, filter_data = T, quiet = T)
+checkDecimalValues(d, sheet, quiet = TRUE)
 
-checkInvalidOrgUnits(d, sheet, filter_data = T, quiet = T)
-
-checkBlankPrioritizations(d, sheet, quiet = T)
+checkInvalidOrgUnits(d, sheet, quiet = TRUE)
 
 checkInvalidPrioritizations(d, sheet, quiet = T)
 
@@ -50,18 +47,9 @@ checkSheetData(d, sheets = NULL, quiet = TRUE, ...)
 first sheet.}
 
 \item{quiet}{Logical. Should warning messages be printed? Default is TRUE.}
-
-\item{filter_data}{Logical. If TRUE, results will be filtered to remove
-irrelevant data before testing.}
-
-\item{compile}{Logical. Should results be compiled back into the d object, or
-returned as a test results object containing \code{test_results}, \code{messages},
-and \code{error} flag? Default is TRUE}
 }
 \value{
-If \code{compile = TRUE}, a DataPack object, with updated tests and warnings.
-If \code{compile = FALSE}, a test results object containing \code{test_results},
-\code{messages}, and \code{error} flag.
+A DataPack object, with updated tests and warnings.
 }
 \description{
 A series of functions to check and validate quality & integrity

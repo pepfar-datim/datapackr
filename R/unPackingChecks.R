@@ -29,13 +29,8 @@
 #' @param sheet String. Name of DataPack sheet to check data from. Default is
 #'   first sheet.
 #' @param quiet Logical. Should warning messages be printed? Default is TRUE.
-#' @param compile Logical. Should results be compiled back into the d object, or
-#'   returned as a test results object containing `test_results`, `messages`,
-#'   and `error` flag? Default is TRUE
 #'
-#' @return If `compile = TRUE`, a DataPack object, with updated tests and warnings.
-#'   If `compile = FALSE`, a test results object containing `test_results`,
-#'   `messages`, and `error` flag.
+#' @return A DataPack object, with updated tests and warnings.
 #'
 NULL
 
@@ -454,64 +449,55 @@ checkConnections <- function(d, quiet = TRUE) {
 #' @export
 #' @rdname unPackDataChecks
 #'
-checkNumeric <- function(d, sheet, quiet = TRUE) {
+checkNonNumeric <- function(d, sheet, quiet = TRUE) {
   
   if (!quiet) {
     messages <- MessageQueue()
   }
   
   # Get data ----
-  data <- d$sheets[[as.character(sheet)]]
+  data <- unPackDataPackSheet(d,
+                              sheet = sheet,
+                              clean_orgs = TRUE,
+                              clean_disaggs = TRUE,
+                              clean_values = FALSE)
   
-  # 
+  # keep_cols <- d$info$schema %>%
+  #   dplyr::filter(sheet_name == sheet,
+  #                 !is.na(indicator_code),
+  #                 !indicator_code %in% c("sheet_num", "ID", "SNU1"),
+  #                 col_type %in% c("row_header", "target", "result"))
   
-  keep_cols <- d$info$schema %>%
-    dplyr::filter(sheet_name == sheet,
-                  !is.na(indicator_code),
-                  !indicator_code %in% c("sheet_num", "ID", "SNU1"),
-                  col_type %in% c("row_header", "target", "result"))
+  # if (d$info$tool == "OPU Data Pack") {
+  #   data %<>%
+  #     tidyr::gather(key = "mechCode_supportType",
+  #                   value = "value",
+  #                   -tidyselect::all_of(header_cols$indicator_code)) %>%
+  #     dplyr::select(dplyr::all_of(header_cols$indicator_code),
+  #                   mechCode_supportType, value) %>%
+  #     tidyr::drop_na(value)
+  # }
   
-  if (d$info$tool == "OPU Data Pack") {
-    data %<>%
-      tidyr::gather(key = "mechCode_supportType",
-                    value = "value",
-                    -tidyselect::all_of(header_cols$indicator_code)) %>%
-      dplyr::select(dplyr::all_of(header_cols$indicator_code),
-                    mechCode_supportType, value) %>%
-      tidyr::drop_na(value)
-  }
+  # if (d$info$tool == "Data Pack" & sheet == "PSNUxIM" & d$info$cop_year %in% c(2021, 2022)) {
+  #   data %<>%
+  #     tidyr::gather(key = "mechCode_supportType",
+  #                   value = "value",
+  #                   -tidyselect::all_of(c(header_cols$indicator_code))) %>%
+  #     dplyr::select(dplyr::all_of(header_cols$indicator_code), -indicator_code,
+  #                   indicator_code = mechCode_supportType, value) %>%
+  #     tidyr::drop_na(value)
+  # }
   
-  if (d$info$tool == "Data Pack" & sheet == "PSNUxIM" & d$info$cop_year %in% c(2021, 2022)) {
-    data %<>%
-      tidyr::gather(key = "mechCode_supportType",
-                    value = "value",
-                    -tidyselect::all_of(c(header_cols$indicator_code))) %>%
-      dplyr::select(dplyr::all_of(header_cols$indicator_code), -indicator_code,
-                    indicator_code = mechCode_supportType, value) %>%
-      tidyr::drop_na(value)
-  }
-  
-  header_cols <- keep_cols %>%
-    dplyr::filter(col_type == "row_header") %>%
-    dplyr::pull(indicator_code)
-  
+  # header_cols <- keep_cols %>%
+  #   dplyr::filter(col_type == "row_header") %>%
+  #   dplyr::pull(indicator_code)
+
   non_numeric <- data %>%
-    dplyr::select(tidyselect::any_of(keep_cols$indicator_code)) %>%
-    tidyr::pivot_longer(cols = !tidyselect::all_of(header_cols),
-                        names_to = "indicator_code",
-                        values_to = "value",
-                        values_drop_na = TRUE) %>%
+    tidyr::drop_na(value) %>%
     dplyr::mutate(value_numeric = suppressWarnings(as.numeric(value))) %>%
     dplyr::filter(is.na(value_numeric)) %>%
-    dplyr::select(indicator_code, value) %>%
-    dplyr::distinct() %>%
-    dplyr::group_by(indicator_code) %>%
-    dplyr::arrange(value) %>%
-    dplyr::summarise(values = paste(value, collapse = ", ")) %>%
-    dplyr::mutate(row_id = paste(indicator_code, values, sep = ":  ")) %>%
-    dplyr::arrange(row_id) %>%
-    dplyr::select(row_id) %>%
-    dplyr::mutate(sheet = sheet)
+    dplyr::mutate(sheet = sheet) %>%
+    dplyr::select(sheet, dplyr::everything(), -value_numeric)
   
   if (NROW(non_numeric) > 0) {
     lvl <- "WARNING"
@@ -520,11 +506,9 @@ checkNumeric <- function(d, sheet, quiet = TRUE) {
       paste0(
         lvl, "! In tab ",
         sheet,
-        ": NON-NUMERIC VALUES found! Please ensure all values entered against",
-        " FY22 Target columns include numeric values only - no letters or punctuation.",
-        " It may be helpful to use an Excel filter to check unique values in a column for",
-        " any non-numeric entries. ->  \n\t* ",
-        paste(non_numeric$row_id, collapse = "\n\t* "),
+        ": NON-NUMERIC VALUES found! Please check the following columns for",
+        " possible non-numeric values. ->  \n\t* ",
+        paste(sort(unique(non_numeric$indicator_code)), collapse = "\n\t* "),
         "\n")
     
     d$tests$non_numeric %<>% dplyr::bind_rows(non_numeric)
@@ -604,134 +588,68 @@ checkMissingMetadata <- function(d, sheet, quiet = T) {
   if (!quiet) {
     printMessages(messages)
   }
-  
+
   return(d)
-  
+
 }
 
 #' @export
 #' @rdname unPackDataChecks
 #' 
-checkNegativeValues <- function(d, sheet, filter_data = T, quiet = T) {
-  
+checkNegativeValues <- function(d, sheet, quiet = T) {
+
   if (!quiet) {
     messages <- MessageQueue()
   }
-  
-  # get data
-  data <- d$sheets[[as.character(sheet)]]
-  
-  # Filter
-  if (filter_data) {
-    target_cols <- d$info$schema %>%
-      dplyr::filter(sheet_name == sheet
-                    & (col_type == "target" | (col_type == "result" & dataset == "subnat"))
-                    # Filter by what's in submission to avoid unknown column warning messages
-                    & indicator_code %in% colnames(data)) %>%
-      dplyr::pull(indicator_code)
-    
-    if (NROW(target_cols) == 0) {
-      return(d)
-    }
-    
-    data %<>%
-      dplyr::filter(!is.na(PSNU)) %>%
-      # Drop rows where entire row is NA
-      dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
-      addcols(c("KeyPop", "Age", "Sex")) %>%
-      dplyr::mutate(
-        psnuid = extract_uid(PSNU),
-        sheet_name = sheet) %>%
-      dplyr::select(PSNU, psnuid, sheet_name, Age, Sex, KeyPop,
-                    dplyr::one_of(target_cols)) %>%
-      tidyr::gather(key = "indicator_code",
-                    value = "value",
-                    -PSNU, -psnuid, -Age, -Sex, -KeyPop, -sheet_name) %>%
-      dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value) %>%
-      dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
-      tidyr::drop_na(value) %>%
-      dplyr::filter(value != 0)
-  }
-  
-  # TEST
-  negative_values <- data %>%
+
+  negative_values <- unPackDataPackSheet(d,
+                                         sheet,
+                                         clean_orgs = TRUE,
+                                         clean_disaggs = TRUE,
+                                         clean_values = FALSE) %>%
+    dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
     dplyr::filter(value < 0)
-  
+
   if (NROW(negative_values) > 0) {
     lvl <- "ERROR"
-    
+  
     msg <-
       paste0(
         lvl, "! In tab ",
         sheet,
         ": NEGATIVE VALUES found in the following columns! Ensure all values entered",
         " against Targets are whole, positive, numeric values. These will be removed. -> \n\t* ",
-        paste(unique(d$tests$negative_values$indicator_code), collapse = "\n\t* "),
+        paste(sort(unique(negative_values$indicator_code)), collapse = "\n\t* "),
         "\n")
-    
+
     d$tests$negative_values <- dplyr::bind_rows(d$test$negative_values, negative_values)
     attr(d$tests$negative_values, "test_name") <- "Negative values"
     d$info$messages <- appendMessage(d$info$messages, msg, lvl)
     d$info$has_error <- TRUE
-    
+
     if (!quiet) {
       messages <- appendMessage(messages, msg, lvl)
     }
-    
+
   }
-  
+
   if (!quiet) {
     printMessages(messages)
   }
-  
+
   return(d)
-  
+
 }
 
 #' @export
 #' @rdname unPackDataChecks
 #' 
-checkDecimalValues <- function(d, sheet, filter_data = T, quiet = T) {
-  if (!quiet) {
+checkDecimalValues <- function(d, sheet, quiet = TRUE) {
+
+    if (!quiet) {
     messages <- MessageQueue()
   }
-  
-  # get data
-  data <- d$sheets[[as.character(sheet)]]
-  
-  # Filter
-  if (filter_data) {
-    target_cols <- d$info$schema %>%
-      dplyr::filter(sheet_name == sheet
-                    & (col_type == "target" | (col_type == "result" & dataset == "subnat"))
-                    # Filter by what's in submission to avoid unknown column warning messages
-                    & indicator_code %in% colnames(data)) %>%
-      dplyr::pull(indicator_code)
-    
-    if (NROW(target_cols) == 0) {
-      return(d)
-    }
-    
-    data %<>%
-      dplyr::filter(!is.na(PSNU)) %>%
-      # Drop rows where entire row is NA
-      dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
-      addcols(c("KeyPop", "Age", "Sex")) %>%
-      dplyr::mutate(
-        psnuid = extract_uid(PSNU),
-        sheet_name = sheet) %>%
-      dplyr::select(PSNU, psnuid, sheet_name, Age, Sex, KeyPop,
-                    dplyr::one_of(target_cols)) %>%
-      tidyr::gather(key = "indicator_code",
-                    value = "value",
-                    -PSNU, -psnuid, -Age, -Sex, -KeyPop, -sheet_name) %>%
-      dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value) %>%
-      dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
-      tidyr::drop_na(value) %>%
-      dplyr::filter(value != 0)
-  }
-  
-  # TEST: actual test begins
+
   decimals_allowed <- d$info$schema %>%
     dplyr::filter(
       sheet_name == sheet
@@ -741,248 +659,170 @@ checkDecimalValues <- function(d, sheet, filter_data = T, quiet = T) {
       & value_type == "percentage"
     ) %>%
     dplyr::pull(indicator_code)
-  
-  decimal_cols <- data %>%
+
+  decimal_cols <- unPackDataPackSheet(d,
+                                      sheet,
+                                      clean_orgs = TRUE,
+                                      clean_disaggs = TRUE,
+                                      clean_values = FALSE) %>%
+    dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
     dplyr::filter(value %% 1 != 0
-                  & !indicator_code %in% decimals_allowed) %>%
-    dplyr::rename(sheet = sheet_name)
-  
-  # test
+                  & !indicator_code %in% decimals_allowed)
+
   if (NROW(decimal_cols) > 0) {
     lvl <- "WARNING"
-    
+
     msg <-
       paste0(
         lvl,
         "! In tab ",
         sheet,
-        ": DECIMAL VALUES found in the following columns! Ensure all values entered",
-        " against Targets are whole, positive, numeric values. (The only exception",
-        " to this rule may be HIV_PREV.) These will be rounded. -> \n\t* ",
-        paste(unique(decimal_cols$indicator_code), collapse = "\n\t* "),
-        "\n"
-      )
-    
+        ": DECIMAL VALUES found in the following columns that should have only",
+        " whole, positive, numeric values. These will be rounded. -> \n\t* ",
+        paste(sort(unique(decimal_cols$indicator_code)), collapse = "\n\t* "),
+        "\n")
+
     d$tests$decimal_values <- dplyr::bind_rows(d$tests$decimal_cols, decimal_cols)
     attr(d$tests$decimal_values, "test_name") <- "Decimal values"
     d$info$messages <- appendMessage(d$info$messages, msg, lvl)
-    
+
     if (!quiet) {
       messages <- appendMessage(messages, msg, lvl)
     }
-    
+
   }
-  
+
   if (!quiet) {
     printMessages(messages)
   }
-  
+
   return(d)
-  
+
 }
+
 
 #' @export
 #' @rdname unPackDataChecks
-#' @param filter_data Logical. If TRUE, results will be filtered to remove
-#' irrelevant data before testing.
 #' 
-checkInvalidOrgUnits <- function(d, sheet, filter_data = T, quiet = T) {
-  
+checkInvalidOrgUnits <- function(d, sheet, quiet = TRUE) {
+
   if (!quiet) {
     messages <- MessageQueue()
   }
-  
+
   # Get data
   if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
-    
+
     data <- d$sheets[["PSNUxIM"]]
   } else {
     data <- d$sheets[[as.character(sheet)]]
   }
-  
-  # Filter
-  if (filter_data) {
-    target_cols <- d$info$schema %>%
-      dplyr::filter(sheet_name == sheet
-                    & (col_type == "target" | (col_type == "result" & dataset == "subnat"))
-                    # Filter by what's in submission to avoid unknown column warning messages
-                    & indicator_code %in% colnames(data)) %>%
-      dplyr::pull(indicator_code)
-    
-    if (NROW(target_cols) == 0) {
-      return(d)
-    }
-    
-    data %<>%
-      dplyr::filter(!is.na(PSNU)) %>%
-      # Drop rows where entire row is NA
-      dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
-      addcols(c("KeyPop", "Age", "Sex")) %>%
-      dplyr::select(PSNU, Age, Sex, KeyPop,
-                    dplyr::one_of(target_cols)) %>%
-      tidyr::gather(key = "indicator_code",
-                    value = "value",
-                    -PSNU, -Age, -Sex, -KeyPop) %>%
-      dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, value) %>%
-      dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
-      tidyr::drop_na(value) %>%
-      dplyr::filter(value != 0)
-  }
-  
-  # TEST: actual test begins
+
+  # TEST
   invalid_orgunits <- data %>%
     dplyr::select(PSNU) %>%
+    tidyr::drop_na(PSNU) %>%
     dplyr::distinct() %>%
     dplyr::mutate(psnuid = extract_uid(PSNU),
                   sheet_name = sheet) %>%
     dplyr::left_join(datapackr::valid_PSNUs, by = c("psnuid" = "psnu_uid")) %>%
     dplyr::filter(is.na(psnu) | is.na(psnuid)) %>%
     dplyr::select(PSNU)
-  
-  if (NROW(invalid_orgunits) > 0) {
-    
+
+  na_orgunits <- data %>%
+    dplyr::select(PSNU) %>%
+    dplyr::filter(is.na(PSNU))
+
+  if (NROW(invalid_orgunits) > 0 | NROW(na_orgunits) > 0) {
+
     lvl <- "ERROR"
-    
-    warning_msg <-
+
+    msg <-
       paste0(
         lvl, "! In tab ",
         sheet,
-        ", INVALID ORG UNITS: Please review all tabs flagged by this test to correct",
-        " any incorrectly added or edited organization units in the PSNU/DSNU column.",
-        " If you believe this is in error, please also confirm in DATIM that all flagged",
-        " organization units are correctly added and valid. The following org units are",
-        " not valid PSNUs, or do not contain the required DATIM PSNU UID ->  \n\t* ",
+        ", INVALID OR BLANK ORG UNITS: ",
+        ifelse(NROW(na_orgunits) > 0,
+               paste0("There are ", NROW(na_orgunits), " rows where PSNU/DSNU is blank."),
+               ""),
+        " \n\nPlease also review the below PSNUs/DSNUs with invalid or missing org",
+        " unit UIDs. (This is an 11-digit alphanumeric code assigned in DATIM to",
+        " each organization unit.) If you believe these are valid, confirm in",
+        " both DATIM & FACTS Info that the below are correctly added and active",
+        " for the appropriate COP Year. ->  \n\t* ",
         paste(invalid_orgunits$PSNU, collapse = "\n\t* "),
         "\n")
-    
+
     d$tests$invalid_orgunits <- dplyr::bind_rows(d$tests$invalid_orgunits, invalid_orgunits)
     attr(d$tests$invalid_orgunits, "test_name") <- "Invalid orgunits"
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, lvl)
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
     d$info$has_error <- TRUE
-    
+
     if (!quiet) {
       messages <- appendMessage(messages, msg, lvl)
     }
-    
+
   }
-  
+
   if (!quiet) {
     printMessages(messages)
   }
-  
+
   return(d)
 }
 
-#' @export
-#' @rdname unPackDataChecks
-checkBlankPrioritizations <- function(d, sheet, quiet = T) {
-  
-  if (!quiet) {
-    messages <- MessageQueue()
-  }
-  
-  if (!sheet == "Prioritization") {
-    return(d)
-  }
-  
-  # Get data
-  data <- d$sheets[[sheet]]
-  
-  # TEST
-  blank_prioritizations <- data %>%
-    dplyr::filter(!stringr::str_detect(PSNU, "^_Military")) %>%
-    dplyr::filter(is.na(value) | value == "NA") %>%
-    dplyr::select(PSNU) %>%
-    dplyr::distinct()
-  
-  if (NROW(blank_prioritizations) > 0) {
-    
-    lvl <- "ERROR"
-    
-    msg <-
-      paste0(
-        lvl,"! In tab ",
-        sheet,
-        ": MISSING PRIORITIZATIONS. Ensure a prioritization value is entered in each",
-        " row of the column labeled 'SNU Prioritization' on the Prioritization tab.",
-        " Refer to guidance on that tab and in the Data Pack User Guide to see",
-        " appropriate entry options. You must enter a prioritization value for",
-        " the following PSNUs -> \n\t* ",
-        paste(blank_prioritizations$PSNU, collapse = "\n\t* "),
-        "\n")
-    
-    d$tests$blank_prioritizations <- blank_prioritizations
-    attr(d$tests$blank_prioritizations, "test_name") <- "Blank prioritization levels"
-    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
-    d$info$has_error <- TRUE
-    
-    if (!quiet) {
-      messages <- MessageQueue()
-    }
-    
-  }
-  
-  if (!quiet) {
-    messages <- MessageQueue()
-  }
-  
-  return(d)
-  
-}
 
 #' @export
 #' @rdname unPackDataChecks
 checkInvalidPrioritizations <- function(d, sheet, quiet = T) {
 
+  if (!sheet == "Prioritization") {
+    return(d)
+  }
+
   if (!quiet) {
     messages <- MessageQueue()
   }
 
   # Get data
-  data <- d$sheets[[sheet]]
-
-  # TEST
-  invalid_prioritizations <- data %>%
+  invalid_prioritizations <- unPackDataPackSheet(d,
+                                                 sheet,
+                                                 clean_orgs = TRUE,
+                                                 clean_disaggs = FALSE,
+                                                 clean_values = FALSE) %>%
     dplyr::filter(!stringr::str_detect(PSNU, "^_Military"),
-                  value != "NA",
                   !value %in% prioritization_dict()$value)
 
   if (NROW(invalid_prioritizations) > 0) {
-    
+
     lvl <- "ERROR"
-    
-    invalid_prio_strings <- invalid_prioritizations %>%
-      tidyr::unite(row_id, c(PSNU, value), sep = ":  ") %>%
-      dplyr::arrange(row_id) %>%
-      dplyr::pull(row_id)
-    
+
     msg <-
       paste0(
         lvl, "! In tab ",
         sheet,
-        ": INVALID PRIORITIZATIONS. The following Prioritizations are not valid for",
-        " the listed PSNUs. Review the guidance on the Prioritization tab and in the",
-        " Data Pack User Guide to understand valid prioritization options. Refer to those",
-        " PSNUs flagged by this check and correct their validation values in the 'SNU Prioritization'",
-        " column on the Prioritization tab. -> \n\t* ",
-        paste(invalid_prio_strings, collapse = "\n\t* "),
+        ": INVALID PRIORITIZATIONS: The following PSNUs have been assigned",
+        " invalid or blank prioritizations. Please note that all PSNUs must have",
+        " an assigned prioritization, and prioritizations can only be assigned ",
+        paste_oxford(prioritization_dict()$value, final = "or"), ". -> \n\t* ",
+        paste(sort(unique(invalid_prioritizations$PSNU)), collapse = "\n\t* "),
         "\n")
-    
+
     d$tests$invalid_prioritizations <- invalid_prioritizations
     attr(d$tests$invalid_prioritizations, "test_name") <- "Invalid prioritizations"
     d$info$messages <- appendMessage(d$info$messages, msg, lvl)
     d$info$has_error <- TRUE
-    
+
     if (!quiet) {
       messages <- MessageQueue()
     }
-    
+
   }
 
   if (!quiet) {
     messages <- MessageQueue()
   }
-  
+
   return(d)
 
 }
@@ -1021,11 +861,12 @@ checkSheetData <- function(d,
     # Duplicate Rows ----
     d <- checkDupeRows(d, sheet)
     
-    # Numeric Values ----
-    d <- checkNumeric(d, sheet)  
+    # Non-numeric Values ----
+    d <- checkNonNumeric(d, sheet)  
     
     # Metadata ----
-    d <- checkMissingMetadata(d, sheet)
+    #d <- checkMissingMetadata(d, sheet)
+    # TODO: Remove this function. Covered by checkFormulas and checkDisaggs
     
     # Negative values ----
     d <- checkNegativeValues(d, sheet)
@@ -1033,14 +874,11 @@ checkSheetData <- function(d,
     # Decimal values ----
     d <- checkDecimalValues(d, sheet)
     
-    # Check invalid org units
+    # Check invalid org units ----
     d <- checkInvalidOrgUnits(d, sheet)
     
     # Check for invalid prioritizations ----
     d <- checkInvalidPrioritizations(d, sheet)
-    
-    # Check for blank prioritizations ----
-    d <- checkBlankPrioritizations(d, sheet)
     
     # TEST AGYW Tab for missing DSNUs ####
     # if (sheet == "AGYW") {
@@ -1067,14 +905,14 @@ checkSheetData <- function(d,
     #     missing_DSNUs <- DSNU_comparison %>%
     #       dplyr::filter(is.na(DataPack))
     #     
-    #     warning_msg <- paste0(
+    #     msg <- paste0(
     #       "WARNING! In tab ",
     #       sheet,
     #       ": MISSING DREAMS SNUs found! ->  \n\t* ",
     #       paste(missing_DSNUs$PSNU.y, collapse = "\n\t* "),
     #       "\n")
     #     
-    #     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    #     d$info$messages <- appendMessage(d$info$messages, msg, "WARNING")
     #     d$info$missing_DSNUs <- TRUE
     #   }
     #   
@@ -1082,14 +920,14 @@ checkSheetData <- function(d,
     #     invalid_DSNUs <- DSNU_comparison %>%
     #       dplyr::filter(is.na(DATIM))
     #     
-    #     warning_msg <- paste0(
+    #     msg <- paste0(
     #       "WARNING! In tab ",
     #       sheet,
     #       ": INVALID DREAMS SNUs found! ->  \n\t* ",
     #       paste(invalid_DSNUs$PSNU.x, collapse = "\n\t* "),
     #       "\n")
     #     
-    #     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    #     d$info$messages <- appendMessage(d$info$messages, msg, "WARNING")
     #   }
     #   
     # }
