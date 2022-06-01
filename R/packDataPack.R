@@ -47,7 +47,7 @@ packDataPack <- function(model_data,
   )
 
   # Open schema ####
-  d$info$schema <- pick_schema(cop_year,"Data Pack")
+  d$info$schema <- pick_schema(cop_year, "Data Pack")
 
   # Open template ####
   # Grab correct schema

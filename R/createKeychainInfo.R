@@ -98,7 +98,7 @@ createKeychainInfo <- function(submission_path = NULL,
   }
 
   #Pick schema based on COP year and tool type
-  d$info$schema <- pick_schema(d$info$cop_year,d$info$tool)
+  d$info$schema <- pick_schema(d$info$cop_year, d$info$tool)
 
 
   # TEST to make sure tool type matches what we see in the submitted file's structure ####
