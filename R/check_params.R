@@ -286,7 +286,7 @@ check_tool <- function(tool, season, cop_year) {
   # No matter what, we now have a tool. If we also have season, use it to
   # validate tool type.
   } else if (season_provided) {
-    if (tool != deduced_tool) {
+    if (!tool %in% c(deduced_tool, paste0(deduced_tool, " Template"))) {
       interactive_message("That tool is not valid for that season.")
     }
   }
@@ -355,7 +355,6 @@ check_season <- function(season, tool) {
   }
 
   season
-
 }
 
 
@@ -521,7 +520,8 @@ checkTemplatePath <- function(template_path,
   interactive_message("Checking template against schema and DATIM...")
   expected_schema <- pick_schema(cop_year, tool)
 
-  input_tool <- paste0(tool, " Template")
+  # Paste "Template" onto end of tool name if it is not a template tool type already
+  input_tool <- ifelse(stringr::str_detect(tool, "Template$"), tool, paste0(tool, " Template"))
   template_schema <-
     unPackSchema(
       template_path = template_path,

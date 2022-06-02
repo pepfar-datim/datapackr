@@ -179,13 +179,13 @@ pick_schema <- function(cop_year, tool) {
   cop_year %<>% check_cop_year()
   invisible(utils::capture.output(tool %<>% check_tool(tool = ., cop_year = cop_year)))
 
-  if (tool == "OPU Data Pack") {
+  if (tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
     if (cop_year == 2021) {
       schema <- datapackr::cop21OPU_data_pack_schema
     } else {
       stop("OPU Data Pack schema not available for the COP year provided.")
     }
-  } else if (tool == "Data Pack") {
+  } else if (tool %in% c("Data Pack", "Data Pack Template")) {
     if (cop_year == 2021) {
       schema <- datapackr::cop21_data_pack_schema
     } else if (cop_year == 2022) {
@@ -221,13 +221,13 @@ pick_template_path <- function(cop_year, tool) {
 
   template_filename <- NULL
 
-  if (tool == "OPU Data Pack") {
+  if (tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
     if (cop_year == 2021) {
       template_filename <- "COP21_OPU_Data_Pack_Template.xlsx"
     }
   }
 
-  if (tool == "Data Pack") {
+  if (tool %in% c("Data Pack", "Data Pack Template")) {
     if (cop_year == 2021) {
       template_filename <- "COP21_Data_Pack_Template.xlsx"
     } else if (cop_year == 2022) {
@@ -248,7 +248,6 @@ pick_template_path <- function(cop_year, tool) {
                                  tool = tool)
 
   template_path
-
 }
 
 
