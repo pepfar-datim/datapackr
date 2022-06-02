@@ -15,7 +15,11 @@ packSNUxIM <- function(d,
 
   # Check if SNUxIM data already exists ####
   if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM$PSNU[1])) {
+    ## If no PSNUxIM tab, set has_psnuxim to FALSE and set target_data equal to all MER dataset ####
     d$info$has_psnuxim <- FALSE
+    targets_data <- d$data$MER
+  } else {
+    d$info$has_psnuxim <- TRUE
     ## If does exist, extract missing combos ####
     d$data$missingCombos <- d$data$MER %>%
       # TODO: Create this here rather than upstream
@@ -30,13 +34,9 @@ packSNUxIM <- function(d,
       ## If tool has PSNUxIM tab and missing combos, SNUxIM model data should include only missing combos ####
       targets_data <- d$data$missingCombos
     }
-  } else {
-    ## If no PSNUxIM tab, set has_psnuxim to FALSE and set target_data equal to all MER dataset ####
-    d$info$has_psnuxim <- TRUE
-    targets_data <- d$data$MER
   }
 
-    #TODO: Consider preparing this ahead of time for all OUs
+  #TODO: Consider preparing this ahead of time for all OUs
   snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path) %>%
     prepare_model_data.PSNUxIM(snuxim_model_data = .,
                                country_uids = d$info$country_uids)
