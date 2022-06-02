@@ -9,7 +9,7 @@ with_mock_api({
   test_that("We can create a datapack schema", {
 
     test_dataset <- unPackSchema(test_sheet("COP21_Data_Pack_Template.xlsx"),
-                                          cop_year = 2021)
+                                 cop_year = 2021)
     expect_type(test_dataset, "list")
     expect_named(
       test_dataset,

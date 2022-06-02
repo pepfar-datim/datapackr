@@ -216,10 +216,10 @@ checkSchema_Formulas <- function(schema) {
 #' @export
 #' @rdname schema-validations
 checkSchema <- function(schema,
-                           template_path,
-                           cop_year,
-                           tool,
-                           season) {
+                        template_path,
+                        cop_year,
+                        tool,
+                        season) {
 
   stopifnot("Package \"waldo\" must be installed to use this function." =
               requireNamespace("waldo", quietly = TRUE))
@@ -365,9 +365,9 @@ checkSchema <- function(schema,
 #' @importFrom methods as
 #' @rdname schema-validations
 unPackSchema <- function(template_path = NULL,
-                                  skip = NULL,
-                                  tool = "Data Pack Template",
-                                  cop_year = NULL) {
+                         skip = NULL,
+                         tool = "Data Pack Template",
+                         cop_year = NULL) {
 
   # Validate parameters ####
   params <- check_params(cop_year = cop_year %missing% NULL,
