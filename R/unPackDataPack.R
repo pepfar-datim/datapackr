@@ -39,19 +39,15 @@ unPackDataPack <- function(d,
   d <- loadSheets(d)
 
   # Check whether there exist any troublesome comments in the file
-  interactive_print("Checking comments...")
   d <- checkToolComments(d)
 
   # Check whether there exist any troublesome connections in the file
-  interactive_print("Checking external links...")
-  d <- checkConnections(d)
+  d <- checkToolConnections(d)
 
   # Check integrity of Workbook tabs ####
-  interactive_print("Checking structure...")
   d <- checkToolStructure(d)
 
   # Unpack the Targets ####
-  interactive_print("Unpacking sheets...")
   d <- unPackSheets(d)
 
   # Separate Data Sets ####

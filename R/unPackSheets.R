@@ -12,6 +12,8 @@
 #'
 unPackSheets <- function(d, sheets = NULL) {
 
+  interactive_print("Unpacking sheets...")
+
   if (d$info$tool != "Data Pack") {
     stop("Cannot process that kind of tool. :(")
   }
@@ -41,7 +43,6 @@ unPackSheets <- function(d, sheets = NULL) {
   # Implementing this here instead of in unPackDataPack or unPackTool because
   # while you may want to checkSheetData without running unPackSheets, you should
   # should never unPackSheets without running checkSheetData
-  interactive_print("Checking sheet data...")
   d <- checkSheetData(d, sheets = sheets)
 
   # Unpack Sheet Data ----
@@ -50,7 +51,8 @@ unPackSheets <- function(d, sheets = NULL) {
   for (sheet in sheets) {
     interactive_print(sheet)
 
-    extract <- unPackDataPackSheet(d, sheet = sheet)
+    extract <- unPackDataPackSheet(d,
+                                   sheet = sheet)
 
     if (!is.null(extract)) {
       targets <- dplyr::bind_rows(targets, extract)
