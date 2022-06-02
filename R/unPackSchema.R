@@ -464,7 +464,7 @@ unPackSchema <- function(template_path = NULL,
     cop_year_select <- gsub("^20", "COP", as.character(cop_year))
     map_datapack_cogs <- datapackr::datapack_cogs %>%
       purrr::pluck(cop_year_select)
-    stopifnot("Can't find categoryOptionGroups for that cop_year and tool." = !is.data.frame(map_datapack_cogs))
+    stopifnot("Can't find categoryOptionGroups for that cop_year and tool." = is.data.frame(map_datapack_cogs))
 
   # # Left-Pad digits with zeros
   #   # TODO: Move into utilities.R
