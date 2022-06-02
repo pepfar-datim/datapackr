@@ -1,8 +1,8 @@
 #' Standardized Schema Checks
 #'
 #' @description Standardized package functions,in terms of schema checks.
-#' These can be run individually (e.g., `validateSchema_SheetNums`), or in
-#' bulk (e.g., `validateSchema(template_path = "my/file/path", cop_year = 2022, tool = "Data Pack")`).
+#' These can be run individually (e.g., `checkSchema_SheetNums`), or in
+#' bulk (e.g., `checkSchema(template_path = "my/file/path", cop_year = 2022, tool = "Data Pack")`).
 #'
 #' @name schema-validations
 #' @md
@@ -11,28 +11,28 @@
 #'
 #' @return
 #' For lower-level functions, a list of instances of failed tests. For the
-#' higher-level `validateSchema`, a list object of lists of failed tests.
-#' * `validateSchema_SkippedSheets`:
-#' * `validateSchema_SheetNums`:
-#' * `validateSchema_SheetNamesComplete`:
-#' * `validateSchema_InvalidDatasets`:
-#' * `validateSchema_InvalidColType`:
-#' * `validateSchema_InvalidValueType`:
-#' * `validateSchema_DSDSyntax`:
-#' * `validateSchema_TASyntax`:
-#' * `validateSchema_COsSyntax` :
-#' * `validateSchema_ValidAges` :
-#' * `validateSchema_ValidSexes` :
-#' * `validateSchema_ValidKPs` :
-#' * `validateSchema_Formulas` :
-#' * `validateSchema` :
+#' higher-level `checkSchema`, a list object of lists of failed tests.
+#' * `checkSchema_SkippedSheets`:
+#' * `checkSchema_SheetNums`:
+#' * `checkSchema_SheetNames`:
+#' * `checkSchema_InvalidDatasets`:
+#' * `checkSchema_InvalidColType`:
+#' * `checkSchema_InvalidValueType`:
+#' * `checkSchema_DSDSyntax`:
+#' * `checkSchema_TASyntax`:
+#' * `checkSchema_COsSyntax` :
+#' * `checkSchema_ValidAges` :
+#' * `checkSchema_ValidSexes` :
+#' * `checkSchema_ValidKPs` :
+#' * `checkSchema_Formulas` :
+#' * `checkSchema` :
 #' * `unPackSchema` :
 #'
 #' @family schema-helpers
 NULL
 
 #' @rdname schema-validations
-validateSchema_SkippedSheets <- function(schema, tool, cop_year) {
+checkSchema_SkippedSheets <- function(schema, tool, cop_year) {
   skip <- skip_tabs(tool = tool, cop_year = cop_year)
   schema_skip <- schema %>%
     dplyr::filter(sheet_name %in% skip) %>%
@@ -58,7 +58,7 @@ validateSchema_SkippedSheets <- function(schema, tool, cop_year) {
 }
 
 #' @rdname schema-validations
-validateSchema_SheetNums <- function(schema) {
+checkSchema_SheetNums <- function(schema) {
   observed_sheet_nums <- unique(schema$sheet_num)
   expected_sheet_nums <- c(min(schema$sheet_num):max(schema$sheet_num))
 
@@ -79,7 +79,7 @@ validateSchema_SheetNums <- function(schema) {
 }
 
 #' @rdname schema-validations
-validateSchema_SheetNamesComplete <- function(schema, filepath_schema) {
+checkSchema_SheetNames <- function(schema, filepath_schema) {
   observed_sheet_names <- unique(schema$sheet_name)
   expected_sheet_names <- unique(filepath_schema$sheet_name)
 
@@ -100,7 +100,7 @@ validateSchema_SheetNamesComplete <- function(schema, filepath_schema) {
 }
 
 #' @rdname schema-validations
-validateSchema_InvalidDatasets <- function(schema) {
+checkSchema_InvalidDatasets <- function(schema) {
   datasets_invalid <- schema %>%
     dplyr::mutate(
       invalid_dataset =
@@ -117,7 +117,7 @@ validateSchema_InvalidDatasets <- function(schema) {
 }
 
 #' @rdname schema-validations
-validateSchema_InvalidColType <- function(schema) {
+checkSchema_InvalidColType <- function(schema) {
   col_type_invalid <- schema %>%
     dplyr::mutate(
       invalid_col_type =
@@ -131,7 +131,7 @@ validateSchema_InvalidColType <- function(schema) {
 }
 
 #' @rdname schema-validations
-validateSchema_InvalidValueType <- function(schema) {
+checkSchema_InvalidValueType <- function(schema) {
   value_type_invalid <- schema %>%
     dplyr::mutate(
       invalid_value_type =
@@ -144,7 +144,7 @@ validateSchema_InvalidValueType <- function(schema) {
 }
 
 #' @rdname schema-validations
-validateSchema_DSDSyntax <- function(DEs_schema, multi_uid_pattern) {
+checkSchema_DSDSyntax <- function(DEs_schema, multi_uid_pattern) {
   DEs_DSD_syntax_invalid <- DEs_schema %>%
     dplyr::select(-dataelement_ta) %>%
     dplyr::mutate(
@@ -158,7 +158,7 @@ validateSchema_DSDSyntax <- function(DEs_schema, multi_uid_pattern) {
 }
 
 #' @rdname schema-validations
-validateSchema_TASyntax <- function(DEs_schema, multi_uid_pattern) {
+checkSchema_TASyntax <- function(DEs_schema, multi_uid_pattern) {
   DEs_TA_syntax_invalid <- DEs_schema %>%
     dplyr::select(-dataelement_dsd) %>%
     dplyr::mutate(
@@ -172,7 +172,7 @@ validateSchema_TASyntax <- function(DEs_schema, multi_uid_pattern) {
 }
 
 #' @rdname schema-validations
-validateSchema_COsSyntax <- function(schema, multi_uid_pattern) {
+checkSchema_COsSyntax <- function(schema, multi_uid_pattern) {
   COs_syntax_invalid <- schema %>%
     dplyr::filter(col_type %in% c("past", "target", "result")) %>%
     dplyr::select(sheet_name, col, indicator_code, categoryoption_specified) %>%
@@ -187,22 +187,22 @@ validateSchema_COsSyntax <- function(schema, multi_uid_pattern) {
 }
 
 #' @rdname schema-validations
-validateSchema_ValidAges <- function(schema) {
+checkSchema_ValidAges <- function(schema) {
 
 }
 
 #' @rdname schema-validations
-validateSchema_ValidSexes <- function(schema) {
+checkSchema_ValidSexes <- function(schema) {
 
 }
 
 #' @rdname schema-validations
-validateSchema_ValidKPs <- function(schema) {
+checkSchema_ValidKPs <- function(schema) {
 
 }
 
 #' @rdname schema-validations
-validateSchema_Formulas <- function(schema) {
+checkSchema_Formulas <- function(schema) {
   fxs_ref_error <- schema %>%
     dplyr::mutate(
       ref_error_fxs = stringr::str_detect(formula, "#REF")) %>%
@@ -215,7 +215,7 @@ validateSchema_Formulas <- function(schema) {
 
 #' @export
 #' @rdname schema-validations
-validateSchema <- function(schema,
+checkSchema <- function(schema,
                            template_path,
                            cop_year,
                            tool,
@@ -262,7 +262,7 @@ validateSchema <- function(schema,
 
     ## Sheet Names complete ####
     tests$sheet_names_complete <-
-      validateSchema_SheetNamesComplete(schema, filepath_schema)
+      checkSchema_SheetNames(schema, filepath_schema)
   }
 
   # Validate schema ####
@@ -272,21 +272,21 @@ validateSchema <- function(schema,
   tests <- list()
 
   ## All Skipped sheets included  ####
-  tests$skipped_sheets <- validateSchema_SkippedSheets(schema, tool, cop_year)
+  tests$skipped_sheets <- checkSchema_SkippedSheets(schema, tool, cop_year)
 
   ## Sheet Numbers don't omit any sheets ####
-  tests$sheet_nums_complete <- validateSchema_SheetNums(schema)
+  tests$sheet_nums_complete <- checkSchema_SheetNums(schema)
 
   ## OPU Schema Specific Checks ####
   if (!grepl("OPU Data Pack", tool)) {
     ### dataset ####
-    tests$datasets_invalid <- validateSchema_InvalidDatasets(schema)
+    tests$datasets_invalid <- checkSchema_InvalidDatasets(schema)
 
     ### col_type ####
-    tests$col_type_invalid <- validateSchema_InvalidColType(schema)
+    tests$col_type_invalid <- checkSchema_InvalidColType(schema)
 
     ### value_type ####
-    tests$value_type_invalid <- validateSchema_InvalidValueType(schema)
+    tests$value_type_invalid <- checkSchema_InvalidValueType(schema)
   }
 
     ## dataElements ####
@@ -298,9 +298,9 @@ validateSchema <- function(schema,
   uid_pattern <- "[A-Za-z][A-Za-z0-9]{10}"
   multi_uid_pattern <- paste0("^(", uid_pattern, ")(\\.((", uid_pattern, ")))*$")
 
-  tests$DEs_DSD_syntax_invalid <- validateSchema_DSDSyntax(DEs_schema,
+  tests$DEs_DSD_syntax_invalid <- checkSchema_DSDSyntax(DEs_schema,
                                                            multi_uid_pattern)
-  tests$DEs_TA_syntax_invalid <- validateSchema_TASyntax(DEs_schema,
+  tests$DEs_TA_syntax_invalid <- checkSchema_TASyntax(DEs_schema,
                                                          multi_uid_pattern)
 
     ##> Match DATIM (valid UIDs only)
@@ -312,7 +312,7 @@ validateSchema <- function(schema,
     ## categoryoption_specified ####
       ### UID Syntax
 
-  tests$COs_syntax_invalid <- validateSchema_COsSyntax(schema,
+  tests$COs_syntax_invalid <- checkSchema_COsSyntax(schema,
                                                        multi_uid_pattern)
 
       # TODO: Update
@@ -331,7 +331,7 @@ validateSchema <- function(schema,
       #       !valid_kps %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog == "Coarse KPs"], empty),
 
   ## Test formulas ####
-  tests$fxs_ref_error <- validateSchema_Formulas(schema = schema)
+  tests$fxs_ref_error <- checkSchema_Formulas(schema = schema)
 
   # TODO: TESTS to add ####
     # * No duplicate indicator_codes on any single sheet
@@ -575,5 +575,4 @@ unPackSchema <- function(template_path = NULL,
     dplyr::select(sheet_num, sheet_name, data_structure, dplyr::everything())
 
   schema
-
 }

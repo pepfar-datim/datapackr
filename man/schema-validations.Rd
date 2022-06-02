@@ -2,50 +2,50 @@
 % Please edit documentation in R/unPackSchema.R
 \name{schema-validations}
 \alias{schema-validations}
-\alias{validateSchema_SkippedSheets}
-\alias{validateSchema_SheetNums}
-\alias{validateSchema_SheetNamesComplete}
-\alias{validateSchema_InvalidDatasets}
-\alias{validateSchema_InvalidColType}
-\alias{validateSchema_InvalidValueType}
-\alias{validateSchema_DSDSyntax}
-\alias{validateSchema_TASyntax}
-\alias{validateSchema_COsSyntax}
-\alias{validateSchema_ValidAges}
-\alias{validateSchema_ValidSexes}
-\alias{validateSchema_ValidKPs}
-\alias{validateSchema_Formulas}
-\alias{validateSchema}
+\alias{checkSchema_SkippedSheets}
+\alias{checkSchema_SheetNums}
+\alias{checkSchema_SheetNames}
+\alias{checkSchema_InvalidDatasets}
+\alias{checkSchema_InvalidColType}
+\alias{checkSchema_InvalidValueType}
+\alias{checkSchema_DSDSyntax}
+\alias{checkSchema_TASyntax}
+\alias{checkSchema_COsSyntax}
+\alias{checkSchema_ValidAges}
+\alias{checkSchema_ValidSexes}
+\alias{checkSchema_ValidKPs}
+\alias{checkSchema_Formulas}
+\alias{checkSchema}
 \alias{unPackSchema}
 \title{Standardized Schema Checks}
 \usage{
-validateSchema_SkippedSheets(schema, tool, cop_year)
+checkSchema_SkippedSheets(schema, tool, cop_year)
 
-validateSchema_SheetNums(schema)
+checkSchema_SheetNums(schema)
 
-validateSchema_SheetNamesComplete(schema, filepath_schema)
+checkSchema_SheetNames(schema, filepath_schema)
 
-validateSchema_InvalidDatasets(schema)
+checkSchema_InvalidDatasets(schema)
 
-validateSchema_InvalidColType(schema)
+checkSchema_InvalidColType(schema)
 
-validateSchema_InvalidValueType(schema)
+checkSchema_InvalidValueType(schema)
 
-validateSchema_DSDSyntax(DEs_schema, multi_uid_pattern)
+checkSchema_DSDSyntax(DEs_schema, multi_uid_pattern)
 
-validateSchema_TASyntax(DEs_schema, multi_uid_pattern)
+checkSchema_TASyntax(DEs_schema, multi_uid_pattern)
 
-validateSchema_COsSyntax(schema, multi_uid_pattern)
+checkSchema_COsSyntax(schema, multi_uid_pattern)
 
-validateSchema_ValidAges(schema)
+checkSchema_ValidAges(schema)
 
-validateSchema_ValidSexes(schema)
+checkSchema_ValidSexes(schema)
 
-validateSchema_ValidKPs(schema)
+checkSchema_ValidKPs(schema)
 
-validateSchema_Formulas(schema)
+checkSchema_Formulas(schema)
 
-validateSchema(schema, template_path, cop_year, tool, season)
+checkSchema(schema, template_path, cop_year, tool, season)
 
 unPackSchema(
   template_path = NULL,
@@ -72,28 +72,28 @@ This file MUST NOT have any data validation formats present. If left
 }
 \value{
 For lower-level functions, a list of instances of failed tests. For the
-higher-level \code{validateSchema}, a list object of lists of failed tests.
+higher-level \code{checkSchema}, a list object of lists of failed tests.
 \itemize{
-\item \code{validateSchema_SkippedSheets}:
-\item \code{validateSchema_SheetNums}:
-\item \code{validateSchema_SheetNamesComplete}:
-\item \code{validateSchema_InvalidDatasets}:
-\item \code{validateSchema_InvalidColType}:
-\item \code{validateSchema_InvalidValueType}:
-\item \code{validateSchema_DSDSyntax}:
-\item \code{validateSchema_TASyntax}:
-\item \code{validateSchema_COsSyntax} :
-\item \code{validateSchema_ValidAges} :
-\item \code{validateSchema_ValidSexes} :
-\item \code{validateSchema_ValidKPs} :
-\item \code{validateSchema_Formulas} :
-\item \code{validateSchema} :
+\item \code{checkSchema_SkippedSheets}:
+\item \code{checkSchema_SheetNums}:
+\item \code{checkSchema_SheetNames}:
+\item \code{checkSchema_InvalidDatasets}:
+\item \code{checkSchema_InvalidColType}:
+\item \code{checkSchema_InvalidValueType}:
+\item \code{checkSchema_DSDSyntax}:
+\item \code{checkSchema_TASyntax}:
+\item \code{checkSchema_COsSyntax} :
+\item \code{checkSchema_ValidAges} :
+\item \code{checkSchema_ValidSexes} :
+\item \code{checkSchema_ValidKPs} :
+\item \code{checkSchema_Formulas} :
+\item \code{checkSchema} :
 \item \code{unPackSchema} :
 }
 }
 \description{
 Standardized package functions,in terms of schema checks.
-These can be run individually (e.g., \code{validateSchema_SheetNums}), or in
-bulk (e.g., \code{validateSchema(template_path = "my/file/path", cop_year = 2022, tool = "Data Pack")}).
+These can be run individually (e.g., \code{checkSchema_SheetNums}), or in
+bulk (e.g., \code{checkSchema(template_path = "my/file/path", cop_year = 2022, tool = "Data Pack")}).
 }
 \concept{schema-helpers}
