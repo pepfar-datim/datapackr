@@ -66,41 +66,7 @@ unPackDataPackSheet <- function(d,
                         values_to = "value") %>%
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value)
 
-  # Add ages to PMTCT_EID ####
-  if (sheet == "PMTCT_EID") {
-    data %<>%
-      dplyr::mutate(
-        Age = dplyr::case_when(
-          stringr::str_detect(indicator_code, "PMTCT_EID(.)+2to12mo") ~ "02 - 12 months",
-          stringr::str_detect(indicator_code, "PMTCT_EID(.)+2mo") ~ "<= 02 months",
-          TRUE ~ Age
-        )
-      )
-  }
-
-  # Convert Sexes for KP_MAT ####
-  if (sheet == "KP") {
-    data %<>%
-      dplyr::mutate(
-        Sex = dplyr::case_when(indicator_code == "KP_MAT.N.Sex.T"
-                               ~ stringr::str_replace(KeyPop, " PWID", ""),
-                               TRUE ~ Sex),
-        KeyPop = dplyr::case_when(indicator_code == "KP_MAT.N.Sex.T" ~ NA_character_,
-                                  TRUE ~ KeyPop)
-      )
-  }
-
-  # Aggregate OVC_HIVSTAT ####
-  if (sheet == "OVC") {
-    data %<>%
-      dplyr::mutate(
-        Age = dplyr::case_when(
-          stringr::str_detect(indicator_code, "OVC_HIVSTAT") ~ NA_character_,
-          TRUE ~ Age),
-        Sex = dplyr::case_when(
-          stringr::str_detect(indicator_code, "OVC_HIVSTAT") ~ NA_character_,
-          TRUE ~ Sex))
-  }
+  #TODO: Decide whether to map PMTCT_EID ages now or later.
 
   # Munge ----
   if (clean_orgs) {
@@ -122,6 +88,18 @@ unPackDataPackSheet <- function(d,
                     & purrr::map2_lgl(Sex, valid_sexes, ~.x %in% .y[["name"]])
                     & purrr::map2_lgl(KeyPop, valid_kps, ~.x %in% .y[["name"]])) %>%
       dplyr::select(-valid_ages, -valid_sexes, -valid_kps)
+
+    # Aggregate OVC_HIVSTAT ####
+    if (sheet == "OVC") {
+      data %<>%
+        dplyr::mutate(
+          Age = dplyr::case_when(
+            stringr::str_detect(indicator_code, "OVC_HIVSTAT") ~ NA_character_,
+            TRUE ~ Age),
+          Sex = dplyr::case_when(
+            stringr::str_detect(indicator_code, "OVC_HIVSTAT") ~ NA_character_,
+            TRUE ~ Sex))
+    }
   }
 
   if (clean_values) {
