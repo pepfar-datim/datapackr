@@ -286,6 +286,7 @@ pick_template_path <- function(cop_year, tool) {
 #' are returned.
 #' @param schema Which datapackr schema to use in guiding this function. If left
 #' \code{NULL} will select the default based on \code{cop_year} and \code{tool}.
+#' @param skip Character vector of Sheet Names to label for skipping in schema.
 #' @param wb Openxlsx workbook object.
 #' @param PSNUs Dataframe of PSNUs to use in this function, containing at least
 #' \code{psnu_uid}.
@@ -333,6 +334,7 @@ datapackr_params <- function(model_data,
                              d,
                              datastreams,
                              schema,
+                             skip,
                              wb,
                              PSNUs,
                              psnus,

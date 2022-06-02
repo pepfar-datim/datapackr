@@ -530,12 +530,12 @@ checkTemplatePath <- function(template_path,
         skip = skip_tabs(tool = input_tool, cop_year = cop_year),
         tool = input_tool,
         cop_year = cop_year)
-    
+
     if (!identical(expected_schema, template_schema)) {
       interactive_message("Template at that destination does not match our archived schema.")
     }
   }
-  
+
   template_path
 }
 
