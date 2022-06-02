@@ -520,19 +520,22 @@ checkTemplatePath <- function(template_path,
   interactive_message("Checking template against schema and DATIM...")
   expected_schema <- pick_schema(cop_year, tool)
 
-  # Paste "Template" onto end of tool name if it is not a template tool type already
-  input_tool <- ifelse(stringr::str_detect(tool, "Template$"), tool, paste0(tool, " Template"))
-  template_schema <-
-    unPackSchema(
-      template_path = template_path,
-      skip = skip_tabs(tool = input_tool, cop_year = cop_year),
-      tool = input_tool,
-      cop_year = cop_year)
-
-  if (!identical(expected_schema, template_schema)) {
-    interactive_message("Template at that destination does not match our archived schema.")
+  # Only compare submitted template to template on record if `tool` is not a template
+  # Trying to compare template files using this method results in an endless loop with `unPackSchema`
+  if (!stringr::str_detect(tool, "Template$")) {
+    input_tool <- paste0(tool, " Template")
+    template_schema <-
+      unPackSchema(
+        template_path = template_path,
+        skip = skip_tabs(tool = input_tool, cop_year = cop_year),
+        tool = input_tool,
+        cop_year = cop_year)
+    
+    if (!identical(expected_schema, template_schema)) {
+      interactive_message("Template at that destination does not match our archived schema.")
+    }
   }
-
+  
   template_path
 }
 
