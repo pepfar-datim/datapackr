@@ -9,7 +9,7 @@ datimutils::loginToDATIM(secrets)
 output_folder <- Sys.getenv("OUTPUT_FOLDER") %>% paste0(., "COP22 Data Packs/")
 model_data_path <- Sys.getenv("MODEL_DATA_PATH")
 snuxim_model_data_path <- Sys.getenv("SNUXIM_MODEL_DATA_PATH")
-# output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 22/3) Testing & Deployment/Beta Packs"
+
 
 # Unpack Submitted Data Pack ####
 d <- unPackTool(cop_year = 2022)
@@ -18,4 +18,5 @@ d <- unPackTool(cop_year = 2022)
 # d <- checkAnalytics(d, model_data_path)
 
 # snuxim_model_data_path <- file.choose()
+# output_folder <- "/Users/scott/Google Drive/PEPFAR/COP Targets/COP 22/3) Testing & Deployment/Beta Packs"
 d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
