@@ -238,7 +238,6 @@ check_cop_year <- function(cop_year, tool) {
   }
 
   cop_year
-
 }
 
 

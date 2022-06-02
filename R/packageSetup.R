@@ -18,7 +18,9 @@ datapackrSupports <- function() {
   tibble::tribble(
     ~tool, ~yrs,
     "Data Pack", c(2021, 2022),
-    "OPU Data Pack", c(2021))
+    "OPU Data Pack", c(2021),
+    "Data Pack Template", c(2021, 2022),
+    "OPU Data Pack Template", c(2021))
 }
 
 
@@ -47,7 +49,6 @@ supportedCOPYears <- function(tool = NULL) {
   }
 
   supported_cop_years
-
 }
 
 #' @export
