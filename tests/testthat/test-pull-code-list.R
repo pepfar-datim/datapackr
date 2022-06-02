@@ -22,20 +22,6 @@ with_mock_api({
 
 
 with_mock_api({
-  test_that("We can fetch a map of HTS modalities from DATIM", {
-
-    test_dataset <-  getHTSModality(d2_session = training)
-    expect_type(test_dataset, "list")
-    expect_true("data.frame" %in% class(test_dataset))
-    expect_true(NROW(test_dataset) > 0)
-    expect_setequal(names(test_dataset), c("dataElement", "hts_modality"))
-    expect_true(all(grepl("FY\\d{2}", test_dataset$hts_modality) == FALSE))
-
-  })
-})
-
-
-with_mock_api({
   test_that("We can get a list of PSNUs from DATIM", {
 
     test_dataset <-  getPSNUs(country_uids = "qllxzIjjurr", include_mil = FALSE,
@@ -93,7 +79,7 @@ with_mock_api({
 })
 
 test_that("We can get a list of dataset UIDs based on the fiscal year", {
-  expect_error(getDatasetUids("foo"))
+  expect_error(suppressWarnings(getDatasetUids("foo")))
   test_dataset <-  getDatasetUids(2021)
   expect_type(test_dataset, "character")
   expect_true(length(test_dataset) > 0)
@@ -103,11 +89,21 @@ test_that("We can get a list of dataset UIDs based on the fiscal year", {
 with_mock_api({
   test_that("We can get a full code list", {
 
-    test_dataset  <-   pullFullCodeList(FY = 2021, d2_session = training)
+    #categoryOptionCombos.json-bf5e01.json)
+    test_dataset  <-   pullFullCodeList(2022, d2_session = training)
     expect_type(test_dataset, "list")
     expect_setequal(names(test_dataset), c("dataelement", "dataelementuid",
     "categoryoptioncombo", "categoryoptioncombouid", "FY"))
-    skip("FY22 code lists are not working?")
-    test_dataset  <-   pullFullCodeList(FY = 2022, d2_session = training)
+    expect_true(all(is_uidish(test_dataset$dataelementuid)))
+    expect_true(all(is_uidish(test_dataset$categoryoptioncombouid)))
+    expect_true(all(test_dataset$FY == "2022"))
+
+    test_dataset <- pullFullCodeList(2023, d2_session = training)
+    expect_type(test_dataset, "list")
+    expect_setequal(names(test_dataset), c("dataelement", "dataelementuid",
+                                           "categoryoptioncombo", "categoryoptioncombouid", "FY"))
+    expect_true(all(is_uidish(test_dataset$dataelementuid)))
+    expect_true(all(is_uidish(test_dataset$categoryoptioncombouid)))
+    expect_true(all(test_dataset$FY == "2023"))
     })
 })

@@ -57,6 +57,13 @@ appendMessage.MessageQueue <- function(x, message=NA, level=NA) {
     level[is.na(level)] <- "UNKNOWN"
   }
 
+  #Check to see if the message and level match.
+  #If they don't issue a warning
+
+  if (!grepl(level, substring(message, first = 0, last = 20))) {
+    warning(paste("Inconsistent message and level!", level, ":", message))
+  }
+
   new_me <- rbind.data.frame(x, list(message = message, level = level),
                            stringsAsFactors = FALSE)
   class(new_me) <- c("data.frame", "MessageQueue")

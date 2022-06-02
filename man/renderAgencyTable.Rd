@@ -20,7 +20,7 @@ should come from the Data Pack or from DATIM. Values can be either
 \code{datapack} or \code{datim}.}
 }
 \value{
-
+Formatted agency-level memo target table
 }
 \description{
 Render Agency-Level Memo Target Table

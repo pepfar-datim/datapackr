@@ -7,8 +7,7 @@
 #'
 #' @return d
 #'
-checkPSNUData  <-  function(d, d2_session = dynGet("d2_default_session",
-                                                   inherits = TRUE)) {
+checkPSNUData  <-  function(d) {
 
   stopifnot("Cannot validate data for this COP year!" =
               d$info$cop_year %in% names(datapackr::cop_validation_rules))
@@ -44,13 +43,14 @@ checkPSNUData  <-  function(d, d2_session = dynGet("d2_default_session",
       tidyr::nest()
 
 
+    n_cores <- getMaxCores()
     #Evaluate the indicators in parallel if possible
-    if ("parallel" %in% rownames(installed.packages()) == TRUE) {
+    if (can_spawn() & n_cores > 1L) {
       vr_data$vr_results <-
         parallel::mclapply(vr_data$data, function(x)
           datimvalidation::evaluateValidation(x$combi,
           x$value, vr = vr_rules, return_violations_only = FALSE),
-          mc.cores = getMaxCores())
+          mc.cores = n_cores)
     } else {
       vr_data$vr_results <-
         lapply(vr_data$data, function(x)

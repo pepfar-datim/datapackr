@@ -47,11 +47,7 @@ packDataPack <- function(model_data,
   )
 
   # Open schema ####
-  if (d$info$cop_year == 2021) {
-    d$info$schema <- datapackr::cop21_data_pack_schema
-  } else if (d$info$cop_year == 2022) {
-    d$info$schema <- datapackr::cop22_data_pack_schema
-  }
+  d$info$schema <- pick_schema(cop_year, "Data Pack")
 
   # Open template ####
   # Grab correct schema
@@ -80,7 +76,7 @@ packDataPack <- function(model_data,
       cop_year = cop_year)
 
   if (!identical(d$info$schema, schema)) {
-    stop("Ruh roh. Template provided does not match archived schema.")
+    stop("Template provided does not match specified schema.")
   }
 
   # Place Workbook into play ####

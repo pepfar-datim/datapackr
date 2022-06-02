@@ -8,6 +8,7 @@ prepareMemoData(
   d,
   memo_type,
   include_no_prio = TRUE,
+  n_cores = getMaxCores(),
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
@@ -22,10 +23,12 @@ comparison: Create a comparison memo with data from both DATIM and datapack}
 \item{include_no_prio}{If TRUE, include \code{"No Prioritiation"}
 as a column in the output.}
 
+\item{n_cores}{Indicates how many cores should be used.}
+
 \item{d2_session}{DHIS2 Session id}
 }
 \value{
-
+Datapackr d object
 }
 \description{
 A list of tables is returned in d$memo$datapack

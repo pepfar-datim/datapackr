@@ -1,3 +1,53 @@
+# datapackr 5.2.2
+
+## Bug fixes
+* Fixes `checkPSNUData` and `prepareMemoData` to stop crashes on Windows by avoiding paralellization if Windows OS detected
+* Adds check to `messageQueue` to avoid potential mismatches of message level and message text
+
+## Breaking changes
+* Merges `getMechanismViewFromDATIM` into `getMechanismView`
+
+## New features
+* Tightens checks of `tool` and `cop_year` against one another. Adds `datapackrSupports`, `supportedCOPYears`, & `supportedTools`.
+
+## Minor improvements and fixes
+* Refactors the following functions to utilize `datimutils` instead of `datapackr` API functions:
+   * `getMechanismView`
+   * `map_COCs_to_COs`
+* Refactors `getDataSetUids`, `writePSNUxIM`, and `packPSNUxIM` to reduce cyclomatic complexity of both functions
+* Switches `getDataSetUids` to use `cop_year` instead of `FY` in parameters
+* Simplifies `pullFullCodeList`
+* Increments `getCurrentCOPYear`
+* Adjusts `paste_oxford` to accommodate length = 2
+* Updates `checkInvalidIndicatorCodes` to utilize `pick_schema` instead of hard coded schema
+* Refactors package to remove dependencies on `R6` (DP-694), `plyr` (DP-672), and `rlist` (DP-684)
+* Clears a number of warnings and notes during build checks:
+   * Adds missing documentation
+   * Adds missing package declarations
+   * Fixes incorrect argument `full.name` to `full.names` in `list.files` call in `extractWorkbook` function
+   * Updates `datapackr.R` to add missing global variables
+* Adds test for the following functions:
+   * `canReadFile`
+   * `checkDuplicateRows`
+   * `checkInvalidIndicatorCodes`
+   * `checkMechanisms`
+   * `defuntDisaggs`
+   * `fetchPrioritizationTable`
+   * `getHTSModality`
+   * `getOPUDataFromDATIM`
+* Adds more tests for memo generation, including `memoStructure` and `prepareMemoData`
+* Fixes `pullFullCodeList` test for FY2022
+* Fixes broken test for `getCurrentCOPYear` incrementing
+* Disables `play-spectrum test`. Also increments `cop_year` within this test
+* Adds more files to `.gitignore` and `.Rbuildignore`
+* Refactors `prepareMemoData` and `prepareMemoDataByPSNU` to avoid parallelization on CI environments
+* Update Circle CI configuration to specify large resource class and add insights snapshot to `README.md`
+
+# datapackr 5.2.1
+
+## Bug fixes
+* Fix to `packOPUDataPack` by reverting changes to parameter names in `exportPackr` calls that were accidentally made during release v5.2.0.
+
 # datapackr 5.2.0
 
 ## Breaking Changes
