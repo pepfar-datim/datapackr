@@ -41,26 +41,26 @@ test_that("Testing swapping of columns...", {
 test_that("Get a map of data elements and category options", {
   expect_error(getMapDataPack_DATIM_DEs_COCs("foo"))
   expect_error(getMapDataPack_DATIM_DEs_COCs(2023))
-  expect_identical(getMapDataPack_DATIM_DEs_COCs(2021),datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
-  expect_identical(getMapDataPack_DATIM_DEs_COCs(2022),datapackr::cop22_map_DataPack_DATIM_DEs_COCs)
-  expect_identical(getMapDataPack_DATIM_DEs_COCs("2021"),datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
-  
-  de_map_names <- c("indicator_code", "col_type", "value_type", 
-                    "categoryoption_specified", "valid_ages.name", 
-                    "valid_ages.id", "valid_sexes.name", "valid_sexes.id", 
-                    "valid_kps.name", "valid_kps.id", "FY", "period", 
+  expect_identical(getMapDataPack_DATIM_DEs_COCs(2021), datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
+  expect_identical(getMapDataPack_DATIM_DEs_COCs(2022), datapackr::cop22_map_DataPack_DATIM_DEs_COCs)
+  expect_identical(getMapDataPack_DATIM_DEs_COCs("2021"), datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
+
+  de_map_names <- c("indicator_code", "col_type", "value_type",
+                    "categoryoption_specified", "valid_ages.name",
+                    "valid_ages.id", "valid_sexes.name", "valid_sexes.id",
+                    "valid_kps.name", "valid_kps.id", "FY", "period",
                     "categoryOptions.ids", "dataelementuid", "hts_modality",
-                    "period_dataset", "dataelementname", "categoryoptioncomboname", 
-                    "categoryoptioncombouid", "targets_results", "dataset", "resultstatus", 
-                    "resultstatus_inclusive", "disagg_type", "technical_area", "top_level", 
+                    "period_dataset", "dataelementname", "categoryoptioncomboname",
+                    "categoryoptioncombouid", "targets_results", "dataset", "resultstatus",
+                    "resultstatus_inclusive", "disagg_type", "technical_area", "top_level",
                     "support_type", "numerator_denominator")
-  
-  
+
+
   de_map <- getMapDataPack_DATIM_DEs_COCs(2022)
-  expect_named(de_map,de_map_names)
+  expect_named(de_map, de_map_names)
   de_map <- getMapDataPack_DATIM_DEs_COCs(2021)
-  expect_named(de_map,de_map_names)
-  
+  expect_named(de_map, de_map_names)
+
   expect_true(is.data.frame(de_map))
 
 })
