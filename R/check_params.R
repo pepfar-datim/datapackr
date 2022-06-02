@@ -319,7 +319,12 @@ check_season <- function(season, tool) {
   tool_provided <- !is.null(tool)
   if (tool_provided) {
     tool %<>% check_tool()
-    deduced_season <- switch(tool, "OPU Data Pack" = "OPU", "Data Pack" = "COP")
+    deduced_season <- switch(tool,
+                             "Data Pack" = "COP",
+                             "OPU Data Pack" = "OPU",
+                             "Data Pack Template" = "COP",
+                             "OPU Data Pack Template" = "OPU",
+                             stop("Invalid tool type provided."))
   }
 
   # Determine if season is provided
