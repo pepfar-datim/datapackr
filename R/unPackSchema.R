@@ -229,7 +229,7 @@ checkSchema <- function(schema,
   schema_provided <- !is.null(schema)
 
   template_path <- template_path %missing% NULL
-  filepath_provided <- !is.null(template_path)
+  template_path_provided <- !is.null(template_path)
 
   # Validate parameters ####
   params <- check_params(cop_year = cop_year %missing% NULL,
@@ -242,8 +242,8 @@ checkSchema <- function(schema,
     assign(p, purrr::pluck(params, p))
   }
 
-  # Checks to perform if filepath_provided is TRUE ####
-  if (filepath_provided) {
+  # Checks to perform if template_path_provided is TRUE ####
+  if (template_path_provided) {
     ## If template_path provided, check it and unpack it to create comparison schema.####
     filepath_schema <-
       unPackSchema(
@@ -379,10 +379,10 @@ unPackSchema <- function(template_path = NULL,
   }
 
   if (tool == "OPU Data Pack Template" & cop_year %in% c(2021)) {
-    schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = T) %>%
+    schema <- tidyxl::xlsx_cells(path = template_path, include_blank_cells = T) %>%
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric, is_array)
   } else {
-    schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = F) %>%
+    schema <- tidyxl::xlsx_cells(path = template_path, include_blank_cells = F) %>%
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
   }
 
@@ -397,7 +397,7 @@ unPackSchema <- function(template_path = NULL,
   if (is.null(skip)) {
     skip <- skip_tabs(tool = tool, cop_year = cop_year)
   }
-  sheets <- tidyxl::xlsx_sheet_names(filepath)
+  sheets <- tidyxl::xlsx_sheet_names(template_path)
   verbose_sheets <- sheets[!sheets %in% skip]
 
   schema %<>%
