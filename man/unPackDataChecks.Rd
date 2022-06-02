@@ -6,13 +6,15 @@
 \alias{checkColumnStructure}
 \alias{checkToolStructure}
 \alias{checkToolComments}
-\alias{checkConnections}
+\alias{checkToolConnections}
 \alias{checkNonNumeric}
 \alias{checkMissingMetadata}
 \alias{checkNegativeValues}
 \alias{checkDecimalValues}
 \alias{checkInvalidOrgUnits}
 \alias{checkInvalidPrioritizations}
+\alias{checkFormulas}
+\alias{checkDisaggs}
 \alias{checkSheetData}
 \title{Perform various data quality checks on in-process data from Data Packs.}
 \usage{
@@ -24,7 +26,7 @@ checkToolStructure(d, quiet = TRUE)
 
 checkToolComments(d, quiet = TRUE)
 
-checkConnections(d, quiet = TRUE)
+checkToolConnections(d, quiet = TRUE)
 
 checkNonNumeric(d, sheet, quiet = TRUE)
 
@@ -37,6 +39,10 @@ checkDecimalValues(d, sheet, quiet = TRUE)
 checkInvalidOrgUnits(d, sheet, quiet = TRUE)
 
 checkInvalidPrioritizations(d, sheet, quiet = T)
+
+checkFormulas(d, sheet, quiet = TRUE)
+
+checkDisaggs(d, sheet, quiet = TRUE)
 
 checkSheetData(d, sheets = NULL, quiet = TRUE, ...)
 }
@@ -57,18 +63,37 @@ of data encountered in various \code{unPack...} functions across \code{datapackr
 that these functions do not attempt to correct issues identified, but only to
 identify them.
 
+\code{checkToolStructure} checks structural integrity of sheets for submitted tool.
+
+\code{checkToolComments} searches Data Pack for any comments that cause
+corruption when executing openxlsx::saveWorkbook.
+
+\code{checkToolConnections} detects the presence of any external links in a Tool.
+
 \code{checkDupeRows} checks for any rows with duplicates across PSNU and other key
 disaggregates.
 
 \code{checkColumnStructure} checks structural integrity of columns on critical sheets for
 a submitted Data Pack.
 
-\code{checkToolStructure} checks structural integrity of sheets for submitted tool.
+\code{checkNonNumeric} alerts to non-numeric values instead of valid data.
 
-\code{checkToolComments} searches Data Pack for any comments that cause
-corruption when executing openxlsx::saveWorkbook.
+\code{checkMissingMetadata} alerts to missing Age, Sex, or KeyPop.
 
-\code{checkConnections} detects the presence of any external links in a Tool.
+\code{checkNegativeValues} alerts to negative values.
 
-\code{checkNumeric} alerts to non-numeric values instead of valid data.
+\code{checkDecimalValues} alerts to decimal values where these are unallowed.
+
+\code{checkInvalidOrgUnits} alerts to invalid org units.
+
+\code{checkInvalidPrioritizations} alerts to invalid Prioritizations.
+
+\code{checkFormulas} checks formulas in a specified sheet in a submitted Data Pack
+to make sure they are up to date and have not been tampered with.
+
+\code{checkDisaggs} alerts to invalid disaggs (Age, Sex, KeyPop).
+
+Some functions (\code{checkToolStructure}, \code{checkToolComments}, &
+\code{checkToolConnections}) are designed to check across entire tools at
+once. All others are specific to single sheet.
 }

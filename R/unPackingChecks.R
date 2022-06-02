@@ -6,20 +6,39 @@
 #' that these functions do not attempt to correct issues identified, but only to
 #' identify them.
 #'
-#' `checkDupeRows` checks for any rows with duplicates across PSNU and other key
-#' disaggregates.
-#'
-#' `checkColumnStructure` checks structural integrity of columns on critical sheets for
-#'    a submitted Data Pack.
-#'
 #' `checkToolStructure` checks structural integrity of sheets for submitted tool.
 #'
 #' `checkToolComments` searches Data Pack for any comments that cause
 #' corruption when executing openxlsx::saveWorkbook.
 #'
-#' `checkConnections` detects the presence of any external links in a Tool.
+#' `checkToolConnections` detects the presence of any external links in a Tool.
 #'
-#' `checkNumeric` alerts to non-numeric values instead of valid data.
+#' `checkDupeRows` checks for any rows with duplicates across PSNU and other key
+#'    disaggregates.
+#'
+#' `checkColumnStructure` checks structural integrity of columns on critical sheets for
+#'    a submitted Data Pack.
+#'
+#' `checkNonNumeric` alerts to non-numeric values instead of valid data.
+#'
+#' `checkMissingMetadata` alerts to missing Age, Sex, or KeyPop.
+#'
+#' `checkNegativeValues` alerts to negative values.
+#'
+#' `checkDecimalValues` alerts to decimal values where these are unallowed.
+#'
+#' `checkInvalidOrgUnits` alerts to invalid org units.
+#'
+#' `checkInvalidPrioritizations` alerts to invalid Prioritizations.
+#'
+#' `checkFormulas` checks formulas in a specified sheet in a submitted Data Pack
+#' to make sure they are up to date and have not been tampered with.
+#'
+#' `checkDisaggs` alerts to invalid disaggs (Age, Sex, KeyPop).
+#'
+#' Some functions (`checkToolStructure`, `checkToolComments`, &
+#' `checkToolConnections`) are designed to check across entire tools at
+#' once. All others are specific to single sheet.
 #'
 #' @name unPackDataChecks
 #' @md
@@ -45,10 +64,10 @@ checkDupeRows <- function(d,
     messages <- MessageQueue()
   }
 
-  # Get data ----
+  # Get data
   data <- d$sheets[[as.character(sheet)]]
 
-  # Get header_cols ####
+  # Get header_cols
   header_cols <- d$info$schema %>%
     dplyr::filter(
       sheet_name == sheet,
@@ -58,7 +77,7 @@ checkDupeRows <- function(d,
 
   header_cols <- header_cols[header_cols %in% names(data)]
 
-  # Drop rows/cols with all NAs or 0s ----
+  # Drop rows/cols with all NAs or 0s
   # We don't care if these are duplicates
   names(data) <- data %>%
     names() %>%
@@ -83,7 +102,7 @@ checkDupeRows <- function(d,
       dplyr::select(data, -tidyselect::all_of(header_cols)) %>%
         dplyr::select_if(colSums(.) != 0))
 
-  # Duplicates ----
+  # Duplicates
   dupes <- data %>%
     #dplyr::select(header_cols) %>%
     dplyr::group_by(dplyr::across(tidyselect::all_of(header_cols))) %>%
@@ -141,10 +160,10 @@ checkColumnStructure <- function(d,
     messages <- MessageQueue()
   }
 
-  # Get data ----
+  # Get data
   data <- d$sheets[[as.character(sheet)]]
 
-  # Cross-check cols ----
+  # Cross-check cols
   submission_cols <- names(data) %>%
     tibble::enframe(name = "submission_order", value = "indicator_code")
 
@@ -316,6 +335,12 @@ checkColumnStructure <- function(d,
 #'
 checkToolStructure <- function(d, quiet = TRUE) {
 
+  interactive_print("Checking structure...")
+
+  if (!quiet) {
+    messages <- MessageQueue()
+  }
+
   interactive_print("Checking for any missing tabs...")
 
   submission_sheets <- readxl::excel_sheets(d$keychain$submission_path)
@@ -356,6 +381,12 @@ checkToolStructure <- function(d, quiet = TRUE) {
 #' @rdname unPackDataChecks
 #'
 checkToolComments <- function(d, quiet = TRUE) {
+
+  interactive_print("Checking comments...")
+
+  if (!quiet) {
+    messages <- MessageQueue()
+  }
 
   if (is.null(d$tool$wb)) {
     wb <- openxlsx::loadWorkbook(file = d$keychain$submission_path)
@@ -405,7 +436,13 @@ checkToolComments <- function(d, quiet = TRUE) {
 #' @export
 #' @rdname unPackDataChecks
 #'
-checkConnections <- function(d, quiet = TRUE) {
+checkToolConnections <- function(d, quiet = TRUE) {
+
+  interactive_print("Checking external links...")
+
+  if (!quiet) {
+    messages <- MessageQueue()
+  }
 
   d$info$workbook_contents <- unzip(d$keychain$submission_path, list = TRUE) %>%
     dplyr::pull(`Name`)
@@ -452,7 +489,7 @@ checkNonNumeric <- function(d, sheet, quiet = TRUE) {
     messages <- MessageQueue()
   }
 
-  # Get data ----
+  # Get data
   data <- unPackDataPackSheet(d,
                               sheet = sheet,
                               clean_orgs = TRUE,
@@ -579,7 +616,6 @@ checkMissingMetadata <- function(d, sheet, quiet = T) {
     if (!quiet) {
       messages <- appendMessage(messages, msg, lvl)
     }
-
   }
 
   if (!quiet) {
@@ -587,8 +623,9 @@ checkMissingMetadata <- function(d, sheet, quiet = T) {
   }
 
   return(d)
-
 }
+
+
 
 #' @export
 #' @rdname unPackDataChecks
@@ -627,7 +664,6 @@ checkNegativeValues <- function(d, sheet, quiet = T) {
     if (!quiet) {
       messages <- appendMessage(messages, msg, lvl)
     }
-
   }
 
   if (!quiet) {
@@ -635,17 +671,24 @@ checkNegativeValues <- function(d, sheet, quiet = T) {
   }
 
   return(d)
-
 }
+
+
 
 #' @export
 #' @rdname unPackDataChecks
 #'
 checkDecimalValues <- function(d, sheet, quiet = TRUE) {
 
-    if (!quiet) {
+  if (!quiet) {
     messages <- MessageQueue()
   }
+
+  data <- unPackDataPackSheet(d,
+                              sheet,
+                              clean_orgs = TRUE,
+                              clean_disaggs = TRUE,
+                              clean_values = FALSE)
 
   decimals_allowed <- d$info$schema %>%
     dplyr::filter(
@@ -657,11 +700,7 @@ checkDecimalValues <- function(d, sheet, quiet = TRUE) {
     ) %>%
     dplyr::pull(indicator_code)
 
-  decimal_cols <- unPackDataPackSheet(d,
-                                      sheet,
-                                      clean_orgs = TRUE,
-                                      clean_disaggs = TRUE,
-                                      clean_values = FALSE) %>%
+  decimal_cols <- data %>%
     dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
     dplyr::filter(value %% 1 != 0
                   & !indicator_code %in% decimals_allowed)
@@ -686,7 +725,6 @@ checkDecimalValues <- function(d, sheet, quiet = TRUE) {
     if (!quiet) {
       messages <- appendMessage(messages, msg, lvl)
     }
-
   }
 
   if (!quiet) {
@@ -694,7 +732,6 @@ checkDecimalValues <- function(d, sheet, quiet = TRUE) {
   }
 
   return(d)
-
 }
 
 
@@ -758,7 +795,6 @@ checkInvalidOrgUnits <- function(d, sheet, quiet = TRUE) {
     if (!quiet) {
       messages <- appendMessage(messages, msg, lvl)
     }
-
   }
 
   if (!quiet) {
@@ -811,17 +847,230 @@ checkInvalidPrioritizations <- function(d, sheet, quiet = T) {
     d$info$has_error <- TRUE
 
     if (!quiet) {
-      messages <- MessageQueue()
+      messages <- appendMessage(messages, msg, lvl)
     }
-
   }
+
+  if (!quiet) {
+    printMessages(messages)
+  }
+
+  return(d)
+}
+
+
+
+#' @export
+#' @rdname unPackDataChecks
+checkFormulas <- function(d, sheet, quiet = TRUE) {
 
   if (!quiet) {
     messages <- MessageQueue()
   }
 
-  return(d)
+  header_row <- headerRow(tool = "Data Pack", cop_year = d$info$cop_year)
 
+  # Pull in formulas from schema
+  formulas_schema <- d$info$schema %>%
+    dplyr::filter(
+      sheet_name == sheet,
+      !is.na(formula)) %>%
+    dplyr::select(col, indicator_code, formula) %>%
+    # tidyr::crossing(row = ((header_row+1):max(formulas_datapack$row))) %>%
+    # dplyr::select(row, col, indicator_code, formula) %>%
+    # dplyr::mutate(
+    #   formula =
+    #     stringr::str_replace_all(
+    #       formula,
+    #       pattern = paste0("(?<=[:upper:])", header_row+1),
+    #       replacement = as.character((header_row+1):max(formulas_datapack$row))
+    #     )
+    # )
+    dplyr::mutate(
+      formula = stringr::str_replace_all(
+        formula,
+        "(?<=[:upper:])\\d+",
+        "\\\\d+"))
+
+  # Pull in formulas from Data Pack sheet
+  formulas_datapack <-
+    tidyxl::xlsx_cells(path = d$keychain$submission_path,
+                       sheets = sheet,
+                       include_blank_cells = T) %>%
+    # Note that this function won't pick up any blank column headers or deleted formulas
+    dplyr::filter(row >= header_row) %>%
+    dplyr::select(sheet, row, col, character, numeric, formula) %>%
+    dplyr::mutate(formula = dplyr::if_else(is.na(formula),
+                                           as.character(numeric),
+                                           formula),
+                  formula = dplyr::if_else(is.na(formula), character, formula))
+
+  # Remove duplicate columns (Take 1st)
+  cols_to_keep <- formulas_datapack %>%
+    dplyr::filter(row == header_row) %>%
+    dplyr::select(col, character) %>%
+    dplyr::filter(!duplicated(character)) %>%
+  # Drop cols not in schema
+    dplyr::filter(character %in% formulas_schema$indicator_code)
+
+  formulas_datapack %<>%
+    dplyr::right_join(
+      (cols_to_keep %>%
+         dplyr::select(col, indicator_code = character)),
+      by = c("col" = "col")) %>%
+    dplyr::select(row, col, indicator_code, formula) %>%
+    dplyr::filter(row != header_row) %>%
+    purrr::when(
+      sheet == "PSNUxIM" & d$info$tool == "Data Pack" ~ .,
+      ~  dplyr::group_by(., row) %>%
+        dplyr::mutate(occurrence = duplicated(indicator_code)) %>%
+        dplyr::ungroup() %>%
+        dplyr::filter(occurrence == FALSE) %>%
+        dplyr::select(-occurrence) %>%
+        # Limit to only columns that DUIT cares about
+        dplyr::filter(indicator_code %in% formulas_schema$indicator_code)
+    ) %>%
+    #TODO: Add to catch where referencing wrong row
+    #TODO: Fix to catch where formulas are completed deleted
+    dplyr::mutate(
+      formula = stringr::str_replace_all(
+        formula,
+        "(?<=[:upper:])\\d+",
+        "\\\\d+"))
+
+  # Compare formulas from schema against Data Pack to see diffs
+  altered_formulas <- formulas_schema %>%
+    dplyr::filter(indicator_code %in% formulas_datapack$indicator_code) %>%
+    dplyr::left_join(
+      formulas_datapack,
+      by = ifelse(sheet == "PSNUxIM" & d$info$tool == "Data Pack",
+                  c("col" = "col"),
+                  c("indicator_code" = "indicator_code"))) %>%
+    dplyr::filter(formula.x != formula.y) %>%
+    purrr::when(sheet == "PSNUxIM" & d$info$tool == "Data Pack" ~ dplyr::rename(., indicator_code = indicator_code.y),
+                ~ .) %>%
+    dplyr::select(
+      indicator_code, correct_fx = formula.x, submitted_fx = formula.y, row) %>%
+    dplyr::group_by(indicator_code, correct_fx, submitted_fx) %>%
+    dplyr::mutate(count = dplyr::n()) %>%
+    dplyr::group_by(indicator_code, correct_fx, submitted_fx, count) %>%
+    dplyr::summarise(affected_rows = formatSetStrings(row)) %>%
+    dplyr::ungroup()
+
+  if (NROW(altered_formulas) > 0) {
+
+    lvl <- "WARNING"
+
+    cols_affected <- altered_formulas %>%
+      dplyr::select(indicator_code, correct_fx, count) %>%
+      dplyr::group_by(indicator_code, correct_fx) %>%
+      dplyr::summarize(count = sum(count)) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(fx_violations = paste0(indicator_code, ":  ", count))
+
+    msg <-
+      paste0(
+        lvl, "! In tab ",
+        sheet,
+        ", ", NROW(cols_affected), " ALTERED FORMULAS:",
+        " Altering formulas in the Grey colored columns without DUIT and PPM",
+        " approval may lead to programmatic and technical issues in your Data ",
+        " Pack. Green colored columns may be altered without permission. ",
+        " Note that this warning may be triggered due to a formula being deleted",
+        " or overwritten, or a manual fix not being applied.",
+        " Affected columns and the number of violations are listed below. ->  \n\t* ",
+        paste(cols_affected$fx_violations, collapse = "\n\t* "),
+        "\n")
+
+    d$tests$altered_formulas <-
+      dplyr::bind_rows(d$tests$altered_formulas, altered_formulas)
+    attr(d$tests$altered_formulas, "test_name") <- "Altered Formulas"
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
+
+    if (!quiet) {
+      messages <- appendMessage(messages, msg, lvl)
+    }
+  }
+
+  if (!quiet) {
+    printMessages(messages)
+  }
+
+  return(d)
+}
+
+
+
+#' @export
+#' @rdname unPackDataChecks
+checkDisaggs <- function(d, sheet, quiet = TRUE) {
+
+  if (sheet %in% c("SNU x IM", "PSNUxIM")) {
+    stop("Sorry! Can't check the PSNUxIM tab with this function.")
+  }
+  #TODO: Add functionality for PSNUxIM
+
+  if (!quiet) {
+    messages <- MessageQueue()
+  }
+
+  data <- unPackDataPackSheet(d,
+                              sheet,
+                              clean_orgs = TRUE,
+                              clean_disaggs = FALSE,
+                              clean_values = TRUE)
+
+  valid_disaggs <- d$info$schema %>%
+    dplyr::filter(
+      sheet_name == sheet
+      & (col_type == "target" | (col_type == "result" & dataset == "subnat"))) %>%
+    dplyr::select(indicator_code, valid_ages, valid_sexes, valid_kps)
+
+  defunct_disaggs <- data %>%
+    dplyr::left_join(valid_disaggs, by = c("indicator_code" = "indicator_code")) %>%
+    dplyr::filter(!purrr::map2_lgl(Age, valid_ages, ~.x %in% .y[["name"]])
+                  | !purrr::map2_lgl(Sex, valid_sexes, ~.x %in% .y[["name"]])
+                  | !purrr::map2_lgl(KeyPop, valid_kps, ~.x %in% .y[["name"]])) %>%
+    dplyr::select(indicator_code, Age, Sex, KeyPop) %>%
+    dplyr::distinct()
+
+  if (NROW(defunct_disaggs) > 0) {
+
+    defunct_msg <-
+      utils::capture.output(
+        print(as.data.frame(defunct_disaggs), row.names = FALSE))
+
+    lvl <- "ERROR"
+
+    msg <-
+      paste0(
+        lvl, "! In tab ",
+        sheet,
+        ": INVALID DISAGGS. Please review all tabs flagged by this test to ensure",
+        " no Age, Sex, or Key Population disaggregates have been inadvertently or",
+        " incorrectly altered. If you believe this has been flagged in error, ",
+        " please first refer to MER Guidance to confirm valid disaggregates for",
+        " the data element flagged. (Check MER Guidance for correct alternatives.",
+        " Also note that single-digit ages should be left-padded with zeros,",
+        " e.g., 01-04 instead of 1-4.) -> \n\t",
+        paste(defunct_msg, collapse = "\n\t"),
+        "\n")
+
+    d$tests$defunct_disaggs <- dplyr::bind_rows(d$tests$defunct_disaggs, defunct_disaggs)
+    attr(d$tests$defunct_disaggs, "test_name") <- "Defunct disaggs"
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
+    d$info$has_error <- TRUE
+
+    if (!quiet) {
+      messages <- appendMessage(messages, msg, lvl)
+    }
+  }
+
+  if (!quiet) {
+    printMessages(messages)
+  }
+
+  return(d)
 }
 
 
@@ -832,6 +1081,8 @@ checkSheetData <- function(d,
                            sheets = NULL,
                            quiet = TRUE,
                            ...) {
+
+  interactive_print("Checking sheet data...")
 
   dots <- list(...)
 
@@ -930,10 +1181,10 @@ checkSheetData <- function(d,
     # }
 
     # Formulas ----
-    # d <- checkFormulas(d, sheet)
+    d <- checkFormulas(d, sheet)
 
     # TEST for defunct disaggs ####
-    # d <- defunctDisaggs(d, sheet)
+    d <- checkDisaggs(d, sheet)
 
   }
 
