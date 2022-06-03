@@ -9,16 +9,16 @@ datimutils::loginToDATIM(secrets)
 cop_year = getCurrentCOPYear()
 
 # Pull Code Lists for FY22 data (MER Targets, IMPATT, SUBNAT Targets) ####
-  mer.T <- pullFullCodeList(FY = cop_year +1, datastreams = c("mer_targets"))
-  subnat.T <- pullFullCodeList(FY = cop_year +1, datastreams = c("subnat_targets"))
-  impatt.T <- pullFullCodeList(FY = cop_year +1, datastreams = c("impatt"))
+  mer.T <- getCodeList(cop_year = cop_year, datastreams = c("mer_targets"))
+  subnat.T <- getCodeList(cop_year = cop_year, datastreams = c("subnat_targets"))
+  impatt.T <- getCodeList(cop_year = cop_year, datastreams = c("impatt"))
 
 # Pull Code Lists for FY21 data (IMPATT, SUBNAT Targets) ####
-  impatt.T_1 <- pullFullCodeList(FY = cop_year, datastreams = c("impatt"))
-  subnat.T_1 <- pullFullCodeList(FY = cop_year, datastreams = c("subnat_targets"))
+  impatt.T_1 <- getCodeList(cop_year = cop_year - 1, datastreams = c("impatt"))
+  subnat.T_1 <- getCodeList(cop_year = cop_year - 1, datastreams = c("subnat_targets"))
 
 # Pull Code Lists for FY20 Results (SUBNAT Results) ####
-  subnat.R <- pullFullCodeList(FY = cop_year -1, datastreams = c("subnat_results"))
+  subnat.R <- getCodeList(cop_year = cop_year - 2, datastreams = c("subnat_results"))
   
 # Pull categoryOption metadata ####
   categoryoptions <- datimutils::getMetadata("categoryOptionCombos", fields = "id, categoryOptions")
