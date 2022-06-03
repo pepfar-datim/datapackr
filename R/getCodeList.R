@@ -32,8 +32,8 @@ getCodeList <- function(cop_year = NULL,
 
   # Pull list of valid datasets from DATIM
   ds <- datimutils::getMetadata("dataSets", d2_session = d2_session)
-  
-  # Test that all datasets is valid  
+
+  # Test that all datasets is valid
   stopifnot("Invalid dataset UID provided!" = all(datasets %in% ds$id))
 
   # Fetch code lists
