@@ -132,7 +132,6 @@ createKeychainInfo <- function(submission_path = NULL,
 
   d$info$datapack_name %<>% checkDataPackName(country_uids = d$info$country_uids)
 
-
   # TEST to make sure tool type matches what we see in the submitted file's structure ####
   # TODO: Improve to use checkColStructure
   # tab_names_expected <- unique(d$info$schema$sheet_name)
@@ -155,7 +154,7 @@ createKeychainInfo <- function(submission_path = NULL,
 
   # Placeholders ####
   if (d$info$tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack", "OPU Data Pack Template")
-      & d$info$cop_year %in% c("2020", "2021", "2022")) {
+      & d$info$cop_year %in% c("2021", "2022")) {
     d$info$needs_psnuxim <- FALSE
     d$info$newSNUxIM <- FALSE
     d$info$has_psnuxim <- FALSE

@@ -4,14 +4,11 @@
 \alias{getDatasetUids}
 \title{getDatasetUids}
 \usage{
-getDatasetUids(
-  fiscal_year,
-  type = c("mer_targets", "mer_results", "subnat_targets", "subnat_results", "impatt")
-)
+getDatasetUids(cop_year, type)
 }
 \arguments{
-\item{fiscal_year}{character - one of: {"2019", "2020", "2021", "2022",
-"2023"}}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
 \item{type}{character vector - one or more of:
 {"mer_targets", "mer_results", "subnat_targets", "subnat_results", "impatt"}}

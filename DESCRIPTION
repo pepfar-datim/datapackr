@@ -1,8 +1,8 @@
 Package: datapackr
 Type: Package
 Title: A Package that Packs and Unpacks all Data Packs
-Version: 5.1.14
-Date: 2022-04-21
+Version: 5.2.2
+Date: 2022-05-31
 Authors@R: c(
     person("Scott", "Jackson", email = "sjackson@baosystems.com",
         role = c("aut", "cre")),
@@ -24,36 +24,31 @@ URL: https://github.com/pepfar-datim/datapackr
 BugReports: https://github.com/pepfar-datim/datapackr
 Depends: R (>= 4.1.0)
 Imports:
-    dplyr (>= 0.8.3),
-    tidyr (>= 1.0.0),
-    tidyxl (>= 1.0.4),
-    readxl (>= 1.3.1),
-    readr (>= 1.3.1),
-    jsonlite (>= 1.6),
-    purrr (>= 0.3.3),
-    tibble (>= 2.1.3),
-    stringr (>= 1.4.0),
-    stringi,
-    httr (>= 1.4.0),
-    rlist (>= 0.4.6.1),
-    magrittr (>= 1.5),
-    crayon (>= 1.3.4),
-    openxlsx,
-    methods,
-    stats,
-    lubridate (>= 1.7.4),
-    data.table (>= 1.12.8),
-    datimutils,
-    datimvalidation,
-    tidyselect (>= 0.2.5),
-    glue (>= 1.3.1),
-    rlang (>= 0.4.2),
     assertthat,
-    plyr,
+    crayon (>= 1.3.4),
+    data.table (>= 1.12.8),
+    datimutils (>= 0.3.0),
+    datimvalidation,
+    dplyr (>= 0.8.3),
     fuzzyjoin (>= 0.1.6),
-    R6
+    glue (>= 1.3.1),
+    httr (>= 1.4.0),
+    jsonlite (>= 1.6),
+    lubridate,
+    magrittr (>= 1.5),
+    methods,
+    openxlsx,
+    purrr (>= 0.3.3),
+    readr (>= 1.3.1),
+    readxl (>= 1.3.1),
+    rlang (>= 0.4.2),
+    stringi,
+    stringr (>= 1.4.0),
+    tibble (>= 2.1.3),
+    tidyr (>= 1.0.0),
+    tidyselect (>= 0.2.5),
+    tidyxl (>= 1.0.4)
 Suggests:
-    datapackcommons (>= 0.2.0),
     devtools (>= 2.0.1),
     httptest,
     testthat,
@@ -66,8 +61,7 @@ Suggests:
     officer
 Remotes:
     pepfar-datim/datimutils,
-    pepfar-datim/datim-validation,
-    pepfar-datim/data-pack-commons
+    pepfar-datim/datim-validation
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true

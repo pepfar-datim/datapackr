@@ -11,10 +11,16 @@ fetchPrioritizationTable <- function(psnus, cop_year,
   period <- paste0(cop_year, "Oct")
 
   #We need to split up the requests if there are many PSNUs
+  # Explicitly filter Military data which may have an assigned prioritization
+  # level below the PSNU level. This will get aggrevgated in the analytics
+  # call leading to incorrect prioritization levels. All Military data
+  # should always be classified as No prioritization anyway and is handled
+  # later when left joining to the main data.
   getPriosFromDatim <- function(x) {
 
     tryCatch({
       datimutils::getAnalytics(
+        "filter=mINJi7rR1a6:POHZmzofoVx;PvuaP6YALSA;AookYR4ECPH",
         dx = "r4zbW3owX9n",
         pe_f = period,
         ou = x,
@@ -48,7 +54,7 @@ fetchPrioritizationTable <- function(psnus, cop_year,
                   "value" = "Value") %>%
     dplyr::left_join(datapackr::prioritization_dict(), by = "value") %>%
     dplyr::select(orgUnit = psnu_uid, "prioritization" = "name") %>%
-    imputePrioritizations(., data.frame(orgUnit = psnus$psnu_uid)) %>%
+    datapackr::imputePrioritizations(., data.frame(orgUnit = psnus$psnu_uid)) %>%
     dplyr::left_join(datapackr::prioritization_dict(), by = c("prioritization" = "name")) %>%
     dplyr::select(-Prioritization) %>%
     dplyr::mutate(prioritization = dplyr::case_when(

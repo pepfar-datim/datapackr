@@ -16,7 +16,7 @@
 #'
 prepareSheetData <- function(sheet,
                              org_units,
-                             schema = datapackr::data_pack_schema,
+                             schema = pick_schema(),
                              sheet_data,
                              cop_year = getCurrentCOPYear()) {
 

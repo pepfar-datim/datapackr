@@ -6,15 +6,16 @@
 #' @param analytics_table A table of COP memo indicators at the PSNU level.
 #' @inheritParams datapackr_params
 #'
-#' @return
+#' @return Data frame of joined analytics table and prioritization levels
 #'
 updateExistingPrioritization <- function(prios, analytics_table) {
 
-  prios <- prios %>%  dplyr::select(-value)
+  prios <- prios %>%
+    dplyr::select(-value)
 
-    analytics_table %>%
+  analytics_table %>%
     dplyr::select(-prioritization) %>%
-    dplyr::left_join(prios, by = "psnu_uid") %>%
+    dplyr::left_join(prios, by = c("psnu_uid" = "orgUnit")) %>%
     dplyr::mutate(prioritization = dplyr::case_when(
       is.na(prioritization) ~ "No Prioritization",
       TRUE ~ prioritization))

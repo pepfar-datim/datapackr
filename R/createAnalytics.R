@@ -53,15 +53,7 @@ createAnalytics <- function(d,
                         psnu_prioritizations = NULL,
                         d2_session = d2_session)
   } else if (d$info$tool == "Data Pack") {
-    if (d$info$cop_year == 2020) {
-      d$data$analytics <- dplyr::bind_rows(
-        d$data$distributedMER,
-        d$data$SUBNAT_IMPATT %>%
-          dplyr::mutate(
-            mechanism_code = "HllvX50cXC0",
-            support_type = "DSD")
-        )
-    } else if (d$info$cop_year %in% c(2021, 2022)) {
+    if (d$info$cop_year %in% c(2021, 2022)) {
       # For COP21+, get data from import files for better consistency ####
       prioritizations <- getFY22Prioritizations(d)
 
@@ -81,7 +73,7 @@ createAnalytics <- function(d,
 
       if (d$info$unallocatedIMs | !d$info$has_psnuxim) {
         d$data$analytics %<>%
-              dplyr::mutate(across(
+              dplyr::mutate(dplyr::across(
                 c(mechanism_code, mechanism_desc, partner_desc, funding_agency),
                 ~ dplyr::case_when(
                   is.na(.x) &

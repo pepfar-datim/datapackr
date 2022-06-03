@@ -10,7 +10,7 @@ zerosToDashes(x)
 \item{x}{Target value to be formatted.}
 }
 \value{
-
+Formatted target value
 }
 \description{
 Zeroes to Dashes

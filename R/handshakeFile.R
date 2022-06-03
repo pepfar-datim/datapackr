@@ -8,7 +8,7 @@
 #'
 #' @return Logical. \code{TRUE} if file can be read, \code{FALSE} if not.
 #'
-canReadFile <- function(path) {
+canReadFile <- function(path = NULL) {
 
   # Check that the file path was supplied.
   if (is.null(path)) {
@@ -17,7 +17,6 @@ canReadFile <- function(path) {
 
   # Check for at least read permissions.
     file.access(path, 4) == 0
-
 }
 
 
