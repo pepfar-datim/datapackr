@@ -22,11 +22,9 @@ pullDATIMCodeList <- function(dataset,
 
   interactive_print(ds$name[ds$id == dataset])
 
-  # Pull Code List
-  codeList <- api_sql_call(sqlView = "DotdxKrNZxG",
-                           var = dataset,
-                           d2_session = d2_session)
-
-  return(codeList)
+  datimutils::getSqlView(sql_view_uid = "DotdxKrNZxG",
+                                     variable_keys = "dataSets",
+                                     variable_values = dataset,
+                                     d2_session = d2_session)
 
 }
