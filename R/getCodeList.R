@@ -29,23 +29,17 @@ getCodeList <- function(cop_year = NULL,
   }
 
   datasets %<>% unique()
-
   # Pull list of valid datasets from DATIM
   ds <- datimutils::getMetadata("dataSets", d2_session = d2_session)
-
-  # Test that all datasets is valid
+# Test that all datasets is valid
   stopifnot("Invalid dataset UID provided!" = all(datasets %in% ds$id))
 
   # Fetch code lists
-  ds <- data.frame()
 
-  codeList <-
-    purrr::map_dfr(datasets, function(x) {
-      datimutils::getSqlView(sql_view_uid = "DotdxKrNZxG",
+    purrr::map_dfr(datasets, function(x) datimutils::getSqlView(sql_view_uid = "DotdxKrNZxG",
                              variable_keys = "dataSets",
                              variable_values = x,
-                             d2_session = d2_session)
-    }) %>%
+                             d2_session = d2_session)) %>%
     dplyr::select(dataelement,
                   dataelementuid,
                   categoryoptioncombo,
@@ -54,5 +48,4 @@ getCodeList <- function(cop_year = NULL,
     dplyr::distinct() %>%
     dplyr::arrange(dataelement, categoryoptioncombo)
 
-  codeList
 }

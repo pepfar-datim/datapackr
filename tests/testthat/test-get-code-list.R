@@ -68,7 +68,11 @@ test_that("We can get a list of dataset UIDs based on the fiscal year", {
 with_mock_api({
   test_that("We can get a full code list", {
 
-    #categoryOptionCombos.json-bf5e01.json)
+    expect_error(getCodeList(cop_year = 2021, datasets = "foo"))
+    expect_error(getCodeList())
+    expect_error(getCodeList(1999))
+    expect_error(getCodeList(cop_year = 2021, datastreams = c("mer_targets", "foo")))
+
     test_dataset <- getCodeList(2021, d2_session = training)
     expect_type(test_dataset, "list")
     expect_setequal(names(test_dataset), c("dataelement", "dataelementuid",
