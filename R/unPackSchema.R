@@ -326,11 +326,11 @@ unPackSchema_datapack <- function(template_path = NULL,
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
   }
 
-  sheets <-data.frame(sheet_name = unique(schema$sheet_name), stringsAsFactors = FALSE)
+  sheets <- data.frame(sheet_name = unique(schema$sheet_name), stringsAsFactors = FALSE)
   sheets$sheet_num <- seq_len(NROW(sheets))
-  
-  schema <- schema %>% 
-    dplyr::inner_join(sheets, by=c("sheet_name"))
+
+  schema <- schema %>%
+    dplyr::inner_join(sheets, by = c("sheet_name"))
 
   # Skip detail on listed sheets. ####
   if (is.null(skip)) {
