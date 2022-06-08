@@ -290,7 +290,6 @@ validateSchema <- function(schema,
 
 
 #' @export
-#' @importFrom data.table :=
 #' @importFrom methods as
 #' @title Extract and save schema from Data Pack template.
 #'
@@ -327,8 +326,11 @@ unPackSchema_datapack <- function(template_path = NULL,
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
   }
 
-  # Add sheet number based on order of occurrence in workbook, rather than A-Z ####
-  data.table::setDT(schema)[, sheet_num := .GRP, by = c("sheet_name")]
+  sheets <- data.frame(sheet_name = unique(schema$sheet_name), stringsAsFactors = FALSE)
+  sheets$sheet_num <- seq_len(NROW(sheets))
+
+  schema <- schema %>%
+    dplyr::inner_join(sheets, by = c("sheet_name"))
 
   # Skip detail on listed sheets. ####
   if (is.null(skip)) {
