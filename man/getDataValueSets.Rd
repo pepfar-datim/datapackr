@@ -16,8 +16,6 @@ getDataValueSets(
 \item{values}{character vector - values marching the key from keys (e.g. "Abcde123456", "2019Q1"}
 
 \item{d2_session}{R6 datimutils object which handles authentication with DATIM}
-
-\item{api_version}{- api version to use when calling DHIS2}
 }
 \value{
 tibble with the data requested

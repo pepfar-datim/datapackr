@@ -49,7 +49,7 @@ exportPackr <- function(data, output_folder, tool, datapack_name) {
 
     output_file_name <- packName(output_folder, tool, datapack_name, extension = ".csv")
 
-    write.csv(data, output_file_name, row.names = FALSE)
+    utils::write.csv(data, output_file_name, row.names = FALSE)
   }
 
   else if (tool %in% c("Results Archive")) {
