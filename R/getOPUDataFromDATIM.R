@@ -51,14 +51,17 @@ getOPUDataFromDATIM <- function(cop_year,
     dplyr::filter(indicator_code %in% indicator_codes)
 
   # COP21+: Output as DHIS2 import file ####
-  data_datim %<>%
+  # TODO: The "value" column of
+  # DHIS2 import files does not have to be numeric and should
+  # actually be cast to quoted characters before export to CSV(JSON)
+  data_datim %>%
+    dplyr::mutate(value = as.numeric(value)) %>%
     dplyr::select(dataElement,
                   period,
                   orgUnit,
                   categoryOptionCombo,
                   attributeOptionCombo,
-                  value)
+                  value = value)
 
-  return(data_datim)
 
 }
