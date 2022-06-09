@@ -12,7 +12,7 @@ getDataValueSets <- function(keys, values,
                             d2_session = dynGet("d2_default_session",
                                                 inherits = TRUE)) {
 
-  #TODO: Conaiswe to implement a check of all paramaters
+  #TODO: Consider implementing a check of all paramaters
   #https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/data.html
 
   # concatenate and format the keys and values provided for the api call
