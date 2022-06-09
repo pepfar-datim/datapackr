@@ -213,19 +213,29 @@ check_PSNUs <- function(PSNUs = NULL, country_uids = NULL) {
 
 #' @export
 #' @rdname parameter-checks
-check_cop_year <- function(cop_year) {
-  supported_cop_years <- c(2021, 2022)
+check_cop_year <- function(cop_year, tool) {
 
   # If cop_year is NULL or missing, use default from package
   cop_year <- cop_year %missing% NULL
   cop_year <- cop_year %||% getCurrentCOPYear()
 
   # Check type & parse if character and resembles a numeric
-  cop_year %<>% parse_maybe_number()# Found in utilities.R
+  cop_year %<>% parse_maybe_number() # Found in utilities.R
 
-  if (!cop_year %in% supported_cop_years) {# If cop year isn't supported.
+  # Check that provided COP Years are supported ####
+  if (!cop_year %in% supportedCOPYears()) {
     stop(paste0("Sorry, datapackr only supports tools from ",
-                paste_oxford(paste0("COP", supported_cop_years - 2000))))
+                paste_oxford(paste0("COP", supportedCOPYears() - 2000),
+                             final = "&",
+                             oxford = FALSE),
+                "."))
+  }
+
+  # Check other parameters
+  tool <- tool %missing% NULL
+  tool_provided <- !is.null(tool)
+  if (tool_provided) {
+    tool <- check_tool(tool = tool, cop_year = cop_year)
   }
 
   cop_year
@@ -237,7 +247,6 @@ check_cop_year <- function(cop_year) {
 #' @rdname parameter-checks
 check_tool <- function(tool, season, cop_year) {
 
-  supported_tools <- c("Data Pack", "OPU Data Pack")
   default_tool <- "Data Pack"
 
   # Collect parameters.
@@ -252,13 +261,14 @@ check_tool <- function(tool, season, cop_year) {
 
   # Rule out any bogus tools so only NULL or valid tools remain.
   if (tool_provided) {
-    if (!tool %in% supported_tools) {
-      stop("Unknown tool parameter provided.")
+    if (!tool %in% supportedTools()) {
+      stop("Unknown tool parameter provided. We only support ",
+           paste_oxford(paste0(supportedTools(), "s"), final = "&"))
     }
   }
 
   # Validate cop_year and season, if provided.
-  if (cop_year_provided) cop_year %<>% check_cop_year()# Can be seen above.
+  if (cop_year_provided) cop_year %<>% check_cop_year()
   if (season_provided) {
     season %<>% check_season(season = ., tool = tool)
     deduced_tool <- switch(season, "OPU" = "OPU Data Pack", "COP" = "Data Pack")
@@ -274,15 +284,10 @@ check_tool <- function(tool, season, cop_year) {
       tool <- default_tool
       interactive_message("Since neither tool nor season was provided, we assumed you meant 'Data Pack'.")
     }
-  }
 
   # No matter what, we now have a tool. If we also have season, use it to
   # validate tool type.
-  if (!tool %in% supported_tools) {
-    stop("Unknown tool parameter provided.")
-  }
-
-  if (season_provided) {
+  } else if (season_provided) {
     if (tool != deduced_tool) {
       interactive_message("That tool is not valid for that season.")
     }
@@ -291,17 +296,10 @@ check_tool <- function(tool, season, cop_year) {
   # If we have cop_year, check whether the tool is still compatible with
   # datapackr for that year.
   if (cop_year_provided) {
-    valid_cop_years <-
-      switch(
-        tool,
-        "Data Pack" = 2021:2022,
-        "OPU Data Pack" = 2021
-      )
-
-    if (!cop_year %in% valid_cop_years) {
-      interactive_message(paste0("Sorry, we no longer fully support ", tool, "s for that cop_year."))
+    if (!cop_year %in% supportedCOPYears(tool = tool)) {
+      interactive_message(paste0("Sorry, we no longer fully support ",
+                                 tool, "s for that cop_year."))
     }
-
   }
 
   tool

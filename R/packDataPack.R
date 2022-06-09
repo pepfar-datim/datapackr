@@ -19,6 +19,7 @@ packDataPack <- function(d,
     "Model data is not correct file type! File must have .rds extension." =
       tools::file_ext(d$info$model_data_path) == "rds"
   )
+
   d$data$model_data <- readRDS(d$info$model_data_path)
 
   # Write Main Sheets ####

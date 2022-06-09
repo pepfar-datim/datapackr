@@ -18,10 +18,10 @@ map_Cs_to_COs <- function(d2_session = dynGet("d2_default_session",
       "|Observed Commodity|Outcome Type|Receiving ART|Service Delivery Point",
       "|TB Therapy Type")
 
-  Cs_to_COs <- api_call("categories",
-                        d2_session = d2_session) %>%
-    api_fields("id,name,categoryOptions[id,name]") %>% # nolint
-    api_get(d2_session = d2_session) %>%
+  Cs_to_COs <-
+    datimutils::getMetadata("categories",
+                            fields = "id,name,categoryOptions[id,name]",
+                            d2_session = d2_session) %>%
     dplyr::mutate(
       categoryoptiongroup = stringr::str_extract(name, str),
       categoryoptiongroup = ifelse(is.na(categoryoptiongroup), name, categoryoptiongroup)) %>%
@@ -30,10 +30,7 @@ map_Cs_to_COs <- function(d2_session = dynGet("d2_default_session",
     tidyr::unnest(categoryOptions) %>%
     dplyr::distinct() %>%
     dplyr::rename(categoryoption = name, categoryoptionuid = id) %>%
-    dplyr::arrange(categoryoptiongroup, categoryoption) #%>%
-  # dplyr::group_by(categoryoptiongroup) %>%
-  # tidyr::nest() %>%
-  # tibble::deframe()
+    dplyr::arrange(categoryoptiongroup, categoryoption)
 
-  return(Cs_to_COs)
+  Cs_to_COs
 }

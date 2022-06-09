@@ -97,32 +97,8 @@ createKeychainInfo <- function(submission_path = NULL,
     stop("The file submitted does not seem to match the type you've specified.")
   }
 
-  # Assign schema based on tool type ####
-  assign_schema <- function(tool_type, cop_year) {
-
-    if (tool_type %in% c("Data Pack", "Data Pack Template")) {
-      result <- switch(
-        as.character(cop_year),
-        "2022" = datapackr::cop22_data_pack_schema,
-        "2021" = datapackr::cop21_data_pack_schema,
-        stop(paste0(
-          "Unable to process Data Packs from COP ", cop_year
-        ))
-      )
-    } else if (tool_type %in% c("OPU Data Pack", "OPU Data Pack Template")) {
-      result <- switch(
-        as.character(cop_year),
-        "2021" = datapackr::cop21OPU_data_pack_schema,
-        stop(
-          paste0("Unable to process OPU Data Packs from COP ", cop_year)
-        )
-      )
-    } else {
-      stop("Unable to process that type of Data Pack.")
-    }
-  }
-
-  d$info$schema <- assign_schema(d$info$tool, d$info$cop_year)
+  #Pick schema based on COP year and tool type
+  d$info$schema <- pick_schema(d$info$cop_year, d$info$tool)
 
 
   # TEST to make sure tool type matches what we see in the submitted file's structure ####

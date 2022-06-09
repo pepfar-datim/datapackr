@@ -11,7 +11,7 @@ generateMemoTemplate(draft_memo = TRUE)
 draft or final memo.}
 }
 \value{
-
+Officer docx object
 }
 \description{
 Generate Memo Template File
