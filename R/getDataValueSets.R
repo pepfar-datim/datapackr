@@ -9,40 +9,32 @@
 #' @return  tibble with the data requested
 #'
 getDataValueSets <- function(keys, values,
-                            api_version = datapackr::api_version(),
                             d2_session = dynGet("d2_default_session",
                                                 inherits = TRUE)) {
+
+  #TODO: Consider implementing a check of all paramaters
+  #https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/data.html
 
   # concatenate and format the keys and values provided for the api call
   parameters <- stringr::str_c(keys,
                                values,
                                sep = "=",
                                collapse = "&")
-  api_call <- glue::glue("{d2_session$base_url}api/{api_version}/dataValueSets.csv?{parameters}")
-  # note the deleted column comes back empty (missing a comma in fact) which results in a warning
-  # we can disregard that warning
-  #  row col   expected     actual         file
-  #  1  -- 11 columns 10 columns literal data
 
-  data <- httr::GET(api_call, handle = d2_session$handle) %>%
+    paste0(d2_session$base_url,
+           "api/dataValueSets.json?",
+           parameters,
+           "&paging=false") %>%
+    httr::GET(httr::timeout(600),
+              handle = d2_session$handle) %>%
     httr::content(., "text") %>%
-{ # nolint
-      suppressWarnings(readr::read_csv(
-        .,
-        col_names = TRUE,
-        col_types = readr::cols(
-          .default = "c",
-          value = "d",
-          lastupdated = "T"
-        )
-      ))
-    } %>%
-    dplyr::rename(data_element = dataelement,
-                  org_unit = orgunit,
-                  category_option_combo = categoryoptioncombo,
-                  attribute_option_combo = attributeoptioncombo,
-                  stored_by = storedby,
-                  last_updated = lastupdated)
+    jsonlite::fromJSON(.) %>%
+    purrr::pluck("dataValues") %>%
+    dplyr::rename(data_element = dataElement,
+                  org_unit = orgUnit,
+                  category_option_combo = categoryOptionCombo,
+                  attribute_option_combo = attributeOptionCombo,
+                  stored_by = storedBy,
+                  last_updated = lastUpdated)
 
-  return(data)
 }
