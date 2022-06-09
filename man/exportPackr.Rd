@@ -16,7 +16,6 @@ saved upon export.}
 \item{tool}{File prefix to be applied in output filename, as follows:
   \describe{
     \item{\code{Data Pack}}{Openxlsx Workbook object containing Data Pack.}
-    \item{\code{FAST Export}}{Data frame containing FAST export data.}
     \item{\code{SUBNAT IMPATT}}{Data frame containing SUBNAT/IMPATT data.}
     \item{\code{Results Archive}}{List object containing results archive.}
     \item{\code{OPU Data Pack}}{Openxlsx Workbook object containing OPU Data Pack.}
