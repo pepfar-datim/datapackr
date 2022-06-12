@@ -63,8 +63,8 @@ createKeychainInfo <- function(submission_path = NULL,
       tool = stringr::str_extract(home_cell, "OPU Data Pack|Data Pack"))
 
   # Is this even a DataPack tool? ----
-  if (!tool_metadata$cop_year[1] %in% c(2018:2030)
-        | !tool_metadata$tool[1] %in% c("Data Pack", "OPU Data Pack")) {
+  if (!tool_metadata$cop_year[1] %in% supportedCOPYears()
+        | !tool_metadata$tool[1] %in% supportedTools()) {
     stop(paste0("Based on a quick scan, the file submitted does not appear to",
                 " be a Data Pack."))
   }
