@@ -176,9 +176,9 @@ test_that("Can detect decimal values...", {
                     load_sheets = TRUE,
                     d2_session = training)
 
-  d <- checkNegativeValues(d, "GEND")
-  expect_true("negative_values" %in% names(d$tests))
-  expect_true(any(grepl("In tab GEND: NEGATIVE VALUES", d$info$messages$message)))
+  d <- checkDecimalValues(d, "GEND")
+  expect_true("decimal_values" %in% names(d$tests))
+  expect_true(any(grepl("In tab GEND: DECIMAL VALUES", d$info$messages$message)))
   expect_gt(nrow(d$tests$negative_values), 0) # test the tests object
 })
 
