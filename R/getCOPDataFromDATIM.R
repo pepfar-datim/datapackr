@@ -71,7 +71,12 @@ getCOPDataFromDATIM <- function(country_uids,
       orgUnit = org_unit,
       categoryOptionCombo = category_option_combo,
       attributeOptionCombo = attribute_option_combo
-    )
+    ) %>%
+      #Maintain legacy behavior which
+      #Cast values to doubles (even though this does not always have to be the case)
+      dplyr::mutate(value = as.numeric(value),
+                    created = strptime(created, format = "%Y-%m-%dT%H:%M:%OS", tz = "UTC"),
+                    lastUpdated = strptime(created, format = "%Y-%m-%dT%H:%M:%OS", tz = "UTC"))
   }
 
 
