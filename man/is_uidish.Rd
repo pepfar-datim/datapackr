@@ -9,6 +9,9 @@ is_uidish(string, ish = FALSE)
 \arguments{
 \item{string}{Input vector. Either a character vector, or something coercible
 to one.}
+
+\item{ish}{Logical. If TRUE, looks for the UID in all parts of string, rather
+than requiring the string be only the UID.}
 }
 \value{
 A logical vector.

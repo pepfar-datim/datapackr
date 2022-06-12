@@ -609,6 +609,8 @@ formatSetStrings <- function(vec) {
 #'
 #' @param string Input vector. Either a character vector, or something coercible
 #' to one.
+#' @param ish Logical. If TRUE, looks for the UID in all parts of string, rather
+#' than requiring the string be only the UID.
 #'
 #' @return A logical vector.
 is_uidish <- function(string, ish = FALSE) {
@@ -659,7 +661,7 @@ extract_uid <- function(string) {
 #' @rdname extract_uid
 #'
 extract_uid_all <- function(string) {
-  stringr::str_extract_all(string, "[[:alpha:]][[:alnum:]]{10}")
+  unlist(stringr::str_extract_all(string, "[[:alpha:]][[:alnum:]]{10}"))
 }
 
 
