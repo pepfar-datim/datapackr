@@ -388,16 +388,19 @@ checkToolComments <- function(d, quiet = TRUE) {
     messages <- MessageQueue()
   }
 
-  if (is.null(d$tool$wb)) {
-    wb <- openxlsx::loadWorkbook(file = d$keychain$submission_path)
-  } else {
-    wb <- d$tool$wb
+  # if (is.null(d$tool$wb)) {
+  #   wb <- openxlsx::loadWorkbook(file = d$keychain$submission_path)
+  # } else {
+  #   wb <- d$tool$wb
+  # }
+
+  if (is.null(d$info$workbook_contents)) {
+    d <- listWorkbookContents(d)
   }
 
-  # d$info$has_comments_issue <-
-  #   any(unlist(lapply(wb$comments, function(x) is.null(x["style"]))))
+  d$info$has_comments_issue <- any(grepl("xl/threadedComments/", d$info$workbook_contents))
 
-  d$info$has_comments_issue <- any(sapply(wb$threadComments, length) != 0)
+  # d$info$has_comments_issue <- any(sapply(wb$threadComments, length) != 0)
 
   if (d$info$has_comments_issue) {
 
@@ -444,8 +447,9 @@ checkToolConnections <- function(d, quiet = TRUE) {
     messages <- MessageQueue()
   }
 
-  d$info$workbook_contents <- unzip(d$keychain$submission_path, list = TRUE) %>%
-    dplyr::pull(`Name`)
+  if (is.null(d$info$workbook_contents)) {
+    d <- listWorkbookContents(d)
+  }
 
   d$info$has_external_links <-
     any(grepl("xl/externalLinks/externalLink\\d+\\.xml", d$info$workbook_contents))

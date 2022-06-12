@@ -663,6 +663,10 @@ extract_uid_all <- function(string) {
 }
 
 
+#' @export
+#' @title listWorkbookContents
+#' @inheritParams datapackr_params
+#' @return d
 listWorkbookContents <- function(d) {
   d$info$workbook_contents <- utils::unzip(d$keychain$submission_path, list = TRUE) %>%
     dplyr::pull(`Name`)
