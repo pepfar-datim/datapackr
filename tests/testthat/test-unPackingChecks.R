@@ -179,7 +179,7 @@ test_that("Can detect decimal values...", {
   d <- checkDecimalValues(d, "GEND")
   expect_true("decimal_values" %in% names(d$tests))
   expect_true(any(grepl("In tab GEND: DECIMAL VALUES", d$info$messages$message)))
-  expect_gt(nrow(d$tests$negative_values), 0) # test the tests object
+  expect_gt(nrow(d$tests$decimal_values), 0) # test the tests object
 })
 
 test_that("Can detect invalid org units...", {
