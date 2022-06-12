@@ -38,13 +38,14 @@ with_mock_api({
 
 with_mock_api({
   test_that("Can unpack and separate data sets", {
-    d <- datapackr::createKeychainInfo(
-      submission_path = test_sheet("COP21_DP_random_no_psnuxim.xlsx"),
-      tool = "Data Pack",
-      country_uids = NULL,
-      cop_year = NULL,
-      d2_session = NULL
-    )
+    d <-
+      datapackr::loadDataPack(
+        submission_path = test_sheet("COP21_DP_random_no_psnuxim.xlsx"),
+        tool = "Data Pack",
+        country_uids = NULL,
+        cop_year = NULL,
+        load_sheets = TRUE,
+        d2_session = training)
 
     d <- unPackSheets(d)
     expect_true(!is.null(d$data$targets))
@@ -52,35 +53,40 @@ with_mock_api({
     expect_true((NROW(d$data$targets) > 0))
     expect_setequal(class(d$data$targets), c("tbl_df", "tbl", "data.frame"))
     expect_identical(unname(sapply(d$data$targets, typeof)), c(rep("character", 7), "double"))
-    d <- separateDataSets(d)
+
+    datasets <- separateDataSets(data = d$data$targets,
+                                 cop_year = d$info$cop_year,
+                                 tool = d$info$tool)
+    d$data$MER <- datasets$MER
+    d$data$SUBNAT_IMPATT <- datasets$SUBNAT_IMPATT
+    d$data <- within(d$data, rm("targets"))
     expect_null(d$data$targets)
     expect_null(d$data$extract)
     expect_true(!is.null(d$data$MER))
     expect_setequal(class(d$data$MER), c("tbl_df", "tbl", "data.frame"))
     expect_identical(unname(sapply(d$data$MER, typeof)), c(rep("character", 7), "double"))
-    skip("Need to add SUBNATT data to this test sheet")
-    expect_true(!is.null(d$data$SUBNATT_IMPATT))
-    expect_setequal(class(d$data$SUBNATT_IMPATT), c("tbl_df", "tbl", "data.frame"))
-    expect_identical(unname(sapply(d$data$SUBNATT_IMPATT, typeof)), c(rep("character", 7), "double"))
+    expect_true(!is.null(d$data$SUBNAT_IMPATT))
+    expect_setequal(class(d$data$SUBNAT_IMPATT), c("tbl_df", "tbl", "data.frame"))
+    expect_identical(unname(sapply(d$data$SUBNAT_IMPATT, typeof)), c(rep("character", 7), "double"))
 
 
     # Package the undistributed data for DATIM
     d <- packForDATIM(d, type = "Undistributed MER")
-    expect_true(!is.null(d$datim$UndistributedMER))
-    expect_true(NROW(d$datim$UndistributedMER) > 0)
+    expect_true(!is.null(d$data$UndistributedMER))
+    expect_true(NROW(d$data$UndistributedMER) > 0)
     expect_true(all(unlist(
-      lapply(d$datim$UndistributedMER$dataElement, is_uidish)
+      lapply(d$data$UndistributedMER$dataElement, is_uidish)
     )))
     expect_true(all(unlist(
-      lapply(d$datim$UndistributedMER$categoryOptionCombo, is_uidish)
+      lapply(d$data$UndistributedMER$categoryOptionCombo, is_uidish)
     )))
     expect_true(all(unlist(
-      lapply(d$datim$UndistributedMER$period, function(x) {
+      lapply(d$data$UndistributedMER$period, function(x) {
         grepl("^\\d{4}Oct$", x)
       })
     )))
 
-    expect_type(d$datim$UndistributedMER$attributeOptionCombo, "character")
-    expect_type(d$datim$UndistributedMER$attributeOptionCombo, "double")
+    expect_type(d$data$UndistributedMER$attributeOptionCombo, "character")
+    expect_type(d$data$UndistributedMER$value, "double")
   })
 })
