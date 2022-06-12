@@ -753,6 +753,10 @@ checkInvalidOrgUnits <- function(d, sheet, quiet = TRUE) {
   }
 
   # TEST
+  expected_PSNUs <- valid_PSNUs %>%
+    dplyr::filter(country_uid %in% d$info$country_uids) %>%
+    dplyr::select(psnu, psnu_uid)
+
   invalid_orgunits <- data %>%
     dplyr::select(PSNU) %>%
     tidyr::drop_na(PSNU) %>%
@@ -779,7 +783,7 @@ checkInvalidOrgUnits <- function(d, sheet, quiet = TRUE) {
         ifelse(NROW(na_orgunits) > 0,
                paste0("There are ", NROW(na_orgunits), " rows where PSNU/DSNU is blank."),
                ""),
-        " \n\nPlease also review the below PSNUs/DSNUs with invalid or missing org",
+        " Please also review the below PSNUs/DSNUs with invalid or missing org",
         " unit UIDs. (This is an 11-digit alphanumeric code assigned in DATIM to",
         " each organization unit.) If you believe these are valid, confirm in",
         " both DATIM & FACTS Info that the below are correctly added and active",
@@ -818,15 +822,36 @@ checkInvalidPrioritizations <- function(d, sheet, quiet = T) {
   }
 
   # Get data
-  invalid_prioritizations <- unPackDataPackSheet(d,
-                                                 sheet,
-                                                 clean_orgs = TRUE,
-                                                 clean_disaggs = FALSE,
-                                                 clean_values = FALSE) %>%
-    dplyr::filter(!stringr::str_detect(PSNU, "^_Military"),
-                  !value %in% prioritization_dict()$value)
+  data <- unPackDataPackSheet(d,
+                              sheet,
+                              clean_orgs = TRUE,
+                              clean_disaggs = FALSE,
+                              clean_values = FALSE)
+
+  expected_PSNUs <- valid_PSNUs %>%
+    dplyr::filter(country_uid %in% d$info$country_uids) %>%
+    dplyr::mutate(psnu_name = paste0(psnu, " [", psnu_uid, "]")) %>%
+    dplyr::select(psnu_uid, psnu_name)
+
+  invalid_prioritizations <- data %>%
+    dplyr::select(PSNU, psnuid, value) %>%
+    dplyr::full_join(expected_PSNUs,
+                     by = c("psnuid" = "psnu_uid")) %>%
+    dplyr::mutate(
+      type = dplyr::case_when(
+        stringr::str_detect(PSNU, "^_Military") ~ "Military",
+        is.na(PSNU) ~ "Missing PSNU",
+        is.na(value) ~ "Blank",
+        !value %in% prioritization_dict()$value ~ "Invalid")) %>%
+    dplyr::filter(!is.na(type),
+                  type != "Military") %>%
+    dplyr::select(psnu_name, type)
 
   if (NROW(invalid_prioritizations) > 0) {
+
+    inv_pzs_msg <-
+      utils::capture.output(
+        print(as.data.frame(invalid_prioritizations), row.names = FALSE))
 
     lvl <- "ERROR"
 
@@ -837,8 +862,8 @@ checkInvalidPrioritizations <- function(d, sheet, quiet = T) {
         ": INVALID PRIORITIZATIONS: The following PSNUs have been assigned",
         " invalid or blank prioritizations. Please note that all PSNUs must have",
         " an assigned prioritization, and prioritizations can only be assigned ",
-        paste_oxford(prioritization_dict()$value, final = "or"), ". -> \n\t* ",
-        paste(sort(unique(invalid_prioritizations$PSNU)), collapse = "\n\t* "),
+        paste_oxford(prioritization_dict()$value, final = "or"), ". -> \n\t",
+        paste(inv_pzs_msg, collapse = "\n\t"),
         "\n")
 
     d$tests$invalid_prioritizations <- invalid_prioritizations
@@ -871,6 +896,7 @@ checkFormulas <- function(d, sheet, quiet = TRUE) {
   header_row <- headerRow(tool = "Data Pack", cop_year = d$info$cop_year)
 
   # Pull in formulas from schema
+  # TODO: Flag differently for green vs other columns
   formulas_schema <- d$info$schema %>%
     dplyr::filter(
       sheet_name == sheet,
@@ -1101,6 +1127,8 @@ checkSheetData <- function(d,
   rm(params, p)
 
   # TODO: Apply method used in checkAnalytics line 631
+
+  sheets <- sheets[!sheets %in% c("KP Validation")]
 
   for (sheet in sheets) {
     # Col Structure ----
