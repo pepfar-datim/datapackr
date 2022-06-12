@@ -31,24 +31,33 @@ with_mock_api({
 with_mock_api({
   test_that("We can create Datapack memo data", {
     d <-
-      datapackr::createKeychainInfo(
+      loadDataPack(
         submission_path = test_sheet("COP21_DP_random_with_psnuxim.xlsx"),
         tool = "Data Pack",
         country_uids = NULL,
-        cop_year = NULL
-      )
-    d <-  d %>%
-      unPackSheets(.) %>%
-      separateDataSets(.) %>%
+        cop_year = NULL,
+        load_sheets = TRUE,
+        d2_session = training)
+
+    d <- d %>%
+      unPackSheets(.)
+
+    datasets <- separateDataSets(data = d$data$targets,
+                                 cop_year = d$info$cop_year,
+                                 tool = d$info$tool)
+    d$data$MER <- datasets$MER
+    d$data$SUBNAT_IMPATT <- datasets$SUBNAT_IMPATT
+    d$data <- within(d$data, rm("targets"))
+
+    d %<>%
       unPackSNUxIM(.) %>%
       packForDATIM(., type = "Undistributed MER") %>%
       packForDATIM(., type = "SUBNAT_IMPATT") %>%
       packForDATIM(., type = "PSNUxIM")
 
     expect_named(d,
-                 c("keychain", "info", "tests", "data", "datim"),
+                 c("keychain", "info", "sheets", "tests", "data", "datim"),
                  ignore.order = TRUE)
-
 
     fy22_prioritizations <- getFY22Prioritizations(d)
     expect_type(fy22_prioritizations, "list")
@@ -143,15 +152,25 @@ with_mock_api({
 with_mock_api({
   test_that("We can prepare existing data analytics", {
     d <-
-      datapackr::createKeychainInfo(
+      loadDataPack(
         submission_path = test_sheet("COP21_DP_random_with_psnuxim.xlsx"),
         tool = "Data Pack",
         country_uids = NULL,
-        cop_year = NULL
-      )
-    d <-  d %>%
-      unPackSheets(.) %>%
-      separateDataSets(.) %>%
+        cop_year = NULL,
+        load_sheets = TRUE,
+        d2_session = training)
+
+    d <- d %>%
+      unPackSheets(.)
+
+    datasets <- separateDataSets(data = d$data$targets,
+                                 cop_year = d$info$cop_year,
+                                 tool = d$info$tool)
+    d$data$MER <- datasets$MER
+    d$data$SUBNAT_IMPATT <- datasets$SUBNAT_IMPATT
+    d$data <- within(d$data, rm("targets"))
+
+    d %<>%
       unPackSNUxIM(.) %>%
       packForDATIM(., type = "Undistributed MER") %>%
       packForDATIM(., type = "SUBNAT_IMPATT") %>%
@@ -172,15 +191,25 @@ with_mock_api({
 with_mock_api({
   test_that("We can create DATIM/Comparison memo data", {
     d <-
-      datapackr::createKeychainInfo(
+      loadDataPack(
         submission_path = test_sheet("COP21_DP_random_with_psnuxim.xlsx"),
         tool = "Data Pack",
         country_uids = NULL,
-        cop_year = NULL
-      )
-    d <-  d %>%
-      unPackSheets(.) %>%
-      separateDataSets(.) %>%
+        cop_year = NULL,
+        load_sheets = TRUE,
+        d2_session = training)
+
+    d <- d %>%
+      unPackSheets(.)
+
+    datasets <- separateDataSets(data = d$data$targets,
+                                   cop_year = d$info$cop_year,
+                                   tool = d$info$tool)
+    d$data$MER <- datasets$MER
+    d$data$SUBNAT_IMPATT <- datasets$SUBNAT_IMPATT
+    d$data <- within(d$data, rm("targets"))
+
+    d %<>%
       unPackSNUxIM(.) %>%
       packForDATIM(., type = "Undistributed MER") %>%
       packForDATIM(., type = "SUBNAT_IMPATT") %>%
