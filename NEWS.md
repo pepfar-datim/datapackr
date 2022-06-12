@@ -1,3 +1,50 @@
+# datapackr 5.2.3
+
+## Bug fixes
+* 
+
+## Breaking changes
+* Replaces some check functions with new versions (see below).
+
+## New features
+* Add the following functions, along with related tests:
+   * `loadSheets`
+   * `readSheet`
+   * `checkFormulas`
+   * `checkDisaggs`
+   * `checkInvalidPrioritizations`
+   * `checkInvalidOrgUnits`
+   * `checkNegativeValues`
+   * `checkDecimalValues`
+   * `checkMissingMetadata`
+   * `checkNonNumeric` (instead of `checkNumericValues`)
+   * `checkDupeRows`
+   * `checkColumnStructure`
+   * `checkToolStructure` (instead of `checkStructure`)
+   * `checkToolConnections` (instead of `checkExternalLinks`)
+   * `checkToolComments` (instead of `checkComments`)
+   * `checkSheets`
+   * `extract_uid`
+   * `extract_uid_all`
+
+## Minor improvements and fixes
+* Refactors `unPackDataPackSheet` to reduce cyclomatic complexity.
+* Updates `unPackDataPack` to use new check functions (see below).
+* Updates `unPackTool` to use `loadDataPack` instead of `createKeychainInfo`.
+* Simplifies and generalizes `unPackDataPackSheet`.
+* Generalizes `separateDataSets`
+* Turns off `checkMissingMetadata` in `unPackSNUxIM` for now.
+* Updates `createKeychainInfo` to be more accurate in deducing metadata from submitted Data Packs.
+* Updates `loadDataPack` to be production ready.
+* Fixes tests for the following functions:
+   * `listWorkbookContents`
+   * `packForDATIM`
+   * `separateDataSets`
+   * `unPackSheets`
+   * `prepareMemoData`
+   * `createAnalytics`
+ 
+
 # datapackr 5.2.2
 
 ## Bug fixes
