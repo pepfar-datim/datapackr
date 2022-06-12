@@ -380,9 +380,9 @@ unPackSNUxIM <- function(d) {
 
   # TEST: Missing key metadata; Error; Drop ####
   # TODO: Make compatible for OPUs
-  if (d$info$tool == "Data Pack") {
-    d <- checkMissingMetadata(d, sheet)
-  }
+  # if (d$info$tool == "Data Pack") {
+  #   d <- checkMissingMetadata(d, sheet)
+  # }
 
   # d$data$SNUxIM %<>%
   #   dplyr::filter_at(dplyr::vars(PSNU, indicator_code), dplyr::any_vars(!is.na(.)))
