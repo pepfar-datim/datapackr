@@ -226,7 +226,7 @@ test_that("Can detect altered formulas...", {
 
   d <- checkFormulas(d, "GEND")
   expect_true("altered_formulas" %in% names(d$tests))
-  expect_true(any(grepl("ALTERED FORMULAS",d$info$messages$message)))
+  expect_true(any(grepl("ALTERED FORMULAS", d$info$messages$message)))
   expect_gt(nrow(d$tests$altered_formulas), 0) # test the tests object
 })
 
@@ -243,7 +243,7 @@ test_that("Can detect defunct disaggs...", {
 
   d <- checkDisaggs(d, "OVC")
   expect_true("defunct_disaggs" %in% names(d$tests))
-  expect_true(any(grepl("ERROR! In tab OVC: INVALID DISAGGS",d$info$messages$message)))
+  expect_true(any(grepl("ERROR! In tab OVC: INVALID DISAGGS", d$info$messages$message)))
   expect_gt(nrow(d$tests$defunct_disaggs), 0) # test the tests object
   expect_true(d$info$has_error)
 })
