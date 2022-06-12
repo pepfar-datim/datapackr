@@ -19,6 +19,9 @@ unPackSheets <- function(d, sheets = NULL) {
   }
 
   # If sheets parameter not provided, use names of sheets in d$sheets
+  if (is.null(d$sheets)) {
+    d <- loadSheets(d)
+  }
   sheets <- sheets %||% grep("PSNUxIM", names(d$sheets), value = TRUE, invert = TRUE)
 
   sheets <- checkSheets(sheets = sheets,
@@ -51,8 +54,7 @@ unPackSheets <- function(d, sheets = NULL) {
   for (sheet in sheets) {
     interactive_print(sheet)
 
-    extract <- unPackDataPackSheet(d,
-                                   sheet = sheet)
+    extract <- unPackDataPackSheet(d, sheet = sheet)
 
     if (!is.null(extract)) {
       targets <- dplyr::bind_rows(targets, extract)
