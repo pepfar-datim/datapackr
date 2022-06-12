@@ -147,7 +147,7 @@ packSNUxIM <- function(d,
   # Get formulas & column order from schema ####
   interactive_print("Building your custom PSNUxIM tab...")
 
-  data_structure <- d$info$schema %>%
+  data_structure <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(sheet_name == "PSNUxIM")
 
   col.im.targets <- data_structure %>%
@@ -219,7 +219,7 @@ packSNUxIM <- function(d,
         dplyr::select(tidyselect::matches("\\d{4,}"))
       )
 
-  header_cols <- d$info$schema %>%
+  header_cols <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(sheet_name == "PSNUxIM"
                   & col < col.im.percents[1]) %>%
     dplyr::pull(indicator_code)
@@ -316,7 +316,7 @@ packSNUxIM <- function(d,
   # Format percent columns ####
   interactive_print("Stylizing percent columns...")
 
-  percentCols <- d$info$schema %>%
+  percentCols <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(sheet_name == "PSNUxIM",
                   value_type == "percentage") %>%
     dplyr::pull(col)
@@ -359,7 +359,7 @@ packSNUxIM <- function(d,
                           heights = 0)
 
   # Hide columns ####
-  hiddenCols <- d$info$schema %>%
+  hiddenCols <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(sheet_name == "PSNUxIM",
                   indicator_code %in% c("ID", "sheet_num", "DSD Dedupe",
                                         "TA Dedupe", "Crosswalk Dedupe")) %>%
