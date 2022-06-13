@@ -49,19 +49,10 @@ unPackSheets <- function(d, sheets = NULL) {
   d <- checkSheetData(d, sheets = sheets)
 
   # Unpack Sheet Data ----
-  targets <- NULL
 
-  for (sheet in sheets) {
-    interactive_print(sheet)
+  d$data$targets <-
+    purrr::map_dfr(sheets, function(x)
+      unPackDataPackSheet(d, sheet = x))
 
-    extract <- unPackDataPackSheet(d, sheet = sheet)
-
-    if (!is.null(extract)) {
-      targets <- dplyr::bind_rows(targets, extract)
-    }
-  }
-
-  d$data$targets <- targets
-
-  return(d)
+  d
 }

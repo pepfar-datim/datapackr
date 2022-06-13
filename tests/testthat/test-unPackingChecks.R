@@ -4,7 +4,7 @@ test_that("Can detect invalid comment types ...", {
 
   #Note: A warning is thrown here on the command line  for "invalid parameter"
   # Does not have any impact on the parsing, but documenting it nonetheless.
-  expect_warning( d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
+  expect_warning(d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
                     tool = "Data Pack",
                     country_uids = NULL,
                     cop_year = NULL,
