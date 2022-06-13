@@ -124,9 +124,8 @@ loadSheets <- function(d,
                         psnuxim = TRUE)
 
   # Load Sheets
-  for (sheet in sheets) {
-    d[["sheets"]][[as.character(sheet)]] <- readSheet(d, sheet = sheet)
-  }
+  extracted_sheets <- lapply(sheets, function(x) readSheet(d,x))
+  d$sheets <- setNames(extracted_sheets, sheets)
 
   d
 
