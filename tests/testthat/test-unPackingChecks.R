@@ -1,14 +1,18 @@
 context("test-unPackingChecks")
 
 test_that("Can detect invalid comment types ...", {
-  d <- loadDataPack(submission_path = test_sheet("Test_COP22_Data Pack_unPackingChecks.xlsx"),
+
+  #Note: A warning is thrown here on the command line  for "invalid parameter"
+  # Does not have any impact on the parsing, but documenting it nonetheless.
+  expect_warning( d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
                     tool = "Data Pack",
                     country_uids = NULL,
                     cop_year = NULL,
                     load_wb = TRUE,
                     load_sheets = TRUE,
-                    d2_session = training) %>%
-    checkToolComments()
+                    d2_session = training))
+
+  d <- checkToolComments(d)
 
   expect_true(d$info$has_comments_issue)
   expect_true(d$info$has_error)
@@ -28,14 +32,16 @@ test_that("Can detect invalid comment types ...", {
 })
 
 test_that("Can detect external links in a file ...", {
-  d <- loadDataPack(submission_path = test_sheet("Test_COP22_Data Pack_unPackingChecks.xlsx"),
+  #Note....A warn
+  expect_warning(d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
                     tool = "Data Pack",
                     country_uids = NULL,
                     cop_year = NULL,
                     load_wb = TRUE,
                     load_sheets = FALSE,
-                    d2_session = training) %>%
-    checkToolConnections()
+                    d2_session = training))
+
+  d <- checkToolConnections(d)
 
   expect_true(d$info$has_external_links)
 })
@@ -69,7 +75,7 @@ test_that("Can check Tool structure...", {
 
 
 test_that("Can check Sheet structure...", {
-  d <- loadDataPack(submission_path = test_sheet("Test_COP22_Data Pack_unPackingChecks.xlsx"),
+  d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
                     tool = "Data Pack",
                     country_uids = NULL,
                     cop_year = NULL,
@@ -87,7 +93,7 @@ test_that("Can check Sheet structure...", {
 })
 
 test_that("Can detect duplicate rows...", {
-  d <- loadDataPack(submission_path = test_sheet("Test_COP22_Data Pack_unPackingChecks.xlsx"),
+  d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
                     tool = "Data Pack",
                     country_uids = NULL,
                     cop_year = NULL,
@@ -101,7 +107,7 @@ test_that("Can detect duplicate rows...", {
 })
 
 test_that("Can detect non-numeric values...", {
-  d <- loadDataPack(submission_path = test_sheet("Test_COP22_Data Pack_unPackingChecks.xlsx"),
+  d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
                     tool = "Data Pack",
                     country_uids = NULL,
                     cop_year = NULL,
@@ -153,7 +159,7 @@ test_that("Can check missing meta data in all sheets", {
 })
 
 test_that("Can detect negative values...", {
-  d <- loadDataPack(submission_path = test_sheet("Test_COP22_Data Pack_unPackingChecks.xlsx"),
+  d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
                     tool = "Data Pack",
                     country_uids = NULL,
                     cop_year = NULL,
@@ -168,7 +174,7 @@ test_that("Can detect negative values...", {
 })
 
 test_that("Can detect decimal values...", {
-  d <- loadDataPack(submission_path = test_sheet("Test_COP22_Data Pack_unPackingChecks.xlsx"),
+  d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
                     tool = "Data Pack",
                     country_uids = NULL,
                     cop_year = NULL,
@@ -183,7 +189,7 @@ test_that("Can detect decimal values...", {
 })
 
 test_that("Can detect invalid org units...", {
-  d <- loadDataPack(submission_path = test_sheet("Test_COP22_Data Pack_unPackingChecks.xlsx"),
+  d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
                     tool = "Data Pack",
                     country_uids = NULL,
                     cop_year = NULL,
@@ -198,7 +204,7 @@ test_that("Can detect invalid org units...", {
 })
 
 test_that("Can detect invalid or blank prioritizations...", {
-  d <- loadDataPack(submission_path = test_sheet("Test_COP22_Data Pack_unPackingChecks.xlsx"),
+  d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
                     tool = "Data Pack",
                     country_uids = NULL,
                     cop_year = NULL,
@@ -216,7 +222,7 @@ test_that("Can detect invalid or blank prioritizations...", {
 })
 
 test_that("Can detect altered formulas...", {
-  d <- loadDataPack(submission_path = test_sheet("Test_COP22_Data Pack_unPackingChecks.xlsx"),
+  d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
                     tool = "Data Pack",
                     country_uids = NULL,
                     cop_year = NULL,
@@ -231,7 +237,7 @@ test_that("Can detect altered formulas...", {
 })
 
 test_that("Can detect defunct disaggs...", {
-  d <- loadDataPack(submission_path = test_sheet("Test_COP22_Data Pack_unPackingChecks.xlsx"),
+  d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
                     tool = "Data Pack",
                     country_uids = NULL,
                     cop_year = NULL,
