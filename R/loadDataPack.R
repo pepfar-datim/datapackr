@@ -9,6 +9,7 @@
 #'
 #' @inheritParams datapackr_params
 #' @param load_sheets Logical. Should all data sheets be loaded too?
+#' @param load_wb Should the datapack be loaded as an openxlsx object?
 #'
 #' @return DataPack object.
 #'
