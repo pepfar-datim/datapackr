@@ -13,6 +13,7 @@
 #'
 packTool <- function(model_data_path = NULL,
                      snuxim_model_data_path = NULL,
+                     undistributed_mer_data = NULL,
                      tool,
                      datapack_name,
                      country_uids,
@@ -77,7 +78,7 @@ packTool <- function(model_data_path = NULL,
   if (d$info$tool == "Data Pack") {
     d <- packDataPack(d, d2_session = d2_session)
   } else if (d$info$tool == "OPU Data Pack") {
-    d <- packOPUDataPack(d, d2_session = d2_session)
+    d <- packOPUDataPack(d, undistributed_mer_data = undistributed_mer_data, d2_session = d2_session)
   } else {
     stop("Selected tool not currently supported.")
   }

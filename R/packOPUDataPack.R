@@ -9,7 +9,7 @@
 #'
 #' @return Exports an OPU Data Pack to Excel within \code{output_folder}.
 #'
-packOPUDataPack <- function(d,
+packOPUDataPack <- function(d, undistributed_mer_data = NULL,
                             d2_session = dynGet("d2_default_session",
                                                 inherits = TRUE)) {
 
@@ -30,17 +30,19 @@ packOPUDataPack <- function(d,
   }
 
   # If empty or unprovided, pull model data from DATIM ####
-  if (is.null(d$info$snuxim_model_data)) {
+  if (is.null(d$data$snuxim_model_data)) {
     d$data$snuxim_model_data <- getOPUDataFromDATIM(cop_year = d$info$cop_year,
-                                             country_uids = d$info$country_uids,
-                                             d2_session = d2_session)
+                                                    country_uids = d$info$country_uids,
+                                                    d2_session = d2_session)
     if (NROW(d$data$snuxim_model_data) == 0) {
       stop("SNUxIM Model data pull seems to have returned no data from DATIM. Please check with DATIM.")
     }
   }
 
   # Prepare totals data for allocation ####
-  if (d$info$cop_year == 2021) {
+  if (!is.null(undistributed_mer_data)) {
+    d$data$UndistributedMER <- undistributed_mer_data
+  } else {
     d$data$UndistributedMER <- d$data$snuxim_model_data %>%
       dplyr::mutate(attributeOptionCombo = default_catOptCombo()) %>%
       dplyr::group_by(dplyr::across(c(-value))) %>%
