@@ -340,16 +340,13 @@ rowMax <- function(df, cn, regex) {
 #' @return {cop21, cop22}_map_DataPack_DATIM_DEs_COCs
 #'
 getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
-  if (cop_year == 2021 && identical(datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
-                                    datapackr::map_DataPack_DATIM_DEs_COCs)) {
-    return(datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
-  } else if (cop_year == 2022) {
-    return(datapackr::cop22_map_DataPack_DATIM_DEs_COCs)
-  } else { # if map_DataPack_DATIM_DEs_COCs has drifted or COP year is invalid this notifies us
-    stop("The COP year and configuration provided is not supported by get_Map_DataPack_DATIM_DEs_COCs")
-  }
-}
 
+  switch(as.character(cop_year),
+         "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
+         "2022" = datapackr::cop22_map_DataPack_DATIM_DEs_COCs,
+         stop("The COP year and configuration provided is not supported by get_Map_DataPack_DATIM_DEs_COCs"))
+
+}
 
 #' @export
 #' @title Create a new Data Pack
@@ -546,6 +543,12 @@ parse_maybe_number <- function(x, default = NULL) {
 #' @return An integer number of cores to use in parallel processing
 #'
 getMaxCores <- function() {
+
+  #Should never be called on Windows
+ if (.Platform$OS.type != "windows") {
+   return(1L)
+ }
+
   n_cores <-
     ifelse(Sys.getenv("MAX_CORES") != "",
            as.numeric(Sys.getenv("MAX_CORES")),
@@ -611,6 +614,26 @@ formatSetStrings <- function(vec) {
 is_uidish <- function(string) {
   stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")
 }
+
+
+
+
+
+#' Title
+#' @description Determines whether processes can be run in parallel.
+#' This is used in indicator and validation rule evaluation, but
+#' should not be run on Windows currently
+#' @return Boolean True or false
+#' @export
+#'
+
+can_spawn <- function() {
+
+  "parallel" %in% rownames(utils::installed.packages()) == TRUE &
+    .Platform$OS.type != "windows"  #Never execute in parallel on Windows
+}
+
+
 
 
 extractWorkbook <- function(d) {

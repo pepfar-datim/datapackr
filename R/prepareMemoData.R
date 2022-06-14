@@ -109,7 +109,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
 #' categoryoptioncombo_id, mechanism_code and target value
 #' @param inds Data frame of indicators from getMemoIndicators
 #' @param partners_agencies Result of getMechanismView
-#' @param ncores Indicates how many cores should be used.
+#' @param n_cores Indicates how many cores should be used.
 #' @inheritParams datapackr_params
 #'
 #' @description This function calculates COP memo indicators at the PSNU level.
@@ -124,7 +124,7 @@ prepareMemoDataByPSNU <- function(analytics,
                                   prios,
                                   partners_agencies,
                                   psnus,
-                                  ncores = getMaxCores()) {
+                                  n_cores = getMaxCores()) {
    #Now we need to calculate the indicators
 
    df <-  analytics %>%
@@ -138,18 +138,12 @@ prepareMemoDataByPSNU <- function(analytics,
     dplyr::group_by(psnu_uid, mechanism_code) %>%
     tidyr::nest()
 
-  #Determine whether we can evaluate in parallel
-   can_spawn <-
-     "parallel" %in% rownames(utils::installed.packages()) == TRUE &
-     .Platform$OS.type != "windows" & #Never execute in parallel on Windows
-     Sys.getenv("CI") == "" #Never execute in parallel on a CI
-
   #Evaluate the indicators in parallel if possible
-  if (can_spawn) {
+  if (can_spawn() & n_cores > 1L) {
     df$indicator_results <-
       parallel::mclapply(df$data, function(x)
         evaluateIndicators(x$combi, x$value, inds),
-        mc.cores = ncores)
+        mc.cores = n_cores)
   } else {
     df$indicator_results <-
       lapply(df$data, function(x)
@@ -432,14 +426,14 @@ prepareMemoDataByPrio <- function(df,
 #' by_prio: Dataframe of indicators aggregated to the prioritization level
 #' by_partner: Dataframe of indicators aggregate to the partner level
 #' @inheritParams datapackr_params
-#' @param ncores Indicates how many cores should be used.
+#' @param n_cores Indicates how many cores should be used.
 #'
 #' @return Datapackr d object
 #'
 prepareMemoData <- function(d,
                               memo_type,
                               include_no_prio = TRUE,
-                              ncores = getMaxCores(),
+                              n_cores = getMaxCores(),
                               d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
 
@@ -463,7 +457,7 @@ prepareMemoData <- function(d,
           prios = d$memo$datim$prios,
           partners_agencies = d$memo$partners_agencies,
           psnus = d$info$psnus,
-          ncores = ncores
+          n_cores = n_cores
         )
 
       d$memo$datim$by_partner <-
@@ -493,7 +487,7 @@ prepareMemoData <- function(d,
                               prios = d$memo$datapack$prios,
                               partners_agencies = d$memo$partners_agencies,
                               psnus = d$info$psnus,
-                              ncores = ncores)
+                              n_cores = n_cores)
 
       #Update the PSNU prioritization levels with those in DATIM
       if (d$info$tool == "OPU Data Pack") {

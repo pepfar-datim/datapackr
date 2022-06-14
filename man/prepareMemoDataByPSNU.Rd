@@ -11,7 +11,7 @@ prepareMemoDataByPSNU(
   prios,
   partners_agencies,
   psnus,
-  ncores = getMaxCores()
+  n_cores = getMaxCores()
 )
 }
 \arguments{
@@ -32,7 +32,7 @@ comparison: Create a comparison memo with data from both DATIM and datapack}
 \item{psnus}{Dataframe of PSNUs to use in this function, containing at least
 \code{psnu_uid}.}
 
-\item{ncores}{Indicates how many cores should be used.}
+\item{n_cores}{Indicates how many cores should be used.}
 }
 \value{
 A dataframe of COP indicators aggregated to the PSNU level.

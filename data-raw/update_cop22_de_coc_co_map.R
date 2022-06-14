@@ -25,7 +25,10 @@ fullCodeList <-
   lapply(
     datasets_to_pull$dataset_uid,
     function(x) {
-      cl <- pullDATIMCodeList(x) %>%
+      cl <- datimutils::getSqlView(sql_view_uid = "DotdxKrNZxG",
+                                   variable_keys = "dataSets",
+                                   variable_values = x,
+                                   d2_session = d2_session) %>%
         dplyr::mutate(dataset_uid = x)
       ds <- rbind(ds, cl)
     }) %>%
