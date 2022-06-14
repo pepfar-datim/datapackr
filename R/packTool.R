@@ -11,17 +11,17 @@
 #' @return Exports a Data Pack or OPU Data Pack tool to Excel within
 #' \code{output_folder}.
 #'
-unPackTool <- function(model_data_path = NULL,
-                       snuxim_model_data_path = NULL,
-                       tool,
-                       datapack_name,
-                       country_uids,
-                       template_path,
-                       cop_year,
-                       output_folder,
-                       results_archive = TRUE,
-                       d2_session = dynGet("d2_default_session",
-                                           inherits = TRUE)) {
+packTool <- function(model_data_path = NULL,
+                     snuxim_model_data_path = NULL,
+                     tool,
+                     datapack_name,
+                     country_uids,
+                     template_path,
+                     cop_year,
+                     output_folder,
+                     results_archive = TRUE,
+                     d2_session = dynGet("d2_default_session",
+                                         inherits = TRUE)) {
 
   interactive_print(datapack_name)
   interactive_print(country_uids)
