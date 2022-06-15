@@ -60,7 +60,7 @@ packOPUDataPack <- function(d, undistributed_mer_data = NULL,
                    d2_session = d2_session)
 
   d$tool$wb <- r$wb
-  d$info$messages <- appendMessage(d$info$messages, r$message, r$level)
+  d$info$messages <- appendMessage(d$info$messages, r$info$messages$message, r$info$messages$level)
 
   # Return d object ####
   d
