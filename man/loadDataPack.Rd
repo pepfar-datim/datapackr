@@ -26,6 +26,8 @@ For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}
 
+\item{load_wb}{Should the datapack be loaded as an openxlsx object?}
+
 \item{load_sheets}{Logical. Should all data sheets be loaded too?}
 
 \item{d2_session}{DHIS2 Session id}

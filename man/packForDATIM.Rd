@@ -2,18 +2,18 @@
 % Please edit documentation in R/packForDATIM.R
 \name{packForDATIM}
 \alias{packForDATIM}
-\title{packForDATIM(data)}
+\title{packForDATIM}
 \usage{
 packForDATIM(d, type = NULL)
 }
 \arguments{
-\item{d}{Datapackr object.}
+\item{d}{Datapackr sidecar object}
 
 \item{type}{Type of dataset to prep for DATIM. Choose from \code{PSNUxIM},
-\code{SUBNAT_IMPATT}, \code{OPU PSNUxIM}, or \code{Site}.}
+\code{SUBNAT_IMPATT}, \code{OPU PSNUxIM}, or \code{Undistributed MER}.}
 }
 \value{
-Data frame ready for DATIM import
+d object
 }
 \description{
 Flexible function that allows packaging of a variety of datapackr outputs as
