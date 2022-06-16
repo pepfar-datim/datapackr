@@ -82,10 +82,13 @@ writePSNUxIM <- function(d,
 
     # Prepare targets to distribute ####
     if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
-      targets_data <- packForDATIM_UndistributedMER(data = d$data$missingCombos,
-                                                    cop_year = d$info$cop_year)
+      p <- d
+      p$data$MER <- p$data$missingCombos
+      p <- packForDATIM(p, type = "Undistributed MER")
+      targets_data <- p$datim$UndistributedMER
+      rm(p)
     } else {
-      targets_data <- d$data$UndistributedMER
+      targets_data <- d$datim$UndistributedMER
     }
 
     #Mirror the data in TA as well
