@@ -25,26 +25,24 @@ getPSNUs <- function(country_uids = NULL,
                                          inherits = TRUE)) {
 
   # Pull PSNUs from DATIM ####
-  PSNUs <- api_call("organisationUnits",
-                    d2_session = d2_session) %>%
-    api_filter(
-      "organisationUnitGroups.id",
-      "in",
-      paste0(
-        "AVy8gJXym2D",
-        dplyr::if_else(include_mil, ",nwQbMeALRjL", ""),
-        dplyr::if_else(include_DREAMS, ",mRRlkbZolDR", "")
-      )
-    ) %>%
-    purrr::when(all(!is.null(country_uids)) ~ api_filter(., "ancestors.id", "in",
-    match = paste(country_uids, collapse = ",")),
-    ~ .) %>%
-    datapackr::api_fields(
-      "id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]"
-    ) %>%
-    purrr::when(!is.null(additional_fields) ~ datapackr::api_fields(., additional_fields),
-    ~ .) %>%
-    datapackr::api_get(d2_session = d2_session)
+  api_filters <-
+    # Filter by appropriate organisation unit groups
+    c(paste0("organisationUnitGroups.id:in:[AVy8gJXym2D", # Filter for COP Prioritization SNU
+             ifelse(include_mil, ",nwQbMeALRjL", ""), # Add military SNUs if requested
+             ifelse(include_DREAMS, ",mRRlkbZolDR", ""), "]")) %>% # Add DREAMS SNUs if requested
+    # If country UIDs are provided, add filter for country UIDs
+    {if (!is.null(country_uids)) {
+      append(., paste0("ancestors.id:in:[", paste(country_uids, collapse = ","), "]"))
+    } else .
+    }
+
+  PSNUs <-
+    datimutils::getMetadata(
+      "organisationUnits",
+      api_filters,
+      fields = paste0("id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]",
+                      ifelse(!is.null(additional_fields), paste0(",", additional_fields), "")), # Pastes additional fields
+      d2_session = d2_session)
 
   # Extract metadata ####
   PSNUs %<>%
