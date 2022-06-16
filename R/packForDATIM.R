@@ -132,11 +132,14 @@ packForDATIM <- function(d, type = NULL) {
           datim_map$dataelementuid[which(datim_map$indicator_code == "IMPATT.PRIORITY_SNU.T")])
   }
 
+  # nolint start
   switch(type,
          PSNUxIM = {d$datim$MER <- data},
          SUBNAT_IMPATT = {d$datim$subnat_impatt <- data},
          `OPU PSNUxIM` = {d$datim$OPU <- data},
          `Undistributed MER` = {d$datim$UndistributedMER <- data})
+  # nolint end
+
 
   return(d)
 }
