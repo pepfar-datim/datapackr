@@ -5,7 +5,7 @@
 #' Flexible function that allows packaging of a variety of datapackr outputs as
 #' DATIM import files.
 #'
-#' @inheritParams
+#' @inheritParams datapackr_params
 #' @param type Type of dataset to prep for DATIM. Choose from \code{PSNUxIM},
 #' \code{SUBNAT_IMPATT}, \code{OPU PSNUxIM}, or \code{Undistributed MER}.
 #'
