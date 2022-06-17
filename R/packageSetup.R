@@ -57,11 +57,11 @@ supportedCOPYears <- function(tool = NULL) {
 #' If cop_year is not provided, will provide list of all tools supported for any
 #' cop_year.
 supportedTools <- function(cop_year = NULL) {
-
+  
   cop_year <- cop_year %missing% NULL
   cop_year_provided <- !is.null(cop_year)
   cop_year %<>% suppressWarnings(check_cop_year())
-
+  
   if (cop_year_provided) {
     supported_tools <- datapackrSupports() %>%
       tidyr::unnest(yrs) %>%
@@ -70,7 +70,7 @@ supportedTools <- function(cop_year = NULL) {
   } else {
     supported_tools <- datapackrSupports()$tool
   }
-
+  
   unique(supported_tools)
 }
 
@@ -128,7 +128,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
   } else {
     skip <- c(NA_character_)
   }
-
+  
   return(skip)
 }
 
@@ -142,15 +142,15 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 #' @return Header row
 #'
 headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
-
+  
   if (cop_year %in% c(2021, 2022)) {
     if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
       header_row <- 14
     } else stop("That tool type is not supported for that cop_year.")
   } else stop("That cop_year is not currently supported.")
-
+  
   return(header_row)
-
+  
 }
 
 #' @export
@@ -163,21 +163,21 @@ headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
 #' @return Schema file for given cop_year and tool type
 #'
 pick_schema <- function(cop_year, tool) {
-
+  
   # Collect parameters
   tool <- tool %missing% NULL
   cop_year <- cop_year %missing% NULL
-
+  
   tool_provided <- !is.null(tool)
   cop_year_provided <- !is.null(cop_year)
-
+  
   if (!tool_provided | !cop_year_provided) {
     interactive_print("Attempted to deduce schema.")
   }
-
+  
   cop_year %<>% check_cop_year()
   invisible(utils::capture.output(tool %<>% check_tool(tool = ., cop_year = cop_year)))
-
+  
   if (tool == "OPU Data Pack") {
     if (cop_year == 2021) {
       schema <- datapackr::cop21OPU_data_pack_schema
@@ -193,7 +193,7 @@ pick_schema <- function(cop_year, tool) {
       stop("Data Pack schema not available for the COP year provided.")
     }
   }
-
+  
   schema
 }
 
@@ -207,25 +207,25 @@ pick_schema <- function(cop_year, tool) {
 #' @return Template filepath for given cop_year and tool.
 #'
 pick_template_path <- function(cop_year, tool) {
-
+  
   cop_year <- cop_year %missing% NULL
   tool <- tool %missing% NULL
-
+  
   params <- check_params(cop_year = cop_year,
                          tool = tool)
-
+  
   for (p in names(params)) {
     assign(p, purrr::pluck(params, p))
   }
-
+  
   template_filename <- NULL
-
+  
   if (tool == "OPU Data Pack") {
     if (cop_year == 2021) {
       template_filename <- "COP21_OPU_Data_Pack_Template.xlsx"
     }
   }
-
+  
   if (tool == "Data Pack") {
     if (cop_year == 2021) {
       template_filename <- "COP21_Data_Pack_Template.xlsx"
@@ -233,21 +233,21 @@ pick_template_path <- function(cop_year, tool) {
       template_filename <- "COP22_Data_Pack_Template.xlsx"
     }
   }
-
+  
   if (is.null(template_filename)) {
     stop("Could not find any template for the provided paramaters")
   }
-
+  
   template_path <- system.file("extdata",
                                template_filename,
                                package = "datapackr",
                                mustWork = TRUE)
-
+  
   template_path <- handshakeFile(path = template_path,
                                  tool = tool)
-
+  
   template_path
-
+  
 }
 
 
@@ -284,6 +284,11 @@ pick_template_path <- function(cop_year, tool) {
 #' \code{mer_results}, \code{subnat_targets}, \code{subnat_results}, or
 #' \code{impatt}. If not specified, then all data streams
 #' are returned.
+#' @param include_mil Logical. If \code{TRUE}, will also include _Military nodes
+#' related to \code{country_uids}. Default is \code{TRUE}.
+#' @param include_DREAMS If \code{TRUE} will also include DREAMS organisation units.
+#' @param additional_fields Character string of any fields to return from DATIM
+#' API other than those returned by default.
 #' @param schema Which datapackr schema to use in guiding this function. If left
 #' \code{NULL} will select the default based on \code{cop_year} and \code{tool}.
 #' @param wb Openxlsx workbook object.
@@ -332,6 +337,9 @@ datapackr_params <- function(model_data,
                              d2_session,
                              d,
                              datastreams,
+                             include_mil,
+                             include_DREAMS,
+                             additional_fields,
                              schema,
                              wb,
                              PSNUs,
@@ -348,7 +356,7 @@ datapackr_params <- function(model_data,
                              include_no_prio,
                              remove_empty_columns,
                              ...) {
-
+  
   # This function should return something
   #Return its own argument names
   #rlang::fn_fmls_names(fn = datapackr_params)

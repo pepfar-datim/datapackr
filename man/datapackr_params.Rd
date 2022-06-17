@@ -21,6 +21,9 @@ datapackr_params(
   d2_session,
   d,
   datastreams,
+  include_mil,
+  include_DREAMS,
+  additional_fields,
   schema,
   wb,
   PSNUs,
@@ -84,6 +87,14 @@ processes to output_folder.}
 \code{mer_results}, \code{subnat_targets}, \code{subnat_results}, or
 \code{impatt}. If not specified, then all data streams
 are returned.}
+
+\item{include_mil}{Logical. If \code{TRUE}, will also include _Military nodes
+related to \code{country_uids}. Default is \code{TRUE}.}
+
+\item{include_DREAMS}{If \code{TRUE} will also include DREAMS organisation units.}
+
+\item{additional_fields}{Character string of any fields to return from DATIM
+API other than those returned by default.}
 
 \item{schema}{Which datapackr schema to use in guiding this function. If left
 \code{NULL} will select the default based on \code{cop_year} and \code{tool}.}
