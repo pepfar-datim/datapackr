@@ -494,7 +494,7 @@ checkNonNumeric <- function(d, sheet, quiet = TRUE) {
   }
 
   # Get data
-  data <- unPackDataPackSheet(d,
+  data <- unPackDataPackSheet(d = d,
                               sheet = sheet,
                               clean_orgs = TRUE,
                               clean_disaggs = TRUE,
@@ -1136,29 +1136,29 @@ checkSheetData <- function(d,
 
   for (sheet in sheets) {
     # Col Structure ----
-    d <- checkColumnStructure(d, sheet)
+    d <- checkColumnStructure(d, sheet, quiet)
 
     # Duplicate Rows ----
-    d <- checkDupeRows(d, sheet)
+    d <- checkDupeRows(d, sheet, quiet)
 
     # Non-numeric Values ----
-    d <- checkNonNumeric(d, sheet)
+    d <- checkNonNumeric(d, sheet, quiet)
 
     # Metadata ----
-    #d <- checkMissingMetadata(d, sheet)
+    #d <- checkMissingMetadata(d, sheet, quiet)
     # TODO: Remove this function. Covered by checkFormulas and checkDisaggs
 
     # Negative values ----
-    d <- checkNegativeValues(d, sheet)
+    d <- checkNegativeValues(d, sheet, quiet)
 
     # Decimal values ----
-    d <- checkDecimalValues(d, sheet)
+    d <- checkDecimalValues(d, sheet, quiet)
 
     # Check invalid org units ----
-    d <- checkInvalidOrgUnits(d, sheet)
+    d <- checkInvalidOrgUnits(d, sheet, quiet)
 
     # Check for invalid prioritizations ----
-    d <- checkInvalidPrioritizations(d, sheet)
+    d <- checkInvalidPrioritizations(d, sheet, quiet)
 
     # TEST AGYW Tab for missing DSNUs ####
     # if (sheet == "AGYW") {
@@ -1213,10 +1213,10 @@ checkSheetData <- function(d,
     # }
 
     # Formulas ----
-    d <- checkFormulas(d, sheet)
+    d <- checkFormulas(d, sheet, quiet)
 
     # TEST for defunct disaggs ####
-    d <- checkDisaggs(d, sheet)
+    d <- checkDisaggs(d, sheet, quiet)
 
   }
 
