@@ -50,16 +50,6 @@ unPackDataPack <- function(d,
   # Unpack the Targets ####
   d <- unPackSheets(d)
 
-  # Separate Data Sets ####
-  interactive_print("Separating datasets...")
-  datasets <- separateDataSets(data = d$data$targets,
-                               cop_year = d$info$cop_year,
-                               tool = d$info$tool)
-
-  d$data$MER <- datasets$MER
-  d$data$SUBNAT_IMPATT <- datasets$SUBNAT_IMPATT
-  d$data <- within(d$data, rm("targets"))
-
   # Unpack the SNU x IM sheet ####
   interactive_print("Unpacking the PSNUxIM tab...")
   d <- unPackSNUxIM(d)

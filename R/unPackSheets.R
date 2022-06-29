@@ -6,11 +6,13 @@
 #' and extracts data, then compiles into single flat dataframe.
 #'
 #' @inheritParams datapackr_params
-#'
+#' @param check_sheets Logical. Should sheet data be validated?
 #'
 #' @return d
 #'
-unPackSheets <- function(d, sheets = NULL) {
+unPackSheets <- function(d,
+                         sheets = NULL,
+                         check_sheets = TRUE) {
 
   interactive_print("Unpacking sheets...")
 
@@ -43,16 +45,23 @@ unPackSheets <- function(d, sheets = NULL) {
              "\n"))
   }
 
-  # Implementing this here instead of in unPackDataPack or unPackTool because
-  # while you may want to checkSheetData without running unPackSheets, you should
-  # should never unPackSheets without running checkSheetData
-  d <- checkSheetData(d, sheets = sheets)
+  if (check_sheets) {
+    d <- checkSheetData(d, sheets = sheets)
+  }
 
   # Unpack Sheet Data ----
-
-  d$data$targets <-
+  targets <-
     purrr::map_dfr(sheets, function(x)
       unPackDataPackSheet(d, sheet = x))
 
-  d
+  # Separate Sheet Data ----
+  interactive_print("Separating datasets...")
+  datasets <- separateDataSets(data = targets,
+                               cop_year = d$info$cop_year,
+                               tool = d$info$tool)
+
+  d$data$MER <- datasets$MER
+  d$data$SUBNAT_IMPATT <- datasets$SUBNAT_IMPATT
+
+  return(d)
 }

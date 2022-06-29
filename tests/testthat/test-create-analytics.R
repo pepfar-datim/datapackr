@@ -13,17 +13,8 @@ with_mock_api({
         load_sheets = TRUE,
         d2_session = training)
 
-    d <- d %>%
-      unPackSheets(.)
-
-    datasets <- separateDataSets(data = d$data$targets,
-                                 cop_year = d$info$cop_year,
-                                 tool = d$info$tool)
-    d$data$MER <- datasets$MER
-    d$data$SUBNAT_IMPATT <- datasets$SUBNAT_IMPATT
-    d$data <- within(d$data, rm("targets"))
-
     d %<>%
+      unPackSheets(., check_sheets = FALSE) %>%
       unPackSNUxIM(.) %>%
       packForDATIM(., type = "Undistributed MER") %>%
       packForDATIM(., type = "SUBNAT_IMPATT") %>%

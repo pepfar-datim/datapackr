@@ -3,22 +3,32 @@ context("can-unpack-COP21-datapack")
 d_data_targets_names <- c("PSNU", "psnuid", "sheet_name", "indicator_code", "Age", "Sex", "KeyPop", "value")
 d_data_tests_types <- c("tbl_df", "tbl", "data.frame")
 
-with_mock_api({
-  test_that("Can unpack all data pack sheets", {
-    d <- datapackr::createKeychainInfo(
-      submission_path = test_sheet("COP21_DP_random_no_psnuxim.xlsx"),
-      tool = "Data Pack",
-      country_uids = NULL,
-      cop_year = NULL,
-      d2_session = NULL
-    )
+d <-
+  datapackr::loadDataPack(
+    submission_path = test_sheet("COP21_DP_random_no_psnuxim.xlsx"),
+    tool = "Data Pack",
+    country_uids = NULL,
+    cop_year = NULL,
+    load_sheets = TRUE,
+    d2_session = training)
 
-    d <- unPackSheets(d)
-    expect_true(!is.null(d$data$targets))
-    expect_setequal(names(d$data$targets), d_data_targets_names)
-    expect_true((NROW(d$data$targets) > 0))
-    expect_setequal(class(d$data$targets), c("tbl_df", "tbl", "data.frame"))
-    expect_identical(unname(sapply(d$data$targets, typeof)), c(rep("character", 7), "double"))
+d <- unPackSheets(d, check_sheets = TRUE)
+
+with_mock_api({
+  test_that("Can unpack all Data Pack sheets", {
+
+    expect_true(!is.null(d$data$MER))
+    expect_setequal(class(d$data$MER), c("tbl_df", "tbl", "data.frame"))
+    expect_identical(unname(sapply(d$data$MER, typeof)), c(rep("character", 7), "double"))
+    expect_setequal(names(d$data$MER), d_data_targets_names)
+    expect_true((NROW(d$data$MER) > 0))
+
+    expect_true(!is.null(d$data$SUBNAT_IMPATT))
+    expect_setequal(class(d$data$SUBNAT_IMPATT), c("tbl_df", "tbl", "data.frame"))
+    expect_identical(unname(sapply(d$data$SUBNAT_IMPATT, typeof)), c(rep("character", 7), "double"))
+    expect_setequal(names(d$data$SUBNAT_IMPATT), d_data_targets_names)
+    expect_true((NROW(d$data$SUBNAT_IMPATT) > 0))
+
     # Expect there to be test information
     # The test_name attribute should not be null
     expect_true(!is.null(d$tests))
@@ -28,47 +38,14 @@ with_mock_api({
     expect_named(validation_summary, c("test_name", "validation_issue_category", "count",
      "ou", "ou_id", "country_name", "country_uid"), ignore.order = TRUE)
 
-
-
     # Should throw an error if the tool is an unknown type
     d$info$tool <- "FooPack"
-    expect_error(d <- unPackSheets(d))
+    expect_error(d <- unPackSheets(d, check_sheets = FALSE))
   })
 })
 
 with_mock_api({
-  test_that("Can unpack and separate data sets", {
-    d <-
-      datapackr::loadDataPack(
-        submission_path = test_sheet("COP21_DP_random_no_psnuxim.xlsx"),
-        tool = "Data Pack",
-        country_uids = NULL,
-        cop_year = NULL,
-        load_sheets = TRUE,
-        d2_session = training)
-
-    d <- unPackSheets(d)
-    expect_true(!is.null(d$data$targets))
-    expect_setequal(names(d$data$targets), d_data_targets_names)
-    expect_true((NROW(d$data$targets) > 0))
-    expect_setequal(class(d$data$targets), c("tbl_df", "tbl", "data.frame"))
-    expect_identical(unname(sapply(d$data$targets, typeof)), c(rep("character", 7), "double"))
-
-    datasets <- separateDataSets(data = d$data$targets,
-                                 cop_year = d$info$cop_year,
-                                 tool = d$info$tool)
-    d$data$MER <- datasets$MER
-    d$data$SUBNAT_IMPATT <- datasets$SUBNAT_IMPATT
-    d$data <- within(d$data, rm("targets"))
-    expect_null(d$data$targets)
-    expect_null(d$data$extract)
-    expect_true(!is.null(d$data$MER))
-    expect_setequal(class(d$data$MER), c("tbl_df", "tbl", "data.frame"))
-    expect_identical(unname(sapply(d$data$MER, typeof)), c(rep("character", 7), "double"))
-    expect_true(!is.null(d$data$SUBNAT_IMPATT))
-    expect_setequal(class(d$data$SUBNAT_IMPATT), c("tbl_df", "tbl", "data.frame"))
-    expect_identical(unname(sapply(d$data$SUBNAT_IMPATT, typeof)), c(rep("character", 7), "double"))
-
+  test_that("Can pack Undistributed data for DATIM.", {
 
     # Package the undistributed data for DATIM
     d <- packForDATIM(d, type = "Undistributed MER")
