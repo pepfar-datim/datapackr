@@ -45,11 +45,6 @@ unPackDataPackSheet <- function(d,
       & indicator_code %in% colnames(data)) %>%
     dplyr::pull(indicator_code)
 
-  # TODO: Is this the best test for whether a sheet is empty??
-  if (NROW(data) == 0 | all(is.na(data$PSNU)) | NROW(target_cols) == 0) {
-    return(d)
-  }
-
   data %<>%
     # Add cols to allow compiling with other sheets ----
     addcols(c("KeyPop", "Age", "Sex")) %>%
