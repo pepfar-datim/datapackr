@@ -753,7 +753,11 @@ checkInvalidOrgUnits <- function(d, sheet, quiet = TRUE) {
 
     data <- d$sheets[["PSNUxIM"]]
   } else {
-    data <- d$sheets[[as.character(sheet)]]
+    data <- unPackDataPackSheet(d = d,
+                                sheet = sheet,
+                                clean_orgs = FALSE,
+                                clean_disaggs = FALSE,
+                                clean_values = TRUE)
   }
 
   # TEST
@@ -775,7 +779,7 @@ checkInvalidOrgUnits <- function(d, sheet, quiet = TRUE) {
     dplyr::select(PSNU) %>%
     dplyr::filter(is.na(PSNU))
 
-  if (NROW(invalid_orgunits) > 0 | NROW(na_orgunits) > 0) {
+  if (NROW(invalid_orgunits) > 0 | (NROW(na_orgunits) > 0 & NROW(data) > 0)) {
 
     lvl <- "ERROR"
 

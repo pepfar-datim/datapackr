@@ -36,7 +36,7 @@ unPackDataPackSheet <- function(d,
   data %<>%
     tibble::as_tibble(.name_repair = "unique")
 
-  # If tab empty or without targets, send d back ----
+  # Focus on target_cols ----
   target_cols <- d$info$schema %>%
     dplyr::filter(
       sheet_name == sheet
