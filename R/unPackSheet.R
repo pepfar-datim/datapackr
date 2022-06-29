@@ -113,8 +113,7 @@ unPackDataPackSheet <- function(d,
       data %<>%
         dplyr::filter(
           !stringr::str_detect(PSNU, "^_Military"),
-          value != "NA",
-          !value %in% prioritization_dict()$value)
+          value %in% prioritization_dict()$value)
     } else {
       data %<>%
         dplyr::filter(value > 0)# Filter out zeros & negatives ----
