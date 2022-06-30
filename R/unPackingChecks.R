@@ -56,6 +56,160 @@ NULL
 #' @export
 #' @rdname unPackDataChecks
 #'
+checkToolStructure <- function(d, quiet = TRUE) {
+
+  interactive_print("Checking structure...")
+
+  if (!quiet) {
+    messages <- MessageQueue()
+  }
+
+  interactive_print("Checking for any missing tabs...")
+
+  submission_sheets <- readxl::excel_sheets(d$keychain$submission_path)
+  schema_sheets <- unique(d$info$schema$sheet_name)
+  missing_sheets <- schema_sheets[!schema_sheets %in% submission_sheets]
+
+  if (length(missing_sheets) > 0) {
+
+    lvl <- "WARNING"
+
+    msg <-
+      paste0(
+        lvl, "! MISSING SHEETS: Please ensure no original sheets have",
+        " been deleted or renamed in your Data Pack. -> \n  * ",
+        paste0(missing_sheets, collapse = "\n  * "),
+        "\n")
+
+    d$tests$missing_sheets <- data.frame(sheet_name = missing_sheets)
+    attr(d$tests$missing_sheets, "test_name") <- "Missing sheets"
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
+
+    if (!quiet) {
+      messages <- appendMessage(messages, msg, lvl)
+    }
+  }
+
+  if (!quiet) {
+    printMessages(messages)
+  }
+
+  return(d)
+
+}
+
+
+
+#' @export
+#' @rdname unPackDataChecks
+#'
+checkToolComments <- function(d, quiet = TRUE) {
+
+  interactive_print("Checking comments...")
+
+  if (!quiet) {
+    messages <- MessageQueue()
+  }
+
+  # if (is.null(d$tool$wb)) {
+  #   wb <- openxlsx::loadWorkbook(file = d$keychain$submission_path)
+  # } else {
+  #   wb <- d$tool$wb
+  # }
+
+  if (is.null(d$info$workbook_contents)) {
+    d <- listWorkbookContents(d)
+  }
+
+  d$info$has_comments_issue <- any(grepl("xl/threadedComments/", d$info$workbook_contents))
+
+  # d$info$has_comments_issue <- any(sapply(wb$threadComments, length) != 0)
+
+  if (d$info$has_comments_issue) {
+
+    lvl <- "ERROR"
+
+    msg <-
+      paste0(
+        lvl, "! Your workbook contains at least one case of a new type of comment
+        introduced in Office 365 called a 'Threaded Comment'. This type of comment,
+        as opposed to the previous type of Notes used in Microsoft Excel, causes
+        corruption issues when this app attempts to update your PSNUxIM tab.
+        Prior to submitting for an updated PSNUxIM tab, you MUST remove all
+        threaded comments. For more information about the differences between
+        threaded comments and notes,",
+        "see: https://support.office.com/en-us/article/the-difference-between-threaded-comments-and-notes-75a51eec-4092-42ab-abf8-7669077b7be3", # nolint
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
+    d$info$has_error <- TRUE
+
+    if (!quiet) {
+      messages <- appendMessage(messages, msg, lvl)
+    }
+
+  }
+
+  if (!quiet) {
+    printMessages(messages)
+  }
+
+  return(d)
+
+}
+
+
+#' @export
+#' @rdname unPackDataChecks
+#'
+checkToolConnections <- function(d, quiet = TRUE) {
+
+  interactive_print("Checking external links...")
+
+  if (!quiet) {
+    messages <- MessageQueue()
+  }
+
+  if (is.null(d$info$workbook_contents)) {
+    d <- listWorkbookContents(d)
+  }
+
+  d$info$has_external_links <-
+    any(grepl("xl/externalLinks/externalLink\\d+\\.xml", d$info$workbook_contents))
+
+  if (d$info$has_external_links) {
+
+    lvl <- "WARNING"
+
+    msg <-
+      paste0(
+        lvl, "! Your workbook contains at least one external link. ",
+        "This usually results from copying and pasting from another workbook. ",
+        "Please find and remove the external links in your DataPack. ",
+        "This error may result in other validation checks failing to run properly ",
+        "and should be fixed immediately.",
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
+
+    if (!quiet) {
+      messages <- appendMessage(messages, msg, lvl)
+    }
+
+  }
+
+  if (!quiet) {
+    printMessages(messages)
+  }
+
+  d
+
+}
+
+
+#' @export
+#' @rdname unPackDataChecks
+#'
 checkDupeRows <- function(d,
                           sheet,
                           quiet = TRUE) {
@@ -325,161 +479,6 @@ checkColumnStructure <- function(d,
   }
 
   return(d)
-
-}
-
-
-
-#' @export
-#' @rdname unPackDataChecks
-#'
-checkToolStructure <- function(d, quiet = TRUE) {
-
-  interactive_print("Checking structure...")
-
-  if (!quiet) {
-    messages <- MessageQueue()
-  }
-
-  interactive_print("Checking for any missing tabs...")
-
-  submission_sheets <- readxl::excel_sheets(d$keychain$submission_path)
-  schema_sheets <- unique(d$info$schema$sheet_name)
-  missing_sheets <- schema_sheets[!schema_sheets %in% submission_sheets]
-
-  if (length(missing_sheets) > 0) {
-
-    lvl <- "WARNING"
-
-    msg <-
-      paste0(
-        lvl, "! MISSING SHEETS: Please ensure no original sheets have",
-        " been deleted or renamed in your Data Pack. -> \n  * ",
-        paste0(missing_sheets, collapse = "\n  * "),
-        "\n")
-
-    d$tests$missing_sheets <- data.frame(sheet_name = missing_sheets)
-    attr(d$tests$missing_sheets, "test_name") <- "Missing sheets"
-    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
-
-    if (!quiet) {
-      messages <- appendMessage(messages, msg, lvl)
-    }
-  }
-
-  if (!quiet) {
-    printMessages(messages)
-  }
-
-  return(d)
-
-}
-
-
-
-#' @export
-#' @rdname unPackDataChecks
-#'
-checkToolComments <- function(d, quiet = TRUE) {
-
-  interactive_print("Checking comments...")
-
-  if (!quiet) {
-    messages <- MessageQueue()
-  }
-
-  # if (is.null(d$tool$wb)) {
-  #   wb <- openxlsx::loadWorkbook(file = d$keychain$submission_path)
-  # } else {
-  #   wb <- d$tool$wb
-  # }
-
-  if (is.null(d$info$workbook_contents)) {
-    d <- listWorkbookContents(d)
-  }
-
-  d$info$has_comments_issue <- any(grepl("xl/threadedComments/", d$info$workbook_contents))
-
-  # d$info$has_comments_issue <- any(sapply(wb$threadComments, length) != 0)
-
-  if (d$info$has_comments_issue) {
-
-    lvl <- "ERROR"
-
-    msg <-
-      paste0(
-        lvl, "! Your workbook contains at least one case of a new type of comment
-        introduced in Office 365 called a 'Threaded Comment'. This type of comment,
-        as opposed to the previous type of Notes used in Microsoft Excel, causes
-        corruption issues when this app attempts to update your PSNUxIM tab.
-        Prior to submitting for an updated PSNUxIM tab, you MUST remove all
-        threaded comments. For more information about the differences between
-        threaded comments and notes,",
-        "see: https://support.office.com/en-us/article/the-difference-between-threaded-comments-and-notes-75a51eec-4092-42ab-abf8-7669077b7be3", # nolint
-        "\n")
-
-    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
-    d$info$has_error <- TRUE
-
-    if (!quiet) {
-      messages <- appendMessage(messages, msg, lvl)
-    }
-
-  }
-
-  if (!quiet) {
-    printMessages(messages)
-  }
-
-  return(d)
-
-}
-
-
-#' @export
-#' @rdname unPackDataChecks
-#'
-checkToolConnections <- function(d, quiet = TRUE) {
-
-  interactive_print("Checking external links...")
-
-  if (!quiet) {
-    messages <- MessageQueue()
-  }
-
-  if (is.null(d$info$workbook_contents)) {
-    d <- listWorkbookContents(d)
-  }
-
-  d$info$has_external_links <-
-    any(grepl("xl/externalLinks/externalLink\\d+\\.xml", d$info$workbook_contents))
-
-  if (d$info$has_external_links) {
-
-    lvl <- "WARNING"
-
-    msg <-
-      paste0(
-        lvl, "! Your workbook contains at least one external link. ",
-        "This usually results from copying and pasting from another workbook. ",
-        "Please find and remove the external links in your DataPack. ",
-        "This error may result in other validation checks failing to run properly ",
-        "and should be fixed immediately.",
-        "\n")
-
-    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
-
-    if (!quiet) {
-      messages <- appendMessage(messages, msg, lvl)
-    }
-
-  }
-
-  if (!quiet) {
-    printMessages(messages)
-  }
-
-  d
 
 }
 
