@@ -100,7 +100,7 @@ processes to output_folder.}
 \item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
 
 \item{snuxim_model_data}{Export from DATIM needed to allocate data across
-mechanisms in the PSNUxIM tab}
+mechanisms in the PSNUxIM tab.}
 
 \item{...}{Additional arguments to pass.}
 }

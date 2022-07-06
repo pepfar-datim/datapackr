@@ -19,6 +19,10 @@ packTool(
 )
 }
 \arguments{
+\item{model_data_path}{Local filepath to a Data Pack model data file.}
+
+\item{snuxim_model_data_path}{Local filepath to an SNUxIM Model Data file.}
+
 \item{undistributed_mer_data}{Data from the \code{d$data$UndistributedMER}
 dataset that can be provided while generating an OPU tool such that the
 targets to be distributed will be sourced from this file.}
