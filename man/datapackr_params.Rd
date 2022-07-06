@@ -7,6 +7,7 @@
 datapackr_params(
   model_data,
   snuxim_model_data,
+  undistributed_mer_data,
   SNUxIM,
   MER,
   PSNUxIM_combos,
@@ -44,6 +45,10 @@ datapackr_params(
 
 \item{snuxim_model_data}{Export from DATIM needed to allocate data across
 mechanisms in the PSNUxIM tab}
+
+\item{undistributed_mer_data}{Data from the \code{d$data$UndistributedMER}
+dataset that can be provided while generating an OPU tool such that the
+targets to be distributed will be sourced from this file.}
 
 \item{SNUxIM}{SNUxIM dataset extract from unPackSNUxIM}
 

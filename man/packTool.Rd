@@ -7,6 +7,7 @@
 packTool(
   model_data_path = NULL,
   snuxim_model_data_path = NULL,
+  undistributed_mer_data = NULL,
   tool,
   datapack_name,
   country_uids,
@@ -18,6 +19,10 @@ packTool(
 )
 }
 \arguments{
+\item{undistributed_mer_data}{Data from the \code{d$data$UndistributedMER}
+dataset that can be provided while generating an OPU tool such that the
+targets to be distributed will be sourced from this file.}
+
 \item{tool}{Type of tool this function will create or interact with. Either
 \code{OPU Data Pack} or \code{Data Pack}}
 

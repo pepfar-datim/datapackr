@@ -5,7 +5,6 @@
 #' Pulls all code lists for MER, SUBNAT, and IMPATT for a specified FY and
 #' combines these into a unique list.
 #'
-#' @param FY Reporting FY for which to filter active code lists.
 #' @param datasets Character vector of dataSet IDs to pull code lists for.
 #' @param expanded If TRUE, will add dataset, period, period_dataset, and
 #' targets_results, related categoryOption metadata,  as additional columns

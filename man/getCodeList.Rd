@@ -28,8 +28,6 @@ are returned.}
 targets_results, related categoryOption metadata,  as additional columns}
 
 \item{d2_session}{DHIS2 Session id}
-
-\item{FY}{Reporting FY for which to filter active code lists.}
 }
 \value{
 Combined code list as dataframe.
