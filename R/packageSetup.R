@@ -322,7 +322,9 @@ pick_template_path <- function(cop_year, tool) {
 #'
 #' @return list of all paramaters of this constructor function
 datapackr_params <- function(model_data,
+                             model_data_path,
                              snuxim_model_data,
+                             snuxim_model_data_path,
                              undistributed_mer_data,
                              SNUxIM,
                              MER,
