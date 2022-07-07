@@ -12,8 +12,7 @@ create_play_spectrum_output(
 )
 }
 \arguments{
-\item{country_uids}{Unique IDs for countries to include in the Data Pack.
-For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.}
 
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}

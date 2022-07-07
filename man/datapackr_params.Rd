@@ -15,6 +15,7 @@ datapackr_params(
   template_path,
   submission_path,
   cached_mechs_path,
+  cached_psnus_path,
   cop_year,
   output_folder,
   results_archive,
@@ -30,6 +31,7 @@ datapackr_params(
   psnus,
   tool,
   season,
+  sheet,
   draft_memo,
   memo_type,
   memo_doc,
@@ -58,8 +60,7 @@ missing from the PSNUxIM tab.}
 \item{datapack_name}{Name you would like associated with this Data Pack.
 (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
 
-\item{country_uids}{Unique IDs for countries to include in the Data Pack.
-For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.}
 
 \item{template_path}{Local filepath to Data Pack template Excel (XLSX) file.
 This file MUST NOT have any data validation formats present. If left
@@ -69,6 +70,9 @@ This file MUST NOT have any data validation formats present. If left
 
 \item{cached_mechs_path}{Local file path to an RDS file containing
 a cached copy of the mechanisms SQL view.}
+
+\item{cached_psnus_path}{Local file path to an RDS file containing
+a cached copy of PSNUs from DATIM.}
 
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}
@@ -111,6 +115,8 @@ API other than those returned by default.}
 \code{OPU Data Pack} or \code{Data Pack}}
 
 \item{season}{Either \code{COP} or \code{OPU}.}
+
+\item{sheet}{Data Pack sheet.}
 
 \item{draft_memo}{Boolean indicating whether the memo being written is a
 draft or final memo.}

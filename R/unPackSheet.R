@@ -5,12 +5,10 @@
 #'    \code{d$keychain$submission_path}), extract data from a single sheet specified
 #'    in \code{d$data$sheet}.
 #'
-#' @param d Datapackr object.
-#' @param sheet Sheet to unpack.
-#'
+#' @inheritParams datapackr_params
 #' @return d
 #'
-unPackDataPackSheet <- function(d, sheet) {
+unPackDataPackSheet <- function(d, sheet, d2_session = dynGet("d2_default_session", inherits = TRUE)) {
   header_row <- headerRow(tool = "Data Pack", cop_year = d$info$cop_year)
 
   d$data$extract <-
@@ -122,8 +120,7 @@ unPackDataPackSheet <- function(d, sheet) {
       dplyr::distinct() %>%
       dplyr::mutate(DataPack = 1)
 
-    DATIM_DSNUs <- datapackr::valid_PSNUs %>%
-      dplyr::filter(country_uid %in% d$info$country_uids) %>%
+    DATIM_DSNUs <- datapackr::getPSNUs(country_uids = d$info$country_uids, d2_session = d2_session) %>%
       add_dp_psnu(.) %>%
       dplyr::arrange(dp_psnu) %>%
       dplyr::filter(!is.na(DREAMS)) %>%
@@ -293,7 +290,7 @@ unPackDataPackSheet <- function(d, sheet) {
     dplyr::filter(value != 0)
 
   # TEST: No invalid org units ####
-  d <- checkInvalidOrgUnits(d, sheet)
+  d <- checkInvalidOrgUnits(d, sheet, d2_session = d2_session)
 
   # TEST for Negative values ####
   negative_values <- d$data$extract %>%

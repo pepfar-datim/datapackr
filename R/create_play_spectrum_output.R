@@ -22,9 +22,9 @@ create_play_spectrum_output <- function(country_uids,
   map_des_cocs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
 
   # Get PSNU list ####
-  PSNUs <- datapackr::valid_PSNUs %>%
-    dplyr::filter(country_uid %in% country_uids,
-                  psnu_type != "Military") %>%
+  PSNUs <- datapackr::getPSNUs(country_uids = country_uids,
+                               include_mil = FALSE, include_DREAMS = TRUE,
+                               d2_session = d2_session) %>%
     datapackr::add_dp_psnu(.) %>%
     dplyr::arrange(dp_psnu) %>%
     dplyr::select(PSNU = dp_psnu, psnu_uid)

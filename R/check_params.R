@@ -124,9 +124,10 @@ NULL
 #' @export
 #' @param force logical. Should country_uids be required?
 #' @rdname parameter-checks
-check_country_uids <- function(country_uids, force = TRUE) {
+check_country_uids <- function(country_uids, force = TRUE, d2_session = dynGet("d2_default_session", inherits = TRUE)) {
 
   country_uids <- country_uids %missing% NULL
+  valid_PSNUs <- datapackr::getPSNUs(country_uids = country_uids, d2_session = d2_session)
 
   # If any country_uids are invalid, warn but remove and still move on.
   if (any(!country_uids %in% valid_PSNUs$country_uid)) {
@@ -170,24 +171,24 @@ check_country_uids <- function(country_uids, force = TRUE) {
 
 #' @export
 #' @rdname parameter-checks
-check_PSNUs <- function(PSNUs = NULL, country_uids = NULL) {
+check_PSNUs <- function(PSNUs = NULL, country_uids = NULL, d2_session = dynGet("d2_default_session", inherits = TRUE)) {
   # TODO: Update how we use PSNUs everywhere to use a character vector of uids
   #   instead of dataframe of all metadata
 
   # If no country_uids provided, return PSNUs across all country_uids.
   country_uids <- country_uids %missing% NULL
-  country_uids %<>% check_country_uids(force = FALSE)
+  country_uids %<>% check_country_uids(force = FALSE, d2_session = d2_session)
 
   # If PSNUs not provided, fill with all PSNUs
   if (is.null(PSNUs)) {
-    PSNUs <- datapackr::valid_PSNUs %>% #found in data/
-      dplyr::filter(., country_uid %in% country_uids) %>%
+    PSNUs <- datapackr::getPSNUs(country_uids = country_uids, d2_session = d2_session) %>%
       add_dp_psnu(.) %>%
       dplyr::arrange(dp_psnu) %>%
       dplyr::select(PSNU = dp_psnu, psnu_uid)
   } else {
     # If PSNUs is provided, check to make sure these are all valid.
     # Warn and remove invalid PSNu's as needed.
+    valid_PSNUs <- datapackr::getPSNUs(country_uids = country_uids, d2_session = d2_session)
     if (any(!PSNUs$psnu_uid %in% valid_PSNUs$psnu_uid)) {
       invalid_PSNUs <- PSNUs %>%
         dplyr::filter(!psnu_uid %in% valid_PSNUs$psnu_uid) %>%
@@ -405,10 +406,13 @@ check_schema <- function(schema, cop_year, tool, season) {
 
 #' @export
 #' @rdname parameter-checks
-checkDataPackName <- function(datapack_name, country_uids) {
-
-  valid_dp_names <- c(unique(valid_PSNUs$country_name), "Caribbean Region", "Central America and Brazil")
-
+checkDataPackName <- function(datapack_name, country_uids,
+                              d2_session = dynGet("d2_default_session",
+                                                  inherits = TRUE)) {
+  
+  dps <- datimutils::getOrgUnitGroups("NUPoPEBGCq9", fields = "organisationUnits[id,name]", d2_session = d2_session)
+  valid_dp_names <- c(dps[["name"]], "Central America and Brazil")
+  
   # Collect parameters
   datapack_name <- datapack_name %missing% NULL
   datapack_name_provided <- !is.null(datapack_name)
@@ -417,7 +421,7 @@ checkDataPackName <- function(datapack_name, country_uids) {
   country_uids_provided <- !is.null(country_uids)
 
   if (country_uids_provided) {
-    country_uids %<>% check_country_uids()
+    country_uids %<>% check_country_uids(d2_session = d2_session)
 
     caribbean <- c("RKoVudgb05Y", "PeOHqAwdtez", "WuxG6jzaypt",
                    "zhJINyURZ5Y", "WSl5y9jxCpC")
@@ -430,12 +434,7 @@ checkDataPackName <- function(datapack_name, country_uids) {
     } else if (all(country_uids %in% central_america)) {
       expected_dpname <- "Central America and Brazil"
     } else {
-      expected_dpname <- valid_PSNUs %>%
-        dplyr::filter(country_uid %in% country_uids) %>%
-        dplyr::pull(country_name) %>%
-        unique() %>%
-        sort() %>%
-        paste(collapse = ", ")
+      expected_dpname <- paste(sort(dps[dps$id %in% country_uids, ][["name"]]), collapse = ", ")
     }
   }
 
@@ -540,20 +539,23 @@ checkWB <- function(wb = NULL,
                     cop_year = NULL,
                     tool = NULL,
                     datapack_name = NULL,
-                    template_path = NULL) {
+                    template_path = NULL,
+                    d2_session = dynGet("d2_default_session",
+                                        inherits = TRUE)) {
 
   if (is.null(wb)) {
-    country_uids <- check_country_uids(country_uids)
+    country_uids <- check_country_uids(country_uids, d2_session = d2_session)
     cop_year <- check_cop_year(cop_year)
     tool <- check_tool(tool)
-    datapack_name <- checkDataPackName(datapack_name, country_uids)
+    datapack_name <- checkDataPackName(datapack_name, country_uids, d2_session = d2_session)
     template_path <- checkTemplatePath(template_path, cop_year, tool)
 
     d <- createDataPack(datapack_name = datapack_name,
                         country_uids = country_uids,
                         template_path = template_path,
                         cop_year = cop_year,
-                        tool = tool)
+                        tool = tool,
+                        d2_session = d2_session)
 
     wb <- d$tool$wb
   }
@@ -590,18 +592,20 @@ check_params <- function(country_uids,
                          snuxim_model_data,
                          output_folder,
                          results_archive,
-                         ...) {
+                         ...,
+                         d2_session = dynGet("d2_default_session",
+                                             inherits = TRUE)) {
 
   params <- list()
 
   # Check Country UIDs ####
   if (!missing(country_uids)) {
-    params$country_uids <- check_country_uids(country_uids, ...)
+    params$country_uids <- check_country_uids(country_uids, ..., d2_session = d2_session)
   }
 
   # Check PSNUs ####
   if (!missing(PSNUs)) {
-    params$PSNUs <- check_PSNUs(PSNUs, country_uids)
+    params$PSNUs <- check_PSNUs(PSNUs, country_uids, d2_session = d2_session)
   }
 
   # Check cop_year ####
@@ -629,7 +633,7 @@ check_params <- function(country_uids,
 
   # Check datapack_name ####
   if (!missing(datapack_name)) {
-    params$datapack_name <- checkDataPackName(datapack_name, country_uids)
+    params$datapack_name <- checkDataPackName(datapack_name, country_uids, d2_session = d2_session)
   }
 
   # Check template path ####
@@ -647,7 +651,8 @@ check_params <- function(country_uids,
                          cop_year = cop_year,
                          tool = tool,
                          datapack_name = datapack_name,
-                         template_path = template_path)
+                         template_path = template_path,
+                         d2_session = d2_session)
   }
 
   # Check model_data ####
@@ -660,7 +665,7 @@ check_params <- function(country_uids,
   #                                     d2_session) {
   #
   #   cop_year = check_cop_year(cop_year)
-  #   country_uids = check_country_uids(country_uids)
+  #   country_uids = check_country_uids(country_uids, d2_session = d2_session)
   #
   #   if (is.null(snuxim_model_data)) {
   #

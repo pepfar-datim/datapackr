@@ -42,7 +42,7 @@ checkHasPSNUxIM <- function(d) {
 }
 
 #' @export
-#' @title unPackSNUxIM(d)
+#' @title unPackSNUxIM
 #'
 #' @description Looks inside submitted Data Pack to extract SNU x IM data from
 #'     \code{SNU x IM} tab and restructure this to be ready for cross-
@@ -51,11 +51,10 @@ checkHasPSNUxIM <- function(d) {
 #'     structural or data anomalies and print any issues into running Warning
 #'     Message queue.
 #'
-#' @param d Datapackr object
-
+#' @inheritParams datapackr_params
 #' @return d
 #'
-unPackSNUxIM <- function(d) {
+unPackSNUxIM <- function(d, d2_session = dynGet("d2_default_session", inherits = TRUE)) {
 
   sheet <- "PSNUxIM"
 
@@ -665,8 +664,7 @@ unPackSNUxIM <- function(d) {
 
   #Test for invalid PSNUs
 
-  possible_psnus <- datapackr::valid_PSNUs %>%
-    dplyr::filter(country_uid %in% d$info$country_uids) %>%
+  possible_psnus <- datapackr::getPSNUs(country_uids = d$info$country_uids, d2_session = d2_session) %>%
     dplyr::pull(psnu_uid)
 
   d$tests$invalid_psnus <- d$data$SNUxIM %>%

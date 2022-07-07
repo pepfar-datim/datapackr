@@ -1,5 +1,10 @@
 # Validate model_data
 
+# Point to DATIM login secrets ####
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
+datimutils::loginToDATIM(secrets)
+d2_session <- d2_default_session$clone()
+
 model_data_path <- file.choose()
 
 model_data <- readRDS(model_data_path) %>%
@@ -32,7 +37,7 @@ invalid.cos <- model_data.cos %>%
 
 # Validate PSNUs
 invalid.PSNUs <- model_data %>%
-  dplyr::filter(!psnu_uid %in% datapackr::valid_PSNUs$psnu_uid) %>%
+  dplyr::filter(!psnu_uid %in% datapackr::getPSNUs(d2_session = d2_session)$psnu_uid) %>%
   dplyr::select(psnu_uid)
 
 # Validate Values

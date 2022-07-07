@@ -24,7 +24,8 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
                                  country_uids = country_uids,
                                  template_path = template_path,
                                  cop_year = cop_year,
-                                 tool = "OPU Data Pack")
+                                 tool = "OPU Data Pack",
+                                 d2_session = d2_session)
 
   # Adds output folder to d object ####
   d$keychain$output_folder <- output_folder
@@ -77,8 +78,7 @@ packOPUDataPack <- function(snuxim_model_data = NULL,
                           d2_session = d2_session)
 
   # Get PSNU List####
-  d$data$PSNUs <- datapackr::valid_PSNUs %>%
-    dplyr::filter(country_uid %in% d$info$country_uids) %>%
+  d$data$PSNUs <- datapackr::getPSNUs(country_uids = d$info$country_uids, d2_session = d2_session) %>%
     add_dp_psnu(.) %>%
     dplyr::arrange(dp_psnu) %>%
     dplyr::select(PSNU = dp_psnu, psnu_uid)

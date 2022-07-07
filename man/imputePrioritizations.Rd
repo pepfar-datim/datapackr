@@ -4,13 +4,19 @@
 \alias{imputePrioritizations}
 \title{imputePrioritizations}
 \usage{
-imputePrioritizations(prio, psnu_import_file)
+imputePrioritizations(
+  prio,
+  psnu_import_file,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
 \item{prio}{Data frame consisting of orgUnit (as a uid) and prioritization
 as a character.}
 
 \item{psnu_import_file}{DHIS2 import file to convert}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 prio

@@ -4,12 +4,18 @@
 \alias{unPackDataPackSheet}
 \title{Unpack a Data Pack sheet.}
 \usage{
-unPackDataPackSheet(d, sheet)
+unPackDataPackSheet(
+  d,
+  sheet,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
-\item{d}{Datapackr object.}
+\item{d}{Datapackr sidecar object}
 
-\item{sheet}{Sheet to unpack.}
+\item{sheet}{Data Pack sheet.}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 d

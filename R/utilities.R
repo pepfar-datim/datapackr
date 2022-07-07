@@ -147,15 +147,12 @@ getSaneName <- function(datapack_name) {
 #'
 #' @description Takes in a set of Country UIDs and returns an Operating Unit name.
 #'
-#' @param country_uids List of country UIDs from the \code{d$info$country_uids} object.
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'
-getOUFromCountryUIDs <- function(country_uids) {
-  ou <- datapackr::valid_PSNUs %>%
-    dplyr::select(ou, ou_id, country_name, country_uid) %>%
-    dplyr::distinct() %>%
-    dplyr::filter(country_uid %in% country_uids) %>%
+getOUFromCountryUIDs <- function(country_uids, d2_session = dynGet("d2_default_session", inherits = TRUE)) {
+  ou <- datapackr::getPSNUs(country_uids = country_uids, d2_session = d2_session) %>%
     dplyr::select(ou, ou_id) %>%
     dplyr::distinct()
 
@@ -361,7 +358,9 @@ createDataPack <- function(datapack_name = NULL,
                            country_uids,
                            template_path = NULL,
                            cop_year = NULL,
-                           tool = NULL) {
+                           tool = NULL,
+                           d2_session = dynGet("d2_default_session",
+                                               inherits = TRUE)) {
 
   # Check & assign params
   params <- check_params(
@@ -370,7 +369,8 @@ createDataPack <- function(datapack_name = NULL,
     tool = tool,
     template_path = template_path,
     schema = NULL,
-    datapack_name = datapack_name)
+    datapack_name = datapack_name,
+    d2_session = d2_session)
 
   for (p in names(params)) {
     assign(p, purrr::pluck(params, p))
@@ -385,7 +385,8 @@ createDataPack <- function(datapack_name = NULL,
                     datapack_name = datapack_name,
                     country_uids = country_uids,
                     cop_year = cop_year,
-                    tool = tool)
+                    tool = tool,
+                    d2_session = d2_session)
 
   # Create DP object
   d <- list(

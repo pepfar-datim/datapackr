@@ -5,11 +5,10 @@
 #' Loops through all critical sheets in a submitted Data Pack
 #' and extracts data, then compiles into single flat dataframe.
 #'
-#' @param d Datapackr object
-#'
+#' @inheritParams datapackr_params
 #' @return d
 #'
-unPackSheets <- function(d) {
+unPackSheets <- function(d, d2_session = dynGet("d2_default_session", inherits = TRUE)) {
 
   # Get sheets list
   sheets <- d$info$schema %>%
@@ -28,7 +27,7 @@ unPackSheets <- function(d) {
     interactive_print(sheet)
 
     if (d$info$tool == "Data Pack") {
-      d <- unPackDataPackSheet(d, sheet = sheet)
+      d <- unPackDataPackSheet(d, sheet = sheet, d2_session = d2_session)
     } else {
       stop("Cannot process that kind of tool. :(")
     }

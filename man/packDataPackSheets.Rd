@@ -12,7 +12,8 @@ packDataPackSheets(
   model_data = NULL,
   schema = pick_schema(),
   sheets = NULL,
-  cop_year = getCurrentCOPYear()
+  cop_year = getCurrentCOPYear(),
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ minus the first few front-matter/summary tabs.}
 
 \item{cop_year}{COP year for dating as well as selection of
 templates.}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 wb with all sheets written except SNU x IM

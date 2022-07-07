@@ -9,15 +9,15 @@ createDataPack(
   country_uids,
   template_path = NULL,
   cop_year = NULL,
-  tool = NULL
+  tool = NULL,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{
 \item{datapack_name}{Name you would like associated with this Data Pack.
 (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
 
-\item{country_uids}{Unique IDs for countries to include in the Data Pack.
-For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.}
 
 \item{template_path}{Local filepath to Data Pack template Excel (XLSX) file.
 This file MUST NOT have any data validation formats present. If left
@@ -28,6 +28,8 @@ FY22 targets = COP21.}
 
 \item{tool}{Type of tool this function will create or interact with. Either
 \code{OPU Data Pack} or \code{Data Pack}}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Data Pack object

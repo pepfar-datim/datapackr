@@ -4,10 +4,12 @@
 \alias{checkPSNUData}
 \title{Check PSNUxIM tab Data}
 \usage{
-checkPSNUData(d)
+checkPSNUData(d, d2_session = dynGet("d2_default_session", inherits = TRUE))
 }
 \arguments{
 \item{d}{Datapackr sidecar object}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 d

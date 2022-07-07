@@ -4,12 +4,11 @@
 #' @description Checks data pulled from a single sheet in a Data Pack and
 #' alerts where there are unallowed org units based on current DATIM PSNU level.
 #'
-#' @param d Datapackr object.
-#' @param sheet Sheet to check
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #'
-checkInvalidOrgUnits <- function(d, sheet) {
+checkInvalidOrgUnits <- function(d, sheet, d2_session = dynGet("d2_default_session", inherits = TRUE)) {
 
   if (sheet %in% c("SNU x IM", "PSNUxIM")) {
     data <- d$data$SNUxIM
@@ -24,7 +23,7 @@ checkInvalidOrgUnits <- function(d, sheet) {
     dplyr::distinct() %>%
     dplyr::mutate(
       psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
-    dplyr::left_join(datapackr::valid_PSNUs, by = c("psnuid" = "psnu_uid")) %>%
+    dplyr::left_join(datapackr::getPSNUs(d2_session = d2_session), by = c("psnuid" = "psnu_uid")) %>%
     dplyr::filter(is.na(psnu)
                   | is.na(psnuid)) %>%
     dplyr::select(PSNU) %>%

@@ -29,7 +29,7 @@ unPackOPUDataPack <- function(d,
   d <- checkStructure(d)
 
   # Unpack updated PSNUxIM data ####
-  d <- unPackSNUxIM(d)
+  d <- unPackSNUxIM(d, d2_session = d2_session)
 
   # Prepare SNU x IM dataset for DATIM import & validation ####
   d <- packForDATIM(d, type = "OPU PSNUxIM")

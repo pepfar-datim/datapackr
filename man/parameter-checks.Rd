@@ -15,9 +15,17 @@
 \alias{check_params}
 \title{Standardized Parameter Defaults}
 \usage{
-check_country_uids(country_uids, force = TRUE)
+check_country_uids(
+  country_uids,
+  force = TRUE,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 
-check_PSNUs(PSNUs = NULL, country_uids = NULL)
+check_PSNUs(
+  PSNUs = NULL,
+  country_uids = NULL,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 
 check_cop_year(cop_year, tool)
 
@@ -27,7 +35,11 @@ check_season(season, tool)
 
 check_schema(schema, cop_year, tool, season)
 
-checkDataPackName(datapack_name, country_uids)
+checkDataPackName(
+  datapack_name,
+  country_uids,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 
 checkTemplatePath(template_path, cop_year, tool, season)
 
@@ -37,7 +49,8 @@ checkWB(
   cop_year = NULL,
   tool = NULL,
   datapack_name = NULL,
-  template_path = NULL
+  template_path = NULL,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 
 checkResultsArchive(results_archive = FALSE)
@@ -56,14 +69,16 @@ check_params(
   snuxim_model_data,
   output_folder,
   results_archive,
-  ...
+  ...,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{
-\item{country_uids}{Unique IDs for countries to include in the Data Pack.
-For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.}
 
 \item{force}{logical. Should country_uids be required?}
+
+\item{d2_session}{DHIS2 Session id}
 
 \item{PSNUs}{Dataframe of PSNUs to use in this function, containing at least
 \code{psnu_uid}.}

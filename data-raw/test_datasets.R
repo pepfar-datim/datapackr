@@ -81,8 +81,7 @@ packCOP22TestDataset <- function(country_uids,
     } else {
       dedupe <- aocs.dedupe
     }
-    ous <- datapackr::valid_PSNUs %>%
-      dplyr::filter(country_uid %in% country_uids) %>%
+    ous <- datapackr::getPSNUs(country_uids = country_uids, d2_session = d2_session) %>%
       dplyr::pull(ou) %>%
       unique()
     

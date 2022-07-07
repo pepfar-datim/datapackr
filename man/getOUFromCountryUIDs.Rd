@@ -4,10 +4,15 @@
 \alias{getOUFromCountryUIDs}
 \title{Get Operating Unit from Country UIDs}
 \usage{
-getOUFromCountryUIDs(country_uids)
+getOUFromCountryUIDs(
+  country_uids,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
-\item{country_uids}{List of country UIDs from the \code{d$info$country_uids} object.}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 d

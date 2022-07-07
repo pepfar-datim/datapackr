@@ -7,15 +7,18 @@
 #' @param psnu_import_file DHIS2 import file to convert
 #' @param prio Data frame consisting of orgUnit (as a uid) and prioritization
 #' as a character.
+#' @inheritParams datapackr_params
 #' @return prio
 #'
 
-  imputePrioritizations <- function(prio, psnu_import_file) {
+  imputePrioritizations <- function(prio, psnu_import_file,
+                                    d2_session = dynGet("d2_default_session",
+                                                        inherits = TRUE)) {
     #Special handling for prioritization of PSNUs which are not at
     #the same level as the defined prioritization.
     #This can occur when DREAMS PSNUs are at a different
     #level than the PSNU level.
-    dreams_orgunits <- valid_PSNUs %>%
+    dreams_orgunits <- datapackr::getPSNUs(d2_session = d2_session) %>%
       dplyr::filter(DREAMS == "Y") %>%
       dplyr::filter(psnu_uid %in% psnu_import_file$orgUnit) %>%
       dplyr::select(psnu_uid, ancestors) %>%
@@ -90,7 +93,7 @@ adorn_import_file <- function(psnu_import_file,
   data <- psnu_import_file %>%
     # Adorn PSNUs
     dplyr::left_join(
-      (valid_PSNUs %>% # Comes from file data/valid_PSNUs.rda
+      (datapackr::getPSNUs(d2_session = d2_session) %>%
          dplyr::filter(psnu_uid %in% psnu_import_file$orgUnit) %>%
          add_dp_psnu() %>% #Found in getPSNUs.R
          dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id,

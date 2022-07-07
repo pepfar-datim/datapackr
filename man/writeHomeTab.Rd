@@ -9,7 +9,8 @@ writeHomeTab(
   datapack_name = NULL,
   country_uids,
   cop_year = getCurrentCOPYear(),
-  tool = "Data Pack"
+  tool = "Data Pack",
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
 \arguments{
@@ -18,12 +19,15 @@ writeHomeTab(
 \item{datapack_name}{Name you would like associated with this Data Pack.
 (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
 
-\item{country_uids}{Character vector of 11 digit alphanumeric DATIM codes
-representing countries.}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.}
 
-\item{cop_year}{COP Year in format YYYY.}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
-\item{tool}{Defaults to "Data Pack".}
+\item{tool}{Type of tool this function will create or interact with. Either
+\code{OPU Data Pack} or \code{Data Pack}}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Openxlsx workbook object with added, styled Home tab.

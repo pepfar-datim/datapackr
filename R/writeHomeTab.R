@@ -4,13 +4,7 @@
 #' @description
 #' Function to write Home tab details into Data Pack as specified.
 #'
-#' @param wb Openxlsx workbook object.
-#' @param datapack_name Name you would like associated with this Data Pack.
-#' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
-#' @param country_uids Character vector of 11 digit alphanumeric DATIM codes
-#' representing countries.
-#' @param cop_year COP Year in format YYYY.
-#' @param tool Defaults to "Data Pack".
+#' @inheritParams datapackr_params
 #'
 #' @return Openxlsx workbook object with added, styled Home tab.
 #'
@@ -18,7 +12,9 @@ writeHomeTab <- function(wb = NULL,
                          datapack_name = NULL,
                          country_uids,
                          cop_year = getCurrentCOPYear(),
-                         tool = "Data Pack") {
+                         tool = "Data Pack",
+                         d2_session = dynGet("d2_default_session",
+                                             inherits = TRUE)) {
   #TODO: Setup for default to run PEPFARLANDIA version.
 
   # Check & assign params
@@ -27,7 +23,8 @@ writeHomeTab <- function(wb = NULL,
     datapack_name = datapack_name,
     cop_year = cop_year,
     tool = tool,
-    wb = wb)
+    wb = wb,
+    d2_session = d2_session)
 
   for (p in names(params)) {
     assign(p, purrr::pluck(params, p))
@@ -79,7 +76,7 @@ writeHomeTab <- function(wb = NULL,
 
   # country_names ####
   country_names <-
-    check_params(country_uids = country_uids, datapack_name = NULL) %>%
+    check_params(country_uids = country_uids, datapack_name = NULL, d2_session = d2_session) %>%
     purrr::pluck("datapack_name")
 
   openxlsx::writeData(wb,

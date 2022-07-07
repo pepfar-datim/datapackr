@@ -4,10 +4,15 @@
 \alias{getFY22Prioritizations}
 \title{getFY22Prioritizations(d)}
 \usage{
-getFY22Prioritizations(d)
+getFY22Prioritizations(
+  d,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{d}{Datapackr sidecar object}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Dataframe of psnu_uid and value

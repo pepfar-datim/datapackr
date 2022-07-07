@@ -50,7 +50,7 @@ unPackDataPack <- function(d,
 
   # Unpack the Targets ####
   interactive_print("Unpacking sheets...")
-  d <- unPackSheets(d)
+  d <- unPackSheets(d, d2_session = d2_session)
 
   # Separate Data Sets ####
   interactive_print("Separating datasets...")
@@ -58,7 +58,7 @@ unPackDataPack <- function(d,
 
   # Unpack the SNU x IM sheet ####
   interactive_print("Unpacking the PSNUxIM tab...")
-  d <- unPackSNUxIM(d)
+  d <- unPackSNUxIM(d, d2_session = d2_session)
 
   # Prepare undistributed import file for use in analytics if necessary ####
   d <- packForDATIM(d, type = "Undistributed MER")

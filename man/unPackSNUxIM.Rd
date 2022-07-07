@@ -2,12 +2,14 @@
 % Please edit documentation in R/unPackSNUxIM.R
 \name{unPackSNUxIM}
 \alias{unPackSNUxIM}
-\title{unPackSNUxIM(d)}
+\title{unPackSNUxIM}
 \usage{
-unPackSNUxIM(d)
+unPackSNUxIM(d, d2_session = dynGet("d2_default_session", inherits = TRUE))
 }
 \arguments{
-\item{d}{Datapackr object}
+\item{d}{Datapackr sidecar object}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 d

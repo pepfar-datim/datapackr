@@ -4,12 +4,18 @@
 \alias{checkInvalidOrgUnits}
 \title{checkInvalidOrgUnits(d)}
 \usage{
-checkInvalidOrgUnits(d, sheet)
+checkInvalidOrgUnits(
+  d,
+  sheet,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
-\item{d}{Datapackr object.}
+\item{d}{Datapackr sidecar object}
 
-\item{sheet}{Sheet to check}
+\item{sheet}{Data Pack sheet.}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 d

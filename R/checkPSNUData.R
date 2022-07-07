@@ -7,7 +7,7 @@
 #'
 #' @return d
 #'
-checkPSNUData  <-  function(d) {
+checkPSNUData  <-  function(d, d2_session = dynGet("d2_default_session", inherits = TRUE)) {
 
   stopifnot("Cannot validate data for this COP year!" =
               d$info$cop_year %in% names(datapackr::cop_validation_rules))
@@ -60,7 +60,8 @@ checkPSNUData  <-  function(d) {
   #Unnest the data
   vr_data <- vr_data %>%
     tidyr::unnest(vr_results) %>%
-    dplyr::inner_join(valid_PSNUs[, c("psnu", "psnu_uid")], by = c("orgUnit" = "psnu_uid")) %>%
+    dplyr::inner_join(datapackr::getPSNUs(d2_session = d2_session)[, c("psnu", "psnu_uid")],
+                      by = c("orgUnit" = "psnu_uid")) %>%
     dplyr::ungroup()
 
 

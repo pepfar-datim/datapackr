@@ -19,6 +19,7 @@
 #' minus the first few front-matter/summary tabs.
 #' @param cop_year COP year for dating as well as selection of
 #' templates.
+#' @inheritParams datapackr_params
 #'
 #' @return wb with all sheets written except SNU x IM
 #'
@@ -29,7 +30,9 @@ packDataPackSheets <- function(wb,
                                model_data = NULL, #TODO: Could we load a play dataset here?
                                schema = pick_schema(), # Load in current COP year schema from package
                                sheets = NULL,
-                               cop_year = getCurrentCOPYear()) {
+                               cop_year = getCurrentCOPYear(),
+                               d2_session = dynGet("d2_default_session",
+                                                   inherits = TRUE)) {
 
   # Resolve parameter issues. ####
   if (is.null(model_data)) {
@@ -40,8 +43,7 @@ packDataPackSheets <- function(wb,
   # Get org_units to write into Data Pack based on provided parameters. ####
   if (is.null(org_units)) {
     if (ou_level == "Prioritization") {
-      org_units <- datapackr::valid_PSNUs %>% # Load in valid_PSNUs list from package
-        dplyr::filter(country_uid %in% country_uids) %>%
+      org_units <- datapackr::getPSNUs(country_uids = country_uids, d2_session = d2_session) %>%
         add_dp_psnu(.) %>%
         dplyr::arrange(dp_psnu) %>%
         ## Remove DSNUs
@@ -115,8 +117,7 @@ packDataPackSheets <- function(wb,
     }
 
     if (sheet == "AGYW") {
-      org_units_sheet <- datapackr::valid_PSNUs %>% # Load in valid_PSNUs list from package
-        dplyr::filter(country_uid %in% country_uids) %>%
+      org_units_sheet <- datapackr::getPSNUs(country_uids = country_uids, d2_session = d2_session) %>%
         add_dp_psnu(.) %>%
         dplyr::arrange(dp_psnu) %>% # Order rows based on dp_psnu col values
         dplyr::filter(!is.na(DREAMS)) %>%

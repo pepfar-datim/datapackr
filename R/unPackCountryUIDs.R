@@ -5,16 +5,14 @@
 #' When supplied a submission path, will return the list of country_uids
 #' pertaining to the file, as read from the Home tab.
 #'
-#' @param submission_path Local path to the file to import.
-#' @param tool What type of tool is the submission file? Default is "Data Pack".
-#' @param cop_year Specifies COP year for dating as well as selection of
-#' templates.
-#'
+#' @inheritParams datapackr_params
 #' @return Character vector of country_uids.
 #'
 unPackCountryUIDs <- function(submission_path,
                               tool = "Data Pack",
-                              cop_year = getCurrentCOPYear()) {
+                              cop_year = getCurrentCOPYear(),
+                              d2_session = dynGet("d2_default_session",
+                                                  inherits = TRUE)) {
 
   if (!tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack", "OPU Data Pack Template")) {
     stop("Cannot unpack Country UIDs for that type of tool.")
@@ -42,7 +40,7 @@ unPackCountryUIDs <- function(submission_path,
           ifelse(tool %in% c("Data Pack", "Data Pack Template"), "Prioritization", "SNUxIM"),
         " tab instead."))
 
-    PSNUs <- parsePSNUs(submission_path, tool, cop_year)
+    PSNUs <- parsePSNUs(submission_path, tool, cop_year, d2_session = d2_session)
 
     if (NROW(PSNUs) == 0) {
       blank_psnus <- TRUE
@@ -65,6 +63,8 @@ unPackCountryUIDs <- function(submission_path,
         datapackr::unPackDataPackName(
           submission_path = submission_path,
           tool = tool)
+
+      valid_PSNUs <- datapackr::getPSNUs(d2_session = d2_session)
 
       if (datapack_name == "Latin America Region") {
 
@@ -115,7 +115,7 @@ unPackCountryUIDs <- function(submission_path,
     stop(msg)
   }
 
-  PSNUs <- parsePSNUs(submission_path, tool, cop_year)
+  PSNUs <- parsePSNUs(submission_path, tool, cop_year, d2_session = d2_session)
 
   if (NROW(PSNUs) > 0) {
     # TEST: Check country_uids and PSNUs in Data Pack match
@@ -139,14 +139,10 @@ unPackCountryUIDs <- function(submission_path,
 #' will return a data frame of PSNU, psnu_uid,country_name, and country_uid
 #' If there are malformed PSNU UIDs in the file, an error will be thrown.
 #'
-#' @param submission_path Local path to the file to import.
-#' @param tool What type of tool is the submission file? Default is "Data Pack".
-#' @param cop_year Specifies COP year for dating as well as selection of
-#' templates.
-#'
+#' @inheritParams datapackr_params
 #' @return Data frame of parsed PSNUs.
 #'
-parsePSNUs <- function(submission_path, tool, cop_year) {
+parsePSNUs <- function(submission_path, tool, cop_year, d2_session = dynGet("d2_default_session", inherits = TRUE)) {
   PSNUs <-
     readxl::read_excel(
       path = submission_path,
@@ -160,7 +156,7 @@ parsePSNUs <- function(submission_path, tool, cop_year) {
     # Add PSNU uid ####
   dplyr::mutate(
     psnu_uid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
-    dplyr::left_join(datapackr::valid_PSNUs %>%
+    dplyr::left_join(datapackr::getPSNUs(d2_session = d2_session) %>%
                        dplyr::select(psnu_uid, country_name, country_uid),
                      by = "psnu_uid") %>%
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))

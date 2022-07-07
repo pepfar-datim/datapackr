@@ -21,8 +21,7 @@ packDataPack(
 \item{datapack_name}{Name you would like associated with this Data Pack.
 (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
 
-\item{country_uids}{Unique IDs for countries to include in the Data Pack.
-For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.}
 
 \item{template_path}{Local filepath to Data Pack template Excel (XLSX) file.
 This file MUST NOT have any data validation formats present. If left

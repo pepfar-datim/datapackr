@@ -265,13 +265,14 @@ pick_template_path <- function(cop_year, tool) {
 #' @param datapack_name Name you would like associated with this Data Pack.
 #' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
 #' @param country_uids Unique IDs for countries to include in the Data Pack.
-#' For full list of these IDs, see \code{datapackr::valid_PSNUs}.
 #' @param template_path Local filepath to Data Pack template Excel (XLSX) file.
 #' This file MUST NOT have any data validation formats present. If left
 #' \code{NULL}, will select the default based on \code{cop_year} and \code{tool}.
 #' @param submission_path Local path to the file to import.
 #' @param cached_mechs_path Local file path to an RDS file containing
 #' a cached copy of the mechanisms SQL view.
+#' @param cached_psnus_path Local file path to an RDS file containing
+#' a cached copy of PSNUs from DATIM.
 #' @param cop_year COP Year to use for tailoring functions. Remember,
 #' FY22 targets = COP21.
 #' @param output_folder Local folder where you would like your Data Pack to be
@@ -299,6 +300,7 @@ pick_template_path <- function(cop_year, tool) {
 #' @param tool Type of tool this function will create or interact with. Either
 #' \code{OPU Data Pack} or \code{Data Pack}
 #' @param season Either \code{COP} or \code{OPU}.
+#' @param sheet Data Pack sheet.
 #' @param draft_memo Boolean indicating whether the memo being written is a
 #' draft or final memo.
 #' @param memo_type memo_type One of the following:
@@ -331,6 +333,7 @@ datapackr_params <- function(model_data,
                              template_path,
                              submission_path,
                              cached_mechs_path,
+                             cached_psnus_path,
                              cop_year,
                              output_folder,
                              results_archive,
@@ -346,6 +349,7 @@ datapackr_params <- function(model_data,
                              psnus,
                              tool,
                              season,
+                             sheet,
                              draft_memo,
                              memo_type,
                              memo_doc,

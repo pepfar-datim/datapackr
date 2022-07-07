@@ -39,7 +39,7 @@ packDataPack <- function(model_data,
       tool = "Data Pack",
       cop_year =  cop_year,
       source_user = d2_session$me$userCredentials$username,
-      operating_unit = getOUFromCountryUIDs(country_uids)
+      operating_unit = getOUFromCountryUIDs(country_uids = country_uids, d2_session = d2_session)
     ),
     data = list(
       model_data = model_data
@@ -92,11 +92,11 @@ packDataPack <- function(model_data,
                             datapack_name = d$info$datapack_name,
                             country_uids = d$info$country_uids,
                             cop_year = cop_year,
-                            tool = "Data Pack")
+                            tool = "Data Pack",
+                            d2_session = d2_session)
 
   # Get PSNU List####
-  d$data$PSNUs <- datapackr::valid_PSNUs %>%
-    dplyr::filter(country_uid %in% country_uids) %>%
+  d$data$PSNUs <- datapackr::getPSNUs(country_uids = country_uids, d2_session = d2_session) %>%
     add_dp_psnu(.) %>%
     dplyr::arrange(dp_psnu) %>%
     ## Remove DSNUs
@@ -114,7 +114,8 @@ packDataPack <- function(model_data,
                                   model_data = d$data$model_data,
                                   schema = d$info$schema,
                                   sheets = NULL,
-                                  cop_year = d$info$cop_year)
+                                  cop_year = d$info$cop_year,
+                                  d2_session = d2_session)
 
   # Hide unneeded sheets ####
   sheets_to_hide <- which(stringr::str_detect(names(d$tool$wb), "PSNUxIM"))
