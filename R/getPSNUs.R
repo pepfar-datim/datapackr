@@ -5,7 +5,7 @@
 #' Queries DATIM to extract list of PSNUs and adds additional PSNUs not
 #' currently in DATIM as needed.
 #'
-#' @inherit_params datapackr_params
+#' @inheritParams datapackr_params
 #'
 #' @return Data frame of PSNUs
 #'
@@ -13,28 +13,64 @@ getPSNUs <- function(country_uids = NULL,
                      include_mil = TRUE,
                      include_DREAMS = TRUE,
                      additional_fields = NULL,
+                     cached_psnus_path = paste0(Sys.getenv("support_files_directory"), "psnus.rds"),
                      d2_session = dynGet("d2_default_session",
                                          inherits = TRUE)) {
+  
+  # If Cached PSNUs list is available and fresh, use this to save processing time
+  print(cached_psnus_path)
+  can_read_file <- file.access(cached_psnus_path, 4) == 0
+  can_write_file <- file.access(dirname(cached_psnus_path), 2) == 0
+  
+  # Check whether Cached PSNUs List is stale
+  if (is.null(d2_session$max_cache_age)) {
+    max_cache_age <- "1 day"
+  } else {
+    max_cache_age <- d2_session$max_cache_age
+  }
+  
+  if (file.exists(cached_psnus_path) & can_read_file) {
+    is_lt <- function(x, y)  x < y
+    cache_age_dur <- lubridate::as.duration(lubridate::interval(file.info(cached_psnus_path)$mtime, Sys.time()))
+    max_cache_age_dur <- lubridate::duration(max_cache_age)
+    is_fresh <- is_lt(cache_age_dur, max_cache_age_dur)
+  } else{
+    is_fresh <- FALSE
+  }
+  
+  if (is_fresh & can_read_file) {
+    interactive_print("Loading cached PSNUs file")
+    psnus <- readRDS(cached_psnus_path)
+  }
 
-  # Pull PSNUs from DATIM ####
-  api_filters <-
-    # Filter by appropriate organisation unit groups
-    c(paste0("organisationUnitGroups.id:in:[AVy8gJXym2D", # Filter for COP Prioritization SNU
-             ifelse(include_mil, ",nwQbMeALRjL", ""), # Add military SNUs if requested
-             ifelse(include_DREAMS, ",mRRlkbZolDR", ""), "]")) %>% # Add DREAMS SNUs if requested
-    # If country UIDs are provided, add filter for country UIDs
-    {if (!is.null(country_uids)) {
-      append(., paste0("ancestors.id:in:[", paste(country_uids, collapse = ","), "]"))
-    } else .
+  # If no fresh cache, pull PSNUs from DATIM ####
+  if (!is_fresh) {
+    interactive_print("Fetching new PSNUs file from DATIM")
+    api_filters <-
+      # Filter by appropriate organisation unit groups
+      c(paste0("organisationUnitGroups.id:in:[AVy8gJXym2D", # Filter for COP Prioritization SNU
+               ifelse(include_mil, ",nwQbMeALRjL", ""), # Add military SNUs if requested
+               ifelse(include_DREAMS, ",mRRlkbZolDR", ""), "]")) %>% # Add DREAMS SNUs if requested
+      # If country UIDs are provided, add filter for country UIDs
+      {if (!is.null(country_uids)) {
+        append(., paste0("ancestors.id:in:[", paste(country_uids, collapse = ","), "]"))
+      } else .
+      }
+
+    PSNUs <-
+      datimutils::getMetadata(
+        "organisationUnits",
+        api_filters,
+        fields = paste0("id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]",
+                        ifelse(!is.null(additional_fields), paste0(",", additional_fields), "")), # Pastes additional fields
+        d2_session = d2_session)
+  
+    if (can_write_file) {
+      interactive_print(paste0("Overwriting stale mechanisms view to ", cached_psnus_path))
+      saveRDS(dplyr::select(psnu, "name", "id", "ancestors", "organisationUnitGroups"), # Filter to desired columns
+              file = cached_psnus_path)
     }
-
-  PSNUs <-
-    datimutils::getMetadata(
-      "organisationUnits",
-      api_filters,
-      fields = paste0("id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]",
-                      ifelse(!is.null(additional_fields), paste0(",", additional_fields), "")), # Pastes additional fields
-      d2_session = d2_session)
+  }
 
   # Extract metadata ####
   PSNUs %<>%

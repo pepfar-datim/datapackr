@@ -9,8 +9,25 @@ getPSNUs(
   include_mil = TRUE,
   include_DREAMS = TRUE,
   additional_fields = NULL,
+  cached_psnus_path = paste0(Sys.getenv("support_files_directory"), "psnus.rds"),
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
+}
+\arguments{
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.}
+
+\item{include_mil}{Logical. If \code{TRUE}, will also include _Military nodes
+related to \code{country_uids}. Default is \code{TRUE}.}
+
+\item{include_DREAMS}{If \code{TRUE} will also include DREAMS organisation units.}
+
+\item{additional_fields}{Character string of any fields to return from DATIM
+API other than those returned by default.}
+
+\item{cached_psnus_path}{Local file path to an RDS file containing
+a cached copy of PSNUs from DATIM.}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Data frame of PSNUs
