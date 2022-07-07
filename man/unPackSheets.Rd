@@ -4,10 +4,12 @@
 \alias{unPackSheets}
 \title{Unpack data from Data Pack sheets.}
 \usage{
-unPackSheets(d, sheets = NULL)
+unPackSheets(d, sheets = NULL, check_sheets = TRUE)
 }
 \arguments{
 \item{d}{Datapackr sidecar object}
+
+\item{check_sheets}{Logical. Should sheet data be validated?}
 }
 \value{
 d

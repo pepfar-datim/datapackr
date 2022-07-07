@@ -2,13 +2,14 @@
 % Please edit documentation in R/unPackingChecks.R
 \name{unPackDataChecks}
 \alias{unPackDataChecks}
-\alias{checkDupeRows}
-\alias{checkColumnStructure}
 \alias{checkToolStructure}
 \alias{checkToolComments}
 \alias{checkToolConnections}
+\alias{checkDupeRows}
+\alias{checkMissingCols}
+\alias{checkDupeCols}
+\alias{checkOutOfOrderCols}
 \alias{checkNonNumeric}
-\alias{checkMissingMetadata}
 \alias{checkNegativeValues}
 \alias{checkDecimalValues}
 \alias{checkInvalidOrgUnits}
@@ -18,41 +19,43 @@
 \alias{checkSheetData}
 \title{Perform various data quality checks on in-process data from Data Packs.}
 \usage{
-checkDupeRows(d, sheet, quiet = TRUE)
-
-checkColumnStructure(d, sheet, quiet = TRUE)
-
 checkToolStructure(d, quiet = TRUE)
 
 checkToolComments(d, quiet = TRUE)
 
 checkToolConnections(d, quiet = TRUE)
 
-checkNonNumeric(d, sheet, quiet = TRUE)
+checkDupeRows(sheet, d, quiet = TRUE)
 
-checkMissingMetadata(d, sheet, quiet = T)
+checkMissingCols(sheet, d, quiet = TRUE)
 
-checkNegativeValues(d, sheet, quiet = T)
+checkDupeCols(sheet, d, quiet = TRUE)
 
-checkDecimalValues(d, sheet, quiet = TRUE)
+checkOutOfOrderCols(sheet, d, quiet = TRUE)
 
-checkInvalidOrgUnits(d, sheet, quiet = TRUE)
+checkNonNumeric(sheet, d, quiet = TRUE)
 
-checkInvalidPrioritizations(d, sheet, quiet = T)
+checkNegativeValues(sheet, d, quiet = T)
 
-checkFormulas(d, sheet, quiet = TRUE)
+checkDecimalValues(sheet, d, quiet = TRUE)
 
-checkDisaggs(d, sheet, quiet = TRUE)
+checkInvalidOrgUnits(sheet, d, quiet = TRUE)
+
+checkInvalidPrioritizations(sheet, d, quiet = T)
+
+checkFormulas(sheet, d, quiet = TRUE)
+
+checkDisaggs(sheet, d, quiet = TRUE)
 
 checkSheetData(d, sheets = NULL, quiet = TRUE, ...)
 }
 \arguments{
 \item{d}{DataPack object loaded via \code{loadDataPack}.}
 
+\item{quiet}{Logical. Should warning messages be printed? Default is TRUE.}
+
 \item{sheet}{String. Name of DataPack sheet to check data from. Default is
 first sheet.}
-
-\item{quiet}{Logical. Should warning messages be printed? Default is TRUE.}
 }
 \value{
 A DataPack object, with updated tests and warnings.

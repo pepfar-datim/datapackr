@@ -483,7 +483,7 @@ unPackSNUxIM <- function(d) {
   # TEST: Non-numeric data; Warn; Convert & Drop ####
   # TODO: Make compatible for OPUs
   if (d$info$tool == "Data Pack") {
-    d <- checkNumericValues(d, sheet, header_cols)
+    #d <- checkNumericValues(d, sheet, header_cols)
   }
 
   # sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
@@ -649,7 +649,7 @@ unPackSNUxIM <- function(d) {
   # TODO: We have already read in the sheet with tidyxl
   # in an earlier test but in this test we read it yet again
   # Lets recycle from above?
-  d <- checkFormulas(d, sheet)
+  #d <- checkFormulas(d = d, sheet = sheet)
 
   # Remove all unneeded columns ####
   d$data$SNUxIM %<>%
