@@ -67,7 +67,7 @@ getPSNUs <- function(country_uids = NULL,
   
     if (can_write_file) {
       interactive_print(paste0("Overwriting stale mechanisms view to ", cached_psnus_path))
-      saveRDS(dplyr::select(psnu, "name", "id", "ancestors", "organisationUnitGroups"), # Filter to desired columns
+      saveRDS(dplyr::select(PSNUs, "name", "id", "ancestors", "organisationUnitGroups"), # Filter to desired columns
               file = cached_psnus_path)
     }
   }
