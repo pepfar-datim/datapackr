@@ -12,9 +12,9 @@ with_mock_api({
         cop_year = NULL
       )
     d <-  d %>%
-      unPackSheets(.) %>%
+      unPackSheets(., d2_session = training) %>%
       separateDataSets(.) %>%
-      unPackSNUxIM(.) %>%
+      unPackSNUxIM(., d2_session = training) %>%
       packForDATIM(., type = "Undistributed MER") %>%
       packForDATIM(., type = "SUBNAT_IMPATT") %>%
       packForDATIM(., type = "PSNUxIM")
@@ -24,7 +24,7 @@ with_mock_api({
                  ignore.order = TRUE)
 
 
-    fy22_prioritizations <- getFY22Prioritizations(d)
+    fy22_prioritizations <- getFY22Prioritizations(d, d2_session = training)
     expect_type(fy22_prioritizations, "list")
     expect_true(NROW(fy22_prioritizations) > 0)
     expect_named(fy22_prioritizations, c("orgUnit", "value"), ignore.order = TRUE)

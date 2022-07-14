@@ -13,7 +13,7 @@ with_mock_api({
       d2_session = NULL
     )
 
-    d <- unPackSheets(d)
+    d <- unPackSheets(d, d2_session = testing)
     expect_true(!is.null(d$data$targets))
     expect_setequal(names(d$data$targets), d_data_targets_names)
     expect_true((NROW(d$data$targets) > 0))
@@ -32,7 +32,7 @@ with_mock_api({
 
     # Should throw an error if the tool is an unknown type
     d$info$tool <- "FooPack"
-    expect_error(d <- unPackSheets(d))
+    expect_error(d <- unPackSheets(d, d2_session = testing))
   })
 })
 
@@ -46,7 +46,7 @@ with_mock_api({
       d2_session = NULL
     )
 
-    d <- unPackSheets(d)
+    d <- unPackSheets(d, d2_session = testing)
     expect_true(!is.null(d$data$targets))
     expect_setequal(names(d$data$targets), d_data_targets_names)
     expect_true((NROW(d$data$targets) > 0))

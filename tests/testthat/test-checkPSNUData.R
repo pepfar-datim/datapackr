@@ -14,7 +14,7 @@ with_mock_api({
     )
     #Never run more than two threads here to avoid errors in checkPackage
     Sys.setenv("MAX_CORES" = 2L)
-    d <- checkPSNUData(d)
+    d <- checkPSNUData(d, d2_session = training)
     expect_true(NROW(d$tests$vr_rules_check) == 3) #This should trip three rules
     expect_true(sum(d$tests$vr_rules_check$Valid) == 2) #Two should be valid
 
@@ -40,7 +40,7 @@ with_mock_api({
       "DhrLCUBm3bK", "2023", "uXwFHXCPYgj", "yWgBf6UOK8d", "12345", "10", #TX_NEW
       "HGZY9RNZjRd", "2023", "uXwFHXCPYgj", "yWgBf6UOK8d", "12345", "20" #TX_CURR
     )
-    d <- checkPSNUData(d)
+    d <- checkPSNUData(d, d2_session = training)
     #Return NULL if there are no violations
     expect_null(d$tests$vr_rules_check)
 

@@ -46,6 +46,7 @@ test_that("We can pick template file", {
 )
 
 
+with_mock_api({
 test_that("We can check datapack paramaters", {
 
   options(rlang_interactive = TRUE)
@@ -58,29 +59,29 @@ test_that("We can check datapack paramaters", {
 
   # country_uids ####
   #Test for a valid country UID
-  test_params <- check_params(country_uids = "JTypsdEUNPw")
+  test_params <- check_params(country_uids = "JTypsdEUNPw", d2_session = training)
   expect_type(test_params, "list")
   expect_equal(test_params$country_uids, "JTypsdEUNPw")
 
   #Throw an error if supplied only invalid country UIDs
-  expect_error(check_params(country_uids = "foo", force = TRUE))
+  expect_error(check_params(country_uids = "foo", force = TRUE, d2_session = training))
 
   #Test for mix of valid and invalid country_uids
-  mix <- check_params(country_uids = c("JTypsdEUNPw", "foo"))
-  single_valid <- check_params(country_uids = "JTypsdEUNPw")
+  mix <- check_params(country_uids = c("JTypsdEUNPw", "foo", d2_session = training))
+  single_valid <- check_params(country_uids = "JTypsdEUNPw", d2_session = training)
   expect_equal(mix, single_valid)
 
   # Throw an error if the argument is NULL or invalid, and force = TRUE
-  expect_error(check_params(country_uids = NULL, force = TRUE))
-  expect_error(check_params(country_uids = "foo", force = TRUE))
+  expect_error(check_params(country_uids = NULL, force = TRUE, d2_session = training))
+  expect_error(check_params(country_uids = "foo", force = TRUE, d2_session = training))
 
   # If country_uids is NULL or invalid and force = FALSE, expect all countries returned
-  all_countries <- sort(unique(valid_PSNUs$country_uid))
+  all_countries <- sort(unique(getPSNUs(d2_session = training)$country_uid))
   expect_equal(
-    sort(check_params(country_uids = NULL, force = FALSE)$country_uids),
+    sort(check_params(country_uids = NULL, force = FALSE, d2_session = training)$country_uids),
     all_countries)
   expect_equal(
-    sort(check_params(country_uids = "foo", force = FALSE)$country_uids),
+    sort(check_params(country_uids = "foo", force = FALSE, d2_session = training)$country_uids),
     all_countries)
 
 
@@ -204,22 +205,22 @@ test_that("We can check datapack paramaters", {
 
   # datapack_name ####
   # Test valid combination
-  test_args <- list(datapack_name = "Zambia", country_uids = "f5RoebaDLMx")
+  test_args <- list(datapack_name = "Zambia", country_uids = "f5RoebaDLMx", d2_session = training)
   test_params <- do.call(check_params, test_args)
   expect_true(identical(sort(unlist(test_params)), sort(unlist(test_args))))
 
   # This will return a handled error, but will NOT return "Global"
   expect_error(test_params <-
-                 check_params(datapack_name = NULL, country_uids = NULL
+                 check_params(datapack_name = NULL, country_uids = NULL, d2_session = training
                  ), "Must supply valid country_uids.")
 
   # Expect a message if datapack_name and country_uids do not match (but allow
   # custom names)
-  test_args <- list(datapack_name = "Demoland", country_uids = "f5RoebaDLMx")
+  test_args <- list(datapack_name = "Demoland", country_uids = "f5RoebaDLMx", d2_session = training)
   expect_message(do.call(check_params, test_args))
 
   # Expect an error here
-  test_args <- list(datapack_name = "Zambia", country_uids = "abc12345678")
+  test_args <- list(datapack_name = "Zambia", country_uids = "abc12345678", d2_session = training)
   expect_error(do.call(check_params, test_args))
 
 
@@ -245,3 +246,4 @@ test_that("We can check datapack paramaters", {
 
   }
 )
+})
