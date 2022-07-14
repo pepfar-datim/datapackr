@@ -16,7 +16,7 @@ getFY22Prioritizations <- function(d, d2_session = dynGet("d2_default_session", 
     dplyr::select(ancestor_uid = psnu_uid, ancestor_name = psnu)
 
   #Classify any DREAMS districts the same as their PSNU parents
-  dreams_prioritizations <- datpackr::getPSNUs(country_uids = d$info$country_uids,
+  dreams_prioritizations <- datapackr::getPSNUs(country_uids = d$info$country_uids,
                                                include_DREAMS = TRUE,
                                                d2_session = d2_session) %>%
     dplyr::filter(DREAMS == "Y") %>%
