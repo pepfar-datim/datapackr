@@ -40,7 +40,7 @@ getPSNUs <- function(country_uids = NULL,
   
   if (is_fresh & can_read_file) {
     interactive_print("Loading cached PSNUs file")
-    psnus <- readRDS(cached_psnus_path)
+    PSNUs <- readRDS(cached_psnus_path)
   }
 
   # If no fresh cache, pull PSNUs from DATIM ####

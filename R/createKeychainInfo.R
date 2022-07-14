@@ -123,7 +123,8 @@ createKeychainInfo <- function(submission_path = NULL,
   if (is.null(d$info$country_uids)) {
     d$info$country_uids <-
       unPackCountryUIDs(submission_path = d$keychain$submission_path,
-                        tool = d$info$tool)
+                        tool = d$info$tool,
+                        d2_session = d2_session)
   }
 
   ## Determine additional Organisation Unit information and save
