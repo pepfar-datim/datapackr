@@ -19,3 +19,4 @@
 ^\.circleci$
 ^data-raw$
 ^.*mechs\.rds$
+^psnus\.rds$

@@ -7,6 +7,7 @@ packrat/lib*/
 .DS_Store
 Icon
 mechs.rds
+psnus.rds
 .Rprofile
 renv/
 .vscode/
