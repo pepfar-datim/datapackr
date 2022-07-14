@@ -6,7 +6,7 @@ test_that("Can generate a key chain", {
                         tool = "Data Pack",
                         country_uids = NULL,
                         cop_year = NULL,
-                        d2_session = NULL)
+                        d2_session = training)
   testthat::expect_setequal(names(d), c("info", "keychain"))
   testthat::expect_setequal(
      names(d$info),
@@ -51,7 +51,8 @@ test_that("Can generate a key chain", {
 
 test_that("Can get the type and COP year of tool of a COP21 Data Pack", {
 
-   d <- datapackr::createKeychainInfo(submission_path = test_sheet("COP21_Data_Pack_Template.xlsx"))
+   d <- datapackr::createKeychainInfo(submission_path = test_sheet("COP21_Data_Pack_Template.xlsx"),
+                                      d2_session = training)
    expect_equal(d$info$tool, "Data Pack")
    expect_equal(d$info$cop_year, 2021)
 })

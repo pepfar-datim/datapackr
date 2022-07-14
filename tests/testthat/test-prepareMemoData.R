@@ -35,7 +35,8 @@ with_mock_api({
         submission_path = test_sheet("COP21_DP_random_with_psnuxim.xlsx"),
         tool = "Data Pack",
         country_uids = NULL,
-        cop_year = NULL
+        cop_year = NULL,
+        d2_session = training
       )
     d <-  d %>%
       unPackSheets(., d2_session = training) %>%
@@ -147,7 +148,8 @@ with_mock_api({
         submission_path = test_sheet("COP21_DP_random_with_psnuxim.xlsx"),
         tool = "Data Pack",
         country_uids = NULL,
-        cop_year = NULL
+        cop_year = NULL,
+        d2_session = training
       )
     d <-  d %>%
       unPackSheets(., d2_session = training) %>%
@@ -176,7 +178,8 @@ with_mock_api({
         submission_path = test_sheet("COP21_DP_random_with_psnuxim.xlsx"),
         tool = "Data Pack",
         country_uids = NULL,
-        cop_year = NULL
+        cop_year = NULL,
+        d2_session = training
       )
     d <-  d %>%
       unPackSheets(., d2_session = training) %>%

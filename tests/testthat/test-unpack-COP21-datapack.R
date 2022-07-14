@@ -10,10 +10,10 @@ with_mock_api({
       tool = "Data Pack",
       country_uids = NULL,
       cop_year = NULL,
-      d2_session = NULL
+      d2_session = training
     )
 
-    d <- unPackSheets(d, d2_session = testing)
+    d <- unPackSheets(d, d2_session = training)
     expect_true(!is.null(d$data$targets))
     expect_setequal(names(d$data$targets), d_data_targets_names)
     expect_true((NROW(d$data$targets) > 0))
@@ -32,7 +32,7 @@ with_mock_api({
 
     # Should throw an error if the tool is an unknown type
     d$info$tool <- "FooPack"
-    expect_error(d <- unPackSheets(d, d2_session = testing))
+    expect_error(d <- unPackSheets(d, d2_session = training))
   })
 })
 
@@ -43,10 +43,10 @@ with_mock_api({
       tool = "Data Pack",
       country_uids = NULL,
       cop_year = NULL,
-      d2_session = NULL
+      d2_session = training
     )
 
-    d <- unPackSheets(d, d2_session = testing)
+    d <- unPackSheets(d, d2_session = training)
     expect_true(!is.null(d$data$targets))
     expect_setequal(names(d$data$targets), d_data_targets_names)
     expect_true((NROW(d$data$targets) > 0))
