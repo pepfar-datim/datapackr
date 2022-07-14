@@ -67,7 +67,7 @@ test_that("We can check datapack paramaters", {
   expect_error(check_params(country_uids = "foo", force = TRUE, d2_session = training))
 
   #Test for mix of valid and invalid country_uids
-  mix <- check_params(country_uids = c("JTypsdEUNPw", "foo", d2_session = training))
+  mix <- check_params(country_uids = c("JTypsdEUNPw", "foo"), d2_session = training)
   single_valid <- check_params(country_uids = "JTypsdEUNPw", d2_session = training)
   expect_equal(mix, single_valid)
 

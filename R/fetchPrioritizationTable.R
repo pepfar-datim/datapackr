@@ -54,7 +54,8 @@ fetchPrioritizationTable <- function(psnus, cop_year,
                   "value" = "Value") %>%
     dplyr::left_join(datapackr::prioritization_dict(), by = "value") %>%
     dplyr::select(orgUnit = psnu_uid, "prioritization" = "name") %>%
-    datapackr::imputePrioritizations(., data.frame(orgUnit = psnus$psnu_uid)) %>%
+    datapackr::imputePrioritizations(., data.frame(orgUnit = psnus$psnu_uid),
+                                     d2_session = d2_session) %>%
     dplyr::left_join(datapackr::prioritization_dict(), by = c("prioritization" = "name")) %>%
     dplyr::select(-Prioritization) %>%
     dplyr::mutate(prioritization = dplyr::case_when(
