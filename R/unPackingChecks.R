@@ -209,98 +209,68 @@ checkToolConnections <- function(d, quiet = TRUE) {
 
 #' @export
 #' @rdname unPackDataChecks
-#'
-checkDupeRows <- function(sheet, d, quiet = TRUE) {
-
-  if (!quiet) {
-    messages <- MessageQueue()
-  }
+checkDupeRows <- function(sheets, d, quiet = TRUE) {
 
   c <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
-            has_error = FALSE,
-            sheet = sheet)
-
-  # Get data
-  data <- d$sheets[[as.character(sheet)]]
+            has_error = FALSE)
 
   # Get header_cols
   header_cols <- d$info$schema %>%
     dplyr::filter(
-      sheet_name == sheet,
-      col_type == "row_header") %>%
+      sheet_name %in% sheets,
+      col_type == "row_header",
+      !indicator_code %in% c("SNU1", "ID")) %>%
     dplyr::pull(indicator_code) %>%
-    c(., "mechCode_supportType")
-
-  header_cols <- header_cols[header_cols %in% names(data)]
-
-  # Drop rows/cols with all NAs or 0s
-  # We don't care if these are duplicates
-  names(data) <- data %>%
-    names() %>%
-    make.names() %>%
-    make.unique()
-
-  data %<>% {
-      suppressWarnings(
-        dplyr::mutate(.,
-                      dplyr::across(-tidyselect::all_of(header_cols), #nolint
-                                    as.numeric)))
-    } %>%
-    dplyr::mutate(
-      dplyr::across(-tidyselect::all_of(header_cols),
-                    ~tidyr::replace_na(.x, 0))) %>%
-    dplyr::filter(
-      rowSums(dplyr::across(-tidyselect::all_of(header_cols))) != 0)
-
-  data <-
-    dplyr::bind_cols(
-      dplyr::select(data, tidyselect::all_of(header_cols)),
-      dplyr::select(data, -tidyselect::all_of(header_cols)) %>%
-        dplyr::select_if(colSums(.) != 0))
+    #c(., "mechCode_supportType") %>%
+    unique()
 
   # Duplicates
-  dupes <- data %>%
-    #dplyr::select(header_cols) %>%
-    dplyr::group_by(dplyr::across(tidyselect::all_of(header_cols))) %>%
-    dplyr::tally() %>%
-    dplyr::ungroup() %>%
-    dplyr::filter(n > 1) %>%
-    dplyr::select(-dplyr::any_of(c("n", "ID"))) %>%
-    dplyr::arrange(dplyr::across()) %>%
-    dplyr::mutate(sheet = sheet) %>%
-    dplyr::select(sheet, dplyr::everything())
+  dupes <- purrr::map(d$sheets[sheets],
+                      function(x) x %>%
+                        dplyr::select(tidyselect::any_of(header_cols)) %>%
+                        dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
+                        dplyr::filter(!is.na(PSNU)) %>% # This is caught by checkInvalidOrgUnits
+                        dplyr::filter(duplicated(.))) %>%
+    purrr::keep(~ NROW(.x) > 0)
 
-  if (NROW(dupes) > 0) {
+  if (length(dupes) > 0) {
+
+    dupes %<>%
+      purrr::map2(., names(.),
+                  function(x, y) x %>%
+                    dplyr::arrange(dplyr::across()) %>%
+                    tibble::add_column(sheet = y, .before = 1))
+
     c$lvl <- "ERROR"
 
-    dupes_msg <-
-      capture.output(
-        print(as.data.frame(dupes), row.names = FALSE))
-
     c$msg <-
-      paste0(
-        c$lvl, "! In tab ",
-        sheet,
-        ": DUPLICATE ROWS found. Ensure PSNUs or Age, Sex, KeyPop disaggregates",
-        " are not repeated within tabs. This issue may have been caused by inadvertent",
-        " or incorrect copying of data from one row to another. -> \n\t",
-        paste(dupes_msg, collapse = "\n\t"),
-        "\n")
+      purrr::map2(
+        dupes, names(dupes),
+        function(x, y)
+          paste0(
+            c$lvl, "! In tab ", y,
+            ": DUPLICATE ROWS found. Ensure PSNUs or Age, Sex, KeyPop disaggregates",
+            " are not repeated within tabs. This issue may have been caused by inadvertent",
+            " or incorrect copying of data from one row to another. -> \n\t",
+            paste(capture.output(print(as.data.frame(x), row.names = FALSE)),
+                  collapse = "\n\t"),
+            "\n"))
 
-    c$result %<>% dplyr::bind_rows(dupes)
+    c$result <- dplyr::bind_rows(dupes)
     attr(c$result, "test_name") <- "Duplicated rows"
-    #d$info$messages <- appendMessage(d$info$messages, msg, lvl)
     c$has_error <- TRUE
 
     if (!quiet) {
-      messages <- appendMessage(messages, c$msg, c$lvl)
-    }
-  }
+      messages <- MessageQueue()
 
-  if (!quiet) {
-    printMessages(messages)
+      for (i in 1:length(c$msg)) {
+        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      }
+
+      printMessages(messages)
+    }
   }
 
   return(c)
@@ -309,208 +279,181 @@ checkDupeRows <- function(sheet, d, quiet = TRUE) {
 
 #' @export
 #' @rdname unPackDataChecks
-checkMissingCols <- function(sheet, d, quiet = TRUE) {
-
-  if (!quiet) {
-    messages <- MessageQueue()
-  }
+checkMissingCols <- function(sheets, d, quiet = TRUE) {
 
   c <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
-            has_error = FALSE,
-            sheet = sheet)
+            has_error = FALSE)
 
-  # Get data
-  data <- d$sheets[[as.character(sheet)]]
+  missing_cols <- d$sheets[sheets] %>%
+    purrr::map2_dfr(
+      .,
+      names(.),
+      function(x, y)
+        d$info$schema %>%
+          dplyr::filter(sheet_name == y,
+                        !indicator_code %in% names(x)) %>%
+          dplyr::select(sheet_name, indicator_code))
 
-  # Cross-check cols
-  submission_cols <- names(data) %>%
-    tibble::enframe(name = "submission_order", value = "indicator_code")
+  # if (sheet == "PSNUxIM") {
+  #   ## Drop all IM cols (left & right sides)
+  #   schema_cols %<>%
+  #     dplyr::filter(
+  #       col_type != "allocation",
+  #       !(col_type == "target"
+  #         & (indicator_code %in% c("Not PEPFAR", "12345_DSD", ""))))
+  #
+  #   ## We don't care to track col issues with blank/NA cols in PSNUxIM
+  #   submission_cols %<>%
+  #     dplyr::filter(!is.na(indicator_code),
+  #                   !indicator_code %in% c("")) %>%
+  #     ## Standardize mech/support_type names
+  #     dplyr::mutate(
+  #       indicator_code =
+  #         dplyr::case_when(
+  #           stringr::str_detect(indicator_code, "\\d+")
+  #           ~ paste0(stringr::str_extract(indicator_code, "\\d+"),
+  #                    "_",
+  #                    stringr::str_extract(indicator_code, "DSD|TA")),
+  #           TRUE ~ indicator_code))
+  # }
 
-  schema_cols <- d$info$schema %>%
-    dplyr::filter(sheet_name == sheet)
+  if (NROW(missing_cols) > 0) {
 
-  if (sheet == "PSNUxIM") {
-    ## Drop all IM cols (left & right sides)
-    schema_cols %<>%
-      dplyr::filter(
-        col_type != "allocation",
-        !(col_type == "target"
-          & (indicator_code %in% c("Not PEPFAR", "12345_DSD", ""))))
-
-    ## We don't care to track col issues with blank/NA cols in PSNUxIM
-    submission_cols %<>%
-      dplyr::filter(!is.na(indicator_code),
-                    !indicator_code %in% c("")) %>%
-      ## Standardize mech/support_type names
-      dplyr::mutate(
-        indicator_code =
-          dplyr::case_when(
-            stringr::str_detect(indicator_code, "\\d+")
-            ~ paste0(stringr::str_extract(indicator_code, "\\d+"),
-                     "_",
-                     stringr::str_extract(indicator_code, "DSD|TA")),
-            TRUE ~ indicator_code))
-  }
-
-  col_check <- schema_cols %>%
-    dplyr::select(indicator_code, template_order = col) %>%
-    dplyr::full_join(submission_cols,
-                     by = "indicator_code") %>%
-    dplyr::mutate(sheet = sheet) %>%
-    dplyr::select(sheet, dplyr::everything())
-
-  if (any(is.na(col_check$submission_order))) {
     c$lvl <- "WARNING"
 
-    missing_cols <- col_check %>%
-      dplyr::filter(is.na(submission_order)) %>%
-      dplyr::select(sheet, indicator_code)
-
-    c$msg <-
-      paste0(
-        c$lvl, "! In tab ", sheet,
-        ", MISSING COLUMNS: Please ensure no columns have been deleted or renamed from",
-        " the original Data Pack you have received. ->  \n\t* ",
-        paste(missing_cols$indicator_code, collapse = "\n\t* "),
-        "\n")
+    c$msg <- unique(missing_cols$sheet_name) %>%
+      purrr::set_names() %>%
+      purrr::map(
+        function(x)
+          paste0(
+            c$lvl, "! In tab ", x,
+            ", MISSING COLUMNS: Please ensure no columns have been deleted or renamed from",
+            " the original Data Pack you have received. ->  \n\t* ",
+            paste(missing_cols$indicator_code[missing_cols$sheet_name == x],
+                  collapse = "\n\t* "),
+            "\n"))
 
     c$result <- missing_cols
     attr(c$result, "test_name") <- "Missing columns"
-    #d$info$messages <- appendMessage(d$info$messages, msg, lvl)
 
     if (!quiet) {
-      messages <- appendMessage(messages, c$msg, c$lvl)
+      messages <- MessageQueue()
+      for (i in 1:length(c$msg)) {
+        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      }
+      printMessages(messages)
     }
-
-  }
-
-  if (!quiet) {
-    printMessages(messages)
   }
 
   return(c)
 
 }
 
+
 #' @export
 #' @rdname unPackDataChecks
-checkDupeCols <- function(sheet, d, quiet = TRUE) {
-
-  if (!quiet) {
-    messages <- MessageQueue()
-  }
+checkDupeCols <- function(sheets, d, quiet = TRUE) {
 
   c <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
-            has_error = FALSE,
-            sheet = sheet)
+            has_error = FALSE)
 
-  # Get data
-  data <- d$sheets[[as.character(sheet)]]
+  dup_cols <- d$sheets[sheets] %>%
+    purrr::map2_dfr(
+      .,
+      names(.),
+      function(x, y)
+        tibble::enframe(names(x), name = NULL, value = "indicator_code") %>%
+        dplyr::filter(duplicated(.)) %>%
+        dplyr::distinct() %>%
+        tibble::add_column(sheet = y, .before = 1)) %>%
+    dplyr::left_join(
+      d$info$schema %>%
+        dplyr::filter(sheet_name %in% sheets) %>%
+        dplyr::mutate(critical = !is.na(col)) %>%
+        dplyr::select(sheet = sheet_name, indicator_code, critical),
+      by = c("sheet", "indicator_code"))
 
-  # Cross-check cols
-  submission_cols <- names(data) %>%
-    tibble::enframe(name = "submission_order", value = "indicator_code")
+  # if (sheet == "PSNUxIM") {
+  #   ## Drop all IM cols (left & right sides)
+  #   schema_cols %<>%
+  #     dplyr::filter(
+  #       col_type != "allocation",
+  #       !(col_type == "target"
+  #         & (indicator_code %in% c("Not PEPFAR", "12345_DSD", ""))))
+  #
+  #   ## We don't care to track col issues with blank/NA cols in PSNUxIM
+  #   submission_cols %<>%
+  #     dplyr::filter(!is.na(indicator_code),
+  #                   !indicator_code %in% c("")) %>%
+  #     ## Standardize mech/support_type names
+  #     dplyr::mutate(
+  #       indicator_code =
+  #         dplyr::case_when(
+  #           stringr::str_detect(indicator_code, "\\d+")
+  #           ~ paste0(stringr::str_extract(indicator_code, "\\d+"),
+  #                    "_",
+  #                    stringr::str_extract(indicator_code, "DSD|TA")),
+  #           TRUE ~ indicator_code))
+  # }
 
-  schema_cols <- d$info$schema %>%
-    dplyr::filter(sheet_name == sheet)
-
-  if (sheet == "PSNUxIM") {
-    ## Drop all IM cols (left & right sides)
-    schema_cols %<>%
-      dplyr::filter(
-        col_type != "allocation",
-        !(col_type == "target"
-          & (indicator_code %in% c("Not PEPFAR", "12345_DSD", ""))))
-
-    ## We don't care to track col issues with blank/NA cols in PSNUxIM
-    submission_cols %<>%
-      dplyr::filter(!is.na(indicator_code),
-                    !indicator_code %in% c("")) %>%
-      ## Standardize mech/support_type names
-      dplyr::mutate(
-        indicator_code =
-          dplyr::case_when(
-            stringr::str_detect(indicator_code, "\\d+")
-            ~ paste0(stringr::str_extract(indicator_code, "\\d+"),
-                     "_",
-                     stringr::str_extract(indicator_code, "DSD|TA")),
-            TRUE ~ indicator_code))
-  }
-
-  col_check <- schema_cols %>%
-    dplyr::select(indicator_code, template_order = col) %>%
-    dplyr::full_join(submission_cols,
-                     by = "indicator_code") %>%
-    dplyr::mutate(sheet = sheet) %>%
-    dplyr::select(sheet, dplyr::everything())
-
-  dup_cols <- col_check %>%
-    dplyr::filter(!is.na(submission_order)) %>%
-    dplyr::mutate(critical = !is.na(template_order))
-
-  if (sheet == "PSNUxIM") {
-    last_im_int <- dup_cols %>%
-      dplyr::filter(critical) %>%
-      dplyr::mutate(
-        jump = submission_order - dplyr::lag(submission_order, default = 0)) %>%
-      dplyr::filter(jump > 1) %>%
-      dplyr::pull(submission_order) %>%
-      min() - 1
-
-    # first_im_int <- max(dup_cols$template_order, na.rm = T)
-    # b4_im <- dup_cols$submission_order[which(dup_cols$template_order == first_im_int)]
-
-    dup_cols %<>%
-      dplyr::mutate(
-        grp =
-          dplyr::case_when(
-            critical ~ "Critical",
-            submission_order < last_im_int ~ "IM Allocations",
-            TRUE ~ "IM Targets"))
-  }
-
-  dup_cols %<>%
-    dplyr::select(sheet, indicator_code, critical, dplyr::any_of("grp")) %>%
-    dplyr::add_count(dplyr::across(c(indicator_code, dplyr::any_of("grp")))) %>%
-    dplyr::filter(n > 1) %>%
-    dplyr::select(-dplyr::any_of("grp"), -n) %>%
-    dplyr::distinct()
+  # if (sheet == "PSNUxIM") {
+  #   last_im_int <- dup_cols %>%
+  #     dplyr::filter(critical) %>%
+  #     dplyr::mutate(
+  #       jump = submission_order - dplyr::lag(submission_order, default = 0)) %>%
+  #     dplyr::filter(jump > 1) %>%
+  #     dplyr::pull(submission_order) %>%
+  #     min() - 1
+  #
+  #   # first_im_int <- max(dup_cols$template_order, na.rm = T)
+  #   # b4_im <- dup_cols$submission_order[which(dup_cols$template_order == first_im_int)]
+  #
+  #   dup_cols %<>%
+  #     dplyr::mutate(
+  #       grp =
+  #         dplyr::case_when(
+  #           critical ~ "Critical",
+  #           submission_order < last_im_int ~ "IM Allocations",
+  #           TRUE ~ "IM Targets"))
+  # }
 
   if (NROW(dup_cols) > 0) {
+
     c$lvl <- "ERROR"
 
-    c$msg <-
-      paste0(
-        c$lvl, "! In tab ", sheet,
-        ", DUPLICATE COLUMNS: The following columns appear multiple times. This",
-        " must be resolved in your submission, especially for those columns",
-        " noted as [Critical!]. ->  \n\t* ",
-        paste(
-          paste0(dup_cols$indicator_code,
-                 ifelse(dup_cols$critical, " [Critical!]", "")),
-          collapse = "\n\t* "),
-        "\n")
-
-    dup_cols %<>%
-      dplyr::mutate(duplicated_cols = TRUE) %>% # remove after deprecate checkColStructure
-      dplyr::select(sheet, indicator_code, duplicated_cols)
+    c$msg <- unique(dup_cols$sheet) %>%
+      purrr::set_names() %>%
+      purrr::map(
+        function(x)
+          paste0(
+            c$lvl, "! In tab ", x,
+            ", DUPLICATE COLUMNS: The following columns appear multiple times. This",
+            " must be resolved in your submission, especially for those columns",
+            " noted as [Critical!]. ->  \n\t* ",
+            paste(
+              dup_cols[dup_cols$sheet == x, ] %>%
+                dplyr::mutate(
+                  msg_col = paste0(indicator_code,
+                                   ifelse(!is.na(critical), " [Critical!]", ""))) %>%
+                dplyr::pull(msg_col),
+              collapse = "\n\t* "),
+            "\n"))
 
     c$result <- dup_cols
     attr(c$result, "test_name") <- "Duplicate columns"
-    #d$info$messages <- appendMessage(d$info$messages, msg, lvl)
     c$has_error <- TRUE
 
     if (!quiet) {
-      messages <- appendMessage(messages, c$msg, c$lvl)
+      messages <- MessageQueue()
+      for (i in 1:length(c$msg)) {
+        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      }
+      printMessages(messages)
     }
-  }
-
-  if (!quiet) {
-    printMessages(messages)
   }
 
   return(c)
@@ -519,93 +462,84 @@ checkDupeCols <- function(sheet, d, quiet = TRUE) {
 
 #' @export
 #' @rdname unPackDataChecks
-checkOutOfOrderCols <- function(sheet, d, quiet = TRUE) {
-
-  if (!quiet) {
-    messages <- MessageQueue()
-  }
+checkOutOfOrderCols <- function(sheets, d, quiet = TRUE) {
 
   c <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
-            has_error = FALSE,
-            sheet = sheet)
+            has_error = FALSE)
 
-  # Get data
-  data <- d$sheets[[as.character(sheet)]]
+  out_of_order <- d$sheets[sheets] %>%
+    purrr::map2_dfr(
+      .,
+      names(.),
+      function(x, y)
+        names(x) %>%
+        tibble::enframe(name = "submission_order", value = "indicator_code") %>%
+        tibble::add_column(sheet = y, .before = 1)) %>%
+      dplyr::right_join(
+        d$info$schema %>%
+          dplyr::filter(sheet_name %in% sheets) %>%
+          dplyr::select(indicator_code, sheet = sheet_name, template_order = col),
+        by = c("indicator_code", "sheet")) %>%
+    dplyr::filter(submission_order != template_order)
 
-  # Cross-check cols
-  submission_cols <- names(data) %>%
-    tibble::enframe(name = "submission_order", value = "indicator_code")
-
-  schema_cols <- d$info$schema %>%
-    dplyr::filter(sheet_name == sheet)
-
-  if (sheet == "PSNUxIM") {
-    ## Drop all IM cols (left & right sides)
-    schema_cols %<>%
-      dplyr::filter(
-        col_type != "allocation",
-        !(col_type == "target"
-          & (indicator_code %in% c("Not PEPFAR", "12345_DSD", ""))))
-
-    ## We don't care to track col issues with blank/NA cols in PSNUxIM
-    submission_cols %<>%
-      dplyr::filter(!is.na(indicator_code),
-                    !indicator_code %in% c("")) %>%
-      ## Standardize mech/support_type names
-      dplyr::mutate(
-        indicator_code =
-          dplyr::case_when(
-            stringr::str_detect(indicator_code, "\\d+")
-            ~ paste0(stringr::str_extract(indicator_code, "\\d+"),
-                     "_",
-                     stringr::str_extract(indicator_code, "DSD|TA")),
-            TRUE ~ indicator_code))
-  }
-
-  col_check <- schema_cols %>%
-    dplyr::select(indicator_code, template_order = col) %>%
-    dplyr::full_join(submission_cols,
-                     by = "indicator_code") %>%
-    dplyr::mutate(sheet = sheet) %>%
-    dplyr::select(sheet, dplyr::everything())
-
-  out_of_order <- col_check %>%
-    dplyr::filter(!is.na(template_order), # Only care about critical cols
-                  !is.na(submission_order), # We've already caught missing
-                  template_order != submission_order) %>%
-    dplyr::rename(columns_out_of_order = indicator_code)
+  # if (sheet == "PSNUxIM") {
+  #   ## Drop all IM cols (left & right sides)
+  #   schema_cols %<>%
+  #     dplyr::filter(
+  #       col_type != "allocation",
+  #       !(col_type == "target"
+  #         & (indicator_code %in% c("Not PEPFAR", "12345_DSD", ""))))
+  #
+  #   ## We don't care to track col issues with blank/NA cols in PSNUxIM
+  #   submission_cols %<>%
+  #     dplyr::filter(!is.na(indicator_code),
+  #                   !indicator_code %in% c("")) %>%
+  #     ## Standardize mech/support_type names
+  #     dplyr::mutate(
+  #       indicator_code =
+  #         dplyr::case_when(
+  #           stringr::str_detect(indicator_code, "\\d+")
+  #           ~ paste0(stringr::str_extract(indicator_code, "\\d+"),
+  #                    "_",
+  #                    stringr::str_extract(indicator_code, "DSD|TA")),
+  #           TRUE ~ indicator_code))
+  # }
 
   if (NROW(out_of_order) > 0) {
+
     c$lvl <- "WARNING"
 
-    c$msg <-
-      paste0(
-        c$lvl, "! In tab ", sheet,
-        ", OUT OF ORDER COLUMNS: While it is permitted to rearrange columns",
-        " within your Data Pack as needed, this is not encouraged as it may",
-        " introduce unintended formula errors. Please review these columns to",
-        " ensure their rearrangement has not caused any issues. -> \n\t* ",
-        paste(out_of_order$indicator_code, collapse = "\n\t* "),
-        "\n")
+    c$msg <- unique(out_of_order$sheet) %>%
+      purrr::set_names() %>%
+      purrr::map(
+        function(x)
+          paste0(
+            c$lvl, "! In tab ", x,
+            ", OUT OF ORDER COLUMNS: While it is permitted to rearrange columns",
+            " within your Data Pack as needed, this is not encouraged as it may",
+            " introduce unintended formula errors. Please review these columns to",
+            " ensure their rearrangement has not caused any issues. -> \n\t* ",
+            paste(unique(out_of_order$indicator_code[out_of_order$sheet == x]),
+                  collapse = "\n\t* "),
+            "\n"))
 
     c$result <- out_of_order
     attr(c$result, "test_name") <- "Columns out of order"
-    #d$info$messages <- appendMessage(d$info$messages, msg, lvl)
 
     if (!quiet) {
-      messages <- appendMessage(messages, c$msg, c$lvl)
+      messages <- MessageQueue()
+      for (i in 1:length(c$msg)) {
+        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      }
+      printMessages(messages)
     }
   }
 
   # TODO: Add PSNUxIM check for malformed IM/type headers
   # TODO: Add PSNUxIM check for making sure IM appears once in both L & R
 
-  if (!quiet) {
-    printMessages(messages)
-  }
-
   return(c)
 
 }
@@ -613,31 +547,25 @@ checkOutOfOrderCols <- function(sheet, d, quiet = TRUE) {
 
 #' @export
 #' @rdname unPackDataChecks
-#'
-checkNonNumeric <- function(sheet, d, quiet = TRUE) {
-
-  if (!quiet) {
-    messages <- MessageQueue()
-  }
+checkNonNumeric <- function(sheets, d, quiet = TRUE) {
 
   c <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
-            has_error = FALSE,
-            sheet = sheet)
+            has_error = FALSE)
 
-  # Get data
-  data <- unPackDataPackSheet(d = d,
-                              sheet = sheet,
-                              clean_orgs = TRUE,
-                              clean_disaggs = TRUE,
-                              clean_values = FALSE)
+  non_numeric <- unPackDataPackSheet(d,
+                                     sheets,
+                                     clean_orgs = F,
+                                     clean_disaggs = F,
+                                     clean_values = F) %>%
+    dplyr::filter(
+      !(sheet_name == "Prioritization"
+        & stringr::str_sub(PSNU, 1, 9) == "_Military")) %>%
+    tidyr::drop_na(value)
 
-  # keep_cols <- d$info$schema %>%
-  #   dplyr::filter(sheet_name == sheet,
-  #                 !is.na(indicator_code),
-  #                 !indicator_code %in% c("sheet_num", "ID", "SNU1"),
-  #                 col_type %in% c("row_header", "target", "result"))
+  non_numeric <-
+    non_numeric[which(is.na(suppressWarnings(as.numeric(non_numeric$value)))), ]
 
   # if (d$info$tool == "OPU Data Pack") {
   #   data %<>%
@@ -659,40 +587,34 @@ checkNonNumeric <- function(sheet, d, quiet = TRUE) {
   #     tidyr::drop_na(value)
   # }
 
-  # header_cols <- keep_cols %>%
-  #   dplyr::filter(col_type == "row_header") %>%
-  #   dplyr::pull(indicator_code)
-
-  non_numeric <- data %>%
-    tidyr::drop_na(value) %>%
-    dplyr::mutate(value_numeric = suppressWarnings(as.numeric(value))) %>%
-    dplyr::filter(is.na(value_numeric)) %>%
-    dplyr::mutate(sheet = sheet) %>%
-    dplyr::select(sheet, dplyr::everything(), -value_numeric)
-
   if (NROW(non_numeric) > 0) {
+
     c$lvl <- "WARNING"
 
-    c$msg <-
-      paste0(
-        c$lvl, "! In tab ",
-        sheet,
-        ": NON-NUMERIC VALUES found! Please check the following columns for",
-        " possible non-numeric values. ->  \n\t* ",
-        paste(sort(unique(non_numeric$indicator_code)), collapse = "\n\t* "),
-        "\n")
+    c$msg <- unique(non_numeric$sheet_name) %>%
+      purrr::set_names() %>%
+      purrr::map(
+        function(x)
+          paste0(
+            c$lvl, "! In tab ", x,
+            ": NON-NUMERIC VALUES found! Please check the following columns for",
+            " possible non-numeric values. ->  \n\t* ",
+            paste(
+              unique(
+                non_numeric$indicator_code[non_numeric$sheet_name == x]),
+              collapse = "\n\t* "),
+            "\n"))
 
     c$result <- non_numeric
     attr(c$result, "test_name") <- "Non-numeric values"
-    #d$info$messages <- appendMessage(d$info$messages, msg, lvl)
 
     if (!quiet) {
-      messages <- appendMessage(messages, c$msg, c$lvl)
+      messages <- MessageQueue()
+      for (i in 1:length(c$msg)) {
+        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      }
+      printMessages(messages)
     }
-  }
-
-  if (!quiet) {
-    printMessages(messages)
   }
 
   return(c)
@@ -701,51 +623,49 @@ checkNonNumeric <- function(sheet, d, quiet = TRUE) {
 
 #' @export
 #' @rdname unPackDataChecks
-#'
-checkNegativeValues <- function(sheet, d, quiet = T) {
-
-  if (!quiet) {
-    messages <- MessageQueue()
-  }
+checkNegativeValues <- function(sheets, d, quiet = T) {
 
   c <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
-            has_error = FALSE,
-            sheet = sheet)
+            has_error = FALSE)
 
   negative_values <- unPackDataPackSheet(d,
-                                         sheet,
-                                         clean_orgs = TRUE,
-                                         clean_disaggs = TRUE,
-                                         clean_values = FALSE) %>%
-    dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
+                                         sheets,
+                                         clean_orgs = F,
+                                         clean_disaggs = F,
+                                         clean_values = F) %>%
     dplyr::filter(value < 0)
 
   if (NROW(negative_values) > 0) {
+
     c$lvl <- "ERROR"
 
-    c$msg <-
-      paste0(
-        c$lvl, "! In tab ",
-        sheet,
-        ": NEGATIVE VALUES found in the following columns! Ensure all values entered",
-        " against Targets are whole, positive, numeric values. These will be removed. -> \n\t* ",
-        paste(sort(unique(negative_values$indicator_code)), collapse = "\n\t* "),
-        "\n")
+    c$msg <- unique(negative_values$sheet_name) %>%
+      purrr::set_names() %>%
+      purrr::map(
+        function(x)
+          paste0(
+            c$lvl, "! In tab ", x,
+            ": NEGATIVE VALUES found in the following columns! Ensure all values entered",
+            " against Targets are whole, positive, numeric values. These will be removed. -> \n\t* ",
+            paste(
+              unique(
+                negative_values$indicator_code[negative_values$sheet_name == x]),
+              collapse = "\n\t* "),
+            "\n"))
 
     c$result <- negative_values
     attr(c$result, "test_name") <- "Negative values"
-    #d$info$messages <- appendMessage(d$info$messages, msg, lvl)
     c$has_error <- TRUE
 
     if (!quiet) {
-      messages <- appendMessage(messages, c$msg, c$lvl)
+      messages <- MessageQueue()
+      for (i in 1:length(c$msg)) {
+        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      }
+      printMessages(messages)
     }
-  }
-
-  if (!quiet) {
-    printMessages(messages)
   }
 
   return(c)
@@ -755,36 +675,24 @@ checkNegativeValues <- function(sheet, d, quiet = T) {
 
 #' @export
 #' @rdname unPackDataChecks
-#'
-checkDecimalValues <- function(sheet, d, quiet = TRUE) {
-
-  if (!quiet) {
-    messages <- MessageQueue()
-  }
+checkDecimalValues <- function(sheets, d, quiet = TRUE) {
 
   c <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
-            has_error = FALSE,
-            sheet = sheet)
-
-  data <- unPackDataPackSheet(d,
-                              sheet,
-                              clean_orgs = TRUE,
-                              clean_disaggs = TRUE,
-                              clean_values = FALSE)
+            has_error = FALSE)
 
   decimals_allowed <- d$info$schema %>%
-    dplyr::filter(
-      sheet_name == sheet
-      & col_type == "target"
-      # Filter by what's in submission to avoid unknown column warning messages
-      & indicator_code %in% unique(data$indicator_code)
-      & value_type == "percentage"
-    ) %>%
+    dplyr::filter(sheet_name %in% sheets,
+                  col_type == "target",
+                  value_type == "percentage") %>%
     dplyr::pull(indicator_code)
 
-  decimal_cols <- data %>%
+  decimal_cols <- unPackDataPackSheet(d,
+                                      sheets,
+                                      clean_orgs = F,
+                                      clean_disaggs = F,
+                                      clean_values = F) %>%
     dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
     dplyr::filter(value %% 1 != 0
                   & !indicator_code %in% decimals_allowed)
@@ -792,27 +700,31 @@ checkDecimalValues <- function(sheet, d, quiet = TRUE) {
   if (NROW(decimal_cols) > 0) {
     c$lvl <- "WARNING"
 
-    c$msg <-
-      paste0(
-        c$lvl,
-        "! In tab ",
-        sheet,
-        ": DECIMAL VALUES found in the following columns that should have only",
-        " whole, positive, numeric values. These will be rounded. -> \n\t* ",
-        paste(sort(unique(decimal_cols$indicator_code)), collapse = "\n\t* "),
-        "\n")
+    c$msg <- unique(decimal_cols$sheet_name) %>%
+      purrr::set_names() %>%
+      purrr::map(
+        function(x)
+          paste0(
+            c$lvl,
+            "! In tab ", x,
+            ": DECIMAL VALUES found in the following columns that should have only",
+            " whole, positive, numeric values. These will be rounded. -> \n\t* ",
+            paste(
+              unique(
+                decimal_cols$indicator_code[decimal_cols$sheet_name == x]),
+              collapse = "\n\t* "),
+            "\n"))
 
     c$result <- decimal_cols
     attr(c$result, "test_name") <- "Decimal values"
-    #d$info$messages <- appendMessage(d$info$messages, msg, lvl)
 
     if (!quiet) {
-      messages <- appendMessage(messages, c$msg, c$lvl)
+      messages <- MessageQueue()
+      for (i in 1:length(c$msg)) {
+        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      }
+      printMessages(messages)
     }
-  }
-
-  if (!quiet) {
-    printMessages(messages)
   }
 
   return(c)
@@ -821,58 +733,32 @@ checkDecimalValues <- function(sheet, d, quiet = TRUE) {
 
 #' @export
 #' @rdname unPackDataChecks
-#'
-checkInvalidOrgUnits <- function(sheet, d, quiet = TRUE) {
-
-  if (!quiet) {
-    messages <- MessageQueue()
-  }
+checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
 
   c <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
-            has_error = FALSE,
-            sheet = sheet)
+            has_error = FALSE)
 
-  # Get data
-  if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
-
-    data <- d$sheets[["PSNUxIM"]]
-  } else {
-    data <- unPackDataPackSheet(d = d,
-                                sheet = sheet,
-                                clean_orgs = FALSE,
-                                clean_disaggs = FALSE,
-                                clean_values = TRUE)
-  }
-
-  # TEST
-  expected_PSNUs <- valid_PSNUs %>%
-    dplyr::filter(country_uid %in% d$info$country_uids) %>%
-    dplyr::select(psnu, psnu_uid)
-
-  invalid_orgunits <- data %>%
-    dplyr::select(PSNU) %>%
-    tidyr::drop_na(PSNU) %>%
+  invalid_orgunits <- d$sheets[sheets] %>%
+    purrr::map_dfr(`[`, "PSNU") %>%
+    dplyr::bind_rows(.id = "sheet_name") %>%
     dplyr::distinct() %>%
-    dplyr::mutate(psnuid = extract_uid(PSNU),
-                  sheet_name = sheet) %>%
-    dplyr::left_join(datapackr::valid_PSNUs, by = c("psnuid" = "psnu_uid")) %>%
-    dplyr::filter(is.na(psnu) | is.na(psnuid)) %>%
-    dplyr::select(PSNU)
+    dplyr::mutate(psnuid = extract_uid(PSNU)) %>%
+    dplyr::anti_join(valid_PSNUs, by = c("psnuid" = "psnu_uid"))
 
-  na_orgunits <- data %>%
-    dplyr::select(PSNU) %>%
-    dplyr::filter(is.na(PSNU))
+  na_orgunits <- invalid_orgunits[is.na(invalid_orgunits$PSNU), ]
 
   if (NROW(invalid_orgunits) > 0 | (NROW(na_orgunits) > 0 & NROW(data) > 0)) {
 
     c$lvl <- "ERROR"
 
-    c$msg <-
+    c$msg <- unique(decimal_cols$sheet_name) %>%
+      purrr::set_names() %>%
+      purrr::map(
+        function(x)
       paste0(
-        c$lvl, "! In tab ",
-        sheet,
+        c$lvl, "! In tab ", sheet,
         ", INVALID OR BLANK ORG UNITS: ",
         ifelse(NROW(na_orgunits) > 0,
                paste0("There are ", NROW(na_orgunits), " rows where PSNU/DSNU is blank."),

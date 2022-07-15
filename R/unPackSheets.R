@@ -7,12 +7,14 @@
 #'
 #' @inheritParams datapackr_params
 #' @param check_sheets Logical. Should sheet data be validated?
+#' @param separate_datasets Logical. Should datasets be separated?
 #'
 #' @return d
 #'
 unPackSheets <- function(d,
                          sheets = NULL,
-                         check_sheets = TRUE) {
+                         check_sheets = TRUE,
+                         separate_datasets = TRUE) {
 
   interactive_print("Unpacking sheets...")
 
@@ -55,13 +57,15 @@ unPackSheets <- function(d,
       unPackDataPackSheet(d, sheet = x))
 
   # Separate Sheet Data ----
-  interactive_print("Separating datasets...")
-  datasets <- separateDataSets(data = targets,
-                               cop_year = d$info$cop_year,
-                               tool = d$info$tool)
+  if (separate_datasets) {
+    interactive_print("Separating datasets...")
+    datasets <- separateDataSets(data = targets,
+                                 cop_year = d$info$cop_year,
+                                 tool = d$info$tool)
 
-  d$data$MER <- datasets$MER
-  d$data$SUBNAT_IMPATT <- datasets$SUBNAT_IMPATT
+    d$data$MER <- datasets$MER
+    d$data$SUBNAT_IMPATT <- datasets$SUBNAT_IMPATT
+  }
 
   return(d)
 }

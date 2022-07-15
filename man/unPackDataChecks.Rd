@@ -25,19 +25,19 @@ checkToolComments(d, quiet = TRUE)
 
 checkToolConnections(d, quiet = TRUE)
 
-checkDupeRows(sheet, d, quiet = TRUE)
+checkDupeRows(sheets, d, quiet = TRUE)
 
-checkMissingCols(sheet, d, quiet = TRUE)
+checkMissingCols(sheets, d, quiet = TRUE)
 
-checkDupeCols(sheet, d, quiet = TRUE)
+checkDupeCols(sheets, d, quiet = TRUE)
 
-checkOutOfOrderCols(sheet, d, quiet = TRUE)
+checkOutOfOrderCols(sheets, d, quiet = TRUE)
 
-checkNonNumeric(sheet, d, quiet = TRUE)
+checkNonNumeric(sheets, d, quiet = TRUE)
 
-checkNegativeValues(sheet, d, quiet = T)
+checkNegativeValues(sheets, d, quiet = T)
 
-checkDecimalValues(sheet, d, quiet = TRUE)
+checkDecimalValues(sheets, d, quiet = TRUE)
 
 checkInvalidOrgUnits(sheet, d, quiet = TRUE)
 

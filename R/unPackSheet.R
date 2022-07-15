@@ -17,49 +17,42 @@
 #' @return d
 #'
 unPackDataPackSheet <- function(d,
-                                sheet,
+                                sheets,
                                 clean_orgs = TRUE,
                                 clean_disaggs = TRUE,
                                 clean_values = TRUE) {
 
-  # Read in data ----
-  data <- d$sheets[[as.character(sheet)]]
-
-  # Remove duplicate columns (Take 1st) ####
-  duplicate_cols <- duplicated(names(data))
-
-  if (any(duplicate_cols)) {
-    data <- data[, -which(duplicate_cols)]
-  }
-
-  # Make sure no blank column names ####
-  data %<>%
-    tibble::as_tibble(.name_repair = "unique")
-
-  # Focus on target_cols ----
-  target_cols <- d$info$schema %>%
+  keep_cols <- d$info$schema %>%
     dplyr::filter(
-      sheet_name == sheet
-      & (col_type == "target" | (col_type == "result" & dataset == "subnat"))
-      # Filter by what's in submission to avoid unknown column warning messages
-      & indicator_code %in% colnames(data)) %>%
-    dplyr::pull(indicator_code)
+      sheet_name %in% sheets,
+      !indicator_code %in% c("SNU1", "ID"),
+      col_type %in% c("row_header", "target")) %>%
+    dplyr::select(sheet = sheet_name, indicator_code, col_type,
+                  valid_ages, valid_sexes, valid_kps)
 
-  data %<>%
+  header_cols <- keep_cols %>%
+    dplyr::filter(col_type == "row_header")
+
+  data <- d$sheets[names(d$sheets) %in% sheets] %>%
+    purrr::map2_dfr(
+      .,
+      names(.),
+      function(x, y) x %>%
+        # Select only target-related columns ----
+      # tidyselect::any_of removes duplicates (takes 1st), ignores blank col names
+      dplyr::select(
+        tidyselect::any_of(keep_cols$indicator_code[keep_cols$sheet == y])) %>%
+      tidyr::pivot_longer(
+        cols = -tidyselect::any_of(
+          c(header_cols$indicator_code[header_cols$sheet == y])),
+        names_to = "indicator_code",
+        values_to = "value") %>%
+        tibble::add_column(sheet_name = y)) %>% # Tag sheet name ----
     # Add cols to allow compiling with other sheets ----
     addcols(c("KeyPop", "Age", "Sex")) %>%
-    dplyr::mutate(
-      psnuid = extract_uid(PSNU), # Extract PSNU uid ----
-      sheet_name = sheet) %>% # Tag sheet name ----
-    # Select only target-related columns ----
-    dplyr::select(PSNU, psnuid, sheet_name, Age, Sex, KeyPop,
-                  dplyr::one_of(target_cols)) %>%
-    dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>% # Drop if entire row NA ----
-    # Gather all indicators as single column for easier processing ----
-    tidyr::pivot_longer(cols = -c(PSNU, psnuid, Age, Sex, KeyPop, sheet_name),
-                        names_to = "indicator_code",
-                        values_to = "value") %>%
-    dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value)
+    dplyr::mutate(psnuid = extract_uid(PSNU)) %>% # Extract PSNU uid ----
+    dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value) %>%
+    tidyr::drop_na(value)
 
   #TODO: Decide whether to map PMTCT_EID ages now or later.
 
@@ -71,28 +64,29 @@ unPackDataPackSheet <- function(d,
   }
 
   if (clean_disaggs) {
-    valid_disaggs <- d$info$schema %>%
-      dplyr::filter(
-        sheet_name == sheet
-        & (col_type == "target" | (col_type == "result" & dataset == "subnat"))) %>%
-      dplyr::select(indicator_code, valid_ages, valid_sexes, valid_kps)
+    # Drop invalid disaggs (Age, Sex, KeyPop) ----
+    data %<>%
+      dplyr::left_join(keep_cols, by = c("indicator_code" = "indicator_code",
+                                       "sheet_name" = "sheet"))
 
-    data %<>% # Drop invalid disaggs (Age, Sex, KeyPop) ----
-      dplyr::left_join(valid_disaggs, by = c("indicator_code" = "indicator_code")) %>%
-      dplyr::filter(purrr::map2_lgl(Age, valid_ages, ~.x %in% .y[["name"]])
-                    & purrr::map2_lgl(Sex, valid_sexes, ~.x %in% .y[["name"]])
-                    & purrr::map2_lgl(KeyPop, valid_kps, ~.x %in% .y[["name"]])) %>%
-      dplyr::select(-valid_ages, -valid_sexes, -valid_kps)
+    data <- data[purrr::map2_lgl(data$Age, data$valid_ages, ~.x %in% .y[["name"]]), ]
+    data <- data[purrr::map2_lgl(data$Sex, data$valid_sexes, ~.x %in% .y[["name"]]), ]
+    data <- data[purrr::map2_lgl(data$KeyPop, data$valid_kps, ~.x %in% .y[["name"]]), ]
+
+    data %<>%
+      dplyr::select(
+        -tidyselect::any_of(
+          c("valid_ages", "valid_sexes", "valid_kps", "col_type")))
 
     # Aggregate OVC_HIVSTAT ####
-    if (sheet == "OVC") {
+    if ("OVC" %in% sheets) {
       data %<>%
         dplyr::mutate(
           Age = dplyr::case_when(
-            stringr::str_detect(indicator_code, "OVC_HIVSTAT") ~ NA_character_,
+            sheet_name == "OVC" & indicator_code == "OVC_HIVSTAT.T" ~ NA_character_,
             TRUE ~ Age),
           Sex = dplyr::case_when(
-            stringr::str_detect(indicator_code, "OVC_HIVSTAT") ~ NA_character_,
+            sheet_name == "OVC" & indicator_code == "OVC_HIVSTAT.T" ~ NA_character_,
             TRUE ~ Sex))
     }
   }
@@ -104,19 +98,17 @@ unPackDataPackSheet <- function(d,
       tidyr::drop_na(value) # Drop NAs & non-numerics ----
 
     # Clean Prioritizations ----
-    if (sheet == "Prioritization") {
-      data %<>%
-        dplyr::filter(
-          !stringr::str_detect(PSNU, "^_Military"),
-          value %in% prioritization_dict()$value)
-    } else {
-      data %<>%
-        dplyr::filter(value > 0)# Filter out zeros & negatives ----
-    }
+    data %<>%
+      dplyr::filter(
+        (sheet_name == "Prioritization"
+          & stringr::str_sub(PSNU, 1, 9) != "_Military"
+          & value %in% prioritization_dict()$value)
+    # Drop value <= 0 (other than 0 prioritization) ---
+        | (sheet_name != "Prioritization" & value > 0))
 
     # Aggregate (esp for OVC_HIVSTAT) ----
     data %<>%
-      dplyr::group_by(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop) %>%
+      dplyr::group_by(-value) %>%
       dplyr::summarise(value = sum(value)) %>%
       dplyr::ungroup()
   }

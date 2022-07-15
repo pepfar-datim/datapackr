@@ -6,7 +6,7 @@
 \usage{
 unPackDataPackSheet(
   d,
-  sheet,
+  sheets,
   clean_orgs = TRUE,
   clean_disaggs = TRUE,
   clean_values = TRUE
