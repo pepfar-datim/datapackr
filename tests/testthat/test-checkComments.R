@@ -7,7 +7,7 @@ test_that("Can pass a COP21 DP Template", {
                                          tool = "Data Pack",
                                          country_uids = NULL,
                                          cop_year = NULL,
-                                        d2_session = training)
+                                         d2_session = training)
   expect_silent(foo <- checkComments(d))
   # should expect no issues so FALSE
   expect_false(foo$info$has_comments_issue)
