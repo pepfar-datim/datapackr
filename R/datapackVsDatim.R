@@ -273,7 +273,7 @@ compareData_OpuDatapackVsDatim <-
     # get data from datim using dataValueSets
     # rename to standard names
     datim_data <-
-      getDataValueSets(parameters$key,
+      datimutils::getDataValueSets(parameters$key,
                        parameters$value,
                        d2_session = d2_session) %>%
       dplyr::rename(

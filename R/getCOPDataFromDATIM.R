@@ -53,7 +53,7 @@ getCOPDataFromDATIM <- function(country_uids,
   # rename to standard names
   datim_data <-
     tryCatch({
-      getDataValueSets(parameters$key,
+      datimutils::getDataValueSets(parameters$key,
                      parameters$value,
                      d2_session = d2_session)},
              error = function(cond) {
@@ -66,12 +66,6 @@ getCOPDataFromDATIM <- function(country_uids,
     return(NULL)
   } else {
     datim_data %>%
-    dplyr::rename(
-      dataElement = data_element,
-      orgUnit = org_unit,
-      categoryOptionCombo = category_option_combo,
-      attributeOptionCombo = attribute_option_combo
-    ) %>%
       #Maintain legacy behavior which
       #Cast values to doubles (even though this does not always have to be the case)
       dplyr::mutate(value = as.numeric(value),
