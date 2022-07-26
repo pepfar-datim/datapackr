@@ -1,6 +1,6 @@
 context("test-signature")
 
-
+with_mock_api({
 test_that("Can generate a key chain", {
   d <- datapackr::createKeychainInfo(submission_path = test_sheet("COP21_Data_Pack_Template.xlsx"),
                         tool = "Data Pack",
@@ -48,11 +48,14 @@ test_that("Can generate a key chain", {
    expect_equal(d$info$cop_year, 2021)
    expect_false(d$info$needs_psnuxim)
 })
+})
 
+with_mock_api({
 test_that("Can get the type and COP year of tool of a COP21 Data Pack", {
 
    d <- datapackr::createKeychainInfo(submission_path = test_sheet("COP21_Data_Pack_Template.xlsx"),
                                       d2_session = training)
    expect_equal(d$info$tool, "Data Pack")
    expect_equal(d$info$cop_year, 2021)
+})
 })

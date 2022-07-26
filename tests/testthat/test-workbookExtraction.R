@@ -1,5 +1,6 @@
 context("test-extractWorkbook")
 
+with_mock_api({
 test_that("Can list contents of COP22 template", {
   d  <-   datapackr::createKeychainInfo(submission_path = test_sheet("COP22_Data_Pack_Template_minimal.xlsx"),
                                         tool = "Data Pack",
@@ -12,8 +13,9 @@ test_that("Can list contents of COP22 template", {
   expect_true(any(d$info$worbook_contents == "xl/workbook.xml"))
 
 })
+})
 
-
+with_mock_api({
 test_that("Can extract contents of a COP22 template", {
   d  <-   datapackr::createKeychainInfo(submission_path = test_sheet("COP22_Data_Pack_Template_minimal.xlsx"),
                                         tool = "Data Pack",
@@ -25,4 +27,5 @@ test_that("Can extract contents of a COP22 template", {
   expect_true(dir.exists(d$keychain$extract_path))
   expect_true(any(list.files(d$keychain$extract_path) == "xl"))
   unlink(d$keychain$extract_path, recursive = TRUE)
+})
 })
