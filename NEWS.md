@@ -28,7 +28,7 @@
    * `extract_uid_all`
 
 ## Minor improvements and fixes
-* Refactors `unPackDataPackSheet` to reduce cyclomatic complexity.
+* Refactors `unPackDataPackSheet` to reduce cyclomatic complexity and make it functional over multiple sheets at once.
 * Updates `unPackDataPack` to use new check functions (see below).
 * Updates `unPackTool` to use `loadDataPack` instead of `createKeychainInfo`.
 * Simplifies and generalizes `unPackDataPackSheet`.
