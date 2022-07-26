@@ -17,6 +17,19 @@ getPSNUs <- function(country_uids = NULL,
                      d2_session = dynGet("d2_default_session",
                                          inherits = TRUE)) {
 
+  # If any country_uids are not actually UIDs, warn, but remove and still move on.
+  if (!any(is_uidish(country_uids))) {
+    country_uids <- NULL
+    interactive_message(paste("WARNING: All supplied country_uids appear to have been invalid.",
+                              "PSNUs for all countries will be returned."))
+  } else if(!all(is_uidish(country_uids))) {
+    invalid_uids <- country_uids[is_uidish(country_uids)]
+    country_uids <- country_uids[!country_uids %in% invalid_uids]
+    interactive_message(
+      paste0("WARNING: The following country_uids do not appear to be UIDs and will be removed: ",
+             paste_oxford(invalid_uids), final = "&"))
+  }
+
   # If Cached PSNUs list is available and fresh, use this to save processing time
   interactive_print(cached_psnus_path)
   can_read_file <- file.access(cached_psnus_path, 4) == 0
@@ -78,7 +91,7 @@ getPSNUs <- function(country_uids = NULL,
              ifelse(include_DREAMS, ",mRRlkbZolDR", ""), "]")) # Add DREAMS SNUs if requested
     
   # If country UIDs are provided, add filter for country UIDs
-  if (!is.null(missing_country_uids)) {
+  if (length(missing_country_uids) > 0) {
     api_filters %<>% append(paste0("ancestors.id:in:[", paste(missing_country_uids, collapse = ","), "]"))
   }
   
