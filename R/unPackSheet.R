@@ -27,8 +27,14 @@ unPackDataPackSheet <- function(d,
       sheet_name %in% sheets,
       !indicator_code %in% c("SNU1", "ID"),
       col_type %in% c("row_header", "target")) %>%
-    dplyr::select(sheet = sheet_name, indicator_code, col_type,
-                  valid_ages, valid_sexes, valid_kps)
+    dplyr::select(sheet_name, indicator_code, col_type,
+                  valid_ages, valid_sexes, valid_kps) %>%
+    tidyr::unnest(valid_ages, names_sep = ".") %>%
+    tidyr::unnest(valid_sexes, names_sep = ".") %>%
+    tidyr::unnest(valid_kps, names_sep = ".") %>%
+    dplyr::select(sheet_name, indicator_code, col_type,
+                  Age = valid_ages.name, Sex = valid_sexes.name,
+                  KeyPop = valid_kps.name)
 
   header_cols <- keep_cols %>%
     dplyr::filter(col_type == "row_header")
@@ -41,14 +47,15 @@ unPackDataPackSheet <- function(d,
         # Select only target-related columns ----
       # tidyselect::any_of removes duplicates (takes 1st), ignores blank col names
       dplyr::select(
-        tidyselect::any_of(keep_cols$indicator_code[keep_cols$sheet == y])) %>%
-      tidyr::pivot_longer(
-        cols = -tidyselect::any_of(
-          c(header_cols$indicator_code[header_cols$sheet == y])),
-        names_to = "indicator_code",
-        values_to = "value") %>%
+        tidyselect::any_of(
+          unique(keep_cols$indicator_code[keep_cols$sheet_name == y]))) %>%
+        tidyr::pivot_longer(
+          cols = -tidyselect::any_of(
+            c(unique(header_cols$indicator_code[header_cols$sheet_name == y]))),
+          names_to = "indicator_code",
+          values_to = "value") %>%
         tibble::add_column(sheet_name = y)) %>% # Tag sheet name ----
-    # Add cols to allow compiling with other sheets ----
+  # Add cols to allow compiling with other sheets ----
     addcols(c("KeyPop", "Age", "Sex")) %>%
     dplyr::mutate(psnuid = extract_uid(PSNU)) %>% # Extract PSNU uid ----
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value) %>%
@@ -66,17 +73,8 @@ unPackDataPackSheet <- function(d,
   if (clean_disaggs) {
     # Drop invalid disaggs (Age, Sex, KeyPop) ----
     data %<>%
-      dplyr::left_join(keep_cols, by = c("indicator_code" = "indicator_code",
-                                       "sheet_name" = "sheet"))
-
-    data <- data[purrr::map2_lgl(data$Age, data$valid_ages, ~.x %in% .y[["name"]]), ]
-    data <- data[purrr::map2_lgl(data$Sex, data$valid_sexes, ~.x %in% .y[["name"]]), ]
-    data <- data[purrr::map2_lgl(data$KeyPop, data$valid_kps, ~.x %in% .y[["name"]]), ]
-
-    data %<>%
-      dplyr::select(
-        -tidyselect::any_of(
-          c("valid_ages", "valid_sexes", "valid_kps", "col_type")))
+      dplyr::semi_join(keep_cols,
+                       by = c("indicator_code", "sheet_name", "Age", "Sex", "KeyPop"))
 
     # Aggregate OVC_HIVSTAT ####
     if ("OVC" %in% sheets) {
@@ -106,11 +104,15 @@ unPackDataPackSheet <- function(d,
     # Drop value <= 0 (other than 0 prioritization) ---
         | (sheet_name != "Prioritization" & value > 0))
 
-    # Aggregate (esp for OVC_HIVSTAT) ----
-    data %<>%
-      dplyr::group_by(-value) %>%
-      dplyr::summarise(value = sum(value)) %>%
-      dplyr::ungroup()
+    # Aggregate (esp for OVC_HIVSTAT) (except prioritizations) ----
+    pzs <- data[data$sheet_name == "Prioritization", ]
+
+    data <- data[data$sheet_name != "Prioritization", ] %>%
+      dplyr::group_by(dplyr::across(c(-value))) %>%
+      dplyr::summarise(value = sum(value), .groups = "drop") %>%
+      dplyr::bind_rows(pzs)
+
+    data <- data[order(match(data$sheet_name, names(d$sheets))), ]
   }
 
   # TEST TX_NEW <1 from somewhere other than EID ####
