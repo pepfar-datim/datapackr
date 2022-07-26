@@ -127,6 +127,19 @@ NULL
 check_country_uids <- function(country_uids, force = TRUE, d2_session = dynGet("d2_default_session", inherits = TRUE)) {
 
   country_uids <- country_uids %missing% NULL
+
+  # If any country_uids are not actually UIDs, warn, but remove and still move on.
+  if (!any(is_uidish(country_uids))) {
+    country_uids <- NULL
+    interactive_message("All supplied country_uids appear to have been invalid.")
+  } else if(!all(is_uidish(country_uids))) {
+    invalid_uids <- country_uids[is_uidish(country_uids)]
+    country_uids <- country_uids[!country_uids %in% invalid_uids]
+    interactive_message(
+      paste0("The following country_uids do not appear to be UIDs and will be removed: ",
+             paste_oxford(invalid_uids), final = "&"))
+  }
+
   valid_PSNUs <- datapackr::getPSNUs(country_uids = country_uids, d2_session = d2_session)
 
   # If any country_uids are invalid, warn but remove and still move on.
