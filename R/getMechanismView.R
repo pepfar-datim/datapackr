@@ -97,12 +97,9 @@ getMechanismView <- function(country_uids = NULL,
 
   # Filter by OU from a vector of country UIDs
   if (!is.null(country_uids)) {
-    ous <- datapackr::getPSNUs(d2_session = d2_session) %>%
-      dplyr::select(ou, ou_id, country_uid) %>%
-      dplyr::distinct() %>%
-      dplyr::filter(country_uid %in% country_uids) %>%
+    ous <- datapackr::getPSNUs(country_uids = country_uids, d2_session = d2_session) %>%
       dplyr::pull(ou) %>%
-      unique(.)
+      unique()
 
     mechs %<>%
       dplyr::filter(ou %in% ous | is.na(ou))
