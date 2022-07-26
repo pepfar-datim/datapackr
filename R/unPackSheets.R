@@ -52,9 +52,7 @@ unPackSheets <- function(d,
   }
 
   # Unpack Sheet Data ----
-  targets <-
-    purrr::map_dfr(sheets, function(x)
-      unPackDataPackSheet(d, sheet = x))
+  targets <- unPackDataPackSheet(d, sheets)
 
   # Separate Sheet Data ----
   if (separate_datasets) {
@@ -65,6 +63,8 @@ unPackSheets <- function(d,
 
     d$data$MER <- datasets$MER
     d$data$SUBNAT_IMPATT <- datasets$SUBNAT_IMPATT
+  } else {
+    d$data$targets <- targets
   }
 
   return(d)
