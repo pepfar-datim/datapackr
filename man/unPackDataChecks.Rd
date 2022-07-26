@@ -39,13 +39,13 @@ checkNegativeValues(sheets, d, quiet = T)
 
 checkDecimalValues(sheets, d, quiet = TRUE)
 
-checkInvalidOrgUnits(sheet, d, quiet = TRUE)
+checkInvalidOrgUnits(sheets, d, quiet = TRUE)
 
-checkInvalidPrioritizations(sheet, d, quiet = T)
+checkInvalidPrioritizations(sheets, d, quiet = T)
 
-checkFormulas(sheet, d, quiet = TRUE)
+checkFormulas(sheets, d, quiet = TRUE)
 
-checkDisaggs(sheet, d, quiet = TRUE)
+checkDisaggs(sheets, d, quiet = TRUE)
 
 checkSheetData(d, sheets = NULL, quiet = TRUE, ...)
 }

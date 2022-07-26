@@ -749,40 +749,41 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
 
   na_orgunits <- invalid_orgunits[is.na(invalid_orgunits$PSNU), ]
 
-  if (NROW(invalid_orgunits) > 0 | (NROW(na_orgunits) > 0 & NROW(data) > 0)) {
+  if (NROW(invalid_orgunits) > 0 | NROW(na_orgunits) > 0) {
 
     c$lvl <- "ERROR"
 
-    c$msg <- unique(decimal_cols$sheet_name) %>%
+    c$msg <- unique(invalid_orgunits$sheet_name) %>%
       purrr::set_names() %>%
       purrr::map(
         function(x)
-      paste0(
-        c$lvl, "! In tab ", sheet,
-        ", INVALID OR BLANK ORG UNITS: ",
-        ifelse(NROW(na_orgunits) > 0,
-               paste0("There are ", NROW(na_orgunits), " rows where PSNU/DSNU is blank."),
-               ""),
-        " Please also review the below PSNUs/DSNUs with invalid or missing org",
-        " unit UIDs. (This is an 11-digit alphanumeric code assigned in DATIM to",
-        " each organization unit.) If you believe these are valid, confirm in",
-        " both DATIM & FACTS Info that the below are correctly added and active",
-        " for the appropriate COP Year. ->  \n\t* ",
-        paste(invalid_orgunits$PSNU, collapse = "\n\t* "),
-        "\n")
+          paste0(
+            c$lvl, "! In tab ", x,
+            ", INVALID OR BLANK ORG UNITS: ",
+            ifelse(
+              NROW(na_orgunits) > 0,
+              paste0("There are ", NROW(na_orgunits),
+                     " rows where PSNU/DSNU was left blank."),
+              ""),
+            " Please also review the below PSNUs/DSNUs with invalid or missing org",
+            " unit UIDs. (This is an 11-digit alphanumeric code assigned in DATIM to",
+            " each organization unit.) If you believe these are valid, confirm in",
+            " both DATIM & FACTSInfo that the below are correctly added and active",
+            " for the appropriate COP Year. ->  \n\t* ",
+            paste(invalid_orgunits$PSNU[!is.na(invalid_orgunits$PSNU)], collapse = "\n\t* "),
+            "\n"))
 
     c$result <- invalid_orgunits
     attr(c$result, "test_name") <- "Invalid orgunits"
-    #d$info$messages <- appendMessage(d$info$messages, msg, lvl)
     c$has_error <- TRUE
 
     if (!quiet) {
-      messages <- appendMessage(messages, c$msg, c$lvl)
+      messages <- MessageQueue()
+      for (i in 1:length(c$msg)) {
+        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      }
+      printMessages(messages)
     }
-  }
-
-  if (!quiet) {
-    printMessages(messages)
   }
 
   return(c)
@@ -791,47 +792,20 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
 
 #' @export
 #' @rdname unPackDataChecks
-checkInvalidPrioritizations <- function(sheet, d, quiet = T) {
-
-  if (!quiet) {
-    messages <- MessageQueue()
-  }
+checkInvalidPrioritizations <- function(sheets, d, quiet = T) {
 
   c <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
-            has_error = FALSE,
-            sheet = sheet)
+            has_error = FALSE)
 
-  if (!sheet == "Prioritization") {
-    return(c)
-  }
-
-  # Get data
-  data <- unPackDataPackSheet(d,
-                              sheet,
-                              clean_orgs = TRUE,
-                              clean_disaggs = FALSE,
-                              clean_values = FALSE)
-
-  expected_PSNUs <- valid_PSNUs %>%
-    dplyr::filter(country_uid %in% d$info$country_uids) %>%
-    dplyr::mutate(psnu_name = paste0(psnu, " [", psnu_uid, "]")) %>%
-    dplyr::select(psnu_uid, psnu_name)
-
-  invalid_prioritizations <- data %>%
-    dplyr::select(PSNU, psnuid, value) %>%
-    dplyr::full_join(expected_PSNUs,
-                     by = c("psnuid" = "psnu_uid")) %>%
-    dplyr::mutate(
-      type = dplyr::case_when(
-        stringr::str_detect(PSNU, "^_Military") ~ "Military",
-        is.na(PSNU) ~ "Missing PSNU",
-        is.na(value) ~ "Blank",
-        !value %in% prioritization_dict()$value ~ "Invalid")) %>%
-    dplyr::filter(!is.na(type),
-                  type != "Military") %>%
-    dplyr::select(psnu_name, type)
+  data <- d$sheets[["Prioritization"]][, c("PSNU", "IMPATT.PRIORITY_SNU.T")]
+  names(data)[names(data) == "IMPATT.PRIORITY_SNU.T"] <- "value"
+  data <- data[, c("PSNU","value")]
+  data$psnuid <- extract_uid(data$PSNU)
+  data <- data[data$psnuid %in% valid_PSNUs$psnu_uid, ]
+  data <- data[!data$psnuid %in% valid_PSNUs$psnu_uid[valid_PSNUs$psnu_type == "Military"], ]
+  invalid_prioritizations <- data[!data$value %in% prioritization_dict()$value, ]
 
   if (NROW(invalid_prioritizations) > 0) {
 
@@ -843,8 +817,7 @@ checkInvalidPrioritizations <- function(sheet, d, quiet = T) {
 
     c$msg <-
       paste0(
-        c$lvl, "! In tab ",
-        sheet,
+        c$lvl, "! In tab Prioritization",
         ": INVALID PRIORITIZATIONS: The following PSNUs have been assigned",
         " invalid or blank prioritizations. Please note that all PSNUs must have",
         " an assigned prioritization, and prioritizations can only be assigned ",
@@ -854,16 +827,15 @@ checkInvalidPrioritizations <- function(sheet, d, quiet = T) {
 
     c$result <- invalid_prioritizations
     attr(c$result, "test_name") <- "Invalid prioritizations"
-    #d$info$messages <- appendMessage(d$info$messages, msg, lvl)
     c$has_error <- TRUE
 
     if (!quiet) {
-      messages <- appendMessage(messages, c$msg, c$lvl)
+      messages <- MessageQueue()
+      for (i in 1:length(c$msg)) {
+        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      }
+      printMessages(messages)
     }
-  }
-
-  if (!quiet) {
-    printMessages(messages)
   }
 
   return(c)
@@ -873,27 +845,20 @@ checkInvalidPrioritizations <- function(sheet, d, quiet = T) {
 
 #' @export
 #' @rdname unPackDataChecks
-checkFormulas <- function(sheet, d, quiet = TRUE) {
-
-  if (!quiet) {
-    messages <- MessageQueue()
-  }
+checkFormulas <- function(sheets, d, quiet = TRUE) {
 
   c <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
-            has_error = FALSE,
-            sheet = sheet)
+            has_error = FALSE)
 
   header_row <- headerRow(tool = "Data Pack", cop_year = d$info$cop_year)
 
   # Pull in formulas from schema
-  # TODO: Flag differently for green vs other columns
   formulas_schema <- d$info$schema %>%
     dplyr::filter(
-      sheet_name == sheet,
+      sheet_name %in% sheets,
       !is.na(formula)) %>%
-    dplyr::select(col, indicator_code, formula) %>%
     # tidyr::crossing(row = ((header_row+1):max(formulas_datapack$row))) %>%
     # dplyr::select(row, col, indicator_code, formula) %>%
     # dplyr::mutate(
@@ -905,112 +870,134 @@ checkFormulas <- function(sheet, d, quiet = TRUE) {
     #     )
     # )
     dplyr::mutate(
-      formula = stringr::str_replace_all(
-        formula,
-        "(?<=[:upper:])\\d+",
-        "\\\\d+"))
+      formula = stringr::str_replace_all(formula,
+                                         "(?<=[:upper:])\\d+",
+                                         "\\\\d+"),
+      critical =
+        dplyr::case_when(
+          indicator_code == "ID" | col_type == "target" ~ "Y",
+          TRUE ~ "N")) %>%
+    dplyr::select(sheet_num, sheet_name, indicator_code, fx_schema = formula,
+                  critical)
 
   # Pull in formulas from Data Pack sheet
   formulas_datapack <-
     tidyxl::xlsx_cells(path = d$keychain$submission_path,
-                       sheets = sheet,
+                       sheets = sheets,
                        include_blank_cells = T) %>%
-    # Note that this function won't pick up any blank column headers or deleted formulas
+    # Note that this function won't pick up any cols with blank indicator_code
     dplyr::filter(row >= header_row) %>%
-    dplyr::select(sheet, row, col, character, numeric, formula) %>%
     dplyr::mutate(formula = dplyr::if_else(is.na(formula),
                                            as.character(numeric),
                                            formula),
-                  formula = dplyr::if_else(is.na(formula), character, formula))
+                  formula = dplyr::if_else(is.na(formula), character, formula)) %>%
+    dplyr::select(sheet_name = sheet, row, col, character, formula)
 
-  # Remove duplicate columns (Take 1st)
-  cols_to_keep <- formulas_datapack %>%
-    dplyr::filter(row == header_row) %>%
-    dplyr::select(col, character) %>%
-    dplyr::filter(!duplicated(character)) %>%
-  # Drop cols not in schema
-    dplyr::filter(character %in% formulas_schema$indicator_code)
+  indicator_codes <- formulas_datapack %>%
+    dplyr::filter(row == header_row, !is.na(character)) %>%
+    dplyr::select(sheet_name, col, indicator_code = character) %>%
+    dplyr::semi_join(formulas_schema, by = c("indicator_code", "sheet_name"))
 
   formulas_datapack %<>%
-    dplyr::right_join(
-      (cols_to_keep %>%
-         dplyr::select(col, indicator_code = character)),
-      by = c("col" = "col")) %>%
-    dplyr::select(row, col, indicator_code, formula) %>%
-    dplyr::filter(row != header_row) %>%
-    purrr::when(
-      sheet == "PSNUxIM" & d$info$tool == "Data Pack" ~ .,
-      ~  dplyr::group_by(., row) %>%
-        dplyr::mutate(occurrence = duplicated(indicator_code)) %>%
-        dplyr::ungroup() %>%
-        dplyr::filter(occurrence == FALSE) %>%
-        dplyr::select(-occurrence) %>%
-        # Limit to only columns that DUIT cares about
-        dplyr::filter(indicator_code %in% formulas_schema$indicator_code)
-    ) %>%
+    dplyr::left_join(indicator_codes, by = c("col", "sheet_name")) %>%
+    dplyr::select(sheet_name, row, indicator_code, formula) %>%
+    dplyr::filter(row != header_row,
+                  !is.na(indicator_code)) %>%
+    # purrr::when(
+    #   sheet == "PSNUxIM" & d$info$tool == "Data Pack" ~ .,
+    #   ~  dplyr::group_by(., row) %>%
+    #     dplyr::mutate(occurrence = duplicated(indicator_code)) %>%
+    #     dplyr::ungroup() %>%
+    #     dplyr::filter(occurrence == FALSE) %>%
+    #     dplyr::select(-occurrence) %>%
+    #     # Limit to only columns that DUIT cares about
+    #     dplyr::filter(indicator_code %in% formulas_schema$indicator_code)
+    # ) %>%
     #TODO: Add to catch where referencing wrong row
-    #TODO: Fix to catch where formulas are completed deleted
     dplyr::mutate(
-      formula = stringr::str_replace_all(
-        formula,
-        "(?<=[:upper:])\\d+",
-        "\\\\d+"))
+      formula = stringr::str_replace_all(formula,
+                                         "(?<=[:upper:])\\d+",
+                                         "\\\\d+"))
 
   # Compare formulas from schema against Data Pack to see diffs
-  altered_formulas <- formulas_schema %>%
-    dplyr::filter(indicator_code %in% formulas_datapack$indicator_code) %>%
-    dplyr::left_join(
-      formulas_datapack,
-      by = ifelse(sheet == "PSNUxIM" & d$info$tool == "Data Pack",
-                  c("col" = "col"),
-                  c("indicator_code" = "indicator_code"))) %>%
-    dplyr::filter(formula.x != formula.y) %>%
-    purrr::when(sheet == "PSNUxIM" & d$info$tool == "Data Pack" ~ dplyr::rename(., indicator_code = indicator_code.y),
-                ~ .) %>%
-    dplyr::select(
-      indicator_code, correct_fx = formula.x, submitted_fx = formula.y, row) %>%
-    dplyr::group_by(indicator_code, correct_fx, submitted_fx) %>%
-    dplyr::mutate(count = dplyr::n()) %>%
-    dplyr::group_by(indicator_code, correct_fx, submitted_fx, count) %>%
-    dplyr::summarise(affected_rows = formatSetStrings(row)) %>%
-    dplyr::ungroup()
+  altered_formulas <- formulas_datapack %>%
+    dplyr::anti_join(formulas_schema,
+                     by = c("sheet_name" = "sheet_name",
+                            "indicator_code" = "indicator_code",
+                            "formula" = "fx_schema")) %>%
+    dplyr::left_join(formulas_schema,
+                     by = c("sheet_name", "indicator_code")) %>%
+    # dplyr::left_join(
+    #   formulas_schema,
+    #   by = ifelse(sheet == "PSNUxIM" & d$info$tool == "Data Pack",
+    #               c("col" = "col"),
+    #               c("indicator_code" = "indicator_code"))) %>%
+    # purrr::when(sheet == "PSNUxIM" & d$info$tool == "Data Pack" ~ dplyr::rename(., indicator_code = indicator_code.y),
+    #             ~ .) %>%
+    dplyr::select(sheet_num, sheet_name, row, indicator_code,
+                  correct_fx = fx_schema, submitted_fx = formula, critical)
 
   if (NROW(altered_formulas) > 0) {
 
     c$lvl <- "WARNING"
 
     cols_affected <- altered_formulas %>%
-      dplyr::select(indicator_code, correct_fx, count) %>%
-      dplyr::group_by(indicator_code, correct_fx) %>%
-      dplyr::summarize(count = sum(count)) %>%
-      dplyr::ungroup() %>%
+      dplyr::count(sheet_num, sheet_name, indicator_code, critical, name = "count") %>%
       dplyr::mutate(fx_violations = paste0(indicator_code, ":  ", count))
 
-    c$msg <-
-      paste0(
-        c$lvl, "! In tab ",
-        sheet,
-        ", ", NROW(cols_affected), " ALTERED FORMULAS:",
-        " Altering formulas in the Grey colored columns without DUIT and PPM",
-        " approval may lead to programmatic and technical issues in your Data ",
-        " Pack. Green colored columns may be altered without permission. ",
-        " Note that this warning may be triggered due to a formula being deleted",
-        " or overwritten, or a manual fix not being applied.",
-        " Affected columns and the number of violations are listed below. ->  \n\t* ",
-        paste(cols_affected$fx_violations, collapse = "\n\t* "),
-        "\n")
+    critical <- cols_affected[cols_affected$critical == "Y", ]
+    non_critical <- cols_affected[cols_affected$critical == "N", ]
+
+    c$msg <- unique(cols_affected$sheet_name) %>%
+      purrr::set_names() %>%
+      purrr::map(
+        function(x)
+          paste0(
+            c$lvl, "! In tab ", x, ", ",
+            sum(critical$count[critical$sheet_name == x]),
+            " CRITICAL ALTERED FORMULAS & ",
+            sum(non_critical$count[non_critical$sheet_name == x]),
+            " NON-CRITICAL ALTERED FORMULAS:",
+            " Altering formulas in Grey colored columns without DUIT and PPM",
+            " approval may lead to programmatic and technical issues in your Data ",
+            " Pack. This warning may be triggered by deleting or overwriting a",
+            " formula, or a manual fix not being applied. See the provided",
+            " Validation Results file for detail on both critical and",
+            " non-critical formulas",
+            ifelse(
+              NROW(critical[critical$sheet_name == x, ]) > 0,
+              paste0(", and below for the number of violations",
+                     " against critical columns ->  \n\t* ",
+                     paste(critical$fx_violations[critical$sheet_name == x],
+                           collapse = "\n\t* ")),
+              "."),
+            "\n"))
+
+    altered_formulas %<>%
+      dplyr::group_by(sheet_num, sheet_name, indicator_code, correct_fx,
+                      submitted_fx, critical) %>%
+      dplyr::summarise(affected_rows = formatSetStrings(row),
+                       .groups = "drop") %>%
+      dplyr::ungroup()
+
+    # Alternative with less detail but more manageably sized:
+    # altered_formulas %<>%
+    #   dplyr::group_by(sheet_num, sheet_name, indicator_code, correct_fx,
+    #                   critical) %>%
+    #   dplyr::summarise(affected_rows = formatSetStrings(row),
+    #                    .groups = "drop") %>%
+    #   dplyr::ungroup()
 
     c$result <- altered_formulas
     attr(c$result, "test_name") <- "Altered Formulas"
-    #d$info$messages <- appendMessage(d$info$messages, msg, lvl)
 
     if (!quiet) {
-      messages <- appendMessage(messages, c$msg, c$lvl)
+      messages <- MessageQueue()
+      for (i in 1:length(c$msg)) {
+        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      }
+      printMessages(messages)
     }
-  }
-
-  if (!quiet) {
-    printMessages(messages)
   }
 
   return(c)
@@ -1020,77 +1007,79 @@ checkFormulas <- function(sheet, d, quiet = TRUE) {
 
 #' @export
 #' @rdname unPackDataChecks
-checkDisaggs <- function(sheet, d, quiet = TRUE) {
+checkDisaggs <- function(sheets, d, quiet = TRUE) {
 
-  if (!quiet) {
-    messages <- MessageQueue()
+  if (any(c("SNU x IM", "PSNUxIM") %in% sheets)) {
+    interactive_warning("Sorry! Can't check the PSNUxIM tab with this function.")
   }
+  sheets <- sheets[sheets != "PSNUxIM"]
 
-  if (sheet %in% c("SNU x IM", "PSNUxIM")) {
-    stop("Sorry! Can't check the PSNUxIM tab with this function.")
-  }
   #TODO: Add functionality for PSNUxIM
 
   c <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
-            has_error = FALSE,
-            sheet = sheet)
-
-  data <- unPackDataPackSheet(d,
-                              sheet,
-                              clean_orgs = TRUE,
-                              clean_disaggs = FALSE,
-                              clean_values = TRUE)
+            has_error = FALSE)
 
   valid_disaggs <- d$info$schema %>%
-    dplyr::filter(
-      sheet_name == sheet
-      & (col_type == "target" | (col_type == "result" & dataset == "subnat"))) %>%
-    dplyr::select(indicator_code, valid_ages, valid_sexes, valid_kps)
+    dplyr::filter(sheet_name %in% sheets
+                  & col_type == "target") %>%
+    dplyr::select(sheet_name, indicator_code,
+                  valid_ages, valid_sexes, valid_kps) %>%
+    tidyr::unnest(valid_ages, names_sep = ".") %>%
+    tidyr::unnest(valid_sexes, names_sep = ".") %>%
+    tidyr::unnest(valid_kps, names_sep = ".") %>%
+    dplyr::select(sheet_name, indicator_code, Age = valid_ages.name,
+                  Sex = valid_sexes.name, KeyPop = valid_kps.name)
 
-  defunct_disaggs <- data %>%
-    dplyr::left_join(valid_disaggs, by = c("indicator_code" = "indicator_code")) %>%
-    dplyr::filter(!purrr::map2_lgl(Age, valid_ages, ~.x %in% .y[["name"]])
-                  | !purrr::map2_lgl(Sex, valid_sexes, ~.x %in% .y[["name"]])
-                  | !purrr::map2_lgl(KeyPop, valid_kps, ~.x %in% .y[["name"]])) %>%
-    dplyr::select(indicator_code, Age, Sex, KeyPop) %>%
+  defunct_disaggs <- unPackDataPackSheet(d,
+                                         sheets,
+                                         clean_orgs = TRUE,
+                                         clean_disaggs = FALSE,
+                                         clean_values = TRUE) %>%
+    dplyr::anti_join(
+      valid_disaggs,
+      by = c("sheet_name", "indicator_code", "Age", "Sex", "KeyPop")) %>%
+    dplyr::select(sheet_name, indicator_code, Age, Sex, KeyPop) %>%
     dplyr::distinct()
 
   if (NROW(defunct_disaggs) > 0) {
 
-    defunct_msg <-
-      utils::capture.output(
-        print(as.data.frame(defunct_disaggs), row.names = FALSE))
-
     c$lvl <- "ERROR"
 
-    c$msg <-
-      paste0(
-        c$lvl, "! In tab ",
-        sheet,
-        ": INVALID DISAGGS. Please review all tabs flagged by this test to ensure",
-        " no Age, Sex, or Key Population disaggregates have been inadvertently or",
-        " incorrectly altered. If you believe this has been flagged in error, ",
-        " please first refer to MER Guidance to confirm valid disaggregates for",
-        " the data element flagged. (Check MER Guidance for correct alternatives.",
-        " Also note that single-digit ages should be left-padded with zeros,",
-        " e.g., 01-04 instead of 1-4.) -> \n\t",
-        paste(defunct_msg, collapse = "\n\t"),
-        "\n")
+    c$msg <- unique(defunct_disaggs$sheet_name) %>%
+      purrr::set_names() %>%
+      purrr::map(
+        function(x)
+          paste0(
+            c$lvl, "! In tab ", x,
+            ": INVALID DISAGGS. Please review all tabs flagged by this test to ensure",
+            " no Age, Sex, or Key Population disaggregates have been inadvertently or",
+            " incorrectly altered. If you believe this has been flagged in error, ",
+            " please first refer to MER Guidance to confirm valid disaggregates for",
+            " the data element flagged. (Check MER Guidance for correct alternatives.",
+            " Also note that single-digit ages should be left-padded with zeros,",
+            " e.g., 01-04 instead of 1-4.) -> \n\t",
+            paste(
+              utils::capture.output(
+                print(
+                  as.data.frame(
+                    defunct_disaggs[defunct_disaggs$sheet_name == x, ]),
+                  row.names = FALSE)),
+              collapse = "\n\t"),
+            "\n"))
 
     c$result <- defunct_disaggs
     attr(c$result, "test_name") <- "Defunct disaggs"
-    #d$info$messages <- appendMessage(d$info$messages, msg, lvl)
     c$has_error <- TRUE
 
     if (!quiet) {
-      messages <- appendMessage(messages, c$msg, c$lvl)
+      messages <- MessageQueue()
+      for (i in 1:length(c$msg)) {
+        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      }
+      printMessages(messages)
     }
-  }
-
-  if (!quiet) {
-    printMessages(messages)
   }
 
   return(c)
@@ -1140,40 +1129,20 @@ checkSheetData <- function(d,
     defunct_disaggs = checkDisaggs
   )
 
-  sheet_checks <- function(.f, sheets, d) {
-
-    r <- purrr::map(sheets, .f, d)
-
-    result <- purrr::map_dfr(r, function(x) purrr::pluck(x, "result"))
-    msg <- purrr::map_chr(r, function(x) purrr::pluck(x, "msg") %||% NA_character_)
-    msg <- msg[!is.na(msg)]
-    lvl <- purrr::map_chr(r, function(x) purrr::pluck(x, "lvl") %||% NA_character_)
-    lvl <- lvl[!is.na(lvl)]
-    has_error <- purrr::map_lgl(r, function(x) purrr::pluck(x, "has_error") %||% NA)
-    has_error <- any(has_error)
-
-    s <- list(result = result,
-              msg = msg,
-              lvl = lvl,
-              has_error = has_error)
-
-    return(s)
-  }
-
-  # TODO: Make sure all functions note sheet name as column in result
-  # TODO: Make sure all functions row bind results
-
-  data_checks <- purrr::map(funs, sheet_checks, sheets, d)
+  data_checks <-  purrr::map(funs, purrr::exec, sheets, d)
 
   d$tests <-
     append(d$tests,
-           purrr::map(data_checks,
-                      function(x) purrr::pluck(x, "result"))) %>%
+           purrr::map(data_checks, ~ purrr::pluck(.x, "result"))) %>%
     purrr::discard(is.null)
 
-  msg <- purrr::map(data_checks, function(x) purrr::pluck(x, "msg")) %>%
+  msg <- purrr::map(data_checks, ~ Reduce(f = c,
+                                              x = purrr::pluck(.x, "msg"))) %>%
     Reduce(f = c, x = .)
-  lvl <- purrr::map(data_checks, function(x) purrr::pluck(x, "lvl")) %>%
+  lvl <- purrr::map(data_checks,
+                    function(x)
+                      rep(purrr::pluck(x, "lvl"),
+                          length(purrr::pluck(x, "msg")))) %>%
     Reduce(f = c, x = .)
 
   for (i in 1:length(msg)) {
@@ -1185,8 +1154,8 @@ checkSheetData <- function(d,
     c(., d$info$has_error) %>%
     any()
 
-
-
+  # TODO: Make sure all functions note sheet name as column in result
+  # TODO: Make sure all functions row bind results
 
 
     # TODO: TEST AGYW Tab for missing DSNUs ####
