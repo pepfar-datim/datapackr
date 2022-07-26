@@ -276,12 +276,7 @@ compareData_OpuDatapackVsDatim <-
       datimutils::getDataValueSets(parameters$key,
                        parameters$value,
                        d2_session = d2_session) %>%
-      dplyr::rename(
-        dataElement = data_element,
-        orgUnit = org_unit,
-        categoryOptionCombo = category_option_combo,
-        attributeOptionCombo = attribute_option_combo,
-        datim_value = value) %>%
+      dplyr::rename(datim_value = value) %>%
       dplyr::select(dataElement,
                     period,
                     orgUnit,
