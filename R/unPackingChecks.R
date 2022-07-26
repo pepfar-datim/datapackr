@@ -265,7 +265,7 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
     if (!quiet) {
       messages <- MessageQueue()
 
-      for (i in 1:length(c$msg)) {
+      for (i in seq_along(c$msg)) {
         messages <- appendMessage(messages, c$msg[[i]], c$lvl)
       }
 
@@ -340,7 +340,7 @@ checkMissingCols <- function(sheets, d, quiet = TRUE) {
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in 1:length(c$msg)) {
+      for (i in seq_along(c$msg)) {
         messages <- appendMessage(messages, c$msg[[i]], c$lvl)
       }
       printMessages(messages)
@@ -449,7 +449,7 @@ checkDupeCols <- function(sheets, d, quiet = TRUE) {
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in 1:length(c$msg)) {
+      for (i in seq_along(c$msg)) {
         messages <- appendMessage(messages, c$msg[[i]], c$lvl)
       }
       printMessages(messages)
@@ -530,7 +530,7 @@ checkOutOfOrderCols <- function(sheets, d, quiet = TRUE) {
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in 1:length(c$msg)) {
+      for (i in seq_along(c$msg)) {
         messages <- appendMessage(messages, c$msg[[i]], c$lvl)
       }
       printMessages(messages)
@@ -610,7 +610,7 @@ checkNonNumeric <- function(sheets, d, quiet = TRUE) {
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in 1:length(c$msg)) {
+      for (i in seq_along(c$msg)) {
         messages <- appendMessage(messages, c$msg[[i]], c$lvl)
       }
       printMessages(messages)
@@ -661,7 +661,7 @@ checkNegativeValues <- function(sheets, d, quiet = T) {
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in 1:length(c$msg)) {
+      for (i in seq_along(c$msg)) {
         messages <- appendMessage(messages, c$msg[[i]], c$lvl)
       }
       printMessages(messages)
@@ -720,7 +720,7 @@ checkDecimalValues <- function(sheets, d, quiet = TRUE) {
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in 1:length(c$msg)) {
+      for (i in seq_along(c$msg)) {
         messages <- appendMessage(messages, c$msg[[i]], c$lvl)
       }
       printMessages(messages)
@@ -779,7 +779,7 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in 1:length(c$msg)) {
+      for (i in seq_along(c$msg)) {
         messages <- appendMessage(messages, c$msg[[i]], c$lvl)
       }
       printMessages(messages)
@@ -801,7 +801,7 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = T) {
 
   data <- d$sheets[["Prioritization"]][, c("PSNU", "IMPATT.PRIORITY_SNU.T")]
   names(data)[names(data) == "IMPATT.PRIORITY_SNU.T"] <- "value"
-  data <- data[, c("PSNU","value")]
+  data <- data[, c("PSNU", "value")]
   data$psnuid <- extract_uid(data$PSNU)
   data <- data[data$psnuid %in% valid_PSNUs$psnu_uid, ]
   data <- data[!data$psnuid %in% valid_PSNUs$psnu_uid[valid_PSNUs$psnu_type == "Military"], ]
@@ -831,7 +831,7 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = T) {
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in 1:length(c$msg)) {
+      for (i in seq_along(c$msg)) {
         messages <- appendMessage(messages, c$msg[[i]], c$lvl)
       }
       printMessages(messages)
@@ -993,7 +993,7 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in 1:length(c$msg)) {
+      for (i in seq_along(c$msg)) {
         messages <- appendMessage(messages, c$msg[[i]], c$lvl)
       }
       printMessages(messages)
@@ -1075,7 +1075,7 @@ checkDisaggs <- function(sheets, d, quiet = TRUE) {
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in 1:length(c$msg)) {
+      for (i in seq_along(c$msg)) {
         messages <- appendMessage(messages, c$msg[[i]], c$lvl)
       }
       printMessages(messages)
@@ -1145,7 +1145,7 @@ checkSheetData <- function(d,
                           length(purrr::pluck(x, "msg")))) %>%
     Reduce(f = c, x = .)
 
-  for (i in 1:length(msg)) {
+  for (i in seq_along(c$msg)) {
     d$info$messages <- appendMessage(d$info$messages, msg[i], lvl[i])
   }
 

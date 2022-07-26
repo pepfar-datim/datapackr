@@ -20,7 +20,8 @@ writePSNUxIM <- function(d,
 
   stopifnot(
     "Cannot update PSNUxIM tab without model data." = !is.null(snuxim_model_data_path),
-    "Packing SNU x IM tabs is not supported for the requested COP year." = d$info$cop_year %in% supportedCOPYears(d$info$tool)
+    "Packing SNU x IM tabs is not supported for the requested COP year."
+      = d$info$cop_year %in% supportedCOPYears(d$info$tool)
   )
 
   if (is.null(output_folder)) {
