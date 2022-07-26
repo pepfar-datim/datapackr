@@ -42,13 +42,6 @@ with_mock_api({
     d <- d %>%
       unPackSheets(., check_sheets = FALSE)
 
-    datasets <- separateDataSets(data = d$data$targets,
-                                 cop_year = d$info$cop_year,
-                                 tool = d$info$tool)
-    d$data$MER <- datasets$MER
-    d$data$SUBNAT_IMPATT <- datasets$SUBNAT_IMPATT
-    d$data <- within(d$data, rm("targets"))
-
     d %<>%
       unPackSNUxIM(.) %>%
       packForDATIM(., type = "Undistributed MER") %>%
@@ -74,7 +67,6 @@ with_mock_api({
       d2_session = training,
       n_cores = 2L #Be nice to the CI ....
     )
-
 
     expect_setequal(names(d$memo$datapack),
                      c("prios", "by_psnu", "by_agency", "by_prio", "by_partner"))

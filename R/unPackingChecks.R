@@ -741,8 +741,8 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
             has_error = FALSE)
 
   invalid_orgunits <- d$sheets[sheets] %>%
-    purrr::map_dfr(`[`, "PSNU") %>%
     dplyr::bind_rows(.id = "sheet_name") %>%
+    dplyr::select(sheet_name, PSNU) %>%
     dplyr::distinct() %>%
     dplyr::mutate(psnuid = extract_uid(PSNU)) %>%
     dplyr::anti_join(valid_PSNUs, by = c("psnuid" = "psnu_uid"))
