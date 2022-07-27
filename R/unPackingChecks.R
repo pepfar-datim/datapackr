@@ -273,7 +273,7 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
     }
   }
 
-  return(c)
+  return(ch)
 }
 
 
@@ -347,7 +347,7 @@ checkMissingCols <- function(sheets, d, quiet = TRUE) {
     }
   }
 
-  return(c)
+  return(ch)
 
 }
 
@@ -456,7 +456,7 @@ checkDupeCols <- function(sheets, d, quiet = TRUE) {
     }
   }
 
-  return(c)
+  return(ch)
 
 }
 
@@ -540,7 +540,7 @@ checkOutOfOrderCols <- function(sheets, d, quiet = TRUE) {
   # TODO: Add PSNUxIM check for malformed IM/type headers
   # TODO: Add PSNUxIM check for making sure IM appears once in both L & R
 
-  return(c)
+  return(ch)
 
 }
 
@@ -617,7 +617,7 @@ checkNonNumeric <- function(sheets, d, quiet = TRUE) {
     }
   }
 
-  return(c)
+  return(ch)
 }
 
 
@@ -668,7 +668,7 @@ checkNegativeValues <- function(sheets, d, quiet = T) {
     }
   }
 
-  return(c)
+  return(ch)
 }
 
 
@@ -727,7 +727,7 @@ checkDecimalValues <- function(sheets, d, quiet = TRUE) {
     }
   }
 
-  return(c)
+  return(ch)
 }
 
 
@@ -786,7 +786,7 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
     }
   }
 
-  return(c)
+  return(ch)
 }
 
 
@@ -838,7 +838,7 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = T) {
     }
   }
 
-  return(c)
+  return(ch)
 }
 
 
@@ -1000,7 +1000,7 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
     }
   }
 
-  return(c)
+  return(ch)
 }
 
 
@@ -1082,7 +1082,7 @@ checkDisaggs <- function(sheets, d, quiet = TRUE) {
     }
   }
 
-  return(c)
+  return(ch)
 }
 
 
