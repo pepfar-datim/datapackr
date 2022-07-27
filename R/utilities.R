@@ -229,8 +229,8 @@ getDatasetUids <-  function(cop_year, type) {
     list(
       "2022" = list(
         "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
-        "o71WtN5JrUu", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
-        "vzhO50taykm"), # Host Country Targets: DREAMS (USG)
+                            "o71WtN5JrUu", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
+                            "vzhO50taykm"), # Host Country Targets: DREAMS (USG)
         "mer_results" = NA,
         "subnat_targets" = "J4tdiDEi08O",
         "subnat_results" = NA,
