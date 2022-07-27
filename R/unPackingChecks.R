@@ -211,7 +211,7 @@ checkToolConnections <- function(d, quiet = TRUE) {
 #' @rdname unPackDataChecks
 checkDupeRows <- function(sheets, d, quiet = TRUE) {
 
-  c <- list(result = NULL,
+  ch <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
             has_error = FALSE)
@@ -243,14 +243,14 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
                     dplyr::arrange(dplyr::across()) %>%
                     tibble::add_column(sheet = y, .before = 1))
 
-    c$lvl <- "ERROR"
+    ch$lvl <- "ERROR"
 
-    c$msg <-
+    ch$msg <-
       purrr::map2(
         dupes, names(dupes),
         function(x, y)
           paste0(
-            c$lvl, "! In tab ", y,
+            ch$lvl, "! In tab ", y,
             ": DUPLICATE ROWS found. Ensure PSNUs or Age, Sex, KeyPop disaggregates",
             " are not repeated within tabs. This issue may have been caused by inadvertent",
             " or incorrect copying of data from one row to another. -> \n\t",
@@ -258,15 +258,15 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
                   collapse = "\n\t"),
             "\n"))
 
-    c$result <- dplyr::bind_rows(dupes)
-    attr(c$result, "test_name") <- "Duplicated rows"
-    c$has_error <- TRUE
+    ch$result <- dplyr::bind_rows(dupes)
+    attr(ch$result, "test_name") <- "Duplicated rows"
+    ch$has_error <- TRUE
 
     if (!quiet) {
       messages <- MessageQueue()
 
-      for (i in seq_along(c$msg)) {
-        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      for (i in seq_along(ch$msg)) {
+        messages <- appendMessage(messages, ch$msg[[i]], ch$lvl)
       }
 
       printMessages(messages)
@@ -281,7 +281,7 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
 #' @rdname unPackDataChecks
 checkMissingCols <- function(sheets, d, quiet = TRUE) {
 
-  c <- list(result = NULL,
+  ch <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
             has_error = FALSE)
@@ -321,27 +321,27 @@ checkMissingCols <- function(sheets, d, quiet = TRUE) {
 
   if (NROW(missing_cols) > 0) {
 
-    c$lvl <- "WARNING"
+    ch$lvl <- "WARNING"
 
-    c$msg <- unique(missing_cols$sheet_name) %>%
+    ch$msg <- unique(missing_cols$sheet_name) %>%
       purrr::set_names() %>%
       purrr::map(
         function(x)
           paste0(
-            c$lvl, "! In tab ", x,
+            ch$lvl, "! In tab ", x,
             ", MISSING COLUMNS: Please ensure no columns have been deleted or renamed from",
             " the original Data Pack you have received. ->  \n\t* ",
             paste(missing_cols$indicator_code[missing_cols$sheet_name == x],
                   collapse = "\n\t* "),
             "\n"))
 
-    c$result <- missing_cols
-    attr(c$result, "test_name") <- "Missing columns"
+    ch$result <- missing_cols
+    attr(ch$result, "test_name") <- "Missing columns"
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in seq_along(c$msg)) {
-        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      for (i in seq_along(ch$msg)) {
+        messages <- appendMessage(messages, ch$msg[[i]], ch$lvl)
       }
       printMessages(messages)
     }
@@ -356,7 +356,7 @@ checkMissingCols <- function(sheets, d, quiet = TRUE) {
 #' @rdname unPackDataChecks
 checkDupeCols <- function(sheets, d, quiet = TRUE) {
 
-  c <- list(result = NULL,
+  ch <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
             has_error = FALSE)
@@ -423,14 +423,14 @@ checkDupeCols <- function(sheets, d, quiet = TRUE) {
 
   if (NROW(dup_cols) > 0) {
 
-    c$lvl <- "ERROR"
+    ch$lvl <- "ERROR"
 
-    c$msg <- unique(dup_cols$sheet) %>%
+    ch$msg <- unique(dup_cols$sheet) %>%
       purrr::set_names() %>%
       purrr::map(
         function(x)
           paste0(
-            c$lvl, "! In tab ", x,
+            ch$lvl, "! In tab ", x,
             ", DUPLICATE COLUMNS: The following columns appear multiple times. This",
             " must be resolved in your submission, especially for those columns",
             " noted as [Critical!]. ->  \n\t* ",
@@ -443,14 +443,14 @@ checkDupeCols <- function(sheets, d, quiet = TRUE) {
               collapse = "\n\t* "),
             "\n"))
 
-    c$result <- dup_cols
-    attr(c$result, "test_name") <- "Duplicate columns"
-    c$has_error <- TRUE
+    ch$result <- dup_cols
+    attr(ch$result, "test_name") <- "Duplicate columns"
+    ch$has_error <- TRUE
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in seq_along(c$msg)) {
-        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      for (i in seq_along(ch$msg)) {
+        messages <- appendMessage(messages, ch$msg[[i]], ch$lvl)
       }
       printMessages(messages)
     }
@@ -464,7 +464,7 @@ checkDupeCols <- function(sheets, d, quiet = TRUE) {
 #' @rdname unPackDataChecks
 checkOutOfOrderCols <- function(sheets, d, quiet = TRUE) {
 
-  c <- list(result = NULL,
+  ch <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
             has_error = FALSE)
@@ -509,14 +509,14 @@ checkOutOfOrderCols <- function(sheets, d, quiet = TRUE) {
 
   if (NROW(out_of_order) > 0) {
 
-    c$lvl <- "WARNING"
+    ch$lvl <- "WARNING"
 
-    c$msg <- unique(out_of_order$sheet) %>%
+    ch$msg <- unique(out_of_order$sheet) %>%
       purrr::set_names() %>%
       purrr::map(
         function(x)
           paste0(
-            c$lvl, "! In tab ", x,
+            ch$lvl, "! In tab ", x,
             ", OUT OF ORDER COLUMNS: While it is permitted to rearrange columns",
             " within your Data Pack as needed, this is not encouraged as it may",
             " introduce unintended formula errors. Please review these columns to",
@@ -525,13 +525,13 @@ checkOutOfOrderCols <- function(sheets, d, quiet = TRUE) {
                   collapse = "\n\t* "),
             "\n"))
 
-    c$result <- out_of_order
-    attr(c$result, "test_name") <- "Columns out of order"
+    ch$result <- out_of_order
+    attr(ch$result, "test_name") <- "Columns out of order"
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in seq_along(c$msg)) {
-        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      for (i in seq_along(ch$msg)) {
+        messages <- appendMessage(messages, ch$msg[[i]], ch$lvl)
       }
       printMessages(messages)
     }
@@ -549,7 +549,7 @@ checkOutOfOrderCols <- function(sheets, d, quiet = TRUE) {
 #' @rdname unPackDataChecks
 checkNonNumeric <- function(sheets, d, quiet = TRUE) {
 
-  c <- list(result = NULL,
+  ch <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
             has_error = FALSE)
@@ -589,14 +589,14 @@ checkNonNumeric <- function(sheets, d, quiet = TRUE) {
 
   if (NROW(non_numeric) > 0) {
 
-    c$lvl <- "WARNING"
+    ch$lvl <- "WARNING"
 
-    c$msg <- unique(non_numeric$sheet_name) %>%
+    ch$msg <- unique(non_numeric$sheet_name) %>%
       purrr::set_names() %>%
       purrr::map(
         function(x)
           paste0(
-            c$lvl, "! In tab ", x,
+            ch$lvl, "! In tab ", x,
             ": NON-NUMERIC VALUES found! Please check the following columns for",
             " possible non-numeric values. ->  \n\t* ",
             paste(
@@ -605,13 +605,13 @@ checkNonNumeric <- function(sheets, d, quiet = TRUE) {
               collapse = "\n\t* "),
             "\n"))
 
-    c$result <- non_numeric
-    attr(c$result, "test_name") <- "Non-numeric values"
+    ch$result <- non_numeric
+    attr(ch$result, "test_name") <- "Non-numeric values"
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in seq_along(c$msg)) {
-        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      for (i in seq_along(ch$msg)) {
+        messages <- appendMessage(messages, ch$msg[[i]], ch$lvl)
       }
       printMessages(messages)
     }
@@ -625,7 +625,7 @@ checkNonNumeric <- function(sheets, d, quiet = TRUE) {
 #' @rdname unPackDataChecks
 checkNegativeValues <- function(sheets, d, quiet = T) {
 
-  c <- list(result = NULL,
+  ch <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
             has_error = FALSE)
@@ -639,14 +639,14 @@ checkNegativeValues <- function(sheets, d, quiet = T) {
 
   if (NROW(negative_values) > 0) {
 
-    c$lvl <- "ERROR"
+    ch$lvl <- "ERROR"
 
-    c$msg <- unique(negative_values$sheet_name) %>%
+    ch$msg <- unique(negative_values$sheet_name) %>%
       purrr::set_names() %>%
       purrr::map(
         function(x)
           paste0(
-            c$lvl, "! In tab ", x,
+            ch$lvl, "! In tab ", x,
             ": NEGATIVE VALUES found in the following columns! Ensure all values entered",
             " against Targets are whole, positive, numeric values. These will be removed. -> \n\t* ",
             paste(
@@ -655,14 +655,14 @@ checkNegativeValues <- function(sheets, d, quiet = T) {
               collapse = "\n\t* "),
             "\n"))
 
-    c$result <- negative_values
-    attr(c$result, "test_name") <- "Negative values"
-    c$has_error <- TRUE
+    ch$result <- negative_values
+    attr(ch$result, "test_name") <- "Negative values"
+    ch$has_error <- TRUE
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in seq_along(c$msg)) {
-        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      for (i in seq_along(ch$msg)) {
+        messages <- appendMessage(messages, ch$msg[[i]], ch$lvl)
       }
       printMessages(messages)
     }
@@ -677,7 +677,7 @@ checkNegativeValues <- function(sheets, d, quiet = T) {
 #' @rdname unPackDataChecks
 checkDecimalValues <- function(sheets, d, quiet = TRUE) {
 
-  c <- list(result = NULL,
+  ch <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
             has_error = FALSE)
@@ -698,14 +698,14 @@ checkDecimalValues <- function(sheets, d, quiet = TRUE) {
                   & !indicator_code %in% decimals_allowed)
 
   if (NROW(decimal_cols) > 0) {
-    c$lvl <- "WARNING"
+    ch$lvl <- "WARNING"
 
-    c$msg <- unique(decimal_cols$sheet_name) %>%
+    ch$msg <- unique(decimal_cols$sheet_name) %>%
       purrr::set_names() %>%
       purrr::map(
         function(x)
           paste0(
-            c$lvl,
+            ch$lvl,
             "! In tab ", x,
             ": DECIMAL VALUES found in the following columns that should have only",
             " whole, positive, numeric values. These will be rounded. -> \n\t* ",
@@ -715,13 +715,13 @@ checkDecimalValues <- function(sheets, d, quiet = TRUE) {
               collapse = "\n\t* "),
             "\n"))
 
-    c$result <- decimal_cols
-    attr(c$result, "test_name") <- "Decimal values"
+    ch$result <- decimal_cols
+    attr(ch$result, "test_name") <- "Decimal values"
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in seq_along(c$msg)) {
-        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      for (i in seq_along(ch$msg)) {
+        messages <- appendMessage(messages, ch$msg[[i]], ch$lvl)
       }
       printMessages(messages)
     }
@@ -735,7 +735,7 @@ checkDecimalValues <- function(sheets, d, quiet = TRUE) {
 #' @rdname unPackDataChecks
 checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
 
-  c <- list(result = NULL,
+  ch <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
             has_error = FALSE)
@@ -751,14 +751,14 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
 
   if (NROW(invalid_orgunits) > 0 | NROW(na_orgunits) > 0) {
 
-    c$lvl <- "ERROR"
+    ch$lvl <- "ERROR"
 
-    c$msg <- unique(invalid_orgunits$sheet_name) %>%
+    ch$msg <- unique(invalid_orgunits$sheet_name) %>%
       purrr::set_names() %>%
       purrr::map(
         function(x)
           paste0(
-            c$lvl, "! In tab ", x,
+            ch$lvl, "! In tab ", x,
             ", INVALID OR BLANK ORG UNITS: ",
             ifelse(
               NROW(na_orgunits) > 0,
@@ -773,14 +773,14 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
             paste(invalid_orgunits$PSNU[!is.na(invalid_orgunits$PSNU)], collapse = "\n\t* "),
             "\n"))
 
-    c$result <- invalid_orgunits
-    attr(c$result, "test_name") <- "Invalid orgunits"
-    c$has_error <- TRUE
+    ch$result <- invalid_orgunits
+    attr(ch$result, "test_name") <- "Invalid orgunits"
+    ch$has_error <- TRUE
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in seq_along(c$msg)) {
-        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      for (i in seq_along(ch$msg)) {
+        messages <- appendMessage(messages, ch$msg[[i]], ch$lvl)
       }
       printMessages(messages)
     }
@@ -794,7 +794,7 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
 #' @rdname unPackDataChecks
 checkInvalidPrioritizations <- function(sheets, d, quiet = T) {
 
-  c <- list(result = NULL,
+  ch <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
             has_error = FALSE)
@@ -813,11 +813,11 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = T) {
       utils::capture.output(
         print(as.data.frame(invalid_prioritizations), row.names = FALSE))
 
-    c$lvl <- "ERROR"
+    ch$lvl <- "ERROR"
 
-    c$msg <-
+    ch$msg <-
       paste0(
-        c$lvl, "! In tab Prioritization",
+        ch$lvl, "! In tab Prioritization",
         ": INVALID PRIORITIZATIONS: The following PSNUs have been assigned",
         " invalid or blank prioritizations. Please note that all PSNUs must have",
         " an assigned prioritization, and prioritizations can only be assigned ",
@@ -825,14 +825,14 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = T) {
         paste(inv_pzs_msg, collapse = "\n\t"),
         "\n")
 
-    c$result <- invalid_prioritizations
-    attr(c$result, "test_name") <- "Invalid prioritizations"
-    c$has_error <- TRUE
+    ch$result <- invalid_prioritizations
+    attr(ch$result, "test_name") <- "Invalid prioritizations"
+    ch$has_error <- TRUE
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in seq_along(c$msg)) {
-        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      for (i in seq_along(ch$msg)) {
+        messages <- appendMessage(messages, ch$msg[[i]], ch$lvl)
       }
       printMessages(messages)
     }
@@ -847,7 +847,7 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = T) {
 #' @rdname unPackDataChecks
 checkFormulas <- function(sheets, d, quiet = TRUE) {
 
-  c <- list(result = NULL,
+  ch <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
             has_error = FALSE)
@@ -939,7 +939,7 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
 
   if (NROW(altered_formulas) > 0) {
 
-    c$lvl <- "WARNING"
+    ch$lvl <- "WARNING"
 
     cols_affected <- altered_formulas %>%
       dplyr::count(sheet_num, sheet_name, indicator_code, critical, name = "count") %>%
@@ -948,12 +948,12 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
     critical <- cols_affected[cols_affected$critical == "Y", ]
     non_critical <- cols_affected[cols_affected$critical == "N", ]
 
-    c$msg <- unique(cols_affected$sheet_name) %>%
+    ch$msg <- unique(cols_affected$sheet_name) %>%
       purrr::set_names() %>%
       purrr::map(
         function(x)
           paste0(
-            c$lvl, "! In tab ", x, ", ",
+            ch$lvl, "! In tab ", x, ", ",
             sum(critical$count[critical$sheet_name == x]),
             " CRITICAL ALTERED FORMULAS & ",
             sum(non_critical$count[non_critical$sheet_name == x]),
@@ -988,13 +988,13 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
     #                    .groups = "drop") %>%
     #   dplyr::ungroup()
 
-    c$result <- altered_formulas
-    attr(c$result, "test_name") <- "Altered Formulas"
+    ch$result <- altered_formulas
+    attr(ch$result, "test_name") <- "Altered Formulas"
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in seq_along(c$msg)) {
-        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      for (i in seq_along(ch$msg)) {
+        messages <- appendMessage(messages, ch$msg[[i]], ch$lvl)
       }
       printMessages(messages)
     }
@@ -1016,7 +1016,7 @@ checkDisaggs <- function(sheets, d, quiet = TRUE) {
 
   #TODO: Add functionality for PSNUxIM
 
-  c <- list(result = NULL,
+  ch <- list(result = NULL,
             msg = NULL,
             lvl = NULL,
             has_error = FALSE)
@@ -1045,14 +1045,14 @@ checkDisaggs <- function(sheets, d, quiet = TRUE) {
 
   if (NROW(defunct_disaggs) > 0) {
 
-    c$lvl <- "ERROR"
+    ch$lvl <- "ERROR"
 
-    c$msg <- unique(defunct_disaggs$sheet_name) %>%
+    ch$msg <- unique(defunct_disaggs$sheet_name) %>%
       purrr::set_names() %>%
       purrr::map(
         function(x)
           paste0(
-            c$lvl, "! In tab ", x,
+            ch$lvl, "! In tab ", x,
             ": INVALID DISAGGS. Please review all tabs flagged by this test to ensure",
             " no Age, Sex, or Key Population disaggregates have been inadvertently or",
             " incorrectly altered. If you believe this has been flagged in error, ",
@@ -1069,14 +1069,14 @@ checkDisaggs <- function(sheets, d, quiet = TRUE) {
               collapse = "\n\t"),
             "\n"))
 
-    c$result <- defunct_disaggs
-    attr(c$result, "test_name") <- "Defunct disaggs"
-    c$has_error <- TRUE
+    ch$result <- defunct_disaggs
+    attr(ch$result, "test_name") <- "Defunct disaggs"
+    ch$has_error <- TRUE
 
     if (!quiet) {
       messages <- MessageQueue()
-      for (i in seq_along(c$msg)) {
-        messages <- appendMessage(messages, c$msg[[i]], c$lvl)
+      for (i in seq_along(ch$msg)) {
+        messages <- appendMessage(messages, ch$msg[[i]], ch$lvl)
       }
       printMessages(messages)
     }
@@ -1145,7 +1145,7 @@ checkSheetData <- function(d,
                           length(purrr::pluck(x, "msg")))) %>%
     Reduce(f = c, x = .)
 
-  for (i in seq_along(c$msg)) {
+  for (i in seq_along(ch$msg)) {
     d$info$messages <- appendMessage(d$info$messages, msg[i], lvl[i])
   }
 
