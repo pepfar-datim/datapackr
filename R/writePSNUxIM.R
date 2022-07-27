@@ -38,7 +38,7 @@ writePSNUxIM <- function(d,
   # We normally cannot process PSNUxIM tabs with threaded comments
   # However, if we are not appending to the existing data pack, we
   # should be able to proceed.
-  if (d$info$has_comments_issue & append) {
+  if (d$info$has_comments_issue && append) {
     warning_msg <-
       paste0(
         "ERROR! Cannot update PSNUxIM information in a Data Pack with Threaded
@@ -50,7 +50,7 @@ writePSNUxIM <- function(d,
     d$info$has_error <- TRUE
 
     #TODO: Replace this with a centralized method
-    if (NROW(d$info$messages) > 0 & interactive()) {
+    if (NROW(d$info$messages) > 0 && interactive()) {
       options(warning.length = 8170)
       cat(crayon::red(d$info$messages$message))
     }
@@ -76,7 +76,7 @@ writePSNUxIM <- function(d,
 
     # TODO: Move this into packPSNUxIM to allow that function to exit early if all good
     # Proceed IFF no PSNU x IM tab exists, or exists but with missing combos ####
-    if (d$info$has_psnuxim & !d$info$missing_psnuxim_combos) {
+    if (d$info$has_psnuxim && !d$info$missing_psnuxim_combos) {
       interactive_warning("No new information available to write to PSNUxIM tab.")
       return(d)
     }
@@ -186,7 +186,7 @@ writePSNUxIM <- function(d,
   }
 
   # If new information added to SNU x IM tab, reexport Data Pack for user ####
-  if (d$info$newSNUxIM & !is.null(output_folder)) {
+  if (d$info$newSNUxIM && !is.null(output_folder)) {
     interactive_print("Removing troublesome NAs that may have been added inadvertently...")
     d <- strip_wb_NAs(d)
 
