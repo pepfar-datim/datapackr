@@ -1145,7 +1145,7 @@ checkSheetData <- function(d,
                           length(purrr::pluck(x, "msg")))) %>%
     Reduce(f = c, x = .)
 
-  for (i in seq_along(ch$msg)) {
+  for (i in seq_along(msg)) {
     d$info$messages <- appendMessage(d$info$messages, msg[i], lvl[i])
   }
 
