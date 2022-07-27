@@ -55,7 +55,8 @@ Suggests:
     parallel,
     gdtools,
     flextable,
-    officer
+    officer,
+    lintr
 Remotes:
     pepfar-datim/datimutils,
     pepfar-datim/datim-validation
