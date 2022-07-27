@@ -8,7 +8,7 @@ checkHasPSNUxIM <- function(d) {
 
   stopifnot(is.data.frame(d$data$SNUxIM))
 
-  if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1, 1]])) {
+  if (NROW(d$data$SNUxIM) == 1 && is.na(d$data$SNUxIM[[1, 1]])) {
     d$info$has_psnuxim <- FALSE
 
     if (d$info$tool == "Data Pack") {
@@ -326,7 +326,7 @@ unPackSNUxIM <- function(d) {
   d$tests$psnuxim_missing_rs_fxs <-
     tidyxl::xlsx_cells(path = d$keychain$submission_path,
                        sheets = "PSNUxIM",
-                       include_blank_cells = T) %>%
+                       include_blank_cells = TRUE) %>%
     dplyr::select(col, row, formula, character) %>%
     dplyr::filter(row >= header_row,
                   col %in% cols_to_keep$col) %>%
@@ -544,7 +544,7 @@ unPackSNUxIM <- function(d) {
                               `Deduplicated DSD Rollup`, `Deduplicated TA Rollup`),
                 na.rm = TRUE),
       `MAX - Crosswalk Total` =
-        pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = T),
+        pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = TRUE),
       `DSD Dedupe` = `Deduplicated DSD Rollup` - `SUM - DSD`,
       `TA Dedupe` = `Deduplicated TA Rollup` - `SUM - TA`,
       `Crosswalk Dedupe` = `Total Deduplicated Rollup` - `SUM - Crosswalk Total`

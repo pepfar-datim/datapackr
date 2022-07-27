@@ -73,11 +73,11 @@ model_data <- readRDS(model_data_path)
 #   "Peru", "Y0PDkv3IkGS", #49
 #   "Venezuela",  "iiPgv10L3fG" #50
 # )
-# 
+#
 # usethis::use_data(COP21_datapacks_countries, overwrite = TRUE, compress = "gzip")
 
 #Beta Pack Countries list ####
- pick <- datapackr::COP21_datapacks_countries[c(39),]
+ pick <- datapackr::COP21_datapacks_countries[c(39), ]
 
 # Dedupe Testing
 # pick <- datapackr::COP21_datapacks_countries %>%
@@ -117,12 +117,12 @@ model_data <- readRDS(model_data_path)
 # For Production run
 # pick <- datapackr::COP21_datapacks_countries
 
-for (i in 1:NROW(pick)) {
-  print(paste0(i," of ",NROW(pick), ": ", pick[[i,1]]))
+for (i in seq_len(pick)) {
+  print(paste0(i, " of ", NROW(pick), ": ", pick[[i, 1]]))
 
   packDataPack(model_data = model_data,
-               datapack_name = pick[[i,1]],
-               country_uids = unlist(pick[[i,2]]),
+               datapack_name = pick[[i, 1]],
+               country_uids = unlist(pick[[i, 2]]),
                template_path = NULL,
                cop_year = 2021,
                output_folder = output_folder,

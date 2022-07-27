@@ -60,7 +60,7 @@ createKeychainInfo <- function(submission_path = NULL,
     )
 
   if (!tool_name_type$cop_year[1] %in% c(2018:2030)
-        | !tool_name_type$type[1] %in% c("Data Pack", "OPU Data Pack")) {
+        || !tool_name_type$type[1] %in% c("Data Pack", "OPU Data Pack")) {
     stop("Please correct cell B10 on the Home tab. This should read 'COP21 Data Pack', or similar")
   }
 
@@ -77,7 +77,7 @@ createKeychainInfo <- function(submission_path = NULL,
     dplyr::select(PSNU)
 
   # If PSNU row count equal zero or empty then add Template label to column type
-  if (NROW(check_if_template$PSNU) == 0 | all(is.na(check_if_template$PSNU))) {
+  if (NROW(check_if_template$PSNU) == 0 || all(is.na(check_if_template$PSNU))) {
     tool_name_type %<>% dplyr::mutate(type = paste0(type, " Template"))
   }
 
@@ -136,7 +136,7 @@ createKeychainInfo <- function(submission_path = NULL,
 
   # Add placeholders for info messages ####
   if (d$info$tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack", "OPU Data Pack Template")
-      & d$info$cop_year %in% c("2021", "2022")) {
+      && d$info$cop_year %in% c("2021", "2022")) {
     d$info$needs_psnuxim <- FALSE
     d$info$newSNUxIM <- FALSE
     d$info$has_psnuxim <- FALSE

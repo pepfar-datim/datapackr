@@ -18,7 +18,9 @@ datapackrSupports <- function() {
   tibble::tribble(
     ~tool, ~yrs,
     "Data Pack", c(2021, 2022),
-    "OPU Data Pack", c(2021))
+    "OPU Data Pack", c(2021),
+    "Data Pack Template", c(2021, 2022),
+    "OPU Data Pack Template", c(2021))
 }
 
 
@@ -121,8 +123,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
     } else if (cop_year %in% c(2022)) {
       skip <- c("Home", "Spectrum")
     }
-  }
-  else if (tool == "OPU Data Pack Template" &
+  } else if (tool == "OPU Data Pack Template" &&
            cop_year %in% c(2021)) {
     skip <- c("Home")
   } else {
@@ -143,14 +144,17 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 #'
 headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
 
-  if (cop_year %in% c(2021, 2022)) {
-    if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
+  if (cop_year %in% supportedCOPYears()) {
+    if (tool %in% supportedTools()) {
       header_row <- 14
-    } else stop("That tool type is not supported for that cop_year.")
-  } else stop("That cop_year is not currently supported.")
+    } else {
+      stop("That tool type is not supported for that cop_year.")
+      }
+  } else {
+    stop("That cop_year is not currently supported.")
+  }
 
   return(header_row)
-
 }
 
 #' @export
@@ -171,7 +175,7 @@ pick_schema <- function(cop_year, tool) {
   tool_provided <- !is.null(tool)
   cop_year_provided <- !is.null(cop_year)
 
-  if (!tool_provided | !cop_year_provided) {
+  if (!tool_provided || !cop_year_provided) {
     interactive_print("Attempted to deduce schema.")
   }
 

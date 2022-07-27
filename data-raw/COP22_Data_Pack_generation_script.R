@@ -11,7 +11,7 @@ model_data <- readRDS(model_data_path)
 
 #Beta Packs ####
 betapack_countries <- c("Malawi", "Namibia", "Nigeria", "South Africa",
-                        "Uganda", "Zambia", "Zimbabwe", "India") 
+                        "Uganda", "Zambia", "Zimbabwe", "India")
 
 cascade_rework <- c("Malawi", "Namibia", "South Africa",
                         "Zimbabwe", "Mozambique")
@@ -60,8 +60,8 @@ pick <- datapackr::COP21_datapacks_countries %>%
 # Execution ####
 
 # i = 1
-for (i in 1:NROW(pick)) {
-  print(paste0(i," of ",NROW(pick), ": ", pick[[i,1]]))
+for (i in seq_len(pick)) {
+  print(paste0(i, " of ", NROW(pick), ": ", pick[[i, 1]]))
 
   packDataPack(model_data = model_data,
                datapack_name = pick$datapack_name[i],

@@ -71,7 +71,7 @@ createAnalytics <- function(d,
                           psnu_prioritizations = prioritizations,
                           d2_session = d2_session)
 
-      if (d$info$unallocatedIMs | !d$info$has_psnuxim) {
+      if (d$info$unallocatedIMs || !d$info$has_psnuxim) {
         d$data$analytics %<>%
               dplyr::mutate(dplyr::across(
                 c(mechanism_code, mechanism_desc, partner_desc, funding_agency),

@@ -46,8 +46,18 @@ output_folder <- Sys.getenv("OUTPUT_FOLDER") %>% paste0(., "COP21 OPUs/")
 #   "Nepal","YlSE5fOVJMa",                                                #35
 #   "Tajikistan","ZtoVYbNCnsj",                                           #36
 #   "Philippines","p1E1K4MWGpa",                                         #37
-#   "Caribbean Region",c("RKoVudgb05Y","PeOHqAwdtez","WuxG6jzaypt","zhJINyURZ5Y","WSl5y9jxCpC"), #38
-#   "Latin America Region",c("joGQFpKiHl9","QKD4CzBG2GM","N7QAPGSaODP","EXVC4bNtv84","w5NMe34EjPN","aUTsSmqqu9O","oK0gC85xx2f"), #39
+#   "Caribbean Region", c("RKoVudgb05Y",
+#                         "PeOHqAwdtez",
+#                         "WuxG6jzaypt",
+#                         "zhJINyURZ5Y",
+#                         "WSl5y9jxCpC"),                                #38
+#   "Latin America Region", c("joGQFpKiHl9",
+#                             "QKD4CzBG2GM",
+#                             "N7QAPGSaODP",
+#                             "EXVC4bNtv84",
+#                             "w5NMe34EjPN",
+#                             "aUTsSmqqu9O",
+#                             "oK0gC85xx2f"),                            #39
 #   "Burkina Faso","ZeB2eGmDfGw",                                        #40
 #   "Ghana","y3zhsvdXlhN",                                                #41
 #   "Liberia","kH29I939rDQ",                                             #42
@@ -57,14 +67,14 @@ output_folder <- Sys.getenv("OUTPUT_FOLDER") %>% paste0(., "COP21 OPUs/")
 #   "Togo","EIUtrKbw8PQ"                                                 #46
 # )
 
-pick <- datapackr::COP21_datapacks_countries[c(8),]
+pick <- datapackr::COP21_datapacks_countries[c(8), ]
 # i = 1
 
-for (i in 1:NROW(pick)) {
-  print(paste0(i," of ",NROW(pick), ": ", pick[[i,1]]))
+for (i in seq_len(pick)) {
+  print(paste0(i, " of ", NROW(pick), ": ", pick[[i, 1]]))
 
-  packOPUDataPack(datapack_name = pick[[i,1]],
-                 country_uids = unlist(pick[[i,"country_uids"]]),
+  packOPUDataPack(datapack_name = pick[[i, 1]],
+                 country_uids = unlist(pick[[i, "country_uids"]]),
                  template_path = NULL,
                  cop_year = 2021,
                  output_folder = output_folder,

@@ -309,8 +309,8 @@ unPackSchema_datapack <- function(template_path = NULL,
                                   tool = "Data Pack Template",
                                   cop_year = getCurrentCOPYear()) {
 
-  if ((tool == "Data Pack Template" & !cop_year %in% c(2021, 2022))
-      | (tool == "OPU Data Pack Template" & !cop_year %in% 2021:2022)) {
+  if ((tool == "Data Pack Template" && !cop_year %in% c(2021, 2022))
+      || (tool == "OPU Data Pack Template" && !cop_year %in% 2021:2022)) {
     stop("Sorry, unPackSchema doesn't work for that combination of tool and cop_year.")
   }
 
@@ -318,11 +318,11 @@ unPackSchema_datapack <- function(template_path = NULL,
   filepath <- handshakeFile(path = template_path,
                             tool = tool)
 
-  if (tool == "OPU Data Pack Template" & cop_year %in% c(2021)) {
-    schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = T) %>%
+  if (tool == "OPU Data Pack Template" && cop_year %in% c(2021)) {
+    schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = TRUE) %>%
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric, is_array)
   } else {
-    schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = F) %>%
+    schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = FALSE) %>%
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
   }
 

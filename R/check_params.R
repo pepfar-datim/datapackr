@@ -566,7 +566,7 @@ checkWB <- function(wb = NULL,
 #' @rdname parameter-checks
 checkResultsArchive <- function(results_archive = FALSE) {
   # IF results_archive parameter is not set throw error message.
-  if (!isTRUE(results_archive) & !isFALSE(results_archive)) {
+  if (!isTRUE(results_archive) && !isFALSE(results_archive)) {
     stop("results_archive must be either TRUE or FALSE.")
   }
 

@@ -10,7 +10,7 @@
 #' @return d
 #'
 checkFormulas <- function(d, sheet) {
-  if (sheet %in% c("SNU x IM", "PSNUxIM") & d$info$tool == "Data Pack") {
+  if (sheet %in% c("SNU x IM", "PSNUxIM") && d$info$tool == "Data Pack") {
     data <- d$data$SNUxIM
   } else {
     data <- d$data$extract
@@ -46,7 +46,7 @@ checkFormulas <- function(d, sheet) {
   formulas_datapack <-
     tidyxl::xlsx_cells(path = d$keychain$submission_path,
                       sheets = sheet,
-                      include_blank_cells = T) %>%
+                      include_blank_cells = TRUE) %>%
     dplyr::filter(row >= header_row,
                   row <= (NROW(data) + header_row)) %>%
     dplyr::mutate(

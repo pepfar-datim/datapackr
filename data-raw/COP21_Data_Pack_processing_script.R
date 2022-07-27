@@ -32,8 +32,8 @@ d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
 
 
 # Produce Beta Pack data for PAW ####
-  d$keychain$snuxim_model_data_path = snuxim_model_data_path
-  d$keychain$output_folder = output_folder
+  d$keychain$snuxim_model_data_path <- snuxim_model_data_path
+  d$keychain$output_folder <- output_folder
 
   d$data$snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path)[d$info$country_uids] %>%
     dplyr::bind_rows()
@@ -50,7 +50,7 @@ d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
   d$data$snuxim_model_data %<>%
     dplyr::left_join(
       (cop20_data_pack_schema %>%
-         dplyr::filter(dataset %in% c("mer","subnat","impatt")
+         dplyr::filter(dataset %in% c("mer", "subnat", "impatt")
                        & col_type == "target") %>%
          dplyr::select(indicator_code, dataelement_dsd, dataelement_ta) %>%
          tidyr::pivot_longer(cols = tidyselect::all_of(c("dataelement_dsd", "dataelement_ta")),
@@ -67,7 +67,7 @@ d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
   d$data$SNUxIM_combined %<>%
     dplyr::left_join(
       (cop21_data_pack_schema %>%
-         dplyr::filter(dataset %in% c("mer","subnat","impatt")
+         dplyr::filter(dataset %in% c("mer", "subnat", "impatt")
                        & col_type == "target") %>%
          dplyr::select(indicator_code, dataelement_dsd, dataelement_ta) %>%
          tidyr::pivot_longer(cols = tidyselect::all_of(c("dataelement_dsd", "dataelement_ta")),
@@ -108,7 +108,7 @@ d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
     tidyr::unnest(cols = valid_ages, names_sep  = ".") %>%
     tidyr::unnest(cols = valid_sexes, names_sep  = ".") %>%
     tidyr::unnest(cols = valid_kps, names_sep  = ".") %>%
-    dplyr::mutate_at(c("valid_sexes.name","valid_ages.name","valid_ages.id","valid_sexes.id"),
+    dplyr::mutate_at(c("valid_sexes.name", "valid_ages.name", "valid_ages.id", "valid_sexes.id"),
                      ~dplyr::case_when(indicator_code == "OVC_HIVSTAT.N.total.T"
                                        ~ NA_character_,
                                        TRUE ~ .)) %>%
@@ -150,8 +150,9 @@ d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
                               fields = "id,categoryOptions",
                               "categoryCombo.id:ne:wUpfppgjEza"),
       by = c("categoryoptioncombouid" = "id")) %>%
-    dplyr::mutate(categoryOptions = purrr::map_chr(categoryOptions,~.x[["id"]] %>%
-                                                     sort() %>% paste(collapse = ".")))
+    dplyr::mutate(categoryOptions = purrr::map_chr(categoryOptions, ~.x[["id"]] %>%
+                                                     sort() %>%
+                                                     paste(collapse = ".")))
 
   map_DataPack_DATIM_DEs_COCs_local %<>%
     dplyr::left_join(fullCodeList,
@@ -159,12 +160,12 @@ d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
                             "categoryOptions.ids" = "categoryOptions"))
 
   d$datim$MER <- d$data$SNUxIM_combined %>%
-    dplyr::left_join(., ( map_DataPack_DATIM_DEs_COCs_local %>%
+    dplyr::left_join(., (map_DataPack_DATIM_DEs_COCs_local %>%
                             dplyr::rename(Age = valid_ages.name,
                                           Sex = valid_sexes.name,
-                                          KeyPop = valid_kps.name) )) %>%
+                                          KeyPop = valid_kps.name))) %>%
     dplyr::mutate(
-      period = paste0(d$info$cop_year,"Oct") ) %>%
+      period = paste0(d$info$cop_year, "Oct")) %>%
     dplyr::select(
       dataElement = dataelement,
       period,
@@ -172,7 +173,7 @@ d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
       categoryOptionCombo = categoryoptioncombouid,
       attributeOptionCombo = mechanism_code,
       value) %>%
-    dplyr::group_by(dataElement, period, orgUnit,categoryOptionCombo,
+    dplyr::group_by(dataElement, period, orgUnit, categoryOptionCombo,
                     attributeOptionCombo) %>%
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup() %>%
