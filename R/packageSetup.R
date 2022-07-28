@@ -185,7 +185,7 @@ pick_schema <- function(cop_year, tool) {
     if (cop_year == 2021) {
       schema <- datapackr::cop21OPU_data_pack_schema
     } else if (cop_year == 2022) {
-      schema <- datapackr::cop22opu_data_pack_schema
+      schema <- datapackr::cop22OPU_data_pack_schema
     } else {
       stop("OPU Data Pack schema not available for the COP year provided.")
     }

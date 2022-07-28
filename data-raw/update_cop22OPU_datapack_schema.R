@@ -12,16 +12,16 @@ datapack_template_filepath <- system.file("extdata",
                                           "COP22_OPU_Data_Pack_Template.xlsx",
                                           package = "datapackr",
                                           mustWork = TRUE)
-cop22opu_data_pack_schema <-
+cop22OPU_data_pack_schema <-
   unPackSchema_datapack(
     template_path = datapack_template_filepath,
     skip = skip_tabs(tool = "OPU Data Pack Template", cop_year = 2022),
     cop_year = 2022)
 
-waldo::compare(cop22opu_data_pack_schema, datapackr::cop22opu_data_pack_schema)
+waldo::compare(cop22OPU_data_pack_schema, datapackr::cop22OPU_data_pack_schema)
 
-save(cop22opu_data_pack_schema,
-     file = "./data/cop22opu_data_pack_schema.rda",
+save(cop22OPU_data_pack_schema,
+     file = "./data/cop22OPU_data_pack_schema.rda",
      compress = "xz")
 
 ## Rebuild package again.
