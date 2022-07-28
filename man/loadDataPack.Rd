@@ -8,6 +8,21 @@ loadDataPack(submission_path = NULL)
 }
 \arguments{
 \item{submission_path}{Local path to the file to import.}
+
+\item{tool}{Type of tool this function will create or interact with. Either
+\code{OPU Data Pack} or \code{Data Pack}}
+
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
+
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
+
+\item{load_wb}{Should the datapack be loaded as an openxlsx object?}
+
+\item{load_sheets}{Logical. Should all data sheets be loaded too?}
+
+\item{d2_session}{DHIS2 Session id}
 }
 \value{
 Data Pack object

@@ -81,6 +81,6 @@ with_mock_api({
     )))
 
     expect_type(d$datim$UndistributedMER$attributeOptionCombo, "character")
-    expect_type(d$datim$UndistributedMER$attributeOptionCombo, "double")
+    expect_type(d$datim$UndistributedMER$value, "double")
   })
 })
