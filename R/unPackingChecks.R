@@ -557,9 +557,9 @@ checkNonNumeric <- function(sheets, d, quiet = TRUE) {
 
   non_numeric <- unPackDataPackSheet(d,
                                      sheets,
-                                     clean_orgs = F,
-                                     clean_disaggs = F,
-                                     clean_values = F) %>%
+                                     clean_orgs = FALSE,
+                                     clean_disaggs = FALSE,
+                                     clean_values = FALSE) %>%
     dplyr::filter(
       !(sheet_name == "Prioritization"
         & stringr::str_sub(PSNU, 1, 9) == "_Military")) %>%
@@ -624,7 +624,7 @@ checkNonNumeric <- function(sheets, d, quiet = TRUE) {
 
 #' @export
 #' @rdname unPackDataChecks
-checkNegativeValues <- function(sheets, d, quiet = T) {
+checkNegativeValues <- function(sheets, d, quiet = TRUE) {
 
   ch <- list(result = NULL,
             msg = NULL,
@@ -633,9 +633,9 @@ checkNegativeValues <- function(sheets, d, quiet = T) {
 
   negative_values <- unPackDataPackSheet(d,
                                          sheets,
-                                         clean_orgs = F,
-                                         clean_disaggs = F,
-                                         clean_values = F) %>%
+                                         clean_orgs = FALSE,
+                                         clean_disaggs = FALSE,
+                                         clean_values = FALSE) %>%
     #TODO: Keeping this consistent with checkDecimalValues
     #Consider doing the numeric conversion once in unPackDataSheet
     #instead of multiple times in these checks.
@@ -695,9 +695,9 @@ checkDecimalValues <- function(sheets, d, quiet = TRUE) {
 
   decimal_cols <- unPackDataPackSheet(d,
                                       sheets,
-                                      clean_orgs = F,
-                                      clean_disaggs = F,
-                                      clean_values = F) %>%
+                                      clean_orgs = FALSE,
+                                      clean_disaggs = FALSE,
+                                      clean_values = FALSE) %>%
     dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
     dplyr::filter(value %% 1 != 0
                   & !indicator_code %in% decimals_allowed)
@@ -754,7 +754,7 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
 
   na_orgunits <- invalid_orgunits[is.na(invalid_orgunits$PSNU), ]
 
-  if (NROW(invalid_orgunits) > 0 | NROW(na_orgunits) > 0) {
+  if (NROW(invalid_orgunits) > 0 || NROW(na_orgunits) > 0) {
 
     ch$lvl <- "ERROR"
 
@@ -797,7 +797,7 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
 
 #' @export
 #' @rdname unPackDataChecks
-checkInvalidPrioritizations <- function(sheets, d, quiet = T) {
+checkInvalidPrioritizations <- function(sheets, d, quiet = TRUE) {
 
   ch <- list(result = NULL,
             msg = NULL,
@@ -889,7 +889,7 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
   formulas_datapack <-
     tidyxl::xlsx_cells(path = d$keychain$submission_path,
                        sheets = sheets,
-                       include_blank_cells = T) %>%
+                       include_blank_cells = TRUE) %>%
     # Note that this function won't pick up any cols with blank indicator_code
     dplyr::filter(row >= header_row) %>%
     dplyr::mutate(formula = dplyr::if_else(is.na(formula),
