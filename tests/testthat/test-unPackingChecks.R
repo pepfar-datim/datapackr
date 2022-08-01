@@ -110,7 +110,7 @@ test_that("Can check sheet data...", {
   expect_gt(nrow(d$tests$duplicate_columns), 0)
   expect_gt(nrow(d$tests$columns_out_of_order), 0)
   expect_gt(nrow(d$tests$non_numeric), 0)
-  expect_gt(nrow(d$tests$negative_values), 0)
+  expect_equal(nrow(d$tests$negative_values), 6L)
   expect_gt(nrow(d$tests$decimal_values), 0)
   expect_gt(nrow(d$tests$invalid_orgunits), 0)
   expect_gt(nrow(d$tests$invalid_prioritizations), 0)
