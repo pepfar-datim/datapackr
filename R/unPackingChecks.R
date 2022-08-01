@@ -469,8 +469,7 @@ checkOutOfOrderCols <- function(sheets, d, quiet = TRUE) {
             lvl = NULL,
             has_error = FALSE)
 
-  out_of_order <- d$sheets %>%
-    purrr::keep(names(.) %in% sheets) %>%
+  out_of_order <- d$sheets[names(d$sheets) %in% sheets] %>%
     purrr::map2_dfr(
       .,
       names(.),
