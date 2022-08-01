@@ -92,7 +92,7 @@ unPackDataPackSheet <- function(d,
   if (clean_values) {
     data %<>%
       dplyr::mutate(
-        value = suppressWarnings(as.numeric(value))) %>% # Convert to numeric ----
+        value = suppressWarnings(as.numeric(value))) %>%
       tidyr::drop_na(value) # Drop NAs & non-numerics ----
 
     # Clean Prioritizations ----
