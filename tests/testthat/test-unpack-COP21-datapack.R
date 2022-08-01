@@ -49,8 +49,8 @@ with_mock_api({
 
     # Package the undistributed data for DATIM
     d <- packForDATIM(d, type = "Undistributed MER")
-    expect_true(!is.null(d$data$UndistributedMER))
-    expect_true(NROW(d$data$UndistributedMER) > 0)
+    expect_true(!is.null(d$datim$UndistributedMER))
+    expect_true(NROW(d$datim$UndistributedMER) > 0)
     expect_true(all(unlist(
       lapply(d$data$UndistributedMER$dataElement, is_uidish)
     )))
