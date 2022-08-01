@@ -469,7 +469,8 @@ checkOutOfOrderCols <- function(sheets, d, quiet = TRUE) {
             lvl = NULL,
             has_error = FALSE)
 
-  out_of_order <- d$sheets[sheets] %>%
+  out_of_order <- d$sheets %>%
+    purrr::keep(names(.) %in% sheets) %>%
     purrr::map2_dfr(
       .,
       names(.),
@@ -634,8 +635,12 @@ checkNegativeValues <- function(sheets, d, quiet = T) {
                                          sheets,
                                          clean_orgs = F,
                                          clean_disaggs = F,
-                                         clean_values = F) %>% #Are the values numeric at this point?
-    dplyr::filter(stringr::str_detect(value, "^-"))
+                                         clean_values = F) %>%
+    #TODO: Keeping this consistent with checkDecimalValues
+    #Consider doing the numeric conversion once in unPackDataSheet
+    #instead of multiple times in these checks.
+    dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
+    dplyr::filter(value < 0)
 
   if (NROW(negative_values) > 0) {
 
