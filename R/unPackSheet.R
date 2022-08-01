@@ -39,7 +39,8 @@ unPackDataPackSheet <- function(d,
   header_cols <- keep_cols %>%
     dplyr::filter(col_type == "row_header")
 
-  data <- d$sheets[names(d$sheets) %in% sheets] %>%
+  data <- d$sheets %>%
+    purrr::keep(names(.) %in% sheets) %>%
     purrr::map2_dfr(
       .,
       names(.),
@@ -92,7 +93,10 @@ unPackDataPackSheet <- function(d,
   if (clean_values) {
     data %<>%
       dplyr::mutate(
-        value = suppressWarnings(as.numeric(value))) %>% # Convert to numeric ----
+        # NOTE: This is the initial conversion to numeric.
+        # Determine what the furture consequences of this are
+        # If this function is called with clean_values.
+        value = suppressWarnings(as.numeric(value))) %>%
       tidyr::drop_na(value) # Drop NAs & non-numerics ----
 
     # Clean Prioritizations ----
