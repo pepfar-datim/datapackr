@@ -635,7 +635,7 @@ checkNegativeValues <- function(sheets, d, quiet = T) {
                                          clean_orgs = F,
                                          clean_disaggs = F,
                                          clean_values = F) %>% #Are the values numeric at this point?
-    dplyr::filter(stringr::str_detect(value,"^-"))
+    dplyr::filter(stringr::str_detect(value, "^-"))
 
   if (NROW(negative_values) > 0) {
 
