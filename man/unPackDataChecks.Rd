@@ -35,13 +35,13 @@ checkOutOfOrderCols(sheets, d, quiet = TRUE)
 
 checkNonNumeric(sheets, d, quiet = TRUE)
 
-checkNegativeValues(sheets, d, quiet = T)
+checkNegativeValues(sheets, d, quiet = TRUE)
 
 checkDecimalValues(sheets, d, quiet = TRUE)
 
 checkInvalidOrgUnits(sheets, d, quiet = TRUE)
 
-checkInvalidPrioritizations(sheets, d, quiet = T)
+checkInvalidPrioritizations(sheets, d, quiet = TRUE)
 
 checkFormulas(sheets, d, quiet = TRUE)
 
