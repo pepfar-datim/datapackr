@@ -4,10 +4,38 @@
 \alias{packDataPack}
 \title{Pack a Data Pack}
 \usage{
-packDataPack(d, d2_session = dynGet("d2_default_session", inherits = TRUE))
+packDataPack(
+  model_data,
+  datapack_name,
+  country_uids,
+  template_path = NULL,
+  cop_year = getCurrentCOPYear(),
+  output_folder = NULL,
+  results_archive = TRUE,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
-\item{d}{Datapackr sidecar object}
+\item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
+
+\item{datapack_name}{Name you would like associated with this Data Pack.
+(Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
+
+\item{country_uids}{Unique IDs for countries to include in the Data Pack.
+For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
+
+\item{template_path}{Local filepath to Data Pack template Excel (XLSX) file.
+This file MUST NOT have any data validation formats present. If left
+\code{NULL}, will select the default based on \code{cop_year} and \code{tool}.}
+
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
+
+\item{output_folder}{Local folder where you would like your Data Pack to be
+saved upon export.}
+
+\item{results_archive}{If TRUE, will export compiled results of all tests and
+processes to output_folder.}
 
 \item{d2_session}{DHIS2 Session id}
 }

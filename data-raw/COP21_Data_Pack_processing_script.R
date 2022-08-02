@@ -18,11 +18,18 @@ d <- checkAnalytics(d,
 d <- writePSNUxIM(d, snuxim_model_data_path, output_folder)
 
 
+
+
+
+
 # Export DATIM import files ####
   exportPackr(data = d$datim$MER,
               output_folder = output_folder,
               type = "DATIM Export File",
               datapack_name = d$info$datapack_name)
+
+
+
 
 # Produce Beta Pack data for PAW ####
   d$keychain$snuxim_model_data_path = snuxim_model_data_path
