@@ -79,6 +79,7 @@ packTool <- function(model_data_path = NULL,
     d <- packDataPack(d, d2_session = d2_session)
   } else if (d$info$tool == "OPU Data Pack") {
     d <- packOPUDataPack(d, undistributed_mer_data = undistributed_mer_data, d2_session = d2_session)
+
   } else {
     stop("Selected tool not currently supported.")
   }

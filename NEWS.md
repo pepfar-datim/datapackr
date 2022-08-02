@@ -1,3 +1,70 @@
+# datapackr 5.2.4
+
+## Bug fixes
+* 
+
+## Breaking changes
+* Replaces some check functions with new versions (see below).
+
+## New features
+* Add the following functions, along with related tests:
+   * `loadSheets`
+   * `readSheet`
+   * `checkFormulas`
+   * `checkDisaggs`
+   * `checkInvalidPrioritizations`
+   * `checkInvalidOrgUnits`
+   * `checkNegativeValues`
+   * `checkDecimalValues`
+   * `checkMissingMetadata`
+   * `checkNonNumeric` (instead of `checkNumericValues`)
+   * `checkDupeRows`
+   * `checkColumnStructure`
+   * `checkToolStructure` (instead of `checkStructure`)
+   * `checkToolConnections` (instead of `checkExternalLinks`)
+   * `checkToolComments` (instead of `checkComments`)
+   * `checkSheets`
+   * `extract_uid`
+   * `extract_uid_all`
+
+## Minor improvements and fixes
+* Refactors `unPackDataPackSheet` to reduce cyclomatic complexity and make it functional over multiple sheets at once.
+* Updates `unPackDataPack` to use new check functions (see below).
+* Updates `unPackTool` to use `loadDataPack` instead of `createKeychainInfo`.
+* Simplifies and generalizes `unPackDataPackSheet`.
+* Generalizes `separateDataSets`
+* Turns off `checkMissingMetadata` in `unPackSNUxIM` for now.
+* Updates `createKeychainInfo` to be more accurate in deducing metadata from submitted Data Packs.
+* Updates `loadDataPack` to be production ready.
+* Fixes tests for the following functions:
+   * `listWorkbookContents`
+   * `packForDATIM`
+   * `separateDataSets`
+   * `unPackSheets`
+   * `prepareMemoData`
+   * `createAnalytics`
+ 
+
+# datapackr 5.2.3
+
+## Breaking changes
+- Deprecates `pullDATIMCodeList` and `pullFullCodeList` functions in favor of `getCodeList`
+- Retires `api_sql_call` function (DP-603)
+
+## New features
+- Creates new function `getCodeList` which utilizes `datimutils` API utilities and replaces `pullDATIMCodeList` and `pullFullCodeList` (DP-599)
+   - `getCodeList` uses `cop_year` as a parameter rather than the `FY` parameter previously used by `pullDATIMCodeList` and `pullFullCodeList`
+
+## Minor improvements and fixes
+- Adds unit tests for `get_Map_DataPack_DATIM_DEs_COCs` and `checkPSNUData` (DP-272)
+- Refactors the following functions to utilize `datimutils` API utilities:
+   - `getHTSModality` (DP-597)
+   - `map_Cs_to_COs` (DP-605)
+ - Refactors package to remove hard dependencies on `stringi`, `glue`, `data.table`, and `readr` packages (DP-670, DP-671, DP-687, DP-693)
+ - Refactors package to standardize on `cop_year` over `fiscal_year` and `FY` for parameters (DP-691)
+ - Refactors package to standardize usage of `pick_schema` across functions (DP-294)
+ - Refactors `packSNUxIM` to reduce cyclomatic complexity (DP-662)
+
 # datapackr 5.2.2
 
 ## Bug fixes

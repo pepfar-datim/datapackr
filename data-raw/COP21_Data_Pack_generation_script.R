@@ -11,7 +11,8 @@ model_data_path <- Sys.getenv("MODEL_DATA_PATH")
 generation_list <- c("Central America and Brazil")
 
 pick <- datapackr::COP21_datapacks_countries %>%
-  dplyr::filter(datapack_name == generation_list)
+  dplyr::filter(datapack_name %in% generation_list)
+
 
 # # For Production run ####
 # pick <- datapackr::COP21_datapacks_countries
@@ -20,12 +21,12 @@ pick <- datapackr::COP21_datapacks_countries %>%
 for (i in 1:NROW(pick)) {
   print(paste0(i," of ",NROW(pick), ": ", pick[[i,1]]))
 
-  packDataPack(model_data_path = model_data_path,
-               tool = "Data Pack",
-               datapack_name = pick[[i,1]],
-               country_uids = unlist(pick[[i,2]]),
-               template_path = NULL,
-               cop_year = 2021,
-               output_folder = output_folder,
-               results_archive = FALSE)
+  packTool(model_data_path = model_data_path,
+           tool = "Data Pack",
+           datapack_name = pick[[i,1]],
+           country_uids = unlist(pick[[i,2]]),
+           template_path = NULL,
+           cop_year = 2021,
+           output_folder = output_folder,
+           results_archive = FALSE)
 }

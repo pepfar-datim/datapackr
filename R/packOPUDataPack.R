@@ -30,7 +30,7 @@ packOPUDataPack <- function(d, undistributed_mer_data = NULL,
   }
 
   # If empty or unprovided, pull model data from DATIM ####
-  if (is.null(d$data$snuxim_model_data)) {
+  if (is.null(d$info$snuxim_model_data)) {
     d$data$snuxim_model_data <- getOPUDataFromDATIM(cop_year = d$info$cop_year,
                                                     country_uids = d$info$country_uids,
                                                     d2_session = d2_session)
@@ -52,7 +52,7 @@ packOPUDataPack <- function(d, undistributed_mer_data = NULL,
 
   # Write PSNUxIM tab ####
   r <- packPSNUxIM(wb = d$tool$wb,
-                   data = d$data$UndistributedMER,
+                   data = d$datim$UndistributedMER,
                    snuxim_model_data = d$data$snuxim_model_data,
                    cop_year = d$info$cop_year,
                    tool = d$info$tool,
