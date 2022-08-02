@@ -384,7 +384,7 @@ check_schema <- function(schema, cop_year, tool, season) {
 
   schema <- schema %||% expected_schema
 
-  if (!schema_provided & !tool_provided & (!cop_year_provided | !season_provided)) {
+  if (!schema_provided && !tool_provided && (!cop_year_provided || !season_provided)) {
     interactive_message(
       paste0(
         "Because of ommitted parameters, we assumed you meant the schema for ",
