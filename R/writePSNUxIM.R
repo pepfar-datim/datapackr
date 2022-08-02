@@ -20,8 +20,8 @@ writePSNUxIM <- function(d,
 
   stopifnot(
     "Cannot update PSNUxIM tab without model data." = !is.null(snuxim_model_data_path),
-    "Packing SNU x IM tabs is not supported for the requested COP year." =
-      d$info$cop_year %in% supportedCOPYears(d$info$tool)
+    "Packing SNU x IM tabs is not supported for the requested COP year."
+      = d$info$cop_year %in% supportedCOPYears(d$info$tool)
   )
 
   if (is.null(output_folder)) {
@@ -82,11 +82,14 @@ writePSNUxIM <- function(d,
     }
 
     # Prepare targets to distribute ####
-    if (d$info$has_psnuxim && d$info$missing_psnuxim_combos) {
-      targets_data <- packForDATIM_UndistributedMER(data = d$data$missingCombos,
-                                                    cop_year = d$info$cop_year)
+    if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
+      p <- d
+      p$data$MER <- p$data$missingCombos
+      p <- packForDATIM(p, type = "Undistributed MER")
+      targets_data <- p$datim$UndistributedMER
+      rm(p)
     } else {
-      targets_data <- d$data$UndistributedMER
+      targets_data <- d$datim$UndistributedMER
     }
 
     #Mirror the data in TA as well
