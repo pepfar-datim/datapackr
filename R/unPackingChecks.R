@@ -223,7 +223,7 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
       col_type == "row_header",
       !indicator_code %in% c("SNU1", "ID")) %>%
     dplyr::pull(indicator_code) %>%
-    #c(., "mechCode_supportType") %>%
+    #c(., "mechCode_supportType") %>% # DP-472
     unique()
 
   # Duplicates
@@ -296,7 +296,7 @@ checkMissingCols <- function(sheets, d, quiet = TRUE) {
                         !indicator_code %in% names(x)) %>%
           dplyr::select(sheet_name, indicator_code))
 
-  # if (sheet == "PSNUxIM") {
+  # if (sheet == "PSNUxIM") { # DP-472
   #   ## Drop all IM cols (left & right sides)
   #   schema_cols %<>%
   #     dplyr::filter(
@@ -377,7 +377,7 @@ checkDupeCols <- function(sheets, d, quiet = TRUE) {
         dplyr::select(sheet = sheet_name, indicator_code, critical),
       by = c("sheet", "indicator_code"))
 
-  # if (sheet == "PSNUxIM") {
+  # if (sheet == "PSNUxIM") { # DP-472
   #   ## Drop all IM cols (left & right sides)
   #   schema_cols %<>%
   #     dplyr::filter(
@@ -400,7 +400,7 @@ checkDupeCols <- function(sheets, d, quiet = TRUE) {
   #           TRUE ~ indicator_code))
   # }
 
-  # if (sheet == "PSNUxIM") {
+  # if (sheet == "PSNUxIM") { # DP-472
   #   last_im_int <- dup_cols %>%
   #     dplyr::filter(critical) %>%
   #     dplyr::mutate(
@@ -484,7 +484,7 @@ checkOutOfOrderCols <- function(sheets, d, quiet = TRUE) {
         by = c("indicator_code", "sheet")) %>%
     dplyr::filter(submission_order != template_order)
 
-  # if (sheet == "PSNUxIM") {
+  # if (sheet == "PSNUxIM") { # DP-472
   #   ## Drop all IM cols (left & right sides)
   #   schema_cols %<>%
   #     dplyr::filter(
@@ -537,8 +537,8 @@ checkOutOfOrderCols <- function(sheets, d, quiet = TRUE) {
     }
   }
 
-  # TODO: Add PSNUxIM check for malformed IM/type headers
-  # TODO: Add PSNUxIM check for making sure IM appears once in both L & R
+  # TODO: Add PSNUxIM check for malformed IM/type headers # DP-472
+  # TODO: Add PSNUxIM check for making sure IM appears once in both L & R # DP-472
 
   return(ch)
 
@@ -567,7 +567,7 @@ checkNonNumeric <- function(sheets, d, quiet = TRUE) {
   non_numeric <-
     non_numeric[which(is.na(suppressWarnings(as.numeric(non_numeric$value)))), ]
 
-  # if (d$info$tool == "OPU Data Pack") {
+  # if (d$info$tool == "OPU Data Pack") { # DP-472
   #   data %<>%
   #     tidyr::gather(key = "mechCode_supportType",
   #                   value = "value",
@@ -577,7 +577,7 @@ checkNonNumeric <- function(sheets, d, quiet = TRUE) {
   #     tidyr::drop_na(value)
   # }
 
-  # if (d$info$tool == "Data Pack" & sheet == "PSNUxIM" & d$info$cop_year %in% c(2021, 2022)) {
+  # if (d$info$tool == "Data Pack" & sheet == "PSNUxIM" & d$info$cop_year %in% c(2021, 2022)) { # DP-472
   #   data %<>%
   #     tidyr::gather(key = "mechCode_supportType",
   #                   value = "value",
@@ -863,6 +863,8 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
     dplyr::filter(
       sheet_name %in% sheets,
       !is.na(formula)) %>%
+    # TODO: Maybe use the below example code to add functionality to detect
+    # incorrect row reference in formula
     # tidyr::crossing(row = ((header_row+1):max(formulas_datapack$row))) %>%
     # dplyr::select(row, col, indicator_code, formula) %>%
     # dplyr::mutate(
@@ -907,7 +909,7 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
     dplyr::select(sheet_name, row, indicator_code, formula) %>%
     dplyr::filter(row != header_row,
                   !is.na(indicator_code)) %>%
-    # purrr::when(
+    # purrr::when( # DP-472
     #   sheet == "PSNUxIM" & d$info$tool == "Data Pack" ~ .,
     #   ~  dplyr::group_by(., row) %>%
     #     dplyr::mutate(occurrence = duplicated(indicator_code)) %>%
@@ -931,7 +933,7 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
                             "formula" = "fx_schema")) %>%
     dplyr::left_join(formulas_schema,
                      by = c("sheet_name", "indicator_code")) %>%
-    # dplyr::left_join(
+    # dplyr::left_join( # DP-472
     #   formulas_schema,
     #   by = ifelse(sheet == "PSNUxIM" & d$info$tool == "Data Pack",
     #               c("col" = "col"),
@@ -984,7 +986,7 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
                        .groups = "drop") %>%
       dplyr::ungroup()
 
-    # Alternative with less detail but more manageably sized:
+    # Alternative with less detail but more manageably sized: (Keep and check with DUIT)
     # altered_formulas %<>%
     #   dplyr::group_by(sheet_num, sheet_name, indicator_code, correct_fx,
     #                   critical) %>%
@@ -1014,7 +1016,7 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
 checkDisaggs <- function(sheets, d, quiet = TRUE) {
 
   if (any(c("SNU x IM", "PSNUxIM") %in% sheets)) {
-    interactive_warning("Sorry! Can't check the PSNUxIM tab with this function.")
+    interactive_warning("Sorry! Can't check the PSNUxIM tab with this function.") # DP-472
   }
   sheets <- sheets[sheets != "PSNUxIM"]
 
@@ -1162,7 +1164,7 @@ checkSheetData <- function(d,
   # TODO: Make sure all functions row bind results
 
 
-    # TODO: TEST AGYW Tab for missing DSNUs ####
+    # TODO: TEST AGYW Tab for missing DSNUs #### This will be addressed in future PR
     # if (sheet == "AGYW") {
     #   DataPack_DSNUs <- d$data$extract %>%
     #     dplyr::select(PSNU, psnu_uid = psnuid) %>%
