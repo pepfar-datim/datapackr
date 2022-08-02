@@ -23,7 +23,6 @@
 #' * `checkDataPackName`: Valid `datapack_name` as string.
 #' * `checkTemplatePath`: Valid `template_path` as string.
 #' * `checkWB`: Valid Data Pack shell for specified `cop_year` and `tool` type.
-#' * `checkOutputFolder`: Valid `output_folder` as string.
 #' * `checkResultsArchive`: Valid `results_archive` as `.rds` list object,
 #' equivalent to the `d` object used throughout this package.
 #' * `check_params`: List object containing one valid parameter value/object for
@@ -565,18 +564,6 @@ checkWB <- function(wb = NULL,
 
 #' @export
 #' @rdname parameter-checks
-checkOutputFolder <- function(output_folder = NULL) {
-  # If output_folder parameter is not set or not a valid filepath, throw error message.
-  if (is.null(output_folder) || file.access(output_folder, 2) != 0) {
-    stop("output_folder must be a valid filepath")
-  }
-
-  output_folder
-}
-
-
-#' @export
-#' @rdname parameter-checks
 checkResultsArchive <- function(results_archive = FALSE) {
   # IF results_archive parameter is not set throw error message.
   if (!isTRUE(results_archive) & !isFALSE(results_archive)) {
@@ -689,9 +676,7 @@ check_params <- function(country_uids,
   # }
 
   # Check output_folder ####
-  if (!missing(output_folder)) {
-    params$output_folder <- checkOutputFolder(output_folder)
-  }
+
 
   # Check results_archive ####
   if (!missing(results_archive)) {
