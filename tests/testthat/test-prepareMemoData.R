@@ -189,7 +189,8 @@ with_mock_api({
       packForDATIM(., type = "SUBNAT_IMPATT") %>%
       packForDATIM(., type = "PSNUxIM")
     #Datapack analytics
-    d <- createAnalytics(d, training)
+    testthat::expect_warning(d <- createAnalytics(d, training))
+    #Expect warning abt DSNU or parent prioritizations purposefully missing (for other test purposes)
     #DATIM analytics
     d <-
       prepareMemoData(d,
