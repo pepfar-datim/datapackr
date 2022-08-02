@@ -17,13 +17,13 @@ pick <- datapackr::COP21_datapacks_countries %>%
 # pick <- datapackr::COP21_datapacks_countries
 
 # Execution ####
-for (i in 1:NROW(pick)) {
-  print(paste0(i," of ",NROW(pick), ": ", pick[[i,1]]))
+for (i in seq_len(pick)) {
+  print(paste0(i, " of ", NROW(pick), ": ", pick[[i, 1]]))
 
   packTool(model_data_path = model_data_path,
            tool = "Data Pack",
-           datapack_name = pick[[i,1]],
-           country_uids = unlist(pick[[i,2]]),
+           datapack_name = pick[[i, 1]],
+           country_uids = unlist(pick[[i, 2]]),
            template_path = NULL,
            cop_year = 2021,
            output_folder = output_folder,

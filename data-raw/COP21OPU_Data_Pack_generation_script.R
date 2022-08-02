@@ -14,12 +14,12 @@ pick <- datapackr::COP21_datapacks_countries %>%
   dplyr::filter(datapack_name %in% generation_list)
 
 # Execution ####
-for (i in 1:NROW(pick)) {
-  print(paste0(i," of ",NROW(pick), ": ", pick[[i,1]]))
+for (i in seq_len(pick)) {
+  print(paste0(i, " of ", NROW(pick), ": ", pick[[i, 1]]))
 
   packTool(tool = "OPU Data Pack",
-           datapack_name = pick[[i,1]],
-           country_uids = unlist(pick[[i,"country_uids"]]),
+           datapack_name = pick[[i, 1]],
+           country_uids = unlist(pick[[i, "country_uids"]]),
            template_path = NULL,
            cop_year = 2021,
            output_folder = output_folder,
