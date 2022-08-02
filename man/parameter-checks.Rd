@@ -13,6 +13,7 @@
 \alias{checkWB}
 \alias{checkOutputFolder}
 \alias{checkResultsArchive}
+\alias{checkSheets}
 \alias{check_params}
 \title{Standardized Parameter Defaults}
 \usage{
@@ -45,6 +46,8 @@ checkOutputFolder(output_folder = NULL)
 
 checkResultsArchive(results_archive = FALSE)
 
+checkSheets(sheets, cop_year, tool, all_sheets = FALSE, psnuxim = FALSE)
+
 check_params(
   country_uids,
   PSNUs,
@@ -59,6 +62,7 @@ check_params(
   snuxim_model_data,
   output_folder,
   results_archive,
+  sheets,
   ...
 )
 }
@@ -96,6 +100,11 @@ saved upon export.}
 
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}
+
+\item{all_sheets}{Logical. Return/check against all sheets (as opposed to only
+those with targets)?}
+
+\item{psnuxim}{Logical. Return/check against PSNUxIM tab as well?}
 
 \item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
 

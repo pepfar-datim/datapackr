@@ -41,7 +41,7 @@ packOPUDataPack <- function(d,
 
   # Prepare totals data for allocation ####
   if (d$info$cop_year == 2021) {
-    d$data$UndistributedMER <- d$data$snuxim_model_data %>%
+    d$datim$UndistributedMER <- d$data$snuxim_model_data %>%
       dplyr::mutate(attributeOptionCombo = default_catOptCombo()) %>%
       dplyr::group_by(dplyr::across(c(-value))) %>%
       dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop") %>%
@@ -50,7 +50,7 @@ packOPUDataPack <- function(d,
 
   # Write PSNUxIM tab ####
   r <- packPSNUxIM(wb = d$tool$wb,
-                   data = d$data$UndistributedMER,
+                   data = d$datim$UndistributedMER,
                    snuxim_model_data = d$data$snuxim_model_data,
                    cop_year = d$info$cop_year,
                    tool = d$info$tool,
