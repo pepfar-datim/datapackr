@@ -566,13 +566,12 @@ unPackSchema <- function(template_path = NULL,
     tibble::add_row(sheet_name = skip, sheet_num = seq_along(skip)) %>%
     dplyr::mutate(valid_ages = empty, valid_sexes = empty, valid_kps = empty)
 
-  schema %<>%
-    dplyr::bind_rows(skipped_schema, .) %>%
+   #Return the final schema
+    dplyr::bind_rows(skipped_schema, schema) %>%
     dplyr::mutate(
       data_structure =
         dplyr::case_when(sheet_name %in% skip ~ "skip",
                          TRUE ~ "normal")) %>%
     dplyr::select(sheet_num, sheet_name, data_structure, dplyr::everything())
 
-  schema
 }
