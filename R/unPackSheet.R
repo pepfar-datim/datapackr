@@ -43,22 +43,24 @@ unPackDataPackSheet <- function(d,
     purrr::map2_dfr(
       .,
       names(.),
-      function(x, y) x %>%
-        # Select only target-related columns ----
-      # tidyselect::any_of removes duplicates (takes 1st), ignores blank col names
-      dplyr::select(
-        tidyselect::any_of(
-          unique(keep_cols$indicator_code[keep_cols$sheet_name == y]))) %>%
-        tidyr::pivot_longer(
-          cols = -tidyselect::any_of(
-            c(unique(header_cols$indicator_code[header_cols$sheet_name == y]))),
-          names_to = "indicator_code",
-          values_to = "value") %>%
-        tibble::add_column(sheet_name = y)) %>% # Tag sheet name ----
+      function(x, y) {
+        x %>%
+          # Select only target-related columns ----
+        # tidyselect::any_of removes duplicates (takes 1st), ignores blank col names
+        dplyr::select(
+          tidyselect::any_of(
+            unique(keep_cols$indicator_code[keep_cols$sheet_name == y]))) %>%
+          tidyr::pivot_longer(
+            cols = -tidyselect::any_of(
+              c(unique(header_cols$indicator_code[header_cols$sheet_name == y]))),
+            names_to = "indicator_code",
+            values_to = "value") %>%
+          tibble::add_column(sheet_name = y)
+      }) %>% # Tag sheet name ----
   # Add cols to allow compiling with other sheets ----
-    addcols(c("KeyPop", "Age", "Sex")) %>%
+  addcols(c("KeyPop", "Age", "Sex")) %>%
     dplyr::mutate(psnuid = extract_uid(PSNU)) %>% # Extract PSNU uid ----
-    dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value) %>%
+  dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value) %>%
     tidyr::drop_na(value)
 
   #TODO: Decide whether to map PMTCT_EID ages now or later.
