@@ -598,11 +598,7 @@ checkSheets <- function(sheets, cop_year, tool,
   all_sheets <- all_sheets %||% FALSE
   psnuxim <- psnuxim %||% FALSE
 
-  if (all_sheets) {
-    skips <- ""
-  } else {
-    skips <- skip_tabs(tool = tool, cop_year = cop_year)
-  }
+  skips <- ifelse(all_sheets,"",skip_tabs(tool = tool, cop_year = cop_year))
 
   sheets_schema <- schema %>%
     dplyr::filter(
