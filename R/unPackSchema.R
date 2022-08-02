@@ -361,7 +361,6 @@ checkSchema <- function(schema,
 
 
 #' @export
-#' @importFrom data.table :=
 #' @importFrom methods as
 #' @rdname schema-validations
 unPackSchema <- function(template_path = NULL,
@@ -386,12 +385,13 @@ unPackSchema <- function(template_path = NULL,
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
   }
 
-  # Add sheet number based on order of occurrence in workbook, rather than A-Z ####
-  #TODO: This seems to be the only place we use data.table
-  #Is there a particular reason for this or can we switch to a tibble instead?
-  #Seems better to get rid of this dependency if we are only using it here
-  #and it could be potentially done in a different way.
-  data.table::setDT(schema)[, sheet_num := .GRP, by = c("sheet_name")]
+
+  sheets <- data.frame(sheet_name = unique(schema$sheet_name), stringsAsFactors = FALSE)
+  sheets$sheet_num <- seq_len(NROW(sheets))
+
+  schema <- schema %>%
+    dplyr::inner_join(sheets, by = c("sheet_name"))
+
 
   # Skip detail on listed sheets. ####
   if (is.null(skip)) {

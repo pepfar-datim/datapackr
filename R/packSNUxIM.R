@@ -11,39 +11,32 @@ packSNUxIM <- function(d,
                        d2_session = dynGet("d2_default_session",
                                            inherits = TRUE)) {
 
-  if (!d$info$cop_year %in% c(2021)) {
-    stop(paste0("Packing SNU x IM tabs is not supported for COP ", d$info$cop_year, " Data Packs."))
-  }
+  stopifnot("Packing SNU x IM tabs is only supported for COP21 Data Packs." = d$info$cop_year == 2021)
 
   # Check if SNUxIM data already exists ####
   if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM$PSNU[1])) {
+    ## If no PSNUxIM tab, set has_psnuxim to FALSE and set target_data equal to all MER dataset ####
     d$info$has_psnuxim <- FALSE
+    targets_data <- d$data$MER
   } else {
     d$info$has_psnuxim <- TRUE
-  }
-
-  # If does exist, extract missing combos ####
-  if (d$info$has_psnuxim) {
+    ## If does exist, extract missing combos ####
     d$data$missingCombos <- d$data$MER %>%
       # TODO: Create this here rather than upstream
       dplyr::anti_join(d$data$PSNUxIM_combos)
 
     d$info$missing_psnuxim_combos <- (NROW(d$data$missingCombos) > 0)
+
+    if (!d$info$missing_psnuxim_combos) {
+      ## If tool has PSNUxIM tab and not missing any combos, exit and return d object. ####
+      return(d)
+    } else {
+      ## If tool has PSNUxIM tab and missing combos, SNUxIM model data should include only missing combos ####
+      targets_data <- d$data$missingCombos
+    }
   }
 
-  # Proceed IFF no PSNU x IM tab exists, or exists but with missing combos ####
-  if (d$info$has_psnuxim & !d$info$missing_psnuxim_combos) {
-    return(d)
-  }
-
-  # Prepare SNU x IM model dataset ####
-  if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
-    targets_data <- d$data$missingCombos
-  } else {
-    targets_data <- d$data$MER
-  }
-
-    #TODO: Consider preparing this ahead of time for all OUs
+  #TODO: Consider preparing this ahead of time for all OUs
   snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path) %>%
     prepare_model_data.PSNUxIM(snuxim_model_data = .,
                                country_uids = d$info$country_uids)
@@ -154,7 +147,7 @@ packSNUxIM <- function(d,
   # Get formulas & column order from schema ####
   interactive_print("Building your custom PSNUxIM tab...")
 
-  data_structure <- d$info$schema %>%
+  data_structure <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(sheet_name == "PSNUxIM")
 
   col.im.targets <- data_structure %>%
@@ -226,7 +219,7 @@ packSNUxIM <- function(d,
         dplyr::select(tidyselect::matches("\\d{4,}"))
       )
 
-  header_cols <- d$info$schema %>%
+  header_cols <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(sheet_name == "PSNUxIM"
                   & col < col.im.percents[1]) %>%
     dplyr::pull(indicator_code)
@@ -323,7 +316,7 @@ packSNUxIM <- function(d,
   # Format percent columns ####
   interactive_print("Stylizing percent columns...")
 
-  percentCols <- d$info$schema %>%
+  percentCols <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(sheet_name == "PSNUxIM",
                   value_type == "percentage") %>%
     dplyr::pull(col)
@@ -366,7 +359,7 @@ packSNUxIM <- function(d,
                           heights = 0)
 
   # Hide columns ####
-  hiddenCols <- d$info$schema %>%
+  hiddenCols <- datapackr::cop21_data_pack_schema %>%
     dplyr::filter(sheet_name == "PSNUxIM",
                   indicator_code %in% c("ID", "sheet_num", "DSD Dedupe",
                                         "TA Dedupe", "Crosswalk Dedupe")) %>%

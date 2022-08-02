@@ -20,7 +20,8 @@ writePSNUxIM <- function(d,
 
   stopifnot(
     "Cannot update PSNUxIM tab without model data." = !is.null(snuxim_model_data_path),
-    "Packing SNU x IM tabs is not supported for the requested COP year." = !d$info$cop_year %in% c(2021, 2022)
+    "Packing SNU x IM tabs is not supported for the requested COP year." =
+      d$info$cop_year %in% supportedCOPYears(d$info$tool)
   )
 
   if (is.null(output_folder)) {
@@ -37,7 +38,7 @@ writePSNUxIM <- function(d,
   # We normally cannot process PSNUxIM tabs with threaded comments
   # However, if we are not appending to the existing data pack, we
   # should be able to proceed.
-  if (d$info$has_comments_issue & append) {
+  if (d$info$has_comments_issue && append) {
     warning_msg <-
       paste0(
         "ERROR! Cannot update PSNUxIM information in a Data Pack with Threaded
@@ -49,7 +50,7 @@ writePSNUxIM <- function(d,
     d$info$has_error <- TRUE
 
     #TODO: Replace this with a centralized method
-    if (NROW(d$info$messages) > 0 & interactive()) {
+    if (NROW(d$info$messages) > 0 && interactive()) {
       options(warning.length = 8170)
       cat(crayon::red(d$info$messages$message))
     }
@@ -75,19 +76,39 @@ writePSNUxIM <- function(d,
 
     # TODO: Move this into packPSNUxIM to allow that function to exit early if all good
     # Proceed IFF no PSNU x IM tab exists, or exists but with missing combos ####
-    if (d$info$has_psnuxim & !d$info$missing_psnuxim_combos) {
+    if (d$info$has_psnuxim && !d$info$missing_psnuxim_combos) {
       interactive_warning("No new information available to write to PSNUxIM tab.")
       return(d)
     }
 
     # Prepare targets to distribute ####
     if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
-
-      targets_data <- packForDATIM_UndistributedMER(data = d$data$missingCombos,
-                                                    cop_year = d$info$cop_year)
+      p <- d
+      p$data$MER <- p$data$missingCombos
+      p <- packForDATIM(p, type = "Undistributed MER")
+      targets_data <- p$datim$UndistributedMER
+      rm(p)
     } else {
-      targets_data <- d$data$UndistributedMER
+      targets_data <- d$datim$UndistributedMER
     }
+
+    #Mirror the data in TA as well
+    dsd_ta_map <- datapackr::cop22_map_DataPack_DATIM_DEs_COCs %>%
+      dplyr::select(indicator_code,
+                    dataelementuid,
+                    support_type,
+                    numerator_denominator,
+                    disagg_type)  %>%
+      dplyr::filter(support_type %in% c("DSD", "TA")) %>%
+      dplyr::distinct() %>%
+      tidyr::pivot_wider(names_from = "support_type", values_from = "dataelementuid") %>%
+      dplyr::select(DSD, TA)
+
+    ta_targets_data <- dplyr::inner_join(targets_data, dsd_ta_map, by = c("dataElement" = "DSD")) %>%
+      dplyr::select(-dataElement) %>%
+      dplyr::rename(dataElement = TA)
+
+    targets_data <- dplyr::bind_rows(targets_data, ta_targets_data)
 
     # Prepare d$tool$wb ####
     # If append is true, add the missing PSNUxIM combos to the existing
@@ -165,7 +186,7 @@ writePSNUxIM <- function(d,
   }
 
   # If new information added to SNU x IM tab, reexport Data Pack for user ####
-  if (d$info$newSNUxIM & !is.null(output_folder)) {
+  if (d$info$newSNUxIM && !is.null(output_folder)) {
     interactive_print("Removing troublesome NAs that may have been added inadvertently...")
     d <- strip_wb_NAs(d)
 

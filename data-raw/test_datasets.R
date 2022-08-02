@@ -10,7 +10,10 @@ packCOP22TestDataset <- function(country_uids,
                                                     inherits = TRUE)) {
   
   # dataElements, categoryOptionCombos, periods ####
-  des_mil <- pullDATIMCodeList("cihuwjoY5xP") %>%
+  des_mil <- datimutils::getSqlView(sql_view_uid = "DotdxKrNZxG",
+                                    variable_keys = "dataSets",
+                                    variable_values = "cihuwjoY5xP",
+                                    d2_session = d2_session) %>%
     dplyr::pull(dataelementuid) %>%
     unique()
   

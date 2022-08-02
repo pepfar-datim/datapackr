@@ -661,7 +661,6 @@ listWorkbookContents <- function(d) {
   d
 }
 
-
 commas <- function(...) paste0(..., collapse = ", ")
 
 names2 <- function(x) {

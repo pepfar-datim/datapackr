@@ -1,25 +1,4 @@
-context("pull-code-lists")
-
-with_mock_api({
-  test_that("We can fetch a code list from DATIM", {
-    test_dataset <-  pullDATIMCodeList("YfZot37BbTm",
-                                    d2_session = training)
-    expect_type(test_dataset, "list")
-    test_dataset_names <-  c("dataset",
-                   "dataelement",
-                   "shortname",
-                   "code",
-                   "dataelementuid",
-                   "dataelementdesc",
-                   "categoryoptioncombo",
-                   "categoryoptioncombocode", "categoryoptioncombouid")
-    expect_true(setequal(test_dataset_names, names(test_dataset)))
-
-    #Expect error on a faulty dataset UID
-    expect_error(pullDATIMCodeList("foo"))
-  })
-})
-
+context("get-code-lists")
 
 with_mock_api({
   test_that("We can get a list of PSNUs from DATIM", {
@@ -89,8 +68,12 @@ test_that("We can get a list of dataset UIDs based on the fiscal year", {
 with_mock_api({
   test_that("We can get a full code list", {
 
-    #categoryOptionCombos.json-bf5e01.json)
-    test_dataset  <-   pullFullCodeList(2022, d2_session = training)
+    expect_error(getCodeList(cop_year = 2021, datasets = "foo"))
+    expect_error(getCodeList())
+    expect_error(getCodeList(1999))
+    expect_error(getCodeList(cop_year = 2021, datastreams = c("mer_targets", "foo")))
+
+    test_dataset <- getCodeList(2021, d2_session = training)
     expect_type(test_dataset, "list")
     expect_setequal(names(test_dataset), c("dataelement", "dataelementuid",
     "categoryoptioncombo", "categoryoptioncombouid", "FY"))
@@ -98,7 +81,7 @@ with_mock_api({
     expect_true(all(is_uidish(test_dataset$categoryoptioncombouid)))
     expect_true(all(test_dataset$FY == "2022"))
 
-    test_dataset <- pullFullCodeList(2023, d2_session = training)
+    test_dataset <- getCodeList(2022, d2_session = training)
     expect_type(test_dataset, "list")
     expect_setequal(names(test_dataset), c("dataelement", "dataelementuid",
                                            "categoryoptioncombo", "categoryoptioncombouid", "FY"))
