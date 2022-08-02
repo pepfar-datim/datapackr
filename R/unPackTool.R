@@ -19,15 +19,14 @@ unPackTool <- function(submission_path = NULL,
                        cop_year = NULL,
                        d2_session = dynGet("d2_default_session",
                                            inherits = TRUE)) {
-  d <- createKeychainInfo(submission_path,
-                          tool,
-                          country_uids,
-                          cop_year,
-                          d2_session)
 
-  #TODO: Are we sure we want to make this change ? If so, the object must be cloned.
-
-  #d$keychain$d2_session <- d2_session$clone()
+  d <- loadDataPack(submission_path = submission_path,
+                    tool = tool,
+                    country_uids = country_uids,
+                    cop_year = cop_year,
+                    load_wb = FALSE,
+                    load_sheets = FALSE,
+                    d2_session = d2_session)
 
   # unPack file based on type
   if (d$info$tool == "Data Pack") {

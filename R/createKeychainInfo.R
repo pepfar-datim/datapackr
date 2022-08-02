@@ -1,10 +1,14 @@
 #' @export
-#' @title Create Keychain Info for use in datapackr sidecar.
+#' @title Create Keychain Info for use in DataPack object.
 #'
 #' @description
-#' Creates Keychain info needed for use across most datapackr unPack functions.
+#' Creates Keychain info needed for use across many `datapackr` functions.
+#'
+#' @md
 #'
 #' @inheritParams datapackr_params
+#'
+#' @return DataPack object
 #'
 createKeychainInfo <- function(submission_path = NULL,
                                tool = NULL,
@@ -12,7 +16,7 @@ createKeychainInfo <- function(submission_path = NULL,
                                cop_year = NULL,
                                d2_session = NULL) {
 
-  # Create data sidecar for use across remainder of program
+  # d ----
   d <- list(
     keychain = list(
       submission_path = submission_path),
@@ -27,7 +31,7 @@ createKeychainInfo <- function(submission_path = NULL,
                                d2_session$me$userCredentials$username,
                                NULL)
 
-  # Start running log of all warning and information messages
+  # Messages ----
   d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
 
@@ -44,8 +48,8 @@ createKeychainInfo <- function(submission_path = NULL,
       }
   }
 
-  # Bootstrap tool type, if not provided ####
-  tool_name_type <-
+  # Home Tab metadata ----
+  tool_metadata <-
     readxl::read_excel(
       path = d$keychain$submission_path,
       sheet = "Home",
@@ -56,50 +60,77 @@ createKeychainInfo <- function(submission_path = NULL,
     dplyr::mutate(
       cop_year = stringr::str_extract(home_cell, "COP\\d{2}"),
       cop_year = as.numeric(stringr::str_replace(cop_year, "COP", "20")),
-      type = stringr::str_extract(home_cell, "OPU Data Pack|Data Pack")
-    )
+      tool = stringr::str_extract(home_cell, "OPU Data Pack|Data Pack"))
 
-  if (!tool_name_type$cop_year[1] %in% c(2018:2030)
-        | !tool_name_type$type[1] %in% c("Data Pack", "OPU Data Pack")) {
-    stop("Please correct cell B10 on the Home tab. This should read 'COP21 Data Pack', or similar")
+  # Is this even a DataPack tool? ----
+  if (!tool_metadata$cop_year[1] %in% supportedCOPYears()
+        | !tool_metadata$tool[1] %in% supportedTools()) {
+    stop(paste0("Based on a quick scan, the file submitted does not appear to",
+                " be a Data Pack."))
   }
 
-  # Determine if template, and if so, label type as template ####
+  # cop_year ----
+  d$info$cop_year <- d$info$cop_year %||% tool_metadata$cop_year
+
+  if (d$info$cop_year != tool_metadata$cop_year) {
+    stop("The file submitted does not seem to match the cop_year you've specified.")
+  }
+
+  d$info$cop_year %<>% check_cop_year()
+
+  # tool ####
+  d$info$tool <- d$info$tool %||% tool_metadata$tool
+
+  if (d$info$tool != tool_metadata$tool) {
+    stop("The file submitted does not seem to match the tool type you've specified.")
+  }
+
+  d$info$tool %<>% check_tool()
+
+  # schema ####
+  d$info$schema <- check_schema(cop_year = d$info$cop_year, tool = d$info$tool)
+
+  # Template? ####
+  header_row <- headerRow(tool = d$info$tool,
+                          cop_year = d$info$cop_year)
+
   check_if_template <-
     readxl::read_excel(
       path = d$keychain$submission_path,
-      sheet = dplyr::if_else(tool_name_type$type == "OPU Data Pack", "PSNUxIM", "Prioritization"),
-      range = readxl::cell_limits(
-        c(headerRow(tool = tool_name_type$type, cop_year = tool_name_type$cop_year), 1),
-        c(NA, 10)),
+      sheet =
+        dplyr::if_else(
+          d$info$tool == "OPU Data Pack", "PSNUxIM", "Prioritization"),
+      range = readxl::cell_limits(c(header_row, 1), c(NA, 10)),
       col_types = "text",
       .name_repair = "minimal") %>%
     dplyr::select(PSNU)
 
-  # If PSNU row count equal zero or empty then add Template label to column type
-  if (NROW(check_if_template$PSNU) == 0 | all(is.na(check_if_template$PSNU))) {
-    tool_name_type %<>% dplyr::mutate(type = paste0(type, " Template"))
+  is_template <- NROW(check_if_template$PSNU) == 0 | all(is.na(check_if_template$PSNU))
+
+  if (is_template) {
+    d$info$tool <- paste0(d$info$tool, " Template")
   }
 
-  # Assign COP Year based on Home tab ####
-  if (is.null(d$info$cop_year)) {
-    d$info$cop_year <- tool_name_type$cop_year
+  # country_uids ----
+  submitted_country_uids <-
+    unPackCountryUIDs(submission_path = d$keychain$submission_path,
+                      tool = d$info$tool)
 
-    if (is.null(d$info$cop_year)) {
-      stop("The file submitted seems to no longer indicate applicable COP Year on the Home tab.")
-    }
+  d$info$country_uids <- d$info$country_uids %||% submitted_country_uids
+
+  if (d$info$country_uids != submitted_country_uids) {
+    stop("The file submitted does not seem to match the country_uids you've specified.")
   }
 
-  # Assign tool type based on Home tab ####
-  if (is.null(d$info$tool)) {
-    d$info$tool <- tool_name_type$type
-  } else if (d$info$tool != tool_name_type$type) {
-    stop("The file submitted does not seem to match the type you've specified.")
-  }
+  d$info$country_uids %<>% check_country_uids()
 
-  #Pick schema based on COP year and tool type
-  d$info$schema <- pick_schema(d$info$cop_year, d$info$tool)
+  # datapack_name ----
+  d$info$datapack_name <-
+    datapackr::unPackDataPackName(
+      submission_path = d$keychain$submission_path,
+      tool = d$info$tool)
 
+  d$info$datapack_name %<>% checkDataPackName(country_uids = d$info$country_uids)
 
   # TEST to make sure tool type matches what we see in the submitted file's structure ####
   # TODO: Improve to use checkColStructure
@@ -110,31 +141,18 @@ createKeychainInfo <- function(submission_path = NULL,
   #   warning("The sheets included in your submitted file don't seem to match the file type specified.")
   # }
 
-  # Grab datapack_name from Home Page
-  d$info$datapack_name <-
-    datapackr::unPackDataPackName(
-      submission_path = d$keychain$submission_path,
-      tool = d$info$tool)
-
   # Generate sane_name for tool
   d$info$sane_name <- getSaneName(d$info$datapack_name)
-
-  # Determine country uids ####
-  if (is.null(d$info$country_uids)) {
-    d$info$country_uids <-
-      unPackCountryUIDs(submission_path = d$keychain$submission_path,
-                        tool = d$info$tool)
-  }
 
   ## Determine additional Organisation Unit information and save
   ## under `d$info$operating_unit` for use in validating mechanisms
   d$info$operating_unit <- getOUFromCountryUIDs(d$info$country_uids)
 
-  # Check the submission file exists and prompt for user input if not
+  # submission_path ----
   d$keychain$submission_path <- handshakeFile(path = d$keychain$submission_path,
                                               tool = d$info$tool)
 
-  # Add placeholders for info messages ####
+  # Placeholders ####
   if (d$info$tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack", "OPU Data Pack Template")
       & d$info$cop_year %in% c("2021", "2022")) {
     d$info$needs_psnuxim <- FALSE
