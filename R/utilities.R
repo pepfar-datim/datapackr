@@ -396,52 +396,14 @@ createDataPack <- function(datapack_name = NULL,
       country_uids = country_uids,
       cop_year = cop_year,
       datapack_name = datapack_name,
-      schema = schema),
+      schema = schema,
+      sane_name = getSaneName(datapack_name),
+      operating_unit = getOUFromCountryUIDs(country_uids)),
     tool = list(
       wb = wb)
     )
 
   return(d)
-}
-
-
-# TODO: To deprecate. Duplicate of check_template_path inside check_params
-
-#' @export
-#' @title Compare Data Pack template against schema
-#'
-#' @param tool Either "Data Pack" or "OPU Data Pack"? Default is "Data Pack".
-#' @inheritParams datapackr_params
-#'
-#' @return Message indicating comparison failure or success.
-#'
-compareTemplateToSchema <- function(template_path = NULL,
-                                   cop_year = getCurrentCOPYear(),
-                                   tool = "Data Pack",
-                                   d2_session = dynGet("d2_default_session",
-                                                       inherits = TRUE)) {
-
-  interactive_print("Checking template against schema and DATIM...")
-
-  if (is.null(template_path)) {
-    template_path <- pick_template_path(cop_year, tool)
-  }
-
-  template_schema <-
-    unPackSchema(
-      template_path = template_path,
-      skip = skip_tabs(tool = paste0(tool, " Template"), cop_year = cop_year),
-      tool = paste0(tool, " Template"),
-      cop_year = cop_year)
-
-  package_schema <- pick_schema(cop_year, tool)
-
-  if (!identical(package_schema, template_schema)) {
-    stop("Template provided does not match published schema.")
-  } else {
-    print("Template provided matches published schema.")
-  }
-
 }
 
 
@@ -605,57 +567,72 @@ formatSetStrings <- function(vec) {
 #' @title Is UID-ish
 #' @md
 #' @description Tests whether a character string matches the regex of a DHIS2
-#' 11-digit UID. Vectorized over `string` and `pattern`.
+#' 11-digit UID.
 #'
 #' @param string Input vector. Either a character vector, or something coercible
 #' to one.
+#' @param ish Logical. If TRUE, looks for the UID in all parts of string, rather
+#' than requiring the string be only the UID.
 #'
 #' @return A logical vector.
-is_uidish <- function(string) {
-  stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")
+is_uidish <- function(string, ish = FALSE) {
+  if (!ish) {
+    stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")
+  } else {
+    stringr::str_detect(string, "[[:alpha:]][[:alnum:]]{10}")
+  }
+
 }
 
 
-
-
-
-#' Title
+#' Can Spawn
 #' @description Determines whether processes can be run in parallel.
 #' This is used in indicator and validation rule evaluation, but
 #' should not be run on Windows currently
 #' @return Boolean True or false
 #' @export
 #'
-
 can_spawn <- function() {
-
   "parallel" %in% rownames(utils::installed.packages()) == TRUE &
     .Platform$OS.type != "windows"  #Never execute in parallel on Windows
 }
 
 
+#' Extract UID.
+#'
+#' @description Extracts a DHIS2 11-digit UID from provided string.
+#'
+#' @name extract_uid
+#' @md
+#'
+#' @param string Input vector. Either a character vector, or something coercible
+#' to one.
+#'
+#' @return Character vector of DHIS2 11-digit UIDs found in string.
+#'
+NULL
 
-
-extractWorkbook <- function(d) {
-  #Create a temporary director to extract the XL object
-  temp_dir <- file.path(tempdir(), "datapackR")
-  #Save this in the keychain for later reuse
-  d$keychain$extract_path <- temp_dir
-
-  unlink(temp_dir, recursive = TRUE)
-  dir.create(temp_dir)
-  file.copy(d$keychain$submission_path, temp_dir)
-
-  new_file <- list.files(temp_dir, full.names = TRUE, pattern = basename(d$keychain$submission_path))
-  utils::unzip(new_file, exdir = temp_dir)
-  d$info$has_extract <- TRUE
-  #Return the object
-  d
+#' @export
+#' @rdname extract_uid
+#'
+extract_uid <- function(string) {
+  stringr::str_extract(string, "[[:alpha:]][[:alnum:]]{10}")
 }
 
-listWorkbookContents <- function(d) {
+#' @export
+#' @rdname extract_uid
+#'
+extract_uid_all <- function(string) {
+  unlist(stringr::str_extract_all(string, "[[:alpha:]][[:alnum:]]{10}"))
+}
 
-  d$info$worbook_contents <- utils::unzip(d$keychain$submission_path, list = TRUE) %>%
+
+#' @export
+#' @title listWorkbookContents
+#' @inheritParams datapackr_params
+#' @return d
+listWorkbookContents <- function(d) {
+  d$info$workbook_contents <- utils::unzip(d$keychain$submission_path, list = TRUE) %>%
     dplyr::pull(`Name`)
 
   d

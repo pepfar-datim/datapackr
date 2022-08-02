@@ -11,7 +11,9 @@
 \alias{checkDataPackName}
 \alias{checkTemplatePath}
 \alias{checkWB}
+\alias{checkOutputFolder}
 \alias{checkResultsArchive}
+\alias{checkSheets}
 \alias{check_params}
 \title{Standardized Parameter Defaults}
 \usage{
@@ -40,7 +42,11 @@ checkWB(
   template_path = NULL
 )
 
+checkOutputFolder(output_folder = NULL)
+
 checkResultsArchive(results_archive = FALSE)
+
+checkSheets(sheets, cop_year, tool, all_sheets = FALSE, psnuxim = FALSE)
 
 check_params(
   country_uids,
@@ -56,6 +62,7 @@ check_params(
   snuxim_model_data,
   output_folder,
   results_archive,
+  sheets,
   ...
 )
 }
@@ -88,16 +95,21 @@ This file MUST NOT have any data validation formats present. If left
 
 \item{wb}{Openxlsx workbook object.}
 
+\item{output_folder}{Local folder where you would like your Data Pack to be
+saved upon export.}
+
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}
+
+\item{all_sheets}{Logical. Return/check against all sheets (as opposed to only
+those with targets)?}
+
+\item{psnuxim}{Logical. Return/check against PSNUxIM tab as well?}
 
 \item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
 
 \item{snuxim_model_data}{Export from DATIM needed to allocate data across
 mechanisms in the PSNUxIM tab}
-
-\item{output_folder}{Local folder where you would like your Data Pack to be
-saved upon export.}
 
 \item{...}{Additional arguments to pass.}
 }
@@ -115,6 +127,7 @@ value/object for each non-missing parameter supplied.
 \item \code{checkDataPackName}: Valid \code{datapack_name} as string.
 \item \code{checkTemplatePath}: Valid \code{template_path} as string.
 \item \code{checkWB}: Valid Data Pack shell for specified \code{cop_year} and \code{tool} type.
+\item \code{checkOutputFolder}: Valid \code{output_folder} as string.
 \item \code{checkResultsArchive}: Valid \code{results_archive} as \code{.rds} list object,
 equivalent to the \code{d} object used throughout this package.
 \item \code{check_params}: List object containing one valid parameter value/object for

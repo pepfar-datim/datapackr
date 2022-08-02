@@ -52,7 +52,7 @@ test_that("We can check datapack paramaters", {
 
   # check_params ####
   # Test that when not supplied any parameters, check_params returns list of length 0.
-  test_params <-  check_params()
+  test_params <- check_params()
   expect_type(test_params, "list")
   expect_equal(length(test_params), 0L)
 
@@ -242,6 +242,37 @@ test_that("We can check datapack paramaters", {
   template_path <- pick_template_path(cop_year = 2021, tool = "Data Pack")
   test_args <- list(template_path = template_path, cop_year = 2021, tool = "OPU Data Pack")
   expect_message(do.call(check_params, test_args))
+
+  # Sheets ----
+  tool <- "Data Pack"
+  cop_year <- 2022
+
+  expect_silent(sheets <- checkSheets(sheets = c("HTS", "Cascade", "GEND"),
+                                      tool = tool, cop_year = cop_year,
+                                      all_sheets = FALSE))
+
+  expect_silent(sheets <- checkSheets(sheets = c("HTS", "Cascade", "GEND", "Home"),
+                                      tool = tool, cop_year = cop_year,
+                                      all_sheets = TRUE))
+
+  expect_silent(
+    sheets <- checkSheets(sheets = c("HTS", "Cascade", "GEND", "Home", "PSNUxIM"),
+                          tool = tool, cop_year = cop_year,
+                          all_sheets = TRUE,
+                          psnuxim = TRUE))
+
+  expect_warning(sheets <- checkSheets(sheets = c("HTS", "Cascade", "GEND", "Home"),
+                                       tool = tool, cop_year = cop_year,
+                                       all_sheets = FALSE))
+
+  expect_warning(sheets <- checkSheets(sheets = c("HTS", "Cascade", "GEND", "foo"),
+                                       tool = tool, cop_year = cop_year,
+                                       all_sheets = FALSE))
+
+  expect_warning(sheets <- checkSheets(sheets = c("HTS", "Cascade", "GEND", "PSNUxIM"),
+                                       tool = tool, cop_year = cop_year,
+                                       all_sheets = FALSE,
+                                       psnuxim = FALSE))
 
   }
 )

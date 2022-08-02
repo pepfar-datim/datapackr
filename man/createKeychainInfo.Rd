@@ -2,7 +2,7 @@
 % Please edit documentation in R/createKeychainInfo.R
 \name{createKeychainInfo}
 \alias{createKeychainInfo}
-\title{Create Keychain Info for use in datapackr sidecar.}
+\title{Create Keychain Info for use in DataPack object.}
 \usage{
 createKeychainInfo(
   submission_path = NULL,
@@ -26,6 +26,9 @@ FY22 targets = COP21.}
 
 \item{d2_session}{DHIS2 Session id}
 }
+\value{
+DataPack object
+}
 \description{
-Creates Keychain info needed for use across most datapackr unPack functions.
+Creates Keychain info needed for use across many \code{datapackr} functions.
 }

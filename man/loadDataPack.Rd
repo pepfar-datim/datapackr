@@ -2,9 +2,17 @@
 % Please edit documentation in R/loadDataPack.R
 \name{loadDataPack}
 \alias{loadDataPack}
-\title{Load a Data Pack from a supplied filepath.}
+\title{Load a DataPack from a supplied filepath.}
 \usage{
-loadDataPack(submission_path = NULL)
+loadDataPack(
+  submission_path = NULL,
+  tool = NULL,
+  country_uids = NULL,
+  cop_year = NULL,
+  load_wb = FALSE,
+  load_sheets = FALSE,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
 \item{submission_path}{Local path to the file to import.}
@@ -25,10 +33,10 @@ FY22 targets = COP21.}
 \item{d2_session}{DHIS2 Session id}
 }
 \value{
-Data Pack object
+DataPack object.
 }
 \description{
-loadDataPack returns a Data Pack object conserving styles and
+\code{loadDataPack} returns a DataPack object conserving styles and
 formatting of the original Data Pack .xlsx file, as well as other metadata
 necessary for processing and analyzing data in the Data Pack.
 }
