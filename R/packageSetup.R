@@ -278,7 +278,8 @@ pick_template_path <- function(cop_year, tool) {
 #' saved upon export.
 #' @param results_archive If TRUE, will export compiled results of all tests and
 #' processes to output_folder.
-#' @param d2_session DHIS2 Session id
+#' @param d2_session DHIS2 Session id. R6 datimutils object which handles
+#' authentication with DATIM.
 #' @param d Datapackr sidecar object
 #' @param datastreams Data stream or streams. One or more of \code{mer_targets},
 #' \code{mer_results}, \code{subnat_targets}, \code{subnat_results}, or
