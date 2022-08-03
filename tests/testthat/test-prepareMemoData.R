@@ -52,7 +52,7 @@ with_mock_api({
                  c("keychain", "info", "sheets", "tests", "data", "datim"),
                  ignore.order = TRUE)
 
-    fy22_prioritizations <- getFY22Prioritizations(d)
+    fy22_prioritizations <- getPrioritizations(d)
     expect_type(fy22_prioritizations, "list")
     expect_true(NROW(fy22_prioritizations) > 0)
     expect_named(fy22_prioritizations,
@@ -189,8 +189,8 @@ with_mock_api({
       packForDATIM(., type = "SUBNAT_IMPATT") %>%
       packForDATIM(., type = "PSNUxIM")
     #Datapack analytics
-    testthat::expect_warning(d <- createAnalytics(d, training))
-    #Expect warning abt DSNU or parent prioritizations purposefully missing (for other test purposes)
+    d <- createAnalytics(d, training)
+
     #DATIM analytics
     d <-
       prepareMemoData(d,
