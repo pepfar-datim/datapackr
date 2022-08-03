@@ -5,6 +5,7 @@
 
 ## Breaking changes
 * Replaces some check functions with new versions (see below).
+* Replaces `getFY22Prioritizations` with `getPrioritizations` for cross-year usage.
 
 ## New features
 * Add the following functions, along with related tests:
