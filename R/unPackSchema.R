@@ -212,6 +212,7 @@ checkSchema_COsSyntax <- function(schema) {
         dplyr::if_else(
           sheet_name == "PSNUxIM", categoryoption_specified != "NA",
           !stringr::str_detect(categoryoption_specified, multi_uid_pattern()))) %>%
+    #TODO: How to handle situations when the categoryoption_specified is NA?
     dplyr::filter(invalid_COs == TRUE)
 
   COs_syntax_invalid
@@ -220,15 +221,57 @@ checkSchema_COsSyntax <- function(schema) {
 #' @rdname schema-validations
 checkSchema_ValidAges <- function(schema) {
 
+  #TODO: This is a bit speculative and may obviously change
+  # depending on the fiscal year. Revisit how to define this.
+  #Similar to the tests above, we should potentially be matching
+  #the category options UID to an actual DATIM category option UID.
+  valid_age_pattern <- "[0-9]{2}-[0-9]{2}|<01|<1[58]|1[58]+|65\\+|50\\+"
+
+    schema %>%
+    dplyr::select(sheet_name, col, indicator_code, valid_ages) %>%
+    tidyr::unnest(valid_ages) %>%
+    tidyr::drop_na() %>%
+    dplyr::mutate(invalid_age_uid = !stringr::str_detect(id,multi_uid_pattern())) %>%
+    dplyr::mutate(invalid_age_string = !stringr::str_detect(name,valid_age_pattern)) %>%
+    dplyr::filter(invalid_age_string + invalid_age_uid > 0) %>%
+    dplyr::select(sheet_name,col,indicator_code,name,id)
+
+
 }
 
 #' @rdname schema-validations
 checkSchema_ValidSexes <- function(schema) {
 
+  valid_sex_pattern <- "^(Male|Female)$"
+  #What about this instead?
+  # unique(map_DataPack_DATIM_DEs_COCs$valid_sexes.name)
+
+  schema %>%
+    dplyr::select(sheet_name, col, indicator_code, valid_sexes) %>%
+    tidyr::unnest(valid_sexes) %>%
+    #TODO: How should we handle "NA"?
+    tidyr::drop_na() %>%
+    dplyr::mutate(invalid_sex_uid = !stringr::str_detect(id,multi_uid_pattern())) %>%
+    dplyr::mutate(invalid_sex_string = !stringr::str_detect(name,valid_sex_pattern)) %>%
+    dplyr::filter(invalid_sex_string + invalid_sex_uid > 0) %>%
+    dplyr::select(sheet_name,col,indicator_code,name,id)
 }
 
 #' @rdname schema-validations
 checkSchema_ValidKPs <- function(schema) {
+  #TODO: Consider a single function for all three of these
+  #Instead of this repetitive code.
+  valid_KP_names <- unique(map_DataPack_DATIM_DEs_COCs$valid_kps.name)
+
+  schema %>%
+    dplyr::select(sheet_name, col, indicator_code, valid_kps) %>%
+    tidyr::unnest(valid_kps) %>%
+    #TODO: How should we handle "NA"?
+    tidyr::drop_na() %>%
+    dplyr::mutate(invalid_kp_uid = !stringr::str_detect(id,multi_uid_pattern())) %>%
+    dplyr::mutate(invalid_kp_string = !(name %in% valid_KP_names)) %>%
+    dplyr::filter(invalid_kp_string + invalid_kp_uid > 0) %>%
+    dplyr::select(sheet_name,col,indicator_code,name,id)
 
 }
 
@@ -309,15 +352,15 @@ checkSchema <- function(schema,
   tests$sheet_nums_complete <- checkSchema_SheetNums(schema)
 
   ## OPU Schema Specific Checks ####
-  if (!grepl("OPU Data Pack", tool)) {
+  if (tool != "OPU Data Pack") {
     ### dataset ####
     tests$datasets_invalid <- checkSchema_InvalidDatasets(schema, tool, cop_year)
 
     ### col_type ####
-    tests$col_type_invalid <- checkSchema_InvalidColType(schema)
+    tests$col_type_invalid <- checkSchema_InvalidColType(schema, tool, cop_year)
 
     ### value_type ####
-    tests$value_type_invalid <- checkSchema_InvalidValueType(schema)
+    tests$value_type_invalid <- checkSchema_InvalidValueType(schema, tool, cop_year)
   }
 
     ## dataElements ####
@@ -326,22 +369,10 @@ checkSchema <- function(schema,
     # and their category options
   tests$DEs_syntax_invalid <- checkSchema_DataElementSyntax(schema)
 
-
     ### UID Syntax
-
   tests$COs_syntax_invalid <- checkSchema_COsSyntax(schema)
 
-      # TODO: Update
-    ## Test valid_ages ####
-      #     valid_ages.test =
-      #      !(valid_ages %in% map_datapack_cogs$options | valid_ages %in% empty),
-      #
-    ## Test valid_sexes ####
-      #     valid_sexes.test =
-      #       !valid_sexes %in%
-      # c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog %in% c("Females", "Males", "M/F")],
-      #                           empty),
-      #
+
     ## Test valid_kps ####
       #     valid_kps.test =
       #       !valid_kps %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog == "Coarse KPs"], empty),

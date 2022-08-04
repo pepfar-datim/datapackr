@@ -187,6 +187,171 @@ test_that("We can flag invalid value types",{
 
 })
 
+test_that("We can pass valid ages",{
+  tool <- "Data Pack"
+  cop_year <- 2022
+  ref_schema <- pick_schema(cop_year,tool)
+
+  test_results <- checkSchema_ValidAges(ref_schema)
+  expect_true(is.data.frame(test_results))
+  expect_true(NROW(test_results) == 0)
+  expect_named(test_results,
+               c("sheet_name","col","indicator_code","name","id"),
+               ignore.order = TRUE)
+
+})
+
+test_that("We can flag invalid ages",{
+  tool <- "Data Pack"
+  cop_year <- 2022
+  ref_schema <- pick_schema(cop_year,tool)
+
+  modify_age <- function(x) {
+    if (is.null(x)) {return(NULL)}
+    dplyr::mutate(x,name= dplyr::case_when(name == "15-19" ~ "abc123", TRUE ~ name))
+  }
+
+   bad_schema <- ref_schema %>%
+    dplyr::mutate(valid_ages = purrr::map(valid_ages, modify_age))
+
+  test_results <- checkSchema_ValidAges(bad_schema)
+
+  expect_true(is.data.frame(test_results))
+  expect_true(NROW(test_results) > 0L)
+  expect_named(test_results,
+               c("sheet_name","col","indicator_code","name","id"),
+               ignore.order = TRUE)
+
+  modify_id <- function(x) {
+    if (is.null(x)) {return(NULL)}
+    dplyr::mutate(x,name= dplyr::case_when(grepl("^tt",id) ~ "abc123", TRUE ~ id))
+  }
+
+  bad_schema <- ref_schema %>%
+    dplyr::mutate(valid_ages = purrr::map(valid_ages, modify_id))
+
+  test_results <- checkSchema_ValidAges(bad_schema)
+
+  expect_true(is.data.frame(test_results))
+  expect_true(NROW(test_results) > 0L)
+  expect_named(test_results,
+               c("sheet_name","col","indicator_code","name","id"),
+               ignore.order = TRUE)
+
+
+})
+
+
+
+test_that("We can pass valid sex identifiers",{
+  tool <- "Data Pack"
+  cop_year <- 2022
+  ref_schema <- pick_schema(cop_year,tool)
+
+  test_results <- checkSchema_ValidSexes(ref_schema)
+  expect_true(is.data.frame(test_results))
+  expect_true(NROW(test_results) == 0)
+  expect_named(test_results,
+               c("sheet_name","col","indicator_code","name","id"),
+               ignore.order = TRUE)
+
+})
+
+test_that("We can flag invalid sexes",{
+  tool <- "Data Pack"
+  cop_year <- 2022
+  ref_schema <- pick_schema(cop_year,tool)
+
+  modify_males <- function(x) {
+    if (is.null(x)) {return(NULL)}
+    dplyr::mutate(x,name= dplyr::case_when(name == "Male" ~ "Malez", TRUE ~ name))
+  }
+
+  bad_schema <- ref_schema %>%
+    dplyr::mutate(valid_sexes = purrr::map(valid_sexes, modify_males))
+
+  test_results <- checkSchema_ValidSexes(bad_schema)
+
+  expect_true(is.data.frame(test_results))
+  expect_true(NROW(test_results) > 0L)
+  expect_named(test_results,
+               c("sheet_name","col","indicator_code","name","id"),
+               ignore.order = TRUE)
+
+  modify_id <- function(x) {
+    if (is.null(x)) {return(NULL)}
+    dplyr::mutate(x,id = dplyr::case_when(name == "Male" ~ "abc123", TRUE ~ id))
+  }
+
+  bad_schema <- ref_schema %>%
+    dplyr::mutate(valid_sexes = purrr::map(valid_sexes, modify_id))
+
+  test_results <- checkSchema_ValidSexes(bad_schema)
+
+  expect_true(is.data.frame(test_results))
+  expect_true(NROW(test_results) > 0L)
+  expect_named(test_results,
+               c("sheet_name","col","indicator_code","name","id"),
+               ignore.order = TRUE)
+
+
+})
+
+test_that("We can pass valid KP identifiers",{
+  tool <- "Data Pack"
+  cop_year <- 2022
+  ref_schema <- pick_schema(cop_year,tool)
+
+  test_results <- checkSchema_ValidKPs(ref_schema)
+  expect_true(is.data.frame(test_results))
+  expect_true(NROW(test_results) == 0)
+  expect_named(test_results,
+               c("sheet_name","col","indicator_code","name","id"),
+               ignore.order = TRUE)
+
+})
+
+test_that("We can flag KP identifiers",{
+  tool <- "Data Pack"
+  cop_year <- 2022
+  ref_schema <- pick_schema(cop_year,tool)
+
+  modify_pwid <- function(x) {
+    if (is.null(x)) {return(NULL)}
+    dplyr::mutate(x,name = dplyr::case_when(name == "PWID" ~ "DIWP", TRUE ~ name))
+  }
+
+  bad_schema <- ref_schema %>%
+    dplyr::mutate(valid_kps = purrr::map(valid_kps, modify_pwid))
+
+  test_results <- checkSchema_ValidKPs(bad_schema)
+
+  expect_true(is.data.frame(test_results))
+  expect_true(NROW(test_results) > 0L)
+  expect_named(test_results,
+               c("sheet_name","col","indicator_code","name","id"),
+               ignore.order = TRUE)
+
+  modify_id <- function(x) {
+    if (is.null(x)) {return(NULL)}
+    dplyr::mutate(x,id = dplyr::case_when(name == "PWID" ~ "abc123", TRUE ~ id))
+  }
+
+  bad_schema <- ref_schema %>%
+    dplyr::mutate(valid_kps = purrr::map(valid_kps, modify_id))
+
+  test_results <- checkSchema_ValidKPs(bad_schema)
+
+  expect_true(is.data.frame(test_results))
+  expect_true(NROW(test_results) > 0L)
+  expect_named(test_results,
+               c("sheet_name","col","indicator_code","name","id"),
+               ignore.order = TRUE)
+
+
+})
+
+
 
 
 
