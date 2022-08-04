@@ -231,10 +231,10 @@ checkSchema_ValidAges <- function(schema) {
     dplyr::select(sheet_name, col, indicator_code, valid_ages) %>%
     tidyr::unnest(valid_ages) %>%
     tidyr::drop_na() %>%
-    dplyr::mutate(invalid_age_uid = !stringr::str_detect(id,multi_uid_pattern())) %>%
-    dplyr::mutate(invalid_age_string = !stringr::str_detect(name,valid_age_pattern)) %>%
+    dplyr::mutate(invalid_age_uid = !stringr::str_detect(id, multi_uid_pattern())) %>%
+    dplyr::mutate(invalid_age_string = !stringr::str_detect(name, valid_age_pattern)) %>%
     dplyr::filter(invalid_age_string + invalid_age_uid > 0) %>%
-    dplyr::select(sheet_name,col,indicator_code,name,id)
+    dplyr::select(sheet_name, col, indicator_code, name, id)
 
 
 }
@@ -251,10 +251,10 @@ checkSchema_ValidSexes <- function(schema) {
     tidyr::unnest(valid_sexes) %>%
     #TODO: How should we handle "NA"?
     tidyr::drop_na() %>%
-    dplyr::mutate(invalid_sex_uid = !stringr::str_detect(id,multi_uid_pattern())) %>%
-    dplyr::mutate(invalid_sex_string = !stringr::str_detect(name,valid_sex_pattern)) %>%
+    dplyr::mutate(invalid_sex_uid = !stringr::str_detect(id, multi_uid_pattern())) %>%
+    dplyr::mutate(invalid_sex_string = !stringr::str_detect(name, valid_sex_pattern)) %>%
     dplyr::filter(invalid_sex_string + invalid_sex_uid > 0) %>%
-    dplyr::select(sheet_name,col,indicator_code,name,id)
+    dplyr::select(sheet_name, col, indicator_code, name, id)
 }
 
 #' @rdname schema-validations
@@ -268,10 +268,10 @@ checkSchema_ValidKPs <- function(schema) {
     tidyr::unnest(valid_kps) %>%
     #TODO: How should we handle "NA"?
     tidyr::drop_na() %>%
-    dplyr::mutate(invalid_kp_uid = !stringr::str_detect(id,multi_uid_pattern())) %>%
+    dplyr::mutate(invalid_kp_uid = !stringr::str_detect(id, multi_uid_pattern())) %>%
     dplyr::mutate(invalid_kp_string = !(name %in% valid_KP_names)) %>%
     dplyr::filter(invalid_kp_string + invalid_kp_uid > 0) %>%
-    dplyr::select(sheet_name,col,indicator_code,name,id)
+    dplyr::select(sheet_name, col, indicator_code, name, id)
 
 }
 
