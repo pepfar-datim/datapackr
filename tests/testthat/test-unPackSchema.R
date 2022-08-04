@@ -368,3 +368,36 @@ test_that("We can flag KP identifiers", {
 
 
 })
+
+
+test_that("We can pass valid formulas", {
+  tool <- "Data Pack"
+  cop_year <- 2022
+  ref_schema <- pick_schema(cop_year, tool)
+
+  test_results <- checkSchema_Formulas(ref_schema)
+  expect_true(is.data.frame(test_results))
+  expect_true(NROW(test_results) == 0)
+  expect_named(test_results,
+               c("col", "formula", "indicator_code", "sheet_name"),
+               ignore.order = TRUE)
+
+})
+
+test_that("We can flag invalid formulas´", {
+  tool <- "Data Pack"
+  cop_year <- 2022
+  ref_schema <- pick_schema(cop_year, tool)
+
+  bad_formulas <- sample(seq_len(NROW(ref_schema)), 10)
+  ref_schema$formula[bad_formulas] <- "#REF"
+  test_results <- checkSchema_Formulas(ref_schema)
+
+  expect_true(is.data.frame(test_results))
+  expect_true(NROW(test_results) == 10)
+  expect_named(test_results,
+               c("col", "formula", "indicator_code", "sheet_name"),
+               ignore.order = TRUE)
+
+
+})

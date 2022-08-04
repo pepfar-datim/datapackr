@@ -363,22 +363,16 @@ checkSchema <- function(schema,
     tests$value_type_invalid <- checkSchema_InvalidValueType(schema, tool, cop_year)
   }
 
-    ## dataElements ####
-    ### UID Syntax
-    #TODO: Match these against actually valid DATIM data element uids
-    # and their category options
+  ###Test DEs name and UID syntax
   tests$DEs_syntax_invalid <- checkSchema_DataElementSyntax(schema)
 
-    ### UID Syntax
+  ###Test COs name and UID syntax
   tests$COs_syntax_invalid <- checkSchema_COsSyntax(schema)
-
-
-    ## Test valid_kps ####
-      #     valid_kps.test =
-      #       !valid_kps %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog == "Coarse KPs"], empty),
+  ###Test KPs name and UID syntax
+  tests$KPS_invalid <- checkSchema_ValidKPs(schema)
 
   ## Test formulas ####
-  tests$fxs_ref_error <- checkSchema_Formulas(schema = schema)
+  tests$fxs_ref_error <- checkSchema_Formulas(schema)
 
   # TODO: TESTS to add ####
     # * No duplicate indicator_codes on any single sheet
