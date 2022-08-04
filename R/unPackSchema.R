@@ -31,18 +31,38 @@
 #' @family schema-helpers
 NULL
 
+
+getSkipSheets <- function(schema, tool, cop_year) {
+  #Skip sheets which are defined in the code
+  package_skip <- skip_tabs(tool = tool, cop_year = cop_year)
+
+  #Skip sheets which are defined in the schema
+  schema_skip <- schema %>%
+    dplyr::filter(sheet_name %in% package_skip) %>%
+    dplyr::select(sheet_name, sheet_num) %>%
+    dplyr::distinct()
+
+   list(
+    package_skip = package_skip,
+    num = schema_skip$sheet_num,
+    names = schema_skip$sheet_name)
+}
+
+uid_pattern <- function() {
+  "[A-Za-z][A-Za-z0-9]{10}"
+}
+multi_uid_pattern <- function() {
+  paste0("^(", uid_pattern(), ")(\\.((", uid_pattern(), ")))*$")
+  }
+
+
+
 #' @rdname schema-validations
 checkSchema_SkippedSheets <- function(schema, tool, cop_year) {
-  skip <- skip_tabs(tool = tool, cop_year = cop_year)
-  schema_skip <- schema %>%
-    dplyr::filter(sheet_name %in% skip) %>%
-    dplyr::select(sheet_name, sheet_num)
 
-  skip_sheets <- list(
-    num = unique(schema_skip$sheet_num),
-    names = unique(schema_skip$sheet_name))
+  skip_sheets <- getSkipSheets(schema, tool, cop_year)
 
-  skip_comparison <- waldo::compare(skip_sheets$names, skip,
+  skip_comparison <- waldo::compare(skip_sheets$names, skip_sheets$package_skip,
                                     x_arg = "schema", y_arg = "package")
 
   if (length(skip_comparison) != 0) {
@@ -60,7 +80,7 @@ checkSchema_SkippedSheets <- function(schema, tool, cop_year) {
 #' @rdname schema-validations
 checkSchema_SheetNums <- function(schema) {
   observed_sheet_nums <- unique(schema$sheet_num)
-  expected_sheet_nums <- c(min(schema$sheet_num):max(schema$sheet_num))
+  expected_sheet_nums <- c(1:max(schema$sheet_num))
 
   sheet_nums_comparison <- waldo::compare(observed_sheet_nums,
                                           expected_sheet_nums,
@@ -100,7 +120,10 @@ checkSchema_SheetNames <- function(schema, filepath_schema) {
 }
 
 #' @rdname schema-validations
-checkSchema_InvalidDatasets <- function(schema) {
+checkSchema_InvalidDatasets <- function(schema, tool, cop_year) {
+
+  skip_sheets <- getSkipSheets(schema, tool, cop_year)
+
   datasets_invalid <- schema %>%
     dplyr::mutate(
       invalid_dataset =
@@ -108,7 +131,7 @@ checkSchema_InvalidDatasets <- function(schema) {
           col_type %in% c("reference", "assumption", "calculation", "row_header", "allocation")
           ~ !dataset == c("datapack"),
           col_type %in% c("target", "past", "result") ~ !dataset %in% c("mer", "impatt", "subnat"),
-          sheet_num %in% skip_sheets$num ~ !is.na(dataset),
+          sheet_name %in% skip_sheets$names ~ !is.na(dataset),
           TRUE ~ TRUE)) %>%
     dplyr::filter(invalid_dataset == TRUE) %>%
     dplyr::select(sheet_name, data_structure, col, indicator_code, dataset, col_type)
@@ -117,13 +140,16 @@ checkSchema_InvalidDatasets <- function(schema) {
 }
 
 #' @rdname schema-validations
-checkSchema_InvalidColType <- function(schema) {
+checkSchema_InvalidColType <- function(schema, tool, cop_year) {
+
+  skip_sheets <- getSkipSheets(schema, tool, cop_year)
+
   col_type_invalid <- schema %>%
     dplyr::mutate(
       invalid_col_type =
         (!col_type %in% c("target", "reference", "assumption", "calculation", "past",
                           "row_header", "allocation", "result"))
-      & (sheet_num %in% skip_sheets$num & !is.na(col_type))) %>%
+      & (sheet_name %in% skip_sheets$names & !is.na(col_type))) %>%
     dplyr::filter(invalid_col_type == TRUE) %>%
     dplyr::select(sheet_name, col, indicator_code, data_structure, col_type)
 
@@ -131,12 +157,15 @@ checkSchema_InvalidColType <- function(schema) {
 }
 
 #' @rdname schema-validations
-checkSchema_InvalidValueType <- function(schema) {
+checkSchema_InvalidValueType <- function(schema, tool, cop_year) {
+
+  skip_sheets <- getSkipSheets(schema, tool, cop_year)
+
   value_type_invalid <- schema %>%
     dplyr::mutate(
       invalid_value_type =
         (!value_type %in% c("integer", "percentage", "string"))
-      & (sheet_num %in% skip_sheets$num & !is.na(value_type))) %>%
+      & (sheet_name %in% skip_sheets$names & !is.na(value_type))) %>%
     dplyr::filter(invalid_value_type == TRUE) %>%
     dplyr::select(sheet_name, col, indicator_code, value_type)
 
@@ -144,35 +173,37 @@ checkSchema_InvalidValueType <- function(schema) {
 }
 
 #' @rdname schema-validations
-checkSchema_DSDSyntax <- function(DEs_schema, multi_uid_pattern) {
+checkSchema_DataElementSyntax <- function(schema) {
+
+  DEs_schema <- schema %>%
+    dplyr::filter(col_type %in% c("past", "target", "result")) %>%
+    dplyr::select(sheet_name, col, indicator_code, dataset, dataelement_dsd, dataelement_ta)
+
+
   DEs_DSD_syntax_invalid <- DEs_schema %>%
     dplyr::select(-dataelement_ta) %>%
     dplyr::mutate(
       invalid_DSD_DEs =
         dplyr::if_else(
           sheet_name == "PSNUxIM", dataelement_dsd != "NA",
-          !stringr::str_detect(dataelement_dsd, multi_uid_pattern))) %>%
+          !stringr::str_detect(dataelement_dsd, multi_uid_pattern()))) %>%
     dplyr::filter(invalid_DSD_DEs == TRUE)
 
-  DEs_DSD_syntax_invalid
-}
-
-#' @rdname schema-validations
-checkSchema_TASyntax <- function(DEs_schema, multi_uid_pattern) {
   DEs_TA_syntax_invalid <- DEs_schema %>%
     dplyr::select(-dataelement_dsd) %>%
     dplyr::mutate(
       invalid_TA_DEs =
         dplyr::if_else(
           sheet_name == "PSNUxIM", dataelement_ta != "NA",
-          !stringr::str_detect(dataelement_ta, multi_uid_pattern))) %>%
+          !stringr::str_detect(dataelement_ta, multi_uid_pattern()))) %>%
     dplyr::filter(invalid_TA_DEs == TRUE)
 
-  DEs_TA_syntax_invalid
+  dplyr::bind_rows(DEs_DSD_syntax_invalid, DEs_TA_syntax_invalid)
 }
 
+
 #' @rdname schema-validations
-checkSchema_COsSyntax <- function(schema, multi_uid_pattern) {
+checkSchema_COsSyntax <- function(schema) {
   COs_syntax_invalid <- schema %>%
     dplyr::filter(col_type %in% c("past", "target", "result")) %>%
     dplyr::select(sheet_name, col, indicator_code, categoryoption_specified) %>%
@@ -180,7 +211,7 @@ checkSchema_COsSyntax <- function(schema, multi_uid_pattern) {
       invalid_COs =
         dplyr::if_else(
           sheet_name == "PSNUxIM", categoryoption_specified != "NA",
-          !stringr::str_detect(categoryoption_specified, multi_uid_pattern))) %>%
+          !stringr::str_detect(categoryoption_specified, multi_uid_pattern()))) %>%
     dplyr::filter(invalid_COs == TRUE)
 
   COs_syntax_invalid
@@ -280,7 +311,7 @@ checkSchema <- function(schema,
   ## OPU Schema Specific Checks ####
   if (!grepl("OPU Data Pack", tool)) {
     ### dataset ####
-    tests$datasets_invalid <- checkSchema_InvalidDatasets(schema)
+    tests$datasets_invalid <- checkSchema_InvalidDatasets(schema, tool, cop_year)
 
     ### col_type ####
     tests$col_type_invalid <- checkSchema_InvalidColType(schema)
@@ -290,30 +321,15 @@ checkSchema <- function(schema,
   }
 
     ## dataElements ####
-      ### UID Syntax
-  DEs_schema <- schema %>%
-    dplyr::filter(col_type %in% c("past", "target", "result")) %>%
-    dplyr::select(sheet_name, col, indicator_code, dataset, dataelement_dsd, dataelement_ta)
+    ### UID Syntax
+    #TODO: Match these against actually valid DATIM data element uids
+    # and their category options
+  tests$DEs_syntax_invalid <- checkSchema_DataElementSyntax(schema)
 
-  uid_pattern <- "[A-Za-z][A-Za-z0-9]{10}"
-  multi_uid_pattern <- paste0("^(", uid_pattern, ")(\\.((", uid_pattern, ")))*$")
 
-  tests$DEs_DSD_syntax_invalid <- checkSchema_DSDSyntax(DEs_schema,
-                                                           multi_uid_pattern)
-  tests$DEs_TA_syntax_invalid <- checkSchema_TASyntax(DEs_schema,
-                                                         multi_uid_pattern)
+    ### UID Syntax
 
-    ##> Match DATIM (valid UIDs only)
-  # DEs_mismatch_DATIM <- DEs_schema %>%
-  #   dplyr::filter(!dataelement_dsd %in% DEs_DSD_syntax_invalid$dataelement_dsd,
-  #                 !dataelement_ta %in% DEs_TA_syntax_invalid$dataelement_ta) %>%
-    # how to check these against DATIM... Cache the data? pull fresh? how to maintain which datasets to pull?
-
-    ## categoryoption_specified ####
-      ### UID Syntax
-
-  tests$COs_syntax_invalid <- checkSchema_COsSyntax(schema,
-                                                       multi_uid_pattern)
+  tests$COs_syntax_invalid <- checkSchema_COsSyntax(schema)
 
       # TODO: Update
     ## Test valid_ages ####
@@ -377,11 +393,11 @@ unPackSchema <- function(template_path = NULL,
     assign(p, purrr::pluck(params, p))
   }
 
-  if (tool == "OPU Data Pack Template" & cop_year %in% c(2021)) {
-    schema <- tidyxl::xlsx_cells(path = template_path, include_blank_cells = T) %>%
+  if (tool == "OPU Data Pack Template" && cop_year %in% c(2021)) {
+    schema <- tidyxl::xlsx_cells(path = template_path, include_blank_cells = TRUE) %>%
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric, is_array)
   } else {
-    schema <- tidyxl::xlsx_cells(path = template_path, include_blank_cells = F) %>%
+    schema <- tidyxl::xlsx_cells(path = template_path, include_blank_cells = FALSE) %>%
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
   }
 
