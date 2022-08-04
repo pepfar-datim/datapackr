@@ -175,30 +175,20 @@ checkSchema_InvalidValueType <- function(schema, tool, cop_year) {
 #' @rdname schema-validations
 checkSchema_DataElementSyntax <- function(schema) {
 
-  DEs_schema <- schema %>%
+  schema %>%
     dplyr::filter(col_type %in% c("past", "target", "result")) %>%
-    dplyr::select(sheet_name, col, indicator_code, dataset, dataelement_dsd, dataelement_ta)
-
-
-  DEs_DSD_syntax_invalid <- DEs_schema %>%
-    dplyr::select(-dataelement_ta) %>%
+    dplyr::select(sheet_name, col, indicator_code, dataset, dataelement_dsd, dataelement_ta) %>%
     dplyr::mutate(
       invalid_DSD_DEs =
         dplyr::if_else(
           sheet_name == "PSNUxIM", dataelement_dsd != "NA",
-          !stringr::str_detect(dataelement_dsd, multi_uid_pattern()))) %>%
-    dplyr::filter(invalid_DSD_DEs == TRUE)
-
-  DEs_TA_syntax_invalid <- DEs_schema %>%
-    dplyr::select(-dataelement_dsd) %>%
-    dplyr::mutate(
+          !stringr::str_detect(dataelement_dsd, multi_uid_pattern())),
       invalid_TA_DEs =
         dplyr::if_else(
           sheet_name == "PSNUxIM", dataelement_ta != "NA",
           !stringr::str_detect(dataelement_ta, multi_uid_pattern()))) %>%
-    dplyr::filter(invalid_TA_DEs == TRUE)
+    dplyr::filter(sum(invalid_DSD_DEs, invalid_TA_DEs, na.rm = TRUE) > 0)
 
-  dplyr::bind_rows(DEs_DSD_syntax_invalid, DEs_TA_syntax_invalid)
 }
 
 

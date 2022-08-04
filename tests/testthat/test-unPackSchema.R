@@ -401,3 +401,61 @@ test_that("We can flag invalid formulas´", {
 
 
 })
+
+
+test_that("We can pass valid data element identifiers", {
+  tool <- "Data Pack"
+  cop_year <- 2022
+  ref_schema <- pick_schema(cop_year, tool)
+
+  test_results <- checkSchema_DataElementSyntax(ref_schema)
+
+  expect_true(is.data.frame(test_results))
+  expect_true(NROW(test_results) == 0)
+  expect_named(
+    test_results,
+    c(
+      "col",
+      "dataelement_dsd",
+      "dataelement_ta",
+      "dataset",
+      "indicator_code",
+      "invalid_DSD_DEs",
+      "invalid_TA_DEs",
+      "sheet_name"
+    ),
+    ignore.order = TRUE
+  )
+
+})
+
+test_that("We can flag invalid data elements´", {
+  tool <- "Data Pack"
+  cop_year <- 2022
+  ref_schema <- pick_schema(cop_year, tool)
+
+  bad_schema <- ref_schema %>%
+    dplyr::mutate(dataelement_dsd = dplyr::case_when(col %% 4 == 0 ~ "foobar",
+                                                     TRUE ~ dataelement_dsd),
+                  dataelement_ta = dplyr::case_when(col %% 5 == 0 ~ "abc123",
+                                                    TRUE ~ dataelement_ta))
+  test_results <- checkSchema_DataElementSyntax(bad_schema)
+
+  expect_true(is.data.frame(test_results))
+  expect_true(NROW(test_results) > 0)
+  expect_named(
+    test_results,
+    c(
+      "col",
+      "dataelement_dsd",
+      "dataelement_ta",
+      "dataset",
+      "indicator_code",
+      "invalid_DSD_DEs",
+      "invalid_TA_DEs",
+      "sheet_name"
+    ),
+    ignore.order = TRUE
+  )
+
+})
