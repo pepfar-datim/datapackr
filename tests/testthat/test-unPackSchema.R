@@ -8,13 +8,16 @@ test_that("We can get sheets to skip", {
   expect_named(this_skip, c("package_skip", "num", "names")) })
 
 
+flubSkippedSheets <- function(schema) {
+  schema %>% dplyr::filter(sheet_name != "Spectrum")
+}
+
 test_that("We can flag missing sheets which are skipped", {
   tool <- "Data Pack"
   cop_year <- 2022
   ref_schema <- pick_schema(cop_year, tool)
   #Simulate deleting the Spectrum tab
-  bad_schema <- ref_schema %>%
-    dplyr::filter(sheet_name != "Spectrum")
+  bad_schema <- flubSkippedSheets(ref_schema)
   test_results <- checkSchema_SkippedSheets(bad_schema, tool, cop_year)
   expect_true(length(test_results) > 0)
   expect_named(test_results, c("error", "data"))
@@ -136,13 +139,19 @@ test_that("We can pass valid column types", {
 
 })
 
+
+flubColumnTypes <- function(schema){
+  schema %>%
+    dplyr::mutate(col_type = dplyr::case_when(col_type == "reference" ~ "foobar",
+                                              TRUE ~ col_type))
+}
+
+
 test_that("We can flag when column types are invalid", {
   tool <- "Data Pack"
   cop_year <- 2022
   ref_schema <- pick_schema(cop_year, tool)
-  bad_schema <- ref_schema %>%
-    dplyr::mutate(col_type = dplyr::case_when(col_type == "reference" ~ "foobar",
-                                              TRUE ~ col_type))
+  bad_schema <- flubColumnTypes(ref_schema)
 
   test_results <- checkSchema_InvalidColType(bad_schema, tool, cop_year)
 
@@ -499,4 +508,23 @@ test_that("We can flag invalid data elements´", {
     ignore.order = TRUE
   )
 
+})
+
+test_that("We can pass when a schema is valid", {
+  tool <- "Data Pack"
+  cop_year <- 2022
+  ref_schema <- pick_schema(cop_year, tool)
+  test_results <- checkSchema(schema = ref_schema,cop_year = cop_year, tool = tool, season = "COP")
+  expect_true( length(test_results) == 0 )
+})
+
+test_that("We can flag when a schema is invalid", {
+  tool <- "Data Pack"
+  cop_year <- 2022
+  ref_schema <- pick_schema(cop_year, tool)
+  bad_schema <- ref_schema %>%
+    flubSkippedSheets(.) %>%
+    flubColumnTypes(.)
+  test_results <- checkSchema(schema = bad_schema,cop_year = cop_year, tool = tool, season = "COP")
+  expect_true( length(test_results) > 0 )
 })
