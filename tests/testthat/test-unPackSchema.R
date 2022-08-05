@@ -140,7 +140,7 @@ test_that("We can pass valid column types", {
 })
 
 
-flubColumnTypes <- function(schema){
+flubColumnTypes <- function(schema) {
   schema %>%
     dplyr::mutate(col_type = dplyr::case_when(col_type == "reference" ~ "foobar",
                                               TRUE ~ col_type))
@@ -514,8 +514,8 @@ test_that("We can pass when a schema is valid", {
   tool <- "Data Pack"
   cop_year <- 2022
   ref_schema <- pick_schema(cop_year, tool)
-  test_results <- checkSchema(schema = ref_schema,cop_year = cop_year, tool = tool, season = "COP")
-  expect_true( length(test_results) == 0 )
+  test_results <- checkSchema(schema = ref_schema, cop_year = cop_year, tool = tool, season = "COP")
+  expect_true(length(test_results) == 0)
 })
 
 test_that("We can flag when a schema is invalid", {
@@ -525,6 +525,6 @@ test_that("We can flag when a schema is invalid", {
   bad_schema <- ref_schema %>%
     flubSkippedSheets(.) %>%
     flubColumnTypes(.)
-  test_results <- checkSchema(schema = bad_schema,cop_year = cop_year, tool = tool, season = "COP")
-  expect_true( length(test_results) > 0 )
+  test_results <- checkSchema(schema = bad_schema, cop_year = cop_year, tool = tool, season = "COP")
+  expect_true(length(test_results) > 0)
 })
