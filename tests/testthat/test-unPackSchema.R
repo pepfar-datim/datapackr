@@ -1,4 +1,3 @@
-context("Schema creation and validation")
 
 test_that("We can get sheets to skip", {
 
@@ -454,6 +453,48 @@ test_that("We can flag invalid data elements´", {
       "invalid_DSD_DEs",
       "invalid_TA_DEs",
       "sheet_name"
+    ),
+    ignore.order = TRUE
+  )
+
+})
+
+
+test_that("We can pass valid category option identifiers", {
+  tool <- "Data Pack"
+  cop_year <- 2022
+  ref_schema <- pick_schema(cop_year, tool)
+
+  test_results <- checkSchema_COsSyntax(ref_schema)
+
+  expect_true(is.data.frame(test_results))
+  expect_true(NROW(test_results) == 0)
+  expect_named(
+    test_results,
+    c(
+      "categoryoption_specified", "col", "indicator_code", "invalid_COs", "sheet_name"
+    ),
+    ignore.order = TRUE
+  )
+
+})
+
+test_that("We can flag invalid data elements´", {
+  tool <- "Data Pack"
+  cop_year <- 2022
+  ref_schema <- pick_schema(cop_year, tool)
+
+  bad_schema <- ref_schema %>%
+    dplyr::mutate(categoryoption_specified = dplyr::case_when(col %% 4 == 0 ~ "foobar",
+                                                     TRUE ~ categoryoption_specified))
+  test_results <- checkSchema_COsSyntax(bad_schema)
+
+  expect_true(is.data.frame(test_results))
+  expect_true(NROW(test_results) > 0)
+  expect_named(
+    test_results,
+    c(
+      "categoryoption_specified", "col", "indicator_code", "invalid_COs", "sheet_name"
     ),
     ignore.order = TRUE
   )
