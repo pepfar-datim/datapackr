@@ -378,7 +378,10 @@ checkSchema <- function(schema,
     # * Numeric or % formatting correct
 
   # Filter out any tests with zero rows ####
-  tests <- tests[sapply(tests, nrow) > 0]
+  tests <-
+    tests  %>%
+    purrr::keep( ~ length(.x) > 0) %>%
+    purrr::keep( ~ NROW(.x) > 0)
 
   # Compile test results ####
   if (length(tests) > 0) {
@@ -606,3 +609,6 @@ unPackSchema <- function(template_path = NULL,
     dplyr::select(sheet_num, sheet_name, data_structure, dplyr::everything())
 
 }
+
+
+
