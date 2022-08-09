@@ -29,7 +29,6 @@ Imports:
     datimutils (>= 0.3.0),
     datimvalidation,
     dplyr (>= 0.8.3),
-    fuzzyjoin (>= 0.1.6),
     httr (>= 1.4.0),
     jsonlite (>= 1.6),
     lubridate,
