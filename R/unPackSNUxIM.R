@@ -758,7 +758,7 @@ unPackSNUxIM <- function(d) {
     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
 
   # TODO: TEST: Defunct disaggs; Error; Drop ####
-  #d <- defunctDisaggs(d, sheet)
+  #d <- checkDisaggs(d, sheet)
 
   # Drop all zeros against IMs ####
   # d$data$SNUxIM %<>%

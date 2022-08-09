@@ -133,7 +133,7 @@ createKeychainInfo <- function(submission_path = NULL,
   d$info$datapack_name %<>% checkDataPackName(country_uids = d$info$country_uids)
 
   # TEST to make sure tool type matches what we see in the submitted file's structure ####
-  # TODO: Improve to use checkColStructure
+  # TODO: Improve to use checkColumnStructure
   # tab_names_expected <- unique(d$info$schema$sheet_name)
   # tab_names_received <- readxl::excel_sheets(d$keychain$submission_path)
   #
