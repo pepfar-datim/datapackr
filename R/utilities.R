@@ -584,6 +584,27 @@ is_uidish <- function(string, ish = FALSE) {
 
 }
 
+#' @export
+#' @title Checks whether cache age is fresh
+#'
+#' @param time The timestamp for the cache
+#' @param max_age The maximum age allowed for a cache to be considered fresh
+#'
+#' @return A logical vector
+is_fresh <- function(time, max_age) {
+  lubridate::as.duration(lubridate::interval(time, Sys.time())) < lubridate::duration(max_age)
+}
+
+#' @export
+#' @title Return the fresh portion of a cache file
+#'
+#' @param cache The cached file
+#' @param max_age The maximum age allowed fora cache to be considered fresh
+#'
+#' @return A dataframe containing only the fresh portion of the cache file
+fresh_cache_part <- function(cache, max_age) {
+  cache[is_fresh(cache$cache_date, max_age)]
+}
 
 #' Can Spawn
 #' @description Determines whether processes can be run in parallel.
