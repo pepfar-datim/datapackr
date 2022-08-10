@@ -29,7 +29,6 @@ Imports:
     datimutils (>= 0.3.0),
     datimvalidation,
     dplyr (>= 0.8.3),
-    httr (>= 1.4.0),
     lubridate,
     magrittr (>= 1.5),
     methods,
