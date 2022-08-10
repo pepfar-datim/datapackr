@@ -11,15 +11,15 @@
    * `loadSheets`
    * `readSheet`
    * `checkFormulas`
-   * `checkDisaggs`
+   * `checkDisaggs` (instead of `defunctDisaggs`)
    * `checkInvalidPrioritizations`
    * `checkInvalidOrgUnits`
    * `checkNegativeValues`
    * `checkDecimalValues`
    * `checkMissingMetadata`
    * `checkNonNumeric` (instead of `checkNumericValues`)
-   * `checkDupeRows`
-   * `checkColumnStructure`
+   * `checkDupeRows` (instead of `checkDuplicateRows`)
+   * `checkColumnStructure` (instead of `checkColStructure`)
    * `checkToolStructure` (instead of `checkStructure`)
    * `checkToolConnections` (instead of `checkExternalLinks`)
    * `checkToolComments` (instead of `checkComments`)
