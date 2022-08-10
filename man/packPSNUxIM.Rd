@@ -21,7 +21,7 @@ packPSNUxIM(
 formatted as a standard DHIS2 import file.}
 
 \item{snuxim_model_data}{Export from DATIM needed to allocate data across
-mechanisms in the PSNUxIM tab}
+mechanisms in the PSNUxIM tab.}
 
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}

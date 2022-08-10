@@ -13,6 +13,7 @@ generation_list <- c("Central America and Brazil")
 pick <- datapackr::COP21_datapacks_countries %>%
   dplyr::filter(datapack_name %in% generation_list)
 
+
 # # For Production run ####
 # pick <- datapackr::COP21_datapacks_countries
 

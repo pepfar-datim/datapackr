@@ -260,8 +260,13 @@ pick_template_path <- function(cop_year, tool) {
 #' @title Standardized package function parameter definitions
 #'
 #' @param model_data Data from DATIM needed to pack into a COP Data Pack.
+#' @param model_data_path Local filepath to a Data Pack model data file.
 #' @param snuxim_model_data Export from DATIM needed to allocate data across
-#' mechanisms in the PSNUxIM tab
+#' mechanisms in the PSNUxIM tab.
+#' @param snuxim_model_data_path Local filepath to an SNUxIM Model Data file.
+#' @param undistributed_mer_data Data from the \code{d$data$UndistributedMER}
+#' dataset that can be provided while generating an OPU tool such that the
+#' targets to be distributed will be sourced from this file.
 #' @param SNUxIM SNUxIM dataset extract from unPackSNUxIM
 #' @param MER MER dataset extract from unPackSheets
 #' @param PSNUxIM_combos Dataset extract from unPackSNUxIM that shows data
@@ -321,7 +326,10 @@ pick_template_path <- function(cop_year, tool) {
 #'
 #' @return list of all paramaters of this constructor function
 datapackr_params <- function(model_data,
+                             model_data_path,
                              snuxim_model_data,
+                             snuxim_model_data_path,
+                             undistributed_mer_data,
                              SNUxIM,
                              MER,
                              PSNUxIM_combos,
