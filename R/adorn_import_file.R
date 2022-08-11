@@ -11,10 +11,11 @@
 #'
 #'
 
-getPriorizationSNU <- function(psnu_import_file) {
+getPriorizationSNU <- function(psnu_uids) {
 
+    # Get a full map of all the PSNUs
     snus <- valid_PSNUs %>% # Comes from file data/valid_PSNUs.rda
-      dplyr::filter(psnu_uid %in% unique(psnu_import_file$orgUnit)) %>%
+      dplyr::filter(psnu_uid %in% unique(psnu_uids)) %>%
       add_dp_psnu() %>% #Found in getPSNUs.R
       dplyr::rename(name = psnu, id = psnu_uid)
 
@@ -96,7 +97,7 @@ adorn_import_file <- function(psnu_import_file,
 
   cop_year %<>% check_cop_year()
 
-  snus <- getPriorizationSNU(psnu_import_file)
+  snus <- getPriorizationSNU(psnu_import_file$orgUnit)
 
   psnu_import_file %<>%
     dplyr::left_join(snus, by = c("orgUnit" = "id"))
