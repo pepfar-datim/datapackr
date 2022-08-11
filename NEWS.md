@@ -1,3 +1,71 @@
+# datapackr 5.3.0
+
+## Breaking changes
+* Removes the following functions from the package:
+   - `checkComments`
+   - `checkDuplicateRows`
+   - `checkExternalLinks`
+   - `checkMissingMetadata`
+   - `checkNumericValues`
+   - `checkStructure`
+   - `compareTemplateToSchema`
+   - `defunctDisaggs`
+   - `exportSubnatToDATIM`
+   - `getDataValueSets`
+   - `packForDATIM_MER`
+   - `packForDATIM_OPU`
+   - `packForDATIM_UndistributedMER`
+* Refactors `packDataPack` and `packOPUDataPack` to work with new `packTool` wrapper function.
+   - Common functionality is removed from individual functions and moved into `packTool` to remove duplication.
+   - The `packDataPack` function now only takes in `d` and `d2_session` as arguments.
+   - The `packOPUDataPack` function now takes in a `d` object, an `undistributed_mer_data` dataframe, and a `d2_session` object as arguments. When an `undistributed_mer_data` object is provided, it will use these target values for distributing rather than taking target values from DATIM.
+   - Each function now checks if appropriate model filepath has been provided and then writes tabs into pre-generated file.
+
+## New features
+* Add the following functions, along with related tests:
+   * `loadSheets`
+   * `readSheet`
+   * `checkFormulas`
+   * `checkDisaggs` (instead of `defunctDisaggs`)
+   * `checkInvalidPrioritizations`
+   * `checkInvalidOrgUnits`
+   * `checkNegativeValues`
+   * `checkDecimalValues`
+   * `checkMissingMetadata`
+   * `checkNonNumeric` (instead of `checkNumericValues`)
+   * `checkDupeRows` (instead of `checkDuplicateRows`)
+   * `checkColumnStructure` (instead of `checkColStructure`)
+   * `checkToolStructure` (instead of `checkStructure`)
+   * `checkToolConnections` (instead of `checkExternalLinks`)
+   * `checkToolComments` (instead of `checkComments`)
+   * `checkSheets`
+   * `extract_uid`
+   * `extract_uid_all`
+* Creates a new wrapper function `packTool` around `packDataPack` and `packOPUDataPack`
+* Adds `checkOutputFolder` function to `check_params` set that validates that an output folder has been provided, that the directory exists, and can be written to.
+
+## Minor improvements and fixes
+* Refactors `unPackDataPackSheet` to reduce cyclomatic complexity and make it functional over multiple sheets at once.
+* Updates `unPackDataPack` to use new check functions (see above).
+* Updates `unPackTool` to use `loadDataPack` instead of `createKeychainInfo`.
+* Simplifies and generalizes `unPackDataPackSheet`.
+* Generalizes `separateDataSets`
+* Turns off `checkMissingMetadata` in `unPackSNUxIM` for now.
+* Updates `createKeychainInfo` to be more accurate in deducing metadata from submitted Data Packs.
+* Updates `loadDataPack` to be production ready.
+* Refactors `packForDATIM` to streamline all related functions into one and removes `packForDATIM_MER`, `packForDATIM_OPU`, and `packForDATIM_UndistributedMER`. Updates related functions accordingly.
+* Removes deprecated code for `exportSubnatToDatim` function.
+* Removes deprecated `compareTemplateToSchema` function after removing last instance of usage in `packDataPack`.
+* Creates `data-raw/COP21OPU_PSNUxIM_generation_from_Data_Pack.R` which allows the generation of a COP21 OPU tool that includes the target values from a COP21 Data Pack tool and the % distributions from DATIM.
+* Fixes tests for the following functions:
+   * `listWorkbookContents`
+   * `packForDATIM`
+   * `separateDataSets`
+   * `unPackSheets`
+   * `prepareMemoData`
+   * `createAnalytics`
+ 
+
 # datapackr 5.2.3
 
 ## Breaking changes
@@ -17,7 +85,6 @@
  - Refactors package to standardize on `cop_year` over `fiscal_year` and `FY` for parameters (DP-691)
  - Refactors package to standardize usage of `pick_schema` across functions (DP-294)
  - Refactors `packSNUxIM` to reduce cyclomatic complexity (DP-662)
-
 
 # datapackr 5.2.2
 

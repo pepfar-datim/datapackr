@@ -4,12 +4,26 @@
 \alias{unPackDataPackSheet}
 \title{Unpack a Data Pack sheet.}
 \usage{
-unPackDataPackSheet(d, sheet)
+unPackDataPackSheet(
+  d,
+  sheets,
+  clean_orgs = TRUE,
+  clean_disaggs = TRUE,
+  clean_values = TRUE
+)
 }
 \arguments{
-\item{d}{Datapackr object.}
+\item{d}{Datapackr sidecar object}
 
-\item{sheet}{Sheet to unpack.}
+\item{clean_orgs}{Logical. If TRUE, drops rows with missing or invalid org
+units.}
+
+\item{clean_disaggs}{Logical. If TRUE, drops rows with missing or incorrect
+Age, Sex, or KeyPop.}
+
+\item{clean_values}{Logical. If TRUE, will convert values to numeric type,
+drop non-numerics, NAs, & negatives; and aggregate all data across duplicate
+rows.}
 }
 \value{
 d

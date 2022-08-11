@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.1.2",
+    "Version": "4.2.0",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -305,32 +305,20 @@
     },
     "datimutils": {
       "Package": "datimutils",
-      "Version": "0.3.0",
+      "Version": "0.4.0",
       "Source": "GitHub",
       "RemoteType": "github",
-      "RemoteHost": "api.github.com",
       "RemoteUsername": "pepfar-datim",
       "RemoteRepo": "datimutils",
       "RemoteRef": "master",
-      "RemoteSha": "d16533e3d3af228c4828f5bc887495abfe657add",
-      "Hash": "eec22e1df0cecaa4dd7424491726522e",
+      "RemoteSha": "0154a3a92ada95d78e8dd61d4f63464ba9e6d57c",
+      "Hash": "28b32368ebe1a01bb4a7160557a2072f",
       "Requirements": [
-        "data.table",
-        "dplyr",
-        "getPass",
         "httr",
         "jsonlite",
         "keyring",
-        "lazyeval",
-        "lubridate",
-        "magrittr",
-        "purrr",
-        "readr",
         "rlang",
-        "rlist",
         "stringi",
-        "stringr",
-        "tibble",
         "tidyr"
       ]
     },
@@ -345,7 +333,7 @@
       "RemoteRef": "master",
       "RemoteSha": "ba276b072d6e74e86037506ce3ce1ff671922ce9",
       "Remotes": "pepfar-datim/datimutils",
-      "Hash": "92c1cfec7e2f88cb2775f126e7c82699",
+      "Hash": "4c8afdf939328478f38ab3d68ab0f10e",
       "Requirements": [
         "ISOweek",
         "R6",
@@ -943,14 +931,6 @@
       "Hash": "b64cdbb2b340437c4ee047a1f4c4377b",
       "Requirements": []
     },
-    "lazyeval": {
-      "Package": "lazyeval",
-      "Version": "0.2.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "d908914ae53b04d4c0c0fd72ecc35370",
-      "Requirements": []
-    },
     "lifecycle": {
       "Package": "lifecycle",
       "Version": "1.0.1",
@@ -1390,13 +1370,14 @@
     },
     "roxygen2": {
       "Package": "roxygen2",
-      "Version": "7.1.2",
+      "Version": "7.2.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "eb9849556c4250305106e82edae35b72",
+      "Hash": "b390c1d54fcd977cda48588e6172daba",
       "Requirements": [
         "R6",
         "brew",
+        "cli",
         "commonmark",
         "cpp11",
         "desc",
@@ -1407,6 +1388,7 @@
         "rlang",
         "stringi",
         "stringr",
+        "withr",
         "xml2"
       ]
     },

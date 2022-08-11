@@ -64,3 +64,20 @@ test_that("Get a map of data elements and category options", {
   expect_true(is.data.frame(de_map))
 
 })
+
+
+test_that("Can extract a UID", {
+  uid_we_want <- "A1234bcDE56"
+  string_w_uid <- paste0("This is a UID [", uid_we_want, "]")
+  uid <- extract_uid(string_w_uid)
+
+  expect_true(uid == uid_we_want)
+
+  uid_1 <- uid_we_want
+  uid_2 <- "B678cdEfg91"
+  string_w_uids <- paste0("[", uid_1, ".", uid_2, "]")
+  uids <- extract_uid_all(string_w_uids)
+
+  expect_true(setequal(uids, c(uid_1, uid_2)))
+
+})

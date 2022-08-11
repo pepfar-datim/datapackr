@@ -26,7 +26,7 @@ unPackOPUDataPack <- function(d,
                                                   inherits = TRUE)) {
 
   # Check integrity of Workbook tabs ####
-  d <- checkStructure(d)
+  d <- checkToolStructure(d)
 
   # Unpack updated PSNUxIM data ####
   d <- unPackSNUxIM(d)
