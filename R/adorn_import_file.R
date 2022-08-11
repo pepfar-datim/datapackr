@@ -54,17 +54,18 @@ getPriorizationSNU <- function(psnu_uids) {
 #' are at the  COP Prioritization level or not.
 #' @return A data frame consisting of organisation unit UIDs
 #' and prioritization as text.
-getPrioritizationMap <- function( snus, psnu_prioritizations) {
+getPrioritizationMap <- function(snus, psnu_prioritizations) {
 
-   snus  %>% dplyr::select(psnu_uid,id) %>%
+   snus  %>%
+    dplyr::select(psnu_uid, id) %>%
     dplyr::left_join(psnu_prioritizations, by = c("psnu_uid" = "orgUnit")) %>%
     #Remove any invalid prioritization
-    dplyr::mutate(value = ifelse(value %in% prioritization_dict()$value,value, NA_real_)) %>%
+    dplyr::mutate(value = ifelse(value %in% prioritization_dict()$value, value, NA_real_)) %>%
     dplyr::left_join(prioritization_dict() %>%
                        dplyr::select(value, prioritization = name),
                      by = c("value")) %>%
-    dplyr::mutate(prioritization = ifelse(is.na(prioritization),"No Prioritization", prioritization)) %>%
-    dplyr::select(id,prioritization)
+    dplyr::mutate(prioritization = ifelse(is.na(prioritization), "No Prioritization", prioritization)) %>%
+    dplyr::select(id, prioritization)
 
 }
 
@@ -111,7 +112,7 @@ adorn_import_file <- function(psnu_import_file,
       addcols("prioritization")
   } else {
 
-    prio_map <- getPrioritizationMap(snus,psnu_prioritizations)
+    prio_map <- getPrioritizationMap(snus, psnu_prioritizations)
     psnu_import_file <- psnu_import_file %>%
       dplyr::left_join(prio_map, by = c("orgUnit" =  "id"))
     # Utilizes row_num to ensure the join worked as expected

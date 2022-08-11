@@ -40,8 +40,8 @@ prepareMemoMetadata <- function(d, memo_type,
     d$memo$datapack$prios <- d$data$analytics %>%
       dplyr::select(orgUnit = psnu_uid, prioritization) %>%
       dplyr::distinct() %>%
-      dplyr::inner_join(prioritization_dict(), by=c("prioritization" = "name")) %>%
-      dplyr::select(orgUnit,value)
+      dplyr::inner_join(prioritization_dict(), by = c("prioritization" = "name")) %>%
+      dplyr::select(orgUnit, value)
   }
 
   if (memo_type %in% c("datim", "comparison")) {
@@ -81,7 +81,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
                                                       "HllvX50cXC0")))
   }
 
-  if (!is.null(df) & NROW(df) > 0) {
+  if (!is.null(df) && NROW(df) > 0) {
     d$memo$datim$analytics <- df %>%
       adorn_import_file(
         .,
@@ -134,7 +134,7 @@ prepareMemoDataByPSNU <- function(analytics,
     tidyr::nest()
 
   #Evaluate the indicators in parallel if possible
-  if (can_spawn() & n_cores > 1L) {
+  if (can_spawn() && n_cores > 1L) {
     df$indicator_results <-
       parallel::mclapply(df$data, function(x)
         evaluateIndicators(x$combi, x$value, inds),
@@ -149,7 +149,7 @@ prepareMemoDataByPSNU <- function(analytics,
   #Prepare the full list of prioritization PSNUs
   #These functions are reused from adorn_import_file
   snus <- getPriorizationSNU(df$psnu_uid)
-  prio_map <- getPrioritizationMap(snus,prios)
+  prio_map <- getPrioritizationMap(snus, prios)
 
   #TODO: Consider to refactor adorn_import_file
   #To handle this adornment. The logic here is
@@ -175,7 +175,7 @@ prepareMemoDataByPSNU <- function(analytics,
     dplyr::select(-"N_OR_D") %>%
     dplyr::mutate(Age = dplyr::case_when(Age == "15-" ~ "<15",
                                   Age == "15+" ~ "15+",
-                                  Age == "18-" ~"<18",
+                                  Age == "18-" ~ "<18",
                                   Age == "18+" ~ "18+",
                                   TRUE ~ "Total")) %>%
     dplyr::mutate(Age = dplyr::case_when(Indicator %in% c("CXCA_SCRN",
@@ -228,7 +228,7 @@ prepareMemoDataByPartner <- function(df,
                                          memo_structure,
                                          indicators) {
 
-  if (is.null(df) | NROW(df) == 0) {
+  if (is.null(df) || NROW(df) == 0) {
     return(NULL)
   }
 
@@ -412,7 +412,7 @@ prepareMemoDataByPrio <- function(df,
       "Total" = rowSums(dplyr::across(where(is.numeric)), na.rm = TRUE)) %>%
     dplyr::select("Indicator", "Age", 3:dim(.)[2])
 
-  if (!include_no_prio & any("No Prioritization" %in% names(df_final))) {
+  if (!include_no_prio && any("No Prioritization" %in% names(df_final))) {
     df_final <- dplyr::select(df_final, -`No Prioritization`) # nolint
   }
 
