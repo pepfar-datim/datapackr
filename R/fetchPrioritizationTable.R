@@ -44,8 +44,8 @@ fetchPrioritizationTable <- function(psnus, cop_year,
   prios <- n_groups %>% purrr::map_dfr(function(x) getPriosFromDatim(x))
 
   if (NROW(prios) == 0) {
-    return(data.frame("orgUnit" = psnus,
-                      "prioritization" = "No Prioritization"))
+    return(data.frame("orgUnit" = unique(psnus$psnu_uid),
+                      "value" = 0))
   }
 
   #Make this compatible with the input to getPrioritizationMap
