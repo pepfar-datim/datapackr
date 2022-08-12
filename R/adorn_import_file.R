@@ -32,15 +32,14 @@ getPriorizationSNU <- function(psnu_uids) {
             x[["organisationUnitGroups"]],
             ~ "AVy8gJXym2D" %in% purrr::pluck(.x, "id")))
 
+    #Determine the position of the ancestor.
+    #Note that this will take the first match only.
+    # There should never be multiple ancestors
+    #We are not really protected against it if it happens.
+    psnu_lvl_index <- unlist(Map(function(x) Position(isTRUE, x), psnu_lvl))
     #Determine the ancestor for each organisation unit which needs one
-    snus$psnu_uid <-
-      purrr::map2(
-        ancestor_ids,
-        psnu_lvl,
-        function(x, y)
-          ifelse(length(x[y]) == 0, c(NA_character_), x[y])) %>%
-      purrr::reduce(.x = ., .f = c)
-
+    snus$psnu_uid <- mapply(function(x, y) x[y], ancestor_ids, psnu_lvl_index)
+    #If the orgunit does not need an ancestor, then use itself.
     snus %>%
       dplyr::mutate(
         psnu_uid = dplyr::case_when(is.na(psnu_uid) ~ id,
