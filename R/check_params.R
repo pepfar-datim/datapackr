@@ -239,7 +239,6 @@ check_cop_year <- function(cop_year, tool) {
   }
 
   cop_year
-
 }
 
 
@@ -288,7 +287,7 @@ check_tool <- function(tool, season, cop_year) {
   # No matter what, we now have a tool. If we also have season, use it to
   # validate tool type.
   } else if (season_provided) {
-    if (tool != deduced_tool) {
+    if (!tool %in% c(deduced_tool, paste0(deduced_tool, " Template"))) {
       interactive_message("That tool is not valid for that season.")
     }
   }
@@ -321,7 +320,12 @@ check_season <- function(season, tool) {
   tool_provided <- !is.null(tool)
   if (tool_provided) {
     tool %<>% check_tool()
-    deduced_season <- switch(tool, "OPU Data Pack" = "OPU", "Data Pack" = "COP")
+    deduced_season <- switch(tool,
+                             "Data Pack" = "COP",
+                             "OPU Data Pack" = "OPU",
+                             "Data Pack Template" = "COP",
+                             "OPU Data Pack Template" = "OPU",
+                             stop("Invalid tool type provided."))
   }
 
   # Determine if season is provided
@@ -352,7 +356,6 @@ check_season <- function(season, tool) {
   }
 
   season
-
 }
 
 
@@ -516,16 +519,20 @@ checkTemplatePath <- function(template_path,
   interactive_message("Checking template against schema and DATIM...")
   expected_schema <- pick_schema(cop_year, tool)
 
-  input_tool <- paste0(tool, " Template")
-  template_schema <-
-    unPackSchema_datapack(
-      template_path = template_path,
-      skip = skip_tabs(tool = input_tool, cop_year = cop_year),
-      tool = input_tool,
-      cop_year = cop_year)
+  # Only compare submitted template to template on record if `tool` is not a template
+  # Trying to compare template files using this method results in an endless loop with `unPackSchema`
+  if (!stringr::str_detect(tool, "Template$")) {
+    input_tool <- paste0(tool, " Template")
+    template_schema <-
+      unPackSchema(
+        template_path = template_path,
+        skip = skip_tabs(tool = input_tool, cop_year = cop_year),
+        tool = input_tool,
+        cop_year = cop_year)
 
-  if (!identical(expected_schema, template_schema)) {
-    interactive_message("Template at that destination does not match our archived schema.")
+    if (!identical(expected_schema, template_schema)) {
+      interactive_message("Template at that destination does not match our archived schema.")
+    }
   }
 
   template_path

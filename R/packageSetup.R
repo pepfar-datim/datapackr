@@ -18,7 +18,9 @@ datapackrSupports <- function() {
   tibble::tribble(
     ~tool, ~yrs,
     "Data Pack", c(2021, 2022),
-    "OPU Data Pack", c(2021))
+    "OPU Data Pack", c(2021),
+    "Data Pack Template", c(2021, 2022),
+    "OPU Data Pack Template", c(2021))
 }
 
 
@@ -47,7 +49,6 @@ supportedCOPYears <- function(tool = NULL) {
   }
 
   supported_cop_years
-
 }
 
 #' @export
@@ -178,13 +179,13 @@ pick_schema <- function(cop_year, tool) {
   cop_year %<>% check_cop_year()
   invisible(utils::capture.output(tool %<>% check_tool(tool = ., cop_year = cop_year)))
 
-  if (tool == "OPU Data Pack") {
+  if (tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
     if (cop_year == 2021) {
       schema <- datapackr::cop21OPU_data_pack_schema
     } else {
       stop("OPU Data Pack schema not available for the COP year provided.")
     }
-  } else if (tool == "Data Pack") {
+  } else if (tool %in% c("Data Pack", "Data Pack Template")) {
     if (cop_year == 2021) {
       schema <- datapackr::cop21_data_pack_schema
     } else if (cop_year == 2022) {
@@ -220,13 +221,13 @@ pick_template_path <- function(cop_year, tool) {
 
   template_filename <- NULL
 
-  if (tool == "OPU Data Pack") {
+  if (tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
     if (cop_year == 2021) {
       template_filename <- "COP21_OPU_Data_Pack_Template.xlsx"
     }
   }
 
-  if (tool == "Data Pack") {
+  if (tool %in% c("Data Pack", "Data Pack Template")) {
     if (cop_year == 2021) {
       template_filename <- "COP21_Data_Pack_Template.xlsx"
     } else if (cop_year == 2022) {
@@ -247,7 +248,6 @@ pick_template_path <- function(cop_year, tool) {
                                  tool = tool)
 
   template_path
-
 }
 
 
@@ -291,6 +291,7 @@ pick_template_path <- function(cop_year, tool) {
 #' are returned.
 #' @param schema Which datapackr schema to use in guiding this function. If left
 #' \code{NULL} will select the default based on \code{cop_year} and \code{tool}.
+#' @param skip Character vector of Sheet Names to label for skipping in schema.
 #' @param wb Openxlsx workbook object.
 #' @param PSNUs Dataframe of PSNUs to use in this function, containing at least
 #' \code{psnu_uid}.
@@ -341,6 +342,7 @@ datapackr_params <- function(model_data,
                              d,
                              datastreams,
                              schema,
+                             skip,
                              wb,
                              PSNUs,
                              psnus,
