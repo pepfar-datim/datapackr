@@ -19,18 +19,13 @@ getPriorizationSNU <- function(psnu_uids) {
       add_dp_psnu() %>% #Found in getPSNUs.R
       dplyr::rename(name = psnu, id = psnu_uid)
 
-    ancestor_ids <- purrr::map(snus$ancestors,
-                               function(x)
-                                 x[["id"]])
+    ancestor_ids <- lapply(snus$ancestors,function(x) x[["id"]])
 
     #Determine if this is in the COP Prioritization SNU
     psnu_lvl <-
-      purrr::map(
-        snus$ancestors,
-        function(x)
-          purrr::map_lgl(
-            x[["organisationUnitGroups"]],
-            ~ "AVy8gJXym2D" %in% purrr::pluck(.x, "id")))
+      lapply(snus$ancestors, function(x)
+        lapply(x[["organisationUnitGroups"]], function(x)
+          any(x$id %in% "AVy8gJXym2D")))
 
     #Determine the position of the ancestor.
     #Note that this will take the first match only.
