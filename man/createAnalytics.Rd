@@ -18,37 +18,3 @@ Modified d object with d$data$analytics
 Wrapper function for creation of d$data$analytics object
 which is suitable for export to external analytics sytems.
 }
-\details{
-#' @title getPrioritizations(d)
-#'
-#' @param  d Datapackr object
-#'
-#' @return Dataframe of psnu_uid and value
-#' @export
-#'
-getPrioritizations <- function(d) {
-  psnu_prioritizations <- d$datim$prioritizations %>%
-    dplyr::select(orgUnit, value)
-
-  psnus <-
-    dplyr::filter(datapackr::valid_PSNUs, psnu_type == "SNU") %>%
-    dplyr::filter(country_uid %in% d$info$country_uids) %>%
-    dplyr::select(ancestor_uid = psnu_uid, ancestor_name = psnu)
-
-  #Classify any DREAMS districts the same as their PSNU parents
-  dreams_prioritizations <- valid_PSNUs %>%
-    dplyr::filter(DREAMS == "Y") %>%
-    dplyr::select(psnu_uid, psnu, ancestors) %>%
-    tidyr::unnest("ancestors") %>%
-    dplyr::select(-organisationUnitGroups) %>%
-    dplyr::group_by(psnu_uid, psnu) %>%
-    dplyr::summarise(path = paste(id, sep = "", collapse = "/")) %>%
-    dplyr::ungroup() %>%
-    fuzzyjoin::regex_inner_join(psnus, by = c("path" = "ancestor_uid")) %>%
-    dplyr::inner_join(psnu_prioritizations, by = c("ancestor_uid" = "orgUnit")) %>%
-    dplyr::select(orgUnit = psnu_uid, value)
-
-  dplyr::bind_rows(psnu_prioritizations, dreams_prioritizations)
-
-}
-}
