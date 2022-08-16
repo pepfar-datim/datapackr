@@ -1,21 +1,289 @@
-#' @export
+#' Standardized Schema Checks
+#'
+#' @description Standardized package functions,in terms of schema checks.
+#' These can be run individually (e.g., `checkSchema_SheetNums`), or in
+#' bulk (e.g., `checkSchema(template_path = "my/file/path", cop_year = 2022, tool = "Data Pack")`).
+#'
+#' @name schema-validations
 #' @md
-#'
-#' @title Validate a `datapackr` Schema object
-#'
-#' @description
-#' Useful in validating a `datapackr` schema object and investigating any issues.
 #'
 #' @inheritParams datapackr_params
 #'
-#' @return List object with any failed Schema validation checks.
+#' @return
+#' For lower-level functions, a list of instances of failed tests. For the
+#' higher-level `checkSchema`, a list object of lists of failed tests.
+#' * `checkSchema_SkippedSheets`:
+#' * `checkSchema_SheetNums`:
+#' * `checkSchema_SheetNames`:
+#' * `checkSchema_InvalidDatasets`:
+#' * `checkSchema_InvalidColType`:
+#' * `checkSchema_InvalidValueType`:
+#' * `checkSchema_DSDSyntax`:
+#' * `checkSchema_TASyntax`:
+#' * `checkSchema_COsSyntax` :
+#' * `checkSchema_ValidAges` :
+#' * `checkSchema_ValidSexes` :
+#' * `checkSchema_ValidKPs` :
+#' * `checkSchema_Formulas` :
+#' * `checkSchema` :
+#' * `unPackSchema` :
 #'
 #' @family schema-helpers
-validateSchema <- function(schema,
-                           template_path,
-                           cop_year,
-                           tool,
-                           season) {
+NULL
+
+
+getSkipSheets <- function(schema, tool, cop_year) {
+  #Skip sheets which are defined in the code
+  package_skip <- skip_tabs(tool = tool, cop_year = cop_year)
+
+  #Skip sheets which are defined in the schema
+  schema_skip <- schema %>%
+    dplyr::filter(sheet_name %in% package_skip) %>%
+    dplyr::select(sheet_name, sheet_num) %>%
+    dplyr::distinct()
+
+   list(
+    package_skip = package_skip,
+    num = schema_skip$sheet_num,
+    names = schema_skip$sheet_name)
+}
+
+uid_pattern <- function() {
+  "[A-Za-z][A-Za-z0-9]{10}"
+}
+multi_uid_pattern <- function() {
+  paste0("^(", uid_pattern(), ")(\\.((", uid_pattern(), ")))*$")
+  }
+
+
+
+#' @rdname schema-validations
+checkSchema_SkippedSheets <- function(schema, tool, cop_year) {
+
+  skip_sheets <- getSkipSheets(schema, tool, cop_year)
+
+  skip_comparison <- waldo::compare(skip_sheets$names, skip_sheets$package_skip,
+                                    x_arg = "schema", y_arg = "package")
+
+  if (length(skip_comparison) != 0) {
+    skipped_sheets <- list(
+      error = length(skip_comparison) != 0,
+      data = skip_comparison
+    )
+  } else {
+    skipped_sheets <- list()
+  }
+
+  skipped_sheets
+}
+
+#' @rdname schema-validations
+checkSchema_SheetNums <- function(schema) {
+  observed_sheet_nums <- unique(schema$sheet_num)
+  expected_sheet_nums <- c(1:max(schema$sheet_num))
+
+  sheet_nums_comparison <- waldo::compare(observed_sheet_nums,
+                                          expected_sheet_nums,
+                                          x_arg = "observed",
+                                          y_arg = "expected")
+
+  if (length(sheet_nums_comparison) != 0) {
+    sheet_nums_complete <- list(
+      error = length(sheet_nums_comparison) != 0,
+      data = sheet_nums_comparison)
+  } else {
+    sheet_nums_complete <- list()
+  }
+
+  sheet_nums_complete
+}
+
+#' @rdname schema-validations
+checkSchema_SheetNames <- function(schema, filepath_schema) {
+  observed_sheet_names <- unique(schema$sheet_name)
+  expected_sheet_names <- unique(filepath_schema$sheet_name)
+
+  sheet_names_comparison <- waldo::compare(observed_sheet_names,
+                                           expected_sheet_names,
+                                           x_arg = "observed",
+                                           y_arg = "expected")
+
+  if (length(sheet_names_comparison) != 0) {
+    sheet_names_complete <- list(
+      error = length(sheet_names_comparison) != 0,
+      data = sheet_names_comparison)
+  } else {
+    sheet_names_complete <- list()
+  }
+
+  sheet_names_complete
+}
+
+#' @rdname schema-validations
+checkSchema_InvalidDatasets <- function(schema, tool, cop_year) {
+
+  skip_sheets <- getSkipSheets(schema, tool, cop_year)
+
+  datasets_invalid <- schema %>%
+    dplyr::mutate(
+      invalid_dataset =
+        dplyr::case_when(
+          col_type %in% c("reference", "assumption", "calculation", "row_header", "allocation")
+          ~ !dataset == c("datapack"),
+          col_type %in% c("target", "past", "result") ~ !dataset %in% c("mer", "impatt", "subnat"),
+          sheet_name %in% skip_sheets$names ~ !is.na(dataset),
+          TRUE ~ TRUE)) %>%
+    dplyr::filter(invalid_dataset == TRUE) %>%
+    dplyr::select(sheet_name, data_structure, col, indicator_code, dataset, col_type)
+
+  datasets_invalid
+}
+
+#' @rdname schema-validations
+checkSchema_InvalidColType <- function(schema, tool, cop_year) {
+
+  skip_sheets <- getSkipSheets(schema, tool, cop_year)
+
+  col_type_invalid <- schema %>%
+    dplyr::mutate(
+      invalid_col_type =
+        (!col_type %in% c("target", "reference", "assumption", "calculation", "past",
+                          "row_header", "allocation", "result"))
+      & (sheet_name %in% skip_sheets$names & !is.na(col_type))) %>%
+    dplyr::filter(invalid_col_type == TRUE) %>%
+    dplyr::select(sheet_name, col, indicator_code, data_structure, col_type)
+
+  col_type_invalid
+}
+
+#' @rdname schema-validations
+checkSchema_InvalidValueType <- function(schema, tool, cop_year) {
+
+  skip_sheets <- getSkipSheets(schema, tool, cop_year)
+
+  value_type_invalid <- schema %>%
+    dplyr::mutate(
+      invalid_value_type =
+        (!value_type %in% c("integer", "percentage", "string"))
+      & (sheet_name %in% skip_sheets$names & !is.na(value_type))) %>%
+    dplyr::filter(invalid_value_type == TRUE) %>%
+    dplyr::select(sheet_name, col, indicator_code, value_type)
+
+  value_type_invalid
+}
+
+#' @rdname schema-validations
+checkSchema_DataElementSyntax <- function(schema) {
+
+  schema %>%
+    dplyr::filter(col_type %in% c("past", "target", "result")) %>%
+    dplyr::select(sheet_name, col, indicator_code, dataset, dataelement_dsd, dataelement_ta) %>%
+    dplyr::mutate(
+      invalid_DSD_DEs =
+        dplyr::if_else(
+          sheet_name == "PSNUxIM", dataelement_dsd != "NA",
+          !stringr::str_detect(dataelement_dsd, multi_uid_pattern())),
+      invalid_TA_DEs =
+        dplyr::if_else(
+          sheet_name == "PSNUxIM", dataelement_ta != "NA",
+          !stringr::str_detect(dataelement_ta, multi_uid_pattern()))) %>%
+    dplyr::filter(sum(invalid_DSD_DEs, invalid_TA_DEs, na.rm = TRUE) > 0)
+
+}
+
+
+#' @rdname schema-validations
+checkSchema_COsSyntax <- function(schema) {
+  COs_syntax_invalid <- schema %>%
+    dplyr::filter(col_type %in% c("past", "target", "result")) %>%
+    dplyr::select(sheet_name, col, indicator_code, categoryoption_specified) %>%
+    dplyr::mutate(
+      invalid_COs =
+        dplyr::if_else(
+          sheet_name == "PSNUxIM", categoryoption_specified != "NA",
+          !stringr::str_detect(categoryoption_specified, multi_uid_pattern()))) %>%
+    #TODO: How to handle situations when the categoryoption_specified is NA?
+    dplyr::filter(invalid_COs == TRUE)
+
+  COs_syntax_invalid
+}
+
+#' @rdname schema-validations
+checkSchema_ValidAges <- function(schema) {
+
+  #TODO: This is a bit speculative and may obviously change
+  # depending on the fiscal year. Revisit how to define this.
+  #Similar to the tests above, we should potentially be matching
+  #the category options UID to an actual DATIM category option UID.
+  valid_age_pattern <- "[0-9]{2}-[0-9]{2}|<01|<1[58]|1[58]+|65\\+|50\\+"
+
+    schema %>%
+    dplyr::select(sheet_name, col, indicator_code, valid_ages) %>%
+    tidyr::unnest(valid_ages) %>%
+    tidyr::drop_na() %>%
+    dplyr::mutate(invalid_age_uid = !stringr::str_detect(id, multi_uid_pattern())) %>%
+    dplyr::mutate(invalid_age_string = !stringr::str_detect(name, valid_age_pattern)) %>%
+    dplyr::filter(invalid_age_string + invalid_age_uid > 0) %>%
+    dplyr::select(sheet_name, col, indicator_code, name, id)
+
+
+}
+
+#' @rdname schema-validations
+checkSchema_ValidSexes <- function(schema) {
+
+  valid_sex_pattern <- "^(Male|Female)$"
+  #What about this instead?
+  # unique(map_DataPack_DATIM_DEs_COCs$valid_sexes.name)
+
+  schema %>%
+    dplyr::select(sheet_name, col, indicator_code, valid_sexes) %>%
+    tidyr::unnest(valid_sexes) %>%
+    #TODO: How should we handle "NA"?
+    tidyr::drop_na() %>%
+    dplyr::mutate(invalid_sex_uid = !stringr::str_detect(id, multi_uid_pattern())) %>%
+    dplyr::mutate(invalid_sex_string = !stringr::str_detect(name, valid_sex_pattern)) %>%
+    dplyr::filter(invalid_sex_string + invalid_sex_uid > 0) %>%
+    dplyr::select(sheet_name, col, indicator_code, name, id)
+}
+
+#' @rdname schema-validations
+checkSchema_ValidKPs <- function(schema) {
+  #TODO: Consider a single function for all three of these
+  #Instead of this repetitive code.
+  valid_KP_names <- unique(map_DataPack_DATIM_DEs_COCs$valid_kps.name)
+
+  schema %>%
+    dplyr::select(sheet_name, col, indicator_code, valid_kps) %>%
+    tidyr::unnest(valid_kps) %>%
+    #TODO: How should we handle "NA"?
+    tidyr::drop_na() %>%
+    dplyr::mutate(invalid_kp_uid = !stringr::str_detect(id, multi_uid_pattern())) %>%
+    dplyr::mutate(invalid_kp_string = !(name %in% valid_KP_names)) %>%
+    dplyr::filter(invalid_kp_string + invalid_kp_uid > 0) %>%
+    dplyr::select(sheet_name, col, indicator_code, name, id)
+
+}
+
+#' @rdname schema-validations
+checkSchema_Formulas <- function(schema) {
+  fxs_ref_error <- schema %>%
+    dplyr::mutate(
+      ref_error_fxs = stringr::str_detect(formula, "#REF")) %>%
+    dplyr::filter(ref_error_fxs == TRUE) %>%
+    dplyr::select(sheet_name, col, indicator_code, formula)
+
+  fxs_ref_error
+}
+
+
+#' @export
+#' @rdname schema-validations
+checkSchema <- function(schema,
+                        template_path,
+                        cop_year,
+                        tool,
+                        season) {
 
   stopifnot("Package \"waldo\" must be installed to use this function." =
               requireNamespace("waldo", quietly = TRUE))
@@ -25,243 +293,76 @@ validateSchema <- function(schema,
   schema_provided <- !is.null(schema)
 
   template_path <- template_path %missing% NULL
-  filepath_provided <- !is.null(template_path)
+  template_path_provided <- !is.null(template_path)
 
   # Validate parameters ####
-  cop_year <- cop_year %missing% NULL
-  tool <- tool %missing% NULL
-  season <- season %missing% NULL
-
-  params <- check_params(cop_year = cop_year,
-                         tool = tool,
-                         season = season)
+  params <- check_params(cop_year = cop_year %missing% NULL,
+                         tool = tool %missing% NULL,
+                         season = season %missing% NULL,
+                         schema = schema %missing% NULL,
+                         template_path = template_path %missing% NULL)
 
   for (p in names(params)) {
     assign(p, purrr::pluck(params, p))
   }
 
-  # If template_path provided, check it and unpack it to create comparison schema.
-  if (filepath_provided) {
-    template_path %<>% checkTemplatePath(template_path = .,
-                                    cop_year = cop_year,
-                                    tool = tool,
-                                    season = season)
-
+  # Checks to perform if template_path_provided is TRUE ####
+  if (template_path_provided) {
+    ## If template_path provided, check it and unpack it to create comparison schema.####
     filepath_schema <-
-      unPackSchema_datapack(
+      unPackSchema(
         template_path = template_path,
         skip = skip_tabs(tool = tool, cop_year = cop_year),
         cop_year = cop_year)
 
-  # If schema_object not provided, use filepath_schema
-    schema <- schema %||% filepath_schema
-  }
-
-  if (schema_provided) {
-  # Check if this schema is already one we have archived
-    schema %<>% check_schema(schema = .,
-                             cop_year = cop_year,
-                             tool = tool,
-                             season = season)
-
-  # Compare schema against filepath_schema
-    if (filepath_provided) {
-      if (!identical(schema, filepath_schema)) {
-        interactive_message(
-          "Provided schema doesn't match the schema at the provided filepath.")
-      }
+    ## If schema_object is provided, check schema against filepath_schema ####
+    if (schema_provided && !identical(schema, filepath_schema)) {
+      interactive_message(
+        "Provided schema doesn't match the schema at the provided filepath.")
     }
+
+    ## If schema_object not provided, use filepath_schema ####
+    schema <- schema %||% filepath_schema
+
+    ## Sheet Names complete ####
+    tests$sheet_names_complete <-
+      checkSchema_SheetNames(schema, filepath_schema)
   }
 
   # Validate schema ####
-    # No matter what, we now have a schema to work from.
-    # For all the below tests, TRUE = test fail
+  # No matter what, we now have a schema to work from.
+  # For all the below tests, TRUE = test fail
 
   tests <- list()
 
-    ## All Skipped sheets included  ####
-  skip <- skip_tabs(tool = tool, cop_year = cop_year)
-  schema_skip <- schema %>%
-    dplyr::filter(sheet_name %in% skip) %>%
-    dplyr::select(sheet_name, sheet_num)
+  ## All Skipped sheets included  ####
+  tests$skipped_sheets <- checkSchema_SkippedSheets(schema, tool, cop_year)
 
-  skip_sheets <- list(
-    num = unique(schema_skip$sheet_num),
-    names = unique(schema_skip$sheet_name))
+  ## Sheet Numbers don't omit any sheets ####
+  tests$sheet_nums_complete <- checkSchema_SheetNums(schema)
 
-  skip_comparison <- waldo::compare(skip_sheets$names, skip,
-                                    x_arg = "schema", y_arg = "package")
+  ## OPU Schema Specific Checks ####
+  if (tool != "OPU Data Pack") {
+    ### dataset ####
+    tests$datasets_invalid <- checkSchema_InvalidDatasets(schema, tool, cop_year)
 
-  if (length(skip_comparison) != 0) {
-    tests$skipped_sheets <- list(
-      error = length(skip_comparison) != 0,
-      data = skip_comparison
-    )
+    ### col_type ####
+    tests$col_type_invalid <- checkSchema_InvalidColType(schema, tool, cop_year)
+
+    ### value_type ####
+    tests$value_type_invalid <- checkSchema_InvalidValueType(schema, tool, cop_year)
   }
 
-    ## Sheet Numbers don't omit any sheets ####
-  observed_sheet_nums <- unique(schema$sheet_num)
-  expected_sheet_nums <- c(min(schema$sheet_num):max(schema$sheet_num))
+  ###Test DEs name and UID syntax
+  tests$DEs_syntax_invalid <- checkSchema_DataElementSyntax(schema)
 
-  sheet_nums_comparison <- waldo::compare(observed_sheet_nums,
-                                          expected_sheet_nums,
-                                          x_arg = "observed",
-                                          y_arg = "expected")
+  ###Test COs name and UID syntax
+  tests$COs_syntax_invalid <- checkSchema_COsSyntax(schema)
+  ###Test KPs name and UID syntax
+  tests$KPS_invalid <- checkSchema_ValidKPs(schema)
 
-  if (length(sheet_nums_comparison) != 0) {
-    tests$sheet_nums_complete <- list(
-      error = length(sheet_nums_comparison) != 0,
-      data = sheet_nums_comparison)
-  }
-
-    ## Sheet Names complete ####
-  if (filepath_provided) {
-    observed_sheet_names <- unique(schema$sheet_name)
-    expected_sheet_names <- unique(filepath_schema$sheet_name)
-
-    sheet_names_comparison <- waldo::compare(observed_sheet_names,
-                                             expected_sheet_names,
-                                             x_arg = "observed",
-                                             y_arg = "expected")
-
-    if (length(sheet_names_comparison) != 0) {
-      tests$sheet_names_complete <- list(
-        error = length(sheet_names_comparison) != 0,
-        data = sheet_names_comparison)
-    }
-  }
-
-    ## dataset ####
-  if (!grepl("OPU Data Pack", tool)) {
-    datasets_invalid <- schema %>%
-      dplyr::mutate(
-        invalid_dataset =
-          dplyr::case_when(
-            col_type %in% c("reference", "assumption", "calculation", "row_header", "allocation")
-            ~ !dataset == c("datapack"),
-            col_type %in% c("target", "past", "result") ~ !dataset %in% c("mer", "impatt", "subnat"),
-            sheet_num %in% skip_sheets$num ~ !is.na(dataset),
-            TRUE ~ TRUE)) %>%
-      dplyr::filter(invalid_dataset == TRUE) %>%
-      dplyr::select(sheet_name, data_structure, col, indicator_code, dataset, col_type)
-
-    if (NROW(datasets_invalid) != 0) {
-      tests$datasets_invalid <- datasets_invalid
-    }
-  }
-
-    ## col_type ####
-  if (!grepl("OPU Data Pack", tool)) {
-    col_type_invalid <- schema %>%
-      dplyr::mutate(
-        invalid_col_type =
-          (!col_type %in% c("target", "reference", "assumption", "calculation", "past",
-                            "row_header", "allocation", "result"))
-          & (sheet_num %in% skip_sheets$num & !is.na(col_type))) %>%
-      dplyr::filter(invalid_col_type == TRUE) %>%
-      dplyr::select(sheet_name, col, indicator_code, data_structure, col_type)
-
-    if (NROW(col_type_invalid) != 0) {
-      tests$col_type_invalid <- col_type_invalid
-    }
-  }
-
-    ## dataElements ####
-      ### UID Syntax
-  DEs_schema <- schema %>%
-    dplyr::filter(col_type %in% c("past", "target", "result")) %>%
-    dplyr::select(sheet_name, col, indicator_code, dataset, dataelement_dsd, dataelement_ta)
-
-  uid_pattern <- "[A-Za-z][A-Za-z0-9]{10}"
-  multi_uid_pattern <- paste0("^(", uid_pattern, ")(\\.((", uid_pattern, ")))*$")
-
-  DEs_DSD_syntax_invalid <- DEs_schema %>%
-    dplyr::select(-dataelement_ta) %>%
-    dplyr::mutate(
-      invalid_DSD_DEs =
-        dplyr::if_else(
-          sheet_name == "PSNUxIM", dataelement_dsd != "NA",
-          !stringr::str_detect(dataelement_dsd, multi_uid_pattern))) %>%
-    dplyr::filter(invalid_DSD_DEs == TRUE)
-
-  if (NROW(DEs_DSD_syntax_invalid) != 0) {
-    tests$DEs_DSD_syntax_invalid <- DEs_DSD_syntax_invalid
-  }
-
-  DEs_TA_syntax_invalid <- DEs_schema %>%
-    dplyr::select(-dataelement_dsd) %>%
-    dplyr::mutate(
-      invalid_TA_DEs =
-        dplyr::if_else(
-          sheet_name == "PSNUxIM", dataelement_ta != "NA",
-          !stringr::str_detect(dataelement_ta, multi_uid_pattern))) %>%
-    dplyr::filter(invalid_TA_DEs == TRUE)
-
-  if (NROW(DEs_TA_syntax_invalid) != 0) {
-    tests$DEs_TA_syntax_invalid <- DEs_TA_syntax_invalid
-  }
-
-    ##> Match DATIM (valid UIDs only)
-  # DEs_mismatch_DATIM <- DEs_schema %>%
-  #   dplyr::filter(!dataelement_dsd %in% DEs_DSD_syntax_invalid$dataelement_dsd,
-  #                 !dataelement_ta %in% DEs_TA_syntax_invalid$dataelement_ta) %>%
-    # how to check these against DATIM... Cache the data? pull fresh? how to maintain which datasets to pull?
-
-    ## categoryoption_specified ####
-      ### UID Syntax
-  COs_syntax_invalid <- schema %>%
-    dplyr::filter(col_type %in% c("past", "target", "result")) %>%
-    dplyr::select(sheet_name, col, indicator_code, categoryoption_specified) %>%
-    dplyr::mutate(
-      invalid_COs =
-        dplyr::if_else(
-          sheet_name == "PSNUxIM", categoryoption_specified != "NA",
-          !stringr::str_detect(categoryoption_specified, multi_uid_pattern))) %>%
-    dplyr::filter(invalid_COs == TRUE)
-
-  if (NROW(COs_syntax_invalid) != 0) {
-    tests$COs_syntax_invalid <- COs_syntax_invalid
-  }
-
-    ## value_type ####
-  if (!grepl("OPU Data Pack", tool)) {
-    value_type_invalid <- schema %>%
-      dplyr::mutate(
-        invalid_value_type =
-          (!value_type %in% c("integer", "percentage", "string"))
-          & (sheet_num %in% skip_sheets$num & !is.na(value_type))) %>%
-      dplyr::filter(invalid_value_type == TRUE) %>%
-      dplyr::select(sheet_name, col, indicator_code, value_type)
-
-    if (NROW(value_type_invalid) != 0) {
-      tests$value_type_invalid <- value_type_invalid
-    }
-  }
-      # TODO: Update
-    ## Test valid_ages ####
-      #     valid_ages.test =
-      #      !(valid_ages %in% map_datapack_cogs$options | valid_ages %in% empty),
-      #
-    ## Test valid_sexes ####
-      #     valid_sexes.test =
-      #       !valid_sexes %in%
-      # c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog %in% c("Females", "Males", "M/F")],
-      #                           empty),
-      #
-    ## Test valid_kps ####
-      #     valid_kps.test =
-      #       !valid_kps %in% c(map_datapack_cogs$options[map_datapack_cogs$datapack_cog == "Coarse KPs"], empty),
-
-    ## Test formulas ####
-  fxs_ref_error <- schema %>%
-    dplyr::mutate(
-      ref_error_fxs = stringr::str_detect(formula, "#REF")) %>%
-    dplyr::filter(ref_error_fxs == TRUE) %>%
-    dplyr::select(sheet_name, col, indicator_code, formula)
-
-  if (NROW(fxs_ref_error) != 0) {
-    tests$fxs_ref_error <- fxs_ref_error
-  }
+  ## Test formulas ####
+  tests$fxs_ref_error <- checkSchema_Formulas(schema)
 
   # TODO: TESTS to add ####
     # * No duplicate indicator_codes on any single sheet
@@ -276,55 +377,48 @@ validateSchema <- function(schema,
     # * No invalid comment types
     # * Numeric or % formatting correct
 
+  # Filter out any tests with zero rows ####
+  tests <-
+    tests  %>%
+    purrr::keep(~ length(.x) > 0) %>%
+    purrr::keep(~ NROW(.x) > 0)
+
   # Compile test results ####
   if (length(tests) > 0) {
-
     interactive_message("ERROR! Issues with schema values! See output.")
   } else {
     interactive_message("Schema checks out! Great job!")
   }
 
   tests
-
 }
 
 
 #' @export
 #' @importFrom methods as
-#' @title Extract and save schema from Data Pack template.
-#'
-#' @description
-#' Supplied a filepath to a Data Pack template (XLSX), will extract and save a
-#' schema based on the template.
-#'
-#' @param skip Character vector of Sheet Names to label for skipping in schema.
-#' @inheritParams datapackr_params
-#'
-#' @return Data Pack schema.
-#'
-#' @family schema-helpers
-#'
-unPackSchema_datapack <- function(template_path = NULL,
-                                  skip = NULL,
-                                  tool = "Data Pack Template",
-                                  cop_year = getCurrentCOPYear()) {
+#' @rdname schema-validations
+unPackSchema <- function(template_path = NULL,
+                         skip = NULL,
+                         tool = "Data Pack Template",
+                         cop_year = NULL) {
 
-  if ((tool == "Data Pack Template" && !cop_year %in% c(2021, 2022))
-      || (tool == "OPU Data Pack Template" && !cop_year %in% 2021:2022)) {
-    stop("Sorry, unPackSchema doesn't work for that combination of tool and cop_year.")
+  # Validate parameters ####
+  params <- check_params(cop_year = cop_year %missing% NULL,
+                         tool = tool %missing% NULL,
+                         template_path = template_path %missing% NULL)
+
+  for (p in names(params)) {
+    assign(p, purrr::pluck(params, p))
   }
-
-  # Check the filepath is valid. If NA, request via window. ####
-  filepath <- handshakeFile(path = template_path,
-                            tool = tool)
 
   if (tool == "OPU Data Pack Template" && cop_year %in% c(2021)) {
-    schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = TRUE) %>%
+    schema <- tidyxl::xlsx_cells(path = template_path, include_blank_cells = TRUE) %>%
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric, is_array)
   } else {
-    schema <- tidyxl::xlsx_cells(path = filepath, include_blank_cells = FALSE) %>%
+    schema <- tidyxl::xlsx_cells(path = template_path, include_blank_cells = FALSE) %>%
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
   }
+
 
   sheets <- data.frame(sheet_name = unique(schema$sheet_name), stringsAsFactors = FALSE)
   sheets$sheet_num <- seq_len(NROW(sheets))
@@ -332,11 +426,12 @@ unPackSchema_datapack <- function(template_path = NULL,
   schema <- schema %>%
     dplyr::inner_join(sheets, by = c("sheet_name"))
 
+
   # Skip detail on listed sheets. ####
   if (is.null(skip)) {
     skip <- skip_tabs(tool = tool, cop_year = cop_year)
   }
-  sheets <- tidyxl::xlsx_sheet_names(filepath)
+  sheets <- tidyxl::xlsx_sheet_names(template_path)
   verbose_sheets <- sheets[!sheets %in% skip]
 
   schema %<>%
@@ -397,29 +492,31 @@ unPackSchema_datapack <- function(template_path = NULL,
 
   if (tool == "Data Pack Template") {
 
-    if (cop_year == 2021) {
-      map_datapack_cogs <- datapackr::datapack_cogs$COP21
-    } else if (cop_year == 2022) {
-      map_datapack_cogs <- datapackr::datapack_cogs$COP22
-    } else {
-      stop("Can't find categoryOptionGroups for that cop_year and tool.")
-    }
+    #TODO: Consider to change the structure of datapack_cogs
+    #to use the COP year instead of COPXX
 
-  # Left-Pad digits with zeros
-    # TODO: Move into utilities.R
-    pad <- function(digit) {
-      padded <- paste0("0", digit)
-    }
+    cop_year_select <- gsub("^20", "COP", as.character(cop_year))
+    map_datapack_cogs <- datapackr::datapack_cogs %>%
+      purrr::pluck(cop_year_select)
+    stopifnot("Can't find categoryOptionGroups for that cop_year and tool." = is.data.frame(map_datapack_cogs))
+
+  # # Left-Pad digits with zeros
+  #   # TODO: Move into utilities.R
+  #   # Move to utlities R if needed....it seems to only be used here.
+  #  Reimplememnted with an anonymous function below
+  #   pad <- function(digit) {
+  #     padded <- paste0("0", digit)
+  #   }
 
     map_datapack_cogs %<>%
-      dplyr::mutate(
-        categoryOptions = purrr::map(
-          categoryOptions,
-          ~ .x %>%
-            dplyr::mutate(
-              name = stringr::str_replace_all(name, "(?<!\\d)\\d(?!\\d)", pad))
-        )
-      )
+      dplyr::mutate(categoryOptions = purrr::map(
+        categoryOptions,
+        ~ .x %>%
+          dplyr::mutate(
+            name = stringr::str_replace_all(name, "(?<!\\d)\\d(?!\\d)",
+                   function(x) paste0("0", as.character(x)))
+          )
+      ))
 
   # Add disagg lists to schema ####
     map_datapack_cogs %<>%
@@ -503,14 +600,12 @@ unPackSchema_datapack <- function(template_path = NULL,
     tibble::add_row(sheet_name = skip, sheet_num = seq_along(skip)) %>%
     dplyr::mutate(valid_ages = empty, valid_sexes = empty, valid_kps = empty)
 
-  schema %<>%
-    dplyr::bind_rows(skipped_schema, .) %>%
+   #Return the final schema
+    dplyr::bind_rows(skipped_schema, schema) %>%
     dplyr::mutate(
       data_structure =
         dplyr::case_when(sheet_name %in% skip ~ "skip",
                          TRUE ~ "normal")) %>%
     dplyr::select(sheet_num, sheet_name, data_structure, dplyr::everything())
-
-  schema
 
 }
