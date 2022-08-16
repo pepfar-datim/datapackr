@@ -18,15 +18,15 @@ cop21OPU_data_pack_schema <-
 
 # comparison <- diffdf::diffdf(base = datapackr::cop21_data_pack_schema,
 #                              compare = cop21_data_pack_schema)
-# 
-# 
-# 
+#
+#
+#
 # comparison <- compareDF::compare_df(df_new = cop21_data_pack_schema,
 #                                     df_old = datapackr::cop21_data_pack_schema,
 #                                     group_col = c("sheet_num", "sheet_name", "col"))
-# 
+#
 # comparison_df <- comparison$comparison_df
-# 
+#
 # View(comparison_df)
 
 waldo::compare(cop21OPU_data_pack_schema, datapackr::cop21OPU_data_pack_schema)

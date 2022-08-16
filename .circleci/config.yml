@@ -34,7 +34,6 @@ jobs:
       - run:
           name: Lint packages
           command: |
-            R -e "install.packages('lintr')"
             R -e "foo<-unique(names(lintr::lint_package())); if ( length(foo) > 0 ) stop(foo)"
     # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
     resource_class: large

@@ -5,7 +5,7 @@
 # Point to DATIM login secrets ####
 secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
 datimutils::loginToDATIM(secrets)
-cop_year = 2022
+cop_year <- 2022
 
 # Pull code lists ####
 datasets_to_pull <- tibble::tribble(
@@ -61,13 +61,13 @@ fullCodeList %<>%
   dplyr::mutate(
     period_dataset =
       paste0(
-        "FY", FY-2000, " ", toupper(datastream),
+        "FY", FY - 2000, " ", toupper(datastream),
         dplyr::if_else(datastream == "impatt", "",
                        paste0(" ", stringr::str_to_title(targets_results)))),
     period = dplyr::case_when(
-      targets_results == "targets" ~ paste0(FY-1, "Oct"),
+      targets_results == "targets" ~ paste0(FY - 1, "Oct"),
       targets_results == "results" ~ paste0(FY, "Q3")))
-    
+
 ## Add metadata for categoryOptions ####
 categoryoptions <-
   datimutils::getMetadata(
@@ -77,9 +77,10 @@ categoryoptions <-
 
 fullCodeList %<>%
   dplyr::left_join(categoryoptions, by = c("categoryoptioncombouid" = "id")) %>%
-  dplyr::mutate(categoryOptions = purrr::map_chr(categoryOptions,~.x[["id"]] %>%
-                                                   sort() %>% paste(collapse = ".")))
-  
+  dplyr::mutate(categoryOptions = purrr::map_chr(categoryOptions, ~.x[["id"]] %>%
+                                                   sort() %>%
+                                                   paste(collapse = ".")))
+
 ## Standardize some column names ####
 fullCodeList %<>%
   dplyr::rename(
@@ -90,7 +91,7 @@ fullCodeList %<>%
 
 # Prep Data Pack schema for mapping ####
 schema <- datapackr::cop22_data_pack_schema
-  
+
 dp_map <- schema %>%
   dplyr::filter((col_type == "target" & dataset %in% c("mer", "subnat", "impatt"))
                 | dataset == "subnat" & col_type == "result",
@@ -103,24 +104,24 @@ dp_map <- schema %>%
   tidyr::unnest(cols = valid_sexes, names_sep  = ".") %>%
   tidyr::unnest(cols = valid_kps, names_sep  = ".") %>%
   dplyr::distinct()
-  
+
 ## Correctly tag OVC_SERV 18+ Caregivers ####
 dp_map %<>%
   dplyr::mutate(
     dataelement_dsd =
       dplyr::case_when(
-        indicator_code %in% c("OVC_SERV.Active.T","OVC_SERV.Grad.T")
+        indicator_code %in% c("OVC_SERV.Active.T", "OVC_SERV.Grad.T")
             & valid_ages.name == "18+"
           ~ stringr::str_extract(dataelement_dsd, "(?<=\\.)([A-Za-z][A-Za-z0-9]{10})$"),
-        indicator_code %in% c("OVC_SERV.Active.T","OVC_SERV.Grad.T")
+        indicator_code %in% c("OVC_SERV.Active.T", "OVC_SERV.Grad.T")
             & valid_ages.name != "18+"
           ~ stringr::str_extract(dataelement_dsd, "^([A-Za-z][A-Za-z0-9]{10})(?=\\.)"),
         TRUE ~ dataelement_dsd),
     dataelement_ta = dplyr::case_when(
-        indicator_code %in% c("OVC_SERV.Active.T","OVC_SERV.Grad.T")
+        indicator_code %in% c("OVC_SERV.Active.T", "OVC_SERV.Grad.T")
             & valid_ages.name == "18+"
           ~ stringr::str_extract(dataelement_ta, "(?<=\\.)([A-Za-z][A-Za-z0-9]{10})$"),
-        indicator_code %in% c("OVC_SERV.Active.T","OVC_SERV.Grad.T")
+        indicator_code %in% c("OVC_SERV.Active.T", "OVC_SERV.Grad.T")
             & valid_ages.name != "18+"
           ~ stringr::str_extract(dataelement_ta, "^([A-Za-z][A-Za-z0-9]{10})(?=\\.)"),
         TRUE ~ dataelement_ta),
@@ -150,7 +151,7 @@ dp_map %<>%
 #         TRUE ~ valid_ages.name
 #       )
 #   )
-    
+
 ## Remap 50+ age bands where necessary ####
 fine_sr_age_des <- fullCodeList %>%
   dplyr::filter(stringr::str_detect(categoryOptions.ids, "SMXPADytkkF|RQbUeV6OAVk|C0GAyd5PaGn|HuWOqxjK4D5")) %>%
@@ -187,8 +188,8 @@ dp_map %<>%
       dplyr::case_when(
         categoryOptions.ids == "" ~ "xYerKDKCefk",
         TRUE ~ categoryOptions.ids))
-  
-## Stack DSD and TA #### 
+
+## Stack DSD and TA ####
 dp_map %<>%
   tidyr::pivot_longer(cols = dataelement_dsd:dataelement_ta,
                       names_to = "support_type",
@@ -199,9 +200,9 @@ dp_map %<>%
   dplyr::mutate(
     support_type = dplyr::case_when(
       stringr::str_detect(indicator_code, "^AGYW_PREV") ~ "No Support Type",
-      dataset %in% c("impatt","subnat") ~ "Sub-National",
+      dataset %in% c("impatt", "subnat") ~ "Sub-National",
       TRUE ~ support_type))
-  
+
 # Accommodate oddities with FY21 PMTCT_SUBNAT
 # I believe this is now accommodated for in FY22-23
 # dp_map %<>%
@@ -212,7 +213,7 @@ dp_map %<>%
 #     period = dplyr::case_when(
 #       stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~ paste0(FY-1, "Oct"),
 #       TRUE ~ period))
-  
+
 # Join Full Code List with Schema ####
 dp_map %<>%
   dplyr::select(-dataset) %>%
@@ -232,10 +233,10 @@ dp_map %<>%
 #       stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~ paste0(FY-1,"Oct"),
 #       TRUE ~ period),
 #     period_dataset = dplyr::case_when(
-#       stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~ 
+#       stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~
 #         stringr::str_replace(period_dataset, "(?<=FY)\\d{2}", stringr::str_sub(FY,-2,-1)),
 #       TRUE ~ period_dataset))
-#   
+#
 
 # Add additional metadata for use in analytics ####
 
@@ -247,10 +248,12 @@ getCOGSMap <- function(uid,
                        d2_session = dynGet("d2_default_session",
                                            inherits = TRUE)) {
 
-  r <- datimutils::getCatOptionGroupSets(values = uid,
-                                         by = "id",
-                                         fields = "categoryOptionGroups[id,name,categoryOptions[categoryOptionCombos[id,name]]]",
-                                         d2_session = d2_session) %>%
+  r <-
+    datimutils::getCatOptionGroupSets(
+      values = uid,
+      by = "id",
+      fields = "categoryOptionGroups[id,name,categoryOptions[categoryOptionCombos[id,name]]]",
+      d2_session = d2_session) %>%
     dplyr::rename(categoryOptionGroupSets.name = name,
                   categoryOptionGroupSets.id = id) %>%
     tidyr::unnest(categoryOptionGroups) %>%
@@ -267,18 +270,18 @@ getCOGSMap <- function(uid,
 
 getHIVSpecific <- function(d2_session = dynGet("d2_default_session",
                                               inherits = TRUE)) {
-  
+
   hiv_specific <- getCOGSMap("bDWsPYyXgWP",
                              d2_session = d2_session) %>% #HIV Test Status (Specific)
     dplyr::select("categoryoptioncombouid" = categoryOptionCombos.id,
                   "resultstatus" = categoryOptionGroups.name) %>%
     dplyr::mutate(
-      resultstatus = stringr::str_replace(resultstatus,"\\(Specific\\)",""),
-      resultstatus = stringr::str_replace(resultstatus,"HIV",""),
+      resultstatus = stringr::str_replace(resultstatus, "\\(Specific\\)", ""),
+      resultstatus = stringr::str_replace(resultstatus, "HIV", ""),
       resultstatus = stringr::str_trim(resultstatus))
- 
+
   return(hiv_specific)
-   
+
 }
 
 getHIVInclusive <- function(d2_session = dynGet("d2_default_session",
@@ -289,9 +292,9 @@ getHIVInclusive <- function(d2_session = dynGet("d2_default_session",
     dplyr::select("categoryoptioncombouid" = categoryOptionCombos.id,
                   "resultstatus_inclusive" = categoryOptionGroups.name) %>%
     dplyr::mutate(
-      resultstatus_inclusive = stringr::str_replace(resultstatus_inclusive,"\\(Inclusive\\)",""),
-      resultstatus_inclusive = stringr::str_replace(resultstatus_inclusive,"HIV",""),
-      resultstatus_inclusive = stringr::str_replace(resultstatus_inclusive,"Status",""),
+      resultstatus_inclusive = stringr::str_replace(resultstatus_inclusive, "\\(Inclusive\\)", ""),
+      resultstatus_inclusive = stringr::str_replace(resultstatus_inclusive, "HIV", ""),
+      resultstatus_inclusive = stringr::str_replace(resultstatus_inclusive, "Status", ""),
       resultstatus_inclusive = stringr::str_trim(resultstatus_inclusive))
 
   return(hiv_inclusive)
@@ -315,7 +318,7 @@ getDEGSMap <- function(uid,
     dplyr::rename(dataElements.name = name,
                   dataElements.id = id) %>%
     dplyr::distinct()
-  
+
   return(r)
 
 }
@@ -376,9 +379,9 @@ compare_diffs <- datapackr::cop22_map_DataPack_DATIM_DEs_COCs %>%
                                "dataelementuid",
                                "categoryoptioncombouid",
                                "FY",
-                               "valid_ages.name","valid_ages.id","valid_sexes.name",
-                               "valid_sexes.id","valid_kps.name","valid_kps.id",
-                               "categoryOptions.ids","support_type","resultstatus","resultstatus_inclusive")) %>%
+                               "valid_ages.name", "valid_ages.id", "valid_sexes.name",
+                               "valid_sexes.id", "valid_kps.name", "valid_kps.id",
+                               "categoryOptions.ids", "support_type", "resultstatus", "resultstatus_inclusive")) %>%
   dplyr::filter(is.na(indicator_code) | is.na(dataelementname.x) | is.na(dataelementname.y))
 
 waldo::compare(datapackr::cop22_map_DataPack_DATIM_DEs_COCs, dp_map)

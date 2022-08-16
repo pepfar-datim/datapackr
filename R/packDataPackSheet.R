@@ -35,8 +35,8 @@ packDataPackSheet <- function(wb,
                       sheet = sheet,
                       x = sheet_data, # Object to be written.
                       xy = c(1, headerRow("Data Pack Template", cop_year)), # Defines start column and start row.
-                      colNames = T,
-                      rowNames = F,
+                      colNames = TRUE,
+                      rowNames = FALSE,
                       withFilter = FALSE)# Filters are not applied to column name row
 
   # Format targets ####

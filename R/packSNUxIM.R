@@ -14,7 +14,7 @@ packSNUxIM <- function(d,
   stopifnot("Packing SNU x IM tabs is only supported for COP21 Data Packs." = d$info$cop_year == 2021)
 
   # Check if SNUxIM data already exists ####
-  if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM$PSNU[1])) {
+  if (NROW(d$data$SNUxIM) == 1 && is.na(d$data$SNUxIM$PSNU[1])) {
     ## If no PSNUxIM tab, set has_psnuxim to FALSE and set target_data equal to all MER dataset ####
     d$info$has_psnuxim <- FALSE
     targets_data <- d$data$MER
@@ -81,7 +81,7 @@ packSNUxIM <- function(d,
         path = d$keychain$submission_path,
         sheet = "PSNUxIM",
         range = readxl::cell_limits(c(1, 2), c(NA, 2)),
-        col_names = F,
+        col_names = FALSE,
         .name_repair = "minimal"
       ) %>%
       NROW()
@@ -253,15 +253,15 @@ packSNUxIM <- function(d,
                       sheet = "PSNUxIM",
                       x = right_side,
                       xy = c(col.im.percents[2] + 1, existing_rows + 1),
-                      colNames = F, rowNames = F, withFilter = FALSE)
+                      colNames = FALSE, rowNames = FALSE, withFilter = FALSE)
 
   if (!d$info$has_psnuxim) {
     openxlsx::writeData(wb = d$tool$wb,
                         sheet = "PSNUxIM",
                         x = left_side,
                         xy = c(1, existing_rows),
-                        colNames = T, rowNames = F, withFilter = FALSE)
-  } else if (d$info$has_psnuxim & d$info$missing_psnuxim_combos) {
+                        colNames = TRUE, rowNames = FALSE, withFilter = FALSE)
+  } else if (d$info$has_psnuxim && d$info$missing_psnuxim_combos) {
 
   # OR, Append rows to bottom of existing PSNUxIM tab ####
     SNUxIM_cols <-
@@ -284,7 +284,7 @@ packSNUxIM <- function(d,
                         sheet = "PSNUxIM",
                         x = left_side,
                         xy = c(1, existing_rows + 1),
-                        colNames = F, rowNames = F, withFilter = FALSE)
+                        colNames = FALSE, rowNames = FALSE, withFilter = FALSE)
 
   # Add additional col_names if any
     new_mech_cols <- IM_cols[!IM_cols %in% SNUxIM_cols]
@@ -293,7 +293,7 @@ packSNUxIM <- function(d,
                           sheet = "PSNUxIM",
                           x = new_mech_cols %>% as.matrix() %>% t(),
                           xy = c(8 + length(SNUxIM_cols) + 1, top_rows),
-                          colNames = F, rowNames = F, withFilter = FALSE)
+                          colNames = FALSE, rowNames = FALSE, withFilter = FALSE)
     }
 
   # Add green highlights to appended rows, if any ####
@@ -374,14 +374,14 @@ packSNUxIM <- function(d,
   openxlsx::writeData(d$tool$wb, "PSNUxIM",
                       paste("Last Updated on:", Sys.time()),
                       xy = c(1, 2),
-                      colNames = F)
+                      colNames = FALSE)
 
   # Package Version ####
   openxlsx::writeData(d$tool$wb, "PSNUxIM",
                       paste("Package version:",
                             as.character(utils::packageVersion("datapackr"))),
                       xy = c(2, 2),
-                      colNames = F)
+                      colNames = FALSE)
 
   # Warning Messages ####
   interactive_print("Compiling alert messages...")

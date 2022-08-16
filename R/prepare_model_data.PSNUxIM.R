@@ -89,10 +89,10 @@ prepare_model_data.PSNUxIM <- function(snuxim_model_data,
     dplyr::mutate(
       `Deduplicated DSD Rollup` =
         rowSums(dplyr::select(., tidyselect::all_of(c("DSD Duplicated Rollup", "DSD Dedupe"))),
-                na.rm = T),
+                na.rm = TRUE),
       `Deduplicated TA Rollup` =
         rowSums(dplyr::select(., tidyselect::all_of(c("TA Duplicated Rollup", "TA Dedupe"))),
-                na.rm = T)) %>%
+                na.rm = TRUE)) %>%
     dplyr::mutate(
       `Total Deduplicated Rollup` =
         rowSums(
@@ -110,7 +110,7 @@ prepare_model_data.PSNUxIM <- function(snuxim_model_data,
     datapackr::rowMax(cn = "Max_DSD.T_1", regex = "\\d{4,}_DSD") %>%
     dplyr::mutate(
       `Max_Crosswalk.T_1` =
-        pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = T))
+        pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = TRUE))
 
   # Create Dedupe Resolution columns ####
   interactive_print("Studying your deduplication patterns...")
