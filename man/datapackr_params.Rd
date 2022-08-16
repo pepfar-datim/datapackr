@@ -6,7 +6,10 @@
 \usage{
 datapackr_params(
   model_data,
+  model_data_path,
   snuxim_model_data,
+  snuxim_model_data_path,
+  undistributed_mer_data,
   SNUxIM,
   MER,
   PSNUxIM_combos,
@@ -26,6 +29,7 @@ datapackr_params(
   include_DREAMS,
   additional_fields,
   schema,
+  skip,
   wb,
   PSNUs,
   psnus,
@@ -46,8 +50,16 @@ datapackr_params(
 \arguments{
 \item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
 
+\item{model_data_path}{Local filepath to a Data Pack model data file.}
+
 \item{snuxim_model_data}{Export from DATIM needed to allocate data across
-mechanisms in the PSNUxIM tab}
+mechanisms in the PSNUxIM tab.}
+
+\item{snuxim_model_data_path}{Local filepath to an SNUxIM Model Data file.}
+
+\item{undistributed_mer_data}{Data from the \code{d$data$UndistributedMER}
+dataset that can be provided while generating an OPU tool such that the
+targets to be distributed will be sourced from this file.}
 
 \item{SNUxIM}{SNUxIM dataset extract from unPackSNUxIM}
 
@@ -104,6 +116,8 @@ API other than those returned by default.}
 
 \item{schema}{Which datapackr schema to use in guiding this function. If left
 \code{NULL} will select the default based on \code{cop_year} and \code{tool}.}
+
+\item{skip}{Character vector of Sheet Names to label for skipping in schema.}
 
 \item{wb}{Openxlsx workbook object.}
 

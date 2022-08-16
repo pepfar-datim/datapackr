@@ -30,7 +30,8 @@ fetchPrioritizationTable <- function(psnus, cop_year,
       message(cond)
       warning("Could not retrieve prioritization levels")
       return(NULL)
-    })}
+    })
+  }
 
   n_requests <- ceiling(nchar(paste(psnus$psnu_uid, sep = "", collapse = ";")) / 2048)
 

@@ -18,7 +18,7 @@
                                    halign = "left",
                                    valign = "center")
   )
-  
+
 # Site Lists ####
   siteList <- list(
     community = openxlsx::createStyle(fontColour = "#000000",
@@ -32,7 +32,7 @@
     military = openxlsx::createStyle(fontColour = "#000000",
                                      bgFill = "#C4BD97")
   )
-  
+
 # Data Tabs ####
   data <- list(
     title = openxlsx::createStyle(fontSize = 18,
@@ -58,7 +58,7 @@
     invalidDisagg = openxlsx::createStyle(fontColour = "#C00000",
                                           bgFill = "#000000")
   )
-  
+
 # COP21 OPU Styles ####
   cop21_opu <- list(
     thin_border = openxlsx::createStyle(border = "left",
@@ -67,13 +67,13 @@
                                          borderStyle = "thick"),
     numeric_format = openxlsx::createStyle(numFmt = "#,##0")
   )
-  
+
  # Compile ####
   styleGuide <- list(home = home,
                      siteList = siteList,
                      data = data,
                      cop21_opu = cop21_opu)
-  
+
   save(styleGuide,
        file = "./data/styleGuide.rda",
        compress = "xz")

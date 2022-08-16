@@ -1,4 +1,5 @@
 
+
 #' @export
 #' @title createAnalytics(d)
 #'
@@ -20,43 +21,51 @@ createAnalytics <- function(d,
   # Append the distributed MER data and subnat data together
   if (d$info$tool == "OPU Data Pack") {
     d$data$analytics <- d$datim$OPU %>%
-      adorn_import_file(cop_year = d$info$cop_year,
-                        psnu_prioritizations = NULL,
-                        d2_session = d2_session)
+      adorn_import_file(
+        cop_year = d$info$cop_year,
+        psnu_prioritizations = NULL,
+        d2_session = d2_session
+      )
     return(d)
-
   } else if (d$info$tool != "Data Pack") {
     stop("Sorry, we don't recognize that tool type.")
   }
 
-  # For COP21+, get data from import files for better consistency ####
   pzns <- d$datim$prioritizations %>%
     dplyr::select(orgUnit, value)
 
   d$data$analytics <-
-    switch(ifelse(d$info$has_psnuxim, "MER", "UndistributedMER"),
-           MER = d$datim$MER,
-           UndistributedMER = d$datim$UndistributedMER) %>%
+    switch(
+      ifelse(d$info$has_psnuxim, "MER", "UndistributedMER"),
+      MER = d$datim$MER,
+      UndistributedMER = d$datim$UndistributedMER
+    ) %>%
     dplyr::bind_rows(d$datim$subnat_impatt) %>%
-    adorn_import_file(cop_year = d$info$cop_year,
-                      psnu_prioritizations = pzns,
-                      d2_session = d2_session)
+    adorn_import_file(
+      cop_year = d$info$cop_year,
+      psnu_prioritizations = pzns,
+      d2_session = d2_session
+    )
 
-  if (d$info$unallocatedIMs | !d$info$has_psnuxim) {
+  if (d$info$unallocatedIMs || !d$info$has_psnuxim) {
     d$data$analytics %<>%
-          dplyr::mutate(dplyr::across(
-            c(mechanism_code, mechanism_desc, partner_desc, funding_agency),
-            ~ dplyr::case_when(
-              is.na(.x) &
-                stringr::str_detect(support_type, "DSD|TA") ~ "Unallocated",
-              is.na(.x) &
-                stringr::str_detect(support_type, "Sub-National") ~ "default",
-              is.na(.x) &
-                stringr::str_detect(support_type, "No Support Type") ~ "default",
-              TRUE ~ .x
-            )
-          ))
-    }
-
+      dplyr::mutate(dplyr::across(
+        c(
+          mechanism_code,
+          mechanism_desc,
+          partner_desc,
+          funding_agency
+        ),
+        ~ dplyr::case_when(
+          is.na(.x) &
+            stringr::str_detect(support_type, "DSD|TA") ~ "Unallocated",
+          is.na(.x) &
+            stringr::str_detect(support_type, "Sub-National") ~ "default",
+          is.na(.x) &
+            stringr::str_detect(support_type, "No Support Type") ~ "default",
+          TRUE ~ .x
+        )
+      ))
+  }
   d
 }
