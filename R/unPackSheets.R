@@ -5,37 +5,66 @@
 #' Loops through all critical sheets in a submitted Data Pack
 #' and extracts data, then compiles into single flat dataframe.
 #'
-#' @param d Datapackr object
+#' @inheritParams datapackr_params
+#' @param check_sheets Logical. Should sheet data be validated?
+#' @param separate_datasets Logical. Should datasets be separated?
 #'
 #' @return d
 #'
-unPackSheets <- function(d) {
+unPackSheets <- function(d,
+                         sheets = NULL,
+                         check_sheets = TRUE,
+                         separate_datasets = TRUE) {
 
-  # Get sheets list
-  sheets <- d$info$schema %>%
-    dplyr::filter(
-      !sheet_name %in% c(skip_tabs(tool = d$info$tool, cop_year = d$info$cop_year),
-                         "SNU x IM", "PSNUxIM")) %>%
-    dplyr::pull(sheet_name) %>%
-    unique()
+  interactive_print("Unpacking sheets...")
 
-  actual_sheets <- readxl::excel_sheets(d$keychain$submission_path)
-  sheets_to_read <- sheets[sheets %in% actual_sheets]
+  if (d$info$tool != "Data Pack") {
+    stop("Cannot process that kind of tool. :(")
+  }
 
-  d$data$targets <- NULL
+  # If sheets parameter not provided, use names of sheets in d$sheets
+  if (is.null(d$sheets)) {
+    d <- loadSheets(d)
+  }
+  sheets <- sheets %||% grep("PSNUxIM", names(d$sheets), value = TRUE, invert = TRUE)
 
-  for (sheet in sheets_to_read) {
-    interactive_print(sheet)
+  sheets <- checkSheets(sheets = sheets,
+                        cop_year = d$info$cop_year,
+                        tool = d$info$tool,
+                        all_sheets = FALSE,
+                        psnuxim = FALSE)
 
-    if (d$info$tool == "Data Pack") {
-      d <- unPackDataPackSheet(d, sheet = sheet)
-    } else {
-      stop("Cannot process that kind of tool. :(")
-    }
+  # Check sheets against actual sheets found in d$sheets
+  if (!all(sheets %in% names(d$sheets))) {
+    invalid_sheets <- unique(sheets[!sheets %in% names(d$sheets)])
 
-    if (!is.null(d$data$extract)) {
-      d$data$targets <- dplyr::bind_rows(d$data$targets, d$data$extract)
-    }
+    sheets <- sheets[sheets %in% names(d$sheets)]
+
+    interactive_warning(
+      paste0("The following sheets do not seem to be present in ",
+             "your submission, so cannot be unpacked:  -> \n\t* ",
+             paste(invalid_sheets, collapse = "\n\t* "),
+             "\n"))
+  }
+
+  if (check_sheets) {
+    d <- checkSheetData(d, sheets = sheets)
+  }
+
+  # Unpack Sheet Data ----
+  targets <- unPackDataPackSheet(d, sheets)
+
+  # Separate Sheet Data ----
+  if (separate_datasets) {
+    interactive_print("Separating datasets...")
+    datasets <- separateDataSets(data = targets,
+                                 cop_year = d$info$cop_year,
+                                 tool = d$info$tool)
+
+    d$data$MER <- datasets$MER
+    d$data$SUBNAT_IMPATT <- datasets$SUBNAT_IMPATT
+  } else {
+    d$data$targets <- targets
   }
 
   return(d)

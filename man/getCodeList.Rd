@@ -2,14 +2,13 @@
 % Please edit documentation in R/getCodeList.R
 \name{getCodeList}
 \alias{getCodeList}
-\title{Pull & combine all MER, SUBNAT, IMPATT code lists for specified FY.}
+\title{Pull & combine all MER, SUBNAT, IMPATT code lists for specified COP year.}
 \usage{
 getCodeList(
   cop_year = NULL,
   datastreams = c("mer_targets", "mer_results", "subnat_targets", "subnat_results",
     "impatt"),
   datasets = NULL,
-  expanded = FALSE,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
@@ -24,15 +23,12 @@ are returned.}
 
 \item{datasets}{Character vector of dataSet IDs to pull code lists for.}
 
-\item{expanded}{If TRUE, will add dataset, period, period_dataset, and
-targets_results, related categoryOption metadata,  as additional columns}
-
 \item{d2_session}{DHIS2 Session id}
 }
 \value{
 Combined code list as dataframe.
 }
 \description{
-Pulls all code lists for MER, SUBNAT, and IMPATT for a specified FY and
+Pulls all code lists for MER, SUBNAT, and IMPATT for a specified COP year and
 combines these into a unique list.
 }

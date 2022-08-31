@@ -2,7 +2,7 @@
 % Please edit documentation in R/utilities.R
 \name{can_spawn}
 \alias{can_spawn}
-\title{Title}
+\title{Can Spawn}
 \usage{
 can_spawn()
 }

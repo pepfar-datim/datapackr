@@ -239,7 +239,6 @@ check_cop_year <- function(cop_year, tool) {
   }
 
   cop_year
-
 }
 
 
@@ -288,7 +287,7 @@ check_tool <- function(tool, season, cop_year) {
   # No matter what, we now have a tool. If we also have season, use it to
   # validate tool type.
   } else if (season_provided) {
-    if (tool != deduced_tool) {
+    if (!tool %in% c(deduced_tool, paste0(deduced_tool, " Template"))) {
       interactive_message("That tool is not valid for that season.")
     }
   }
@@ -321,7 +320,12 @@ check_season <- function(season, tool) {
   tool_provided <- !is.null(tool)
   if (tool_provided) {
     tool %<>% check_tool()
-    deduced_season <- switch(tool, "OPU Data Pack" = "OPU", "Data Pack" = "COP")
+    deduced_season <- switch(tool,
+                             "Data Pack" = "COP",
+                             "OPU Data Pack" = "OPU",
+                             "Data Pack Template" = "COP",
+                             "OPU Data Pack Template" = "OPU",
+                             stop("Invalid tool type provided."))
   }
 
   # Determine if season is provided
@@ -352,7 +356,6 @@ check_season <- function(season, tool) {
   }
 
   season
-
 }
 
 
@@ -375,18 +378,16 @@ check_schema <- function(schema, cop_year, tool, season) {
 
   # Validate parameters
   cop_year %<>% check_cop_year()
-  season %<>% check_season(season = ., tool = tool)
+  season <- suppressMessages(check_season(season = season, tool = tool))
   tool %<>% check_tool(tool = ., season = season, cop_year = cop_year)
 
   # For NULL schemas, attempt to deduce from other parameters, if provided.
   # Default here is the COP schema for the most recent/current COP Year
-  invisible(
-    utils::capture.output(
-      expected_schema <- pick_schema(tool = tool, cop_year = cop_year)))
+  expected_schema <- suppressMessages(pick_schema(tool = tool, cop_year = cop_year))
 
   schema <- schema %||% expected_schema
 
-  if (!schema_provided) {
+  if (!schema_provided && !tool_provided && (!cop_year_provided || !season_provided)) {
     interactive_message(
       paste0(
         "Because of ommitted parameters, we assumed you meant the schema for ",
@@ -518,16 +519,20 @@ checkTemplatePath <- function(template_path,
   interactive_message("Checking template against schema and DATIM...")
   expected_schema <- pick_schema(cop_year, tool)
 
-  input_tool <- paste0(tool, " Template")
-  template_schema <-
-    unPackSchema_datapack(
-      template_path = template_path,
-      skip = skip_tabs(tool = input_tool, cop_year = cop_year),
-      tool = input_tool,
-      cop_year = cop_year)
+  # Only compare submitted template to template on record if `tool` is not a template
+  # Trying to compare template files using this method results in an endless loop with `unPackSchema`
+  if (!stringr::str_detect(tool, "Template$")) {
+    input_tool <- paste0(tool, " Template")
+    template_schema <-
+      unPackSchema(
+        template_path = template_path,
+        skip = skip_tabs(tool = input_tool, cop_year = cop_year),
+        tool = input_tool,
+        cop_year = cop_year)
 
-  if (!identical(expected_schema, template_schema)) {
-    interactive_message("Template at that destination does not match our archived schema.")
+    if (!identical(expected_schema, template_schema)) {
+      interactive_message("Template at that destination does not match our archived schema.")
+    }
   }
 
   template_path
@@ -579,13 +584,79 @@ checkOutputFolder <- function(output_folder = NULL) {
 #' @rdname parameter-checks
 checkResultsArchive <- function(results_archive = FALSE) {
   # IF results_archive parameter is not set throw error message.
-  if (!isTRUE(results_archive) & !isFALSE(results_archive)) {
+  if (!isTRUE(results_archive) && !isFALSE(results_archive)) {
     stop("results_archive must be either TRUE or FALSE.")
   }
 
   results_archive
 }
 
+
+#' @export
+#' @param all_sheets Logical. Return/check against all sheets (as opposed to only
+#'   those with targets)?
+#' @param psnuxim Logical. Return/check against PSNUxIM tab as well?
+#' @rdname parameter-checks
+checkSheets <- function(sheets, cop_year, tool,
+                        all_sheets = FALSE, psnuxim = FALSE) {
+
+  # Collect parameters
+  sheets <- sheets %missing% NULL
+  sheets_provided <- !is.null(sheets)
+
+  tool <- tool %missing% NULL
+  tool_provided <- !is.null(tool)
+
+  cop_year <- cop_year %missing% NULL
+  cop_year_provided <- !is.null(cop_year)
+
+  # Validate parameters
+  cop_year %<>% check_cop_year()
+  tool %<>% check_tool(tool = ., cop_year = cop_year)
+  schema <- check_schema(schema = NULL, cop_year = cop_year, tool = tool)
+
+  all_sheets <- all_sheets %||% FALSE
+  psnuxim <- psnuxim %||% FALSE
+
+  if (all_sheets) {
+    skips <- ""
+  } else {
+    skips <- skip_tabs(tool = tool, cop_year = cop_year)
+  }
+
+  sheets_schema <- schema %>%
+    dplyr::filter(
+      !sheet_name %in% skips) %>%
+    dplyr::pull(sheet_name) %>%
+    unique()
+
+  if (!psnuxim) {
+    sheets_schema <- sheets_schema[!sheets_schema %in% c("PSNUxIM")]
+  }
+
+  if (!sheets_provided) {
+    sheets <- sheets_schema
+  } else {
+    invalid_sheets_param <- sheets[!sheets %in% sheets_schema]
+
+    sheets <- sheets[sheets %in% sheets_schema]
+
+    if (length(sheets) == 0) {
+      stop("All provided sheets were either invalid or not present.\n")
+    } else if (length(invalid_sheets_param) > 0) {
+      interactive_warning(
+        paste0(
+          "The following sheets are either invalid or not present. Only those ",
+          "remaining valid sheets will be returned. -> \n\t* ",
+          paste(invalid_sheets_param, collapse = "\n\t* "),
+          "\n"))
+    }
+
+  }
+
+  sheets
+
+}
 
 
 #' @export
@@ -603,9 +674,12 @@ check_params <- function(country_uids,
                          snuxim_model_data,
                          output_folder,
                          results_archive,
+                         sheets,
                          ...) {
 
   params <- list()
+
+  dots <- list(...)
 
   # Check Country UIDs ####
   if (!missing(country_uids)) {
@@ -696,6 +770,15 @@ check_params <- function(country_uids,
   # Check results_archive ####
   if (!missing(results_archive)) {
     params$results_archive <- checkResultsArchive(results_archive)
+  }
+
+  # Check sheets ----
+  if (!missing(sheets)) {
+    params$sheets <- checkSheets(sheets = sheets,
+                                 cop_year = params$cop_year,
+                                 tool = params$tool,
+                                 all_sheets = dots$all_sheets,
+                                 psnuxim = dots$psnuxim)
   }
 
 

@@ -1,13 +1,11 @@
 #' @export
-#' @title Pull & combine all MER, SUBNAT, IMPATT code lists for specified FY.
+#' @title Pull & combine all MER, SUBNAT, IMPATT code lists for specified COP year.
 #'
 #' @description
-#' Pulls all code lists for MER, SUBNAT, and IMPATT for a specified FY and
+#' Pulls all code lists for MER, SUBNAT, and IMPATT for a specified COP year and
 #' combines these into a unique list.
 #'
 #' @param datasets Character vector of dataSet IDs to pull code lists for.
-#' @param expanded If TRUE, will add dataset, period, period_dataset, and
-#' targets_results, related categoryOption metadata,  as additional columns
 #' @inheritParams datapackr_params
 #' @return Combined code list as dataframe.
 #'
@@ -16,7 +14,6 @@ getCodeList <- function(cop_year = NULL,
                                          "subnat_targets", "subnat_results",
                                          "impatt"),
                          datasets = NULL,
-                         expanded = FALSE,
                          d2_session = dynGet("d2_default_session",
                                              inherits = TRUE)) {
 
@@ -35,10 +32,12 @@ getCodeList <- function(cop_year = NULL,
 
   # Fetch code lists
 
-    purrr::map_dfr(datasets, function(x) datimutils::getSqlView(sql_view_uid = "DotdxKrNZxG",
+    purrr::map_dfr(datasets, function(x) {
+      datimutils::getSqlView(sql_view_uid = "DotdxKrNZxG",
                              variable_keys = "dataSets",
                              variable_values = x,
-                             d2_session = d2_session)) %>%
+                             d2_session = d2_session)
+    }) %>%
     dplyr::select(dataelement,
                   dataelementuid,
                   categoryoptioncombo,

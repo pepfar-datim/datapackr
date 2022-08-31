@@ -41,7 +41,7 @@ writeHomeTab <- function(wb = NULL,
   }
 
   # PEPFAR banner ####
-  openxlsx::writeData(wb, "Home", "PEPFAR", xy = c(2, 2), colNames = F)
+  openxlsx::writeData(wb, "Home", "PEPFAR", xy = c(2, 2), colNames = FALSE)
   openxlsx::addStyle(wb, "Home",
                      styleGuide$home$pepfar,
                      rows = 2, cols = 2)
@@ -53,13 +53,13 @@ writeHomeTab <- function(wb = NULL,
                                  " ",
                                  tool),
                       xy = c(2, 10),
-                      colNames = F)
+                      colNames = FALSE)
   openxlsx::addStyle(wb, "Home",
                      styleGuide$home$title,
                      rows = 10, cols = 2)
 
   # datapack_name ####
-  openxlsx::writeData(wb, "Home", datapack_name, xy = c(2, 20), colNames = F)
+  openxlsx::writeData(wb, "Home", datapack_name, xy = c(2, 20), colNames = FALSE)
   openxlsx::addStyle(wb, "Home",
                      styleGuide$home$datapack_name,
                      rows = 20, cols = 2)
@@ -75,7 +75,7 @@ writeHomeTab <- function(wb = NULL,
 
   countries <- paste(country_uids, collapse = ", ")
 
-  openxlsx::writeData(wb, "Home", countries, xy = c(col, row), colNames = F)
+  openxlsx::writeData(wb, "Home", countries, xy = c(col, row), colNames = FALSE)
 
   # country_names ####
   country_names <-
@@ -86,13 +86,13 @@ writeHomeTab <- function(wb = NULL,
                       "Home",
                       country_names,
                       xy = c(col, row + 1),
-                      colNames = F)
+                      colNames = FALSE)
 
   # Generated: ####
   openxlsx::writeData(wb, "Home",
                       paste("Generated on:", Sys.time()),
                       xy = c(2, row + 2),
-                      colNames = F)
+                      colNames = FALSE)
 
   # Package version ####
   openxlsx::writeData(wb, "Home",

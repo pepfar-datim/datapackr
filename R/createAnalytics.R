@@ -8,7 +8,7 @@
 #'
 getFY22Prioritizations <- function(d) {
 
-  psnu_prioritizations <- d$datim$fy22_prioritizations %>%
+  psnu_prioritizations <- d$datim$prioritizations %>%
     dplyr::select(orgUnit, value)
 
   psnus <- dplyr::filter(datapackr::valid_PSNUs, psnu_type == "SNU") %>%
@@ -60,7 +60,7 @@ createAnalytics <- function(d,
       if (d$info$has_psnuxim) {
         targets <- d$datim$MER
       } else {
-        targets <- d$data$UndistributedMER
+        targets <- d$datim$UndistributedMER
       }
 
       d$data$analytics <-
@@ -71,7 +71,7 @@ createAnalytics <- function(d,
                           psnu_prioritizations = prioritizations,
                           d2_session = d2_session)
 
-      if (d$info$unallocatedIMs | !d$info$has_psnuxim) {
+      if (d$info$unallocatedIMs || !d$info$has_psnuxim) {
         d$data$analytics %<>%
               dplyr::mutate(dplyr::across(
                 c(mechanism_code, mechanism_desc, partner_desc, funding_agency),

@@ -8,7 +8,7 @@ checkHasPSNUxIM <- function(d) {
 
   stopifnot(is.data.frame(d$data$SNUxIM))
 
-  if (NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM[[1, 1]])) {
+  if (NROW(d$data$SNUxIM) == 1 && is.na(d$data$SNUxIM[[1, 1]])) {
     d$info$has_psnuxim <- FALSE
 
     if (d$info$tool == "Data Pack") {
@@ -326,7 +326,7 @@ unPackSNUxIM <- function(d) {
   d$tests$psnuxim_missing_rs_fxs <-
     tidyxl::xlsx_cells(path = d$keychain$submission_path,
                        sheets = "PSNUxIM",
-                       include_blank_cells = T) %>%
+                       include_blank_cells = TRUE) %>%
     dplyr::select(col, row, formula, character) %>%
     dplyr::filter(row >= header_row,
                   col %in% cols_to_keep$col) %>%
@@ -377,12 +377,6 @@ unPackSNUxIM <- function(d) {
   # Drop rows where entire row is NA ####
   d$data$SNUxIM %<>%
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
-
-  # TEST: Missing key metadata; Error; Drop ####
-  # TODO: Make compatible for OPUs
-  if (d$info$tool == "Data Pack") {
-    d <- checkMissingMetadata(d, sheet)
-  }
 
   # d$data$SNUxIM %<>%
   #   dplyr::filter_at(dplyr::vars(PSNU, indicator_code), dplyr::any_vars(!is.na(.)))
@@ -483,7 +477,7 @@ unPackSNUxIM <- function(d) {
   # TEST: Non-numeric data; Warn; Convert & Drop ####
   # TODO: Make compatible for OPUs
   if (d$info$tool == "Data Pack") {
-    d <- checkNumericValues(d, sheet, header_cols)
+    #d <- checkNumericValues(d, sheet, header_cols)
   }
 
   # sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
@@ -544,7 +538,7 @@ unPackSNUxIM <- function(d) {
                               `Deduplicated DSD Rollup`, `Deduplicated TA Rollup`),
                 na.rm = TRUE),
       `MAX - Crosswalk Total` =
-        pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = T),
+        pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = TRUE),
       `DSD Dedupe` = `Deduplicated DSD Rollup` - `SUM - DSD`,
       `TA Dedupe` = `Deduplicated TA Rollup` - `SUM - TA`,
       `Crosswalk Dedupe` = `Total Deduplicated Rollup` - `SUM - Crosswalk Total`
@@ -649,7 +643,7 @@ unPackSNUxIM <- function(d) {
   # TODO: We have already read in the sheet with tidyxl
   # in an earlier test but in this test we read it yet again
   # Lets recycle from above?
-  d <- checkFormulas(d, sheet)
+  #d <- checkFormulas(d = d, sheet = sheet)
 
   # Remove all unneeded columns ####
   d$data$SNUxIM %<>%
@@ -764,7 +758,7 @@ unPackSNUxIM <- function(d) {
     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
 
   # TODO: TEST: Defunct disaggs; Error; Drop ####
-  #d <- defunctDisaggs(d, sheet)
+  #d <- checkDisaggs(d, sheet)
 
   # Drop all zeros against IMs ####
   # d$data$SNUxIM %<>%
