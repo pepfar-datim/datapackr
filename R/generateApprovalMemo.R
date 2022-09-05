@@ -127,7 +127,11 @@ renderPrioTable <- function(memo_doc, prio_table, ou_name, source_type) {
     if (has_no_prio) {
       prio_table <- flextable::bg(prio_table,
                                   j = "No Prioritization - USG Only",
-                                  bg = "#D3D3D3", part = "body")
+                                  bg = "#D3D3D3", part = "body") %>%
+        flextable::bg(i = ~ Age == "Total",
+                      bg = "#E4DFEC",
+                      part = "body") #Highlight total rows
+
 
     }
 
