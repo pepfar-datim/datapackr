@@ -133,6 +133,60 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 }
 
 #' @export
+#' @title Schema Columns
+#'
+#' @param cop_year COP Year for dating as well as selection of templates.
+#'
+#' @return List of columns to select from template.
+#'
+schema_cols <- function(cop_year = getCurrentCOPYear()) {
+  if (cop_year == 2021) {
+    cols <- tibble::tribble(
+      ~name, ~code,
+      "sheet_num", "sheet_num",
+      "sheet_name", "sheet_name",
+      "col", "col",
+      "indicator_code", "character_14",
+      "dataset", "character_5",
+      "col_type", "character_6",
+      "value_type", "character_7",
+      "dataelement_dsd", "character_8",
+      "dataelement_ta", "character_9",
+      "categoryoption_specified", "character_10",
+      "valid_ages", "character_11",
+      "valid_sexes", "character_12",
+      "valid_kps", "character_13",
+      "formula", "formula_15",
+      "value", "numeric_15"
+    )
+  } else if (cop_year == 2022) {
+    cols <- tibble::tribble(
+      ~name, ~code,
+      "sheet_num", "sheet_num",
+      "sheet_name", "sheet_name",
+      "col", "col",
+      "col_name", "character_3",
+      "indicator_code", "character_14",
+      "dataset", "character_5",
+      "col_type", "character_6",
+      "value_type", "character_7",
+      "dataelement_dsd", "character_8",
+      "dataelement_ta", "character_9",
+      "categoryoption_specified", "character_10",
+      "valid_ages", "character_11",
+      "valid_sexes", "character_12",
+      "valid_kps", "character_13",
+      "formula", "formula_15",
+      "value", "numeric_15"
+    )
+  } else {
+    stop("That cop_year is not currently supported.")
+  }
+
+  return(cols)
+}
+
+#' @export
 #' @title Tool to assist with formatting the header rows
 #'
 #' @param tool "Data Pack", "Data Pack Template",""OPU Data Pack".
