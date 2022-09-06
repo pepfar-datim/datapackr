@@ -426,7 +426,6 @@
 #'    These values consist of "skip" or "normal"}
 #'   \item{col}{Value describing the column position of each
 #'   \code{indicator_code}.}
-#'   \item{col_name}{The descriptive name used in the Data Pack for the column.}
 #'   \item{indicator_code}{Code used in the Data Pack to uniquely
 #'   identify each distinct programmatic area of target setting.}
 #'   \item{dataset}{For \code{indicator_codes} listed as "\code{Targets}"
