@@ -16,8 +16,8 @@ pick <- datapackr::COP21_datapacks_countries %>%
 # pick <- datapackr::COP21_datapacks_countries
 
 # Execution ####
-for (i in 1:NROW(pick)) {
-  print(paste0(i," of ",NROW(pick), ": ", pick[[i,1]]))
+for (i in seq_len(NROW(pick))) {
+  print(paste0(i, " of ", NROW(pick), ": ", pick[[i, 1]]))
 
   packTool(tool = "OPU Data Pack",
            datapack_name = pick$datapack_name[i],
