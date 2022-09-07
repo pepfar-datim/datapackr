@@ -9,7 +9,7 @@ output_folder <- Sys.getenv("OUTPUT_FOLDER") %>% paste0(., "COP21 OPUs/")
 # snuxim_model_data_path <- Sys.getenv("SNUXIM_MODEL_DATA_PATH")
 
 # Unpack Submitted Data Pack ####
-d <- unPackTool(tool = "OPU Data Pack", cop_year = 2021)
+d <- unPackTool(tool = "OPU Data Pack", cop_year = 2022)
 
 # Export DATIM import files ####
 exportPackr(data = d$datim$MER,
