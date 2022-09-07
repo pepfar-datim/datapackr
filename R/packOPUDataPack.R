@@ -52,7 +52,7 @@ packOPUDataPack <- function(d, undistributed_mer_data = NULL,
 
   # Write PSNUxIM tab ####
   r <- packPSNUxIM(wb = d$tool$wb,
-                   data = d$datim$UndistributedMER,
+                   data = d$data$UndistributedMER,
                    snuxim_model_data = d$data$snuxim_model_data,
                    cop_year = d$info$cop_year,
                    tool = d$info$tool,
