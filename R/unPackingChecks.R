@@ -748,7 +748,8 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
     dplyr::bind_rows(.id = "sheet_name") %>%
     dplyr::select(sheet_name, PSNU) %>%
     dplyr::distinct() %>%
-    dplyr::mutate(psnuid = extract_uid(PSNU)) %>%
+    #dplyr::mutate(psnuid = extract_uid(PSNU)) %>%
+    dplyr::mutate(psnuid = purrr::pmap_chr(list(PSNU), extract_uid)) %>%
     dplyr::anti_join(valid_PSNUs, by = c("psnuid" = "psnu_uid"))
 
   na_orgunits <- invalid_orgunits[is.na(invalid_orgunits$PSNU), ]
@@ -806,7 +807,7 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = TRUE) {
   data <- d$sheets[["Prioritization"]][, c("PSNU", "IMPATT.PRIORITY_SNU.T")]
   names(data)[names(data) == "IMPATT.PRIORITY_SNU.T"] <- "value"
   data <- data[, c("PSNU", "value")]
-  data$psnuid <- extract_uid(data$PSNU)
+  data$psnuid <- purrr::pmap_chr(list(data$PSNU), extract_uid) #extract_uid(data$PSNU)
   data <- data[data$psnuid %in% valid_PSNUs$psnu_uid, ]
   data <- data[!data$psnuid %in% valid_PSNUs$psnu_uid[valid_PSNUs$psnu_type == "Military"], ]
   invalid_prioritizations <- data[!data$value %in% prioritization_dict()$value, ]
