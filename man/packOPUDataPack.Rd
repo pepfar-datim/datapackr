@@ -13,14 +13,12 @@ packOPUDataPack(
 \arguments{
 \item{d}{Datapackr sidecar object}
 
-\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
-authentication with DATIM.}
-
 \item{undistributed_mer_data}{Data from the \code{d$data$UndistributedMER}
 dataset that can be provided while generating an OPU tool such that the
 targets to be distributed will be sourced from this file.}
 
-\item{d2_session}{DHIS2 Session id}
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
 }
 \value{
 Exports an OPU Data Pack to Excel within \code{output_folder}.

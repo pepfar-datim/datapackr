@@ -25,6 +25,7 @@ datapackr_params(
   d,
   datastreams,
   schema,
+  skip,
   wb,
   PSNUs,
   psnus,
@@ -99,6 +100,8 @@ are returned.}
 
 \item{schema}{Which datapackr schema to use in guiding this function. If left
 \code{NULL} will select the default based on \code{cop_year} and \code{tool}.}
+
+\item{skip}{Character vector of Sheet Names to label for skipping in schema.}
 
 \item{wb}{Openxlsx workbook object.}
 
