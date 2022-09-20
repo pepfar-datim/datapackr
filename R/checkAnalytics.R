@@ -58,9 +58,9 @@ analyze_eid_2mo <- function(data) {
         PMTCT_EID.N.2.T) %>%
       dplyr::summarise(
         PMTCT_EID.T =
-          sum(PMTCT_EID.T, na.rm = T),
+          sum(PMTCT_EID.T, na.rm = TRUE),
         PMTCT_EID.N.2.T =
-          sum(PMTCT_EID.N.2.T, na.rm = T)) %>%
+          sum(PMTCT_EID.N.2.T, na.rm = TRUE)) %>%
       dplyr::mutate(
         PMTCT_EID.2mo.rate =
           PMTCT_EID.N.2.T / PMTCT_EID.T)
@@ -132,11 +132,11 @@ analyze_vmmc_indeterminate <- function(data) {
         VMMC_CIRC.Unk.T) %>%
       dplyr::summarise(
         VMMC_CIRC.Pos.T =
-          sum(VMMC_CIRC.Pos.T, na.rm = T),
+          sum(VMMC_CIRC.Pos.T, na.rm = TRUE),
         VMMC_CIRC.Neg.T =
-          sum(VMMC_CIRC.Neg.T, na.rm = T),
+          sum(VMMC_CIRC.Neg.T, na.rm = TRUE),
         VMMC_CIRC.Unk.T =
-          sum(VMMC_CIRC.Unk.T, na.rm = T)) %>%
+          sum(VMMC_CIRC.Unk.T, na.rm = TRUE)) %>%
       dplyr::mutate(
         VMMC_CIRC.indeterminateRate =
           (VMMC_CIRC.Unk.T) /
@@ -332,9 +332,9 @@ analyze_retention <- function(data) {
         TX_CURR.T_1,
         TX_NEW.T) %>%
       dplyr::summarise(
-        TX_CURR.T = sum(TX_CURR.T, na.rm = T),
-        TX_CURR.T_1  = sum(TX_CURR.T_1, na.rm = T),
-        TX_NEW.T = sum(TX_NEW.T, na.rm = T)) %>%
+        TX_CURR.T = sum(TX_CURR.T, na.rm = TRUE),
+        TX_CURR.T_1  = sum(TX_CURR.T_1, na.rm = TRUE),
+        TX_NEW.T = sum(TX_NEW.T, na.rm = TRUE)) %>%
       dplyr::mutate(
         TX.Retention.T =
           (TX_CURR.T)
@@ -421,7 +421,7 @@ analyze_linkage <- function(data) {
        TX_NEW.T,
        HTS_TST.KP.Pos.T,
        TX_NEW.KP.T) %>%
-      dplyr::summarise_all(list(sum), na.rm = T) %>%
+      dplyr::summarise_all(list(sum), na.rm = TRUE) %>%
       dplyr::mutate(
        HTS_TST.Linkage.T =
          TX_NEW.T / HTS_TST_POS.T,
@@ -654,7 +654,7 @@ checkAnalytics <- function(d,
     append(
       d$info$analytics_warning_msg,
       purrr::map(analytics_checks,
-                 function(x)purrr::pluck(x, "msg"))) %>%
+                 function(x) purrr::pluck(x, "msg"))) %>%
     purrr::discard(is.null)
 
 
@@ -665,7 +665,7 @@ checkAnalytics <- function(d,
     purrr::discard(is.null)
 
   # If warnings, show all grouped by sheet and issue ####
-  if (!is.null(d$info$analytics_warning_msg) & interactive()) {
+  if (!is.null(d$info$analytics_warning_msg) && interactive()) {
     options(warning.length = 8170)
 
     messages <-

@@ -55,7 +55,7 @@ indicator_code_comparison <- model_data %>%
   dplyr::distinct() %>%
   dplyr::full_join(
     datapackr::cop22_data_pack_schema %>%
-      dplyr::filter(col_type %in% c("past","calculation")) %>%
+      dplyr::filter(col_type %in% c("past", "calculation")) %>%
       dplyr::select(indicator_code) %>%
       dplyr::mutate(in_schema = 1),
     by = c("indicator_code" = "indicator_code"))
@@ -64,4 +64,5 @@ missing.indicator_codes <- indicator_code_comparison %>%
   dplyr::filter(is.na(in_model))
 
 na.indicator_codes <- indicator_code_comparison %>%
-  dplyr::filter(indicator_code %in% na.omit(indicator_code_comparison$indicator_code[indicator_code_comparison$na_value]))
+  dplyr::filter(indicator_code %in%
+                  na.omit(indicator_code_comparison$indicator_code[indicator_code_comparison$na_value]))

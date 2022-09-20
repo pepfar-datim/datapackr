@@ -26,7 +26,7 @@ generateComparisonTable <- function(d) {
       dplyr::rename("Current" = value)
   }
 
-  if (NROW(d_datapack) > 0 | NROW(d_datim) > 0) {
+  if (NROW(d_datapack) > 0 || NROW(d_datim) > 0) {
 
     d$memo$comparison <- dplyr::full_join(d_datapack, d_datim)  %>%
       dplyr::mutate(Current = ifelse(is.na(Current), 0, Current),

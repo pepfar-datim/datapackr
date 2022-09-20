@@ -228,27 +228,31 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
 
   # Duplicates
   dupes <- purrr::map(d$sheets[sheets],
-                      function(x) x %>%
-                        dplyr::select(tidyselect::any_of(header_cols)) %>%
-                        dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
-                        dplyr::filter(!is.na(PSNU)) %>% # This is caught by checkInvalidOrgUnits
-                        dplyr::filter(duplicated(.))) %>%
+                      function(x) {
+                        x %>%
+                          dplyr::select(tidyselect::any_of(header_cols)) %>%
+                          dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
+                          dplyr::filter(!is.na(PSNU)) %>% # This is caught by checkInvalidOrgUnits
+                          dplyr::filter(duplicated(.))
+                      }) %>%
     purrr::keep(~ NROW(.x) > 0)
 
   if (length(dupes) > 0) {
 
     dupes %<>%
       purrr::map2(., names(.),
-                  function(x, y) x %>%
-                    dplyr::arrange(dplyr::across()) %>%
-                    tibble::add_column(sheet = y, .before = 1))
+                  function(x, y) {
+                    x %>%
+                      dplyr::arrange(dplyr::across()) %>%
+                      tibble::add_column(sheet = y, .before = 1)
+                  })
 
     ch$lvl <- "ERROR"
 
     ch$msg <-
       purrr::map2(
         dupes, names(dupes),
-        function(x, y)
+        function(x, y) {
           paste0(
             ch$lvl, "! In tab ", y,
             ": DUPLICATE ROWS found. Ensure PSNUs or Age, Sex, KeyPop disaggregates",
@@ -256,7 +260,8 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
             " or incorrect copying of data from one row to another. -> \n\t",
             paste(capture.output(print(as.data.frame(x), row.names = FALSE)),
                   collapse = "\n\t"),
-            "\n"))
+            "\n")
+        })
 
     ch$result <- dplyr::bind_rows(dupes)
     attr(ch$result, "test_name") <- "Duplicated rows"
@@ -290,11 +295,12 @@ checkMissingCols <- function(sheets, d, quiet = TRUE) {
     purrr::map2_dfr(
       .,
       names(.),
-      function(x, y)
+      function(x, y) {
         d$info$schema %>%
           dplyr::filter(sheet_name == y,
                         !indicator_code %in% names(x)) %>%
-          dplyr::select(sheet_name, indicator_code))
+          dplyr::select(sheet_name, indicator_code)
+      })
 
   # if (sheet == "PSNUxIM") { # DP-472
   #   ## Drop all IM cols (left & right sides)
@@ -326,14 +332,15 @@ checkMissingCols <- function(sheets, d, quiet = TRUE) {
     ch$msg <- unique(missing_cols$sheet_name) %>%
       purrr::set_names() %>%
       purrr::map(
-        function(x)
+        function(x) {
           paste0(
             ch$lvl, "! In tab ", x,
             ", MISSING COLUMNS: Please ensure no columns have been deleted or renamed from",
             " the original Data Pack you have received. ->  \n\t* ",
             paste(missing_cols$indicator_code[missing_cols$sheet_name == x],
                   collapse = "\n\t* "),
-            "\n"))
+            "\n")
+        })
 
     ch$result <- missing_cols
     attr(ch$result, "test_name") <- "Missing columns"
@@ -365,11 +372,12 @@ checkDupeCols <- function(sheets, d, quiet = TRUE) {
     purrr::map2_dfr(
       .,
       names(.),
-      function(x, y)
+      function(x, y) {
         tibble::enframe(names(x), name = NULL, value = "indicator_code") %>%
-        dplyr::filter(duplicated(.)) %>%
-        dplyr::distinct() %>%
-        tibble::add_column(sheet = y, .before = 1)) %>%
+          dplyr::filter(duplicated(.)) %>%
+          dplyr::distinct() %>%
+          tibble::add_column(sheet = y, .before = 1)
+      }) %>%
     dplyr::left_join(
       d$info$schema %>%
         dplyr::filter(sheet_name %in% sheets) %>%
@@ -428,7 +436,7 @@ checkDupeCols <- function(sheets, d, quiet = TRUE) {
     ch$msg <- unique(dup_cols$sheet) %>%
       purrr::set_names() %>%
       purrr::map(
-        function(x)
+        function(x) {
           paste0(
             ch$lvl, "! In tab ", x,
             ", DUPLICATE COLUMNS: The following columns appear multiple times. This",
@@ -441,7 +449,8 @@ checkDupeCols <- function(sheets, d, quiet = TRUE) {
                                    ifelse(!is.na(critical), " [Critical!]", ""))) %>%
                 dplyr::pull(msg_col),
               collapse = "\n\t* "),
-            "\n"))
+            "\n")
+        })
 
     ch$result <- dup_cols
     attr(ch$result, "test_name") <- "Duplicate columns"
@@ -473,15 +482,16 @@ checkOutOfOrderCols <- function(sheets, d, quiet = TRUE) {
     purrr::map2_dfr(
       .,
       names(.),
-      function(x, y)
+      function(x, y) {
         names(x) %>%
-        tibble::enframe(name = "submission_order", value = "indicator_code") %>%
-        tibble::add_column(sheet = y, .before = 1)) %>%
-      dplyr::right_join(
-        d$info$schema %>%
-          dplyr::filter(sheet_name %in% sheets) %>%
-          dplyr::select(indicator_code, sheet = sheet_name, template_order = col),
-        by = c("indicator_code", "sheet")) %>%
+          tibble::enframe(name = "submission_order", value = "indicator_code") %>%
+          tibble::add_column(sheet = y, .before = 1)
+      }) %>%
+    dplyr::right_join(
+      d$info$schema %>%
+        dplyr::filter(sheet_name %in% sheets) %>%
+        dplyr::select(indicator_code, sheet = sheet_name, template_order = col),
+      by = c("indicator_code", "sheet")) %>%
     dplyr::filter(submission_order != template_order)
 
   # if (sheet == "PSNUxIM") { # DP-472
@@ -514,7 +524,7 @@ checkOutOfOrderCols <- function(sheets, d, quiet = TRUE) {
     ch$msg <- unique(out_of_order$sheet) %>%
       purrr::set_names() %>%
       purrr::map(
-        function(x)
+        function(x) {
           paste0(
             ch$lvl, "! In tab ", x,
             ", OUT OF ORDER COLUMNS: While it is permitted to rearrange columns",
@@ -523,7 +533,8 @@ checkOutOfOrderCols <- function(sheets, d, quiet = TRUE) {
             " ensure their rearrangement has not caused any issues. -> \n\t* ",
             paste(unique(out_of_order$indicator_code[out_of_order$sheet == x]),
                   collapse = "\n\t* "),
-            "\n"))
+            "\n")
+        })
 
     ch$result <- out_of_order
     attr(ch$result, "test_name") <- "Columns out of order"
@@ -594,7 +605,7 @@ checkNonNumeric <- function(sheets, d, quiet = TRUE) {
     ch$msg <- unique(non_numeric$sheet_name) %>%
       purrr::set_names() %>%
       purrr::map(
-        function(x)
+        function(x) {
           paste0(
             ch$lvl, "! In tab ", x,
             ": NON-NUMERIC VALUES found! Please check the following columns for",
@@ -603,7 +614,8 @@ checkNonNumeric <- function(sheets, d, quiet = TRUE) {
               unique(
                 non_numeric$indicator_code[non_numeric$sheet_name == x]),
               collapse = "\n\t* "),
-            "\n"))
+            "\n")
+        })
 
     ch$result <- non_numeric
     attr(ch$result, "test_name") <- "Non-numeric values"
@@ -648,7 +660,7 @@ checkNegativeValues <- function(sheets, d, quiet = TRUE) {
     ch$msg <- unique(negative_values$sheet_name) %>%
       purrr::set_names() %>%
       purrr::map(
-        function(x)
+        function(x) {
           paste0(
             ch$lvl, "! In tab ", x,
             ": NEGATIVE VALUES found in the following columns! Ensure all values entered",
@@ -657,7 +669,8 @@ checkNegativeValues <- function(sheets, d, quiet = TRUE) {
               unique(
                 negative_values$indicator_code[negative_values$sheet_name == x]),
               collapse = "\n\t* "),
-            "\n"))
+            "\n")
+        })
 
     ch$result <- negative_values
     attr(ch$result, "test_name") <- "Negative values"
@@ -707,7 +720,7 @@ checkDecimalValues <- function(sheets, d, quiet = TRUE) {
     ch$msg <- unique(decimal_cols$sheet_name) %>%
       purrr::set_names() %>%
       purrr::map(
-        function(x)
+        function(x) {
           paste0(
             ch$lvl,
             "! In tab ", x,
@@ -717,7 +730,8 @@ checkDecimalValues <- function(sheets, d, quiet = TRUE) {
               unique(
                 decimal_cols$indicator_code[decimal_cols$sheet_name == x]),
               collapse = "\n\t* "),
-            "\n"))
+            "\n")
+        })
 
     ch$result <- decimal_cols
     attr(ch$result, "test_name") <- "Decimal values"
@@ -760,7 +774,7 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
     ch$msg <- unique(invalid_orgunits$sheet_name) %>%
       purrr::set_names() %>%
       purrr::map(
-        function(x)
+        function(x) {
           paste0(
             ch$lvl, "! In tab ", x,
             ", INVALID OR BLANK ORG UNITS: ",
@@ -775,7 +789,8 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
             " both DATIM & FACTSInfo that the below are correctly added and active",
             " for the appropriate COP Year. ->  \n\t* ",
             paste(invalid_orgunits$PSNU[!is.na(invalid_orgunits$PSNU)], collapse = "\n\t* "),
-            "\n"))
+            "\n")
+        })
 
     ch$result <- invalid_orgunits
     attr(ch$result, "test_name") <- "Invalid orgunits"
@@ -957,7 +972,7 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
     ch$msg <- unique(cols_affected$sheet_name) %>%
       purrr::set_names() %>%
       purrr::map(
-        function(x)
+        function(x) {
           paste0(
             ch$lvl, "! In tab ", x, ", ",
             sum(critical$count[critical$sheet_name == x]),
@@ -977,7 +992,8 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
                      paste(critical$fx_violations[critical$sheet_name == x],
                            collapse = "\n\t* ")),
               "."),
-            "\n"))
+            "\n")
+        })
 
     altered_formulas %<>%
       dplyr::group_by(sheet_num, sheet_name, indicator_code, correct_fx,
@@ -1056,7 +1072,7 @@ checkDisaggs <- function(sheets, d, quiet = TRUE) {
     ch$msg <- unique(defunct_disaggs$sheet_name) %>%
       purrr::set_names() %>%
       purrr::map(
-        function(x)
+        function(x) {
           paste0(
             ch$lvl, "! In tab ", x,
             ": INVALID DISAGGS. Please review all tabs flagged by this test to ensure",
@@ -1073,7 +1089,8 @@ checkDisaggs <- function(sheets, d, quiet = TRUE) {
                     defunct_disaggs[defunct_disaggs$sheet_name == x, ]),
                   row.names = FALSE)),
               collapse = "\n\t"),
-            "\n"))
+            "\n")
+        })
 
     ch$result <- defunct_disaggs
     attr(ch$result, "test_name") <- "Defunct disaggs"
@@ -1146,9 +1163,10 @@ checkSheetData <- function(d,
                                               x = purrr::pluck(.x, "msg"))) %>%
     Reduce(f = c, x = .)
   lvl <- purrr::map(data_checks,
-                    function(x)
+                    function(x) {
                       rep(purrr::pluck(x, "lvl"),
-                          length(purrr::pluck(x, "msg")))) %>%
+                          length(purrr::pluck(x, "msg")))
+                    }) %>%
     Reduce(f = c, x = .)
 
   for (i in seq_along(msg)) {

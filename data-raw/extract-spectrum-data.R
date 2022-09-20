@@ -26,25 +26,25 @@ for (filepath in dp_filepaths) {
           calendar_quarter == "CY2021Q3" ~ "CY2022Q3",
           TRUE ~ calendar_quarter)
     )
-  
+
   country_name <-
     datapackr::unPackDataPackName(
       submission_path = filepath,
       tool = "Data Pack")
-  
+
   country_uid <-
     datapackr::unPackCountryUIDs(
       submission_path = filepath,
       tool = "Data Pack",
       cop_year = 2021)
-  
+
   bundle <- list(
     country_name = country_name,
     data = extract
   )
-  
+
   spectrum_extracts[[country_uid]] <- bundle
-  
+
 }
 
 saveRDS(spectrum_extracts, paste0(output_folder, "SpectrumExtracts.rds"))
@@ -52,12 +52,12 @@ saveRDS(spectrum_extracts, paste0(output_folder, "SpectrumExtracts.rds"))
 
 # Export ####
 
-for (i in 1:length(spectrum_extracts)) {
+for (i in seq_len(spectrum_extracts)) {
   country <- spectrum_extracts[[i]]$country_name
   data <- spectrum_extracts[[i]]$data
-  
-  output_file_name <- 
+
+  output_file_name <-
     paste0(output_folder, "COP21SpectrumExtract_", country, ".csv")
-  
+
   readr::write_csv(data, output_file_name)
 }

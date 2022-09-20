@@ -86,7 +86,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
                                                       "HllvX50cXC0")))
   }
 
-  if (!is.null(df) & NROW(df) > 0) {
+  if (!is.null(df) && NROW(df) > 0) {
     d$memo$datim$analytics <- df %>%
       adorn_import_file(
         .,
@@ -139,15 +139,14 @@ prepareMemoDataByPSNU <- function(analytics,
     tidyr::nest()
 
   #Evaluate the indicators in parallel if possible
-  if (can_spawn() & n_cores > 1L) {
+  if (can_spawn() && n_cores > 1L) {
     df$indicator_results <-
-      parallel::mclapply(df$data, function(x)
-        evaluateIndicators(x$combi, x$value, inds),
-        mc.cores = n_cores)
+      parallel::mclapply(df$data,
+                         function(x) evaluateIndicators(x$combi, x$value, inds),
+                         mc.cores = n_cores)
   } else {
     df$indicator_results <-
-      lapply(df$data, function(x)
-        evaluateIndicators(x$combi, x$value, inds))
+      lapply(df$data, function(x) evaluateIndicators(x$combi, x$value, inds))
   }
 
 
@@ -171,7 +170,7 @@ prepareMemoDataByPSNU <- function(analytics,
     dplyr::select(-"N_OR_D") %>%
     dplyr::mutate(Age = dplyr::case_when(Age == "15-" ~ "<15",
                                   Age == "15+" ~ "15+",
-                                  Age == "18-" ~"<18",
+                                  Age == "18-" ~ "<18",
                                   Age == "18+" ~ "18+",
                                   TRUE ~ "Total")) %>%
     dplyr::mutate(Age = dplyr::case_when(Indicator %in% c("CXCA_SCRN",
@@ -224,7 +223,7 @@ prepareMemoDataByPartner <- function(df,
                                          memo_structure,
                                          indicators) {
 
-  if (is.null(df) | NROW(df) == 0) {
+  if (is.null(df) || NROW(df) == 0) {
     return(NULL)
   }
 
@@ -408,7 +407,7 @@ prepareMemoDataByPrio <- function(df,
       "Total" = rowSums(dplyr::across(where(is.numeric)), na.rm = TRUE)) %>%
     dplyr::select("Indicator", "Age", 3:dim(.)[2])
 
-  if (!include_no_prio & any("No Prioritization" %in% names(df_final))) {
+  if (!include_no_prio && any("No Prioritization" %in% names(df_final))) {
     df_final <- dplyr::select(df_final, -`No Prioritization`) # nolint
   }
 

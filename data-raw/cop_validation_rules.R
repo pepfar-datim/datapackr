@@ -23,7 +23,7 @@ processValidationRules <- function(r) {
                              "exclusive_pair",
                              "compulsory_pair"),
                        y = c(">=", ">", "==", "!=", "<=", "<", "|", "&"),
-                       stringsAsFactors = F)
+                       stringsAsFactors = FALSE)
   # Strategies
   strat.map <- data.frame(x = c("SKIP_IF_ANY_VALUE_MISSING",
                                 "SKIP_IF_ALL_VALUES_MISSING",

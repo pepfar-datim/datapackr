@@ -32,7 +32,7 @@ packForDATIM <- function(d, type = NULL) {
                  `OPU PSNUxIM` = d$data$SNUxIM,
                  `Undistributed MER` = d$data$MER)
 
-  if (is.null(data) | NROW(data) == 0) {
+  if (is.null(data) || NROW(data) == 0) {
     stop(
       paste0(
         "For type '", type, "', expected to see ",

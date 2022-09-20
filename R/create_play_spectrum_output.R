@@ -144,9 +144,9 @@ create_play_spectrum_output <- function(country_uids,
     dplyr::group_by(psnu, psnu_uid, area_id,
                     indicator_code, dataelementuid, calendar_quarter) %>%
     dplyr::mutate(
-      pop_dist = pop / sum(pop, na.rm = T),
-      plhiv_dist = plhiv / sum(plhiv, na.rm = T),
-      tx_curr_dist = tx_curr / sum(tx_curr, na.rm = T),
+      pop_dist = pop / sum(pop, na.rm = TRUE),
+      plhiv_dist = plhiv / sum(plhiv, na.rm = TRUE),
+      tx_curr_dist = tx_curr / sum(tx_curr, na.rm = TRUE),
       value = dplyr::case_when(
         stringr::str_detect(indicator_code, "PMTCT_STAT_SUBNAT\\.D")
           ~ round_trunc(value * pop_dist),
@@ -169,8 +169,8 @@ create_play_spectrum_output <- function(country_uids,
   # Add randomized RSEs ####
   play_spectrum_output %<>%
     dplyr::mutate(
-      age_sex_rse = sample(1:60, NROW(.), replace = T),
-      district_rse = sample(1:50, NROW(.), replace = T)
+      age_sex_rse = sample(1:60, NROW(.), replace = TRUE),
+      district_rse = sample(1:50, NROW(.), replace = TRUE)
     )
 
   # Export

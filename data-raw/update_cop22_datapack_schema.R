@@ -13,7 +13,7 @@ datapack_template_filepath <- system.file("extdata",
                                           package = "datapackr",
                                           mustWork = TRUE)
 cop22_data_pack_schema <-
-  unPackSchema_datapack(
+  unPackSchema(
     template_path = datapack_template_filepath,
     skip = skip_tabs(tool = "Data Pack Template", cop_year = 2022),
     cop_year = 2022)
