@@ -15,16 +15,12 @@ datapackr_params(
   template_path,
   submission_path,
   cached_mechs_path,
-  cached_psnus_path,
   cop_year,
   output_folder,
   results_archive,
   d2_session,
   d,
   datastreams,
-  include_mil,
-  include_DREAMS,
-  additional_fields,
   schema,
   wb,
   PSNUs,
@@ -60,7 +56,7 @@ missing from the PSNUxIM tab.}
 (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
 
 \item{country_uids}{Unique IDs for countries to include in the Data Pack.
-For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
+For full list of these IDs, see \code{datapackr::valid_OrgUnits}.}
 
 \item{template_path}{Local filepath to Data Pack template Excel (XLSX) file.
 This file MUST NOT have any data validation formats present. If left
@@ -70,9 +66,6 @@ This file MUST NOT have any data validation formats present. If left
 
 \item{cached_mechs_path}{Local file path to an RDS file containing
 a cached copy of the mechanisms SQL view.}
-
-\item{cached_psnus_path}{Local file path to an RDS file containing
-a cached copy of PSNUs from DATIM.}
 
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}
@@ -92,15 +85,6 @@ authentication with DATIM.}
 \code{mer_results}, \code{subnat_targets}, \code{subnat_results}, or
 \code{impatt}. If not specified, then all data streams
 are returned.}
-
-\item{include_mil}{Logical. If \code{TRUE}, will also include _Military nodes
-related to \code{country_uids}. Default is \code{TRUE}.}
-
-\item{include_DREAMS}{Logical. If \code{TRUE}, will also include DREAMS
-organisation units.}
-
-\item{additional_fields}{Character string of any fields to return from DATIM
-API other than those returned by default.}
 
 \item{schema}{Which datapackr schema to use in guiding this function. If left
 \code{NULL} will select the default based on \code{cop_year} and \code{tool}.}

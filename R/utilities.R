@@ -152,11 +152,11 @@ getSaneName <- function(datapack_name) {
 #' @return d
 #'
 getOUFromCountryUIDs <- function(country_uids) {
-  ou <- datapackr::valid_PSNUs %>%
-    dplyr::select(ou, ou_id, country_name, country_uid) %>%
+  ou <- datapackr::valid_OrgUnits %>%
+    dplyr::select(ou, ou_uid, country_name, country_uid) %>%
     dplyr::distinct() %>%
     dplyr::filter(country_uid %in% country_uids) %>%
-    dplyr::select(ou, ou_id) %>%
+    dplyr::select(ou, ou_uid) %>%
     dplyr::distinct()
 
   if (NROW(ou) != 1) {
@@ -585,17 +585,6 @@ is_uidish <- function(string, ish = FALSE) {
 }
 
 #' @export
-#' @title Checks whether cache age is fresh
-#'
-#' @param time The timestamp for the cache
-#' @param max_age The maximum age allowed for a cache to be considered fresh
-#'
-#' @return A logical vector
-is_fresh <- function(time, max_age) {
-  lubridate::as.duration(lubridate::interval(time, Sys.time())) < lubridate::duration(max_age)
-}
-
-#' @export
 #' @title Return the fresh portion of a cache file
 #'
 #' @param cache The cached file
@@ -605,6 +594,42 @@ is_fresh <- function(time, max_age) {
 fresh_cache_part <- function(cache, max_age) {
   cache[is_fresh(cache$cache_date, max_age)]
 }
+
+
+#' @export
+#' @title Checks whether a cached file is stale
+#'
+#' @param cache Filepath to the cached file to check.
+#' @param max_age The maximum age allowed for a cache to be considered fresh.
+#' Follows syntax of \code{lubridate} package.
+#'
+#' @return A dataframe containing only the fresh portion of the cache file
+#'
+cache_is_fresh <- function(cache, max_age = NULL) {
+  interactive_print(cache)
+
+  if (!file.exists(cache)) {
+    is_fresh <- FALSE
+  } else if (file.access(cache, 4) != 0) { # Calc iff exists
+    is_fresh <- FALSE
+  } else { # Check age iff exists and can read
+
+    max_age <- max_age %||% "1 day" %>%
+      lubridate::duration()
+
+    cache_age <-
+      lubridate::as.duration(
+        lubridate::interval(
+          file.info(cache)$mtime,
+          Sys.time()))
+
+    is_fresh <- cache_age < max_age
+  }
+
+  is_fresh
+}
+
+
 
 #' Can Spawn
 #' @description Determines whether processes can be run in parallel.

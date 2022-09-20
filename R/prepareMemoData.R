@@ -11,9 +11,9 @@ prepareMemoMetadata <- function(d, memo_type,
 
   #This is still not sensitive to the COP year
   #TODO: maybe valid_PSNUs a function of the COP year
-  d$info$psnus <- datapackr::valid_PSNUs %>%
+  d$info$psnus <- datapackr::valid_OrgUnits %>%
     dplyr::filter(country_uid %in% d$info$country_uids) %>%
-    dplyr::select(ou, country_name, snu1, psnu, psnu_uid)
+    dplyr::select(ou, country_name, snu1, psnu = name, psnu_uid = uid)
 
   #Get the memo structure
   d <- memoStructure(d, d2_session)

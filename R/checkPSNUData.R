@@ -58,9 +58,12 @@ checkPSNUData  <-  function(d) {
     }
 
   #Unnest the data
+  valid_Orgs <- datapackr::valid_OrgUnits %>%
+    dplyr::rename(psnu = name, psnu_uid = uid)
+
   vr_data <- vr_data %>%
     tidyr::unnest(vr_results) %>%
-    dplyr::inner_join(valid_PSNUs[, c("psnu", "psnu_uid")], by = c("orgUnit" = "psnu_uid")) %>%
+    dplyr::inner_join(valid_Orgs[, c("psnu", "psnu_uid")], by = c("orgUnit" = "psnu_uid")) %>%
     dplyr::ungroup()
 
 

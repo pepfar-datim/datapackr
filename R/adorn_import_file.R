@@ -16,10 +16,10 @@
     #the same level as the defined prioritization.
     #This can occur when DREAMS PSNUs are at a different
     #level than the PSNU level.
-    dreams_orgunits <- valid_PSNUs %>%
+    dreams_orgunits <- valid_OrgUnits %>%
       dplyr::filter(DREAMS == "Y") %>%
-      dplyr::filter(psnu_uid %in% psnu_import_file$orgUnit) %>%
-      dplyr::select(psnu_uid, ancestors) %>%
+      dplyr::filter(uid %in% psnu_import_file$orgUnit) %>%
+      dplyr::select(psnu_uid = uid, ancestors) %>%
       dplyr::filter(!psnu_uid %in% prio$orgUnit)
 
     if (NROW(dreams_orgunits) > 0) {
@@ -85,15 +85,14 @@ adorn_import_file <- function(psnu_import_file,
                                                   inherits = TRUE),
                               include_default = FALSE) {
 
-  row_num <- NROW(psnu_import_file)
-
   cop_year %<>% check_cop_year()
 
   # Adorn orgunits ----
-  snus <- valid_PSNUs %>% # Comes from file data/valid_PSNUs.rda
-    dplyr::filter(psnu_uid %in% psnu_import_file$orgUnit) %>%
-    add_dp_psnu() %>% #Found in getPSNUs.R
-    dplyr::rename(name = psnu, id = psnu_uid)
+    # TODO: Maybe move some of this handling to getPSNUs and store right in valid_PSNUs?
+  snus <- valid_OrgUnits %>% # Comes from file data/valid_PSNUs.rda
+    dplyr::filter(uid %in% psnu_import_file$orgUnit) %>%
+    add_dp_label() %>% #Found in getPSNUs.R
+    dplyr::rename(id = uid)
 
   ancestor_ids <- purrr::map(snus$ancestors,
                              function(x)
@@ -119,24 +118,28 @@ adorn_import_file <- function(psnu_import_file,
     dplyr::mutate(
       psnu_uid = dplyr::case_when(is.na(psnu_uid) ~ id,
                                    TRUE ~ psnu_uid)) %>%
-    dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id, psnu_uid,
-                  name, id, dp_psnu, psnu_type, DREAMS)
+    dplyr::select(ou, ou_uid, country_name, country_uid, snu1, snu1_uid, psnu_uid,
+                  psnu = name, id, dp_label, org_type, DREAMS)
 
   psnu_import_file %<>%
     dplyr::left_join(snus, by = c("orgUnit" = "id"))
 
-  # Utilizes row_num to ensure the join worked as expected
-  assertthat::are_equal(NROW(psnu_import_file), row_num)
-
   # Add Prioritizations ####
   if (is.null(psnu_prioritizations)) {
+
     psnu_import_file %<>%
       addcols("prioritization")
+
+    interactive_warning(
+      paste0("Prioritizations not provided to adorn_import_file, so not included",
+             " in analytics dataset."))
+
   } else {
+
     psnu_prioritizations %<>%
       dplyr::select(orgUnit, value) %>%
     # Remove anything not a PSNU & remove Mil
-      dplyr::filter(orgUnit %in% snus$psnu_uid[snus$psnu_type != "Military"],
+      dplyr::filter(orgUnit %in% snus$psnu_uid[snus$org_type != "Military"],
     # Remove invalid values
                     value %in% prioritization_dict()$value) %>%
     # Translate values into descriptions
@@ -150,15 +153,28 @@ adorn_import_file <- function(psnu_import_file,
       dplyr::left_join(psnu_prioritizations, by = c("psnu_uid" = "orgUnit")) %>%
       dplyr::mutate(
         prioritization =
-          dplyr::case_when(is.na(prioritization) ~ "No Prioritization",
+          dplyr::case_when(
+            stringr::str_sub(psnu, 1, 9) == "_Military" ~ "No Prioritization",
+            TRUE ~ prioritization))
+
+    blank_pzns <- psnu_import_file$dp_label[is.na(psnu_import_file$prioritization)] %>%
+      unique() %>%
+      sort()
+
+    if (length(blank_pzns) > 0) {
+      interactive_warning(
+        paste0("Prioritizations not provided to adorn_import_file for the",
+               " following Org Units: \n\t* ",
+               paste(blank_pzns, collapse = "\n\t* ")))
+    }
+
+    psnu_import_file %<>%
+      dplyr::mutate(
+        prioritization =
+          dplyr::case_when(is.na(prioritization) ~ "Unknown",
                            TRUE ~ prioritization))
 
-    # Utilizes row_num to ensure the join worked as expected
-    assertthat::are_equal(NROW(psnu_import_file), row_num)
   }
-
-  psnu_import_file %<>%
-    dplyr::rename(psnu = name)
 
   # Adorn Mechanisms ####
   mechs <-
@@ -204,7 +220,7 @@ adorn_import_file <- function(psnu_import_file,
   # Stack data_codes and data_ids on top of one another.
   psnu_import_file <- dplyr::bind_rows(data_codes, data_ids, data_default) %>% dplyr::distinct()
   # Utilizes row_num to ensure the join,filter,stack worked as expected
-  assertthat::are_equal(NROW(psnu_import_file), row_num)
+  #assertthat::are_equal(NROW(psnu_import_file), row_num)
 
   # Adorn dataElements & categoryOptionCombos ####
 
@@ -239,19 +255,18 @@ adorn_import_file <- function(psnu_import_file,
              "categoryOptionCombo" = "categoryoptioncombouid",
              "fiscal_year" = "FY",
              "period" = "period"))
-  # Utilizes row_num to ensure the join worked as expected
-  assertthat::are_equal(NROW(psnu_import_file), row_num)
+
   # Select/order columns ####
   # Flag set in original function, approx line 20
   if (filter_rename_output) {# If flag is true, Keep the below columns from data
     # and rename where necessary with =.
     psnu_import_file %<>%
       dplyr::select(ou,
-                    ou_id,
+                    ou_uid,
                     country_name,
                     country_uid,
                     snu1,
-                    snu1_id,
+                    snu1_uid,
                     psnu,
                     psnu_uid = orgUnit,
                     prioritization,
@@ -281,8 +296,7 @@ adorn_import_file <- function(psnu_import_file,
                     target_value = value,
                     indicator_code)
   }
-  # Utilizes row_num to ensure the join,filter,stack worked as expected
-  assertthat::are_equal(NROW(psnu_import_file), row_num)
+
   psnu_import_file
 
 }

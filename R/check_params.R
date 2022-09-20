@@ -130,16 +130,16 @@ check_country_uids <- function(country_uids, force = TRUE) {
   country_uids <- country_uids %missing% NULL
 
   # If any country_uids are invalid, warn but remove and still move on.
-  if (any(!country_uids %in% valid_PSNUs$country_uid)) {
-    # subset submitted list base on it values NOT being in valid_PSNUs
-    invalid_country_uids <- country_uids[!country_uids %in% valid_PSNUs$country_uid]
+  if (any(!country_uids %in% valid_OrgUnits$country_uid)) {
+    # subset submitted list base on it values NOT being in valid_OrgUnits
+    invalid_country_uids <- country_uids[!country_uids %in% valid_OrgUnits$country_uid]
 
     interactive_message(
       paste0("The following supplied country_uids appear to be invalid and will be removed: ",
              paste_oxford(invalid_country_uids, final = "&"))
     )
-    # subset submitted list base on it values being in valid_PSNUs
-    country_uids <- country_uids[country_uids %in% valid_PSNUs$country_uid]
+    # subset submitted list base on it values being in valid_OrgUnits
+    country_uids <- country_uids[country_uids %in% valid_OrgUnits$country_uid]
 
     if (length(country_uids) == 0) {
       interactive_message(
@@ -161,7 +161,7 @@ check_country_uids <- function(country_uids, force = TRUE) {
                "selected force = FALSE, all country_uids have been returned.")
       )
 
-      country_uids <- unique(valid_PSNUs$country_uid)
+      country_uids <- unique(valid_OrgUnits$country_uid)
     }
   }
 
@@ -181,20 +181,20 @@ check_PSNUs <- function(PSNUs = NULL, country_uids = NULL) {
 
   # If PSNUs not provided, fill with all PSNUs
   if (is.null(PSNUs)) {
-    PSNUs <- datapackr::valid_PSNUs %>% #found in data/
+    PSNUs <- datapackr::valid_OrgUnits %>% #found in data/
       dplyr::filter(., country_uid %in% country_uids) %>%
       add_dp_psnu(.) %>%
-      dplyr::arrange(dp_psnu) %>%
-      dplyr::select(PSNU = dp_psnu, psnu_uid)
+      dplyr::arrange(dp_label) %>%
+      dplyr::select(PSNU = dp_label, psnu_uid = uid)
   } else {
     # If PSNUs is provided, check to make sure these are all valid.
     # Warn and remove invalid PSNu's as needed.
-    if (any(!PSNUs$psnu_uid %in% valid_PSNUs$psnu_uid)) {
+    if (any(!PSNUs$psnu_uid %in% valid_OrgUnits$uid)) {
       invalid_PSNUs <- PSNUs %>%
-        dplyr::filter(!psnu_uid %in% valid_PSNUs$psnu_uid) %>%
-        add_dp_psnu(.) %>%
-        dplyr::arrange(dp_psnu) %>%
-        dplyr::select(PSNU = dp_psnu, psnu_uid)
+        dplyr::filter(!psnu_uid %in% valid_OrgUnits$uid) %>%
+        add_dp_label(.) %>%
+        dplyr::arrange(dp_label) %>%
+        dplyr::select(PSNU = dp_label, psnu_uid)
 
       interactive_message(
         paste0("The following PSNUs were supplied as a parameter, but appear to ",
@@ -202,7 +202,7 @@ check_PSNUs <- function(PSNUs = NULL, country_uids = NULL) {
                paste_dataframe(invalid_PSNUs)))
 
       PSNUs <- PSNUs %>%
-        dplyr::filter(psnu_uid %in% valid_PSNUs$psnu_uid)
+        dplyr::filter(psnu_uid %in% valid_OrgUnits$uid)
     }
   }
 
@@ -406,7 +406,7 @@ check_schema <- function(schema, cop_year, tool, season) {
 #' @rdname parameter-checks
 checkDataPackName <- function(datapack_name, country_uids) {
 
-  valid_dp_names <- c(unique(valid_PSNUs$country_name), "Caribbean Region", "Central America and Brazil")
+  valid_dp_names <- c(unique(valid_OrgUnits$country_name), "Caribbean Region", "Central America and Brazil")
 
   # Collect parameters
   datapack_name <- datapack_name %missing% NULL
@@ -429,7 +429,7 @@ checkDataPackName <- function(datapack_name, country_uids) {
     } else if (all(country_uids %in% central_america)) {
       expected_dpname <- "Central America and Brazil"
     } else {
-      expected_dpname <- valid_PSNUs %>%
+      expected_dpname <- valid_OrgUnits %>%
         dplyr::filter(country_uid %in% country_uids) %>%
         dplyr::pull(country_name) %>%
         unique() %>%

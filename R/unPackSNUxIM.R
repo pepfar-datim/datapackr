@@ -659,8 +659,9 @@ unPackSNUxIM <- function(d) {
 
   #Test for invalid PSNUs
 
-  possible_psnus <- datapackr::valid_PSNUs %>%
+  possible_psnus <- datapackr::valid_OrgUnits %>%
     dplyr::filter(country_uid %in% d$info$country_uids) %>%
+    dplyr::select(psnu_uid = uid) %>%
     dplyr::pull(psnu_uid)
 
   d$tests$invalid_psnus <- d$data$SNUxIM %>%

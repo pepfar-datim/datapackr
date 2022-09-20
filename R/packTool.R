@@ -62,13 +62,13 @@ packTool <- function(model_data_path = NULL,
   d$info$has_error <- FALSE
 
   # Get PSNU List####
-  d$data$PSNUs <- datapackr::valid_PSNUs %>%
+  d$data$PSNUs <- datapackr::valid_OrgUnits %>%
     dplyr::filter(country_uid %in% country_uids) %>%
-    add_dp_psnu(.) %>%
-    dplyr::arrange(dp_psnu) %>%
+    add_dp_label(.) %>%
+    dplyr::arrange(dp_label) %>%
     ## Remove DSNUs
-    dplyr::filter(!is.na(psnu_type)) %>%
-    dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)
+    dplyr::filter(!is.na(org_type)) %>%
+    dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
 
   # TODO: Separate PSNUs as parameter for this function, allowing you to include
   # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
