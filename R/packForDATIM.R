@@ -12,10 +12,10 @@
 #' @return d object
 packForDATIM <- function(d, type = NULL) {
 
-  # Call DATIM map once for cop year to pass to functions
+  # Call DATIM map ----
   datim_map <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
 
-  # Check params
+  # Check params ----
   approved_types <- c("PSNUxIM", "SUBNAT_IMPATT",
                       "OPU PSNUxIM", "Undistributed MER")
 
@@ -25,7 +25,7 @@ packForDATIM <- function(d, type = NULL) {
     stop("Specify type: 'PSNUxIM', 'SUBNAT_IMPATT', 'OPU PSNUxIM', 'Undistributed MER'")
   }
 
-  # Pick correct dataset
+  # Pick correct dataset ----
   data <- switch(type,
                  PSNUxIM = d$data$SNUxIM,
                  SUBNAT_IMPATT = d$data$SUBNAT_IMPATT,
@@ -44,11 +44,11 @@ packForDATIM <- function(d, type = NULL) {
         ". However, this appears to be missing."))
   }
 
-  # Munge
+  # Munge ----
   expected_col_names <- c("PSNU", "indicator_code", "Age", "Sex", "KeyPop",
                           "psnuid", "mech_code", "support_type", "value")
 
-  if (type == "PSNUxIM") {
+  if (type == "PSNUxIM") { ## PSNUxIM ----
     # Combine PSNUxIM distributed data with undistributed AGYW_PREV
     agyw_data <- d$data$MER %>%
       dplyr::filter(stringr::str_detect(indicator_code, "^AGYW_PREV")) %>%
@@ -61,7 +61,7 @@ packForDATIM <- function(d, type = NULL) {
       dplyr::bind_rows(agyw_data)
   }
 
-  if (type == "Undistributed MER") {
+  if (type == "Undistributed MER") { ## Undistributed MER ----
     data %<>%
       dplyr::mutate(
         support_type = dplyr::case_when(
@@ -70,7 +70,7 @@ packForDATIM <- function(d, type = NULL) {
         mech_code = default_catOptCombo())
   }
 
-  if (type == "SUBNAT_IMPATT") {
+  if (type == "SUBNAT_IMPATT") { ## SUBNAT_IMPATT ----
     data %<>%
       dplyr::mutate(
         mech_code = default_catOptCombo(),
@@ -83,34 +83,34 @@ packForDATIM <- function(d, type = NULL) {
     dplyr::select(expected_col_names)
 
   data %<>%
-  # Map to dataElement & categoryOptionCombo
+  # Map to dataElement & categoryOptionCombo ----
     dplyr::left_join(datim_map,
                      by = c("indicator_code" = "indicator_code",
                             "Age" = "valid_ages.name",
                             "Sex" = "valid_sexes.name",
                             "KeyPop" = "valid_kps.name",
                             "support_type" = "support_type")) %>%
-  # Round value as needed
+  # Round value as needed ----
     dplyr::mutate(
       value =
         dplyr::case_when(
           value_type == "integer" ~ datapackr::round_trunc(value),
           TRUE ~ value)) %>%
-  # Form into DATIM import file
+  # Form into DATIM import file ----
     dplyr::select(dataElement = dataelementuid,
                   period,
                   orgUnit = psnuid,
                   categoryOptionCombo = categoryoptioncombouid,
                   attributeOptionCombo = mech_code,
                   value) %>%
-  # Aggregate across 50+ age bands
+  # Aggregate across 50+ age bands ----
     dplyr::group_by(dplyr::across(c(-value))) %>%
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup() %>%
-  # Drop any rows with NA in any col to prevent breakage in iHub
+  # Drop any rows with NA in any col to prevent breakage in iHub ----
     tidyr::drop_na()
 
-  # TEST: Blank Rows; Error
+  # TEST: Blank Rows; Error ----
   # blank_rows <- data %>%
   #   dplyr::filter_all(dplyr::any_vars(is.na(.)))
   #
@@ -124,7 +124,7 @@ packForDATIM <- function(d, type = NULL) {
   #   d$info$has_error <- TRUE
   # }
 
-  # Assign
+  # Prioritizations ----
   if (type == "SUBNAT_IMPATT") {
     d$datim$prioritizations <- data %>%
       dplyr::filter(
