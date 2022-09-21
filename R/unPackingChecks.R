@@ -747,12 +747,16 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
   invalid_orgunits <- d$sheets[sheets] %>%
     dplyr::bind_rows(.id = "sheet_name") %>%
     dplyr::select(sheet_name, PSNU) %>%
+    # blank sheets are automatically read as 1 row tibbles
+    # so we assume any sheet with one row is a default NA row
+    dplyr::add_count(sheet_name, name = "raw_sheet_row_count") %>%
+    dplyr::filter(raw_sheet_row_count > 1) %>%
     dplyr::distinct() %>%
     #dplyr::mutate(psnuid = extract_uid(PSNU)) %>%
     dplyr::mutate(psnuid = purrr::pmap_chr(list(PSNU), extract_uid)) %>%
     dplyr::anti_join(valid_PSNUs, by = c("psnuid" = "psnu_uid"))
 
-  na_orgunits <- invalid_orgunits[is.na(invalid_orgunits$PSNU), ]
+    na_orgunits <- invalid_orgunits[is.na(invalid_orgunits$PSNU), ]
 
   if (NROW(invalid_orgunits) > 0 || NROW(na_orgunits) > 0) {
 
