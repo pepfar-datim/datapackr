@@ -615,9 +615,14 @@ NULL
 #' @export
 #' @rdname extract_uid
 #'
-extract_uid <- function(string) {
-  #stringr::str_extract(string, "[[:alpha:]][[:alnum:]]{10}")
-  gsub("\\[|]", "", tail(stringr::str_extract_all(string, "\\[(.*?)\\]")[[1]], 1))
+extract_uid <- function(string, bracketed = TRUE) {
+
+  pattern <- ifelse(bracketed,
+                    "(?<=\\[)[[:alpha:]][[:alnum:]]{10}(?=\\]$)",
+                    "[[:alpha:]][[:alnum:]]{10}")
+
+  stringr::str_extract(string, pattern)
+
 }
 
 #' @export

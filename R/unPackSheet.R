@@ -57,8 +57,8 @@ unPackDataPackSheet <- function(d,
         tibble::add_column(sheet_name = y)) %>% # Tag sheet name ----
   # Add cols to allow compiling with other sheets ----
     addcols(c("KeyPop", "Age", "Sex")) %>%
-    #dplyr::mutate(psnuid = extract_uid(PSNU)) %>% # Extract PSNU uid ----
-    dplyr::mutate(psnuid = purrr::pmap_chr(list(PSNU), extract_uid)) %>% # Extract PSNU uid ----
+    dplyr::mutate(psnuid = extract_uid(PSNU)) %>% # Extract PSNU uid ----
+    #dplyr::mutate(psnuid = purrr::pmap_chr(list(PSNU), extract_uid)) %>% # Extract PSNU uid ----
     dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value) %>%
     tidyr::drop_na(value)
 

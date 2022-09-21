@@ -88,6 +88,9 @@ readSheet <- function(d,
       progress = progress,
       .name_repair = .name_repair)
 
+  # kill excess rows where all data is NULL, base R for speed
+  data <- data[rowSums(is.na(data)) != ncol(data),]
+
   data
 
 }

@@ -744,16 +744,12 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
             lvl = NULL,
             has_error = FALSE)
 
-  invalid_orgunits <- d$sheets[sheets] %>%
+  invalid_orgunits <<- d$sheets[sheets] %>%
     dplyr::bind_rows(.id = "sheet_name") %>%
+    filter(if_any(c("SNU1", "PSNU", "Age", "Sex"), ~!is.na(.))) %>%
     dplyr::select(sheet_name, PSNU) %>%
-    # blank sheets are automatically read as 1 row tibbles
-    # so we assume any sheet with one row is a default NA row
-    dplyr::add_count(sheet_name, name = "raw_sheet_row_count") %>%
-    dplyr::filter(raw_sheet_row_count > 1) %>%
     dplyr::distinct() %>%
-    #dplyr::mutate(psnuid = extract_uid(PSNU)) %>%
-    dplyr::mutate(psnuid = purrr::pmap_chr(list(PSNU), extract_uid)) %>%
+    dplyr::mutate(psnuid = extract_uid(PSNU)) %>%
     dplyr::anti_join(valid_PSNUs, by = c("psnuid" = "psnu_uid"))
 
     na_orgunits <- invalid_orgunits[is.na(invalid_orgunits$PSNU), ]
@@ -811,7 +807,7 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = TRUE) {
   data <- d$sheets[["Prioritization"]][, c("PSNU", "IMPATT.PRIORITY_SNU.T")]
   names(data)[names(data) == "IMPATT.PRIORITY_SNU.T"] <- "value"
   data <- data[, c("PSNU", "value")]
-  data$psnuid <- purrr::pmap_chr(list(data$PSNU), extract_uid) #extract_uid(data$PSNU)
+  data$psnuid <- extract_uid(data$PSNU)
   data <- data[data$psnuid %in% valid_PSNUs$psnu_uid, ]
   data <- data[!data$psnuid %in% valid_PSNUs$psnu_uid[valid_PSNUs$psnu_type == "Military"], ]
   invalid_prioritizations <- data[!data$value %in% prioritization_dict()$value, ]
