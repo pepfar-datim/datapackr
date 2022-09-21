@@ -744,7 +744,7 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
             lvl = NULL,
             has_error = FALSE)
 
-  invalid_orgunits <<- d$sheets[sheets] %>%
+  invalid_orgunits <- d$sheets[sheets] %>%
     dplyr::bind_rows(.id = "sheet_name") %>%
     dplyr::filter(dplyr::if_any(c("SNU1", "PSNU", "Age", "Sex"), ~!is.na(.))) %>%
     dplyr::select(sheet_name, PSNU) %>%
