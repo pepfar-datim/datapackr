@@ -92,7 +92,7 @@ readSheet <- function(d,
   data <- data[rowSums(is.na(data)) != ncol(data), ]
   # kill empty column names
   keep.cols <- names(data) %in% c("")
-  data <- data[, !keep.cols ]
+  data <- data[, !keep.cols]
 
   data
 
