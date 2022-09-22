@@ -752,7 +752,7 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
     dplyr::mutate(psnuid = extract_uid(PSNU)) %>%
     dplyr::anti_join(valid_PSNUs, by = c("psnuid" = "psnu_uid"))
 
-    na_orgunits <- invalid_orgunits[is.na(invalid_orgunits$PSNU), ]
+  na_orgunits <- invalid_orgunits[is.na(invalid_orgunits$PSNU), ]
 
   if (NROW(invalid_orgunits) > 0 || NROW(na_orgunits) > 0) {
 
