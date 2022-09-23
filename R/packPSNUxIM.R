@@ -9,10 +9,10 @@
 #'
 #' @return r Sidecar object containing both an openxlsx Workbook and alert messages
 #'
-packPSNUxIM <- function(wb, # Workbook object
+packPSNUxIM <- function(wb,
                         data,
                         snuxim_model_data,
-                        cop_year = NULL, # Cop year based on the file
+                        cop_year = NULL,
                         tool = "OPU Data Pack",
                         schema = NULL,
                         d2_session = dynGet("d2_default_session",
@@ -67,7 +67,6 @@ packPSNUxIM <- function(wb, # Workbook object
                                  # Final data in the new, more complete format?
                                  filter_rename_output = FALSE,
                                  d2_session = d2_session) %>%
-    # Select columns wanted and rename where necessary
     dplyr::select(indicator_code, psnu_uid = orgUnit, mechanism_code,
                   type = support_type,
                   age_option_name = Age, age_option_uid = valid_ages.id,
@@ -75,30 +74,26 @@ packPSNUxIM <- function(wb, # Workbook object
                   kp_option_name = KeyPop, kp_option_uid = valid_kps.id,
                   value) %>%
     dplyr::group_by(dplyr::across(c(-mechanism_code, -type, -value))) %>%
-    dplyr::mutate(
-      percent = value / sum(value) #Creates percent column
-    ) %>%
-    dplyr::ungroup() %>% #Opposite of group_by. Ungroups the data
+    dplyr::mutate(value = as.numeric(value),
+                  percent = value / sum(value)) %>%
+    dplyr::ungroup() %>%
     dplyr::arrange(indicator_code, psnu_uid, age_option_name, sex_option_name,
-                   kp_option_name, mechanism_code, type) #Put columns in desired order
+                   kp_option_name, mechanism_code, type)
 
   ## Drop data that can't be allocated across mech & DSD/TA ####
-  # Prints during execution to inform the user.
   interactive_print("Getting data about your Mechanism Allocations from DATIM...")
 
   snuxim_model_data %<>%
-    dplyr::filter(stringr::str_detect(mechanism_code, "\\d{4,}"), # Regex digits
-                  stringr::str_detect(type, "DSD|TA")) #Regex for DSDITA
+    dplyr::filter(stringr::str_detect(mechanism_code, "\\d{4,}"),
+                  stringr::str_detect(type, "DSD|TA"))
 
   ## Pivot mechs/type wider ####
   snuxim_model_data %<>%
-    #Merges the 2 columns into 1 named mechcode_supporttype
     tidyr::unite(col = mechcode_supporttype, mechanism_code, type) %>%
     dplyr::select(psnu_uid, indicator_code, Age = age_option_name,
                   Sex = sex_option_name, KeyPop = kp_option_name,
-                  mechcode_supporttype, percent, value) %>% #Only keeps these columns
+                  mechcode_supporttype, percent, value) %>%
     dplyr::mutate(
-      #converts certain mech codes.
       mechcode_supporttype = dplyr::case_when(
         mechcode_supporttype == "00000_DSD" ~ "DSD Dedupe",
         mechcode_supporttype == "00000_TA" ~ "TA Dedupe",
@@ -108,27 +103,26 @@ packPSNUxIM <- function(wb, # Workbook object
     )
 
   percents <- snuxim_model_data %>%
-    dplyr::select(-value) %>% # Drops value column
-    tidyr::pivot_wider(names_from = mechcode_supporttype, # pivots data to be wide with more columns
+    dplyr::select(-value) %>%
+    tidyr::pivot_wider(names_from = mechcode_supporttype,
                        values_from = percent)
 
   values <- snuxim_model_data %>%
-    dplyr::select(-percent, -mechcode_supporttype) %>% # Drops these columns
+    dplyr::select(-percent, -mechcode_supporttype) %>%
     dplyr::group_by(dplyr::across(c(-value))) %>%
-    dplyr::summarise(value = sum(value)) %>% # Summarize based upon values
+    dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup()
 
   # Throws a warning to the user if the number rows do not match after munging.
   stopifnot("Aggregating values and percents led to different row counts!" = NROW(percents) == NROW(values))
 
-  snuxim_model_data <- values %>% # Joins percents to values
+  snuxim_model_data <- values %>%
     dplyr::left_join(percents,
                      by = c("psnu_uid", "indicator_code", "Age", "Sex", "KeyPop"))
 
   ## Align EID age bands with Data Pack ####
   snuxim_model_data %<>%
     dplyr::mutate(
-      # If age contains the below values place NA.
       Age = dplyr::if_else(
         indicator_code %in% c("PMTCT_EID.N.2.T", "PMTCT_EID.N.12.T"),
         NA_character_,
@@ -138,7 +132,7 @@ packPSNUxIM <- function(wb, # Workbook object
 
   ## Check Dedupe cols ####
   # Double check that Dedupe cols all exist as expected
-  snuxim_model_data %<>% # Adds the below columns to snuxim_model_data
+  snuxim_model_data %<>%
     datapackr::addcols(cnames = c("DSD Dedupe",
                                   "TA Dedupe",
                                   "Crosswalk Dedupe"),
@@ -186,6 +180,7 @@ packPSNUxIM <- function(wb, # Workbook object
   # Prints for user to see what is occurring
   interactive_print("Studying your deduplication patterns...")
 
+  # TODO: This step takes a lot of time. Find a way to speed up...
   snuxim_model_data %<>%
     dplyr::rowwise() %>%
     dplyr::mutate(ta_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_TA")))), # nolint
@@ -249,6 +244,7 @@ packPSNUxIM <- function(wb, # Workbook object
                "Sex" = "Sex",
                "KeyPop" = "KeyPop"))
   } else {
+    # TODO: If snuxim_model_data is empty, just skip all the above and add cols here??
     snuxim_model_data <- data %>%
       datapackr::addcols(cnames = c("Custom DSD Dedupe Allocation (% of DataPackTarget)",
                                     "Custom TA Dedupe Allocation (% of DataPackTarget)",
@@ -260,12 +256,14 @@ packPSNUxIM <- function(wb, # Workbook object
                          type = "character")
   }
 
+  # DP-765: Dedupes present till here
+
   # TODO: Filter to see if we're trying to write data that's already there
   # TODO: Check whether we need to proceed at all, based on whether `data` is duplicated in PSNUxIM tab already
   # TODO: Then move all these checks up to avoid wasting time processing snuxim_model_data
 
   # Document existing state of PSNUxIM tab ####
-  header_row <- headerRow(tool = tool, cop_year = cop_year) # Found in packageSetup.R
+  header_row <- headerRow(tool = tool, cop_year = cop_year)
   header_cols <- schema %>%
     dplyr::filter(sheet_name == "PSNUxIM"
                   & col_type == "row_header") %>%
@@ -388,8 +386,8 @@ packPSNUxIM <- function(wb, # Workbook object
   ## #We could use map, but I don't think a performance boost will be realized?
 
   data_structure %<>%
-    dplyr::arrange(col) %>% # Arrange rows based upon col values
-    dplyr::mutate(# Sets column names based upon col.im.percents values
+    dplyr::arrange(col) %>%
+    dplyr::mutate(
       column_names = dplyr::case_when(
         col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_", col),
         col >= col.im.targets[1] & col <= (col.im.targets[1] + count.im.datim - 1) ~ paste0("target_col_", col),
@@ -400,7 +398,8 @@ packPSNUxIM <- function(wb, # Workbook object
     tibble::column_to_rownames(var = "column_names") %>%
     dplyr::select(formula) %>%
     t() %>%
-    tibble::as_tibble() %>% # make tibble
+    tibble::as_tibble() %>%
+
     ## Setup formulas
     dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
     dplyr::mutate(
@@ -424,8 +423,12 @@ packPSNUxIM <- function(wb, # Workbook object
   # Combine schema with SNU x IM model dataset ####
   # TODO: Fix this to not re-add mechanisms removed by the Country Team
   # (filter snuxim_model_data to only columns with not all NA related to data in missing combos)
+  #DP-765: This swapColumns is causing dedupes to not be moved from snuxim_model_data
+  # This seems to be because of mismatches in column names:
+  # In snuxim_model_data (correct): "Custom DSD Dedupe Allocation (% of DataPackTarget)"
+  # In data_structure (incorrect): "Custom DSD Dedupe Allocation  (% of DataPackTarget)"
+  # Note the errant space. This is due to issues in the schema.
   data_structure <- datapackr::swapColumns(data_structure, snuxim_model_data) %>%
-    # swapColumns found in utilities.R
     dplyr::bind_cols(
       snuxim_model_data %>%
         # Regex matches string that start with 4 digits. Note this can mean
@@ -460,6 +463,8 @@ packPSNUxIM <- function(wb, # Workbook object
       # 1 will be matched and 111, but 1111 will be considered two matches.
       -tidyselect::matches("percent_col_\\d{1,3}") # nolint
     )
+
+  # DP-765 dedupes missing here
 
   # Write data to sheet ####
   interactive_print("Writing your new PSNUxIM data to your Data Pack...")
@@ -522,6 +527,7 @@ packPSNUxIM <- function(wb, # Workbook object
   ## Add green highlights to appended rows, if any
     newRowStyle <- openxlsx::createStyle(fontColour = "#006100", fgFill = "#C6EFCE")
 
+    #TODO: Adding styles takes a very very long time. Any way to build this into the template itself??
     openxlsx::addStyle(
       wb = r$wb,
       sheet = "PSNUxIM",
@@ -545,6 +551,7 @@ packPSNUxIM <- function(wb, # Workbook object
 
   percentStyle <- openxlsx::createStyle(numFmt = "0%")
 
+  #TODO: Adding styles takes a very very long time. Any way to build this into the template itself??
   openxlsx::addStyle(wb = r$wb,
                      sheet = "PSNUxIM",
                      style = percentStyle,
@@ -561,6 +568,7 @@ packPSNUxIM <- function(wb, # Workbook object
                   value_type == "integer") %>%
     dplyr::pull(col)
 
+  #TODO: Adding styles takes a very very long time. Any way to build this into the template itself??
   openxlsx::addStyle(
     wb = r$wb,
     sheet = "PSNUxIM",
@@ -608,8 +616,8 @@ packPSNUxIM <- function(wb, # Workbook object
                       xy = c(1, 2),
                       colNames = FALSE)
 
-  #Make the PSNUxIM visible
   openxlsx::sheetVisibility(r$wb)[which(openxlsx::sheets(r$wb) == "PSNUxIM")] <- TRUE
+
   # Package Version ####
   openxlsx::writeData(r$wb,
                       sheet = "PSNUxIM",
