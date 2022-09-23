@@ -10,7 +10,7 @@ datapack_template_filepath <- system.file("extdata",
                                           package = "datapackr",
                                           mustWork = TRUE)
 cop21OPU_data_pack_schema <-
-  unPackSchema_datapack(
+  unPackSchema(
     template_path = datapack_template_filepath,
     skip = skip_tabs(tool = "OPU Data Pack Template", cop_year = 2021),
     tool = "OPU Data Pack Template",
@@ -18,15 +18,15 @@ cop21OPU_data_pack_schema <-
 
 # comparison <- diffdf::diffdf(base = datapackr::cop21_data_pack_schema,
 #                              compare = cop21_data_pack_schema)
-# 
-# 
-# 
+#
+#
+#
 # comparison <- compareDF::compare_df(df_new = cop21_data_pack_schema,
 #                                     df_old = datapackr::cop21_data_pack_schema,
 #                                     group_col = c("sheet_num", "sheet_name", "col"))
-# 
+#
 # comparison_df <- comparison$comparison_df
-# 
+#
 # View(comparison_df)
 
 waldo::compare(cop21OPU_data_pack_schema, datapackr::cop21OPU_data_pack_schema)

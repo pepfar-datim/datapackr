@@ -45,7 +45,7 @@ packPSNUxIM <- function(wb, # Workbook object
   # TODO: Consider replacing this with something more straightforward like:
   # all(is.na(snuxim_model_data))
 
-  if (NROW(empty_snuxim_model_data) == 0 | is.null(snuxim_model_data)) {
+  if (NROW(empty_snuxim_model_data) == 0 || is.null(snuxim_model_data)) {
     interactive_warning(paste0("Provided SNUxIM model data seems empty or ",
       "fatally flawed. Please provide acceptable model data."))
     snuxim_model_data <- NULL
@@ -159,10 +159,10 @@ packPSNUxIM <- function(wb, # Workbook object
     dplyr::mutate(
       `Deduplicated DSD Rollup` =
         rowSums(dplyr::select(., tidyselect::all_of(c("DSD Duplicated Rollup", "DSD Dedupe"))),
-                na.rm = T),
+                na.rm = TRUE),
       `Deduplicated TA Rollup` =
         rowSums(dplyr::select(., tidyselect::all_of(c("TA Duplicated Rollup", "TA Dedupe"))),
-                na.rm = T)) %>%
+                na.rm = TRUE)) %>%
       dplyr::mutate(
         `Total Deduplicated Rollup` =
           rowSums(
@@ -180,7 +180,7 @@ packPSNUxIM <- function(wb, # Workbook object
     datapackr::rowMax(cn = "Max_DSD.T_1", regex = "\\d{4,}_DSD") %>% # nolint
     dplyr::mutate(
       `Max_Crosswalk.T_1` =
-        pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = T))
+        pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = TRUE))
 
   # Create Dedupe Resolution columns. ####
   # Prints for user to see what is occurring
@@ -471,7 +471,7 @@ packPSNUxIM <- function(wb, # Workbook object
                       sheet = "PSNUxIM",
                       x = right_side,
                       xy = c(col.im.percents[2] + 1, first_blank_row),
-                      colNames = F, rowNames = F, withFilter = FALSE)
+                      colNames = FALSE, rowNames = FALSE, withFilter = FALSE)
 
   # Document new and existing mech cols ####
   existing_im_cols <-
@@ -494,7 +494,7 @@ packPSNUxIM <- function(wb, # Workbook object
                         sheet = "PSNUxIM",
                         x = left_side,
                         xy = c(1, first_blank_row - 1),
-                        colNames = T, rowNames = F, withFilter = FALSE)
+                        colNames = TRUE, rowNames = FALSE, withFilter = FALSE)
 
   } else {
     left_side %<>%
@@ -507,7 +507,7 @@ packPSNUxIM <- function(wb, # Workbook object
                         sheet = "PSNUxIM",
                         x = left_side,
                         xy = c(1, first_blank_row),
-                        colNames = F, rowNames = F, withFilter = FALSE)
+                        colNames = FALSE, rowNames = FALSE, withFilter = FALSE)
 
   ## Add additional col_names if any ----
     if (length(new_mech_cols) > 0) {
@@ -516,7 +516,7 @@ packPSNUxIM <- function(wb, # Workbook object
                           x = new_mech_cols %>% as.matrix() %>% t(),
                           xy = c(col.im.percents[1] + length(existing_im_cols) + 1,
                                  header_row),
-                          colNames = F, rowNames = F, withFilter = FALSE)
+                          colNames = FALSE, rowNames = FALSE, withFilter = FALSE)
     }
 
   ## Add green highlights to appended rows, if any
@@ -606,7 +606,7 @@ packPSNUxIM <- function(wb, # Workbook object
                       sheet = "PSNUxIM",
                       x = paste("Last Updated on:", Sys.time()),
                       xy = c(1, 2),
-                      colNames = F)
+                      colNames = FALSE)
 
   #Make the PSNUxIM visible
   openxlsx::sheetVisibility(r$wb)[which(openxlsx::sheets(r$wb) == "PSNUxIM")] <- TRUE
@@ -616,7 +616,7 @@ packPSNUxIM <- function(wb, # Workbook object
                       x = paste("Package version:",
                                 as.character(utils::packageVersion("datapackr"))),
                       xy = c(2, 2),
-                      colNames = F)
+                      colNames = FALSE)
 
 
 

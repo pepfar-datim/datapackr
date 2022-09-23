@@ -55,16 +55,16 @@ getMechanismView <- function(country_uids = NULL,
     max_cache_age <- d2_session$max_cache_age
   }
 
-  if (file.exists(cached_mechs_path) & can_read_file) {
+  if (file.exists(cached_mechs_path) && can_read_file) {
     is_lt <- function(x, y)  x < y
     cache_age_dur <- lubridate::as.duration(lubridate::interval(file.info(cached_mechs_path)$mtime, Sys.time()))
     max_cache_age_dur <- lubridate::duration(max_cache_age)
     is_fresh <- is_lt(cache_age_dur, max_cache_age_dur)
-  } else{
+  } else {
     is_fresh <- FALSE
   }
 
-  if (is_fresh & can_read_file) {
+  if (is_fresh && can_read_file) {
     interactive_print("Loading cached mechs file")
     mechs <- readRDS(cached_mechs_path)
   }
