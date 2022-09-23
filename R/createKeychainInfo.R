@@ -26,6 +26,7 @@ createKeychainInfo <- function(submission_path = NULL,
       cop_year = cop_year)
   )
 
+  # source_user ----
   # Pulls username if `d2_session` object provided
   d$info$source_user <- switch(!is.null(d2_session),
                                d2_session$me$userCredentials$username,
@@ -141,7 +142,7 @@ createKeychainInfo <- function(submission_path = NULL,
   #   warning("The sheets included in your submitted file don't seem to match the file type specified.")
   # }
 
-  # Generate sane_name for tool
+  # Generate sane_name for tool ----
   d$info$sane_name <- getSaneName(d$info$datapack_name)
 
   ## Determine additional Organisation Unit information and save

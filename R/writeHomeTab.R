@@ -33,6 +33,8 @@ writeHomeTab <- function(wb = NULL,
     assign(p, purrr::pluck(params, p))
   }
 
+  rm(params, p)
+
   # Add Tab ####
   if (!any(stringr::str_detect(names(wb), "Home"))) {
     openxlsx::addWorksheet(wb,
