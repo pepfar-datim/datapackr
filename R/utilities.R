@@ -361,7 +361,13 @@ createDataPack <- function(datapack_name = NULL,
                            country_uids,
                            template_path = NULL,
                            cop_year = NULL,
-                           tool = NULL) {
+                           tool = NULL,
+                           d2_session = dynGet("d2_default_session",
+                                               inherits = TRUE)) {
+
+  if (tool %in% c("Data Pack Template", "OPU Data Pack Template")) {
+    tool <- stringr::str_remove(tool, " Template$")
+  }
 
   # Check & assign params
   params <- check_params(
@@ -376,6 +382,8 @@ createDataPack <- function(datapack_name = NULL,
     assign(p, purrr::pluck(params, p))
   }
 
+  rm(params, p)
+
   wb <- openxlsx::loadWorkbook(template_path)
 
   options("openxlsx.numFmt" = "#,##0")
@@ -387,21 +395,23 @@ createDataPack <- function(datapack_name = NULL,
                     cop_year = cop_year,
                     tool = tool)
 
+  wb_copy <- paste0(tempfile(), ".xlsx")
+  openxlsx::saveWorkbook(wb = wb, file = wb_copy, overwrite = TRUE)
+
   # Create DP object
-  d <- list(
-    keychain = list(
-      template_path = template_path),
-    info = list(
-      tool = tool,
-      country_uids = country_uids,
-      cop_year = cop_year,
-      datapack_name = datapack_name,
-      schema = schema,
-      sane_name = getSaneName(datapack_name),
-      operating_unit = getOUFromCountryUIDs(country_uids)),
-    tool = list(
-      wb = wb)
-    )
+  d <- createKeychainInfo(submission_path = wb_copy,
+                          tool = tool,
+                          country_uids = country_uids,
+                          cop_year = cop_year,
+                          d2_session = d2_session)
+
+  d$tool$wb <- wb
+
+  unlink(wb_copy)
+
+  if (d$info$tool %in% c("Data Pack Template", "OPU Data Pack Template")) {
+    d$info$tool <- stringr::str_remove(d$info$tool, " Template$")
+  }
 
   return(d)
 }
