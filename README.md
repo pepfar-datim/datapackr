@@ -38,4 +38,4 @@ d <- unPackData()
 
 Have a question? Find us on [GitHub](https://github.com/pepfar-datim/datapackr/issues/new) or [DATIM Support](https://datim.zendesk.com) (DATIM users only).
 
-[![CircleCI](https://dl.circleci.com/insights-snapshot/gh/pepfar-datim/datapackr/master/workflow/badge.svg?window=30d)](https://app.circleci.com/insights/github/pepfar-datim/datapackr/workflows/workflow/overview?branch=master&reporting-window=last-30-days&insights-snapshot=true)
+[![CircleCI](https://circleci.com/gh/pepfar-datim/datapackr.svg?style=svg)](https://app.circleci.com/insights/github/pepfar-datim/datapackr/)
