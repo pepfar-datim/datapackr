@@ -13,12 +13,15 @@ datapack_template_filepath <- system.file("extdata",
                                           package = "datapackr",
                                           mustWork = TRUE)
 cop22OPU_data_pack_schema <-
-  unPackSchema_datapack(
+  unPackSchema(
     template_path = datapack_template_filepath,
     skip = skip_tabs(tool = "OPU Data Pack Template", cop_year = 2022),
+    tool = "OPU Data Pack Template",
     cop_year = 2022)
 
-waldo::compare(cop22OPU_data_pack_schema, datapackr::cop22OPU_data_pack_schema)
+waldo::compare(datapackr::cop22OPU_data_pack_schema,
+               cop22OPU_data_pack_schema,
+               max_diffs = Inf)
 
 save(cop22OPU_data_pack_schema,
      file = "./data/cop22OPU_data_pack_schema.rda",
