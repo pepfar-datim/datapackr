@@ -9,7 +9,8 @@
 #'
 #' @return Exports an OPU Data Pack to Excel within \code{output_folder}.
 #'
-packOPUDataPack <- function(d, undistributed_mer_data = NULL,
+packOPUDataPack <- function(d,
+                            undistributed_mer_data = NULL,
                             d2_session = dynGet("d2_default_session",
                                                 inherits = TRUE)) {
 
@@ -29,6 +30,9 @@ packOPUDataPack <- function(d, undistributed_mer_data = NULL,
     }
   }
 
+  # Don't use `else` here so that if d$data$snuxim_model_data still NULL even after
+  # attempting to load from file, we can still pull from DATIM.
+
   # If empty or unprovided, pull model data from DATIM ####
   if (is.null(d$info$snuxim_model_data)) {
     d$data$snuxim_model_data <- getOPUDataFromDATIM(cop_year = d$info$cop_year,
@@ -41,10 +45,11 @@ packOPUDataPack <- function(d, undistributed_mer_data = NULL,
 
   # Prepare totals data for allocation ####
   if (!is.null(undistributed_mer_data)) {
-    d$data$UndistributedMER <- undistributed_mer_data
+    d$datim$UndistributedMER <- undistributed_mer_data
   } else {
-    d$data$UndistributedMER <- d$data$snuxim_model_data %>%
-      dplyr::mutate(attributeOptionCombo = default_catOptCombo()) %>%
+    d$datim$UndistributedMER <- d$data$snuxim_model_data %>%
+      dplyr::mutate(attributeOptionCombo = default_catOptCombo(),
+                    value = as.numeric(value)) %>%
       dplyr::group_by(dplyr::across(c(-value))) %>%
       dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop") %>%
       dplyr::filter(value != 0)
@@ -52,7 +57,7 @@ packOPUDataPack <- function(d, undistributed_mer_data = NULL,
 
   # Write PSNUxIM tab ####
   r <- packPSNUxIM(wb = d$tool$wb,
-                   data = d$data$UndistributedMER,
+                   data = d$datim$UndistributedMER,
                    snuxim_model_data = d$data$snuxim_model_data,
                    cop_year = d$info$cop_year,
                    tool = d$info$tool,
