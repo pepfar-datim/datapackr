@@ -155,7 +155,7 @@ adorn_import_file <- function(psnu_import_file,
              " in analytics dataset."))
 
   } else {
-==== BASE ====
+
     # If psnu_prioritizations are found
     prio_defined <- prioritization_dict() %>% # Dict found in utilities.R
       dplyr::select(value, prioritization = name)
