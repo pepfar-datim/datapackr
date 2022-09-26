@@ -6,7 +6,7 @@ with_mock_api({
     d$info$country_uids <- "cDGPF739ZZr"
     d$info$cop_year <- "2022"
     d$data$analytics <-
-      data.frame(psnu_uid = "uXwFHXCPYgj", prioritization = "2")
+      data.frame(psnu_uid = "uXwFHXCPYgj", prioritization = "Attained")
     d <- prepareMemoMetadata(d, "datapack", d2_session = training)
     expect_true(is.list(d$memo))
     expect_setequal(names(d$memo),
@@ -18,7 +18,7 @@ with_mock_api({
 
     expect_true(is.list(d$memo$datapack$prios))
     expect_setequal(names(d$memo$datapack$prios),
-                    c("orgUnit", "prioritization", "value"))
+                    c("orgUnit", "value"))
     expect_setequal(names(d$memo$partners_agencies),
                     c("Mechanism", "Partner", "Agency"))
 
@@ -65,7 +65,7 @@ with_mock_api({
                      c("prios", "by_psnu", "by_agency", "by_prio", "by_partner"))
 
     expect_setequal(names(d$memo$datapack$prios),
-                    c("orgUnit", "prioritization", "value"))
+                    c("orgUnit",  "value"))
     #By PSNU
     expect_setequal(
       names(d$memo$datapack$by_psnu),
@@ -201,7 +201,7 @@ with_mock_api({
                     c("prios", "by_psnu", "by_agency", "by_prio", "by_partner", "analytics"))
 
     expect_setequal(names(d$memo$datim$prios),
-                    c("orgUnit", "prioritization", "value"))
+                    c("orgUnit", "value"))
     #By PSNU
     expect_setequal(
       names(d$memo$datim$by_psnu),

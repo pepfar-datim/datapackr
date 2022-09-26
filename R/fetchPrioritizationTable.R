@@ -1,3 +1,4 @@
+
 #' @export
 #' @title Fetch Prioritization Table
 #'
@@ -12,7 +13,7 @@ fetchPrioritizationTable <- function(psnus, cop_year,
 
   #We need to split up the requests if there are many PSNUs
   # Explicitly filter Military data which may have an assigned prioritization
-  # level below the PSNU level. This will get aggrevgated in the analytics
+  # level below the PSNU level. This will get aggregated in the analytics
   # call leading to incorrect prioritization levels. All Military data
   # should always be classified as No prioritization anyway and is handled
   # later when left joining to the main data.
@@ -44,23 +45,23 @@ fetchPrioritizationTable <- function(psnus, cop_year,
   prios <- n_groups %>% purrr::map_dfr(function(x) getPriosFromDatim(x))
 
   if (NROW(prios) == 0) {
-    return(data.frame("psnu_uid" = psnus,
-                      "prioritization" = "No Prioritization",
-                      value = 0))
+    return(data.frame("orgUnit" = unique(psnus$psnu_uid),
+                      "value" = 0))
   }
 
+  #Make this compatible with the input to getPrioritizationMap
   prios %>%
     dplyr::select(-Data) %>%
-    dplyr::rename("psnu_uid" = "Organisation unit",
-                  "value" = "Value") %>%
-    dplyr::left_join(datapackr::prioritization_dict(), by = "value") %>%
-    dplyr::select(orgUnit = psnu_uid, "prioritization" = "name") %>%
-    datapackr::imputePrioritizations(., data.frame(orgUnit = psnus$psnu_uid)) %>%
-    dplyr::left_join(datapackr::prioritization_dict(), by = c("prioritization" = "name")) %>%
-    dplyr::select(-Prioritization) %>%
-    dplyr::mutate(prioritization = dplyr::case_when(
-      is.na(prioritization) ~ "No Prioritization",
-      TRUE ~ prioritization
-    ))
+    dplyr::rename(orgUnit = "Organisation unit",
+                          value = "Value")
 
+  # #Helper methods from adorn_import_file
+  # #Produces a full prioritization map consisting of
+  # #a two column tibble. The column id corresponds to the
+  # #organisation unit UID
+  # #which might or might not be a prioritization PSNU.
+  # #The prioritization column is represented as character text .
+  # #like "Attained".
+  # getPriorizationSNU(psnus$psnu_uid) %>%
+  # getPrioritizationMap(., prios)
 }

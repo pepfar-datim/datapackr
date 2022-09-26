@@ -1,13 +1,14 @@
-#' @export
-#' @title imputePrioritizations
 #'
-#' @description Utility function to handle situations where DREAMS PSNUs
-#' do not have an explicitly defined prioritization level. The prioritization
-#' of the parent organisation unit will be used.
-#' @param psnu_import_file DHIS2 import file to convert
-#' @param prio Data frame consisting of orgUnit (as a uid) and prioritization
-#' as a character.
-#' @return prio
+#' @description Certain special PSNUs (like DREAMS) are part of the
+#' target setting process, but may exist at a level in the
+#' organisation unit hierarchy other than the COP Prioritization level.
+#' For organisation units which exist at the prioritization level,
+#' their prioritization should be left as is. For organisation units
+#' which do not exist at the level at which prioritization is set,
+#' the parent prioritization should be used.
+#'
+#'
+#'
 #'
 
   imputePrioritizations <- function(prio, psnu_import_file) {
@@ -59,6 +60,25 @@
     prio
   }
 
+#' @description Utility function to create a map of all PSNUs
+#' and their prioritization level regardless of whether they
+#' are at the  COP Prioritization level or not.
+#' @return A data frame consisting of organisation unit UIDs
+#' and prioritization as text.
+getPrioritizationMap <- function(snus, psnu_prioritizations) {
+
+   snus  %>%
+    dplyr::select(psnu_uid, id) %>%
+    dplyr::left_join(psnu_prioritizations, by = c("psnu_uid" = "orgUnit")) %>%
+    #Remove any invalid prioritization
+    dplyr::mutate(value = ifelse(value %in% prioritization_dict()$value, value, NA_real_)) %>%
+    dplyr::left_join(prioritization_dict() %>%
+                       dplyr::select(value, prioritization = name),
+                     by = c("value")) %>%
+    dplyr::mutate(prioritization = ifelse(is.na(prioritization), "No Prioritization", prioritization)) %>%
+    dplyr::select(id, prioritization)
+
+}
 
 #' @export
 #' @title Convert a 'PSNU-level' DATIM import file into an analytics-friendly
@@ -135,6 +155,10 @@ adorn_import_file <- function(psnu_import_file,
              " in analytics dataset."))
 
   } else {
+==== BASE ====
+    # If psnu_prioritizations are found
+    prio_defined <- prioritization_dict() %>% # Dict found in utilities.R
+      dplyr::select(value, prioritization = name)
 
     psnu_prioritizations %<>%
       dplyr::select(orgUnit, value) %>%
@@ -175,6 +199,8 @@ adorn_import_file <- function(psnu_import_file,
                            TRUE ~ prioritization))
 
   }
+
+  psnu_import_file %<>% dplyr::rename(psnu = name)
 
   # Adorn Mechanisms ####
   mechs <-
