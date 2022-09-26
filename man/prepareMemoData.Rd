@@ -25,7 +25,8 @@ as a column in the output.}
 
 \item{n_cores}{Indicates how many cores should be used.}
 
-\item{d2_session}{DHIS2 Session id}
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
 }
 \value{
 Datapackr d object

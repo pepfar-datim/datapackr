@@ -28,7 +28,8 @@ Default is FALSE.}
 \item{include_MOH}{Logical. If TRUE will include MOH mechanisms. Default is
 FALSE.}
 
-\item{d2_session}{DHIS2 Session id}
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
 
 \item{cached_mechs_path}{Local file path to an RDS file containing
 a cached copy of the mechanisms SQL view.}

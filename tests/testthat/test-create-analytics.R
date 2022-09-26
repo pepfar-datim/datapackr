@@ -24,11 +24,6 @@ with_mock_api({
                  c("keychain", "info", "tests", "sheets", "data", "datim"),
                  ignore.order = TRUE)
 
-    fy22_prioritizations <- getFY22Prioritizations(d)
-    expect_type(fy22_prioritizations, "list")
-    expect_true(NROW(fy22_prioritizations) > 0)
-    expect_named(fy22_prioritizations, c("orgUnit", "value"), ignore.order = TRUE)
-
     d %<>% createAnalytics(d2_session = training)
 
     # "upload_timestamp", removed form below to alleviate duplicates

@@ -25,6 +25,7 @@ datapackr_params(
   d,
   datastreams,
   schema,
+  skip,
   wb,
   PSNUs,
   psnus,
@@ -87,7 +88,8 @@ saved upon export.}
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}
 
-\item{d2_session}{DHIS2 Session id}
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
 
 \item{d}{Datapackr sidecar object}
 
@@ -98,6 +100,8 @@ are returned.}
 
 \item{schema}{Which datapackr schema to use in guiding this function. If left
 \code{NULL} will select the default based on \code{cop_year} and \code{tool}.}
+
+\item{skip}{Character vector of Sheet Names to label for skipping in schema.}
 
 \item{wb}{Openxlsx workbook object.}
 

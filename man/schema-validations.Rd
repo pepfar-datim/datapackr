@@ -8,8 +8,7 @@
 \alias{checkSchema_InvalidDatasets}
 \alias{checkSchema_InvalidColType}
 \alias{checkSchema_InvalidValueType}
-\alias{checkSchema_DSDSyntax}
-\alias{checkSchema_TASyntax}
+\alias{checkSchema_DataElementSyntax}
 \alias{checkSchema_COsSyntax}
 \alias{checkSchema_ValidAges}
 \alias{checkSchema_ValidSexes}
@@ -25,17 +24,15 @@ checkSchema_SheetNums(schema)
 
 checkSchema_SheetNames(schema, filepath_schema)
 
-checkSchema_InvalidDatasets(schema)
+checkSchema_InvalidDatasets(schema, tool, cop_year)
 
-checkSchema_InvalidColType(schema)
+checkSchema_InvalidColType(schema, tool, cop_year)
 
-checkSchema_InvalidValueType(schema)
+checkSchema_InvalidValueType(schema, tool, cop_year)
 
-checkSchema_DSDSyntax(DEs_schema, multi_uid_pattern)
+checkSchema_DataElementSyntax(schema)
 
-checkSchema_TASyntax(DEs_schema, multi_uid_pattern)
-
-checkSchema_COsSyntax(schema, multi_uid_pattern)
+checkSchema_COsSyntax(schema)
 
 checkSchema_ValidAges(schema)
 
@@ -69,6 +66,8 @@ This file MUST NOT have any data validation formats present. If left
 \code{NULL}, will select the default based on \code{cop_year} and \code{tool}.}
 
 \item{season}{Either \code{COP} or \code{OPU}.}
+
+\item{skip}{Character vector of Sheet Names to label for skipping in schema.}
 }
 \value{
 For lower-level functions, a list of instances of failed tests. For the
