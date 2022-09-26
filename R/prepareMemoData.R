@@ -136,13 +136,12 @@ prepareMemoDataByPSNU <- function(analytics,
   #Evaluate the indicators in parallel if possible
   if (can_spawn() && n_cores > 1L) {
     df$indicator_results <-
-      parallel::mclapply(df$data, function(x)
-        evaluateIndicators(x$combi, x$value, inds),
-        mc.cores = n_cores)
+      parallel::mclapply(df$data,
+                         function(x) evaluateIndicators(x$combi, x$value, inds),
+                         mc.cores = n_cores)
   } else {
     df$indicator_results <-
-      lapply(df$data, function(x)
-        evaluateIndicators(x$combi, x$value, inds))
+      lapply(df$data, function(x) evaluateIndicators(x$combi, x$value, inds))
   }
 
 

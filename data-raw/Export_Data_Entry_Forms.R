@@ -5,7 +5,7 @@
 # Point to DATIM login secrets ####
 secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "cop-test.json")
 datimutils::loginToDATIM(secrets)
-entryform_id = "eeZpSGQu8hx"
+entryform_id <- "eeZpSGQu8hx"
 data <- datimutils::getMetadata(end_point = "dataEntryForms",
                                 paste0("id:eq:", entryform_id),
                                 fields = "htmlCode") %>%
@@ -22,11 +22,11 @@ data <- datimutils::getMetadata(end_point = "dataEntryForms",
 # Method without datimutils ####
 # username <- readline("Username: ")
 # password <- getPass::getPass()
-# 
+#
 # base_url <- "https://cop-test.datim.org/"
 # url <- utils::URLencode(URL = paste0(base_url, "api", "/me"))
 # handle <- httr::handle(base_url)
-# 
+#
 # # Logging in here will give us a cookie to reuse
 # r <- httr::GET(
 #   url,
@@ -35,11 +35,11 @@ data <- datimutils::getMetadata(end_point = "dataEntryForms",
 #   httr::timeout(60),
 #   handle = handle
 # )
-# 
+#
 # URL <- paste0(
 #   base_url, "api/dataEntryForms/eeZpSGQu8hx.json?paging=false") %>%
 #   utils::URLencode()
-# 
+#
 # data <- URL %>%
 #   httr::GET(httr::timeout(180),
 #             handle = handle) %>%
@@ -48,4 +48,3 @@ data <- datimutils::getMetadata(end_point = "dataEntryForms",
   # unlist() %>%
   # tibble::tibble(pairs = .) %>%
   # tidyr::separate(pairs, c("dataElement", "categoryOptionCombo"))
-

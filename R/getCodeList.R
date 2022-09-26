@@ -32,10 +32,12 @@ getCodeList <- function(cop_year = NULL,
 
   # Fetch code lists
 
-    purrr::map_dfr(datasets, function(x) datimutils::getSqlView(sql_view_uid = "DotdxKrNZxG",
+    purrr::map_dfr(datasets, function(x) {
+      datimutils::getSqlView(sql_view_uid = "DotdxKrNZxG",
                              variable_keys = "dataSets",
                              variable_values = x,
-                             d2_session = d2_session)) %>%
+                             d2_session = d2_session)
+    }) %>%
     dplyr::select(dataelement,
                   dataelementuid,
                   categoryoptioncombo,

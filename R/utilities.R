@@ -274,7 +274,7 @@ getDatasetUids <-  function(cop_year, type) {
     unlist(use.names = FALSE) %>%
     purrr::discard(~ is.na(.))
 
-  if (is.null(datasets_filtered) | length(datasets_filtered) == 0) {
+  if (is.null(datasets_filtered) || length(datasets_filtered) == 0) {
     stop(paste("No datasets could be found for cop_year", cop_year, "and type(s)", type))
   }
 
@@ -326,7 +326,7 @@ rowMax <- function(df, cn, regex) {
   }
 # Create the new column in the dataframe, and ensure its column type is numeric.
   df[[cn]] <- df_filtered %>%
-    purrr::pmap(pmax, na.rm = T) %>% # Row-wise Calculations.
+    purrr::pmap(pmax, na.rm = TRUE) %>% # Row-wise Calculations.
     as.numeric
 
   return(df)
@@ -615,8 +615,14 @@ NULL
 #' @export
 #' @rdname extract_uid
 #'
-extract_uid <- function(string) {
-  stringr::str_extract(string, "[[:alpha:]][[:alnum:]]{10}")
+extract_uid <- function(string, bracketed = TRUE) {
+
+  pattern <- ifelse(bracketed,
+                    "(?<=\\[)[[:alpha:]][[:alnum:]]{10}(?=\\]$)",
+                    "[[:alpha:]][[:alnum:]]{10}")
+
+  stringr::str_extract(string, pattern)
+
 }
 
 #' @export

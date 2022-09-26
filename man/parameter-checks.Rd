@@ -109,7 +109,7 @@ those with targets)?}
 \item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
 
 \item{snuxim_model_data}{Export from DATIM needed to allocate data across
-mechanisms in the PSNUxIM tab}
+mechanisms in the PSNUxIM tab.}
 
 \item{...}{Additional arguments to pass.}
 }
@@ -153,34 +153,44 @@ definition upfront, and then calculate the default only when this value is
 unsupplied or otherwise left \code{NULL}. The virtue of this approach is that not
 supplying this value at all still supplies \code{NULL} to the  function's internal
 logic without a \code{missing} error. In many cases, we use the following custom
-function to make this simpler and cleaner:\preformatted{`\%||\%` <- function(x, y) if (is.null(x)) y else x
-}
+function to make this simpler and cleaner:
 
-For example:\preformatted{example_function <- function(arg1 = NULL) \{
+\if{html}{\out{<div class="sourceCode">}}\preformatted{`\%||\%` <- function(x, y) if (is.null(x)) y else x
+}\if{html}{\out{</div>}}
+
+For example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{example_function <- function(arg1 = NULL) \{
   arg2 <- arg1 \%||\% 10
   arg2 + 10
 \}
 
 example_function()
 20
-}
+}\if{html}{\out{</div>}}
 
 However, in some cases within this package, \code{NULL} is an equally valid value
 that could be passed to a parameter from a higher-level function. To
 distinguish these from truly missing values, we have in some places left the
 default undefined in the function parameter and employed the following custom
-function:\preformatted{`\%missing\%` <- function(x, y = NULL) rlang::maybe_missing(x, y)
-}
+function:
 
-For example:\preformatted{example_function2 <- function(arg1) \{
+\if{html}{\out{<div class="sourceCode">}}\preformatted{`\%missing\%` <- function(x, y = NULL) rlang::maybe_missing(x, y)
+}\if{html}{\out{</div>}}
+
+For example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{example_function2 <- function(arg1) \{
   arg1 <- arg1 \%missing\% NULL
   arg2 <- arg1 \%||\% 10
   arg2 + 10
 \}
-}
+}\if{html}{\out{</div>}}
 
 This function allows the following to return equivalent values without
-\code{missing} errors:\preformatted{test_arg <- rlang::missing_arg()
+\code{missing} errors:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{test_arg <- rlang::missing_arg()
 test_arg2 <- NULL
 example_function2()
 20
@@ -190,10 +200,12 @@ example_function2(test_arg)
 
 example_function2(test_arg2)
 20
-}
+}\if{html}{\out{</div>}}
 
 Similarly, when nested within a higher-level function, this approach also
-accommodates scenarios where \code{missing} or \code{NULL} values may be meaningful:\preformatted{example_function3 <- function(arg1, arg2) \{
+accommodates scenarios where \code{missing} or \code{NULL} values may be meaningful:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{example_function3 <- function(arg1, arg2) \{
   example_function2(arg1)
 \}
 
@@ -202,7 +214,7 @@ example_function3(arg1 = test_arg, arg2 = 3)
 
 example_function3(arg1 = test_arg2, arg2 = 3)
 20
-}
+}\if{html}{\out{</div>}}
 
 So, within this package, we alternatively use \verb{\%||\%} and \verb{\%missing\%} to
 determine default parameters based on the situation and package usage.
