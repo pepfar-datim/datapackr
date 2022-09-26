@@ -118,7 +118,7 @@ createKeychainInfo <- function(submission_path = NULL,
 
   d$info$country_uids <- d$info$country_uids %||% submitted_country_uids
 
-  if (d$info$country_uids != submitted_country_uids) {
+  if (!setequal(d$info$country_uids, submitted_country_uids)) {
     stop("The file submitted does not seem to match the country_uids you've specified.")
   }
 
