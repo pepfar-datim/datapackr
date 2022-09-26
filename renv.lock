@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.2.0",
+    "Version": "4.2.1",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -327,15 +327,17 @@
     },
     "datimutils": {
       "Package": "datimutils",
-      "Version": "0.4.0",
+      "Version": "0.6.0",
       "Source": "GitHub",
       "RemoteType": "github",
+      "RemoteHost": "api.github.com",
       "RemoteUsername": "pepfar-datim",
       "RemoteRepo": "datimutils",
-      "RemoteRef": "master",
-      "RemoteSha": "0154a3a92ada95d78e8dd61d4f63464ba9e6d57c",
-      "Hash": "28b32368ebe1a01bb4a7160557a2072f",
+      "RemoteRef": "dev",
+      "RemoteSha": "0cebf8d01952fb5f26d5e68026682a3cba1a816c",
+      "Hash": "6a241a2ff52637c21d61d274ad43aebf",
       "Requirements": [
+        "R6",
         "httr",
         "jsonlite",
         "keyring",
@@ -586,22 +588,6 @@
       "Hash": "7c89603d81793f0d5486d91ab1fc6f1d",
       "Requirements": []
     },
-    "fuzzyjoin": {
-      "Package": "fuzzyjoin",
-      "Version": "0.1.6",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "24af5fc67dbeaac6d776a8e6630aacd9",
-      "Requirements": [
-        "dplyr",
-        "geosphere",
-        "purrr",
-        "stringdist",
-        "stringr",
-        "tibble",
-        "tidyr"
-      ]
-    },
     "gargle": {
       "Package": "gargle",
       "Version": "1.2.0",
@@ -638,16 +624,6 @@
       "Repository": "CRAN",
       "Hash": "177475892cf4a55865868527654a7741",
       "Requirements": []
-    },
-    "geosphere": {
-      "Package": "geosphere",
-      "Version": "1.5-14",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "1ce6e028f3d056dad1ea9c3c0a5444bf",
-      "Requirements": [
-        "sp"
-      ]
     },
     "gert": {
       "Package": "gert",
@@ -1430,10 +1406,10 @@
     },
     "roxygen2": {
       "Package": "roxygen2",
-      "Version": "7.2.0",
+      "Version": "7.2.1",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "b390c1d54fcd977cda48588e6172daba",
+      "Hash": "da1f278262e563c835345872f2fef537",
       "Requirements": [
         "R6",
         "brew",
@@ -1553,24 +1529,6 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "07060494360a48fc8a2e282f0dc8f2cf",
-      "Requirements": []
-    },
-    "sp": {
-      "Package": "sp",
-      "Version": "1.4-7",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "c5dad1d43440f0c426a6d29b30b333fa",
-      "Requirements": [
-        "lattice"
-      ]
-    },
-    "stringdist": {
-      "Package": "stringdist",
-      "Version": "0.9.8",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "c8b6c79c3b2d7d8475f3ab35cd99737b",
       "Requirements": []
     },
     "stringi": {

@@ -90,6 +90,7 @@ with_mock_api({
     expect_true(names(d$memo$datapack$by_prio)[[2]] == "Age")
     expect_true(names(d$memo$datapack$by_prio)[[NCOL(d$memo$datapack$by_prio)]] == "Total")
     prio_cols_end <- NCOL(d$memo$datapack$by_prio) - 1
+    print(names(d$memo$datapack$by_prio[3:prio_cols_end]))
     expect_true(all(
       names(d$memo$datapack$by_prio[3:prio_cols_end]) %in% prioritization_dict()$name
     ))
