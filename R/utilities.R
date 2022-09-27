@@ -507,7 +507,7 @@ parse_maybe_number <- function(x, default = NULL) {
 getMaxCores <- function() {
 
   #Should never be called on Windows
- if (.Platform$OS.type != "windows") {
+ if (.Platform$OS.type == "windows") {
    return(1L)
  }
 
@@ -519,7 +519,8 @@ getMaxCores <- function() {
   stopifnot("MAX_CORES environment variable must be a whole integer" != is.integer(n_cores))
 
     if (n_cores > parallel::detectCores()) {
-      n_cores <- parallel::detectCores()
+      #Don't bogart ALL of the cores...
+      n_cores <- parallel::detectCores() -1
       warning("MAX_CORES cannot be greater than available cores. Using available cores only.")
     }
 
