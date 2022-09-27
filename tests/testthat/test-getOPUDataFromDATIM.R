@@ -9,8 +9,11 @@ with_mock_api({
     expect_true(all(is_uidish(opu_data$dataElement)))
     expect_true(all(opu_data$period == "2021Oct"))
     expect_true(all(is_uidish(opu_data$orgUnit)))
+    #Mechanisms are still expressed as codes here
     expect_true(all(stringr::str_detect(opu_data$attributeOptionCombo, "^[0-9]{4,6}")))
-    expect_true(all(is.double(opu_data$value)))
+    #Data is left as characters
+    expect_equal(typeof(opu_data$value), "character")
+    expect_silent(as.numeric(opu_data$value))
 
     })
 })
