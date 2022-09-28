@@ -13,7 +13,11 @@ checkMechanisms <- function(d,
                             d2_session = dynGet("d2_default_session",
                                                 inherits = TRUE)) {
 
-  mechs_data <- unique(d$datim$MER$attributeOptionCombo)
+  mechs_data <- switch(d$info$tool,
+                       "OPU Data Pack"  = unique(d$datim$OPU$attributeOptionCombo),
+                       "Data Pack"  = unique(d$datim$MER$attributeOptionCombo))
+
+  stopifnot("Mechanisms cannot be null." = !is.null(mechs_data) || length(mechs_data) != 0L)
 
   period_info <- datimvalidation::getPeriodFromISO(paste0(d$info$cop_year, "Oct"))
 
