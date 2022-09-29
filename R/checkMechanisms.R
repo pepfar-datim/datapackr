@@ -14,7 +14,7 @@ checkMechanisms <- function(d,
                                                 inherits = TRUE)) {
 
   #Do not refer to d$datim$MER or d$datim$OPU directly.
-  mechs_data <- d$data$analytics$mechanism_code
+  mechs_data <- unique(d$data$analytics$mechanism_code)
 
   stopifnot("Mechanisms cannot be null." = !is.null(mechs_data) || length(mechs_data) != 0L)
 
