@@ -39,7 +39,7 @@ checkMechanisms <- function(d,
     mechs_datim <- append(c("00000", "00001"), mechs_datim)
   }
 
-  bad_mechs <- mechs_data[!(mechs_data %in% mechs_datim)]
+  bad_mechs <- mechs_data[!(mechs_data %in% c(mechs_datim, "default"))]
 
   if (length(bad_mechs) > 0) {
     msg <- paste0("ERROR!: Invalid mechanisms found in the PSNUxIM tab.
