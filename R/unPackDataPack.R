@@ -69,6 +69,9 @@ unPackDataPack <- function(d,
   interactive_print("Creating analytics...")
   d <- createAnalytics(d, d2_session = d2_session)
 
+  # check for invalid mechanisms
+  d <- checkMechanisms(d, d2_session = d2_session)
+
   d <- checkNotPEPFARSupportedPSNUs(d)
 
   return(d)
