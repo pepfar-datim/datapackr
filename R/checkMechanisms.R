@@ -35,7 +35,7 @@ checkMechanisms <- function(d,
   mechs_datim <- append("HllvX50cXC0", mechs_datim)
 
   #Allow for the dedupe mechanisms in COP21/COP22 DataPacks and OPUs
-  if (d$info$tool %in% c("Data Pack","OPU Data Pack") && d$info$cop_year %in% c(2021, 2022)) {
+  if (d$info$tool %in% c("Data Pack", "OPU Data Pack") && d$info$cop_year %in% c(2021, 2022)) {
     mechs_datim <- append(c("00000", "00001"), mechs_datim)
   }
 
