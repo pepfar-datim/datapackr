@@ -32,14 +32,14 @@ checkMechanisms <- function(d,
     dplyr::pull(mechanism_code)
 
   #Allow for the default mechanism
-  mechs_datim <- append("HllvX50cXC0", mechs_datim)
+  mechs_datim <- append("default", mechs_datim)
 
   #Allow for the dedupe mechanisms in COP21/COP22 DataPacks and OPUs
   if (d$info$tool %in% c("Data Pack", "OPU Data Pack") && d$info$cop_year %in% c(2021, 2022)) {
     mechs_datim <- append(c("00000", "00001"), mechs_datim)
   }
 
-  bad_mechs <- mechs_data[!(mechs_data %in% c(mechs_datim, "default"))]
+  bad_mechs <- mechs_data[!(mechs_data %in% mechs_datim)]
 
   if (length(bad_mechs) > 0) {
     msg <- paste0("ERROR!: Invalid mechanisms found in the PSNUxIM tab.
