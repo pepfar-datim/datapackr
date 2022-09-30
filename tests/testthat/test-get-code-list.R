@@ -25,6 +25,7 @@ with_mock_api({
         "name",
         "uid",
         "org_type",
+        "lastUpdated",
         "ancestors",
         "organisationUnitGroups",
         "DREAMS"
