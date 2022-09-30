@@ -26,14 +26,31 @@ getDataPackOrgUnits <- function(country_uids = NULL,
                                 include_DREAMS = TRUE,
                                 additional_fields = NULL,
                                 use_cache = TRUE,
-                                cache_path = paste0(Sys.getenv("support_files_directory"), "datapackorgs.rds"),
+
                                 d2_session = dynGet("d2_default_session",
                                                     inherits = TRUE)) {
+
+  api_filters <-
+    c(paste0("organisationUnitGroups.id:in:[AVy8gJXym2D", # Filter for COP Prioritization SNU
+             ifelse(include_mil, ",nwQbMeALRjL", ""), # Add military SNUs if requested
+             ifelse(include_DREAMS, ",mRRlkbZolDR", ""), # Add DREAMS SNUs if requested
+             "]"))
 
   # Check parameters ####
   if (!is.null(country_uids)) {
     country_uids %<>% check_country_uids(force = FALSE)
+    api_filters %<>% append(paste0("ancestors.id:in:[", paste(country_uids, collapse = ","), "]"))
   }
+
+  fields <-
+    paste0(
+      "id,name,lastUpdated,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]",
+      ifelse(!is.null(additional_fields), paste0(",", additional_fields), ""))
+
+  #Calculate a cache hash
+  cache_hash <- digest::sha1(list(api_filters,fields))
+  cache_path = paste0(Sys.getenv("support_files_directory"), cache_hash,".rds")
+
 
   # Pull Org Units ####
   is_fresh <- cache_is_fresh(cache_path)
@@ -42,20 +59,6 @@ getDataPackOrgUnits <- function(country_uids = NULL,
     interactive_print("Loading cached Data Pack Org Units")
     orgunits <- readRDS(cache_path)
   } else {
-    api_filters <-
-      c(paste0("organisationUnitGroups.id:in:[AVy8gJXym2D", # Filter for COP Prioritization SNU
-               ifelse(include_mil, ",nwQbMeALRjL", ""), # Add military SNUs if requested
-               ifelse(include_DREAMS, ",mRRlkbZolDR", ""), # Add DREAMS SNUs if requested
-               "]"))
-
-    if (!is.null(country_uids)) {
-      api_filters %<>% append(paste0("ancestors.id:in:[", paste(country_uids, collapse = ","), "]"))
-    }
-
-    fields <-
-      paste0(
-        "id,name,lastUpdated,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]",
-         ifelse(!is.null(additional_fields), paste0(",", additional_fields), ""))
 
     orgunits <-
       datimutils::getMetadata(
