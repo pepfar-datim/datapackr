@@ -114,9 +114,7 @@ adorn_import_file <- function(psnu_import_file,
     add_dp_label() %>% #Found in getPSNUs.R
     dplyr::rename(id = uid)
 
-  ancestor_ids <- purrr::map(snus$ancestors,
-                             function(x)
-                               x[["id"]])
+  ancestor_ids <- purrr::map(snus$ancestors, function(x) x[["id"]])
 
   psnu_lvl <-
     purrr::map(

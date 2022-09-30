@@ -48,8 +48,8 @@ getDataPackOrgUnits <- function(country_uids = NULL,
       ifelse(!is.null(additional_fields), paste0(",", additional_fields), ""))
 
   #Calculate a cache hash
-  cache_hash <- digest::sha1(list(api_filters,fields))
-  cache_path = paste0(Sys.getenv("support_files_directory"), cache_hash,".rds")
+  cache_hash <- digest::sha1(list(api_filters, fields))
+  cache_path <- paste0(Sys.getenv("support_files_directory"), cache_hash, ".rds")
 
 
   # Pull Org Units ####
