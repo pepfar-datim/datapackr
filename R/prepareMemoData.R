@@ -193,7 +193,7 @@ prepareMemoDataByPSNU <- function(analytics,
                  TRUE ~ Age)) %>%
     dplyr::select(-id, -numerator, -denominator) %>%
     dplyr::left_join(prio_map,
-                     by = c("psnu_uid" = "id")) %>%
+                     by = c("psnu_uid" = "uid")) %>%
     dplyr::mutate(prioritization = dplyr::case_when(
       is.na(prioritization) ~ "No Prioritization",
       TRUE ~ prioritization)) %>%

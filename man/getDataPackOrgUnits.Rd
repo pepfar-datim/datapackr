@@ -11,7 +11,6 @@ getDataPackOrgUnits(
   include_DREAMS = TRUE,
   additional_fields = NULL,
   use_cache = TRUE,
-  cache_path = paste0(Sys.getenv("support_files_directory"), "datapackorgs.rds"),
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
@@ -32,11 +31,11 @@ API other than those returned by default.}
 of Data Pack Org Units already exists and is not stale. If so, will use this
 cached version to save time.}
 
-\item{cache_path}{Local file path to an RDS file containing a cached copy of
-Data Pack Org Units from DATIM.}
-
 \item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
 authentication with DATIM.}
+
+\item{cache_path}{Local file path to an RDS file containing a cached copy of
+Data Pack Org Units from DATIM.}
 }
 \value{
 Tibble of Data Pack Org Units.
