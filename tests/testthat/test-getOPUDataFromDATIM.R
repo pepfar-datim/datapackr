@@ -12,7 +12,7 @@ with_mock_api({
     #Mechanisms are still expressed as codes here
     expect_true(all(stringr::str_detect(opu_data$attributeOptionCombo, "^[0-9]{4,6}")))
     #Data is left as characters
-    expect_equal(typeof(opu_data$value),"character")
+    expect_equal(typeof(opu_data$value), "character")
     expect_silent(as.numeric(opu_data$value))
 
     })
