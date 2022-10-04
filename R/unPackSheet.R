@@ -69,7 +69,7 @@ unPackDataPackSheet <- function(d,
   if (clean_orgs) {
     data %<>%
       dplyr::filter(
-        psnuid %in% valid_PSNUs$psnu_uid) # Drop if invalid or blank org unit ----
+        psnuid %in% valid_OrgUnits$uid) # Drop if invalid or blank org unit ----
   }
 
   if (clean_disaggs) {

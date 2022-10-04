@@ -267,6 +267,38 @@
 #' }
 "valid_PSNUs"
 
+
+#' @docType data
+#' @title List of valid PSNUs used for generating Data Packs.
+#'
+#' @description List of valid PSNUs used for generating Data Packs. Must be
+#' synced and saved manually!
+#'
+#' @format
+#' \describe{
+#'   \item{ou}{Operating Unit name associated with the Organisation Unit}
+#'   \item{ou_uid}{Operating Unit UID}
+#'   \item{country_name}{Country name associated with the Organisation Unit}
+#'   \item{country_uid}{Country name UID}
+#'   \item{snu1}{Subnational Unit associated with the Organisation Unit}
+#'   \item{snu1_uid}{Subnational Unit UID}
+#'   \item{name}{Priority Sub-National Unit associated with the Organisation
+#'    Unit}
+#'   \item{uid}{Priority Sub-National Unit UID}
+#'   \item{orgtype}{The type of Priority Sub-National Unit}
+#'   \item{lastUpdated}{The last time the Organisation Unit was updated}
+#'   \item{ancestors}{A nested eleven column data frame that contains the
+#'    list of parent organisation units that contain the PSNU,
+#'    including the names, ids, and which organisationUnitGroups that those
+#'    parent organisation units belong to}
+#'   \item{organisationUnitGroups}{A nested two column data frame that
+#'    contains the name and id of the groups the organisation unit is associated
+#'    with. For example "Community" and "PvuaP6YALSA"}
+#'   \item{DREAMS}{Determined, Resilient, Empowered, AIDS-free, Mentored, and
+#'    Safe Partnernship. Binary column "Y" or NA.}
+#' }
+"valid_OrgUnits"
+
 #' @docType data
 #' @title List of valid COP22 PSNUs used for generating Data Packs.
 #'

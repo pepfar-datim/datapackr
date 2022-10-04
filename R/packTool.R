@@ -55,6 +55,22 @@ packTool <- function(model_data_path = NULL,
   d$keychain$model_data_path <- model_data_path
   d$keychain$snuxim_model_data_path <- snuxim_model_data_path
 
+  # Start running log of all warning and information messages ####
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+
+  # Get PSNU List####
+  d$data$PSNUs <- datapackr::valid_OrgUnits %>%
+    dplyr::filter(country_uid %in% country_uids) %>%
+    add_dp_label(.) %>%
+    dplyr::arrange(dp_label) %>%
+    ## Remove DSNUs
+    dplyr::filter(!is.na(org_type)) %>%
+    dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
+
+  # TODO: Separate PSNUs as parameter for this function, allowing you to include
+  # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
+
   # Pack file based on type ####
   if (d$info$tool == "Data Pack") {
     d <- packDataPack(d, d2_session = d2_session)
