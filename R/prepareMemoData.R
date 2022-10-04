@@ -40,13 +40,8 @@ prepareMemoMetadata <- function(d, memo_type,
     d$memo$datapack$prios <- d$data$analytics %>%
       dplyr::select(orgUnit = psnu_uid, prioritization) %>%
       dplyr::distinct() %>%
-      dplyr::left_join(datapackr::prioritization_dict(),
-                       by = c("prioritization" = "name")) %>%
-      dplyr::select(-Prioritization) %>%
-      dplyr::mutate(prioritization = dplyr::case_when(
-        is.na(prioritization) ~ "No Prioritization",
-        TRUE ~ prioritization
-      ))
+      dplyr::inner_join(prioritization_dict(), by = c("prioritization" = "name")) %>%
+      dplyr::select(orgUnit, value)
   }
 
   if (memo_type %in% c("datim", "comparison")) {
@@ -150,6 +145,15 @@ prepareMemoDataByPSNU <- function(analytics,
   }
 
 
+  #Prepare the full list of prioritization PSNUs
+  #These functions are reused from adorn_import_file
+  snus <- getPriorizationSNU(df$psnu_uid)
+  prio_map <- getPrioritizationMap(snus, prios)
+
+  #TODO: Consider to refactor adorn_import_file
+  #To handle this adornment. The logic here is
+  #very similar, but we are dealing with indicators
+  #instead of data elements.
   df %>%
     dplyr::select(-data) %>%
     tidyr::unnest(indicator_results) %>%
@@ -188,8 +192,8 @@ prepareMemoDataByPSNU <- function(analytics,
    dplyr::mutate(Age = dplyr::case_when(Indicator == "PrEP_CT" & Age == "15+" ~ "Total",
                  TRUE ~ Age)) %>%
     dplyr::select(-id, -numerator, -denominator) %>%
-    dplyr::left_join(dplyr::select(prios, orgUnit, prioritization),
-                     by = c("psnu_uid" = "orgUnit")) %>%
+    dplyr::left_join(prio_map,
+                     by = c("psnu_uid" = "id")) %>%
     dplyr::mutate(prioritization = dplyr::case_when(
       is.na(prioritization) ~ "No Prioritization",
       TRUE ~ prioritization)) %>%

@@ -9,7 +9,8 @@ packDataPack(d, d2_session = dynGet("d2_default_session", inherits = TRUE))
 \arguments{
 \item{d}{Datapackr sidecar object}
 
-\item{d2_session}{DHIS2 Session id}
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
 }
 \value{
 Exports a Data Pack to Excel within \code{output_folder}.

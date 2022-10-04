@@ -18,7 +18,8 @@ datapack: Create the memo based on the data in the datapack or OPU datapack
 datim: Create the memo based on data currently in DATIM
 comparison: Create a comparison memo with data from both DATIM and datapack}
 
-\item{d2_session}{DHIS2 Session id}
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
 }
 \value{
 Datapackr d object

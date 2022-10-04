@@ -516,8 +516,8 @@ parse_maybe_number <- function(x, default = NULL) {
 #'
 getMaxCores <- function() {
 
-  #Should never be called on Windows
- if (.Platform$OS.type != "windows") {
+#Should never be called on Windows
+ if (.Platform$OS.type == "windows") {
    return(1L)
  }
 
@@ -625,8 +625,14 @@ NULL
 #' @export
 #' @rdname extract_uid
 #'
-extract_uid <- function(string) {
-  stringr::str_extract(string, "[[:alpha:]][[:alnum:]]{10}")
+extract_uid <- function(string, bracketed = TRUE) {
+
+  pattern <- ifelse(bracketed,
+                    "(?<=\\[)[[:alpha:]][[:alnum:]]{10}(?=\\]$)",
+                    "[[:alpha:]][[:alnum:]]{10}")
+
+  stringr::str_extract(string, pattern)
+
 }
 
 #' @export

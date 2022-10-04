@@ -16,7 +16,8 @@ checkMechanisms(
 \item{cached_mechs_path}{Local file path to an RDS file containing
 a cached copy of the mechanisms SQL view.}
 
-\item{d2_session}{DHIS2 Session id}
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
 }
 \value{
 d

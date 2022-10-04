@@ -10,7 +10,7 @@ with_mock_api({
     d$info$tool <- "Data Pack"
     d$info$messages <- MessageQueue()
     d$tests <- list()
-    d$datim$MER <- data.frame(attributeOptionCombo = c("100000", "10432"))
+    d$data$analytics <- data.frame(mechanism_code = c("100000", "10432"))
     d <- checkMechanisms(d, d2_session = training)
     expect_true(d$info$has_error)
     expect_true(!is.null(d$tests$bad_mechs))

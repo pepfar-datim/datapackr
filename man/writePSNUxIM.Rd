@@ -21,7 +21,8 @@ across mechanisms in the PSNUxIM tab}
 \item{output_folder}{Local folder where you would like your Data Pack to be
 saved upon export.}
 
-\item{d2_session}{DHIS2 Session id}
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
 
 \item{append}{If TRUE append rows to the existing DataPack otherwise,
 output a Missing PSNUxIM targets workbook.}

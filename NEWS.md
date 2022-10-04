@@ -64,6 +64,7 @@
    * `unPackSheets`
    * `prepareMemoData`
    * `createAnalytics`
+* Adds additional explanation to documentation of d2_session parameter.
  
 
 # datapackr 5.2.3

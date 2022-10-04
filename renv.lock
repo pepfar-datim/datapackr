@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.2.0",
+    "Version": "4.2.1",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -327,14 +327,15 @@
     },
     "datimutils": {
       "Package": "datimutils",
-      "Version": "0.4.0",
+      "Version": "0.5.1",
       "Source": "GitHub",
       "RemoteType": "github",
+      "RemoteHost": "api.github.com",
       "RemoteUsername": "pepfar-datim",
       "RemoteRepo": "datimutils",
       "RemoteRef": "master",
-      "RemoteSha": "0154a3a92ada95d78e8dd61d4f63464ba9e6d57c",
-      "Hash": "28b32368ebe1a01bb4a7160557a2072f",
+      "RemoteSha": "5957b933cf801a923ed429ee400a9a1420fc8524",
+      "Hash": "79c0d129750c813a1feb221ea1fc182d",
       "Requirements": [
         "httr",
         "jsonlite",
@@ -1430,14 +1431,13 @@
     },
     "roxygen2": {
       "Package": "roxygen2",
-      "Version": "7.2.0",
+      "Version": "7.1.2",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "b390c1d54fcd977cda48588e6172daba",
+      "Hash": "eb9849556c4250305106e82edae35b72",
       "Requirements": [
         "R6",
         "brew",
-        "cli",
         "commonmark",
         "cpp11",
         "desc",
@@ -1448,7 +1448,6 @@
         "rlang",
         "stringi",
         "stringr",
-        "withr",
         "xml2"
       ]
     },

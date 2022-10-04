@@ -23,7 +23,8 @@ FY22 targets = COP21.}
 \code{impatt}. If not specified, then all data streams
 are returned.}
 
-\item{d2_session}{DHIS2 Session id}
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
 }
 \value{
 Raw data in DATIM for a country for the COP data sets for a given COP Year.

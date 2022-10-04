@@ -1,3 +1,6 @@
+#TODO: Fix valid_PSNU nomenclature RE: SNUs, PSNUs, and DSNUs, list PSNU separately in another col?
+#TODO: Make valid_PSNUs into a tibble please
+
 # Load PSNUs into package from DATIM ####
 library(magrittr)
 library(datapackr)
