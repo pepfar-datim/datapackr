@@ -221,7 +221,7 @@ packPSNUxIM <- function(wb,
   # Prep dataset of targets to allocate ####
   data %<>% # adorn_import_file found in adorn_import_file.R
     adorn_import_file(cop_year = cop_year, filter_rename_output = FALSE, d2_session = d2_session) %>%
-    dplyr::select(PSNU = dp_psnu, orgUnit, indicator_code, Age, Sex, KeyPop,
+    dplyr::select(PSNU = dp_label, orgUnit, indicator_code, Age, Sex, KeyPop,
                   DataPackTarget = value) %>%
     dplyr::group_by(dplyr::across(c(-DataPackTarget))) %>%
     dplyr::summarise(DataPackTarget = sum(DataPackTarget)) %>%
