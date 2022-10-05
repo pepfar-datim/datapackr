@@ -26,10 +26,10 @@ packDataPack <- function(d,
   d$data$PSNUs <- datapackr::valid_PSNUs %>%
     dplyr::filter(country_uid %in% d$info$country_uids) %>%
     add_dp_psnu(.) %>%
-    dplyr::arrange(dp_psnu) %>%
+    dplyr::arrange(dp_label) %>%
     ## Remove DSNUs
     dplyr::filter(!is.na(psnu_type)) %>%
-    dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)
+    dplyr::select(PSNU = dp_label, psnu_uid, snu1)
 
   # TODO: Separate PSNUs as parameter for this function, allowing you to include
   # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
