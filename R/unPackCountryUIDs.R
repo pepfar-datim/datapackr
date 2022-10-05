@@ -56,6 +56,8 @@ unPackCountryUIDs <- function(submission_path,
       country_uids <- unique(PSNUs$country_uid)
     } else {
       warning(
+        #TODO @jacksons: This seems to throw a warning
+        #when packing an OPU datapack. Is this warning relevant?
         paste0("Unable to deduce Country UIDs from ",
                ifelse(tool %in% c("Data Pack", "Data Pack Template"), "Prioritization", "SNUxIM"),
                " tab. Attempting to deduce from Data Pack name on Home tab.")
