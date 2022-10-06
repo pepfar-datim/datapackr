@@ -50,11 +50,64 @@ with_mock_api({
   out_file <- paste0(out_dir, "/", basename(d$info$output_file))
 
    #Unpack this tool which has been "opened" in libreoffice
-   d_out <- unPackTool(submission_path = out_file, d2_session = training)
-   expect_identical(d$info$datapack_name, d_out$info$datapack_name)
-   expect_setequal(names(d_out), c("keychain", "info", "data", "tests", "datim"))
-   expect_setequal(names(d_out$datim$OPU), c("dataElement", "period",
+   d_opened <- unPackTool(submission_path = out_file, d2_session = training)
+   expect_identical(d$info$datapack_name, d_opened$info$datapack_name)
+   expect_setequal(names(d_opened), c("keychain", "info", "data", "tests", "datim"))
+   expect_setequal(names(d_opened$datim$OPU), c("dataElement", "period",
                                              "orgUnit", "categoryOptionCombo", "attributeOptionCombo", "value"))
+
+   #The opened and unopened SNUxIM tabs should be identical at the SNU/DE/COC level
+   test_data_unopened <- d_out$data$SNUxIM %>%
+     dplyr::select(indicator_code, Age, Sex, KeyPop, psnuid, support_type, value) %>%
+     dplyr::group_by(indicator_code, Age, Sex, KeyPop, psnuid, support_type) %>%
+     dplyr::summarise(value = sum(as.numeric(value)), .groups = "drop")
+
+   test_data_opened <- d_opened$data$SNUxIM %>%
+     dplyr::select(indicator_code, Age, Sex, KeyPop, psnuid, support_type, value) %>%
+     dplyr::group_by(indicator_code, Age, Sex, KeyPop, psnuid, support_type) %>%
+     dplyr::summarise(value = sum(as.numeric(value)), .groups = "drop") %>%
+     dplyr::rename(value_opened = value)
+
+   test_data_joined <- test_data_unopened %>%
+     dplyr::full_join(test_data_opened) %>%
+     dplyr::mutate(diff = value_opened - value) %>%
+     dplyr::filter(diff != 0)
+   expect_true(NROW(test_data_joined) == 0)
+
+   #Compare with the original input data
+   test_data_model <- d_opened$datim$OPU %>%
+     dplyr::rename(value_opened = value) %>% #Are we joining the correct data?
+     dplyr::inner_join(d$data$snuxim_model_data) %>% #Unclear if we should do an inner join...
+     dplyr::mutate(diff = as.numeric(value_opened) - as.numeric(value))
+
+   #Seems that rows are being filtered here...not clear why.
+   #expect_true(NROW(test_data_model) == NROW(d_opened$datim$OPU))
+
+   expect_true(all(test_data_model$diff == 0))
+
+   #TODO: Test from the analytics
+   test_data_analytics <- d_opened %>%
+     purrr::pluck("data") %>%
+     purrr::pluck("analytics") %>%
+     dplyr::select(dataElement = dataelement_id,
+                   period = fiscal_year,
+                   orgUnit = psnu_uid,
+                   categoryOptionCombo = categoryoptioncombo_id,
+                   target_value) %>%
+     dplyr::mutate(target_value = as.numeric(target_value),
+                   period = paste0(period, "Oct")) %>%
+     #TODO: Once we get all formulas in place, do not aggregate here
+     dplyr::group_by(dataElement, period, orgUnit, categoryOptionCombo) %>%
+     dplyr::summarise(target_value = sum(target_value), .groups = "drop") %>%
+     #TODO: Unclear at the moment of the effect of the inner join
+     #We are trying to test whether the input and output are equivalent
+     #But seems that certain things are being dropped in the join
+     dplyr::inner_join(d$data$snuxim_model_data) %>%
+     dplyr::mutate(diff = as.numeric(target_value) - as.numeric(value))
+
+
+   expect_true(all(test_data_analytics$diff == 0))
+
 
    unlink(output_folder, recursive = TRUE)
 
