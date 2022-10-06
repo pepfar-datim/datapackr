@@ -10,7 +10,7 @@ with_mock_api({
       dplyr::filter(datapack_name %in% generation_list) %>%
       dplyr::arrange(datapack_name)
 
-    output_folder <- paste0("/tmp/",digest::sha1(Sys.time()))
+    output_folder <- paste0("/tmp/", stringi::stri_rand_strings(1, 20))
     dir.create(output_folder)
 
     d <- packTool(tool = "OPU Data Pack",
@@ -37,13 +37,14 @@ with_mock_api({
   #Do not even try and do this on Windows
   skip_if(Sys.info()["sysname"] == "Windows")
   lo_path <- system("which libreoffice", intern = TRUE)
+  #Skip this if we cannot execute libreoffice
+  skip_if(file.access(lo_path, 1) != 0)
 
-  out_dir <- paste0(output_folder,"/out")
+  out_dir <- paste0(output_folder, "/out")
   dir.create(out_dir)
 
-
   Sys.setenv(LD_LIBRARY_PATH = "/usr/lib/libreoffice/program/")
-  sys_command <- paste0("libreoffice --headless --convert-to xlsx --outdir ", out_dir, " '", d$info$output_file, "'" )
+  sys_command <- paste0("libreoffice --headless --convert-to xlsx --outdir ", out_dir, " '", d$info$output_file, "'")
   system(sys_command)
 
   out_file <- paste0(out_dir, "/", basename(d$info$output_file))
