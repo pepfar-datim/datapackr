@@ -21,6 +21,7 @@ packTool <- function(model_data_path = NULL,
                      cop_year,
                      output_folder,
                      results_archive = TRUE,
+                     expand_formulas = FALSE,
                      d2_session = dynGet("d2_default_session",
                                          inherits = TRUE)) {
 
@@ -75,8 +76,10 @@ packTool <- function(model_data_path = NULL,
   if (d$info$tool == "Data Pack") {
     d <- packDataPack(d, d2_session = d2_session)
   } else if (d$info$tool == "OPU Data Pack") {
+    print(paste("Expand formulas is ", expand_formulas))
     d <- packOPUDataPack(d,
                          undistributed_mer_data = undistributed_mer_data,
+                         expand_formulas = expand_formulas,
                          d2_session = d2_session)
   } else {
     stop("Selected tool not currently supported.")
