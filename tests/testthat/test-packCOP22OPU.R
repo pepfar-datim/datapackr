@@ -85,9 +85,9 @@ with_mock_api({
      dplyr::inner_join(d$data$snuxim_model_data) %>% #Unclear if we should do an inner join...
      dplyr::mutate(diff = as.numeric(value_opened) - as.numeric(value))
 
-   #Seems that rows are being filtered here...not clear why.
-   #expect_true(NROW(test_data_model) == NROW(d_opened$datim$OPU))
+   #We should get the same number of rows we input
    testthat_print("Compare an opened and unopened file")
+   expect_true(NROW(test_data_model) == NROW(d_opened$datim$OPU))
    expect_true(all(test_data_model$diff == 0))
 
    #TODO: Test from the analytics
@@ -100,20 +100,20 @@ with_mock_api({
                    categoryOptionCombo = categoryoptioncombo_id,
                    attributeOptionCombo = mechanism_code,
                    target_value) %>%
+     dplyr::filter(attributeOptionCombo == "default") %>%  #Filter AGYW_PREV data
      dplyr::mutate(target_value = as.numeric(target_value),
-                   period = paste0(period -1, "Oct")) %>%
-     #TODO: Once we get all formulas in place, do not aggregate here
-     #dplyr::group_by(dataElement, period, orgUnit, categoryOptionCombo) %>%
-     #dplyr::summarise(target_value = sum(target_value), .groups = "drop") %>%
+                   period = paste0(period - 1, "Oct")) %>%
      #TODO: Unclear at the moment of the effect of the inner join
      #We are trying to test whether the input and output are equivalent
      #But seems that certain things are being dropped in the join
-     dplyr::inner_join(d$data$snuxim_model_data) %>%
-     dplyr::mutate(diff = as.numeric(target_value) - as.numeric(value))
+     dplyr::full_join(d$data$snuxim_model_data,
+     by=c("dataElement","period","orgUnit","categoryOptionCombo","attributeOptionCombo")) %>%
+     dplyr::mutate(diff = dplyr::near(as.numeric(target_value),as.numeric(value),tol = 1.0)) %>%
+     dplyr::filter(!diff | is.na(diff))
 
 
    testthat_print("Compare analytics with original data from DATIM")
-   expect_true(all(test_data_analytics$diff == 0))
+   expect_true(NROW(test_data_analytics) == 0)
 
 
    unlink(output_folder, recursive = TRUE)
