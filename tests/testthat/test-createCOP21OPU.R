@@ -1,10 +1,11 @@
-context("Create a COP22 OPU")
+context("Create a COP21 OPU")
+
 
 with_mock_api({
-  test_that("We can write an COP22 OPU tool", {
-
+  test_that("We can write an COP21 OPU tool", {
+    skip("Skip COP21 OPU generation for now")
     # For Generating Individual Data Packs ####
-    generation_list <- c("Eswatini")
+    generation_list <- c("Burundi")
 
     pick <- datapackr::COP21_datapacks_countries %>%
       dplyr::filter(datapack_name %in% generation_list) %>%
@@ -20,11 +21,11 @@ with_mock_api({
                   cop_year = 2021,
                   output_folder = output_folder,
                   results_archive = FALSE,
-                  expand_formulas = TRUE,
+                  expand_formulas = FALSE,
                   d2_session = training)
 
     #Write some more tests here to test metadata
-    testthat::expect_identical(d$info$datapack_name, "Eswatini")
+    testthat::expect_identical(d$info$datapack_name, "Burundi")
 
     #Be sure we can unpack what we just wrote to a file
     d_out <- unPackTool(submission_path = d$info$output_file, d2_session = training)
