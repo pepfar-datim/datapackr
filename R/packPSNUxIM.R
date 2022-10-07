@@ -357,8 +357,8 @@ packPSNUxIM <- function(wb,
   data_structure <- schema %>%
     dplyr::filter(sheet_name == "PSNUxIM")
 
-  start_col <- ifelse(cop_year == 2021, "12345_DSD", "Not PEPFAR")
-
+  #start_col <- ifelse(cop_year == 2021, "12345_DSD", "Not PEPFAR")
+  start_col <- "Not PEPFAR"
   col.im.targets <- data_structure %>%
     dplyr::filter(col_type == "target",
                   indicator_code %in% c("Not PEPFAR", "12345_DSD", "")) %>%
