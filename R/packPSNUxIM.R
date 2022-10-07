@@ -392,7 +392,7 @@ packPSNUxIM <- function(wb,
       dplyr::mutate(
         column_names = dplyr::case_when(
           col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_", col),
-          col >= col.im.targets[1] & col <= col.im.targets[2] ~ paste0("target_col_",col),
+          col >= col.im.targets[1] & col <= col.im.targets[2] ~ paste0("target_col_", col),
           TRUE ~ indicator_code)
       ) %>%
       tibble::column_to_rownames(var = "column_names") %>%
@@ -403,8 +403,8 @@ packPSNUxIM <- function(wb,
       dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
       dplyr::mutate(
         dplyr::across(dplyr::all_of(col.formulas),
-                      ~stringr::str_replace_all(., pattern = paste0("(?<=[:upper:])", header_row + 1),
-                                                replacement = as.character(seq_len(NROW(snuxim_model_data)) + first_blank_row - 1))))
+        ~stringr::str_replace_all(., pattern = paste0("(?<=[:upper:])", header_row + 1),
+        replacement = as.character(seq_len(NROW(snuxim_model_data)) + first_blank_row - 1))))
 
   } else {
     col.formulas <- data_structure %>%
@@ -434,8 +434,8 @@ packPSNUxIM <- function(wb,
       dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
       dplyr::mutate(
         dplyr::across(dplyr::all_of(col.formulas),
-                      ~stringr::str_replace_all(., pattern = paste0("(?<=[:upper:])", header_row + 1),
-                                                replacement = as.character(seq_len(NROW(snuxim_model_data)) + first_blank_row - 1))))
+        ~stringr::str_replace_all(., pattern = paste0("(?<=[:upper:])", header_row + 1),
+        replacement = as.character(seq_len(NROW(snuxim_model_data)) + first_blank_row - 1))))
   }
 
   # Classify formula columns as formulas
