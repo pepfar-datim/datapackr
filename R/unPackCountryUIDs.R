@@ -165,7 +165,8 @@ parsePSNUs <- function(submission_path, tool, cop_year) {
     dplyr::left_join(datapackr::valid_OrgUnits %>%
                        dplyr::select(psnu_uid = uid, country_name, country_uid),
                      by = "psnu_uid") %>%
-    dplyr::filter_all(dplyr::any_vars(!is.na(.)))
+    dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
+    dplyr::distinct()
 
   #Test for valid PSNU UIDs
   malformed_psnu_uids <- PSNUs %>%
