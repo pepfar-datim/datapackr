@@ -125,7 +125,6 @@ with_mock_api({
 
    testthat_print("Compare analytics with original data from DATIM")
    expect_true(NROW(test_data_analytics) == 0)
-   print(head(test_data_analytics))
 
    unlink(output_folder, recursive = TRUE)
 
