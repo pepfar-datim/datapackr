@@ -21,12 +21,11 @@ checkExistsAllCols <- function(d, sheets = sheets) {
   })
 
   has_all_header_columns <- purrr::map2(d$sheets[sheets], header_cols,
-                                         function(x,y) { Reduce("+",names(x) %in% y) == length(y) }) %>%
+                                       function(x, y) {
+                                         Reduce("+", names(x) %in% y) == length(y)
+                                         }
+                                       ) %>%
      unlist()
-
-  # # return all sheets that have all headers
-  # sheets_with_all_headers <- d$sheets[sheets] %>%
-  #   purrr::keep(has_all_header_columns)
 
   return(has_all_header_columns)
 
