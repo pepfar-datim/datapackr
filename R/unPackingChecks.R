@@ -231,8 +231,8 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
 
   #Before we check for duplicates rows, be sure we have all of
   #The header columns
-  has_all_header_columns <- purrr::map(d$sheets[sheets],
-    function(x) { Reduce("+",names(x) %in% header_cols) == length(header_cols) }) %>%
+  has_all_header_columns <- purrr::map2(d$sheets[sheets], header_cols,
+    function(x,y) { Reduce("+",names(x) %in% y) == length(y) }) %>%
     unlist()
 
 
@@ -259,7 +259,7 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
   dupes <- purrr::map2(sheets_with_all_headers, header_cols[has_all_header_columns],
                       function(x,y) {
                         x %>%
-                          dplyr::select(tidyselect::all_of(y)) %>%
+                          dplyr::select(tidyselect::any_of(y)) %>%
                           dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
                           dplyr::filter(!is.na(PSNU)) %>% # This is caught by checkInvalidOrgUnits
                           dplyr::filter(duplicated(.))
