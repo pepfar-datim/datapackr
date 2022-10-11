@@ -47,12 +47,32 @@ unPackSheets <- function(d,
              "\n"))
   }
 
+  # Check if there are any sheets where all columns are missing
+  has_all_header_columns <- checkExistsAllCols(d, sheets = sheets)
+  sheets_with_all_headers <- d$sheets[sheets] %>%
+    purrr::keep(has_all_header_columns) %>% names(.)
+
+  lvl <- "ERROR"
+  if (any(!has_all_header_columns)) {
+    msg <-
+      paste0(
+        lvl,"! The following sheets could not undergo any of our checks as they
+        are missing ALL their column header. Please correct this error and resubmit: ",
+        paste(sheets[!has_all_header_columns])
+      )
+
+    d$tests$missing_al_columns <- data.frame(sheet_name = sheets[!has_all_header_columns])
+    attr(d$tests$missing_al_columns, "test_name") <- "Missing all columns"
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
+
+  }
+
   if (check_sheets) {
-    d <- checkSheetData(d, sheets = sheets)
+    d <- checkSheetData(d, sheets = sheets_with_all_headers)
   }
 
   # Unpack Sheet Data ----
-  targets <- unPackDataPackSheet(d, sheets)
+  targets <- unPackDataPackSheet(d, sheets_with_all_headers)
 
   # Separate Sheet Data ----
   if (separate_datasets) {

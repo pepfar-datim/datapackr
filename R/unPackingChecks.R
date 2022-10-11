@@ -217,54 +217,26 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
             has_error = FALSE)
 
   # Get header_cols
-  header_cols <- purrr::map(sheets, function(x) {
-      d$info$schema %>%
-        dplyr::filter(
-          sheet_name %in% x,
-          col_type == "row_header",
-          !indicator_code %in% c("SNU1", "ID")) %>%
-        dplyr::pull(indicator_code) %>%
-        #c(., "mechCode_supportType") %>% # DP-472
-        unique()
-    })
-
-
-  #Before we check for duplicates rows, be sure we have all of
-  #The header columns
-  has_all_header_columns <- purrr::map(d$sheets[sheets],
-    function(x) { Reduce("+",names(x) %in% header_cols) == length(header_cols) }) %>%
-    unlist()
-
-
-
-  if (any(!has_all_header_columns)) {
-    msg <-
-      paste(
-        "ERROR! The following sheets could not be checked for duplicate rows.",
-        "This could indicate missing index columns. ",
-        paste(sheets[!has_all_header_columns]),
-        sep = "",
-        collapse = ", ")
-
-    #TODO: Convert this into the message queue
-    warning(msg)
-
-  }
-
-
-  sheets_with_all_headers <- d$sheets[sheets] %>%
-    purrr::keep(has_all_header_columns)
+  header_cols <- d$info$schema %>%
+    dplyr::filter(
+      sheet_name %in% sheets,
+      col_type == "row_header",
+      !indicator_code %in% c("SNU1", "ID")) %>%
+    dplyr::pull(indicator_code) %>%
+    #c(., "mechCode_supportType") %>% # DP-472
+    unique()
 
   # Duplicates
-  dupes <- purrr::map2(sheets_with_all_headers, header_cols[has_all_header_columns],
-                      function(x,y) {
+  dupes <- purrr::map(d$sheets[sheets],
+                      function(x) {
                         x %>%
-                          dplyr::select(tidyselect::all_of(y)) %>%
+                          dplyr::select(tidyselect::any_of(header_cols)) %>%
                           dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
                           dplyr::filter(!is.na(PSNU)) %>% # This is caught by checkInvalidOrgUnits
                           dplyr::filter(duplicated(.))
                       }) %>%
     purrr::keep(~ NROW(.x) > 0)
+
 
   if (length(dupes) > 0) {
 
