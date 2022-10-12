@@ -119,3 +119,37 @@ test_that("Can check sheet data...", {
 
   expect_true(d$info$has_error)
 })
+
+
+test_that("Can check index header columns exist", {
+
+  d <- list()
+  d$info$schema <- datapackr::cop22_data_pack_schema
+  d$info$messages <- MessageQueue()
+
+  #Get the HTS sheet headers. This one should pass
+
+  hts_col_headers <- d$info$schema %>%
+    dplyr::filter(sheet_name == "HTS",
+                  col_type == "row_header",
+                  !indicator_code %in% c("SNU1", "ID")) %>%
+    dplyr::pull(indicator_code)
+
+  mock_data <- data.frame(t(rep("abc123", length(hts_col_headers))))
+  hts_df <- mock_data
+  names(hts_df) <- hts_col_headers
+
+  d$sheets$HTS <- hts_df
+
+  #Fake another one
+
+  bogus_sheet <- mock_data
+
+  d$sheets$KP_MAT <- bogus_sheet
+
+  d <- checkExistsIndexCols(d, sheets = c("HTS", "KP_MAT"))
+  expect_true(is.data.frame(d$tests$missing_index_columns))
+  expect_setequal(names(d$tests$missing_index_columns),c("sheet_name"))
+  expect_equal(d$tests$missing_index_columns$sheet_name,"KP_MAT")
+
+})
