@@ -1139,7 +1139,7 @@ checkExistsIndexCols <- function(d, sheets = sheets) {
   header_cols <- purrr::map(sheets, function(x) {
     d$info$schema %>%
       dplyr::filter(sheet_name %in% x,
-                    col_type == "row_header",!indicator_code %in% c("SNU1", "ID")) %>%
+                    col_type == "row_header", !indicator_code %in% c("SNU1", "ID")) %>%
       dplyr::pull(indicator_code) %>%
       #c(., "mechCode_supportType") %>% # DP-472
       unique()
@@ -1172,7 +1172,8 @@ checkExistsIndexCols <- function(d, sheets = sheets) {
     d$tests$missing_index_columns <- data.frame(sheet_name = sheets[!has_all_header_columns])
     attr(d$tests$missing_index_columns, "test_name") <- "Missing index columns"
     d$info$messages <- appendMessage(d$info$messages, msg, lvl)
-    d$info$has_error <- TRUE }
+    d$info$has_error <- TRUE
+    }
 
     d
 

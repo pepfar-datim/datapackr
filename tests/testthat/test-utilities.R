@@ -81,5 +81,3 @@ test_that("Can extract a UID", {
   expect_true(setequal(uids, c(uid_1, uid_2)))
 
 })
-
-

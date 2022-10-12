@@ -79,7 +79,7 @@ test_that("Can check sheet data...", {
                     load_sheets = TRUE,
                     d2_session = training)
 
-  d <- checkSheetData(d)
+   d <- checkSheetData(d)
 
   expect_true("duplicate_rows" %in% names(d$tests))
   expect_true("missing_cols" %in% names(d$tests))
@@ -149,7 +149,7 @@ test_that("Can check index header columns exist", {
 
   d <- checkExistsIndexCols(d, sheets = c("HTS", "KP_MAT"))
   expect_true(is.data.frame(d$tests$missing_index_columns))
-  expect_setequal(names(d$tests$missing_index_columns),c("sheet_name"))
-  expect_equal(d$tests$missing_index_columns$sheet_name,"KP_MAT")
+  expect_setequal(names(d$tests$missing_index_columns), c("sheet_name"))
+  expect_equal(d$tests$missing_index_columns$sheet_name, "KP_MAT")
 
 })
