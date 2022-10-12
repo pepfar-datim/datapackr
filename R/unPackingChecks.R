@@ -341,7 +341,7 @@ checkMissingCols <- function(sheets, d, quiet = TRUE) {
 
   if (NROW(missing_cols) > 0) {
 
-    ch$lvl <- "WARNING"
+    ch$lvl <- "ERROR"
 
     ch$msg <- unique(missing_cols$sheet_name) %>%
       purrr::set_names() %>%
@@ -1164,8 +1164,7 @@ checkExistsIndexCols <- function(d, sheets = sheets) {
 
     msg <-
       paste0(
-        lvl, "! The following sheets could not undergo any of our checks as they
-        are missing ALL their column headers. Please correct this error and resubmit: ",
+        lvl, "! The following sheets are missing critical columns. Some checks could not be performed. ",
         paste(sheets[!has_all_header_columns])
       )
 
