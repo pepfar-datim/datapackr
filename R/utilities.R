@@ -1,38 +1,4 @@
 #' @export
-#' @title Returns `default` checkExistsAllColumns.
-#'
-#' @description
-#' Returns a vector showing which sheets have all header columns
-#'
-#' @return `Default` categoryOptionCombo uid.
-#'
-checkExistsAllCols <- function(d, sheets = sheets) {
-
-  # Get header_cols
-  header_cols <- purrr::map(sheets, function(x) {
-    d$info$schema %>%
-      dplyr::filter(
-        sheet_name %in% x,
-        col_type == "row_header",
-        !indicator_code %in% c("SNU1", "ID")) %>%
-      dplyr::pull(indicator_code) %>%
-      #c(., "mechCode_supportType") %>% # DP-472
-      unique()
-  })
-
-  has_all_header_columns <- purrr::map2(d$sheets[sheets], header_cols,
-                                       function(x, y) {
-                                         Reduce("+", names(x) %in% y) == length(y)
-                                         }
-                                       ) %>%
-     unlist()
-
-  return(has_all_header_columns)
-
-}
-
-
-#' @export
 #' @title Returns `default` categoryOptionCombo uid.
 #'
 #' @return `Default` categoryOptionCombo uid.
