@@ -148,6 +148,10 @@ with_mock_api({
     #Only test the structure here....
     expect_identical(names(d$memo$datapack$by_partner)[1:3], c("Agency", "Partner", "Mechanism"))
 
+    #Difficult to test the Word doc, but lets just confirm it works
+    doc <- generateApprovalMemo(d, memo_type = "comparison", draft_memo = TRUE, d2_session = training)
+    expect_equal(class(doc), "rdocx")
+
   })
 })
 
