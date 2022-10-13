@@ -415,7 +415,12 @@ prepareMemoDataByPrio <- function(df,
     df_final <- dplyr::select(df_final, -`No Prioritization`) # nolint
   }
 
-  df_final %>% dplyr::select(where(~ any(. != 0))) # Remove all columns which are completely zero
+  df_final %>%
+    dplyr::select(where(~ any(. != 0))) %>%  # Remove all columns which are completely zero
+    dplyr::rename_with(
+    ~ dplyr::case_when(
+      . == "No Prioritization" ~ "No Prioritization - USG Only",
+      TRUE ~ .)) #DP-590
 }
 
 
