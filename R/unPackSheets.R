@@ -47,6 +47,9 @@ unPackSheets <- function(d,
              "\n"))
   }
 
+  # Check if there are any sheets where all columns are missing
+  d <- checkExistsIndexCols(d, sheets = sheets)
+
   if (check_sheets) {
     d <- checkSheetData(d, sheets = sheets)
   }

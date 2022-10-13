@@ -216,26 +216,40 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
             lvl = NULL,
             has_error = FALSE)
 
+  #This test requires index columns. If they are not there, drop the sheets
+  #If they are missing index columns, we are not going to
+  #Attempt to process them
+  if (!is.null(d$tests$missing_index_columns)) {
+    sheets <- sheets[!(sheets %in% d$tests$missing_index_columns$sheet_name)]
+  }
+
+  if (length(sheets) == 0) {
+    return(NULL)
+  }
+
   # Get header_cols
-  header_cols <- d$info$schema %>%
-    dplyr::filter(
-      sheet_name %in% sheets,
-      col_type == "row_header",
-      !indicator_code %in% c("SNU1", "ID")) %>%
-    dplyr::pull(indicator_code) %>%
-    #c(., "mechCode_supportType") %>% # DP-472
-    unique()
+  header_cols <- purrr::map(sheets, function(x) {
+    d$info$schema %>%
+      dplyr::filter(
+        sheet_name %in% x,
+        col_type == "row_header",
+        !indicator_code %in% c("SNU1", "ID")) %>%
+      dplyr::pull(indicator_code) %>%
+      #c(., "mechCode_supportType") %>% # DP-472
+      unique()
+  })
 
   # Duplicates
-  dupes <- purrr::map(d$sheets[sheets],
-                      function(x) {
+  dupes <- purrr::map2(d$sheets[sheets], header_cols,
+                      function(x, y) {
                         x %>%
-                          dplyr::select(tidyselect::any_of(header_cols)) %>%
+                          dplyr::select(tidyselect::all_of(y)) %>%
                           dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
                           dplyr::filter(!is.na(PSNU)) %>% # This is caught by checkInvalidOrgUnits
                           dplyr::filter(duplicated(.))
                       }) %>%
     purrr::keep(~ NROW(.x) > 0)
+
 
   if (length(dupes) > 0) {
 
@@ -327,7 +341,7 @@ checkMissingCols <- function(sheets, d, quiet = TRUE) {
 
   if (NROW(missing_cols) > 0) {
 
-    ch$lvl <- "WARNING"
+    ch$lvl <- "ERROR"
 
     ch$msg <- unique(missing_cols$sheet_name) %>%
       purrr::set_names() %>%
@@ -1109,6 +1123,60 @@ checkDisaggs <- function(sheets, d, quiet = TRUE) {
   return(ch)
 }
 
+#' @export
+#' @title checkExistsIndexCols
+#'
+#' @description All data pack sheets have certain columns (PSNU, Age, Sex, etc )
+#' which are essentially index columns on that sheet. In order to determine
+#' whether there are duplicate rows in the sheet, all of these columns
+#' must be presen
+#'
+#'
+#' @return  A vector showing which sheets have all index header columns
+#'
+checkExistsIndexCols <- function(d, sheets = sheets) {
+  # Get header_cols
+  header_cols <- purrr::map(sheets, function(x) {
+    d$info$schema %>%
+      dplyr::filter(sheet_name %in% x,
+                    col_type == "row_header", !indicator_code %in% c("SNU1", "ID")) %>%
+      dplyr::pull(indicator_code) %>%
+      #c(., "mechCode_supportType") %>% # DP-472
+      unique()
+  })
+
+  has_all_header_columns <-
+    purrr::map2(d$sheets[sheets], header_cols,
+                function(x, y) {
+                  Reduce("+", names(x) %in% y) == length(y)
+                }) %>%
+    unlist()
+
+
+  if (any(!has_all_header_columns)) {
+
+    sheets_with_all_headers <- d$sheets[sheets] %>%
+      purrr::keep(has_all_header_columns) %>%
+      names(.)
+
+
+    lvl <- "ERROR"
+
+    msg <-
+      paste0(
+        lvl, "! The following sheets are missing critical columns. Some checks could not be performed. ",
+        paste(sheets[!has_all_header_columns])
+      )
+
+    d$tests$missing_index_columns <- data.frame(sheet_name = sheets[!has_all_header_columns])
+    attr(d$tests$missing_index_columns, "test_name") <- "Missing index columns"
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
+    d$info$has_error <- TRUE
+    }
+
+    d
+
+}
 
 
 #' @export
