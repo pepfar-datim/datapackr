@@ -97,8 +97,18 @@ with_mock_api({
     expect_true(names(d$memo$datapack$by_prio)[[2]] == "Age")
     expect_true(names(d$memo$datapack$by_prio)[[NCOL(d$memo$datapack$by_prio)]] == "Total")
     prio_cols_end <- NCOL(d$memo$datapack$by_prio) - 1
+
+    #We have changed  the No prioritization label here....
+    prio_dict_mod <- prioritization_dict() %>%
+      dplyr::mutate(
+        name = dplyr::case_when(
+          name == "No Prioritization" ~ "No Prioritization - USG Only",
+          TRUE ~ name
+        )
+      )
+
     expect_true(all(
-      names(d$memo$datapack$by_prio[3:prio_cols_end]) %in% prioritization_dict()$name
+      names(d$memo$datapack$by_prio[3:prio_cols_end]) %in% prio_dict_mod$name
     ))
 
     #Compare to confirm that the totals match
