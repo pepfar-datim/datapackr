@@ -1,5 +1,22 @@
 context("test-unPackingChecks")
 
+# test_that("Can read xslx and save as rds for later user", {
+#
+#   file <- "COP22_DataPack_unPackingChecks.xlsx"
+#
+#   d <- loadDataPack(submission_path = test_sheet(file),
+#                     tool = "Data Pack",
+#                     country_uids = NULL,
+#                     cop_year = NULL,
+#                     load_wb = FALSE,
+#                     load_sheets = TRUE,
+#                     d2_session = training)
+#
+#   saveRDS(d, paste0(gsub(".xlsx", "", test_sheet(file)), ".rds"))
+#   rm(d)
+#   gc()
+# })
+
 test_that("Can detect invalid comment types ...", {
 
   #Note: A warning is thrown here on the command line  for "invalid parameter"
@@ -118,4 +135,61 @@ test_that("Can check sheet data...", {
   expect_equal(nrow(d$tests$defunct_disaggs), 12L)
 
   expect_true(d$info$has_error)
+})
+
+
+test_that("Can check decimal values", {
+
+  d <- readRDS(test_sheet("COP22_DataPack_unPackingChecks.rds"))
+
+  # choose minimal sheets to test
+  test_sheets <- c(
+    "Prioritization"
+  )
+
+  # filter test datapack down to minimal structures
+  d$info$schema <-
+    d$info$schema[
+      d$info$schema$sheet_name %in% c("Prioritization")
+      , c("sheet_name", "indicator_code", "col_type", "value_type", "valid_ages", "valid_sexes", "valid_kps")
+    ]
+
+  # keep the variables needed for unpacking
+  variables <- d$info$schema %>%
+    dplyr::filter(
+      sheet_name %in% test_sheets,
+      !indicator_code %in% c("SNU1", "ID"),
+      col_type %in% c("row_header", "target")) %>%
+    dplyr::select(sheet_name, indicator_code, col_type,
+                  valid_ages, valid_sexes, valid_kps) %>%
+    tidyr::unnest(valid_ages, names_sep = ".") %>%
+    tidyr::unnest(valid_sexes, names_sep = ".") %>%
+    tidyr::unnest(valid_kps, names_sep = ".") %>%
+    dplyr::select(sheet_name, indicator_code, col_type,
+                  Age = valid_ages.name, Sex = valid_sexes.name,
+                  KeyPop = valid_kps.name)
+
+  # create minimal example where a decimal is present in the target column
+  # Prioritization is simple since it only has one target column
+  d$sheets$Prioritization <- d$sheets$Prioritization %>%
+    select(filter(variables, sheet_name == "Prioritization")$indicator_code) %>%
+    head(5)
+
+  # test no false positive
+  res <- checkDecimalValues(d = d, sheets = test_sheets)
+  expect_null(res$result)
+  rm(res)
+
+  # test positive flag
+  d$sheets$Prioritization <- d$sheets$Prioritization %>%
+    add_row(!!!setNames(c("testing district", "1.5"), names(.)))
+  res <- checkDecimalValues(d =d, sheets = test_sheets)
+
+  expect_equal(nrow(res$result), 1L)
+  expect_equal(res$result$value, 1.5)
+  expect_equal(res$lvl, "WARNING")
+
+  rm(res, d)
+  gc()
+
 })
