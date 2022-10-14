@@ -148,44 +148,23 @@ test_that("Can check decimal values", {
   # create minimal schema data
   d <- list()
   d$info$schema <-
-    data.frame(
-      sheet_name = "Prioritization",
-      indicator_code = c("SNU1", "PSNU", "IMPATT.PRIORITY_SNU.T_1", "IMPATT.PRIORITY_SNU.T", "PRIORITY_SNU.translation"),
-      col_type = c("row_header", "row_header", "past", "target", "reference"),
-      value_type = c("string", "string", "integer", "integer", "string"),
-      valid_ages = I(
-        list(
-          data.frame(name = NA, id = NA),
-          data.frame(name = NA, id = NA),
-          data.frame(name = NA, id = NA),
-          data.frame(name = NA, id = NA),
-          data.frame(name = NA, id = NA)
-        )
-      ),
-      valid_sexes = I(
-        list(
-          data.frame(name = NA, id = NA),
-          data.frame(name = NA, id = NA),
-          data.frame(name = NA, id = NA),
-          data.frame(name = NA, id = NA),
-          data.frame(name = NA, id = NA)
-        )
-      ),
-      valid_kps = I(
-        list(
-          data.frame(name = NA, id = NA),
-          data.frame(name = NA, id = NA),
-          data.frame(name = NA, id = NA),
-          data.frame(name = NA, id = NA),
-          data.frame(name = NA, id = NA)
-        )
-      )
-    )
+    tribble(
+      ~sheet_name, ~indicator_code, ~col_type, ~value_type,
+      "Prioritization", "SNU1", "row_header", "string",
+      "Prioritization", "PSNU", "row_header", "string",
+      "Prioritization", "IMPATT.PRIORITY_SNU.T","target", "integer"
+    ) %>%
+    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+
 
   d$sheets$Prioritization <-
-    data.frame(
-      PSNU = c("_Military Malawi [#Military] [PQZgU9dagaH]", "Lilongwe District [#SNU] [ScR9iFKAasW]", "Dowa District [#SNU] [zphK9WV8JB4]"),
-      IMPATT.PRIORITY_SNU.T = c("M", "20", "NA")
+    tribble(
+      ~PSNU, ~IMPATT.PRIORITY_SNU.T,
+      "_Military Malawi [#Military] [PQZgU9dagaH]", "M",
+      "Lilongwe District [#SNU] [ScR9iFKAasW]", "20",
+      "Dowa District [#SNU] [zphK9WV8JB4]", "NA"
     )
 
   # test no false positive
