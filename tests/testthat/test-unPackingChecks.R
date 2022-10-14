@@ -137,7 +137,7 @@ test_that("Can check sheet data...", {
   expect_true(d$info$has_error)
 })
 
-
+# check decimal values -----
 test_that("Can check decimal values", {
 
   # choose minimal sheets to test
@@ -180,6 +180,106 @@ test_that("Can check decimal values", {
   expect_equal(nrow(res$result), 1L)
   expect_equal(res$result$value, 1.5)
   expect_equal(res$lvl, "WARNING")
+
+  rm(res, d)
+  gc()
+
+})
+
+# check non numeric values ----
+test_that("Can check non numeric values", {
+
+  test_sheets <- c(
+    "Prioritization"
+  )
+
+  # create minimal schema data
+  d <- list()
+  d$info$schema <-
+    tribble(
+      ~sheet_name, ~indicator_code, ~col_type, ~value_type,
+      "Prioritization", "SNU1", "row_header", "string",
+      "Prioritization", "PSNU", "row_header", "string",
+      "Prioritization", "IMPATT.PRIORITY_SNU.T","target", "integer"
+    ) %>%
+    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+
+
+  d$sheets$Prioritization <-
+    tribble(
+      ~PSNU, ~IMPATT.PRIORITY_SNU.T,
+      "_Military Malawi [#Military] [PQZgU9dagaH]", "M",
+      "Lilongwe District [#SNU] [ScR9iFKAasW]", "20"
+    )
+
+  # test no errors/warnings
+  res <- checkNonNumeric(d, sheets = test_sheets)
+  expect_null(res$result)
+  rm(res)
+
+  # test positive flag
+  # we add NA to test the dropping of NA values
+  # note that any values that are interpreted as character "NAs" are not dropped
+  d$sheets$Prioritization <- d$sheets$Prioritization %>%
+    add_row(!!!setNames(c("Some other District [#SNU] [zphK9WV8J78]", "blah"), names(.))) %>%
+    add_row(!!!setNames(c("Dowa District [#SNU] [zphK9WV8JB4]", NA), names(.))) %>%
+    add_row(!!!setNames(c("Another district [#SNU] [zphK9WV8JB9]", "NA"), names(.)))
+
+  res <- checkNonNumeric(d =d, sheets = test_sheets)
+
+  expect_equal(nrow(res$result), 2L)
+  expect_equal(res$lvl, "WARNING")
+
+  rm(res, d)
+  gc()
+
+})
+
+
+# check negative values ----
+test_that("Can check negative values", {
+
+  test_sheets <- c(
+    "Prioritization"
+  )
+
+  # create minimal schema data
+  d <- list()
+  d$info$schema <-
+    tribble(
+      ~sheet_name, ~indicator_code, ~col_type, ~value_type,
+      "Prioritization", "SNU1", "row_header", "string",
+      "Prioritization", "PSNU", "row_header", "string",
+      "Prioritization", "IMPATT.PRIORITY_SNU.T","target", "integer"
+    ) %>%
+    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+
+
+  d$sheets$Prioritization <-
+    tribble(
+      ~PSNU, ~IMPATT.PRIORITY_SNU.T,
+      "_Military Malawi [#Military] [PQZgU9dagaH]", "M",
+      "Lilongwe District [#SNU] [ScR9iFKAasW]", "20"
+    )
+
+  # test no errors/warnings
+  res <- checkNegativeValues(d, sheets = test_sheets)
+  expect_null(res$result)
+  rm(res)
+
+  # test positive flag
+  # we add a negative value
+  d$sheets$Prioritization <- d$sheets$Prioritization %>%
+    add_row(!!!setNames(c( "Some other District [#SNU] [zphK9WV8J78]", "-6"), names(.)))
+
+  res <- checkNegativeValues(d =d, sheets = test_sheets)
+
+  expect_equal(nrow(res$result), 1L)
+  expect_equal(res$lvl, "ERROR")
 
   rm(res, d)
   gc()
