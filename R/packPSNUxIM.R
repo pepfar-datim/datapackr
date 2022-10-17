@@ -357,8 +357,14 @@ packPSNUxIM <- function(wb,
   data_structure <- schema %>%
     dplyr::filter(sheet_name == "PSNUxIM")
 
-  #start_col <- ifelse(cop_year == 2021, "12345_DSD", "Not PEPFAR")
-  start_col <- "Not PEPFAR"
+  #These columns are duplicated in the schema. Which one
+  #Should we take? Values or percents.
+  start_col <- ifelse(cop_year == 2021, "12345_DSD", "Not PEPFAR")
+  #JPP: Reverting this change for now, as it seems to cause problems
+  #between COP21 and COP22 OPUs
+  #start_col <- "Not PEPFAR"
+
+  #Get the column range for IM Targets
   col.im.targets <- data_structure %>%
     dplyr::filter(col_type == "target",
                   indicator_code %in% c("Not PEPFAR", "12345_DSD", "")) %>%
@@ -366,6 +372,7 @@ packPSNUxIM <- function(wb,
       indicator_code == start_col | col == max(col)) %>%
     dplyr::pull(col)
 
+  #Get the column ranges for IM percentages
   col.im.percents <- data_structure %>%
     dplyr::filter(col_type == "allocation"
                   & (indicator_code %in% c("12345_DSD", "Not PEPFAR")
