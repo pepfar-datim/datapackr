@@ -55,13 +55,13 @@ unPackCountryUIDs <- function(submission_path,
     if (!blank_psnus) {
       country_uids <- unique(PSNUs$country_uid)
     } else {
-      warning(
-        #TODO @jacksons: This seems to throw a warning
-        #when packing an OPU datapack. Is this warning relevant?
-        paste0("Unable to deduce Country UIDs from ",
-               ifelse(tool %in% c("Data Pack", "Data Pack Template"), "Prioritization", "SNUxIM"),
-               " tab. Attempting to deduce from Data Pack name on Home tab.")
-      )
+       warning(
+         #TODO @jacksons: This seems to throw a warning
+         #when packing an OPU datapack. Is this warning relevant?
+         paste0("Unable to deduce Country UIDs from ",
+                ifelse(tool %in% c("Data Pack", "Data Pack Template"), "Prioritization", "SNUxIM"),
+                " tab. Attempting to deduce from Data Pack name on Home tab.")
+       )
 
       datapack_name <-
         datapackr::unPackDataPackName(
@@ -165,7 +165,8 @@ parsePSNUs <- function(submission_path, tool, cop_year) {
     dplyr::left_join(datapackr::valid_OrgUnits %>%
                        dplyr::select(psnu_uid = uid, country_name, country_uid),
                      by = "psnu_uid") %>%
-    dplyr::filter_all(dplyr::any_vars(!is.na(.)))
+    dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
+    dplyr::distinct()
 
   #Test for valid PSNU UIDs
   malformed_psnu_uids <- PSNUs %>%

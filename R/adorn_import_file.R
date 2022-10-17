@@ -146,6 +146,8 @@ adorn_import_file <- function(psnu_import_file,
       include_default = TRUE) %>%
     dplyr::select(-ou, -startdate, -enddate)
 
+  assertthat::are_equal(NROW(psnu_import_file), row_num)
+
   # Allow mapping of either numeric codes or alphanumeric uids
   data_codes <- psnu_import_file %>%
     # Filter column attribute Option combo based on if it has 4 digits
@@ -178,11 +180,15 @@ adorn_import_file <- function(psnu_import_file,
   # Stack data_codes and data_ids on top of one another.
   psnu_import_file <- dplyr::bind_rows(data_codes, data_ids, data_default) %>% dplyr::distinct()
   # Utilizes row_num to ensure the join,filter,stack worked as expected
-  #assertthat::are_equal(NROW(psnu_import_file), row_num)
+  # JPP (2022-10-07): This was commented out. Why?
+  assertthat::are_equal(NROW(psnu_import_file), row_num)
 
   # Adorn dataElements & categoryOptionCombos ####
-
+  # JPP: We have two situations here. When data is coming from DATIM,
+  # Some of the 50+ age bands have been collapsed
   map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year) # Found in utilities.R
+
+
 
   # 2022-10-03-JPP commented this out. I do not see why this is required.
   # # TODO: Is this munging still required with the map being a function of fiscal year?
@@ -214,6 +220,19 @@ adorn_import_file <- function(psnu_import_file,
              "categoryOptionCombo" = "categoryoptioncombouid",
              "fiscal_year" = "FY",
              "period" = "period"))
+
+  #There maybe be duplicates here due to remapping of 50+ age bands
+  #In general, we should never have duplicates along
+  #the five primary dimensions.
+  #This filtering assumes that the values are actually the same
+  #but likely we need to test for that.
+  duplicated_due_to_age_bands <- psnu_import_file %>%
+    dplyr::select(orgUnit, mechanism_code, dataelementname, categoryoptioncomboname, period) %>%
+    duplicated()
+
+  psnu_import_file <- psnu_import_file[!duplicated_due_to_age_bands, ]
+
+  assertthat::are_equal(NROW(psnu_import_file), row_num)
 
   # Select/order columns ####
   # Flag set in original function, approx line 20
