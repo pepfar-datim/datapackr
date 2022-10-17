@@ -86,7 +86,7 @@ test_that("Can check Tool structure...", {
   expect_true(grepl("MISSING SHEETS", d$info$messages$message))
 })
 
-
+# can check sheet data ----
 test_that("Can check sheet data...", {
   d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
                     tool = "Data Pack",
@@ -170,6 +170,7 @@ test_that("Can check decimal values", {
   # test no false positive
   res <- checkDecimalValues(d = d, sheets = test_sheets)
   expect_null(res$result)
+  expect_equal(res$has_error, FALSE)
   rm(res)
 
   # test positive flag
@@ -217,6 +218,7 @@ test_that("Can check non numeric values", {
   # test no errors/warnings
   res <- checkNonNumeric(d, sheets = test_sheets)
   expect_null(res$result)
+  expect_equal(res$has_error, FALSE)
   rm(res)
 
   # test positive flag
@@ -231,6 +233,7 @@ test_that("Can check non numeric values", {
 
   expect_equal(nrow(res$result), 2L)
   expect_equal(res$lvl, "WARNING")
+  expect_equal(res$has_error, FALSE)
 
   rm(res, d)
   gc()
@@ -269,6 +272,7 @@ test_that("Can check negative values", {
   # test no errors/warnings
   res <- checkNegativeValues(d, sheets = test_sheets)
   expect_null(res$result)
+  expect_equal(res$has_error, FALSE)
   rm(res)
 
   # test positive flag
@@ -280,8 +284,405 @@ test_that("Can check negative values", {
 
   expect_equal(nrow(res$result), 1L)
   expect_equal(res$lvl, "ERROR")
+  expect_equal(res$has_error, TRUE)
 
   rm(res, d)
   gc()
+
+})
+
+
+# check dupe rows ----
+  test_that("Can check dupe rows", {
+
+    test_sheets <- c(
+      "Prioritization"
+    )
+
+    # create minimal schema data
+    d <- list()
+    d$info$schema <-
+      tribble(
+        ~sheet_name, ~indicator_code, ~col_type, ~value_type,
+        "Prioritization", "SNU1", "row_header", "string",
+        "Prioritization", "PSNU", "row_header", "string",
+        "Prioritization", "IMPATT.PRIORITY_SNU.T","target", "integer"
+      ) %>%
+      mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+      mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+      mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+
+
+    d$sheets$Prioritization <-
+      tribble(
+        ~PSNU, ~IMPATT.PRIORITY_SNU.T,
+        "_Military Malawi [#Military] [PQZgU9dagaH]", "M",
+        "Lilongwe District [#SNU] [ScR9iFKAasW]", "20"
+      )
+
+    # test no errors/warnings
+    res <- checkDupeRows(d, sheets = test_sheets)
+    expect_null(res$result)
+    expect_equal(res$has_error, FALSE)
+    rm(res)
+
+    # test positive flag
+    # we add a duplicate row on PSNU
+    d$sheets$Prioritization <- d$sheets$Prioritization %>%
+      add_row(!!!setNames(c("Lilongwe District [#SNU] [ScR9iFKAasW]", "10"), names(.)))
+
+    res <- checkDupeRows(d =d, sheets = test_sheets)
+
+    expect_equal(nrow(res$result), 1L)
+    expect_equal(res$lvl, "ERROR")
+    expect_equal(res$has_error, TRUE)
+
+    rm(res, d)
+    gc()
+
+  })
+
+# check missing cols ----
+test_that("Can check missing cols", {
+
+  test_sheets <- c(
+    "Prioritization"
+  )
+
+  # create minimal schema data
+  d <- list()
+  d$info$schema <-
+    tribble(
+      ~sheet_name, ~indicator_code, ~col_type, ~value_type,
+      "Prioritization", "SNU1", "row_header", "string",
+      "Prioritization", "PSNU", "row_header", "string",
+      "Prioritization", "IMPATT.PRIORITY_SNU.T","target", "integer"
+    ) %>%
+    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+
+
+  d$sheets$Prioritization <-
+    tribble(
+      ~SNU1, ~PSNU, ~IMPATT.PRIORITY_SNU.T_1, ~IMPATT.PRIORITY_SNU.T, ~PRIORITY_SNU.translation,
+      "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", NA, "M", "Military",
+      "Central Region", "Lilongwe District [#SNU] [ScR9iFKAasW]", "4" , "4", "Sustained",
+      "Central Region", "Dowa District [#SNU] [zphK9WV8JB4]", "4", NA, "Not a PSNU"
+    )
+
+  # test no errors/warnings
+  res <- checkMissingCols(d, sheets = test_sheets)
+  expect_null(res$result)
+  expect_equal(res$has_error, FALSE)
+  rm(res)
+
+  # test positive flag
+  # we remove columns
+  d$sheets$Prioritization <- d$sheets$Prioritization[,1:3]
+
+  res <- checkMissingCols(d =d, sheets = test_sheets)
+
+  expect_equal(nrow(res$result), 1L)
+  expect_equal(res$result$indicator_code, "IMPATT.PRIORITY_SNU.T")
+  expect_equal(res$lvl, "WARNING")
+  expect_equal(res$has_error, FALSE)
+
+  rm(res, d)
+  gc()
+
+})
+
+# check dupe cols ----
+test_that("Can check dupe cols", {
+
+  test_sheets <- c(
+    "Prioritization"
+  )
+
+  # create minimal schema data
+  d <- list()
+  d$info$schema <-
+    tribble(
+      ~sheet_name, ~col, ~indicator_code, ~col_type, ~value_type,
+      "Prioritization", 1, "SNU1", "row_header", "string",
+      "Prioritization", 2,  "PSNU", "row_header", "string",
+      "Prioritization", 3, "IMPATT.PRIORITY_SNU.T_1","past", "integer",
+      "Prioritization", 4,  "IMPATT.PRIORITY_SNU.T","target", "integer"
+    ) %>%
+    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+
+
+  d$sheets$Prioritization <-
+    tribble(
+      ~SNU1, ~PSNU, ~IMPATT.PRIORITY_SNU.T_1, ~IMPATT.PRIORITY_SNU.T, ~PRIORITY_SNU.translation,
+      "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", NA, "M", "Military",
+      "Central Region", "Lilongwe District [#SNU] [ScR9iFKAasW]", "4" , "4", "Sustained",
+      "Central Region", "Dowa District [#SNU] [zphK9WV8JB4]", "4", NA, "Not a PSNU"
+    )
+
+  # test no errors/warnings
+  res <- checkDupeCols(d, sheets = test_sheets)
+  expect_null(res$result)
+  expect_equal(res$has_error, FALSE)
+  rm(res)
+
+  # test positive flag
+  # we remove columns
+  d$sheets$Prioritization <-
+    cbind(
+      d$sheets$Prioritization,
+      tribble(~IMPATT.PRIORITY_SNU.T, "a", "b", "c")
+    )
+
+  res <- checkDupeCols(d =d, sheets = test_sheets)
+
+  expect_equal(nrow(res$result), 1L)
+  expect_equal(res$result$indicator_code, "IMPATT.PRIORITY_SNU.T")
+  expect_equal(res$lvl, "ERROR")
+  expect_equal(res$has_error, TRUE)
+
+  rm(res, d)
+  gc()
+
+})
+
+# check out of order cols ----
+test_that("Can check out of order cols", {
+
+  test_sheets <- c(
+    "Prioritization"
+  )
+
+  # create minimal schema data
+  d <- list()
+  d$info$schema <-
+    tribble(
+      ~sheet_name, ~col, ~indicator_code, ~col_type, ~value_type,
+      "Prioritization", 1, "SNU1", "row_header", "string",
+      "Prioritization", 2,  "PSNU", "row_header", "string",
+      "Prioritization", 3, "IMPATT.PRIORITY_SNU.T_1","past", "integer",
+      "Prioritization", 4,  "IMPATT.PRIORITY_SNU.T","target", "integer"
+    ) %>%
+    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+
+
+  d$sheets$Prioritization <-
+    tribble(
+      ~SNU1, ~PSNU, ~IMPATT.PRIORITY_SNU.T_1, ~IMPATT.PRIORITY_SNU.T, ~PRIORITY_SNU.translation,
+      "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", NA, "M", "Military",
+      "Central Region", "Lilongwe District [#SNU] [ScR9iFKAasW]", "4" , "4", "Sustained",
+      "Central Region", "Dowa District [#SNU] [zphK9WV8JB4]", "4", NA, "Not a PSNU"
+    )
+
+  # test no errors/warnings
+  res <- checkOutOfOrderCols(d, sheets = test_sheets)
+  expect_null(res$result)
+  expect_equal(res$has_error, FALSE)
+  rm(res)
+
+  # test positive flag
+  # we reverse order of columns
+  d$sheets$Prioritization <- d$sheets$Prioritization[,order(ncol(d$sheets$Prioritization):1)]
+
+  res <- checkOutOfOrderCols(d =d, sheets = test_sheets)
+
+  expect_equal(nrow(res$result), 3L)
+  expect_equal(res$lvl, "WARNING")
+  expect_equal(res$has_error, FALSE)
+
+  rm(res, d)
+  gc()
+
+})
+
+# check invalid org units ----
+test_that("Can check invalid org units", {
+
+  test_sheets <- c(
+    "Cascade"
+  )
+
+  # create minimal sheet needed
+  d <- list()
+  d$sheets$Cascade <-
+    tribble(
+      ~SNU1, ~PSNU, ~Age, ~Sex, ~ID, ~POP_EST.T_1,
+      "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", "<01",   "Female",   "_Military Malawi [#Military] [PQZgU9dagaH]|<01|Female",   NA,
+      "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", "<01",   "Male",     "_Military Malawi [#Military] [PQZgU9dagaH]|<01|Male",     NA,
+      "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", "01-04", "Female",   "_Military Malawi [#Military] [PQZgU9dagaH]|01-04|Female", NA,
+      "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", "01-04", "Male",     "_Military Malawi [#Military] [PQZgU9dagaH]|01-04|Male",   NA,
+      "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", "05-09", "Female",   "_Military Malawi [#Military] [PQZgU9dagaH]|05-09|Female",  NA
+    )
+
+  # test no errors/warnings
+  res <- checkInvalidOrgUnits(d = d, sheets = test_sheets)
+  expect_null(res$result)
+  expect_equal(res$has_error, FALSE)
+  rm(res)
+
+  # test positive flag
+  # add bad PSNU
+  d$sheets$Cascade <- d$sheets$Cascade %>%
+    add_row(!!!setNames(c("_Military Malawi", "_Military Malawi [#Military] [BLAHBLAH]", "05-09", "Female",   "_Military Malawi [#Military] [PQZgU9dagaH]|05-09|Female",  NA), names(.)))
+
+  res <- checkInvalidOrgUnits(d =d, sheets = test_sheets)
+
+  expect_equal(nrow(res$result), 1L)
+  expect_equal(res$lvl, "ERROR")
+  expect_equal(res$has_error, TRUE)
+
+  rm(res, d)
+  gc()
+
+})
+
+# check invalid prioritization ----
+test_that("Can check invalid prioritizations", {
+
+  test_sheets <- c(
+    "Prioritization"
+  )
+
+  # create minimal sheet needed
+  d <- list()
+  d$sheets$Prioritization <-
+    tribble(
+      ~SNU1, ~PSNU, ~IMPATT.PRIORITY_SNU.T_1, ~IMPATT.PRIORITY_SNU.T, ~PRIORITY_SNU.translation,
+      "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", NA, "M", "Military",
+      "Central Region", "Lilongwe District [#SNU] [ScR9iFKAasW]", "4" , "4", "Sustained"
+    )
+
+  # test no errors/warnings
+  res <- checkInvalidPrioritizations(d, sheets = test_sheets)
+  expect_null(res$result)
+  expect_equal(res$has_error, FALSE)
+  rm(res)
+
+  # test positive flag
+  # add row with NA value that triggers invalid prioritization
+  d$sheets$Prioritization <- d$sheets$Prioritization %>%
+    add_row(!!!setNames(c("Central Region", "Dowa District [#SNU] [zphK9WV8JB4]", "4", NA, "Not a PSNU"), names(.)))
+
+  res <- checkInvalidPrioritizations(d =d, sheets = test_sheets)
+
+  expect_equal(nrow(res$result), 1L)
+  expect_equal(res$lvl, "ERROR")
+  expect_equal(res$has_error, TRUE)
+
+  rm(res, d)
+  gc()
+
+})
+
+# check formulas ----
+test_that("Can check formulas", {
+
+  d <- list()
+  d$info$tool <- "Data Pack"
+  d$info$cop_year <- "2022"
+  d$keychain$submission_path <- test_sheet("COP22_DataPack_unPackingChecks.xlsx")
+
+  test_sheets <- c(
+    "Prioritization"
+  )
+
+  # create minimal schema data
+  d$info$schema <-
+    tribble(
+      ~sheet_num, ~sheet_name, ~col, ~indicator_code, ~col_type, ~value_type, ~formula,
+      3, "Prioritization", 4,  "IMPATT.PRIORITY_SNU.T","target", "integer", 'IF(LEFT($B\\d+,4)=\"_Mil\",\"M\",IF(SUM($C\\d+)=0,\"\",$C\\d+))',
+      3, "Prioritization", 5,  "PRIORITY_SNU.translation","reference", "string", 'IF(LEFT($B\\d+,4)=\"_Mil\",\"M\",IF(SUM($C\\d+)=0,\"\",$C\\d+))'
+    ) %>%
+    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+
+
+  d$sheets$Prioritization <-
+    tribble(
+      ~SNU1, ~PSNU, ~IMPATT.PRIORITY_SNU.T_1, ~IMPATT.PRIORITY_SNU.T, ~PRIORITY_SNU.translation,
+      "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", NA, "M", "Military",
+      "Central Region", "Lilongwe District [#SNU] [ScR9iFKAasW]", "4" , "4", "Sustained"
+    )
+
+  # test error kicks because of incorrect formulas
+  # TODO: how do we test no errors since checkFormula depends on on a path read
+  res <- checkFormulas(d, sheets = test_sheets)
+  expect_equal(nrow(res$result), 4L)
+  expect_equal(res$lvl, "WARNING")
+  expect_equal(res$has_error, FALSE)
+
+  rm(res, d)
+  gc()
+
+})
+
+# check disaggs ----
+test_that("Can check disaggs", {
+
+  # test sheet stop
+  sheets <- c("SNU x IM", "PSNUxIM", "Prioritization")
+
+  # create minimal schema data
+  d <- list()
+  d$info$schema <-
+    tribble(
+      ~sheet_num, ~sheet_name, ~col, ~indicator_code, ~col_type, ~value_type,
+      3, "Prioritization", 1, "SNU1", "row_header", "string",
+      3, "Prioritization", 2,  "PSNU", "row_header", "string",
+      3, "Prioritization", 3, "IMPATT.PRIORITY_SNU.T_1","past", "integer",
+      3, "Prioritization", 4,  "IMPATT.PRIORITY_SNU.T","target", "integer",
+      3, "Prioritization", 5,  "PRIORITY_SNU.translation","reference", "string"
+    ) %>%
+    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+
+  # create minimal sheet needed
+  d$sheets$Prioritization <-
+    tribble(
+      ~SNU1, ~PSNU, ~IMPATT.PRIORITY_SNU.T_1, ~IMPATT.PRIORITY_SNU.T, ~PRIORITY_SNU.translation,
+      "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", NA, "M", "Military",
+      "Central Region", "Lilongwe District [#SNU] [ScR9iFKAasW]", "4" , "4", "Sustained",
+      "Central Region", "Dowa District [#SNU] [zphK9WV8JB4]", "4", NA, "Not a PSNU"
+    )
+
+  # expect warning for invalid sheets
+  expect_warning(checkDisaggs(d = d, sheets = sheets))
+
+  # next test
+  sheets <- c("Prioritization")
+
+  # test no issues
+  res <- checkDisaggs(d = d, sheets = sheets)
+  expect_null(res$result)
+  expect_equal(res$has_error, FALSE)
+  rm(res)
+
+
+  # test positive error
+  # add value to key pop
+  d$info$schema <-
+    tribble(
+      ~sheet_num, ~sheet_name, ~col, ~indicator_code, ~col_type, ~value_type,
+      3, "Prioritization", 1, "SNU1", "row_header", "string",
+      3, "Prioritization", 2,  "PSNU", "row_header", "string",
+      3, "Prioritization", 3, "IMPATT.PRIORITY_SNU.T_1","past", "integer",
+      3, "Prioritization", 4,  "IMPATT.PRIORITY_SNU.T","target", "integer",
+      3, "Prioritization", 5,  "PRIORITY_SNU.translation","reference", "string"
+    ) %>%
+    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    mutate(valid_kps = I(list(data.frame(id = NA, name = "4"))))
+
+  res <- checkDisaggs(d = d, sheets = sheets)
+  expect_equal(nrow(res$result), 1L)
+  expect_equal(res$lvl, "ERROR")
+  expect_equal(res$has_error, TRUE)
 
 })
