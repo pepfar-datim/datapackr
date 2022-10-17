@@ -57,7 +57,8 @@ with_mock_api({
       "/usr/lib/libreoffice/program/"))
     sys_command <- paste0(ifelse(Sys.info()["sysname"] == "Darwin",
                                  "/Applications/LibreOffice.app/Contents/MacOS/soffice",
-                                 "libreoffice"), " --headless --convert-to xlsx --outdir ", out_dir, " '", d$info$output_file, "'")
+                                 "libreoffice"),
+                          " --headless --convert-to xlsx --outdir ", out_dir, " '", d$info$output_file, "'")
     system(sys_command)
 
     out_file <- paste0(out_dir, "/", basename(d$info$output_file))
