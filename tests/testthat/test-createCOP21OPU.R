@@ -55,7 +55,7 @@ with_mock_api({
     Sys.setenv(LD_LIBRARY_PATH = ifelse(Sys.info()["sysname"] == "Darwin",
       "/Applications/LibreOffice.app/Contents/MacOS/soffice",
       "/usr/lib/libreoffice/program/"))
-    sys_command <- paste0(Sys.getenv("LD_LIBRARY_PATH"), " --headless --convert-to xlsx --outdir ", out_dir, " '", d$info$output_file, "'")
+    sys_command <- paste0("/usr/lib/libreoffice/program/ --headless --convert-to xlsx --outdir ", out_dir, " '", d$info$output_file, "'")
     system(sys_command)
 
     out_file <- paste0(out_dir, "/", basename(d$info$output_file))
