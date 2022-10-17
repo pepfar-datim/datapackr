@@ -82,7 +82,7 @@ with_mock_api({
     #Compare with the original input data
     test_data_model <- d_opened$datim$OPU %>%
       #Filter dedupe here....need better tests for it
-      dplyr::filter(!(attributeOptionCombo %in% c("00000","00001"))) %>%
+      dplyr::filter(!(attributeOptionCombo %in% c("00000", "00001"))) %>%
       dplyr::rename(value_opened = value) %>% #Are we joining the correct data?
       dplyr::inner_join(d$data$snuxim_model_data) %>% #Unclear if we should do an inner join...
       dplyr::mutate(diff = as.numeric(value_opened) - as.numeric(value))
