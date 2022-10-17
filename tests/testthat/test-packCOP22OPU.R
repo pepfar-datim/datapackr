@@ -36,15 +36,27 @@ with_mock_api({
   #Open the generated tool in libreoffice to kick off the formulas
   #Do not even try and do this on Windows
   skip_if(Sys.info()["sysname"] == "Windows")
-  lo_path <- system("which libreoffice", intern = TRUE)
+
+  #MacOS users will need to install LibreOffice
+  lo_path <- ifelse(Sys.info()["sysname"] == "Darwin",
+                    "/Applications/LibreOffice.app/Contents/MacOS/soffice",
+                    #Needs to be relative, but can't figure out terminal command
+                    #got to ls /Applications/ | grep -i libre
+                    system("which libreoffice", intern = TRUE))
+
   #Skip this if we cannot execute libreoffice
   skip_if(file.access(lo_path, 1) != 0)
 
   out_dir <- paste0(output_folder, "/out")
   dir.create(out_dir)
 
-  Sys.setenv(LD_LIBRARY_PATH = "/usr/lib/libreoffice/program/")
-  sys_command <- paste0("libreoffice --headless --convert-to xlsx --outdir ", out_dir, " '", d$info$output_file, "'")
+  Sys.setenv(LD_LIBRARY_PATH = ifelse(Sys.info()["sysname"] == "Darwin",
+                                      "/Applications/LibreOffice.app/Contents/MacOS/soffice",
+                                      "/usr/lib/libreoffice/program/"))
+  sys_command <- paste0(ifelse(Sys.info()["sysname"] == "Darwin",
+                               "/Applications/LibreOffice.app/Contents/MacOS/soffice",
+                               "libreoffice"),
+                        " --headless --convert-to xlsx --outdir ", out_dir, " '", d$info$output_file, "'")
   system(sys_command)
 
   out_file <- paste0(out_dir, "/", basename(d$info$output_file))
