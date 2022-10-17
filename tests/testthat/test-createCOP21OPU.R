@@ -3,7 +3,7 @@ context("Create a COP21 OPU")
 
 with_mock_api({
   test_that("We can write an COP21 OPU tool", {
-    skip("Skip COP21 OPU generation for now")
+    #skip("Skip COP21 OPU generation for now")
     # For Generating Individual Data Packs ####
     generation_list <- c("Burundi")
 
@@ -21,7 +21,7 @@ with_mock_api({
                   cop_year = 2021,
                   output_folder = output_folder,
                   results_archive = FALSE,
-                  expand_formulas = FALSE,
+                  expand_formulas = TRUE,
                   d2_session = training)
 
     #Write some more tests here to test metadata
