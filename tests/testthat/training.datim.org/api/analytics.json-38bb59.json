@@ -1,0 +1,269 @@
+{
+    "headers": [
+        {
+            "name": "dx",
+            "column": "Data",
+            "valueType": "TEXT",
+            "type": "java.lang.String",
+            "hidden": false,
+            "meta": true
+        },
+        {
+            "name": "ou",
+            "column": "Organisation unit",
+            "valueType": "TEXT",
+            "type": "java.lang.String",
+            "hidden": false,
+            "meta": true
+        },
+        {
+            "name": "value",
+            "column": "Value",
+            "valueType": "NUMBER",
+            "type": "java.lang.Double",
+            "hidden": false,
+            "meta": false
+        }
+    ],
+    "metaData": {
+        "items": {
+            "GprWfFROQSq": {
+                "name": "Hosea"
+            },
+            "DJ30KUNp7Jx": {
+                "name": "Kwaluseni"
+            },
+            "EGlefU013zq": {
+                "name": "Shiselweni 2"
+            },
+            "xWSoWDJ2evF": {
+                "name": "Ngwempisi"
+            },
+            "xeiMMTy3SY4": {
+                "name": "Ekukhanyeni"
+            },
+            "qYzGABaWyCf": {
+                "name": "Hhohho"
+            },
+            "UuDvnvLz0H9": {
+                "name": "Mhlume"
+            },
+            "sPyITBca9iC": {
+                "name": "Sandleni"
+            },
+            "dx": {
+                "name": "Data"
+            },
+            "uGmlcjolWJQ": {
+                "name": "Manzini North"
+            },
+            "b5weT1q4MfP": {
+                "name": "Madlangampisi"
+            },
+            "mINJi7rR1a6": {
+                "name": "Type of organisational unit"
+            },
+            "WCiZxCsRf8I": {
+                "name": "Maseyisini"
+            },
+            "WtniIbuJk7k": {
+                "name": "_Military Eswatini"
+            },
+            "nxGb6sd7p7D": {
+                "name": "Lubombo"
+            },
+            "X5HXEKsZ2fr": {
+                "name": "Siphocosini Inhkuhndla"
+            },
+            "fYsR7D2x5lM": {
+                "name": "Ntfonjeni"
+            },
+            "r4zbW3owX9n": {
+                "name": "IMPATT.PRIORITY_SNU (N, SUBNAT) TARGET: "
+            },
+            "rXyxyoAgbIR": {
+                "name": "Motshane"
+            },
+            "S7lV81CEWVs": {
+                "name": "Mbabane West"
+            },
+            "xWi9gh8oZKO": {
+                "name": "Mtsambama"
+            },
+            "HllvX50cXC0": {
+                "name": "default"
+            },
+            "vD9ROI7sqBM": {
+                "name": "Mbabane East"
+            },
+            "OBnYjEViQox": {
+                "name": "Mpolonjeni"
+            },
+            "T5EaD8qyziS": {
+                "name": "Nkomiyahlaba Inkhundla"
+            },
+            "OWTpaz9X1RX": {
+                "name": "Mkhiweni"
+            },
+            "f3zKfAOJsML": {
+                "name": "Lobamba Lomdzala"
+            },
+            "lXwHa7SD4QL": {
+                "name": "Dvokodvweni"
+            },
+            "AookYR4ECPH": {
+                "name": "Other organisation unit type"
+            },
+            "Xq9oPjnGb6q": {
+                "name": "Gilgali Inkhundla"
+            },
+            "aCPtdZU2C7R": {
+                "name": "Piggs Peak"
+            },
+            "POHZmzofoVx": {
+                "name": "Facility"
+            },
+            "GTMGd9gNu7k": {
+                "name": "Ngudzeni"
+            },
+            "ACzdZfcPxje": {
+                "name": "Mafutseni"
+            },
+            "i5qTJgJrmMa": {
+                "name": "Manzini South"
+            },
+            "GPQ5dOXSJfN": {
+                "name": "Sithobela"
+            },
+            "LIh273fHrkD": {
+                "name": "Siphofaneni"
+            },
+            "qRppsyyTP4A": {
+                "name": "Shiselweni"
+            },
+            "JDURHImj6NG": {
+                "name": "Ludzeludze"
+            },
+            "qzT9WPEdci3": {
+                "name": "Phondo Inkhundla"
+            },
+            "zsWF9xspgml": {
+                "name": "Lomahasha"
+            },
+            "ciLrwlyi1dv": {
+                "name": "Lobamba"
+            },
+            "S3gYw3DaEYU": {
+                "name": "Nkhaba"
+            },
+            "ou": {
+                "name": "Organisation unit"
+            },
+            "aD6LNvdiMuV": {
+                "name": "Mhlangatane"
+            },
+            "lbHYdf0K35V": {
+                "name": "Kumethula Inkhundla"
+            },
+            "pe": {
+                "name": "Period"
+            },
+            "Z3IDOaDDkwG": {
+                "name": "Manzini"
+            },
+            "uNOgcI63aoU": {
+                "name": "Lugongolweni"
+            },
+            "2022Oct": {
+                "name": "Oct 2022 to Sep 2023"
+            },
+            "PvuaP6YALSA": {
+                "name": "Community"
+            }
+        },
+        "dimensions": {
+            "dx": [
+                "r4zbW3owX9n"
+            ],
+            "pe": [
+                "2022Oct"
+            ],
+            "ou": [
+                "WtniIbuJk7k",
+                "lXwHa7SD4QL",
+                "xeiMMTy3SY4",
+                "Xq9oPjnGb6q",
+                "qYzGABaWyCf",
+                "GprWfFROQSq",
+                "lbHYdf0K35V",
+                "DJ30KUNp7Jx",
+                "ciLrwlyi1dv",
+                "f3zKfAOJsML",
+                "zsWF9xspgml",
+                "nxGb6sd7p7D",
+                "JDURHImj6NG",
+                "uNOgcI63aoU",
+                "b5weT1q4MfP",
+                "ACzdZfcPxje",
+                "Z3IDOaDDkwG",
+                "uGmlcjolWJQ",
+                "i5qTJgJrmMa",
+                "WCiZxCsRf8I",
+                "vD9ROI7sqBM",
+                "S7lV81CEWVs",
+                "aD6LNvdiMuV",
+                "UuDvnvLz0H9",
+                "OWTpaz9X1RX",
+                "rXyxyoAgbIR",
+                "OBnYjEViQox",
+                "xWi9gh8oZKO",
+                "GTMGd9gNu7k",
+                "xWSoWDJ2evF",
+                "S3gYw3DaEYU",
+                "T5EaD8qyziS",
+                "fYsR7D2x5lM",
+                "qzT9WPEdci3",
+                "aCPtdZU2C7R",
+                "sPyITBca9iC",
+                "qRppsyyTP4A",
+                "EGlefU013zq",
+                "X5HXEKsZ2fr",
+                "LIh273fHrkD",
+                "GPQ5dOXSJfN"
+            ],
+            "mINJi7rR1a6": [
+                "POHZmzofoVx",
+                "PvuaP6YALSA",
+                "AookYR4ECPH"
+            ],
+            "co": [
+                "HllvX50cXC0"
+            ]
+        }
+    },
+    "rows": [
+        [
+            "r4zbW3owX9n",
+            "qYzGABaWyCf",
+            "1.0"
+        ],
+        [
+            "r4zbW3owX9n",
+            "qRppsyyTP4A",
+            "2.0"
+        ],
+        [
+            "r4zbW3owX9n",
+            "nxGb6sd7p7D",
+            "4.0"
+        ],
+        [
+            "r4zbW3owX9n",
+            "Z3IDOaDDkwG",
+            "5.0"
+        ]
+    ],
+    "height": 4,
+    "width": 3,
+    "headerWidth": 3
+}
