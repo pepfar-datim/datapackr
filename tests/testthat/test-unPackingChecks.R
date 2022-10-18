@@ -14,7 +14,7 @@ context("test-unPackingChecks")
 #
 #   saveRDS(d, paste0(gsub(".xlsx", "", test_sheet(file)), ".rds"))
 #   rm(d)
-#   gc()
+#
 # })
 
 test_that("Can detect invalid comment types ...", {
@@ -183,7 +183,7 @@ test_that("Can check decimal values", {
   expect_equal(res$lvl, "WARNING")
 
   rm(res, d)
-  gc()
+
 
 })
 
@@ -236,7 +236,7 @@ test_that("Can check non numeric values", {
   expect_equal(res$has_error, FALSE)
 
   rm(res, d)
-  gc()
+
 
 })
 
@@ -287,7 +287,7 @@ test_that("Can check negative values", {
   expect_equal(res$has_error, TRUE)
 
   rm(res, d)
-  gc()
+
 
 })
 
@@ -338,7 +338,7 @@ test_that("Can check negative values", {
     expect_equal(res$has_error, TRUE)
 
     rm(res, d)
-    gc()
+
 
   })
 
@@ -389,7 +389,7 @@ test_that("Can check missing cols", {
   expect_equal(res$has_error, FALSE)
 
   rm(res, d)
-  gc()
+
 
 })
 
@@ -445,7 +445,7 @@ test_that("Can check dupe cols", {
   expect_equal(res$has_error, TRUE)
 
   rm(res, d)
-  gc()
+
 
 })
 
@@ -496,7 +496,7 @@ test_that("Can check out of order cols", {
   expect_equal(res$has_error, FALSE)
 
   rm(res, d)
-  gc()
+
 
 })
 
@@ -537,7 +537,7 @@ test_that("Can check invalid org units", {
   expect_equal(res$has_error, TRUE)
 
   rm(res, d)
-  gc()
+
 
 })
 
@@ -575,7 +575,7 @@ test_that("Can check invalid prioritizations", {
   expect_equal(res$has_error, TRUE)
 
   rm(res, d)
-  gc()
+
 
 })
 
@@ -618,7 +618,7 @@ test_that("Can check formulas", {
   expect_equal(res$has_error, FALSE)
 
   rm(res, d)
-  gc()
+
 
 })
 
