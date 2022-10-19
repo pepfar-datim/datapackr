@@ -35,8 +35,6 @@ prepareMemoMetadata <- function(d, memo_type,
 
   if (memo_type %in% c("datapack", "comparison")) {
 
-    #TODO: If this is an OPU, use the existing prioritizations
-    #from DATIM.
     d$memo$datapack$prios <- d$data$analytics %>%
       dplyr::select(orgUnit = psnu_uid, prioritization) %>%
       dplyr::distinct() %>%
@@ -82,6 +80,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
   }
 
   if (!is.null(df) && NROW(df) > 0) {
+
     d$memo$datim$analytics <- df %>%
       adorn_import_file(
         .,
@@ -90,6 +89,8 @@ prepareExistingDataAnalytics <- function(d, d2_session =
         d2_session = d2_session,
         include_default = TRUE
       )
+    assertthat::are_equal(NROW(df),NROW(d$memo$datim$analytics))
+
   }
 
   d

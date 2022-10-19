@@ -54,16 +54,16 @@ evaluateIndicators <- function(combis, values, inds) {
     return(indicators_empty)
   }
 
-  #Remove the extra fomula ornmentation
-  stripIndicatorOrnamentation <- function(x) {
-    x %>%
-    stringr::str_replace_all("(#|\\{|\\})", "")
+  escapeIndicatorOrnamentation <- function(x) {
+    x  %>% stringr::str_replace_all("[.]","\\\\.") %>%
+      stringr::str_replace_all("[{]","\\\\{") %>%
+      stringr::str_replace_all("[}]","\\\\}")
   }
 
-  matches$numerator <- stripIndicatorOrnamentation(matches$numerator)
-  matches$denominator <- stripIndicatorOrnamentation(matches$denominator)
-  combis <- stripIndicatorOrnamentation(combis)
-  totals_df$exp <- stripIndicatorOrnamentation(totals_df$exp)
+  #Must escape the ornamentation, as these will be substituted
+  combis <- escapeIndicatorOrnamentation(combis)
+  totals_df$exp <- escapeIndicatorOrnamentation(totals_df$exp)
+
 
   #Function to substitute values based on the
   #dataelement_id.categoryoptioncombo_id
@@ -79,13 +79,13 @@ evaluateIndicators <- function(combis, values, inds) {
   # Function to replace missing totals with zeros
   replaceTotalsWithValues <- function(x) {
     replaceCombisWithValues(x,
-                               expressions = totals_df$exp,
-                               v = as.character(totals_df$values))
+                            expressions = totals_df$exp,
+                            v = as.character(totals_df$values))
   }
 
   #Function to replace missing combis with zeros
   replaceExpressionsWithZeros <- function(x) {
-    expression.pattern <- "[a-zA-Z][a-zA-Z0-9]{10}(\\.[a-zA-Z][a-zA-Z0-9]{10})?"
+    expression.pattern <- "#\\{[a-zA-Z][a-zA-Z0-9]{10}(\\.[a-zA-Z][a-zA-Z0-9]{10})?\\}"
     gsub(expression.pattern, "0", x)
   }
 
