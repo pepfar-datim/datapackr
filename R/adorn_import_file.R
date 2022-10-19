@@ -205,12 +205,6 @@ adorn_import_file <- function(psnu_import_file,
 
   map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year) # Found in utilities.R
 
-  # 2022-10-03-JPP commented this out. I do not see why this is required.
-  # # TODO: Is this munging still required with the map being a function of fiscal year?
-  # if (cop_year == 2022) {
-  #   map_des_cocs <- datapackr::cop22_map_adorn_import_file
-  # }
-
   psnu_import_file %<>%
     dplyr::mutate(
       # Create a time stamp column based on the the servers system time
