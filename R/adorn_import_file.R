@@ -111,12 +111,18 @@ adorn_import_file <- function(psnu_import_file,
       dplyr::pull(orgUnit) %>%
       unique()
 
-    psnus <- getPSNUInfo(unknown_psnu, d2_session = d2_session) %>%
-      dplyr::select(-name)
+    if (length(unknown_psnu) > 0) {
+      psnus <- getPSNUInfo(unknown_psnu, d2_session = d2_session) %>%
+        dplyr::select(-name)
+
+      psnu_import_file %<>%
+        dplyr::left_join(psnus, by = c("orgUnit" = "uid"))
+    } else {
+      psnu_import_file %<>%
+        addcols(c("psnu", "psnu_uid"))
+    }
 
     psnu_import_file %<>%
-      dplyr::left_join(
-          psnus, by = c("orgUnit" = "uid")) %>%
       dplyr::mutate(
         psnu = dplyr::case_when(
           is.na(psnu_uid) & !is.na(name) ~ name,
@@ -126,6 +132,11 @@ adorn_import_file <- function(psnu_import_file,
           TRUE ~ psnu_uid)) %>%
       dplyr::left_join(psnu_prioritizations,
                        by = c("psnu_uid" = "orgUnit")) %>%
+      dplyr::mutate(
+        prioritization =
+          ifelse(is.na(prioritization),
+                 "No Prioritization",
+                 prioritization)) %>%
       dplyr::select(-psnu, -psnu_uid)
   }
 
