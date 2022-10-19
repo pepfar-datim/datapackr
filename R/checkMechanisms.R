@@ -13,7 +13,10 @@ checkMechanisms <- function(d,
                             d2_session = dynGet("d2_default_session",
                                                 inherits = TRUE)) {
 
-  mechs_data <- unique(d$datim$MER$attributeOptionCombo)
+  #Do not refer to d$datim$MER or d$datim$OPU directly.
+  mechs_data <- unique(d$data$analytics$mechanism_code)
+
+  stopifnot("Mechanisms cannot be null." = !is.null(mechs_data) || length(mechs_data) != 0L)
 
   period_info <- datimvalidation::getPeriodFromISO(paste0(d$info$cop_year, "Oct"))
 
@@ -29,10 +32,10 @@ checkMechanisms <- function(d,
     dplyr::pull(mechanism_code)
 
   #Allow for the default mechanism
-  mechs_datim <- append("HllvX50cXC0", mechs_datim)
+  mechs_datim <- append("default", mechs_datim)
 
-  #Allow for the dedupe mechanisms in COP21 Data packs
-  if (d$info$tool == "Data Pack" && d$info$cop_year %in% c(2021, 2022)) {
+  #Allow for the dedupe mechanisms in COP21/COP22 DataPacks and OPUs
+  if (d$info$tool %in% c("Data Pack", "OPU Data Pack") && d$info$cop_year %in% c(2021, 2022)) {
     mechs_datim <- append(c("00000", "00001"), mechs_datim)
   }
 

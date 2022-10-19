@@ -72,6 +72,9 @@ unPackDataPack <- function(d,
 
   d <- checkNotPEPFARSupportedPSNUs(d)
 
+  # Check for invalid mechanisms
+  d <- checkMechanisms(d, d2_session = d2_session)
+
   return(d)
 
 }
