@@ -1,4 +1,17 @@
-
+#' @export
+#' @title getPSNUInfo
+#' @description Certain special PSNUs (like DREAMS) are part of the
+#' target setting process, but may exist at a level in the
+#' organisation unit hierarchy other than the COP Prioritization level.
+#' For organisation units which exist at the prioritization level,
+#' their prioritization should be left as is. For organisation units
+#' which do not exist at the level at which prioritization is set,
+#' the parent prioritization should be used.
+#'
+#' @param snu_uids List of UIDs corresponding to DATIM organisation units.
+#' @inheritParams datapackr_params
+#'
+#' @return Tibble of orgunits mapped to orgunit name, PSNU name, & PSNU uid.
 getPSNUInfo <- function(snu_uids,
                         d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
