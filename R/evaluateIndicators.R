@@ -55,9 +55,10 @@ evaluateIndicators <- function(combis, values, inds) {
   }
 
   escapeIndicatorOrnamentation <- function(x) {
-    x  %>% stringr::str_replace_all("[.]","\\\\.") %>%
-      stringr::str_replace_all("[{]","\\\\{") %>%
-      stringr::str_replace_all("[}]","\\\\}")
+    x  %>%
+      stringr::str_replace_all("[.]", "\\\\.") %>%
+      stringr::str_replace_all("[{]", "\\\\{") %>%
+      stringr::str_replace_all("[}]", "\\\\}")
   }
 
   #Must escape the ornamentation, as these will be substituted
