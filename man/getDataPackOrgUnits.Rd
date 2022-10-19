@@ -28,14 +28,11 @@ organisation units.}
 API other than those returned by default.}
 
 \item{use_cache}{If \code{TRUE}, will first check to see if a cached export
-of Data Pack Org Units already exists and is not stale. If so, will use this
-cached version to save time.}
+of Data Pack Org Units already exists. If so, will use this cached version to
+save time.}
 
 \item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
 authentication with DATIM.}
-
-\item{cache_path}{Local file path to an RDS file containing a cached copy of
-Data Pack Org Units from DATIM.}
 }
 \value{
 Tibble of Data Pack Org Units.

@@ -14,10 +14,8 @@
 #' @param additional_fields Character string of any fields to return from DATIM
 #' API other than those returned by default.
 #' @param use_cache If \code{TRUE}, will first check to see if a cached export
-#' of Data Pack Org Units already exists and is not stale. If so, will use this
-#' cached version to save time.
-#' @param cache_path Local file path to an RDS file containing a cached copy of
-#' Data Pack Org Units from DATIM.
+#' of Data Pack Org Units already exists. If so, will use this cached version to
+#' save time.
 #'
 #' @return Tibble of Data Pack Org Units.
 #'
@@ -26,9 +24,36 @@ getDataPackOrgUnits <- function(country_uids = NULL,
                                 include_DREAMS = TRUE,
                                 additional_fields = NULL,
                                 use_cache = TRUE,
-
                                 d2_session = dynGet("d2_default_session",
                                                     inherits = TRUE)) {
+
+  if (use_cache) {
+
+    if (!is.null(additional_fields)) {
+      stop("Sorry, can't use additional_fields and use_cache at the same time.")
+    }
+
+    orgunits <- valid_OrgUnits
+
+    if (!include_mil) {
+      orgunits %<>%
+        dplyr::filter(org_type != "Military")
+    }
+
+    if (!include_DREAMS) {
+      orgunits %<>%
+        dplyr::filter(org_type != "DSNU")
+    }
+
+    if (!is.null(country_uids)) {
+      orgunits %<>%
+        dplyr::filter(country_uid %in% country_uids)
+    }
+
+    return(orgunits)
+  }
+
+  # If not using cache, then pulling from API. Remainder helps do that.
 
   api_filters <-
     c(paste0("organisationUnitGroups.id:in:[AVy8gJXym2D", # Filter for COP Prioritization SNU
@@ -36,85 +61,82 @@ getDataPackOrgUnits <- function(country_uids = NULL,
              ifelse(include_DREAMS, ",mRRlkbZolDR", ""), # Add DREAMS SNUs if requested
              "]"))
 
-  # Check parameters ####
-  if (!is.null(country_uids)) {
-    country_uids %<>% check_country_uids(force = FALSE)
-    api_filters %<>% append(paste0("ancestors.id:in:[", paste(country_uids, collapse = ","), "]"))
-  }
-
   fields <-
     paste0(
       "id,name,lastUpdated,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]",
       ifelse(!is.null(additional_fields), paste0(",", additional_fields), ""))
 
-  #Calculate a cache hash
-  cache_hash <- digest::sha1(list(api_filters, fields))
-  cache_path <- paste0(Sys.getenv("support_files_directory"), cache_hash, ".rds")
-
-
   # Pull Org Units ####
-  is_fresh <- cache_is_fresh(cache_path)
+  organisationUnits <-
+    datimutils::getMetadata(
+      "organisationUnits",
+      api_filters,
+      fields = fields,
+      d2_session = d2_session)
 
-  if (use_cache && is_fresh) {
-    interactive_print("Loading cached Data Pack Org Units")
-    orgunits <- readRDS(cache_path)
-  } else {
+  # orgunits <- datimutils::getSqlView(sql_view_uid = ""), #Replace once DP-786 resolved
 
-    orgunits <-
-      datimutils::getMetadata(
-        "organisationUnits",
-        api_filters,
-        fields = fields,
-        d2_session = d2_session)
+  # Filter by country if needed ####
 
-    # orgunits <- datimutils::getSqlView(sql_view_uid = ""), #Replace once DP-786 resolved
+    # Add country_uid here instead of later so we can filter against it quickly.
+    # Not as simple as filtering against the one ancestors col because sometimes
+    # the org unit *is* a country. And by the time you've filtered correctly,
+    # might as well have just created the country_uid column.
 
-    # Extract metadata ####
+  orgunits <- organisationUnits %>%
+    tibble::as_tibble(.) %>%
+    dplyr::rename(uid = id) %>%
+    dplyr::mutate(
+      level_4_type = purrr::map(ancestors, list("organisationUnitGroups", 4, "id"), .default = NA),
+      org_type =
+        dplyr::case_when(
+          stringr::str_detect(as.character(organisationUnitGroups), "nwQbMeALRjL") ~ "Military",
+          stringr::str_detect(as.character(organisationUnitGroups), "cNzfcPWEGSH") ~ "Country",
+          stringr::str_detect(as.character(organisationUnitGroups), "AVy8gJXym2D") ~ "PSNU",
+          stringr::str_detect(as.character(organisationUnitGroups), "mRRlkbZolDR") ~ "DSNU"),
+            # While some PSNUs may also be DSNUs, the above will only categorize
+            # as a DSNU when it has not already been tagged as a PSNU, making it
+            # easier to distinguish the DSNUs below PSNU level in Eswatini & Rwanda.
+            # See DP-768 for more.
+      country_uid = dplyr::case_when(
+        org_type == "Country" ~ uid,
+        stringr::str_detect(as.character(level_4_type), "cNzfcPWEGSH") ~ # i.e., when a country under regional OU...
+          purrr::map_chr(ancestors, list("id", 4), .default = NA),
+        TRUE ~ purrr::map_chr(ancestors, list("id", 3), .default = NA))
+    )
+
+  if (!is.null(country_uids)) {
+    country_uids %<>% check_country_uids(force = FALSE)
     orgunits %<>%
-      tibble::as_tibble(.) %>%
-      dplyr::rename(uid = id) %>%
-        dplyr::mutate(
-          org_type =
-            dplyr::case_when(
-              stringr::str_detect(as.character(organisationUnitGroups), "nwQbMeALRjL") ~ "Military",
-              stringr::str_detect(as.character(organisationUnitGroups), "cNzfcPWEGSH") ~ "Country",
-              stringr::str_detect(as.character(organisationUnitGroups), "AVy8gJXym2D|mRRlkbZolDR") ~ "SNU"),
-          DREAMS =
-            dplyr::case_when(
-              stringr::str_detect(as.character(organisationUnitGroups), "mRRlkbZolDR") ~ "Y"
-            ),
-          level_4_type = purrr::map(ancestors, list("organisationUnitGroups", 4, "id"), .default = NA),
-          country_name = dplyr::case_when(
-            org_type == "Country" ~ name,
-            stringr::str_detect(as.character(level_4_type), "cNzfcPWEGSH") ~
-              purrr::map_chr(ancestors, list("name", 4), .default = NA),
-            TRUE ~ purrr::map_chr(ancestors, list("name", 3), .default = NA)),
-          country_uid = dplyr::case_when(
-            org_type == "Country" ~ uid,
-            stringr::str_detect(as.character(level_4_type), "cNzfcPWEGSH") ~
-              purrr::map_chr(ancestors, list("id", 4), .default = NA),
-            TRUE ~ purrr::map_chr(ancestors, list("id", 3), .default = NA)),
-          # What to do about DSNUs != PSNU. Leave these NA?
-          ou_uid = purrr::map_chr(ancestors, list("id", 3), .default = NA),
-          ou = purrr::map_chr(ancestors, list("name", 3), .default = NA),
-          snu1_uid = purrr::map_chr(ancestors, list("id", 4), .default = NA)
-              %|% uid,
-          snu1 = purrr::map_chr(ancestors, list("name", 4), .default = NA)
-              %|% name) %>%
-        dplyr::select(ou, ou_uid, country_name, country_uid, snu1, snu1_uid,
-                      name, uid, org_type,
-                      tidyselect::everything(), -level_4_type)
-    }
-
-  can_write_file <- file.access(dirname(cache_path), 2) == 0
-
-  # If cache location can be written and fresh data was pulled, write fresh cache to location
-  if (can_write_file && !is_fresh) {
-    interactive_print(paste0("Updating Data Pack org units cache at ", cache_path))
-    saveRDS(orgunits, file = cache_path)
+      dplyr::filter(country_uid %in% country_uids)
   }
 
-  orgunits
+  # Extract metadata ####
+  orgunits %<>%
+    dplyr::mutate(
+      DREAMS =
+        dplyr::case_when(
+          stringr::str_detect(as.character(organisationUnitGroups), "mRRlkbZolDR") ~ "Y"),
+      country_name = dplyr::case_when(
+        org_type == "Country" ~ name,
+        stringr::str_detect(as.character(level_4_type), "cNzfcPWEGSH") ~
+          purrr::map_chr(ancestors, list("name", 4), .default = NA),
+        TRUE ~ purrr::map_chr(ancestors, list("name", 3), .default = NA)),
+      ou_uid = purrr::map_chr(ancestors, list("id", 3), .default = NA),
+      ou = purrr::map_chr(ancestors, list("name", 3), .default = NA),
+      snu1_uid = purrr::map_chr(ancestors, list("id", 4), .default = NA)
+          %|% uid,
+      snu1 = purrr::map_chr(ancestors, list("name", 4), .default = NA)
+          %|% name) %>%
+    dplyr::select(name, uid, org_type,
+                  ou, ou_uid, country_name, country_uid, snu1, snu1_uid,
+                  tidyselect::everything(), -level_4_type)
+
+  # Sort pretty
+  orgunits %<>%
+    dplyr::arrange(ou, country_name, snu1, org_type, name)
+
+  return(orgunits)
 }
 
 
@@ -126,7 +148,7 @@ getDataPackOrgUnits <- function(country_uids = NULL,
 #'
 #' @param orgunits Data frame of Data Pack org units produced by \code{\link{getDataPackOrgUnits}}.
 #'
-#' @return Data frame of Data Pack Org units with added Data Pack label, \code{dp_psnu}.
+#' @return Data frame of Data Pack Org units with added Data Pack label, \code{dp_label}.
 #'
 add_dp_label <- function(orgunits) {
 
@@ -140,10 +162,5 @@ add_dp_label <- function(orgunits) {
           paste0(country_name, " > "),
           ""),
         name,
-        dplyr::if_else(!is.na(org_type), paste0(" [#", org_type, "]"), ""),
-        dplyr::if_else(!is.na(DREAMS), " [#DREAMS]", ""),
-        " [", uid, "]")
-    )
-
-  orgunits
+        " [", uid, "]"))
 }
