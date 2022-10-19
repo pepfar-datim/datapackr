@@ -89,7 +89,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
         d2_session = d2_session,
         include_default = TRUE
       )
-    assertthat::are_equal(NROW(df),NROW(d$memo$datim$analytics))
+    assertthat::are_equal(NROW(df), NROW(d$memo$datim$analytics))
 
   }
 
