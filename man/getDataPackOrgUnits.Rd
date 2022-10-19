@@ -6,7 +6,6 @@
 on provided country UIDs.}
 \usage{
 getDataPackOrgUnits(
-  country_uids = NULL,
   include_mil = TRUE,
   include_DREAMS = TRUE,
   additional_fields = NULL,
@@ -15,9 +14,6 @@ getDataPackOrgUnits(
 )
 }
 \arguments{
-\item{country_uids}{Unique IDs for countries to include in the Data Pack.
-For full list of these IDs, see \code{datapackr::valid_OrgUnits}.}
-
 \item{include_mil}{Logical. If \code{TRUE}, will also include _Military nodes
 related to \code{country_uids}. Default is \code{TRUE}.}
 

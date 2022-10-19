@@ -5,7 +5,6 @@ with_mock_api({
 
     test_dataset <-
       getDataPackOrgUnits(
-        country_uids = "qllxzIjjurr",
         include_mil = FALSE,
         include_DREAMS = TRUE,
         use_cache = FALSE,

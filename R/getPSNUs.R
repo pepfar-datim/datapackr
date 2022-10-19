@@ -19,8 +19,7 @@
 #'
 #' @return Tibble of Data Pack Org Units.
 #'
-getDataPackOrgUnits <- function(country_uids = NULL,
-                                include_mil = TRUE,
+getDataPackOrgUnits <- function(include_mil = TRUE,
                                 include_DREAMS = TRUE,
                                 additional_fields = NULL,
                                 use_cache = TRUE,
@@ -43,11 +42,6 @@ getDataPackOrgUnits <- function(country_uids = NULL,
     if (!include_DREAMS) {
       orgunits %<>%
         dplyr::filter(org_type != "DSNU")
-    }
-
-    if (!is.null(country_uids)) {
-      orgunits %<>%
-        dplyr::filter(country_uid %in% country_uids)
     }
 
     return(orgunits)
@@ -76,13 +70,7 @@ getDataPackOrgUnits <- function(country_uids = NULL,
 
   # orgunits <- datimutils::getSqlView(sql_view_uid = ""), #Replace once DP-786 resolved
 
-  # Filter by country if needed ####
-
-    # Add country_uid here instead of later so we can filter against it quickly.
-    # Not as simple as filtering against the one ancestors col because sometimes
-    # the org unit *is* a country. And by the time you've filtered correctly,
-    # might as well have just created the country_uid column.
-
+  # Extract metadata ####
   orgunits <- organisationUnits %>%
     tibble::as_tibble(.) %>%
     dplyr::rename(uid = id) %>%
@@ -102,18 +90,7 @@ getDataPackOrgUnits <- function(country_uids = NULL,
         org_type == "Country" ~ uid,
         stringr::str_detect(as.character(level_4_type), "cNzfcPWEGSH") ~ # i.e., when a country under regional OU...
           purrr::map_chr(ancestors, list("id", 4), .default = NA),
-        TRUE ~ purrr::map_chr(ancestors, list("id", 3), .default = NA))
-    )
-
-  if (!is.null(country_uids)) {
-    country_uids %<>% check_country_uids(force = FALSE)
-    orgunits %<>%
-      dplyr::filter(country_uid %in% country_uids)
-  }
-
-  # Extract metadata ####
-  orgunits %<>%
-    dplyr::mutate(
+        TRUE ~ purrr::map_chr(ancestors, list("id", 3), .default = NA)),
       DREAMS =
         dplyr::case_when(
           stringr::str_detect(as.character(organisationUnitGroups), "mRRlkbZolDR") ~ "Y"),
