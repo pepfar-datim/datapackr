@@ -85,6 +85,7 @@ renderPrioTable <- function(memo_doc, prio_table, ou_name, source_type) {
   }
 
 
+  has_no_prio <- "No Prioritization - USG Only" %in% names(prio_table)
 
   #Transform all zeros to dashes
   prio_table %<>%
@@ -123,7 +124,16 @@ renderPrioTable <- function(memo_doc, prio_table, ou_name, source_type) {
     flextable::align(j = 1:2, align = "center") %>% #Center first two columns
     flextable::add_footer_lines(values = footer_message)
 
+    if (has_no_prio) {
+      prio_table <- flextable::bg(prio_table,
+                                  j = "No Prioritization - USG Only",
+                                  bg = "#D3D3D3", part = "body") %>%
+        flextable::bg(i = ~ Age == "Total",
+                      bg = "#E4DFEC",
+                      part = "body") #Highlight total rows
 
+
+    }
 
 
   fontname <- defaultMemoFont()

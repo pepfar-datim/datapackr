@@ -37,6 +37,9 @@ unPackOPUDataPack <- function(d,
   # Prepare data for sharing with other systems ####
   d <- createAnalytics(d, d2_session = d2_session)
 
+  # Check for invalid mechanisms
+  d <- checkMechanisms(d, d2_session = d2_session)
+
   return(d)
 
 }

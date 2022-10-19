@@ -90,9 +90,18 @@ with_mock_api({
     expect_true(names(d$memo$datapack$by_prio)[[2]] == "Age")
     expect_true(names(d$memo$datapack$by_prio)[[NCOL(d$memo$datapack$by_prio)]] == "Total")
     prio_cols_end <- NCOL(d$memo$datapack$by_prio) - 1
-    print(names(d$memo$datapack$by_prio[3:prio_cols_end]))
+
+    #We have changed  the No prioritization label here....
+    prio_dict_mod <- prioritization_dict() %>%
+      dplyr::mutate(
+        name = dplyr::case_when(
+          name == "No Prioritization" ~ "No Prioritization - USG Only",
+          TRUE ~ name
+        )
+      )
+
     expect_true(all(
-      names(d$memo$datapack$by_prio[3:prio_cols_end]) %in% prioritization_dict()$name
+      names(d$memo$datapack$by_prio[3:prio_cols_end]) %in% prio_dict_mod$name
     ))
 
     #Compare to confirm that the totals match
@@ -131,6 +140,10 @@ with_mock_api({
     #By Partner
     #Only test the structure here....
     expect_identical(names(d$memo$datapack$by_partner)[1:3], c("Agency", "Partner", "Mechanism"))
+
+    #Difficult to test the Word doc, but lets just confirm it works
+    doc <- generateApprovalMemo(d, memo_type = "comparison", draft_memo = TRUE, d2_session = training)
+    expect_equal(class(doc), "rdocx")
 
   })
 })
