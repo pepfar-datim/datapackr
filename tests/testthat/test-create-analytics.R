@@ -29,7 +29,7 @@ with_mock_api({
     # "upload_timestamp", removed form below to alleviate duplicates
     analytics_column_names <-
       c(
-        "ou", "ou_id", "country_name", "country_uid", "snu1", "snu1_id", "psnu",
+        "ou", "ou_uid", "country_name", "country_uid", "snu1", "snu1_uid", "psnu",
         "psnu_uid", "prioritization", "mechanism_code", "mechanism_desc", "partner_id",
         "partner_desc", "funding_agency", "fiscal_year", "dataelement_id", "dataelement_name",
         "indicator", "numerator_denominator", "support_type", "hts_modality",
@@ -46,9 +46,9 @@ with_mock_api({
    foo <- sapply(d$data$analytics, typeof)
    expect_true(all(foo[!(names(d$data$analytics) %in%  numeric_columns)] == "character"))
    expect_true(all(foo[(names(d$data$analytics) %in%  numeric_columns)] == "double"))
-   expect_true(all(sapply(d$data$analytics$ou_id, is_uidish)))
+   expect_true(all(sapply(d$data$analytics$ou_uid, is_uidish)))
    expect_true(all(sapply(d$data$analytics$country_uid, is_uidish)))
-   expect_true(all(sapply(d$data$analytics$snu1_id, is_uidish)))
+   expect_true(all(sapply(d$data$analytics$snu1_uid, is_uidish)))
    expect_true(all(sapply(d$data$analytics$psnu_uid, is_uidish)))
    expect_true(all(sapply(d$data$analytics$dataelement_id, is_uidish)))
   })

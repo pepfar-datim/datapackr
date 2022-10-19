@@ -1,122 +1,143 @@
 #' @export
-#' @title Pull list of PSNUs from DATIM based on provided country UIDs.
+#' @title Pull list of Org Units approved for use in Data Packs from DATIM based
+#' on provided country UIDs.
 #'
 #' @description
-#' Queries DATIM to extract list of PSNUs and adds additional PSNUs not
-#' currently in DATIM as needed.
+#' Queries DATIM to extract tibble of Org Units approved for use in Data Pack
+#' target setting.
 #'
-#' @param country_uids Character vector of DATIM country IDs. This can only
-#' include countries. Regional Operating Unit UIDs will not be accepted
+#' @inheritParams datapackr_params
 #' @param include_mil Logical. If \code{TRUE}, will also include _Military nodes
 #' related to \code{country_uids}. Default is \code{TRUE}.
-#' @param include_DREAMS If \code{TRUE} will also include DREAMS organisation units.
+#' @param include_DREAMS Logical. If \code{TRUE}, will also include DREAMS
+#' organisation units.
 #' @param additional_fields Character string of any fields to return from DATIM
-#' API other than those returned by default: \code{name}, \code{id}, \code{ancestors},
-#' & \code{organisationUnitGroups}.
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' API other than those returned by default.
+#' @param use_cache If \code{TRUE}, will first check to see if a cached export
+#' of Data Pack Org Units already exists. If so, will use this cached version to
+#' save time.
 #'
-#' @return Data frame of PSNUs
+#' @return Tibble of Data Pack Org Units.
 #'
-getPSNUs <- function(country_uids = NULL,
-                     include_mil = TRUE,
-                     include_DREAMS = TRUE,
-                     additional_fields = NULL,
-                     d2_session = dynGet("d2_default_session",
-                                         inherits = TRUE)) {
+getDataPackOrgUnits <- function(include_mil = TRUE,
+                                include_DREAMS = TRUE,
+                                additional_fields = NULL,
+                                use_cache = TRUE,
+                                d2_session = dynGet("d2_default_session",
+                                                    inherits = TRUE)) {
 
-  # Pull PSNUs from DATIM ####
-  PSNUs <- api_call("organisationUnits",
-                    d2_session = d2_session) %>%
-    api_filter(
-      "organisationUnitGroups.id",
-      "in",
-      paste0(
-        "AVy8gJXym2D",
-        dplyr::if_else(include_mil, ",nwQbMeALRjL", ""),
-        dplyr::if_else(include_DREAMS, ",mRRlkbZolDR", "")
-      )
-    ) %>%
-    purrr::when(all(!is.null(country_uids)) ~ api_filter(., "ancestors.id", "in",
-    match = paste(country_uids, collapse = ",")),
-    ~ .) %>%
-    datapackr::api_fields(
-      "id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]"
-    ) %>%
-    purrr::when(!is.null(additional_fields) ~ datapackr::api_fields(., additional_fields),
-    ~ .) %>%
-    datapackr::api_get(d2_session = d2_session)
+  if (use_cache) {
+
+    if (!is.null(additional_fields)) {
+      stop("Sorry, can't use additional_fields and use_cache at the same time.")
+    }
+
+    orgunits <- valid_OrgUnits
+
+    if (!include_mil) {
+      orgunits %<>%
+        dplyr::filter(org_type != "Military")
+    }
+
+    if (!include_DREAMS) {
+      orgunits %<>%
+        dplyr::filter(org_type != "DSNU")
+    }
+
+    return(orgunits)
+  }
+
+  # If not using cache, then pulling from API. Remainder helps do that.
+
+  api_filters <-
+    c(paste0("organisationUnitGroups.id:in:[AVy8gJXym2D", # Filter for COP Prioritization SNU
+             ifelse(include_mil, ",nwQbMeALRjL", ""), # Add military SNUs if requested
+             ifelse(include_DREAMS, ",mRRlkbZolDR", ""), # Add DREAMS SNUs if requested
+             "]"))
+
+  fields <-
+    paste0(
+      "id,name,lastUpdated,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]",
+      ifelse(!is.null(additional_fields), paste0(",", additional_fields), ""))
+
+  # Pull Org Units ####
+  organisationUnits <-
+    datimutils::getMetadata(
+      "organisationUnits",
+      api_filters,
+      fields = fields,
+      d2_session = d2_session)
+
+  # orgunits <- datimutils::getSqlView(sql_view_uid = ""), #Replace once DP-786 resolved
 
   # Extract metadata ####
-  PSNUs %<>%
-    dplyr::rename(psnu = name, psnu_uid = id) %>%
+  orgunits <- organisationUnits %>%
+    tibble::as_tibble(.) %>%
+    dplyr::rename(uid = id) %>%
     dplyr::mutate(
-      psnu_type =
+      level_4_type = purrr::map(ancestors, list("organisationUnitGroups", 4, "id"), .default = NA),
+      org_type =
         dplyr::case_when(
           stringr::str_detect(as.character(organisationUnitGroups), "nwQbMeALRjL") ~ "Military",
           stringr::str_detect(as.character(organisationUnitGroups), "cNzfcPWEGSH") ~ "Country",
-          stringr::str_detect(as.character(organisationUnitGroups), "AVy8gJXym2D") ~ "SNU"),
+          stringr::str_detect(as.character(organisationUnitGroups), "AVy8gJXym2D") ~ "PSNU",
+          stringr::str_detect(as.character(organisationUnitGroups), "mRRlkbZolDR") ~ "DSNU"),
+            # While some PSNUs may also be DSNUs, the above will only categorize
+            # as a DSNU when it has not already been tagged as a PSNU, making it
+            # easier to distinguish the DSNUs below PSNU level in Eswatini & Rwanda.
+            # See DP-768 for more.
+      country_uid = dplyr::case_when(
+        org_type == "Country" ~ uid,
+        stringr::str_detect(as.character(level_4_type), "cNzfcPWEGSH") ~ # i.e., when a country under regional OU...
+          purrr::map_chr(ancestors, list("id", 4), .default = NA),
+        TRUE ~ purrr::map_chr(ancestors, list("id", 3), .default = NA)),
       DREAMS =
         dplyr::case_when(
-          stringr::str_detect(as.character(organisationUnitGroups), "mRRlkbZolDR") ~ "Y"
-        ),
-      level_4_type = purrr::map(ancestors, list("organisationUnitGroups", 4), .default = NA),
+          stringr::str_detect(as.character(organisationUnitGroups), "mRRlkbZolDR") ~ "Y"),
       country_name = dplyr::case_when(
-        psnu_type == "Country" ~ psnu,
+        org_type == "Country" ~ name,
         stringr::str_detect(as.character(level_4_type), "cNzfcPWEGSH") ~
           purrr::map_chr(ancestors, list("name", 4), .default = NA),
-        TRUE ~ purrr::map_chr(ancestors, list("name", 3), .default = NA)
-      ),
-      country_uid = dplyr::case_when(
-        psnu_type == "Country" ~ psnu_uid,
-        stringr::str_detect(as.character(level_4_type), "cNzfcPWEGSH") ~
-          purrr::map_chr(ancestors, list("id", 4), .default = NA),
-        TRUE ~ purrr::map_chr(ancestors, list("id", 3), .default = NA)
-      ),
-      ou_id = purrr::map_chr(ancestors, list("id", 3), .default = NA),
+        TRUE ~ purrr::map_chr(ancestors, list("name", 3), .default = NA)),
+      ou_uid = purrr::map_chr(ancestors, list("id", 3), .default = NA),
       ou = purrr::map_chr(ancestors, list("name", 3), .default = NA),
-      snu1_id = dplyr::if_else(
-        condition = is.na(purrr::map_chr(ancestors, list("id", 4), .default = NA)),
-        true = psnu_uid,
-        false = purrr::map_chr(ancestors, list("id", 4), .default = NA)),
-      snu1 = dplyr::if_else(
-        condition = is.na(purrr::map_chr(ancestors, list("name", 4), .default = NA)),
-        true = psnu,
-        false = purrr::map_chr(ancestors, list("name", 4), .default = NA))
-    ) %>%
-    dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id,
-                  psnu, psnu_uid, psnu_type,
+      snu1_uid = purrr::map_chr(ancestors, list("id", 4), .default = NA)
+          %|% uid,
+      snu1 = purrr::map_chr(ancestors, list("name", 4), .default = NA)
+          %|% name) %>%
+    dplyr::select(name, uid, org_type,
+                  ou, ou_uid, country_name, country_uid, snu1, snu1_uid,
                   tidyselect::everything(), -level_4_type)
 
-  return(PSNUs)
+  # Sort pretty
+  orgunits %<>%
+    dplyr::arrange(ou, country_name, snu1, org_type, name)
+
+  return(orgunits)
 }
 
 
 #' @export
-#' @title Modify PSNU list to add datapackr IDs.
+#' @title Modify Data Pack Org Unit list to add datapackr IDs.
 #'
 #' @description
-#' Adds PSNU label used in Data Packs.
+#' Adds Org Unit label used in Data Packs.
 #'
-#' @param PSNUs Data frame of PSNUs produced by \code{\link{getPSNUs}}.
+#' @param orgunits Data frame of Data Pack org units produced by \code{\link{getDataPackOrgUnits}}.
 #'
-#' @return Data frame of PSNUs with added Data Pack label, \code{dp_psnu}.
+#' @return Data frame of Data Pack Org units with added Data Pack label, \code{dp_label}.
 #'
-add_dp_psnu <- function(PSNUs) {
+add_dp_label <- function(orgunits) {
 
-  country_count <- unique(PSNUs$country_uid) %>% length()
+  country_count <- unique(orgunits$country_uid) %>% length()
 
-  PSNUs %<>%
+  orgunits %<>%
     dplyr::mutate(
-      dp_psnu = paste0(
+      dp_label = paste0(
         dplyr::if_else(
-          country_count > 1 & country_uid != psnu_uid,
+          country_count > 1 & country_uid != uid,
           paste0(country_name, " > "),
           ""),
-        psnu,
-        dplyr::if_else(!is.na(psnu_type), paste0(" [#", psnu_type, "]"), ""),
-        dplyr::if_else(!is.na(DREAMS), " [#DREAMS]", ""),
-        " [", psnu_uid, "]")
-    )
-
-  return(PSNUs)
+        name,
+        " [", uid, "]"))
 }

@@ -22,12 +22,12 @@ create_play_spectrum_output <- function(country_uids,
   map_des_cocs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
 
   # Get PSNU list ####
-  PSNUs <- datapackr::valid_PSNUs %>%
+  PSNUs <- datapackr::valid_OrgUnits %>%
     dplyr::filter(country_uid %in% country_uids,
                   psnu_type != "Military") %>%
-    datapackr::add_dp_psnu(.) %>%
-    dplyr::arrange(dp_psnu) %>%
-    dplyr::select(PSNU = dp_psnu, psnu_uid)
+    datapackr::add_dp_label(.) %>%
+    dplyr::arrange(dp_label) %>%
+    dplyr::select(PSNU = dp_label, psnu_uid = uid)
 
   # Get some real data from DATIM ####
   spectrum_des <- tibble::tribble(

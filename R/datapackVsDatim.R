@@ -29,7 +29,7 @@ compareData_DatapackVsDatim <-
                                                    d2session = d2_session)
 
       psnus <-
-        datapackr::valid_PSNUs %>% dplyr::select(psnu, psnu_uid)
+        datapackr::valid_OrgUnits %>% dplyr::select(psnu = name, psnu_uid = uid)
 
   # calculate diff between data pack and datim handling NAs like a 0
   # round diff to 5 decimal places so we don't get differences due to floating point error

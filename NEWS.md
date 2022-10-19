@@ -1,3 +1,21 @@
+# datapackr 5.3.1
+
+## Breaking changes
+* Removes `getFY22Prioritizations` in favor of clearer, more stable, internal functions.
+* Replaces getPSNUs with with more versatile (and appropriately named)
+getDataPackOrgUnits. Many of the org units used in Data Packs are actually not
+PSNUs (e.g., DREAMS SNUs, or Military SNUs), making many of the columns created
+previously less than sensible. This function now also produces a tibble instead
+of a data frame. In some cases, column names in this output have also slightly
+changed.
+* adorn_import_file can now correctly assign prioritizations to org units below
+PSNU.
+
+## New features
+
+## Minor improvements and fixes
+
+
 # datapackr 5.3.0
 
 ## Breaking changes
@@ -64,8 +82,7 @@
    * `unPackSheets`
    * `prepareMemoData`
    * `createAnalytics`
-* Adds additional explanation to documentation of d2_session parameter.
- 
+
 
 # datapackr 5.2.3
 
@@ -327,7 +344,7 @@
     - Adds `d2_session` argument to `createKeychainInfo`
     - Updates relevant tests to incorporate new elements of keychain
 * Enables the ability to get COP22 data using `getCOPDataFromDATIM` (DP-536)
-    
+
 ## Minor improvements and fixes
 * Adds `parallel`, `gdtools`, `flextable`, and `officer` as suggested packages
 
@@ -344,7 +361,7 @@
 
 ## Bug Fixes
 * Downgrades `openxslx` to version 4.2.3 to prevent error with PSNUxIM packing.
-* Changes the HTS modality group set to `HTS Modality (USE ONLY for FY22 Results/FY23 Targets)`. 
+* Changes the HTS modality group set to `HTS Modality (USE ONLY for FY22 Results/FY23 Targets)`.
 * Change `compareData_OpuDatapackVsDatim` to NOT compare AGYW data which are not part of OPU data packs.
 
 ## Breaking changes

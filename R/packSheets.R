@@ -40,13 +40,13 @@ packDataPackSheets <- function(wb,
   # Get org_units to write into Data Pack based on provided parameters. ####
   if (is.null(org_units)) {
     if (ou_level == "Prioritization") {
-      org_units <- datapackr::valid_PSNUs %>% # Load in valid_PSNUs list from package
+      org_units <- datapackr::valid_OrgUnits %>% # Load in valid_PSNUs list from package
         dplyr::filter(country_uid %in% country_uids) %>%
-        add_dp_psnu(.) %>%
-        dplyr::arrange(dp_psnu) %>%
+        add_dp_label(.) %>%
+        dplyr::arrange(dp_label) %>%
         ## Remove DSNUs
-        dplyr::filter(!is.na(psnu_type)) %>%
-        dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)
+        dplyr::filter(!is.na(org_type)) %>%
+        dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
       #TODO: Update Data Pack and here to use `OrgUnit as column header instead
       # of PSNU to allow custom org unit list.
 
@@ -115,12 +115,12 @@ packDataPackSheets <- function(wb,
     }
 
     if (sheet == "AGYW") {
-      org_units_sheet <- datapackr::valid_PSNUs %>% # Load in valid_PSNUs list from package
+      org_units_sheet <- datapackr::valid_OrgUnits %>% # Load in valid_PSNUs list from package
         dplyr::filter(country_uid %in% country_uids) %>%
-        add_dp_psnu(.) %>%
-        dplyr::arrange(dp_psnu) %>% # Order rows based on dp_psnu col values
+        add_dp_label(.) %>%
+        dplyr::arrange(dp_label) %>% # Order rows based on dp_psnu col values
         dplyr::filter(!is.na(DREAMS)) %>%
-        dplyr::select(PSNU = dp_psnu, psnu_uid, snu1)# Only keep these columns
+        dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)# Only keep these columns
 
       if (NROW(org_units_sheet) == 0) {
         next

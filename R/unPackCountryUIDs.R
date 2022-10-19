@@ -74,10 +74,10 @@ unPackCountryUIDs <- function(submission_path,
 
       } else if (datapack_name == "Caribbean Region") {
         country_uids <- c("RKoVudgb05Y", "PeOHqAwdtez", "WuxG6jzaypt", "zhJINyURZ5Y", "WSl5y9jxCpC")
-      } else if (datapack_name %in% unique(valid_PSNUs$country_name)) {
-        country_uids <- unique(valid_PSNUs$country_uid[valid_PSNUs$country_name == datapack_name])
-      } else if (datapack_name %in% unique(valid_PSNUs$ou)) {
-        country_uids <- unique(valid_PSNUs$country_uid[valid_PSNUs$ou == datapack_name])
+      } else if (datapack_name %in% unique(valid_OrgUnits$country_name)) {
+        country_uids <- unique(valid_OrgUnits$country_uid[valid_OrgUnits$country_name == datapack_name])
+      } else if (datapack_name %in% unique(valid_OrgUnits$ou)) {
+        country_uids <- unique(valid_OrgUnits$country_uid[valid_OrgUnits$ou == datapack_name])
       } else {
         stop("Impossible to deduce Country UIDs from submission.")
       }
@@ -160,8 +160,8 @@ parsePSNUs <- function(submission_path, tool, cop_year) {
     # Add PSNU uid ####
   dplyr::mutate(
     psnu_uid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
-    dplyr::left_join(datapackr::valid_PSNUs %>%
-                       dplyr::select(psnu_uid, country_name, country_uid),
+    dplyr::left_join(datapackr::valid_OrgUnits %>%
+                       dplyr::select(psnu_uid = uid, country_name, country_uid),
                      by = "psnu_uid") %>%
     dplyr::filter_all(dplyr::any_vars(!is.na(.)))
 
