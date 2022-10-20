@@ -264,7 +264,7 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
                       tibble::add_column(sheet = y, .before = 1)
                   })
 
-    ch$lvl <- "WARNING"
+    ch$lvl <- "ERROR"
 
     ch$msg <-
       purrr::map2(
