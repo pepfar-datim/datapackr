@@ -91,7 +91,7 @@ adorn_import_file <- function(psnu_import_file,
                                                   inherits = TRUE),
                               include_default = FALSE) {
 
-  #row_num <- NROW(psnu_import_file)
+  row_num <- NROW(psnu_import_file)
 
   cop_year %<>% check_cop_year()
 
@@ -101,7 +101,7 @@ adorn_import_file <- function(psnu_import_file,
                      by = c("orgUnit" = "uid"))
 
   # Utilizes row_num to ensure the join worked as expected
-  # assertthat::are_equal(NROW(psnu_import_file), row_num)
+  assertthat::are_equal(NROW(psnu_import_file), row_num)
   # TODO: Convert to test
 
   # Add Prioritizations ####
