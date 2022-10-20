@@ -23,10 +23,14 @@ unPackDataPackSheet <- function(d,
                                 clean_values = TRUE) {
 
   #If we have corrupt sheets, it may not be smart to try and unpack them at all.
-  #If they are missing index columns, we are not going to attempt to unpack them.
-  if (!is.null(d$tests$missing_index_columns)) {
-    sheets <- sheets[!(sheets %in% d$tests$missing_index_columns$sheet_name)]
-  }
+  # Don't proceed with any sheets where *any* index columns are missing (PSNU,
+  #   Age, Sex, KeyPop), or no rows of data
+
+  no_data <- c(d$tests$missing_index_columns$sheet_name,
+               d$tests$no_rows_data$sheet_name) %>%
+    unique()
+
+  sheets <- sheets[!sheets %in% no_data]
 
   keep_cols <- d$info$schema %>%
     dplyr::filter(
