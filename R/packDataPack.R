@@ -15,12 +15,12 @@ packDataPack <- function(d,
 
   # Checks and reads in Data Pack Model File ####
   stopifnot(
-    "Model data file could not be read!" = canReadFile(d$info$model_data_path),
+    "Model data file could not be read!" = canReadFile(d$keychain$model_data_path),
     "Model data is not correct file type! File must have .rds extension." =
-      tools::file_ext(d$info$model_data_path) == "rds"
+      tools::file_ext(d$keychain$model_data_path) == "rds"
   )
 
-  d$data$model_data <- readRDS(d$info$model_data_path)
+  d$data$model_data <- readRDS(d$keychain$model_data_path)
 
   # Write Main Sheets ####
   d$tool$wb <- packDataPackSheets(wb = d$tool$wb,
