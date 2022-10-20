@@ -1,8 +1,24 @@
+# datapackr 5.3.1
+
+## Breaking changes
+* Removes `getFY22Prioritizations` in favor of clearer, more stable, internal functions.
+* Replaces getPSNUs with with more versatile (and appropriately named)
+getDataPackOrgUnits. Many of the org units used in Data Packs are actually not
+PSNUs (e.g., DREAMS SNUs, or Military SNUs), making many of the columns created
+previously less than sensible. This function now also produces a tibble instead
+of a data frame. In some cases, column names in this output have also slightly
+changed.
+* adorn_import_file can now correctly assign prioritizations to org units below
+PSNU.
+
+## New features
+
+## Minor improvements and fixes
+
+
 # datapackr 5.3.0
 
 ## Breaking changes
-* Replaces some check functions with new versions (see below).
-* Replaces `getFY22Prioritizations` with `getPrioritizations` for cross-year usage.
 * Removes the following functions from the package:
    - `checkComments`
    - `checkDuplicateRows`
@@ -66,7 +82,6 @@
    * `unPackSheets`
    * `prepareMemoData`
    * `createAnalytics`
-* Adds additional explanation to documentation of d2_session parameter.
 
 
 # datapackr 5.2.3

@@ -44,22 +44,6 @@ createAnalytics <- function(d,
   pzns <- d$datim$prioritizations %>%
     dplyr::select(orgUnit, value)
 
-  if (d$info$unallocatedIMs || !d$info$has_psnuxim) {
-    d$data$analytics %<>%
-          dplyr::mutate(dplyr::across(
-            c(mechanism_code, mechanism_desc, partner_desc, funding_agency),
-            ~ dplyr::case_when(
-              is.na(.x) &
-                stringr::str_detect(support_type, "DSD|TA") ~ "Unallocated",
-              is.na(.x) &
-                stringr::str_detect(support_type, "Sub-National") ~ "default",
-              is.na(.x) &
-                stringr::str_detect(support_type, "No Support Type") ~ "default",
-              TRUE ~ .x
-            )
-          ))
-      }
-
   d$data$analytics <-
     switch(ifelse(d$info$has_psnuxim, "MER", "UndistributedMER"),
            MER = d$datim$MER,

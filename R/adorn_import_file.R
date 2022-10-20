@@ -1,4 +1,5 @@
-#'
+#' @export
+#' @title getPSNUInfo
 #' @description Certain special PSNUs (like DREAMS) are part of the
 #' target setting process, but may exist at a level in the
 #' organisation unit hierarchy other than the COP Prioritization level.
@@ -7,80 +8,64 @@
 #' which do not exist at the level at which prioritization is set,
 #' the parent prioritization should be used.
 #'
-#'
-#'
-#'
-
-getPriorizationSNU <- function(psnu_uids) {
-
-  # Get a full map of all the PSNUs
-  orgunits <- valid_OrgUnits %>% # Comes from file data/valid_PSNUs.rda
-    dplyr::filter(uid %in% unique(psnu_uids)) %>%
-    add_dp_label(.) #Found in getPSNUs.R
-
-
-  ancestor_ids <- lapply(orgunits$ancestors, function(x) x[["id"]])
-
-  #Determine if this is in the COP Prioritization SNU
-  psnu_lvl <-
-    lapply(orgunits$ancestors, function(x) {
-      lapply(x[["organisationUnitGroups"]],
-             function(x) any(x$id %in% "AVy8gJXym2D"))
-    })
-
-  #Determine the position of the ancestor.
-  #Note that this will take the first match only.
-  # There should never be multiple ancestors
-  #We are not really protected against it if it happens.
-  psnu_lvl_index <- unlist(Map(function(x) Position(isTRUE, x), psnu_lvl))
-  #Determine the ancestor for each organisation unit which needs one
-  orgunits$psnu_uid <- mapply(function(x, y) x[y], ancestor_ids, psnu_lvl_index)
-  #If the orgunit does not need an ancestor, then use itself.
-  orgunits %>%
-    dplyr::mutate(
-      psnu_uid = dplyr::case_when(is.na(psnu_uid) ~ uid,
-                                  TRUE ~ psnu_uid))
-  # dplyr::select(ou, ou_id, country_name, country_uid, snu1, snu1_id,
-  #               name, id, dp_psnu, psnu_type, DREAMS)
-}
-
-#' @description Utility function to create a map of all PSNUs
-#' and their prioritization level regardless of whether they
-#' are at the  COP Prioritization level or not.
-#' @return A data frame consisting of organisation unit UIDs
-#' and prioritization as text.
-getPrioritizationMap <- function(snus, psnu_prioritizations) {
-
-  snus  %>%
-    dplyr::select(psnu_uid, uid) %>%
-    dplyr::left_join(psnu_prioritizations, by = c("psnu_uid" = "orgUnit")) %>%
-    #Remove any invalid prioritization
-    dplyr::mutate(value = ifelse(value %in% prioritization_dict()$value, value, NA_real_)) %>%
-    dplyr::left_join(prioritization_dict() %>%
-                       dplyr::select(value, prioritization = name),
-                     by = c("value")) %>%
-    dplyr::mutate(prioritization = ifelse(is.na(prioritization), "No Prioritization", prioritization)) %>%
-    dplyr::select(uid, prioritization)
-
-}
-
-#' @export
-#' @title Convert a 'PSNU-level' DATIM import file into an analytics-friendly
-#'  object.
-#'
-#' @description Convert a 'PSNU-level' DATIM import file into an
-#'  analytics-friendly object, similar to the MER Structured Datasets
-#'
-#' @param psnu_import_file DHIS2 import file to convert
+#' @param snu_uids List of UIDs corresponding to DATIM organisation units.
 #' @inheritParams datapackr_params
-#' @param psnu_prioritizations List of orgUnit, value containing prioritization
-#' values for each PSNU. If not included, blank prioritizations shown.
-#' @param filter_rename_output T/F Should this function output the final data in
-#' the new, more complete format?
-#' @param include_default Should default mechanisms be included?
 #'
-#' @return psnu_import_file
-#'
+#' @return Tibble of orgunits mapped to orgunit name, PSNU name, & PSNU uid.
+getPSNUInfo <- function(snu_uids,
+                        d2_session = dynGet("d2_default_session",
+                                                  inherits = TRUE)) {
+
+  orgunits <- valid_OrgUnits %>%
+    dplyr::filter(uid %in% unique(snu_uids)) %>%
+    dplyr::select(name, uid, ancestors, organisationUnitGroups)
+
+  uids_not_cached <- snu_uids[!snu_uids %in% valid_OrgUnits$uid]
+
+  if (length(uids_not_cached) > 0) {
+    orgunits <-
+      datimutils::getMetadata(
+        end_point = "organisationUnits",
+        paste0("id:in:[", paste(uids_not_cached, collapse = ","), "]"),
+        fields =
+          "id,name,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]",
+        d2_session = d2_session) %>%
+      tibble::as_tibble(.) %>%
+      dplyr::rename(uid = id) %>%
+      dplyr::bind_rows(orgunits, .)
+  }
+
+  # Find position of the PSNU. Note that this will take the first match only.
+  # There should never be multiple ancestors, but we are not really protected
+  # anywhere against it anyway if it happens.
+  psnu_lvl <-
+    lapply(orgunits$ancestors,
+           function(x) {
+             lapply(x[["organisationUnitGroups"]],
+                    function(x) any(x$id %in% "AVy8gJXym2D"))})
+  psnu_lvl_index <- unlist(Map(function(x) Position(isTRUE, x), psnu_lvl))
+
+  # ID the PSNU
+  ancestor_ids <- lapply(orgunits$ancestors, function(x) x[["id"]])
+  orgunits$psnu_uid <- mapply(function(x, y) x[y], ancestor_ids, psnu_lvl_index)
+  ancestor_names <- lapply(orgunits$ancestors, function(x) x[["name"]])
+  orgunits$psnu <- mapply(function(x, y) x[y], ancestor_names, psnu_lvl_index)
+
+  # If orgunit is PSNU or Military, then use itself.
+  orgunits %<>%
+    dplyr::mutate(
+      psnu_uid = dplyr::case_when(
+        stringr::str_detect(as.character(organisationUnitGroups), "AVy8gJXym2D|nwQbMeALRjL") ~ uid,
+        TRUE ~ psnu_uid),
+      psnu = dplyr::case_when(
+        stringr::str_detect(as.character(organisationUnitGroups), "AVy8gJXym2D|nwQbMeALRjL") ~ name,
+        TRUE ~ psnu)) %>%
+    dplyr::select(name, uid, psnu, psnu_uid)
+
+  return(orgunits)
+}
+
+
 #' @export
 #' @title Convert a 'PSNU-level' DATIM import file into an analytics-friendly
 #'  object.
@@ -106,30 +91,66 @@ adorn_import_file <- function(psnu_import_file,
                                                   inherits = TRUE),
                               include_default = FALSE) {
 
-  row_num <- NROW(psnu_import_file)
+  #row_num <- NROW(psnu_import_file)
 
   cop_year %<>% check_cop_year()
 
   # Adorn orgunits ----
-  snus <- getPriorizationSNU(psnu_import_file$orgUnit)
-
   psnu_import_file %<>%
-    dplyr::left_join(snus, by = c("orgUnit" = "uid"))
+    dplyr::left_join(dplyr::select(valid_OrgUnits, -lastUpdated),
+                     by = c("orgUnit" = "uid"))
 
   # Utilizes row_num to ensure the join worked as expected
-  assertthat::are_equal(NROW(psnu_import_file), row_num)
+  # assertthat::are_equal(NROW(psnu_import_file), row_num)
+  # TODO: Convert to test
 
   # Add Prioritizations ####
   if (is.null(psnu_prioritizations)) {
     psnu_import_file %<>%
       addcols("prioritization")
+    #TODO: Rename this everywhere to something specifying it means psnu
+    # prioritization, instead of facility/community
   } else {
+    # Check prioritizations
+    psnu_prioritizations %<>%
+      dplyr::left_join(prioritization_dict() %>%
+                         dplyr::select(value, prioritization = name),
+                       by = c("value")) %>%
+      dplyr::filter(!is.na(prioritization)) %>%
+      dplyr::select(-value)
 
-    prio_map <- getPrioritizationMap(snus, psnu_prioritizations)
-    psnu_import_file <- psnu_import_file %>%
-      dplyr::left_join(prio_map, by = c("orgUnit" =  "uid"))
-    # Utilizes row_num to ensure the join worked as expected
-    assertthat::are_equal(NROW(psnu_import_file), row_num)
+    unknown_psnu <- psnu_import_file %>%
+      dplyr::filter(org_type == "DSNU" | is.na(org_type)) %>%
+      dplyr::pull(orgUnit) %>%
+      unique()
+
+    if (length(unknown_psnu) > 0) {
+      psnus <- getPSNUInfo(unknown_psnu, d2_session = d2_session) %>%
+        dplyr::select(-name)
+
+      psnu_import_file %<>%
+        dplyr::left_join(psnus, by = c("orgUnit" = "uid"))
+    } else {
+      psnu_import_file %<>%
+        addcols(c("psnu", "psnu_uid"))
+    }
+
+    psnu_import_file %<>%
+      dplyr::mutate(
+        psnu = dplyr::case_when(
+          is.na(psnu_uid) & !is.na(name) ~ name,
+          TRUE ~ psnu),
+        psnu_uid = dplyr::case_when(
+          is.na(psnu_uid) & !is.na(name) ~ orgUnit,
+          TRUE ~ psnu_uid)) %>%
+      dplyr::left_join(psnu_prioritizations,
+                       by = c("psnu_uid" = "orgUnit")) %>%
+      dplyr::mutate(
+        prioritization =
+          ifelse(is.na(prioritization),
+                 "No Prioritization",
+                 prioritization)) %>%
+      dplyr::select(-psnu, -psnu_uid)
   }
 
   psnu_import_file %<>% dplyr::rename(psnu = name)
@@ -187,14 +208,6 @@ adorn_import_file <- function(psnu_import_file,
   # JPP: We have two situations here. When data is coming from DATIM,
   # Some of the 50+ age bands have been collapsed
   map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year) # Found in utilities.R
-
-
-
-  # 2022-10-03-JPP commented this out. I do not see why this is required.
-  # # TODO: Is this munging still required with the map being a function of fiscal year?
-  # if (cop_year == 2022) {
-  #   map_des_cocs <- datapackr::cop22_map_adorn_import_file
-  # }
 
   psnu_import_file %<>%
     dplyr::mutate(

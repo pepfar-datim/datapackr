@@ -5,7 +5,6 @@ with_mock_api({
 
     test_dataset <-
       getDataPackOrgUnits(
-        country_uids = "qllxzIjjurr",
         include_mil = FALSE,
         include_DREAMS = TRUE,
         use_cache = FALSE,
@@ -15,16 +14,15 @@ with_mock_api({
     expect_true(NROW(test_dataset) > 0)
     expect_setequal(
       names(test_dataset),
-      c(
+      c("name",
+        "uid",
+        "org_type",
         "ou",
         "ou_uid",
         "country_name",
         "country_uid",
         "snu1",
         "snu1_uid",
-        "name",
-        "uid",
-        "org_type",
         "lastUpdated",
         "ancestors",
         "organisationUnitGroups",
