@@ -6,7 +6,6 @@
 on provided country UIDs.}
 \usage{
 getDataPackOrgUnits(
-  country_uids = NULL,
   include_mil = TRUE,
   include_DREAMS = TRUE,
   additional_fields = NULL,
@@ -15,9 +14,6 @@ getDataPackOrgUnits(
 )
 }
 \arguments{
-\item{country_uids}{Unique IDs for countries to include in the Data Pack.
-For full list of these IDs, see \code{datapackr::valid_OrgUnits}.}
-
 \item{include_mil}{Logical. If \code{TRUE}, will also include _Military nodes
 related to \code{country_uids}. Default is \code{TRUE}.}
 
@@ -28,14 +24,11 @@ organisation units.}
 API other than those returned by default.}
 
 \item{use_cache}{If \code{TRUE}, will first check to see if a cached export
-of Data Pack Org Units already exists and is not stale. If so, will use this
-cached version to save time.}
+of Data Pack Org Units already exists. If so, will use this cached version to
+save time.}
 
 \item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
 authentication with DATIM.}
-
-\item{cache_path}{Local file path to an RDS file containing a cached copy of
-Data Pack Org Units from DATIM.}
 }
 \value{
 Tibble of Data Pack Org Units.

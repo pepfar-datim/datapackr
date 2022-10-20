@@ -33,13 +33,8 @@ authentication with DATIM.}
 }
 \value{
 psnu_import_file
-
-psnu_import_file
 }
 \description{
-Convert a 'PSNU-level' DATIM import file into an
- analytics-friendly object, similar to the MER Structured Datasets
-
 Convert a 'PSNU-level' DATIM import file into an
  analytics-friendly object, similar to the MER Structured Datasets
 }

@@ -10,7 +10,7 @@ add_dp_label(orgunits)
 \item{orgunits}{Data frame of Data Pack org units produced by \code{\link{getDataPackOrgUnits}}.}
 }
 \value{
-Data frame of Data Pack Org units with added Data Pack label, \code{dp_psnu}.
+Data frame of Data Pack Org units with added Data Pack label, \code{dp_label}.
 }
 \description{
 Adds Org Unit label used in Data Packs.

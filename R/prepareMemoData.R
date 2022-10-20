@@ -148,8 +148,20 @@ prepareMemoDataByPSNU <- function(analytics,
 
   #Prepare the full list of prioritization PSNUs
   #These functions are reused from adorn_import_file
-  snus <- getPriorizationSNU(df$psnu_uid)
-  prio_map <- getPrioritizationMap(snus, prios)
+  prio_map <- getPSNUInfo(df$psnu_uid) %>%
+    dplyr::select(psnu_uid, uid) %>%
+    dplyr::left_join(prios, by = c("psnu_uid" = "orgUnit")) %>%
+    #Remove any invalid prioritizations
+    dplyr::mutate(
+      value = ifelse(value %in% prioritization_dict()$value, value, NA_real_)) %>%
+    dplyr::left_join(prioritization_dict() %>%
+                       dplyr::select(value, prioritization = name),
+                     by = c("value")) %>%
+    dplyr::mutate(
+      prioritization = ifelse(is.na(prioritization),
+                              "No Prioritization",
+                              prioritization)) %>%
+    dplyr::select(uid, prioritization)
 
   #TODO: Consider to refactor adorn_import_file
   #To handle this adornment. The logic here is
@@ -416,7 +428,12 @@ prepareMemoDataByPrio <- function(df,
     df_final <- dplyr::select(df_final, -`No Prioritization`) # nolint
   }
 
-  df_final %>% dplyr::select(where(~ any(. != 0))) # Remove all columns which are completely zero
+  df_final %>%
+    dplyr::select(where(~ any(. != 0))) %>%  # Remove all columns which are completely zero
+    dplyr::rename_with(
+    ~ dplyr::case_when(
+      . == "No Prioritization" ~ "No Prioritization - USG Only",
+      TRUE ~ .)) #DP-590
 }
 
 
