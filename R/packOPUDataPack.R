@@ -10,6 +10,7 @@
 #' @return Exports an OPU Data Pack to Excel within \code{output_folder}.
 #'
 packOPUDataPack <- function(d, undistributed_mer_data = NULL,
+                            expand_formulas = FALSE,
                             d2_session = dynGet("d2_default_session",
                                                 inherits = TRUE)) {
 
@@ -57,6 +58,7 @@ packOPUDataPack <- function(d, undistributed_mer_data = NULL,
                    cop_year = d$info$cop_year,
                    tool = d$info$tool,
                    schema = d$info$schema,
+                   expand_formulas = expand_formulas,
                    d2_session = d2_session)
 
   d$tool$wb <- r$wb

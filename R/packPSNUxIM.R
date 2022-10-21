@@ -3,6 +3,8 @@
 #'
 #' @description Packs the PSNUxIM tab in either a COP or OPU Data Pack.
 #'
+#' @param expand_formulas Write all formulas on right side of PSNUxIM tab, not
+#' just the first row.
 #' @param data Dataset containing totals for allocation within PSNUxIM tab,
 #' formatted as a standard DHIS2 import file.
 #' @inheritParams datapackr_params
@@ -15,6 +17,7 @@ packPSNUxIM <- function(wb, # Workbook object
                         cop_year = NULL, # Cop year based on the file
                         tool = "OPU Data Pack",
                         schema = NULL,
+                        expand_formulas = FALSE,
                         d2_session = dynGet("d2_default_session",
                                             inherits = TRUE)) {
 
@@ -378,35 +381,65 @@ packPSNUxIM <- function(wb, # Workbook object
   count.im.datim <- names(snuxim_model_data)[stringr::str_detect(names(snuxim_model_data), "\\d{4,}_(DSD|TA)")] %>%
     length()
 
-  col.formulas <- data_structure %>%
-    dplyr::filter(
-      !is.na(formula),
-      col < (col.im.targets[1])) %>%
-    dplyr::pull(col)
+  if (expand_formulas) {
+    col.formulas <- data_structure %>%
+      dplyr::filter(
+        !is.na(formula)) %>%
+      dplyr::pull(col)
 
-  ## TODO: Improve this next piece to be more efficient instead of using str_replace_all.
-  ## #We could use map, but I don't think a performance boost will be realized?
+    ## TODO: Improve this next piece to be more efficient instead of using str_replace_all.
+    ## #We could use map, but I don't think a performance boost will be realized?
 
-  data_structure %<>%
-    dplyr::arrange(col) %>% # Arrange rows based upon col values
-    dplyr::mutate(# Sets column names based upon col.im.percents values
-      column_names = dplyr::case_when(
-        col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_", col),
-        col >= col.im.targets[1] & col <= (col.im.targets[1] + count.im.datim - 1) ~ paste0("target_col_", col),
-        #col >= col.im.targets[1] & col <= col.im.targets[2] ~ paste0("target_col_", col),
-        TRUE ~ indicator_code)
-    ) %>%
-    dplyr::filter(col < col.im.targets[1]) %>%
-    tibble::column_to_rownames(var = "column_names") %>%
-    dplyr::select(formula) %>%
-    t() %>%
-    tibble::as_tibble() %>% # make tibble
-    ## Setup formulas
-    dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
-    dplyr::mutate(
-      dplyr::across(dplyr::all_of(col.formulas),
-                    ~stringr::str_replace_all(., pattern = paste0("(?<=[:upper:])", header_row + 1),
-                      replacement = as.character(seq_len(NROW(snuxim_model_data)) + first_blank_row - 1))))
+    data_structure %<>%
+      dplyr::arrange(col) %>%
+      dplyr::mutate(
+        column_names = dplyr::case_when(
+          col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_", col),
+          col >= col.im.targets[1] & col <= col.im.targets[2] ~ paste0("target_col_",col),
+          TRUE ~ indicator_code)
+      ) %>%
+      tibble::column_to_rownames(var = "column_names") %>%
+      dplyr::select(formula) %>%
+      t() %>%
+      tibble::as_tibble() %>%
+      ## Setup formulas
+      dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
+      dplyr::mutate(
+        dplyr::across(dplyr::all_of(col.formulas),
+                      ~stringr::str_replace_all(., pattern = paste0("(?<=[:upper:])", header_row + 1),
+                                                replacement = as.character(seq_len(NROW(snuxim_model_data)) + first_blank_row - 1))))
+
+  } else {
+    col.formulas <- data_structure %>%
+      dplyr::filter(
+        !is.na(formula),
+        col < (col.im.targets[1])) %>%
+      dplyr::pull(col)
+
+    ## TODO: Improve this next piece to be more efficient instead of using str_replace_all.
+    ## #We could use map, but I don't think a performance boost will be realized?
+
+    data_structure %<>%
+      dplyr::arrange(col) %>%
+      dplyr::mutate(
+        column_names = dplyr::case_when(
+          col >= col.im.percents[1] & col <= col.im.percents[2] ~ paste0("percent_col_", col),
+          col >= col.im.targets[1] & col <= (col.im.targets[1] + count.im.datim - 1) ~ paste0("target_col_", col),
+          #col >= col.im.targets[1] & col <= col.im.targets[2] ~ paste0("target_col_", col),
+          TRUE ~ indicator_code)
+      ) %>%
+      dplyr::filter(col < col.im.targets[1]) %>%
+      tibble::column_to_rownames(var = "column_names") %>%
+      dplyr::select(formula) %>%
+      t() %>%
+      tibble::as_tibble() %>%
+      ## Setup formulas
+      dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
+      dplyr::mutate(
+        dplyr::across(dplyr::all_of(col.formulas),
+                      ~stringr::str_replace_all(., pattern = paste0("(?<=[:upper:])", header_row + 1),
+                                                replacement = as.character(seq_len(NROW(snuxim_model_data)) + first_blank_row - 1))))
+  }
 
   # Classify formula columns as formulas
   ## Not sure if my approach is better, but is more readable.
