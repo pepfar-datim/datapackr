@@ -22,10 +22,12 @@ unPackSheets <- function(d,
     stop("Cannot process that kind of tool. :(")
   }
 
-  # If sheets parameter not provided, use names of sheets in d$sheets
+  # Check sheets param provided
+    # If sheets parameter not provided, use names of sheets in d$sheets
   if (is.null(d$sheets)) {
     d <- loadSheets(d)
   }
+
   sheets <- sheets %||% grep("PSNUxIM", names(d$sheets), value = TRUE, invert = TRUE)
 
   sheets <- checkSheets(sheets = sheets,
@@ -41,15 +43,23 @@ unPackSheets <- function(d,
     sheets <- sheets[sheets %in% names(d$sheets)]
 
     interactive_warning(
-      paste0("The following sheets do not seem to be present in ",
-             "your submission, so cannot be unpacked:  -> \n\t* ",
+      paste0("You've asked us to unpack the following sheets, which do not ",
+             "appear in your submission.:  -> \n\t* ",
              paste(invalid_sheets, collapse = "\n\t* "),
              "\n"))
   }
 
-  # Check if there are any sheets where all columns are missing
-  d <- checkExistsIndexCols(d, sheets = sheets)
+  # Don't proceed with any sheets where *any* index columns are missing (PSNU,
+  #   Age, Sex, KeyPop), or no rows of data
+  d <- checkToolEmptySheets(d, sheets = sheets)
 
+  no_data <- c(d$tests$missing_index_columns$sheet_name,
+               d$tests$no_rows_data$sheet_name) %>%
+    unique()
+
+  sheets <- sheets[!sheets %in% no_data]
+
+  # Check sheet data
   if (check_sheets) {
     d <- checkSheetData(d, sheets = sheets)
   }

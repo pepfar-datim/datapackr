@@ -1,17 +1,27 @@
-# datapackr 5.3.1
+# datapackr 5.3.2
 
 ## Breaking changes
 * Removes `getFY22Prioritizations` in favor of clearer, more stable, internal functions.
-* Replaces getPSNUs with with more versatile (and appropriately named)
-getDataPackOrgUnits. Many of the org units used in Data Packs are actually not
+* Replaces `getPSNUs` with with more versatile (and appropriately named)
+`getDataPackOrgUnits`. Many of the org units used in Data Packs are actually not
 PSNUs (e.g., DREAMS SNUs, or Military SNUs), making many of the columns created
 previously less than sensible. This function now also produces a tibble instead
 of a data frame. In some cases, column names in this output have also slightly
 changed.
-* adorn_import_file can now correctly assign prioritizations to org units below
-PSNU.
+* Similarly, replaces `add_dp_psnu` with `add_dp_label`.
+* `adorn_import_file` can now correctly assign prioritizations to org units below
+PSNU (e.g., for DREAMS SNUs in Rwanda & Eswatini).
 
 ## New features
+* Adds the functions `cache_is_fresh` and `fresh_cache_part` for use in 
+anticipated functions allowing the caching of metadata objects retrieved from
+the DATIM API, allowing faster processing for repeat requests.
+* Adds the function `checkToolEmptySheets` to allow checking and unpacking
+processes to detect sheets with either no rows of data, or no text in key header
+columns (e.g., PSNU, Age, Sex, KeyPop). In these cases, unpacking and checking
+functions cannot accurately assess data, so these sheets should be skipped. This
+function results in updates in `unPackingChecks`, `unPackSheets`, and
+`unPackDataPackSheet`.
 
 ## Minor improvements and fixes
 
