@@ -117,7 +117,10 @@ adorn_import_file <- function(psnu_import_file,
                          dplyr::select(value, prioritization = name),
                        by = c("value")) %>%
       dplyr::filter(!is.na(prioritization)) %>%
-      dplyr::select(-value)
+      dplyr::select(-value) %>%
+      dplyr::semi_join(valid_OrgUnits %>%
+                         dplyr::filter(org_type %in% c("PSNU", "Country")),
+                       by = c("orgUnit" = "uid"))
 
     unknown_psnu <- psnu_import_file %>%
       dplyr::filter(org_type == "DSNU" | is.na(org_type)) %>%

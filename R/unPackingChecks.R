@@ -13,6 +13,9 @@
 #'
 #' `checkToolConnections` detects the presence of any external links in a Tool.
 #'
+#' `checkToolEmptySheets` detects whether a sheet is essentially empty (no data
+#'   in rows, or no data in row 14 column headers).
+#'
 #' `checkDupeRows` checks for any rows with duplicates across PSNU and other key
 #'    disaggregates.
 #'
@@ -224,7 +227,7 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
   }
 
   if (length(sheets) == 0) {
-    return(NULL)
+    return(ch)
   }
 
   # Get header_cols
@@ -358,6 +361,7 @@ checkMissingCols <- function(sheets, d, quiet = TRUE) {
 
     ch$result <- missing_cols
     attr(ch$result, "test_name") <- "Missing columns"
+    ch$has_error <- TRUE
 
     if (!quiet) {
       messages <- MessageQueue()
@@ -1123,19 +1127,17 @@ checkDisaggs <- function(sheets, d, quiet = TRUE) {
   return(ch)
 }
 
+
 #' @export
-#' @title checkExistsIndexCols
+#' @rdname unPackDataChecks
 #'
-#' @description All data pack sheets have certain columns (PSNU, Age, Sex, etc )
-#' which are essentially index columns on that sheet. In order to determine
-#' whether there are duplicate rows in the sheet, all of these columns
-#' must be presen
-#'
-#'
-#' @return  A vector showing which sheets have all index header columns
-#'
-checkExistsIndexCols <- function(d, sheets = sheets) {
-  # Get header_cols
+checkToolEmptySheets <- function(d, sheets, quiet = TRUE) {
+
+  if (!quiet) {
+    messages <- MessageQueue()
+  }
+
+  # Check if all key header columns missing
   header_cols <- purrr::map(sheets, function(x) {
     d$info$schema %>%
       dplyr::filter(sheet_name %in% x,
@@ -1148,33 +1150,65 @@ checkExistsIndexCols <- function(d, sheets = sheets) {
   has_all_header_columns <-
     purrr::map2(d$sheets[sheets], header_cols,
                 function(x, y) {
-                  Reduce("+", names(x) %in% y) == length(y)
+                  Reduce("+", y %in% names(x)) == length(y)
                 }) %>%
     unlist()
 
-
   if (any(!has_all_header_columns)) {
-
-    sheets_with_all_headers <- d$sheets[sheets] %>%
-      purrr::keep(has_all_header_columns) %>%
-      names(.)
-
 
     lvl <- "ERROR"
 
     msg <-
       paste0(
-        lvl, "! The following sheets are missing critical columns. Some checks could not be performed. ",
-        paste(sheets[!has_all_header_columns])
-      )
+        lvl, "! MISSING KEY COLUMNS: The following sheets are missing critical ",
+        "columns — usually PSNU, Age, Sex, and/or KeyPop. This prevents us from ",
+        "checking and reading any data from these sheets. -> \n  * ",
+        paste0(sheets[!has_all_header_columns], collapse = "\n  * "),
+        "\n")
 
     d$tests$missing_index_columns <- data.frame(sheet_name = sheets[!has_all_header_columns])
     attr(d$tests$missing_index_columns, "test_name") <- "Missing index columns"
     d$info$messages <- appendMessage(d$info$messages, msg, lvl)
     d$info$has_error <- TRUE
-    }
 
-    d
+    if (!quiet) {
+      messages <- appendMessage(messages, msg, lvl)
+    }
+  }
+
+  # Check if no rows of data
+  has_rows_data <-
+    purrr::map(d$sheets[sheets],
+               function(x) {
+                 NROW(x) > 0
+               }) %>%
+    unlist()
+
+  if (any(!has_rows_data)) {
+
+    lvl <- "INFO"
+
+    msg <-
+      paste0(
+        lvl, "! SHEETS WITH NO DATA: The following sheets appear to have no ",
+        "rows of data. If this is intentional, no need to worry. -> \n  * ",
+        paste0(sheets[!has_rows_data], collapse = "\n  * "),
+        "\n")
+
+    d$tests$no_rows_data <- data.frame(sheet_name = sheets[!has_rows_data])
+    attr(d$tests$no_rows_data, "test_name") <- "No rows of data"
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
+
+    if (!quiet) {
+      messages <- appendMessage(messages, msg, lvl)
+    }
+  }
+
+  if (!quiet) {
+    printMessages(messages)
+  }
+
+    return(d)
 
 }
 

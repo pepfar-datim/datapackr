@@ -16,6 +16,7 @@
 \alias{checkInvalidPrioritizations}
 \alias{checkFormulas}
 \alias{checkDisaggs}
+\alias{checkToolEmptySheets}
 \alias{checkSheetData}
 \title{Perform various data quality checks on in-process data from Data Packs.}
 \usage{
@@ -47,6 +48,8 @@ checkFormulas(sheets, d, quiet = TRUE)
 
 checkDisaggs(sheets, d, quiet = TRUE)
 
+checkToolEmptySheets(d, sheets, quiet = TRUE)
+
 checkSheetData(d, sheets = NULL, quiet = TRUE, ...)
 }
 \arguments{
@@ -72,6 +75,9 @@ identify them.
 corruption when executing openxlsx::saveWorkbook.
 
 \code{checkToolConnections} detects the presence of any external links in a Tool.
+
+\code{checkToolEmptySheets} detects whether a sheet is essentially empty (no data
+in rows, or no data in row 14 column headers).
 
 \code{checkDupeRows} checks for any rows with duplicates across PSNU and other key
 disaggregates.
