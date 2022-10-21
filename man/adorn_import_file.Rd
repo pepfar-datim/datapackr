@@ -7,7 +7,7 @@
 \usage{
 adorn_import_file(
   psnu_import_file,
-  cop_year = getCurrentCOPYear(),
+  cop_year = NULL,
   psnu_prioritizations = NULL,
   filter_rename_output = TRUE,
   d2_session = dynGet("d2_default_session", inherits = TRUE),
@@ -17,7 +17,8 @@ adorn_import_file(
 \arguments{
 \item{psnu_import_file}{DHIS2 import file to convert}
 
-\item{cop_year}{COP Year}
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
 \item{psnu_prioritizations}{List of orgUnit, value containing prioritization
 values for each PSNU. If not included, blank prioritizations shown.}
@@ -25,12 +26,13 @@ values for each PSNU. If not included, blank prioritizations shown.}
 \item{filter_rename_output}{T/F Should this function output the final data in
 the new, more complete format?}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
 
 \item{include_default}{Should default mechanisms be included?}
 }
 \value{
-data
+psnu_import_file
 }
 \description{
 Convert a 'PSNU-level' DATIM import file into an

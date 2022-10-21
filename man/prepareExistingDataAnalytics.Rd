@@ -12,7 +12,8 @@ prepareExistingDataAnalytics(
 \arguments{
 \item{d}{Datapackr sidecar object}
 
-\item{d2_session}{DHIS2 Session id}
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
 }
 \value{
 Datapackr d object

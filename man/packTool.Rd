@@ -34,7 +34,7 @@ targets to be distributed will be sourced from this file.}
 (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)}
 
 \item{country_uids}{Unique IDs for countries to include in the Data Pack.
-For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
+For full list of these IDs, see \code{datapackr::valid_OrgUnits}.}
 
 \item{template_path}{Local filepath to Data Pack template Excel (XLSX) file.
 This file MUST NOT have any data validation formats present. If left
@@ -49,7 +49,8 @@ saved upon export.}
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}
 
-\item{d2_session}{DHIS2 Session id}
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
 }
 \value{
 Exports a Data Pack or OPU Data Pack tool to Excel within

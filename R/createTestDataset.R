@@ -23,11 +23,11 @@ createTestDataset <- function(country_uids,
   DATIM_map <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
 
   # Get PSNUs to test against ####
-  org_units <- datapackr::valid_PSNUs %>%
+  org_units <- datapackr::valid_OrgUnits %>%
     dplyr::filter(
       country_uid %in% country_uids,
-      !is.na(psnu_type)) %>%
-    dplyr::select(orgUnit = psnu_uid) %>%
+      !is.na(org_type)) %>%
+    dplyr::select(orgUnit = uid) %>%
     dplyr::distinct()
 
   # Get dataElements and categoryOptionCombos to test against ####

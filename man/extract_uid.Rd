@@ -5,7 +5,7 @@
 \alias{extract_uid_all}
 \title{Extract UID.}
 \usage{
-extract_uid(string)
+extract_uid(string, bracketed = TRUE)
 
 extract_uid_all(string)
 }

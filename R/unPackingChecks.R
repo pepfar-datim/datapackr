@@ -13,6 +13,9 @@
 #'
 #' `checkToolConnections` detects the presence of any external links in a Tool.
 #'
+#' `checkToolEmptySheets` detects whether a sheet is essentially empty (no data
+#'   in rows, or no data in row 14 column headers).
+#'
 #' `checkDupeRows` checks for any rows with duplicates across PSNU and other key
 #'    disaggregates.
 #'
@@ -216,26 +219,40 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
             lvl = NULL,
             has_error = FALSE)
 
+  #This test requires index columns. If they are not there, drop the sheets
+  #If they are missing index columns, we are not going to
+  #Attempt to process them
+  if (!is.null(d$tests$missing_index_columns)) {
+    sheets <- sheets[!(sheets %in% d$tests$missing_index_columns$sheet_name)]
+  }
+
+  if (length(sheets) == 0) {
+    return(ch)
+  }
+
   # Get header_cols
-  header_cols <- d$info$schema %>%
-    dplyr::filter(
-      sheet_name %in% sheets,
-      col_type == "row_header",
-      !indicator_code %in% c("SNU1", "ID")) %>%
-    dplyr::pull(indicator_code) %>%
-    #c(., "mechCode_supportType") %>% # DP-472
-    unique()
+  header_cols <- purrr::map(sheets, function(x) {
+    d$info$schema %>%
+      dplyr::filter(
+        sheet_name %in% x,
+        col_type == "row_header",
+        !indicator_code %in% c("SNU1", "ID")) %>%
+      dplyr::pull(indicator_code) %>%
+      #c(., "mechCode_supportType") %>% # DP-472
+      unique()
+  })
 
   # Duplicates
-  dupes <- purrr::map(d$sheets[sheets],
-                      function(x) {
+  dupes <- purrr::map2(d$sheets[sheets], header_cols,
+                      function(x, y) {
                         x %>%
-                          dplyr::select(tidyselect::any_of(header_cols)) %>%
+                          dplyr::select(tidyselect::all_of(y)) %>%
                           dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
                           dplyr::filter(!is.na(PSNU)) %>% # This is caught by checkInvalidOrgUnits
                           dplyr::filter(duplicated(.))
                       }) %>%
     purrr::keep(~ NROW(.x) > 0)
+
 
   if (length(dupes) > 0) {
 
@@ -327,7 +344,7 @@ checkMissingCols <- function(sheets, d, quiet = TRUE) {
 
   if (NROW(missing_cols) > 0) {
 
-    ch$lvl <- "WARNING"
+    ch$lvl <- "ERROR"
 
     ch$msg <- unique(missing_cols$sheet_name) %>%
       purrr::set_names() %>%
@@ -344,6 +361,7 @@ checkMissingCols <- function(sheets, d, quiet = TRUE) {
 
     ch$result <- missing_cols
     attr(ch$result, "test_name") <- "Missing columns"
+    ch$has_error <- TRUE
 
     if (!quiet) {
       messages <- MessageQueue()
@@ -763,8 +781,8 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
     dplyr::filter(dplyr::if_any(c("SNU1", "PSNU", "Age", "Sex"), ~!is.na(.))) %>%
     dplyr::select(sheet_name, PSNU) %>%
     dplyr::distinct() %>%
-    dplyr::mutate(psnuid = extract_uid(PSNU)) %>%
-    dplyr::anti_join(valid_PSNUs, by = c("psnuid" = "psnu_uid"))
+    dplyr::mutate(snu_uid = extract_uid(PSNU)) %>%
+    dplyr::anti_join(valid_OrgUnits, by = c("snu_uid" = "uid"))
 
   na_orgunits <- invalid_orgunits[is.na(invalid_orgunits$PSNU), ]
 
@@ -822,9 +840,9 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = TRUE) {
   data <- d$sheets[["Prioritization"]][, c("PSNU", "IMPATT.PRIORITY_SNU.T")]
   names(data)[names(data) == "IMPATT.PRIORITY_SNU.T"] <- "value"
   data <- data[, c("PSNU", "value")]
-  data$psnuid <- extract_uid(data$PSNU)
-  data <- data[data$psnuid %in% valid_PSNUs$psnu_uid, ]
-  data <- data[!data$psnuid %in% valid_PSNUs$psnu_uid[valid_PSNUs$psnu_type == "Military"], ]
+  data$snu_uid <- extract_uid(data$PSNU)
+  data <- data[data$snu_uid %in% valid_OrgUnits$uid, ]
+  data <- data[!data$snu_uid %in% valid_OrgUnits$uid[valid_OrgUnits$org_type == "Military"], ]
   invalid_prioritizations <- data[!data$value %in% prioritization_dict()$value, ]
 
   if (NROW(invalid_prioritizations) > 0) {
@@ -1109,6 +1127,90 @@ checkDisaggs <- function(sheets, d, quiet = TRUE) {
   return(ch)
 }
 
+
+#' @export
+#' @rdname unPackDataChecks
+#'
+checkToolEmptySheets <- function(d, sheets, quiet = TRUE) {
+
+  if (!quiet) {
+    messages <- MessageQueue()
+  }
+
+  # Check if all key header columns missing
+  header_cols <- purrr::map(sheets, function(x) {
+    d$info$schema %>%
+      dplyr::filter(sheet_name %in% x,
+                    col_type == "row_header", !indicator_code %in% c("SNU1", "ID")) %>%
+      dplyr::pull(indicator_code) %>%
+      #c(., "mechCode_supportType") %>% # DP-472
+      unique()
+  })
+
+  has_all_header_columns <-
+    purrr::map2(d$sheets[sheets], header_cols,
+                function(x, y) {
+                  Reduce("+", y %in% names(x)) == length(y)
+                }) %>%
+    unlist()
+
+  if (any(!has_all_header_columns)) {
+
+    lvl <- "ERROR"
+
+    msg <-
+      paste0(
+        lvl, "! MISSING KEY COLUMNS: The following sheets are missing critical ",
+        "columns — usually PSNU, Age, Sex, and/or KeyPop. This prevents us from ",
+        "checking and reading any data from these sheets. -> \n  * ",
+        paste0(sheets[!has_all_header_columns], collapse = "\n  * "),
+        "\n")
+
+    d$tests$missing_index_columns <- data.frame(sheet_name = sheets[!has_all_header_columns])
+    attr(d$tests$missing_index_columns, "test_name") <- "Missing index columns"
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
+    d$info$has_error <- TRUE
+
+    if (!quiet) {
+      messages <- appendMessage(messages, msg, lvl)
+    }
+  }
+
+  # Check if no rows of data
+  has_rows_data <-
+    purrr::map(d$sheets[sheets],
+               function(x) {
+                 NROW(x) > 0
+               }) %>%
+    unlist()
+
+  if (any(!has_rows_data)) {
+
+    lvl <- "INFO"
+
+    msg <-
+      paste0(
+        lvl, "! SHEETS WITH NO DATA: The following sheets appear to have no ",
+        "rows of data. If this is intentional, no need to worry. -> \n  * ",
+        paste0(sheets[!has_rows_data], collapse = "\n  * "),
+        "\n")
+
+    d$tests$no_rows_data <- data.frame(sheet_name = sheets[!has_rows_data])
+    attr(d$tests$no_rows_data, "test_name") <- "No rows of data"
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
+
+    if (!quiet) {
+      messages <- appendMessage(messages, msg, lvl)
+    }
+  }
+
+  if (!quiet) {
+    printMessages(messages)
+  }
+
+    return(d)
+
+}
 
 
 #' @export

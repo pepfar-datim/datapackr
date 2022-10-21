@@ -15,9 +15,10 @@ getOPUDataFromDATIM(
 FY22 targets = COP21.}
 
 \item{country_uids}{Unique IDs for countries to include in the Data Pack.
-For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
+For full list of these IDs, see \code{datapackr::valid_OrgUnits}.}
 
-\item{d2_session}{DHIS2 Session id}
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
 }
 \value{
 Returns dataset needed for use in \code{\link{packOPUDataPack}}.

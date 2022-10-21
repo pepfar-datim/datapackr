@@ -6,7 +6,7 @@ with_mock_api({
     d$info$country_uids <- "cDGPF739ZZr"
     d$info$cop_year <- "2022"
     d$data$analytics <-
-      data.frame(psnu_uid = "uXwFHXCPYgj", prioritization = "2")
+      data.frame(psnu_uid = "uXwFHXCPYgj", prioritization = "Attained")
     d <- prepareMemoMetadata(d, "datapack", d2_session = training)
     expect_true(is.list(d$memo))
     expect_setequal(names(d$memo),
@@ -18,7 +18,7 @@ with_mock_api({
 
     expect_true(is.list(d$memo$datapack$prios))
     expect_setequal(names(d$memo$datapack$prios),
-                    c("orgUnit", "prioritization", "value"))
+                    c("orgUnit", "value"))
     expect_setequal(names(d$memo$partners_agencies),
                     c("Mechanism", "Partner", "Agency"))
 
@@ -52,13 +52,6 @@ with_mock_api({
                  c("keychain", "info", "sheets", "tests", "data", "datim"),
                  ignore.order = TRUE)
 
-    fy22_prioritizations <- getFY22Prioritizations(d)
-    expect_type(fy22_prioritizations, "list")
-    expect_true(NROW(fy22_prioritizations) > 0)
-    expect_named(fy22_prioritizations,
-                 c("orgUnit", "value"),
-                 ignore.order = TRUE)
-
     d %<>% createAnalytics(d2_session = training)
 
     d %<>% prepareMemoData(
@@ -72,7 +65,7 @@ with_mock_api({
                      c("prios", "by_psnu", "by_agency", "by_prio", "by_partner"))
 
     expect_setequal(names(d$memo$datapack$prios),
-                    c("orgUnit", "prioritization", "value"))
+                    c("orgUnit",  "value"))
     #By PSNU
     expect_setequal(
       names(d$memo$datapack$by_psnu),
@@ -97,8 +90,18 @@ with_mock_api({
     expect_true(names(d$memo$datapack$by_prio)[[2]] == "Age")
     expect_true(names(d$memo$datapack$by_prio)[[NCOL(d$memo$datapack$by_prio)]] == "Total")
     prio_cols_end <- NCOL(d$memo$datapack$by_prio) - 1
+
+    #We have changed  the No prioritization label here....
+    prio_dict_mod <- prioritization_dict() %>%
+      dplyr::mutate(
+        name = dplyr::case_when(
+          name == "No Prioritization" ~ "No Prioritization - USG Only",
+          TRUE ~ name
+        )
+      )
+
     expect_true(all(
-      names(d$memo$datapack$by_prio[3:prio_cols_end]) %in% prioritization_dict()$name
+      names(d$memo$datapack$by_prio[3:prio_cols_end]) %in% prio_dict_mod$name
     ))
 
     #Compare to confirm that the totals match
@@ -137,6 +140,10 @@ with_mock_api({
     #By Partner
     #Only test the structure here....
     expect_identical(names(d$memo$datapack$by_partner)[1:3], c("Agency", "Partner", "Mechanism"))
+
+    #Difficult to test the Word doc, but lets just confirm it works
+    doc <- generateApprovalMemo(d, memo_type = "comparison", draft_memo = TRUE, d2_session = training)
+    expect_equal(class(doc), "rdocx")
 
   })
 })
@@ -189,8 +196,8 @@ with_mock_api({
       packForDATIM(., type = "SUBNAT_IMPATT") %>%
       packForDATIM(., type = "PSNUxIM")
     #Datapack analytics
-    testthat::expect_warning(d <- createAnalytics(d, training))
-    #Expect warning abt DSNU or parent prioritizations purposefully missing (for other test purposes)
+    d <- createAnalytics(d, training)
+
     #DATIM analytics
     d <-
       prepareMemoData(d,
@@ -207,7 +214,7 @@ with_mock_api({
                     c("prios", "by_psnu", "by_agency", "by_prio", "by_partner", "analytics"))
 
     expect_setequal(names(d$memo$datim$prios),
-                    c("orgUnit", "prioritization", "value"))
+                    c("orgUnit", "value"))
     #By PSNU
     expect_setequal(
       names(d$memo$datim$by_psnu),

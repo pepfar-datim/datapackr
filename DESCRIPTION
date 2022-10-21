@@ -1,8 +1,8 @@
 Package: datapackr
 Type: Package
 Title: A Package that Packs and Unpacks all Data Packs
-Version: 5.3.0
-Date: 2022-08-10
+Version: 5.3.2
+Date: 2022-10-19
 Authors@R: c(
     person("Scott", "Jackson", email = "sjackson@baosystems.com",
         role = c("aut", "cre")),
@@ -22,14 +22,13 @@ Authors@R: c(
 Description: Generates and processes PEPFAR Data Packs and Site Tools.
 URL: https://github.com/pepfar-datim/datapackr
 BugReports: https://github.com/pepfar-datim/datapackr
-Depends: R (>= 4.1.0)
+Depends: R (>= 4.1.0),
+    datimutils (>= 0.5.1)
 Imports:
     assertthat,
     crayon (>= 1.3.4),
-    datimutils (>= 0.5.1),
     datimvalidation,
     dplyr (>= 0.8.3),
-    fuzzyjoin (>= 0.1.6),
     httr (>= 1.4.0),
     jsonlite (>= 1.6),
     lubridate,
@@ -63,4 +62,4 @@ Remotes:
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1

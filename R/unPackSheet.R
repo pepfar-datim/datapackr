@@ -22,6 +22,16 @@ unPackDataPackSheet <- function(d,
                                 clean_disaggs = TRUE,
                                 clean_values = TRUE) {
 
+  #If we have corrupt sheets, it may not be smart to try and unpack them at all.
+  # Don't proceed with any sheets where *any* index columns are missing (PSNU,
+  #   Age, Sex, KeyPop), or no rows of data
+
+  no_data <- c(d$tests$missing_index_columns$sheet_name,
+               d$tests$no_rows_data$sheet_name) %>%
+    unique()
+
+  sheets <- sheets[!sheets %in% no_data]
+
   keep_cols <- d$info$schema %>%
     dplyr::filter(
       sheet_name %in% sheets,
@@ -69,7 +79,7 @@ unPackDataPackSheet <- function(d,
   if (clean_orgs) {
     data %<>%
       dplyr::filter(
-        psnuid %in% valid_PSNUs$psnu_uid) # Drop if invalid or blank org unit ----
+        psnuid %in% valid_OrgUnits$uid) # Drop if invalid or blank org unit ----
   }
 
   if (clean_disaggs) {

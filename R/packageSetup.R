@@ -272,7 +272,7 @@ pick_template_path <- function(cop_year, tool) {
 #' @param datapack_name Name you would like associated with this Data Pack.
 #' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
 #' @param country_uids Unique IDs for countries to include in the Data Pack.
-#' For full list of these IDs, see \code{datapackr::valid_PSNUs}.
+#' For full list of these IDs, see \code{datapackr::valid_OrgUnits}.
 #' @param template_path Local filepath to Data Pack template Excel (XLSX) file.
 #' This file MUST NOT have any data validation formats present. If left
 #' \code{NULL}, will select the default based on \code{cop_year} and \code{tool}.
@@ -285,7 +285,8 @@ pick_template_path <- function(cop_year, tool) {
 #' saved upon export.
 #' @param results_archive If TRUE, will export compiled results of all tests and
 #' processes to output_folder.
-#' @param d2_session DHIS2 Session id
+#' @param d2_session DHIS2 Session id. R6 datimutils object which handles
+#' authentication with DATIM.
 #' @param d Datapackr sidecar object
 #' @param datastreams Data stream or streams. One or more of \code{mer_targets},
 #' \code{mer_results}, \code{subnat_targets}, \code{subnat_results}, or
