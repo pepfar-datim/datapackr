@@ -34,7 +34,7 @@ packOPUDataPack <- function(d,
   # attempting to load from file, we can still pull from DATIM.
 
   # If empty or unprovided, pull model data from DATIM ####
-  if (is.null(d$info$snuxim_model_data)) {
+  if (is.null(d$data$snuxim_model_data)) {
     d$data$snuxim_model_data <- getOPUDataFromDATIM(cop_year = d$info$cop_year,
                                                     country_uids = d$info$country_uids,
                                                     d2_session = d2_session)

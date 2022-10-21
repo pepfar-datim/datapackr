@@ -403,9 +403,14 @@ packPSNUxIM <- function(wb,
     ## Setup formulas
     dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
     dplyr::mutate(
-      dplyr::across(dplyr::all_of(col.formulas),
-                    ~stringr::str_replace_all(., pattern = paste0("(?<=[:upper:])", header_row + 1),
-                      replacement = as.character(seq_len(NROW(snuxim_model_data)) + first_blank_row - 1))))
+      dplyr::across(
+        dplyr::all_of(col.formulas),
+        ~stringr::str_replace_all(
+          .,
+          pattern = paste0("(?<=[:upper:])", header_row + 1),
+          replacement =
+            as.character(
+              seq_len(NROW(snuxim_model_data)) + first_blank_row - 1))))
 
   # Classify formula columns as formulas
   ## Not sure if my approach is better, but is more readable.
