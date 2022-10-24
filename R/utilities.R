@@ -1,4 +1,66 @@
 #' @export
+#'
+#' @title merge two datapacks into one d object.
+#'
+#' @description
+#' If two datapacks are supplied, they will be merged into one d object.
+#'
+#' @param d1 the first d object
+#' @param d2 the second d object
+#' @param use_path When TRUE will combine all datapacks in a directory
+#'
+#' @return combined d object
+#'
+mergeDatapack <- function(d1 = d1, d2 = d2, use_path = FALSE) {
+
+  if(use_path == FALSE) {
+
+    if(d1$info$datapack_name == d2$info$datapack_name) {
+
+      # bind data, datim and data
+      d <- d1
+      d$datim <- purrr::map2(d1$datim, d2$datim, dplyr::bind_rows)
+      d$data <- purrr::map2(d1$data, d2$data, dplyr::bind_rows)
+
+      # ensure all test results are coded as data frames or tibbles
+      d1$tests <- lapply(d1$tests, tibble)
+      d2$tests <- lapply(d2$tests, tibble)
+
+      # extract extras in each test list
+      # each datapck will have different list tests
+      d1$tests <- lapply(d1$tests, tibble)
+      d2$tests <- lapply(d2$tests, tibble)
+      d1_names <- names(d1$tests)
+      d2_names <- names(d2$tests)
+      d1_extras <- d1_names[!d1_names %in% d2_names]
+      d2_extras <- d2_names[!d2_names %in% d1_names]
+
+      # combine
+      d$tests <- purrr::map2(
+        d1$tests[!names(d1$tests) %in% d1_extras],
+        d2$tests[!names(d2$tests) %in% d2_extras],
+        dplyr::bind_rows
+      )
+
+      # add extras
+      d$tests <- c(d$tests, d1$tests[d1_extras], d2$tests[d2_extras])
+
+      # combine message information
+      d$info <- d1$info
+      d$info$messages <- rbind(d1$info$messages, d2$info$messages)
+
+      return(d)
+
+    } else {
+      print("These are different datapacks, stop!!!")
+    }
+
+  } else {
+    print("using a directory to join all datapacks in that directory...")
+  }
+}
+
+#' @export
 #' @title Returns `default` categoryOptionCombo uid.
 #'
 #' @return `Default` categoryOptionCombo uid.
