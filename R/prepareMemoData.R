@@ -35,8 +35,6 @@ prepareMemoMetadata <- function(d, memo_type,
 
   if (memo_type %in% c("datapack", "comparison")) {
 
-    #TODO: If this is an OPU, use the existing prioritizations
-    #from DATIM.
     d$memo$datapack$prios <- d$data$analytics %>%
       dplyr::select(orgUnit = psnu_uid, prioritization) %>%
       dplyr::distinct() %>%
@@ -82,6 +80,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
   }
 
   if (!is.null(df) && NROW(df) > 0) {
+
     d$memo$datim$analytics <- df %>%
       adorn_import_file(
         .,
@@ -90,6 +89,8 @@ prepareExistingDataAnalytics <- function(d, d2_session =
         d2_session = d2_session,
         include_default = TRUE
       )
+    assertthat::are_equal(NROW(df), NROW(d$memo$datim$analytics))
+
   }
 
   d
@@ -508,13 +509,6 @@ prepareMemoData <- function(d,
                               partners_agencies = d$memo$partners_agencies,
                               psnus = d$info$psnus,
                               n_cores = n_cores)
-
-      #Update the PSNU prioritization levels with those in DATIM
-      if (d$info$tool == "OPU Data Pack") {
-
-        d$memo$datapack$by_psnu <- updateExistingPrioritization(d$memo$datim$prios, d$memo$datapack$by_psnu)
-
-         }
 
       d$memo$datapack$by_partner <-
         prepareMemoDataByPartner(d$memo$datapack$by_psnu,
