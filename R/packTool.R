@@ -21,6 +21,7 @@ packTool <- function(model_data_path = NULL,
                      cop_year,
                      output_folder,
                      results_archive = TRUE,
+                     expand_formulas = FALSE,
                      d2_session = dynGet("d2_default_session",
                                          inherits = TRUE)) {
 
@@ -40,7 +41,8 @@ packTool <- function(model_data_path = NULL,
     assign(p, purrr::pluck(params, p))
   }
 
-  rm(params, p)
+  # Set global numeric format ####
+  options("openxlsx.numFmt" = "#,##0")
 
   # Create data sidecar ####
   d <- datapackr::createDataPack(datapack_name = datapack_name,
@@ -55,13 +57,31 @@ packTool <- function(model_data_path = NULL,
   d$keychain$model_data_path <- model_data_path
   d$keychain$snuxim_model_data_path <- snuxim_model_data_path
 
+  # Start running log of all warning and information messages ####
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+
+  # Get PSNU List####
+  d$data$PSNUs <- datapackr::valid_OrgUnits %>%
+    dplyr::filter(country_uid %in% country_uids) %>%
+    add_dp_label(.) %>%
+    dplyr::arrange(dp_label) %>%
+    ## Remove DSNUs
+    dplyr::filter(!is.na(org_type)) %>%
+    dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
+
+  # TODO: Separate PSNUs as parameter for this function, allowing you to include
+  # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
+
   # Pack file based on type ####
   if (d$info$tool == "Data Pack") {
     d <- packDataPack(d, d2_session = d2_session)
   } else if (d$info$tool == "OPU Data Pack") {
-    d <- packOPUDataPack(d,
-                         undistributed_mer_data = undistributed_mer_data,
+    print(paste("Expand formulas is ", expand_formulas))
+    d <- packOPUDataPack(d, undistributed_mer_data = undistributed_mer_data,
+                         expand_formulas = expand_formulas,
                          d2_session = d2_session)
+
   } else {
     stop("Selected tool not currently supported.")
   }

@@ -9,8 +9,8 @@
 #'
 #' @return Exports an OPU Data Pack to Excel within \code{output_folder}.
 #'
-packOPUDataPack <- function(d,
-                            undistributed_mer_data = NULL,
+packOPUDataPack <- function(d, undistributed_mer_data = NULL,
+                            expand_formulas = FALSE,
                             d2_session = dynGet("d2_default_session",
                                                 inherits = TRUE)) {
 
@@ -30,11 +30,8 @@ packOPUDataPack <- function(d,
     }
   }
 
-  # Don't use `else` here so that if d$data$snuxim_model_data still NULL even after
-  # attempting to load from file, we can still pull from DATIM.
-
   # If empty or unprovided, pull model data from DATIM ####
-  if (is.null(d$data$snuxim_model_data)) {
+  if (is.null(d$info$snuxim_model_data)) {
     d$data$snuxim_model_data <- getOPUDataFromDATIM(cop_year = d$info$cop_year,
                                                     country_uids = d$info$country_uids,
                                                     d2_session = d2_session)
@@ -45,11 +42,10 @@ packOPUDataPack <- function(d,
 
   # Prepare totals data for allocation ####
   if (!is.null(undistributed_mer_data)) {
-    d$datim$UndistributedMER <- undistributed_mer_data
+    d$data$UndistributedMER <- undistributed_mer_data
   } else {
-    d$datim$UndistributedMER <- d$data$snuxim_model_data %>%
-      dplyr::mutate(attributeOptionCombo = default_catOptCombo(),
-                    value = as.double(value)) %>%
+    d$data$UndistributedMER <- d$data$snuxim_model_data %>%
+      dplyr::mutate(attributeOptionCombo = default_catOptCombo()) %>%
       dplyr::group_by(dplyr::across(c(-value))) %>%
       dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop") %>%
       dplyr::filter(value != 0)
@@ -62,6 +58,7 @@ packOPUDataPack <- function(d,
                    cop_year = d$info$cop_year,
                    tool = d$info$tool,
                    schema = d$info$schema,
+                   expand_formulas = expand_formulas,
                    d2_session = d2_session)
 
   d$tool$wb <- r$wb
