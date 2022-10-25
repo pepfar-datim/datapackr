@@ -20,12 +20,12 @@ mergeDatapack <- function(d1 = d1, d2 = d2) {
       d$data <- purrr::map2(d1$data, d2$data, dplyr::bind_rows)
 
       # ensure all test results are coded as data frames or tibbles
-      d1$tests <- lapply(d1$tests, tibble)
-      d2$tests <- lapply(d2$tests, tibble)
+      d1$tests <- lapply(d1$tests, dplyr::tibble)
+      d2$tests <- lapply(d2$tests, dplyr::tibble)
 
       # extract extras in each test list
-      d1$tests <- lapply(d1$tests, tibble)
-      d2$tests <- lapply(d2$tests, tibble)
+      d1$tests <- lapply(d1$tests, dplyr::tibble)
+      d2$tests <- lapply(d2$tests, dplyr::tibble)
       d1_names <- names(d1$tests)
       d2_names <- names(d2$tests)
       d1_extras <- d1_names[!d1_names %in% d2_names]
