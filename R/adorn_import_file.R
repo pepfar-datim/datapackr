@@ -233,6 +233,7 @@ adorn_import_file <- function(psnu_import_file,
              "fiscal_year" = "FY",
              "period" = "period"))
 
+  assertthat::are_equal(NROW(psnu_import_file), row_num)
   # Select/order columns ####
   # Flag set in original function, approx line 20
   if (filter_rename_output) {# If flag is true, Keep the below columns from data
