@@ -14,6 +14,7 @@
 packPSNUxIM <- function(wb, # Workbook object
                         data,
                         snuxim_model_data,
+                        org_units,
                         cop_year = NULL, # Cop year based on the file
                         tool = "OPU Data Pack",
                         schema = NULL,
@@ -77,6 +78,7 @@ packPSNUxIM <- function(wb, # Workbook object
                   sex_option_name = Sex, sex_option_uid = valid_sexes.id,
                   kp_option_name = KeyPop, kp_option_uid = valid_kps.id,
                   value) %>%
+    dplyr::mutate(value = as.numeric(value))  %>% #This needs to be numeric
     dplyr::group_by(dplyr::across(c(-mechanism_code, -type, -value))) %>%
     dplyr::mutate(
       percent = value / sum(value) #Creates percent column
@@ -227,8 +229,11 @@ packPSNUxIM <- function(wb, # Workbook object
                   `DSD Dedupe`, `TA Dedupe`, `Crosswalk Dedupe`)
 
   # Prep dataset of targets to allocate ####
+
+
   data %<>% # adorn_import_file found in adorn_import_file.R
     adorn_import_file(cop_year = cop_year, filter_rename_output = FALSE, d2_session = d2_session) %>%
+    dplyr::inner_join(org_units, by = "orgUnit") %>%
     dplyr::select(PSNU = dp_label, orgUnit, indicator_code, Age, Sex, KeyPop,
                   DataPackTarget = value) %>%
     dplyr::group_by(dplyr::across(c(-DataPackTarget))) %>%

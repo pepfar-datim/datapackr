@@ -45,16 +45,29 @@ packOPUDataPack <- function(d, undistributed_mer_data = NULL,
     d$data$UndistributedMER <- undistributed_mer_data
   } else {
     d$data$UndistributedMER <- d$data$snuxim_model_data %>%
-      dplyr::mutate(attributeOptionCombo = default_catOptCombo()) %>%
+      dplyr::mutate(attributeOptionCombo = default_catOptCombo(),
+                    value = as.numeric(value)) %>%
       dplyr::group_by(dplyr::across(c(-value))) %>%
+      #TODO: Are these not numeric here?
       dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop") %>%
       dplyr::filter(value != 0)
   }
 
+  org_units <- datapackr::valid_OrgUnits %>% # Load in valid_PSNUs list from package
+    dplyr::filter(country_uid %in% d$info$country_uids) %>%
+    add_dp_label(.) %>%
+    dplyr::arrange(dp_label) %>%
+    ## Remove DSNUs
+    dplyr::filter(!is.na(org_type)) %>%
+    dplyr::select(dp_label, orgUnit = uid)
+
+  assertthat::assert_that(NROW(org_units) > 0)
+
   # Write PSNUxIM tab ####
   r <- packPSNUxIM(wb = d$tool$wb,
-                   data = d$datim$UndistributedMER,
+                   data = d$data$UndistributedMER,
                    snuxim_model_data = d$data$snuxim_model_data,
+                   org_units = org_units,
                    cop_year = d$info$cop_year,
                    tool = d$info$tool,
                    schema = d$info$schema,
