@@ -20,7 +20,7 @@ datapackrSupports <- function() {
     "Data Pack", c(2021, 2022),
     "OPU Data Pack", c(2021, 2022),
     "Data Pack Template", c(2021, 2022),
-    "OPU Data Pack Template", c(2021))
+    "OPU Data Pack Template", c(2021, 2022))
 }
 
 
