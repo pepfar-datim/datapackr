@@ -20,6 +20,7 @@ with_mock_api({
              cop_year = 2022,
              output_folder = output_folder,
              results_archive = FALSE,
+             expand_formulas = TRUE,
              d2_session = training)
 
   #Write some more tests here to test metadata
@@ -107,6 +108,19 @@ with_mock_api({
    #We should get the same number of rows we input
    testthat_print("Compare an opened and unopened file")
    expect_true(all(test_data_model$diff == 0))
+   testthat::expect_true(NROW(d$data$snuxim_model_data) > 0)
+   #Do we have rows which differ?
+
+   # missing_data_model <- d_opened$datim$OPU %>%
+   #   dplyr::rename(value_opened = value) %>% #Are we joining the correct data?
+   #   #Unclear if we should do an inner join...
+   #   #But this is basically testing that the values in the
+   #   #model match the values in the DATIM export.
+   #   dplyr::anti_join(d$data$snuxim_model_data)
+   #
+   #TODO: Should there be any missing data here?
+   #Crosswalk dedupes are missing here....
+   #testthat::expect_true(NROW(missing_data_model) == 0)
 
    #TODO: Test from the analytics
    test_data_analytics <- d_opened %>%
@@ -116,6 +130,7 @@ with_mock_api({
                    period = fiscal_year,
                    orgUnit = psnu_uid,
                    categoryOptionCombo = categoryoptioncombo_id,
+                   attributeOptionCombo = mechanism_code,
                    target_value) %>%
      dplyr::mutate(target_value = as.numeric(target_value),
                    period = paste0(period - 1, "Oct")) %>%
@@ -128,8 +143,7 @@ with_mock_api({
      dplyr::mutate(diff = dplyr::near(as.numeric(target_value), as.numeric(value), tol = 1.0)) %>%
      #Lets not worry about zeros?
      #They need to be there for dedupe mechanisms, but lets test this separ
-     dplyr::filter(value != 0,
-                   target_value != 0) %>%
+     dplyr::filter(value != 0, target_value != 0) %>%
      dplyr::filter(!diff | is.na(diff))
 
    testthat_print("Compare analytics with original data from DATIM")
