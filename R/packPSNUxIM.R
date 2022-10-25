@@ -65,7 +65,7 @@ packPSNUxIM <- function(wb, # Workbook object
   #the data with the model, the model should decide
   #how the data gets spread between DSD and TA.
 
-  #Choose the correct adrornment file based on the tool
+  #Choose the correct adornment file based on the tool
   if (tool == "OPU Data Pack" && cop_year == 2022) {
     map_des_cocs <- cop22_map_adorn_import_file
   } else {
@@ -248,8 +248,7 @@ packPSNUxIM <- function(wb, # Workbook object
     dplyr::select(PSNU = dp_label, orgUnit, indicator_code, Age, Sex, KeyPop,
                   DataPackTarget = value) %>%
     dplyr::group_by(dplyr::across(c(-DataPackTarget))) %>%
-    dplyr::summarise(DataPackTarget = sum(DataPackTarget)) %>%
-    dplyr::ungroup()
+    dplyr::summarise(DataPackTarget = sum(DataPackTarget), .groups = "drop")
 
   ## Drop AGYW_PREV (Not allocated to IMs) ####
   data %<>%
@@ -434,8 +433,7 @@ packPSNUxIM <- function(wb, # Workbook object
             .,
             pattern = paste0("(?<=[:upper:])",
                              header_row + 1),
-            replacement = as.character(seq_len(NROW(snuxim_model_data))
-                                        + first_blank_row - 1))))
+            replacement = as.character(seq_len(NROW(snuxim_model_data)) + first_blank_row - 1))))
 
   } else {
     col.formulas <- data_structure %>%
