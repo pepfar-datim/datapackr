@@ -10,8 +10,11 @@ with_mock_api({
 
     template_file <- file.path(system.file("extdata", package="datapackr"), "COP21_OPU_Data_Pack_Template.xlsx")
     expect_true(file.exists(template_file))
-    test_dataset <- unPackSchema(template_file,
-                                 cop_year = 2021)
+    test_dataset <- unPackSchema(
+      template_path = template_file,
+      skip = skip_tabs(tool = "OPU Data Pack Template", cop_year = 2021),
+      tool = "OPU Data Pack Template",
+      cop_year = 2021)
     expect_type(test_dataset, "list")
     expect_named(
       test_dataset,
@@ -67,8 +70,11 @@ with_mock_api({
 
     template_file <- file.path(system.file("extdata", package="datapackr"), "COP22_OPU_Data_Pack_Template.xlsx")
     expect_true(file.exists(template_file))
-    test_dataset <- unPackSchema(template_file,
-                                 cop_year = 2022)
+    test_dataset <-     test_dataset <- unPackSchema(
+      template_path = template_file,
+      skip = skip_tabs(tool = "OPU Data Pack Template", cop_year = 2022),
+      tool = "OPU Data Pack Template",
+      cop_year = 2022)
     expect_type(test_dataset, "list")
     expect_named(
       test_dataset,
@@ -124,8 +130,10 @@ with_mock_api({
 
     template_file <- file.path(system.file("extdata", package="datapackr"), "COP22_Data_Pack_Template.xlsx")
     expect_true(file.exists(template_file))
-    test_dataset <- unPackSchema(template_file,
-                                 cop_year = 2022)
+    test_dataset <-   unPackSchema(
+      template_path = template_file,
+      skip = skip_tabs(tool = "Data Pack Template", cop_year = 2022),
+      cop_year = 2022)
     expect_type(test_dataset, "list")
     expect_named(
       test_dataset,
