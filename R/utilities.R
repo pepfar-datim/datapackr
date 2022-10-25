@@ -7,13 +7,10 @@
 #'
 #' @param d1 the first d object
 #' @param d2 the second d object
-#' @param use_path When TRUE will combine all datapacks in a directory
 #'
 #' @return combined d object
 #'
-mergeDatapack <- function(d1 = d1, d2 = d2, use_path = FALSE) {
-
-  if(use_path == FALSE) {
+mergeDatapack <- function(d1 = d1, d2 = d2) {
 
     if(d1$info$datapack_name == d2$info$datapack_name) {
 
@@ -27,7 +24,6 @@ mergeDatapack <- function(d1 = d1, d2 = d2, use_path = FALSE) {
       d2$tests <- lapply(d2$tests, tibble)
 
       # extract extras in each test list
-      # each datapck will have different list tests
       d1$tests <- lapply(d1$tests, tibble)
       d2$tests <- lapply(d2$tests, tibble)
       d1_names <- names(d1$tests)
@@ -52,12 +48,8 @@ mergeDatapack <- function(d1 = d1, d2 = d2, use_path = FALSE) {
       return(d)
 
     } else {
-      print("These are different datapacks, stop!!!")
+      stop("These are different datapacks, cannot merge!!!")
     }
-
-  } else {
-    print("using a directory to join all datapacks in that directory...")
-  }
 }
 
 #' @export
