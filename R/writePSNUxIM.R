@@ -89,7 +89,7 @@ writePSNUxIM <- function(d,
       targets_data <- p$datim$UndistributedMER
       rm(p)
     } else {
-      targets_data <- d$datim$UndistributedMER
+      targets_data <- d$data$UndistributedMER
     }
 
     #Mirror the data in TA as well

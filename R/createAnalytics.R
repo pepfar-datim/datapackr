@@ -47,7 +47,7 @@ createAnalytics <- function(d,
   d$data$analytics <-
     switch(ifelse(d$info$has_psnuxim, "MER", "UndistributedMER"),
            MER = d$datim$MER,
-           UndistributedMER = d$datim$UndistributedMER) %>%
+           UndistributedMER = d$data$UndistributedMER) %>%
     dplyr::bind_rows(d$datim$subnat_impatt) %>%
     adorn_import_file(cop_year = d$info$cop_year,
                       psnu_prioritizations = pzns,
