@@ -65,11 +65,19 @@ packPSNUxIM <- function(wb, # Workbook object
   #the data with the model, the model should decide
   #how the data gets spread between DSD and TA.
 
+  #Choose the correct adrornment file based on the tool
+  if (tool == "OPU Data Pack" && cop_year == 2022) {
+    map_des_cocs <- cop22_map_adorn_import_file
+  } else {
+    map_des_cocs <- NULL
+  }
+
   ## Translate from import format ####
   snuxim_model_data %<>%
     datapackr::adorn_import_file(cop_year = cop_year, #adorn_import_file.R
                                  # Final data in the new, more complete format?
                                  filter_rename_output = FALSE,
+                                 map_des_cocs = map_des_cocs,
                                  d2_session = d2_session) %>%
     # Select columns wanted and rename where necessary
     dplyr::select(indicator_code, psnu_uid = orgUnit, mechanism_code,
@@ -232,7 +240,10 @@ packPSNUxIM <- function(wb, # Workbook object
 
 
   data %<>% # adorn_import_file found in adorn_import_file.R
-    adorn_import_file(cop_year = cop_year, filter_rename_output = FALSE, d2_session = d2_session) %>%
+    adorn_import_file(cop_year = cop_year,
+                      filter_rename_output = FALSE,
+                      map_des_cocs = map_des_cocs,
+                      d2_session = d2_session) %>%
     dplyr::inner_join(org_units, by = "orgUnit") %>%
     dplyr::select(PSNU = dp_label, orgUnit, indicator_code, Age, Sex, KeyPop,
                   DataPackTarget = value) %>%
