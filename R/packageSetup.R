@@ -272,7 +272,7 @@ pick_template_path <- function(cop_year, tool) {
 #' @param datapack_name Name you would like associated with this Data Pack.
 #' (Example: "Western Hemisphere", or "Caribbean Region", or "Kenya".)
 #' @param country_uids Unique IDs for countries to include in the Data Pack.
-#' For full list of these IDs, see \code{datapackr::valid_PSNUs}.
+#' For full list of these IDs, see \code{datapackr::valid_OrgUnits}.
 #' @param template_path Local filepath to Data Pack template Excel (XLSX) file.
 #' This file MUST NOT have any data validation formats present. If left
 #' \code{NULL}, will select the default based on \code{cop_year} and \code{tool}.

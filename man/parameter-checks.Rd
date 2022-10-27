@@ -68,7 +68,7 @@ check_params(
 }
 \arguments{
 \item{country_uids}{Unique IDs for countries to include in the Data Pack.
-For full list of these IDs, see \code{datapackr::valid_PSNUs}.}
+For full list of these IDs, see \code{datapackr::valid_OrgUnits}.}
 
 \item{force}{logical. Should country_uids be required?}
 

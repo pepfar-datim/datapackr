@@ -11,9 +11,9 @@ prepareMemoMetadata <- function(d, memo_type,
 
   #This is still not sensitive to the COP year
   #TODO: maybe valid_PSNUs a function of the COP year
-  d$info$psnus <- datapackr::valid_PSNUs %>%
+  d$info$psnus <- datapackr::valid_OrgUnits %>%
     dplyr::filter(country_uid %in% d$info$country_uids) %>%
-    dplyr::select(ou, country_name, snu1, psnu, psnu_uid)
+    dplyr::select(ou, country_name, snu1, psnu = name, psnu_uid = uid)
 
   #Get the memo structure
   d <- memoStructure(d, d2_session)
@@ -147,8 +147,20 @@ prepareMemoDataByPSNU <- function(analytics,
 
   #Prepare the full list of prioritization PSNUs
   #These functions are reused from adorn_import_file
-  snus <- getPriorizationSNU(df$psnu_uid)
-  prio_map <- getPrioritizationMap(snus, prios)
+  prio_map <- getPSNUInfo(df$psnu_uid) %>%
+    dplyr::select(psnu_uid, uid) %>%
+    dplyr::left_join(prios, by = c("psnu_uid" = "orgUnit")) %>%
+    #Remove any invalid prioritizations
+    dplyr::mutate(
+      value = ifelse(value %in% prioritization_dict()$value, value, NA_real_)) %>%
+    dplyr::left_join(prioritization_dict() %>%
+                       dplyr::select(value, prioritization = name),
+                     by = c("value")) %>%
+    dplyr::mutate(
+      prioritization = ifelse(is.na(prioritization),
+                              "No Prioritization",
+                              prioritization)) %>%
+    dplyr::select(uid, prioritization)
 
   #TODO: Consider to refactor adorn_import_file
   #To handle this adornment. The logic here is
@@ -193,7 +205,7 @@ prepareMemoDataByPSNU <- function(analytics,
                  TRUE ~ Age)) %>%
     dplyr::select(-id, -numerator, -denominator) %>%
     dplyr::left_join(prio_map,
-                     by = c("psnu_uid" = "id")) %>%
+                     by = c("psnu_uid" = "uid")) %>%
     dplyr::mutate(prioritization = dplyr::case_when(
       is.na(prioritization) ~ "No Prioritization",
       TRUE ~ prioritization)) %>%
@@ -415,7 +427,12 @@ prepareMemoDataByPrio <- function(df,
     df_final <- dplyr::select(df_final, -`No Prioritization`) # nolint
   }
 
-  df_final %>% dplyr::select(where(~ any(. != 0))) # Remove all columns which are completely zero
+  df_final %>%
+    dplyr::select(where(~ any(. != 0))) %>%  # Remove all columns which are completely zero
+    dplyr::rename_with(
+    ~ dplyr::case_when(
+      . == "No Prioritization" ~ "No Prioritization - USG Only",
+      TRUE ~ .)) #DP-590
 }
 
 

@@ -3,24 +3,27 @@ context("get-code-lists")
 with_mock_api({
   test_that("We can get a list of PSNUs from DATIM", {
 
-    test_dataset <-  getPSNUs(country_uids = "qllxzIjjurr", include_mil = FALSE,
-                           include_DREAMS = TRUE,
-                           d2_session = training)
+    test_dataset <-
+      getDataPackOrgUnits(
+        include_mil = FALSE,
+        include_DREAMS = TRUE,
+        use_cache = FALSE,
+        d2_session = training)
     expect_type(test_dataset, "list")
     expect_true("data.frame" %in% class(test_dataset))
     expect_true(NROW(test_dataset) > 0)
     expect_setequal(
       names(test_dataset),
-      c(
+      c("name",
+        "uid",
+        "org_type",
         "ou",
-        "ou_id",
+        "ou_uid",
         "country_name",
         "country_uid",
         "snu1",
-        "snu1_id",
-        "psnu",
-        "psnu_uid",
-        "psnu_type",
+        "snu1_uid",
+        "lastUpdated",
         "ancestors",
         "organisationUnitGroups",
         "DREAMS"
