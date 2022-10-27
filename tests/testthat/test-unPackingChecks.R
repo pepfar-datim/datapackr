@@ -484,7 +484,7 @@ test_that("Can check out of order cols", {
 
   # test positive flag
   # we reverse order of columns
-  d$sheets$Prioritization <- d$sheets$Prioritization[, order(seq_len(d$sheets$Prioritization):1)]
+  d$sheets$Prioritization <- d$sheets$Prioritization[, order(rev(names(d$sheets$Prioritization)))]
 
   res <- checkOutOfOrderCols(d = d, sheets = test_sheets)
 
