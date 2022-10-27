@@ -383,8 +383,8 @@ test_that("Can check missing cols", {
 
   expect_equal(nrow(res$result), 1L)
   expect_equal(res$result$indicator_code, "IMPATT.PRIORITY_SNU.T")
-  expect_equal(res$lvl, "WARNING")
-  expect_equal(res$has_error, FALSE)
+  expect_equal(res$lvl, "ERROR")
+  expect_equal(res$has_error, TRUE)
 
   rm(res, d)
 
