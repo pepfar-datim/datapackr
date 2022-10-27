@@ -12,7 +12,7 @@
 #'
 mergeDatapack <- function(d1 = d1, d2 = d2) {
 
-    if(d1$info$datapack_name == d2$info$datapack_name) {
+    if (d1$info$datapack_name == d2$info$datapack_name) {
 
       # bind data, datim and data
       d <- d1
