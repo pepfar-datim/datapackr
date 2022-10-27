@@ -721,5 +721,5 @@ test_that("Can check index header columns exist", {
   expect_true(is.data.frame(d$tests$missing_index_columns))
   expect_setequal(names(d$tests$missing_index_columns), c("sheet_name"))
   expect_equal(d$tests$missing_index_columns$sheet_name, "KP_MAT")
-  
+
   })
