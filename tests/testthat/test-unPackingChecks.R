@@ -154,9 +154,9 @@ test_that("Can check decimal values", {
       "Prioritization", "PSNU", "row_header", "string",
       "Prioritization", "IMPATT.PRIORITY_SNU.T","target", "integer"
     ) %>%
-    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+    dplyr::mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
 
 
   d$sheets$Prioritization <-
@@ -203,9 +203,9 @@ test_that("Can check non numeric values", {
       "Prioritization", "PSNU", "row_header", "string",
       "Prioritization", "IMPATT.PRIORITY_SNU.T","target", "integer"
     ) %>%
-    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+    dplyr::mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
 
 
   d$sheets$Prioritization <-
@@ -240,7 +240,6 @@ test_that("Can check non numeric values", {
 
 })
 
-
 # check negative values ----
 test_that("Can check negative values", {
 
@@ -257,9 +256,9 @@ test_that("Can check negative values", {
       "Prioritization", "PSNU", "row_header", "string",
       "Prioritization", "IMPATT.PRIORITY_SNU.T","target", "integer"
     ) %>%
-    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+    dplyr::mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
 
 
   d$sheets$Prioritization <-
@@ -291,9 +290,8 @@ test_that("Can check negative values", {
 
 })
 
-
 # check dupe rows ----
-  test_that("Can check dupe rows", {
+test_that("Can check dupe rows", {
 
     test_sheets <- c(
       "Prioritization"
@@ -308,9 +306,9 @@ test_that("Can check negative values", {
         "Prioritization", "PSNU", "row_header", "string",
         "Prioritization", "IMPATT.PRIORITY_SNU.T","target", "integer"
       ) %>%
-      mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
-      mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
-      mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+      dplyr::mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+      dplyr::mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+      dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
 
 
     d$sheets$Prioritization <-
@@ -358,9 +356,9 @@ test_that("Can check missing cols", {
       "Prioritization", "PSNU", "row_header", "string",
       "Prioritization", "IMPATT.PRIORITY_SNU.T","target", "integer"
     ) %>%
-    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+    dplyr::mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
 
 
   d$sheets$Prioritization <-
@@ -410,9 +408,9 @@ test_that("Can check dupe cols", {
       "Prioritization", 3, "IMPATT.PRIORITY_SNU.T_1","past", "integer",
       "Prioritization", 4,  "IMPATT.PRIORITY_SNU.T","target", "integer"
     ) %>%
-    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+    dplyr::mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
 
 
   d$sheets$Prioritization <-
@@ -466,9 +464,9 @@ test_that("Can check out of order cols", {
       "Prioritization", 3, "IMPATT.PRIORITY_SNU.T_1","past", "integer",
       "Prioritization", 4,  "IMPATT.PRIORITY_SNU.T","target", "integer"
     ) %>%
-    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+    dplyr::mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
 
 
   d$sheets$Prioritization <-
@@ -598,9 +596,9 @@ test_that("Can check formulas", {
       3, "Prioritization", 4,  "IMPATT.PRIORITY_SNU.T","target", "integer", 'IF(LEFT($B\\d+,4)=\"_Mil\",\"M\",IF(SUM($C\\d+)=0,\"\",$C\\d+))',
       3, "Prioritization", 5,  "PRIORITY_SNU.translation","reference", "string", 'IF(LEFT($B\\d+,4)=\"_Mil\",\"M\",IF(SUM($C\\d+)=0,\"\",$C\\d+))'
     ) %>%
-    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+    dplyr::mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
 
 
   d$sheets$Prioritization <-
@@ -625,9 +623,6 @@ test_that("Can check formulas", {
 # check disaggs ----
 test_that("Can check disaggs", {
 
-  # test sheet stop
-  sheets <- c("SNU x IM", "PSNUxIM", "Prioritization")
-
   # create minimal schema data
   d <- list()
   d$info$schema <-
@@ -639,9 +634,9 @@ test_that("Can check disaggs", {
       3, "Prioritization", 4,  "IMPATT.PRIORITY_SNU.T","target", "integer",
       3, "Prioritization", 5,  "PRIORITY_SNU.translation","reference", "string"
     ) %>%
-    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
+    dplyr::mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
 
   # create minimal sheet needed
   d$sheets$Prioritization <-
@@ -651,9 +646,6 @@ test_that("Can check disaggs", {
       "Central Region", "Lilongwe District [#SNU] [ScR9iFKAasW]", "4" , "4", "Sustained",
       "Central Region", "Dowa District [#SNU] [zphK9WV8JB4]", "4", NA, "Not a PSNU"
     )
-
-  # expect warning for invalid sheets
-  expect_warning(checkDisaggs(d = d, sheets = sheets))
 
   # next test
   sheets <- c("Prioritization")
@@ -676,9 +668,9 @@ test_that("Can check disaggs", {
       3, "Prioritization", 4,  "IMPATT.PRIORITY_SNU.T","target", "integer",
       3, "Prioritization", 5,  "PRIORITY_SNU.translation","reference", "string"
     ) %>%
-    mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
-    mutate(valid_kps = I(list(data.frame(id = NA, name = "4"))))
+    dplyr::mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_sexes= I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = "4"))))
 
   res <- checkDisaggs(d = d, sheets = sheets)
   expect_equal(nrow(res$result), 1L)
