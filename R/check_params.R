@@ -223,13 +223,13 @@ check_cop_year <- function(cop_year, tool) {
   cop_year %<>% parse_maybe_number() # Found in utilities.R
 
   # Check that provided COP Years are supported ####
-  if (!cop_year %in% supportedCOPYears()) {
-    stop(paste0("Sorry, datapackr only supports tools from ",
-                paste_oxford(paste0("COP", supportedCOPYears() - 2000),
-                             final = "&",
-                             oxford = FALSE),
-                "."))
-  }
+  # if (!cop_year %in% supportedCOPYears()) {
+  #   stop(paste0("Sorry, datapackr only supports tools from ",
+  #               paste_oxford(paste0("COP", supportedCOPYears() - 2000),
+  #                            final = "&",
+  #                            oxford = FALSE),
+  #               "."))
+  # }
 
   # Check other parameters
   tool <- tool %missing% NULL
