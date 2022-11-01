@@ -8,7 +8,7 @@ Sys.setlocale(category = "LC_COLLATE", locale = "en_US.UTF-8")
 with_mock_api({
   test_that("We can create a COP21 OPU Data Pack Schema", {
 
-    template_file <- file.path(system.file("extdata", package="datapackr"), "COP21_OPU_Data_Pack_Template.xlsx")
+    template_file <- file.path(system.file("extdata", package = "datapackr"), "COP21_OPU_Data_Pack_Template.xlsx")
     expect_true(file.exists(template_file))
     test_dataset <- unPackSchema(
       template_path = template_file,
@@ -57,7 +57,7 @@ with_mock_api({
     expect_type(test_dataset$FY, "double")
     expect_type(test_dataset$period, "character")
     #skip("Why does the COP21 OPU template not match the template?")
-    expect_identical(test_dataset,cop21OPU_data_pack_schema)
+    expect_identical(test_dataset, cop21OPU_data_pack_schema)
 
 
   })
@@ -68,7 +68,7 @@ with_mock_api({
 with_mock_api({
   test_that("We can create a COP22 OPU DataPack Schema", {
 
-    template_file <- file.path(system.file("extdata", package="datapackr"), "COP22_OPU_Data_Pack_Template.xlsx")
+    template_file <- file.path(system.file("extdata", package = "datapackr"), "COP22_OPU_Data_Pack_Template.xlsx")
     expect_true(file.exists(template_file))
     test_dataset <-     test_dataset <- unPackSchema(
       template_path = template_file,
@@ -128,7 +128,7 @@ with_mock_api({
 with_mock_api({
   test_that("We can create a COP22 DataPack Schema", {
     skip("Schema creation test failing for unknown reasons")
-    template_file <- file.path(system.file("extdata", package="datapackr"), "COP22_Data_Pack_Template.xlsx")
+    template_file <- file.path(system.file("extdata", package = "datapackr"), "COP22_Data_Pack_Template.xlsx")
     expect_true(file.exists(template_file))
     test_dataset <-   unPackSchema(
       template_path = template_file,
