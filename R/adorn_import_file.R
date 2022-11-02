@@ -76,9 +76,11 @@ getPSNUInfo <- function(snu_uids,
 #' @param psnu_import_file DHIS2 import file to convert
 #' @inheritParams datapackr_params
 #' @param psnu_prioritizations List of orgUnit, value containing prioritization
-#' values for each PSNU. If not included, blank prioritizations shown.
-#' @param filter_rename_output T/F Should this function output the final data in
+#' values for each PSNU.
+#' @param filter_rename_output Should this function output the final data in
 #' the new, more complete format?
+#' @param map_des_cocs Can be used to supply a specific data element/COC map.
+#' If not specified, results will be obtained from default methods.
 #' @param include_default Should default mechanisms be included?
 #'
 #' @return psnu_import_file
@@ -86,12 +88,13 @@ getPSNUInfo <- function(snu_uids,
 adorn_import_file <- function(psnu_import_file,
                               cop_year = NULL,
                               psnu_prioritizations = NULL,
+                              map_des_cocs = NULL,
                               filter_rename_output = TRUE,
                               d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE),
                               include_default = FALSE) {
 
-  #row_num <- NROW(psnu_import_file)
+  row_num <- NROW(psnu_import_file)
 
   cop_year %<>% check_cop_year()
 
@@ -101,7 +104,7 @@ adorn_import_file <- function(psnu_import_file,
                      by = c("orgUnit" = "uid"))
 
   # Utilizes row_num to ensure the join worked as expected
-  # assertthat::are_equal(NROW(psnu_import_file), row_num)
+  assertthat::are_equal(NROW(psnu_import_file), row_num)
   # TODO: Convert to test
 
   # Add Prioritizations ####
@@ -202,11 +205,13 @@ adorn_import_file <- function(psnu_import_file,
   # Stack data_codes and data_ids on top of one another.
   psnu_import_file <- dplyr::bind_rows(data_codes, data_ids, data_default) %>% dplyr::distinct()
   # Utilizes row_num to ensure the join,filter,stack worked as expected
-  #assertthat::are_equal(NROW(psnu_import_file), row_num)
+  assertthat::are_equal(NROW(psnu_import_file), row_num)
 
   # Adorn dataElements & categoryOptionCombos ####
-
-  map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year) # Found in utilities.R
+  # Use the default DE/COC map if none has been supplied.
+  if (is.null(map_des_cocs)) {
+    map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year) # Found in utilities.R
+  }
 
   psnu_import_file %<>%
     dplyr::mutate(
@@ -233,6 +238,7 @@ adorn_import_file <- function(psnu_import_file,
              "fiscal_year" = "FY",
              "period" = "period"))
 
+  assertthat::are_equal(NROW(psnu_import_file), row_num)
   # Select/order columns ####
   # Flag set in original function, approx line 20
   if (filter_rename_output) {# If flag is true, Keep the below columns from data
