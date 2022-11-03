@@ -1,3 +1,13 @@
+# datapackr 5.3.3
+
+## Breaking changes
+
+## New features
+* Adds `mergeDatapack` function for use in merging multiple datapacks along
+with related unit test.
+
+## Minor improvements and fixes
+
 # datapackr 5.3.2
 
 ## Breaking changes
