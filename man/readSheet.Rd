@@ -56,11 +56,9 @@ only in an interactive session, outside the context of knitting a document,
 and when the call is likely to run for several seconds or more. See
 \code{\link[readxl:readxl_progress]{readxl_progress()}} for more details.}
 
-\item{.name_repair}{Handling of column names. By default, readxl ensures
-column names are not empty and are unique. If the tibble package version is
-recent enough, there is full support for \code{.name_repair} as documented in
-\code{\link[tibble:tibble]{tibble::tibble()}}. If an older version of tibble is present, readxl falls
-back to name repair in the style of tibble v1.4.2.}
+\item{.name_repair}{Handling of column names. Passed along to
+\code{\link[tibble:as_tibble]{tibble::as_tibble()}}. readxl's default is `.name_repair = "unique", which
+ensures column names are not empty and are unique.}
 }
 \value{
 A \link[tibble:tibble-package]{tibble}
