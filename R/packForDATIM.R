@@ -14,6 +14,10 @@ packForDATIM <- function(d, type = NULL) {
 
   # Call DATIM map ----
   datim_map <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
+  #TODO: Fix this in getMapDataPack_DATIM_DEs_COCs
+  if (type == "OPU PSNUxIM" && d$info$cop_year == 2022) {
+    datim_map <- cop22_map_adorn_import_file
+  }
 
   # Check params ----
   approved_types <- c("PSNUxIM", "SUBNAT_IMPATT",

@@ -30,8 +30,18 @@ createAnalytics <- function(d,
                                       cop_year = d$info$cop_year,
                                       d2_session = d2_session)
 
+    #TODO: Does adorn_import file need to be smarter
+    #about choosing which adorn file to use?
+    #Choose the correct DE/COC mapping
+    if (d$info$cop_year == 2022) {
+      map_des_cocs <- cop22_map_adorn_import_file
+    } else {
+      map_des_cocs <- NULL
+    }
+
     d$data$analytics <- d$datim$OPU %>%
       adorn_import_file(cop_year = d$info$cop_year,
+                        map_des_cocs = map_des_cocs,
                         psnu_prioritizations = prios,
                         d2_session = d2_session)
     return(d)

@@ -77,15 +77,26 @@ prepareExistingDataAnalytics <- function(d, d2_session =
     df <- dplyr::filter(df,
                         !(attributeOptionCombo %in% c("default",
                                                       "HllvX50cXC0")))
-  }
+
 
   if (!is.null(df) && NROW(df) > 0) {
+
+    #TODO: Does adorn_import file need to be smarter
+    #about choosing which adorn file to use?
+    #Choose the correct DE/COC mapping
+    if (d$info$cop_year == 2022) {
+      map_des_cocs <- cop22_map_adorn_import_file
+    } else {
+      map_des_cocs <- NULL
+    }
+  }
 
     d$memo$datim$analytics <- df %>%
       adorn_import_file(
         .,
         cop_year = d$info$cop_year,
         psnu_prioritizations = d$memo$datim$prios,
+        map_des_cocs = map_des_cocs,
         d2_session = d2_session,
         include_default = TRUE
       )
