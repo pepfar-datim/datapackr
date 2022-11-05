@@ -17,6 +17,10 @@ createAnalytics <- function(d,
     stop("createAnalytics does not work on tools for that COP Year.")
   }
 
+  #Choose the correct DE/COC map
+  map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
+                                                datasource = d$info$tool)
+
   # Append the distributed MER data and subnat data together
   if (d$info$tool == "OPU Data Pack") {
 
@@ -30,14 +34,7 @@ createAnalytics <- function(d,
                                       cop_year = d$info$cop_year,
                                       d2_session = d2_session)
 
-    #TODO: Does adorn_import file need to be smarter
-    #about choosing which adorn file to use?
-    #Choose the correct DE/COC mapping
-    if (d$info$cop_year == 2022) {
-      map_des_cocs <- cop22_map_adorn_import_file
-    } else {
-      map_des_cocs <- NULL
-    }
+
 
     d$data$analytics <- d$datim$OPU %>%
       adorn_import_file(cop_year = d$info$cop_year,
@@ -61,6 +58,7 @@ createAnalytics <- function(d,
     dplyr::bind_rows(d$datim$subnat_impatt) %>%
     adorn_import_file(cop_year = d$info$cop_year,
                       psnu_prioritizations = pzns,
+                      map_des_cocs = map_des_cocs,
                       d2_session = d2_session)
 
   if (d$info$unallocatedIMs || !d$info$has_psnuxim) {
