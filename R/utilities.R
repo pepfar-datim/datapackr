@@ -343,7 +343,7 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL) {
 
   stopifnot("The COP year must be specified" = !is.null(cop_year))
 
-  if (datasource == "Data Pack" || is.null(datasource)) {
+  if (datasource %in%  c("Data Pack", "Data Pack Template") || is.null(datasource)) {
     de_coc_map <- switch(as.character(cop_year),
            "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
            "2022" = datapackr::cop22_map_DataPack_DATIM_DEs_COCs,
@@ -351,7 +351,7 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL) {
   return(de_coc_map)
     }
 
-  if (datasource %in% c("OPU Data Pack", "DATIM")) {
+  if (datasource %in% c("OPU Data Pack", "OPU Data Pack Template", "DATIM")) {
     de_coc_map <- switch(as.character(cop_year),
                          "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
                          "2022" = datapackr::cop22_map_adorn_import_file,
