@@ -1,4 +1,13 @@
-checkPSNUxIM_Disaggs <- function(d, sheet) {
+#' Title checkPSNUxIM_Disaggs
+#'
+#' @description Checks disagg combinations (Age/Sex/Key Pop) in the PSNUxIM
+#' tab for invalid combinations. Removes data which is invalid.
+#' @param d Datapackr object.
+#'
+#' @return d Datapackr object.
+#' @export
+#'
+checkPSNUxIM_Disaggs <- function(d) {
 
   sheet_disaggs <- d$data$SNUxIM %>%
     dplyr::select(indicator_code,Age,Sex,KeyPop)
@@ -22,10 +31,10 @@ checkPSNUxIM_Disaggs <- function(d, sheet) {
 
     warning_msg <-
       paste0(
-        "ERROR! In tab ",
-        sheet,
-        ", Invalid disaggregates: You have used an incorrect combination",
-        "of disaggregates (Age, Sex, KeyPops).",
+        "ERROR! In tab PSNUxIM: ",length(disagg_check_idx), " rows with ",
+        " invalid disaggregates were found. You have used an incorrect combination",
+        " of disaggregates (Age, Sex, KeyPops). These rows will be removed",
+        " from further processing.",
         "The following rows are affected: ", formatSetStrings(disagg_check_idx))
 
     d$tests$bad_disaggs_psnuxim <- disagg_check %>%
@@ -35,17 +44,13 @@ checkPSNUxIM_Disaggs <- function(d, sheet) {
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
+
+    #Filter the bad rows
+    d$data$SNUxIM <- d$data$SNUxIM %>%
+      dplyr::filter(!dplyr::row_number() %in% disagg_check_idx)
+
   }
 
   d
 
-}
-checkDisaggs <- function(d, sheet) {
-
-  if (sheet == "PSNUxIM") {
-
-   d <-  checkPSNUxIM_Disaggs(d, sheet)
-
-   }
-  d
 }

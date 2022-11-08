@@ -5,15 +5,19 @@ test_that("Detect bad disaggs in PSNUxIM tab", {
   d$info$tool <- "OPU Data Pack"
   d$info$messages <- MessageQueue()
 
-  d$data$SNUxIM <- tribble(
+   data <- tribble(
     ~indicator_code,~Age,~Sex,~KeyPop,
     "CXCA_SCRN.T", "134-587", "Female", NA,
     "CXCA_SCRN.T", "25-29", "Female", NA
   )
 
-  d <- checkDisaggs(d,"PSNUxIM")
+  d$data$SNUxIM <- data
+  d <- checkPSNUxIM_Disaggs(d)
   expect_true(NROW(d$tests$bad_disaggs_psnuxim) == 1)
   expect_true(d$tests$bad_disaggs_psnuxim$rownum == 1)
   expect_true(d$info$has_error)
-  expect_true(grepl("Invalid disaggregates", d$info$messages$message))
+  expect_true(grepl("invalid disaggregates", d$info$messages$message))
+  #Bad row should be filtered
+  expect_identical(d$data$SNUxIM, data[2,])
+
 })
