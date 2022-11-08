@@ -81,11 +81,16 @@ prepareExistingDataAnalytics <- function(d, d2_session =
 
   if (!is.null(df) && NROW(df) > 0) {
 
+    #TODO: Does adorn_import file need to be smarter
+    map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
+                                                            datasource = "DATIM")
+
     d$memo$datim$analytics <- df %>%
       adorn_import_file(
         .,
         cop_year = d$info$cop_year,
         psnu_prioritizations = d$memo$datim$prios,
+        map_des_cocs = map_des_cocs,
         d2_session = d2_session,
         include_default = TRUE
       )
