@@ -6,7 +6,7 @@ test_that("Detect bad disaggs in PSNUxIM tab", {
   d$info$messages <- MessageQueue()
 
    data <- tribble(
-    ~indicator_code,~Age,~Sex,~KeyPop,
+    ~indicator_code, ~Age, ~Sex, ~KeyPop,
     "CXCA_SCRN.T", "134-587", "Female", NA,
     "CXCA_SCRN.T", "25-29", "Female", NA
   )
@@ -18,6 +18,6 @@ test_that("Detect bad disaggs in PSNUxIM tab", {
   expect_true(d$info$has_error)
   expect_true(grepl("invalid disaggregates", d$info$messages$message))
   #Bad row should be filtered
-  expect_identical(d$data$SNUxIM, data[2,])
+  expect_identical(d$data$SNUxIM, data[2, ])
 
 })

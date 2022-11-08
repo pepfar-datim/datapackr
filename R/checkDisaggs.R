@@ -10,7 +10,7 @@
 checkPSNUxIM_Disaggs <- function(d) {
 
   sheet_disaggs <- d$data$SNUxIM %>%
-    dplyr::select(indicator_code,Age,Sex,KeyPop)
+    dplyr::select(indicator_code, Age, Sex, KeyPop)
 
   schema_disaggs <- getMapDataPack_DATIM_DEs_COCs(d$info$cop_year,
                                                   datasource = d$info$tool) %>%
@@ -31,7 +31,7 @@ checkPSNUxIM_Disaggs <- function(d) {
 
     warning_msg <-
       paste0(
-        "ERROR! In tab PSNUxIM: ",length(disagg_check_idx), " rows with ",
+        "ERROR! In tab PSNUxIM: ", length(disagg_check_idx), " rows with ",
         " invalid disaggregates were found. You have used an incorrect combination",
         " of disaggregates (Age, Sex, KeyPops). These rows will be removed",
         " from further processing.",
