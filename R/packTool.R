@@ -21,6 +21,7 @@ packTool <- function(model_data_path = NULL,
                      cop_year,
                      output_folder,
                      results_archive = TRUE,
+                     expand_formulas = FALSE,
                      d2_session = dynGet("d2_default_session",
                                          inherits = TRUE)) {
 
@@ -48,10 +49,8 @@ packTool <- function(model_data_path = NULL,
                                  country_uids = country_uids,
                                  template_path = template_path,
                                  cop_year = cop_year,
-                                 tool = tool)
-
-  # Adds user information to d object ####
-  d$info$source_user <- d2_session$me$userCredentials$username
+                                 tool = tool,
+                                 d2_session = d2_session)
 
   # Adds additional folder and file paths to d object ####
   d$keychain$output_folder <- output_folder
@@ -78,7 +77,11 @@ packTool <- function(model_data_path = NULL,
   if (d$info$tool == "Data Pack") {
     d <- packDataPack(d, d2_session = d2_session)
   } else if (d$info$tool == "OPU Data Pack") {
-    d <- packOPUDataPack(d, undistributed_mer_data = undistributed_mer_data, d2_session = d2_session)
+    print(paste("Expand formulas is ", expand_formulas))
+    d <- packOPUDataPack(d,
+                         undistributed_mer_data = undistributed_mer_data,
+                         expand_formulas = expand_formulas,
+                         d2_session = d2_session)
 
   } else {
     stop("Selected tool not currently supported.")
@@ -86,7 +89,7 @@ packTool <- function(model_data_path = NULL,
 
   # Save & Export Workbook ####
   interactive_print("Saving...")
-  exportPackr(data = d$tool$wb,
+  d$info$output_file <- exportPackr(data = d$tool$wb,
               output_folder = d$keychain$output_folder,
               tool = d$info$tool,
               datapack_name = d$info$datapack_name)
@@ -94,13 +97,17 @@ packTool <- function(model_data_path = NULL,
   # Save & Export Archive ####
   if (results_archive) {
     interactive_print("Archiving...")
-    exportPackr(data = d,
+    d$info$output_file <- exportPackr(data = d,
                 output_folder = d$keychain$output_folder,
                 tool = "Results Archive",
                 datapack_name = d$info$datapack_name)
   }
 
   # Print messages ####
-  printMessages(d$info$messages)
+  interactive_print(d$info$messages)
+
+  #Return the d object for testing purposes
+  d
+
 
 }

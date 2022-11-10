@@ -15,7 +15,10 @@ getOPUDataFromDATIM <- function(cop_year,
 
   stopifnot("ERROR! Must provide country_uids." = !is.null(country_uids))
 
-  map_des_cocs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
+
+  map_des_cocs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year = cop_year,
+                                                                 datasource = "DATIM")
+
 
   options("scipen" = 999)
   options(warning.length = 8170)
@@ -51,17 +54,13 @@ getOPUDataFromDATIM <- function(cop_year,
     dplyr::filter(indicator_code %in% indicator_codes)
 
   # COP21+: Output as DHIS2 import file ####
-  # TODO: The "value" column of
-  # DHIS2 import files does not have to be numeric and should
-  # actually be cast to quoted characters before export to CSV(JSON)
   data_datim %>%
-    dplyr::mutate(value = as.numeric(value)) %>%
+    dplyr::mutate(value = as.character(value)) %>%
     dplyr::select(dataElement,
                   period,
                   orgUnit,
                   categoryOptionCombo,
                   attributeOptionCombo,
                   value = value)
-
 
 }

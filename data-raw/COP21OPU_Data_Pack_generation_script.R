@@ -14,7 +14,7 @@ pick <- datapackr::COP21_datapacks_countries %>%
   dplyr::filter(datapack_name %in% generation_list)
 
 # Execution ####
-for (i in seq_len(pick)) {
+for (i in seq_len(NROW(pick))) {
   print(paste0(i, " of ", NROW(pick), ": ", pick[[i, 1]]))
 
   packTool(tool = "OPU Data Pack",

@@ -51,8 +51,8 @@ with_mock_api({
 
     # Package the undistributed data for DATIM
     d <- packForDATIM(d, type = "Undistributed MER")
-    expect_true(!is.null(d$datim$UndistributedMER))
-    expect_true(NROW(d$datim$UndistributedMER) > 0)
+    expect_true(!is.null(d$data$UndistributedMER))
+    expect_true(NROW(d$data$UndistributedMER) > 0)
     expect_true(all(unlist(
       lapply(d$data$UndistributedMER$dataElement, is_uidish)
     )))
@@ -65,7 +65,7 @@ with_mock_api({
       })
     )))
 
-    expect_type(d$datim$UndistributedMER$attributeOptionCombo, "character")
-    expect_type(d$datim$UndistributedMER$value, "double")
+    expect_type(d$data$UndistributedMER$attributeOptionCombo, "character")
+    expect_type(d$data$UndistributedMER$value, "double")
   })
 })

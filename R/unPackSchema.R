@@ -411,7 +411,9 @@ unPackSchema <- function(template_path = NULL,
     assign(p, purrr::pluck(params, p))
   }
 
-  if (tool == "OPU Data Pack Template" && cop_year %in% c(2021)) {
+  rm(params, p)
+
+  if (tool == "OPU Data Pack Template" && cop_year %in% c(2021, 2022)) {
     schema <- tidyxl::xlsx_cells(path = template_path, include_blank_cells = TRUE) %>%
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric, is_array)
   } else {
@@ -419,13 +421,11 @@ unPackSchema <- function(template_path = NULL,
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
   }
 
-
   sheets <- data.frame(sheet_name = unique(schema$sheet_name), stringsAsFactors = FALSE)
   sheets$sheet_num <- seq_len(NROW(sheets))
 
   schema <- schema %>%
     dplyr::inner_join(sheets, by = c("sheet_name"))
-
 
   # Skip detail on listed sheets. ####
   if (is.null(skip)) {
@@ -580,7 +580,7 @@ unPackSchema <- function(template_path = NULL,
         stringr::str_detect(indicator_code, "\\.T_1$") ~ cop_year,
         stringr::str_detect(indicator_code, "\\.R$") ~ cop_year - 1,
       # Apply default cop_year to blank cols in PSNUxIM tab
-        dataset == "mer" & col_type == "target" ~ datapackr::getCurrentCOPYear(),
+        dataset == "mer" & col_type == "target" ~ cop_year + 1,
         TRUE ~ NA_real_
       ),
       period = dplyr::case_when(

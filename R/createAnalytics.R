@@ -17,11 +17,29 @@ createAnalytics <- function(d,
     stop("createAnalytics does not work on tools for that COP Year.")
   }
 
+  #Choose the correct DE/COC map
+  map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
+                                                datasource = d$info$tool)
+
   # Append the distributed MER data and subnat data together
   if (d$info$tool == "OPU Data Pack") {
+
+    if (is.null(d$info$psnus)) {
+      d$info$psnus <- datapackr::valid_OrgUnits %>%
+        dplyr::filter(country_uid %in% d$info$country_uids) %>%
+        dplyr::select(ou, country_name, snu1, psnu = name, psnu_uid = uid)
+    }
+    #OPU datapacks have no prioritizations, so we need to get them from DATIM
+    prios <- fetchPrioritizationTable(psnus = d$info$psnus,
+                                      cop_year = d$info$cop_year,
+                                      d2_session = d2_session)
+
+
+
     d$data$analytics <- d$datim$OPU %>%
       adorn_import_file(cop_year = d$info$cop_year,
-                        psnu_prioritizations = NULL,
+                        map_des_cocs = map_des_cocs,
+                        psnu_prioritizations = prios,
                         d2_session = d2_session)
     return(d)
 
@@ -36,10 +54,11 @@ createAnalytics <- function(d,
   d$data$analytics <-
     switch(ifelse(d$info$has_psnuxim, "MER", "UndistributedMER"),
            MER = d$datim$MER,
-           UndistributedMER = d$datim$UndistributedMER) %>%
+           UndistributedMER = d$data$UndistributedMER) %>%
     dplyr::bind_rows(d$datim$subnat_impatt) %>%
     adorn_import_file(cop_year = d$info$cop_year,
                       psnu_prioritizations = pzns,
+                      map_des_cocs = map_des_cocs,
                       d2_session = d2_session)
 
   if (d$info$unallocatedIMs || !d$info$has_psnuxim) {
