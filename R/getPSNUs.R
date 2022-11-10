@@ -131,13 +131,12 @@ add_dp_label <- function(orgunits) {
 
   country_count <- unique(orgunits$country_uid) %>% length()
 
-  orgunits %<>%
+  orgunits %>%
     dplyr::mutate(
       dp_label = paste0(
         dplyr::if_else(
           country_count > 1 & country_uid != uid,
-          paste0(country_name, " > "),
-          ""),
+          paste0(country_name, " > "), ""),
         name,
         " [", uid, "]"))
 }
