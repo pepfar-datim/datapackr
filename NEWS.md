@@ -1,3 +1,15 @@
+# datapackr 5.4.0
+
+## Breaking changes
+
+## New features
+* Adds support for COP22 OPU Data Pack processing
+
+## Minor improvements and fixes
+* Fixes an issue with COP Memo indicator calculations
+* New unit tests for OPU generation
+* Fixes an issue with dedupes being dropped in the PSNUxIM tab
+
 # datapackr 5.3.3
 
 ## Breaking changes
