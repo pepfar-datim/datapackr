@@ -15,6 +15,7 @@ packTool(
   cop_year,
   output_folder,
   results_archive = TRUE,
+  expand_formulas = FALSE,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
