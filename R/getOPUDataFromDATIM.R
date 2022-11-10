@@ -15,12 +15,10 @@ getOPUDataFromDATIM <- function(cop_year,
 
   stopifnot("ERROR! Must provide country_uids." = !is.null(country_uids))
 
-  if (cop_year == 2022) { # Adjust for weird issues with 50+ age bands.
-    #TODO: Fix this in getMapDataPack...
-    map_des_cocs_local <- datapackr::cop22_map_adorn_import_file
-  } else {
-    map_des_cocs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year)
-  }
+
+  map_des_cocs_local <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year = cop_year,
+                                                                 datasource = "DATIM")
+
 
   options("scipen" = 999)
   options(warning.length = 8170)
