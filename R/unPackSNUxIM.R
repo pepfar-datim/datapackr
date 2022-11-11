@@ -737,8 +737,8 @@ unPackSNUxIM <- function(d) {
       dplyr::across(c(header_cols$indicator_code, "psnuid", "mechCode_supportType"))) %>%
     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
 
-  # TODO: TEST: Defunct disaggs; Error; Drop ####
-  #d <- checkDisaggs(d, sheet)
+  # TEST: Defunct disaggs; Error; Drop ####
+  d <- checkPSNUxIM_Disaggs(d)
 
   # Drop all zeros against IMs ####
   # d$data$SNUxIM %<>%
