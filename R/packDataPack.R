@@ -15,12 +15,24 @@ packDataPack <- function(d,
 
   # Checks and reads in Data Pack Model File ####
   stopifnot(
-    "Model data file could not be read!" = canReadFile(d$info$model_data_path),
+    "Model data file could not be read!" = canReadFile(d$keychain$model_data_path),
     "Model data is not correct file type! File must have .rds extension." =
-      tools::file_ext(d$info$model_data_path) == "rds"
+      tools::file_ext(d$keychain$model_data_path) == "rds"
   )
 
-  d$data$model_data <- readRDS(d$info$model_data_path)
+  d$data$model_data <- readRDS(d$keychain$model_data_path)
+
+  # Get PSNU List ####
+  d$data$PSNUs <- datapackr::valid_PSNUs %>%
+    dplyr::filter(country_uid %in% d$info$country_uids) %>%
+    add_dp_psnu(.) %>%
+    dplyr::arrange(dp_label) %>%
+    ## Remove DSNUs
+    dplyr::filter(!is.na(psnu_type)) %>%
+    dplyr::select(PSNU = dp_label, psnu_uid, snu1)
+
+  # TODO: Separate PSNUs as parameter for this function, allowing you to include
+  # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
 
   # Get PSNU List ####
   d$data$PSNUs <- datapackr::valid_PSNUs %>%
