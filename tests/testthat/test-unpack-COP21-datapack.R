@@ -69,3 +69,26 @@ with_mock_api({
     expect_type(d$data$UndistributedMER$value, "double")
   })
 })
+
+with_mock_api({
+  test_that("Can unpack a COP21 Datapack with PSNUxIM", {
+
+    d <-
+      datapackr::loadDataPack(
+        submission_path = test_sheet("COP21_DP_random_no_psnuxim.xlsx"),
+        tool = "Data Pack",
+        country_uids = NULL,
+        cop_year = NULL,
+        load_sheets = TRUE,
+        d2_session = training)
+
+    d <-unPackDataPack(d,
+        d2_session = training)
+
+    #Most of this is tested elsewhere, so only test the structure here
+    expect_named(d, c("keychain", "info", "sheets", "tests", "data", "datim"), ignore.order = TRUE)
+
+
+
+    })})
+
