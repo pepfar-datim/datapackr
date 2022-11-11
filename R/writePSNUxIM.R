@@ -89,11 +89,14 @@ writePSNUxIM <- function(d,
       targets_data <- p$datim$UndistributedMER
       rm(p)
     } else {
-      targets_data <- d$datim$UndistributedMER
+      targets_data <- d$data$UndistributedMER
     }
 
     #Mirror the data in TA as well
-    dsd_ta_map <- datapackr::cop22_map_DataPack_DATIM_DEs_COCs %>%
+    dsd_ta_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
+                                                datasource = d$info$tool)
+
+    dsd_ta_map <- dsd_ta_map %>%
       dplyr::select(indicator_code,
                     dataelementuid,
                     support_type,

@@ -18,9 +18,9 @@ datapackrSupports <- function() {
   tibble::tribble(
     ~tool, ~yrs,
     "Data Pack", c(2021, 2022),
-    "OPU Data Pack", c(2021),
+    "OPU Data Pack", c(2021, 2022),
     "Data Pack Template", c(2021, 2022),
-    "OPU Data Pack Template", c(2021))
+    "OPU Data Pack Template", c(2021, 2022))
 }
 
 
@@ -122,8 +122,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
     } else if (cop_year %in% c(2022)) {
       skip <- c("Home", "Spectrum", "KP Validation")
     }
-  } else if (tool == "OPU Data Pack Template" &&
-           cop_year %in% c(2021)) {
+  } else if (tool == "OPU Data Pack Template" && cop_year %in% c(2021, 2022)) {
     skip <- c("Home")
   } else {
     skip <- c(NA_character_)
@@ -184,6 +183,8 @@ pick_schema <- function(cop_year, tool) {
   if (tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
     if (cop_year == 2021) {
       schema <- datapackr::cop21OPU_data_pack_schema
+    } else if (cop_year == 2022) {
+      schema <- datapackr::cop22OPU_data_pack_schema
     } else {
       stop("OPU Data Pack schema not available for the COP year provided.")
     }
@@ -226,6 +227,8 @@ pick_template_path <- function(cop_year, tool) {
   if (tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
     if (cop_year == 2021) {
       template_filename <- "COP21_OPU_Data_Pack_Template.xlsx"
+    } else if (cop_year == 2022) {
+      template_filename <- "COP22_OPU_Data_Pack_Template.xlsx"
     }
   }
 

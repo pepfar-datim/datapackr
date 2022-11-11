@@ -12,9 +12,9 @@
 #' @return d object
 packForDATIM <- function(d, type = NULL) {
 
-  # Call DATIM map ----
-  datim_map <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
-
+  # Choose the correct DE/COC map
+  datim_map <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
+                                                        datasource = d$info$tool)
   # Check params ----
   approved_types <- c("PSNUxIM", "SUBNAT_IMPATT",
                       "OPU PSNUxIM", "Undistributed MER")
@@ -137,7 +137,7 @@ packForDATIM <- function(d, type = NULL) {
          PSNUxIM = {d$datim$MER <- data},
          SUBNAT_IMPATT = {d$datim$subnat_impatt <- data},
          `OPU PSNUxIM` = {d$datim$OPU <- data},
-         `Undistributed MER` = {d$datim$UndistributedMER <- data})
+         `Undistributed MER` = {d$data$UndistributedMER <- data})
   # nolint end
 
 
