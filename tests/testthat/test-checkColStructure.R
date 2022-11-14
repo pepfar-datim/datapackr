@@ -34,7 +34,7 @@ test_that("Can check missing column...", {
   testthat::expect_equal(
     d$info$messages$message,
     paste0("ERROR! In tab PSNUxIM, MISSING COLUMNS:",
-           "Please ensure no columns have been deleted or renamed",
+           " Please ensure no columns have been deleted or renamed",
            " from the original Data Pack you have received. ->  \n\t* ID\n")
     )
 
