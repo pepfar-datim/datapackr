@@ -73,8 +73,7 @@ with_mock_api({
 with_mock_api({
   test_that("Can unpack a COP21 Datapack with PSNUxIM", {
 
-    d <-
-      datapackr::loadDataPack(
+    d <- datapackr::loadDataPack(
         submission_path = test_sheet("COP21_DP_random_no_psnuxim.xlsx"),
         tool = "Data Pack",
         country_uids = NULL,
@@ -82,7 +81,7 @@ with_mock_api({
         load_sheets = TRUE,
         d2_session = training)
 
-    d <-unPackDataPack(d,
+    d  <- unPackDataPack(d,
         d2_session = training)
 
     #Most of this is tested elsewhere, so only test the structure here
@@ -91,4 +90,3 @@ with_mock_api({
 
 
     })})
-
