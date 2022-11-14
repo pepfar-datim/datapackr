@@ -14,7 +14,7 @@ test_that("Can load sheets if empty ...", {
   d <- unPackSheets(d)
   # when d$sheets is explicitly NULL, unPackSheets should call
   # loadSheets and therefore fix the NULL value
-  testthat::expect_equal(length(d$sheets),18)
+  testthat::expect_equal(length(d$sheets), 18)
 
 })
 
@@ -49,9 +49,3 @@ test_that("Can test sheets are valid...", {
   testthat::expect_warning(unPackSheets(d, check_sheets = FALSE, sheets = c("Prioritization", "Cascade")))
 
 })
-
-
-
-
-
-
