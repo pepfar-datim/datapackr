@@ -189,7 +189,7 @@ getHeaderColumns <- function(cols_to_keep, sheet = "PSNUxIM") {
     dplyr::filter(col_type == "row_header")
 }
 
-checkNonEqualTargets <- function(d, original_targets ) {
+checkNonEqualTargets <- function(d, original_targets) {
 
 
   if (d$info$tool == "Data Pack") {
@@ -245,7 +245,7 @@ checkNonEqualTargets <- function(d, original_targets ) {
 
 }
 
-extractOriginalTargets <- function(d, cols_to_keep, header_cols) {
+extractOriginalTargets <- function(d, cols_to_keep, header_cols, sheet = "PSNUxIM") {
 
   if (d$info$tool == "Data Pack") {
     original_targets <- d$data$MER
@@ -321,7 +321,7 @@ unPackSNUxIM <- function(d) {
 
   cols_to_keep <- getColumnsToKeep(d, sheet)
   header_cols <- getHeaderColumns(cols_to_keep, sheet)
-  original_targets <- extractOriginalTargets(d, cols_to_keep, header_cols)
+  original_targets <- extractOriginalTargets(d, cols_to_keep, header_cols, sheet)
 
   #TODO: This test is overly simplistic, as we can
   #simply drop blank columns.
@@ -351,7 +351,7 @@ unPackSNUxIM <- function(d) {
         d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
 
-  d <- d %>%  checkNonEqualTargets(d, original_targets)
+  d <- checkNonEqualTargets(d, original_targets)
 
   # Pare down to populated, updated targets only ####
   blank_cols_idx <- which(names(d$data$SNUxIM) == "")
