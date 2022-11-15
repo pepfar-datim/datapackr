@@ -1,3 +1,9 @@
+# datapackr 5.4.1
+
+## Breaking changes
+- Removes api_version, api_get, api_filter, api_fields, and api_call as all of their usages have been replaced by datimutils functions.
+
+
 # datapackr 5.4.0
 
 ## Breaking changes
