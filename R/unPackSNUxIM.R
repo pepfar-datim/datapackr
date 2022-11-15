@@ -41,7 +41,20 @@ checkHasPSNUxIM <- function(d) {
 
 }
 
+#' Title
+#'
+#' @inheritParams datapackr_params
+#'
+#' @return Modified d object with documented and missing SNUxIM combos
+#'
+#' @example
 extractSNUxIMCombos <- function(d) {
+
+  if (is.null(d$data$SNUxIM)) {
+    stop("PSNUxIM cannot be null")
+  }
+
+
   # Document all combos used in submitted PSNUxIM tab ####
   # This ensures tests for new combinations are correctly matched
   d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
@@ -55,6 +68,11 @@ extractSNUxIMCombos <- function(d) {
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop)
 
   if (d$info$tool == "Data Pack") {
+
+    if (is.null(d$data$MER)) {
+      stop("MER data cannot be null.")
+    }
+
     d$data$missingCombos <- d$data$MER %>%
       dplyr::filter(!indicator_code %in% c("AGYW_PREV.D.T", "AGYW_PREV.N.T")) %>%
       # Special handling for differences between main tab and PSNUxIM tab age bands
