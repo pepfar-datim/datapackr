@@ -41,51 +41,7 @@ checkHasPSNUxIM <- function(d) {
 
 }
 
-#' @export
-#' @title unPackSNUxIM(d)
-#'
-#' @description Looks inside submitted Data Pack to extract SNU x IM data from
-#'     \code{SNU x IM} tab and restructure this to be ready for cross-
-#'     pollination with PSNU-level MER data coming from
-#'     \code{\link{unPackSheets}}. This data is also analyzed to identify
-#'     structural or data anomalies and print any issues into running Warning
-#'     Message queue.
-#'
-#' @param d Datapackr object
-
-#' @return d
-#'
-unPackSNUxIM <- function(d) {
-
-  sheet <- "PSNUxIM"
-
-  header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
-
-  #Check to see if the object already. If its NULL read it from
-  # Excel, otherwise, use the existing object. This is just the
-  # first step to be able to functionalize and test everything else
-  # below.
-  if (is.null(d$data$SNUxIM)) {
-    d$data$SNUxIM <-
-      readxl::read_excel(
-        path = d$keychain$submission_path,
-        sheet = sheet,
-        range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
-        col_types = "text",
-        .name_repair = "minimal"
-      )
-  }
-
-  d <- checkHasPSNUxIM(d)
-
-  if (!d$info$has_psnuxim) {
-    return(d)
-  }
-
-
-  # PATCH: Remove hard-coded FYs
-  names(d$data$SNUxIM) <- stringr::str_replace(names(d$data$SNUxIM), " \\(FY22\\)", "")
-
+extractSNUxIMCombos <- function(d) {
   # Document all combos used in submitted PSNUxIM tab ####
   # This ensures tests for new combinations are correctly matched
   d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
@@ -138,6 +94,57 @@ unPackSNUxIM <- function(d) {
 
     }
   }
+
+  d
+}
+
+
+#' @export
+#' @title unPackSNUxIM(d)
+#'
+#' @description Looks inside submitted Data Pack to extract SNU x IM data from
+#'     \code{SNU x IM} tab and restructure this to be ready for cross-
+#'     pollination with PSNU-level MER data coming from
+#'     \code{\link{unPackSheets}}. This data is also analyzed to identify
+#'     structural or data anomalies and print any issues into running Warning
+#'     Message queue.
+#'
+#' @param d Datapackr object
+
+#' @return d
+#'
+unPackSNUxIM <- function(d) {
+
+  sheet <- "PSNUxIM"
+
+  header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
+
+  #Check to see if the object already. If its NULL read it from
+  # Excel, otherwise, use the existing object. This is just the
+  # first step to be able to functionalize and test everything else
+  # below.
+  if (is.null(d$data$SNUxIM)) {
+    d$data$SNUxIM <-
+      readxl::read_excel(
+        path = d$keychain$submission_path,
+        sheet = sheet,
+        range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
+        col_types = "text",
+        .name_repair = "minimal"
+      )
+  }
+
+  d <- checkHasPSNUxIM(d)
+
+  if (!d$info$has_psnuxim) {
+    return(d)
+  }
+
+
+  # PATCH: Remove hard-coded FYs
+  names(d$data$SNUxIM) <- stringr::str_replace(names(d$data$SNUxIM), " \\(FY22\\)", "")
+
+  d <- extractSNUxIMCombos(d)
 
   # TEST: Duplicate Rows; Warn; Combine ####
   duplicates <- d$data$SNUxIM %>%
