@@ -133,3 +133,47 @@ test_that("Can extract missing Datapack SNUxIM combos", {
   expect_true(d$info$missing_psnuxim_combos)
 
 })
+
+
+test_that("Can indentify duplicate rows in PSNUxIM tab", {
+  d <- list()
+  d$info$tool <- "Data Pack"
+  d$info$messages <- MessageQueue()
+
+  d$data$SNUxIM <- tibble::tribble(
+    ~PSNU, ~indicator_code, ~Age, ~Sex, ~KeyPop, ~DataPackTarget,
+    "Cupcake District [NYWv44mLzDN]", "TX_CURR.T", "25-49", "F", NA, 10,
+    "Cupcake District [NYWv44mLzDN]", "TX_CURR.T", "25-49", "F", NA, 10)
+
+   d <- extractDuplicateRows(d, "PSNUxIM")
+   expect_equal(NROW(d$tests$duplicate_rows), 1L)
+   expect_true(all(d$tests$duplicate_rows$sheet == "PSNUxIM"))
+   expect_true(d$info$has_error)
+
+})
+
+test_that("Can get columns to keep", {
+  d <- list()
+  d$info$tool <- "Data Pack"
+  d$info$messages <- MessageQueue()
+  d$info$schema <- datapackr::cop22OPU_data_pack_schema
+  cols_to_keep <- getColumnsToKeep(d, sheet = "PSNUxIM")
+  expect_setequal(names(cols_to_keep), names(cop22OPU_data_pack_schema))
+})
+
+
+# test_that("Can extract original targets", {
+#   d <- list()
+#   d$info$tool <- "OPU Data Pack"
+#   d$info$messages <- MessageQueue()
+#
+#   d$data$SNUxIM <- tibble::tribble(
+#     ~PSNU, ~indicator_code, ~Age, ~Sex, ~KeyPop, ~DataPackTarget,
+#     "Cupcake District [NYWv44mLzDN]", "TX_CURR.T", "25-49", "F", NA, 10,
+#     "Cupcake District [NYWv44mLzDN]", "TX_CURR.T", "15-24", "F", NA, 10)
+#
+#   original_targets <- extractOriginalTargets(d)
+#   PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop,
+#   value = DataPackTarget
+#
+#   })

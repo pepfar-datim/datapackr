@@ -117,52 +117,17 @@ extractSNUxIMCombos <- function(d) {
 }
 
 
-#' @export
-#' @title unPackSNUxIM(d)
+#' Title
 #'
-#' @description Looks inside submitted Data Pack to extract SNU x IM data from
-#'     \code{SNU x IM} tab and restructure this to be ready for cross-
-#'     pollination with PSNU-level MER data coming from
-#'     \code{\link{unPackSheets}}. This data is also analyzed to identify
-#'     structural or data anomalies and print any issues into running Warning
-#'     Message queue.
+#' @inheritParams datapackr_params
 #'
-#' @param d Datapackr object
-
-#' @return d
+#' @return Modified d object with a list of duplicated rows
 #'
-unPackSNUxIM <- function(d) {
+extractDuplicateRows <- function(d, sheet = "PSNUxIM") {
 
-  sheet <- "PSNUxIM"
-
-  header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
-
-  #Check to see if the object already. If its NULL read it from
-  # Excel, otherwise, use the existing object. This is just the
-  # first step to be able to functionalize and test everything else
-  # below.
   if (is.null(d$data$SNUxIM)) {
-    d$data$SNUxIM <-
-      readxl::read_excel(
-        path = d$keychain$submission_path,
-        sheet = sheet,
-        range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
-        col_types = "text",
-        .name_repair = "minimal"
-      )
+    stop("PSNUxIM cannot be null")
   }
-
-  d <- checkHasPSNUxIM(d)
-
-  if (!d$info$has_psnuxim) {
-    return(d)
-  }
-
-
-  # PATCH: Remove hard-coded FYs
-  names(d$data$SNUxIM) <- stringr::str_replace(names(d$data$SNUxIM), " \\(FY22\\)", "")
-
-  d <- extractSNUxIMCombos(d)
 
   # TEST: Duplicate Rows; Warn; Combine ####
   duplicates <- d$data$SNUxIM %>%
@@ -191,7 +156,6 @@ unPackSNUxIM <- function(d) {
     warning_msg <-
       paste0(
         "ERROR! In tab ",
-
         sheet,
         ": DUPLICATE ROWS found. Ensure rows are all unique, and the SNU Disaggregates",
         " are not repeated within tabs. This issue may have been caused by inadvertent",
@@ -204,66 +168,29 @@ unPackSNUxIM <- function(d) {
 
   }
 
-  # Run structural checks ####
-  d <- checkColStructure(d, sheet)
+  d
 
-  # Save snapshot of original targets ####
-  cols_to_keep <- d$info$schema %>%
+}
+
+getColumnsToKeep <- function(d, sheet = "PSNUxIM") {
+    d$info$schema %>%
     dplyr::filter(sheet_name == sheet,
                   !is.na(indicator_code),
                   !indicator_code %in% c("sheet_num", "ID", "SNU1"),
                   col_type %in% c("row_header", "target"))
+}
 
-  header_cols <- cols_to_keep %>%
+getHeaderColumns <- function(cols_to_keep, sheet = "PSNUxIM") {
+  if (is.null(cols_to_keep)) {
+    cols_to_keep <- getColumnsToKeep(d, sheet)
+  }
+
+  cols_to_keep %>%
     dplyr::filter(col_type == "row_header")
+}
 
+checkNonEqualTargets <- function(d, original_targets ) {
 
-  if (d$info$tool == "Data Pack") {
-    original_targets <- d$data$MER
-  } else {
-    original_targets <- d$data$SNUxIM %>%
-      dplyr::select(header_cols$indicator_code, "DataPackTarget") %>%
-      { suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)), # nolint
-                                         as.numeric))
-      } %>%
-      dplyr::group_by(dplyr::across(header_cols$indicator_code)) %>%
-      dplyr::summarise(DataPackTarget = sum(DataPackTarget)) %>%
-      dplyr::mutate(
-        psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)"),
-        sheet_name = sheet
-      ) %>%
-      dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop,
-                    value = DataPackTarget)
-  }
-
-
-  #TODO: This test is overly simplistic, as we can
-  #simply drop blank columns.
-  if (NCOL(d$data$SNUxIM) < max(cols_to_keep$col)) {
-    stop(
-      paste(
-        "ERROR: Missing columns in the PSNUxIM tab. Please ensure that there are exactly",
-        max(cols_to_keep$col), "columns in the PSNUxIM tab.",
-        "Please check columns",
-        cellranger::num_to_letter(NCOL(d$data$SNUxIM) + 1),
-        "to",
-        cellranger::num_to_letter(max(cols_to_keep$col)),
-        "."
-      )
-    )
-  }
-
-  if (NCOL(d$data$SNUxIM) > max(cols_to_keep$col)) {
-        warning_msg <-
-          paste(
-            "WARNING: Extra columns in the PSNUxIM tab. Please ensure that there are exactly",
-            max(cols_to_keep$col), "columns in the PSNUxIM tab for your final submissions. Please review columns",
-            cellranger::num_to_letter(max(cols_to_keep$col) + 1), "to columns",
-            cellranger::num_to_letter(NCOL(d$data$SNUxIM))
-            )
-
-        d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
-  }
 
   if (d$info$tool == "Data Pack") {
     #Check to ensure that the value in column G (DataPack Target) actually
@@ -314,7 +241,117 @@ unPackSNUxIM <- function(d) {
 
   }
 
+  d
 
+}
+
+extractOriginalTargets <- function(d, cols_to_keep, header_cols) {
+
+  if (d$info$tool == "Data Pack") {
+    original_targets <- d$data$MER
+  } else {
+    original_targets <- d$data$SNUxIM %>%
+      dplyr::select(header_cols$indicator_code, "DataPackTarget") %>%
+      { suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)), # nolint
+                                          as.numeric))
+      } %>%
+      dplyr::group_by(dplyr::across(header_cols$indicator_code)) %>%
+      dplyr::summarise(DataPackTarget = sum(DataPackTarget)) %>%
+      dplyr::mutate(
+        psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)"),
+        sheet_name = sheet
+      ) %>%
+      dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop,
+                    value = DataPackTarget)
+  }
+
+  original_targets
+}
+
+#' @export
+#' @title unPackSNUxIM(d)
+#'
+#' @description Looks inside submitted Data Pack to extract SNU x IM data from
+#'     \code{SNU x IM} tab and restructure this to be ready for cross-
+#'     pollination with PSNU-level MER data coming from
+#'     \code{\link{unPackSheets}}. This data is also analyzed to identify
+#'     structural or data anomalies and print any issues into running Warning
+#'     Message queue.
+#'
+#' @param d Datapackr object
+
+#' @return d
+#'
+unPackSNUxIM <- function(d) {
+
+  sheet <- "PSNUxIM"
+
+  header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
+
+  #Check to see if the object already. If its NULL read it from
+  # Excel, otherwise, use the existing object. This is just the
+  # first step to be able to functionalize and test everything else
+  # below.
+  if (is.null(d$data$SNUxIM)) {
+    d$data$SNUxIM <-
+      readxl::read_excel(
+        path = d$keychain$submission_path,
+        sheet = sheet,
+        range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
+        col_types = "text",
+        .name_repair = "minimal"
+      )
+  }
+
+  d <- checkHasPSNUxIM(d)
+
+  if (!d$info$has_psnuxim) {
+    return(d)
+  }
+
+  # PATCH: Remove hard-coded FYs
+  names(d$data$SNUxIM) <- stringr::str_replace(names(d$data$SNUxIM), " \\(FY22\\)", "")
+
+  d <- d  %>%
+    extractSNUxIMCombos(.) %>%
+    extractDuplicateRows(., sheet) %>%
+    checkColStructure(., sheet)
+
+  # Save snapshot of original targets ####
+
+  cols_to_keep <- getColumnsToKeep(d, sheet)
+  header_cols <- getHeaderColumns(cols_to_keep, sheet)
+  original_targets <- extractOriginalTargets(d, cols_to_keep, header_cols)
+
+  #TODO: This test is overly simplistic, as we can
+  #simply drop blank columns.
+  if (NCOL(d$data$SNUxIM) < max(cols_to_keep$col)) {
+    stop(
+      paste(
+        "ERROR: Missing columns in the PSNUxIM tab. Please ensure that there are exactly",
+        max(cols_to_keep$col), "columns in the PSNUxIM tab.",
+        "Please check columns",
+        cellranger::num_to_letter(NCOL(d$data$SNUxIM) + 1),
+        "to",
+        cellranger::num_to_letter(max(cols_to_keep$col)),
+        "."
+      )
+    )
+  }
+
+  if (NCOL(d$data$SNUxIM) > max(cols_to_keep$col)) {
+        warning_msg <-
+          paste(
+            "WARNING: Extra columns in the PSNUxIM tab. Please ensure that there are exactly",
+            max(cols_to_keep$col), "columns in the PSNUxIM tab for your final submissions. Please review columns",
+            cellranger::num_to_letter(max(cols_to_keep$col) + 1), "to columns",
+            cellranger::num_to_letter(NCOL(d$data$SNUxIM))
+            )
+
+        d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+  }
+
+  d <- d %>%  checkNonEqualTargets(d, original_targets)
 
   # Pare down to populated, updated targets only ####
   blank_cols_idx <- which(names(d$data$SNUxIM) == "")
