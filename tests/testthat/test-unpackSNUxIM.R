@@ -210,22 +210,22 @@ test_that("Can detected missing right side formulas", {
                                  blank_cols_idx,
                                  parsed_cells = parsed_cells)
 
-  expect_named(d$tests$psnuxim_missing_rs_fxs,c("col","row","formula","col_letter"))
+  expect_named(d$tests$psnuxim_missing_rs_fxs, c("col", "row", "formula", "col_letter"))
   expect_true(NROW(d$tests$psnuxim_missing_rs_fxs) > 1L)
 })
 })
 
-test_that("Can drop duplicated PSNUxIM columns",{
+test_that("Can drop duplicated PSNUxIM columns", {
   d <- list()
   d$info$tool <- "Data Pack"
   d$info$messages <- MessageQueue()
-  test_data <- data.frame(foo=c(1L, 1L),foo2=c(2L, 2L),bar=c(3L, 3L))
+  test_data <- data.frame(foo = c(1L, 1L), foo2 = c(2L, 2L), bar = c(3L, 3L))
   d$data$SNUxIM <- test_data
-  names(d$data$SNUxIM) <- c("foo","foo", "bar")
+  names(d$data$SNUxIM) <- c("foo", "foo", "bar")
   expect_warning(d <- dropDuplicatedPSNUxIMColumns(d))
   expect_true(NCOL(d$data$SNUxIM) == 2L)
-  expect_named(d$data$SNUxIM,c("foo", "bar"))
-  expect_identical(d$data$SNUxIM, test_data[,c(1,3)])
+  expect_named(d$data$SNUxIM, c("foo", "bar"))
+  expect_identical(d$data$SNUxIM, test_data[, c(1, 3)])
 })
 
 # test_that("Can extract original targets", {
