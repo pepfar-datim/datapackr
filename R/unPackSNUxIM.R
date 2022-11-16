@@ -268,6 +268,83 @@ extractOriginalTargets <- function(d, cols_to_keep, header_cols, sheet = "PSNUxI
   original_targets
 }
 
+testMissingRightSideFormulas <- function(d,
+           cols_to_keep,
+           header_cols,
+           header_row,
+           blank_cols_idx,
+           parsed_cells = NULL) {
+
+    if (is.null(parsed_cells)) {
+      parsed_cells <-  tidyxl::xlsx_cells(path = d$keychain$submission_path,
+                                             sheets = "PSNUxIM",
+                                             include_blank_cells = TRUE)
+    }
+    # TEST: Missing right-side formulas; Warn; Continue ####
+    # TODO: This seems not particularly efficient to
+    # again read the Excel sheet from disk.
+    d$tests$psnuxim_missing_rs_fxs <- parsed_cells %>%
+    dplyr::select(col, row, formula, character) %>%
+    dplyr::filter(row >= header_row,
+                  col %in% cols_to_keep$col) %>%
+    dplyr::filter(!col %in% header_cols$col) %>%
+    dplyr::mutate(formula = dplyr::if_else(is.na(formula),
+                                           character,
+                                           formula)) %>%
+    dplyr::select(-character) %>%
+    dplyr::filter(is.na(formula)) %>%
+    dplyr::mutate(col_letter = openxlsx::int2col(col)) %>%
+    #Ignore missing right side formulas in columns which have no header information
+    dplyr::filter(!(col %in% blank_cols_idx))
+
+  attr(d$tests$psnuxim_missing_rs_fxs, "test_name") <- "Missing PSNUxIM R.S. Formulas"
+
+  if (NROW(d$tests$psnuxim_missing_rs_fxs) > 0) {
+    warning_msg <-
+      paste0(
+        "WARNING! In tab PSNUxIM: MISSING FORMULAS ON RIGHT SIDE.",
+        " Make sure all formulas in the far right section of your PSNUxIM tab",
+        " (section titled 'Target Values') are completely copied to the bottom",
+        " of your data. The following columns are implicated. -> \n\t",
+        paste(sort(unique(d$tests$psnuxim_missing_rs_fxs$col_letter)), collapse = ", "),
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+  }
+
+  d
+}
+
+dropDuplicatedPSNUxIMColumns <- function(d) {
+
+  #Test for duplicate columns
+  dup_cols <- names(d$data$SNUxIM)[duplicated(names(d$data$SNUxIM))]
+
+  if (length(dup_cols) > 0) {
+    warning_msg <-
+      paste0(
+        "ERROR! In tab PSNUxIM: DUPLICATE MECHANISM COLUMNS",
+        " Ensure that all mechanisms columns are unique in both the percentage",
+        " allocation section as well as the value section of the PSNUxIM tab.",
+        " The following columns are implicated. -> \n\t",
+        paste(dup_cols, sep = "", collapse = ","),
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+
+    #Drop the duplicated columns and continue
+    d$data$SNUxIM <- d$data$SNUxIM[, !duplicated(names(d$data$SNUxIM))]
+    warning("Dropping duplicated columns in the PSNUxIM tab.")
+
+  }
+
+  d
+
+}
+
+
+
+
 #' @export
 #' @title unPackSNUxIM(d)
 #'
@@ -358,70 +435,13 @@ unPackSNUxIM <- function(d) {
   d$data$SNUxIM <- d$data$SNUxIM[, cols_to_keep$col]
   d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
 
-  # TEST: Missing right-side formulas; Warn; Continue ####
-  # TODO: This seems not particularly efficient to
-  # again read the Excel sheet from disk.
-  d$tests$psnuxim_missing_rs_fxs <-
-    tidyxl::xlsx_cells(path = d$keychain$submission_path,
-                       sheets = "PSNUxIM",
-                       include_blank_cells = TRUE) %>%
-    dplyr::select(col, row, formula, character) %>%
-    dplyr::filter(row >= header_row,
-                  col %in% cols_to_keep$col) %>%
-    dplyr::filter(!col %in% header_cols$col) %>%
-    dplyr::mutate(formula = dplyr::if_else(is.na(formula),
-                                           character,
-                                           formula)) %>%
-    dplyr::select(-character) %>%
-    dplyr::filter(is.na(formula)) %>%
-    dplyr::mutate(row_letter = openxlsx::int2col(col)) %>%
-    #Ignore missing right side formulas in columns which have no header information
-    dplyr::filter(!(col %in% blank_cols_idx))
-
-  attr(d$tests$psnuxim_missing_rs_fxs, "test_name") <- "Missing PSNUxIM R.S. Formulas"
-
-  if (NROW(d$tests$psnuxim_missing_rs_fxs) > 0) {
-    warning_msg <-
-      paste0(
-        "WARNING! In tab PSNUxIM: MISSING FORMULAS ON RIGHT SIDE.",
-        " Make sure all formulas in the far right section of your PSNUxIM tab",
-        " (section titled 'Target Values') are completely copied to the bottom",
-        " of your data. The following columns are implicated. -> \n\t",
-        paste(sort(unique(d$tests$psnuxim_missing_rs_fxs$row_letter)), collapse = ", "),
-        "\n")
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
-  }
-
-  #Test for duplicate columns
-  dup_cols <- names(d$data$SNUxIM)[duplicated(names(d$data$SNUxIM))]
-
-  if (length(dup_cols) > 0) {
-    warning_msg <-
-      paste0(
-        "ERROR! In tab PSNUxIM: DUPLICATE MECHANISM COLUMNS",
-        " Ensure that all mechanisms columns are unique in both the percentage",
-        " allocation section as well as the value section of the PSNUxIM tab.",
-        " The following columns are implicated. -> \n\t",
-        paste(dup_cols, sep = "", collapse = ","),
-        "\n")
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-
-    #Drop the duplicated columns and continue
-    d$data$SNUxIM <- d$data$SNUxIM[, !duplicated(names(d$data$SNUxIM))]
-    warning("Dropping duplicated columns in the PSNUxIM tab.")
-
-  }
+  #Test for missing right side formulas
+  d <- testMissingRightSideFormulas(d, cols_to_keep, header_cols, header_row, blank_cols_idx)
+  d <- dropDuplicatedPSNUxIMColumns(d)
 
   # Drop rows where entire row is NA ####
   d$data$SNUxIM %<>%
-    dplyr::filter_all(dplyr::any_vars(!is.na(.)))
-
-  # d$data$SNUxIM %<>%
-  #   dplyr::filter_at(dplyr::vars(PSNU, indicator_code), dplyr::any_vars(!is.na(.)))
-
-  d$data$SNUxIM %<>%
+    dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
     tidyr::drop_na(PSNU, indicator_code)
 
   # nolint

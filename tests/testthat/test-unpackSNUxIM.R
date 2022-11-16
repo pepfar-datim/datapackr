@@ -160,7 +160,73 @@ test_that("Can get columns to keep", {
   cols_to_keep <- getColumnsToKeep(d, sheet = "PSNUxIM")
   expect_setequal(names(cols_to_keep), names(cop22OPU_data_pack_schema))
 })
+with_mock_api({
+test_that("Can detected missing right side formulas", {
 
+
+  generation_list <- c("Eswatini")
+
+  pick <- datapackr::COP21_datapacks_countries %>%
+    dplyr::filter(datapack_name %in% generation_list) %>%
+    dplyr::arrange(datapack_name)
+
+  output_folder <- paste0("/tmp/", stringi::stri_rand_strings(1, 20))
+  dir.create(output_folder)
+
+  #This should produce a tool with no formulas on the right hand side.
+  d <- packTool(tool = "OPU Data Pack",
+                datapack_name = pick$datapack_name[1],
+                country_uids = unlist(pick$country_uids[1]),
+                template_path = NULL,
+                cop_year = 2022,
+                output_folder = output_folder,
+                results_archive = FALSE,
+                expand_formulas = FALSE,
+                d2_session = training)
+
+  sheet <- "PSNUxIM"
+  header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
+  cols_to_keep <- getColumnsToKeep(d, sheet)
+  header_cols <- getHeaderColumns(cols_to_keep, sheet)
+  d$data$SNUxIM <-
+    readxl::read_excel(
+      path = d$info$output_file,
+      sheet = sheet,
+      range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
+      col_types = "text",
+      .name_repair = "minimal"
+    )
+
+  blank_cols_idx <- which(names(d$data$SNUxIM) == "")
+  #Read from the output file, which has not been opened, thus no formulas
+  parsed_cells <-  tidyxl::xlsx_cells(path = d$info$output_file,
+                                      sheets = "PSNUxIM",
+                                      include_blank_cells = TRUE)
+
+  d <- testMissingRightSideFormulas(d,
+                                 cols_to_keep,
+                                 header_cols,
+                                 header_row,
+                                 blank_cols_idx,
+                                 parsed_cells = parsed_cells)
+
+  expect_named(d$tests$psnuxim_missing_rs_fxs,c("col","row","formula","col_letter"))
+  expect_true(NROW(d$tests$psnuxim_missing_rs_fxs) > 1L)
+})
+})
+
+test_that("Can drop duplicated PSNUxIM columns",{
+  d <- list()
+  d$info$tool <- "Data Pack"
+  d$info$messages <- MessageQueue()
+  test_data <- data.frame(foo=c(1L, 1L),foo2=c(2L, 2L),bar=c(3L, 3L))
+  d$data$SNUxIM <- test_data
+  names(d$data$SNUxIM) <- c("foo","foo", "bar")
+  expect_warning(d <- dropDuplicatedPSNUxIMColumns(d))
+  expect_true(NCOL(d$data$SNUxIM) == 2L)
+  expect_named(d$data$SNUxIM,c("foo", "bar"))
+  expect_identical(d$data$SNUxIM, test_data[,c(1,3)])
+})
 
 # test_that("Can extract original targets", {
 #   d <- list()
