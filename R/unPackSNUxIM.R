@@ -268,12 +268,8 @@ extractOriginalTargets <- function(d, cols_to_keep, header_cols, sheet = "PSNUxI
   original_targets
 }
 
-testMissingRightSideFormulas <- function(d,
-           cols_to_keep,
-           header_cols,
-           header_row,
-           blank_cols_idx,
-           parsed_cells = NULL) {
+testMissingRightSideFormulas <- function(d, cols_to_keep, header_cols,
+                                         header_row, blank_cols_idx, parsed_cells = NULL) {
 
     if (is.null(parsed_cells)) {
       parsed_cells <-  tidyxl::xlsx_cells(path = d$keychain$submission_path,
@@ -342,8 +338,53 @@ dropDuplicatedPSNUxIMColumns <- function(d) {
 
 }
 
+dropInvalidMechColumns <- function(d, cols_to_keep, sheet = "PSNUxIM") {
+  # nolint
+  # nolint start
+  # TEST: Improper Col Names; Error; Drop ####
+  invalid_mech_headers <- names(d$data$SNUxIM) %>%
+    tibble::tibble(col_name = .) %>%
+    dplyr::filter(!col_name %in% cols_to_keep$indicator_code,
+                  !(stringr::str_detect(col_name, "(\\d){4,6}")
+                    & stringr::str_detect(col_name, "DSD|TA"))) %>%
+    dplyr::filter(col_name != "Not PEPFAR") #Specifically allow for "Not PEPFAR"
+  # nolint end
 
+  #Test specifically for DSD and TA which have been populated as mechanisms by the user.
+  improper_dedupe_mechs <- names(d$data$SNUxIM) %>%
+    tibble::tibble(col_name = .) %>%
+    dplyr::filter(!col_name %in% cols_to_keep$indicator_code,
+                  (stringr::str_detect(col_name, "^0000[01]")))
 
+  invalid_mech_headers <- dplyr::bind_rows(invalid_mech_headers, improper_dedupe_mechs)
+
+  d$tests$invalid_mech_headers <- data.frame(invalid_mech_headers = invalid_mech_headers$col_name)
+  attr(d$tests$invalid_mech_headers, "test_name") <- "Invalid mechanism headers"
+
+  if (NROW(d$tests$invalid_mech_headers) > 0) {
+    d$info$has_error <- TRUE
+
+    warning_msg <-
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ", INVALID COLUMN HEADERS: Ensure all PSNUxIM column header mechanism are accurate",
+        " and complete, and contain at least the 5- or 6-digit mechanism code and either",
+        " `DSD` or `TA` (e.g., `12345_DSD`). The following column headers are invalid and",
+        " will be dropped in processing. Please use only the form 12345_DSD. ->  \n\t* ",
+        paste(d$tests$invalid_mech_headers$invalid_mech_headers, collapse = "\n\t* "),
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$has_error <- TRUE
+  }
+
+  d$data$SNUxIM %<>%
+    dplyr::select(-dplyr::all_of(d$tests$invalid_mech_headers$invalid_mech_headers))
+
+  d
+
+}
 
 #' @export
 #' @title unPackSNUxIM(d)
@@ -444,48 +485,7 @@ unPackSNUxIM <- function(d) {
     dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%
     tidyr::drop_na(PSNU, indicator_code)
 
-  # nolint
-  # nolint start
-  # TEST: Improper Col Names; Error; Drop ####
-  invalid_mech_headers <- names(d$data$SNUxIM) %>%
-    tibble::tibble(col_name = .) %>%
-    dplyr::filter(!col_name %in% cols_to_keep$indicator_code,
-                  !(stringr::str_detect(col_name, "(\\d){4,6}")
-                    & stringr::str_detect(col_name, "DSD|TA"))) %>%
-    dplyr::filter(col_name != "Not PEPFAR") #Specifically allow for "Not PEPFAR"
-  # nolint end
-
-  #Test specifically for DSD and TA which have been populated as mechanisms by the user.
-  improper_dedupe_mechs <- names(d$data$SNUxIM) %>%
-    tibble::tibble(col_name = .) %>%
-    dplyr::filter(!col_name %in% cols_to_keep$indicator_code,
-                  (stringr::str_detect(col_name, "^0000[01]")))
-
-  invalid_mech_headers <- dplyr::bind_rows(invalid_mech_headers, improper_dedupe_mechs)
-
-  d$tests$invalid_mech_headers <- data.frame(invalid_mech_headers = invalid_mech_headers$col_name)
-  attr(d$tests$invalid_mech_headers, "test_name") <- "Invalid mechanism headers"
-
-  if (NROW(d$tests$invalid_mech_headers) > 0) {
-    d$info$has_error <- TRUE
-
-    warning_msg <-
-      paste0(
-        "ERROR! In tab ",
-        sheet,
-        ", INVALID COLUMN HEADERS: Ensure all PSNUxIM column header mechanism are accurate",
-        " and complete, and contain at least the 5- or 6-digit mechanism code and either",
-        " `DSD` or `TA` (e.g., `12345_DSD`). The following column headers are invalid and",
-        " will be dropped in processing. Please use only the form 12345_DSD. ->  \n\t* ",
-        paste(d$tests$invalid_mech_headers$invalid_mech_headers, collapse = "\n\t* "),
-        "\n")
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-    d$info$has_error <- TRUE
-  }
-
-  d$data$SNUxIM %<>%
-    dplyr::select(-dplyr::all_of(d$tests$invalid_mech_headers$invalid_mech_headers))
+  d <- dropInvalidMechColumns(d, cols_to_keep)
 
   # TEST: Duplicate Cols; Warn; Combine ####
   col_names <- names(d$data$SNUxIM) %>%
