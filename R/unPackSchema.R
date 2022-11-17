@@ -402,13 +402,9 @@ unPackSchema <- function(template_path = NULL,
                          tool = "Data Pack Template",
                          cop_year = NULL) {
 
-  # Validate parameters ####
-  params <- check_params(cop_year = cop_year %missing% NULL,
-                         tool = tool %missing% NULL,
-                         template_path = template_path %missing% NULL)
-
-  for (p in names(params)) {
-    assign(p, purrr::pluck(params, p))
+  if ((tool == "Data Pack Template" & !cop_year %in% c(2021, 2022, 2023))
+      | (tool == "OPU Data Pack Template" & !cop_year %in% 2021:2022)) {
+    stop("Sorry, unPackSchema doesn't work for that combination of tool and cop_year.")
   }
 
   rm(params, p)
@@ -492,8 +488,13 @@ unPackSchema <- function(template_path = NULL,
 
   if (tool == "Data Pack Template") {
 
-    #TODO: Consider to change the structure of datapack_cogs
-    #to use the COP year instead of COPXX
+    if (cop_year == 2021) {
+      map_datapack_cogs <- datapackr::datapack_cogs$COP21
+    } else if (cop_year %in% c(2022, 2023)) {
+      map_datapack_cogs <- datapackr::datapack_cogs$COP22
+    } else {
+      stop("Can't find categoryOptionGroups for that cop_year and tool.")
+    }
 
     cop_year_select <- gsub("^20", "COP", as.character(cop_year))
     map_datapack_cogs <- datapackr::datapack_cogs %>%
