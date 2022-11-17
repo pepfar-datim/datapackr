@@ -240,7 +240,7 @@ test_that("Can drop invalid mechanism columns", {
   #Do nothing if the columns are OK
   test_data <- tibble::tribble(
     ~`12345_DSD`, ~`45678_DSD`, ~`99999_TA`, ~"Not PEPFAR",
-    1, 2, 3,4
+    1, 2, 3, 4
   )
 
   d$data$SNUxIM <- test_data
@@ -251,16 +251,16 @@ test_that("Can drop invalid mechanism columns", {
 
   test_data <- tibble::tribble(
     ~`ABC_DSD`, ~`45678_DSD`, ~`99999_TA`, ~"Not PEPFAR",
-    1, 2, 3,4
+    1, 2, 3, 4
   )
 
   d$data$SNUxIM <- test_data
   d <- dropInvalidMechColumns(d, cols_to_keep)
 
-  expect_identical(d$data$SNUxIM, test_data[,2:4])
+  expect_identical(d$data$SNUxIM, test_data[, 2:4])
   expect_identical(d$tests$invalid_mech_headers$invalid_mech_headers, "ABC_DSD")
   expect_true(d$info$has_error)
-  expect_true(grepl("INVALID COLUMN HEADERS",d$info$messages$message))
+  expect_true(grepl("INVALID COLUMN HEADERS", d$info$messages$message))
   expect_true(grepl("ERROR", d$info$messages$level))
 
 

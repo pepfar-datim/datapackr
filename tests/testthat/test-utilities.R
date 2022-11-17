@@ -223,17 +223,17 @@ test_that("Testing can merge data packs...", {
 test_that("Can calculate a max by row for a data frame", {
 
   test_data <- tibble::tribble(
-    ~`12345_DSD`, ~`12555_DSD`,~`34567_DSD`,
+    ~`12345_DSD`, ~`12555_DSD`, ~`34567_DSD`,
     1, 2, 3,
     2, 1, 5
   )
 
-  test_result <- rowMax(test_data,"row_max","^12")
-  expect_named(test_result, c(names(test_data),"row_max"),ignore.order = TRUE)
+  test_result <- rowMax(test_data, "row_max", "^12")
+  expect_named(test_result, c(names(test_data), "row_max"), ignore.order = TRUE)
   expect_true(test_result$row_max[1] == 2)
   expect_true(test_result$row_max[2] == 2)
 
-  test_result <- rowMax(test_data,"row_max","foo")
-  expect_named(test_result, c(names(test_data),"row_max"),ignore.order = TRUE)
+  test_result <- rowMax(test_data, "row_max", "foo")
+  expect_named(test_result, c(names(test_data), "row_max"), ignore.order = TRUE)
   expect_true(all(is.na(test_result$row_max)))
 })
