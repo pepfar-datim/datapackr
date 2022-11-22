@@ -38,7 +38,12 @@ test_that("Can pack a datapack", {
 
       # Be sure we can unpack what we just wrote to a file (currently cannot unpack)
       # see https://jira.pepfar.net/browse/DP-818
-      # d_out <- unPackTool(submission_path = d$info$output_file, d2_session = training)
+      testthat::expect_error(
+        unPackTool(submission_path = d$info$output_file, d2_session = training),
+        paste0("For type 'Undistributed MER', expected to see data from the main tabs of your Data Pack. ",
+               "However, this appears to be missing."
+        )
+      )
 
       #expect_identical(d$info$datapack_name, d_out$info$datapack_name)
       #expect_setequal(names(d_out), c("keychain", "info", "data", "tests", "datim"))

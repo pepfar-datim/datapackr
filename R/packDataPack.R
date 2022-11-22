@@ -15,12 +15,12 @@ packDataPack <- function(d,
                                              inherits = TRUE)) {
 
   # is packDataPack receiving a model path or a model structure?
-  if(!is.null(model_data) & is.null(d$keychain$model_data_path)) {
+  if (!is.null(model_data) && is.null(d$keychain$model_data_path)) {
     # some sort of check on the model data?
 
     # assign the model data
     d$data$model_data <- model_data
-  } else if(is.null(model_data) & !is.null(d$keychain$model_data_path)) {
+  } else if (is.null(model_data) && !is.null(d$keychain$model_data_path)) {
     # Checks and reads in Data Pack Model File ####
     stopifnot(
       "Model data file could not be read!" = canReadFile(d$keychain$model_data_path),
@@ -28,7 +28,7 @@ packDataPack <- function(d,
         tools::file_ext(d$keychain$model_data_path) == "rds"
     )
     d$data$model_data <- readRDS(d$keychain$model_data_path)
-  } else if(!is.null(model_data)  & !is.null(d$keychain$model_data_path)) {
+  } else if (!is.null(model_data)  && !is.null(d$keychain$model_data_path)) {
     stop(
       "You have provided both a model path and model data to packTool. Please provide only one!"
     )
