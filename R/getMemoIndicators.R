@@ -23,7 +23,7 @@ getValidIndicators <- function(inds) {
   num_is_valid <- lapply(inds$numerator, function(x) datimvalidation::lex(x, indicator_regexes))
   denom_is_valid <- lapply(inds$denominator, function(x) datimvalidation::lex(x, indicator_regexes))
   is_valid <- isValidIndicator(num_is_valid) & isValidIndicator(denom_is_valid)
-  inds[is_valid,]
+  inds[is_valid, ]
 }
 #' @export
 #' @title Get COP Memo Indicators
