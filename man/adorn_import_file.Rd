@@ -9,7 +9,6 @@ adorn_import_file(
   psnu_import_file,
   cop_year = NULL,
   psnu_prioritizations = NULL,
-  map_des_cocs = NULL,
   filter_rename_output = TRUE,
   d2_session = dynGet("d2_default_session", inherits = TRUE),
   include_default = FALSE
@@ -22,12 +21,9 @@ adorn_import_file(
 FY22 targets = COP21.}
 
 \item{psnu_prioritizations}{List of orgUnit, value containing prioritization
-values for each PSNU.}
+values for each PSNU. If not included, blank prioritizations shown.}
 
-\item{map_des_cocs}{Can be used to supply a specific data element/COC map.
-If not specified, results will be obtained from default methods.}
-
-\item{filter_rename_output}{Should this function output the final data in
+\item{filter_rename_output}{T/F Should this function output the final data in
 the new, more complete format?}
 
 \item{d2_session}{DHIS2 Session id. R6 datimutils object which handles

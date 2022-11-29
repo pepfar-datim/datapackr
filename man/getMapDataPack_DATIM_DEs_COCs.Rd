@@ -4,12 +4,10 @@
 \alias{getMapDataPack_DATIM_DEs_COCs}
 \title{get_Map_DataPack_DATIM_DEs_COCs}
 \usage{
-getMapDataPack_DATIM_DEs_COCs(cop_year, datasource = NULL)
+getMapDataPack_DATIM_DEs_COCs(cop_year)
 }
 \arguments{
 \item{cop_year}{cop year to pull get map for}
-
-\item{datasource}{Type of datasource (Data Pack, OPU Data Pack, DATIM)}
 }
 \value{
 {cop21, cop22}_map_DataPack_DATIM_DEs_COCs

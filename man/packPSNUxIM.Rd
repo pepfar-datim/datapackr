@@ -8,11 +8,9 @@ packPSNUxIM(
   wb,
   data,
   snuxim_model_data,
-  org_units,
   cop_year = NULL,
   tool = "OPU Data Pack",
   schema = NULL,
-  expand_formulas = FALSE,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
@@ -33,9 +31,6 @@ FY22 targets = COP21.}
 
 \item{schema}{Which datapackr schema to use in guiding this function. If left
 \code{NULL} will select the default based on \code{cop_year} and \code{tool}.}
-
-\item{expand_formulas}{Write all formulas on right side of PSNUxIM tab, not
-just the first row.}
 
 \item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
 authentication with DATIM.}
