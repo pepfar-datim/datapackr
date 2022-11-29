@@ -17,9 +17,9 @@ getCurrentCOPYear <- function() {
 datapackrSupports <- function() {
   tibble::tribble(
     ~tool, ~yrs,
-    "Data Pack", c(2021, 2022),
+    "Data Pack", c(2021, 2022, 2023),
     "OPU Data Pack", c(2021, 2022),
-    "Data Pack Template", c(2021, 2022),
+    "Data Pack Template", c(2021, 2022, 2023),
     "OPU Data Pack Template", c(2021, 2022))
 }
 
@@ -193,6 +193,8 @@ pick_schema <- function(cop_year, tool) {
       schema <- datapackr::cop21_data_pack_schema
     } else if (cop_year == 2022) {
       schema <- datapackr::cop22_data_pack_schema
+    } else if (cop_year == 2023) {
+      schema <- datapackr::cop23_data_pack_schema
     } else {
       stop("Data Pack schema not available for the COP year provided.")
     }
@@ -237,6 +239,8 @@ pick_template_path <- function(cop_year, tool) {
       template_filename <- "COP21_Data_Pack_Template.xlsx"
     } else if (cop_year == 2022) {
       template_filename <- "COP22_Data_Pack_Template.xlsx"
+    } else if (cop_year == 2023) {
+      template_filename <- "COP23_Data_Pack_Template.xlsx"
     }
   }
 
