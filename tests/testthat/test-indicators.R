@@ -142,6 +142,3 @@ test_that("Handle empty indicator calculations", {
             expect_equal(NROW(test_values), 0)
           }
 )
-
-
-

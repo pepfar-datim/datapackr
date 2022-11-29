@@ -119,7 +119,7 @@ evaluateIndicators <- function(combis, values, inds) {
     purrr::modify_at(., c("numerator", "denominator"), replaceCombisWithValues) %>%
     purrr::modify_at(., c("numerator", "denominator"), replaceTotalsWithValues) %>%
     purrr::modify_at(., c("numerator", "denominator"), replaceExpressionsWithZeros) %>%
-    purrr::modify_at(.,c("numerator", "denominator"), sanitizeExpression) %>%
+    purrr::modify_at(., c("numerator", "denominator"), sanitizeExpression) %>%
     purrr::modify_at(., c("numerator", "denominator"), evaluateExpression) %>%
     dplyr::mutate(value = numerator / denominator)
 
