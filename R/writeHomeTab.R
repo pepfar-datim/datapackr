@@ -47,11 +47,17 @@ writeHomeTab <- function(wb = NULL,
                      rows = 2, cols = 2)
 
   # Title ####
+  if (cop_year = 2023 && tool == "Data Pack") {
+    tool_title <- "Target Setting Tool"
+  } else {
+    tool_title <- tool
+  }
+
   openxlsx::writeData(wb, "Home",
                       x = paste0("COP",
                                  stringr::str_sub(cop_year, -2, -1),
                                  " ",
-                                 tool),
+                                 tool_title),
                       xy = c(2, 10),
                       colNames = FALSE)
   openxlsx::addStyle(wb, "Home",

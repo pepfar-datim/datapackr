@@ -60,7 +60,12 @@ createKeychainInfo <- function(submission_path = NULL,
     dplyr::mutate(
       cop_year = stringr::str_extract(home_cell, "COP\\d{2}"),
       cop_year = as.numeric(stringr::str_replace(cop_year, "COP", "20")),
-      tool = stringr::str_extract(home_cell, "OPU Data Pack|Data Pack"))
+      tool = stringr::str_extract(home_cell, "OPU Data Pack|Data Pack|Target Setting Tool"))
+
+  # Accommodate COP23 Name Change ----
+  tool_metadata$tool <- stringr::str_replace(tool_metadata$tool,
+                                             "Target Setting Tool",
+                                             "Data Pack")
 
   # Is this even a DataPack tool? ----
   if (!tool_metadata$cop_year[1] %in% supportedCOPYears()
