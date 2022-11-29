@@ -14,15 +14,15 @@ datapack_template_filepath <- system.file("extdata",
                                           package = "datapackr",
                                           mustWork = TRUE)
 cop23_data_pack_schema <-
-  unPackSchema_datapack(
+  unPackSchema(
     template_path = datapack_template_filepath,
     skip = skip_tabs(tool = "Data Pack Template", cop_year = 2023),
     cop_year = 2023)
 
-waldo::compare(cop22_data_pack_schema, datapackr::cop22_data_pack_schema)
+waldo::compare(cop23_data_pack_schema, datapackr::cop23_data_pack_schema)
 
-save(cop22_data_pack_schema,
-     file = "./data/cop22_data_pack_schema.rda",
+save(cop23_data_pack_schema,
+     file = "./data/cop23_data_pack_schema.rda",
      compress = "xz")
 
 ## Rebuild package again.
