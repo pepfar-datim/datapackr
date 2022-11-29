@@ -104,7 +104,7 @@ packDataPackSheets <- function(wb,
     sheet_codes <- schema %>%
       dplyr::filter(sheet_name == sheet
                     & col_type %in% c("past", "calculation")) %>%
-      dplyr::pull(indicator_code)# Extracts the column indicator_code
+      dplyr::pull(indicator_code) # Extracts the column indicator_code
 
     ## If no model data needed for a sheet, forward a NULL dataset to prevent errors
     if (length(sheet_codes) != 0) {

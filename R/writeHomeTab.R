@@ -47,7 +47,7 @@ writeHomeTab <- function(wb = NULL,
                      rows = 2, cols = 2)
 
   # Title ####
-  if (cop_year = 2023 && tool == "Data Pack") {
+  if (cop_year == 2023 && tool == "Data Pack") {
     tool_title <- "Target Setting Tool"
   } else {
     tool_title <- tool

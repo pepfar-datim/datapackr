@@ -41,6 +41,8 @@ packTool <- function(model_data_path = NULL,
     assign(p, purrr::pluck(params, p))
   }
 
+  rm(params, p)
+
   # Set global numeric format ####
   options("openxlsx.numFmt" = "#,##0")
 
@@ -60,18 +62,6 @@ packTool <- function(model_data_path = NULL,
   # Start running log of all warning and information messages ####
   d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
-
-  # Get PSNU List####
-  d$data$PSNUs <- datapackr::valid_OrgUnits %>%
-    dplyr::filter(country_uid %in% country_uids) %>%
-    add_dp_label(.) %>%
-    dplyr::arrange(dp_label) %>%
-    ## Remove DSNUs
-    dplyr::filter(!is.na(org_type)) %>%
-    dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
-
-  # TODO: Separate PSNUs as parameter for this function, allowing you to include
-  # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
 
   # Pack file based on type ####
   if (d$info$tool == "Data Pack") {
@@ -107,7 +97,7 @@ packTool <- function(model_data_path = NULL,
   interactive_print(d$info$messages)
 
   #Return the d object for testing purposes
-  d
+  return(d)
 
 
 }
