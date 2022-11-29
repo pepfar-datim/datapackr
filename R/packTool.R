@@ -94,7 +94,7 @@ packTool <- function(model_data_path = NULL,
   }
 
   # Print messages ####
-  interactive_print(d$info$messages)
+  printMessages(d$info$messages)
 
   #Return the d object for testing purposes
   return(d)
