@@ -7,7 +7,6 @@
 packOPUDataPack(
   d,
   undistributed_mer_data = NULL,
-  expand_formulas = FALSE,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }

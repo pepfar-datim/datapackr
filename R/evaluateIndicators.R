@@ -31,7 +31,7 @@ evaluateIndicators <- function(combis, values, inds) {
   totals_df <-
     data.frame(exp = this.des, values = values, stringsAsFactors = FALSE) %>%
     dplyr::group_by(exp) %>%
-    dplyr::summarise(values = as.character(sum(values))) %>%
+    dplyr::summarise(values = sum(values)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(exp = paste0(exp, "}"))
 
@@ -61,12 +61,10 @@ evaluateIndicators <- function(combis, values, inds) {
       stringr::str_replace_all("[}]", "\\\\}")
   }
 
-  #Append totals
-  combis <- c(combis, totals_df$exp)
-  values <- c(values, totals_df$values)
-
   #Must escape the ornamentation, as these will be substituted
   combis <- escapeIndicatorOrnamentation(combis)
+  totals_df$exp <- escapeIndicatorOrnamentation(totals_df$exp)
+
 
   #Function to substitute values based on the
   #dataelement_id.categoryoptioncombo_id
@@ -79,6 +77,12 @@ evaluateIndicators <- function(combis, values, inds) {
     x
   }
 
+  # Function to replace missing totals with zeros
+  replaceTotalsWithValues <- function(x) {
+    replaceCombisWithValues(x,
+                            expressions = totals_df$exp,
+                            v = as.character(totals_df$values))
+  }
 
   #Function to replace missing combis with zeros
   replaceExpressionsWithZeros <- function(x) {
@@ -93,6 +97,7 @@ evaluateIndicators <- function(combis, values, inds) {
 
   matches %>%
     purrr::modify_at(., c("numerator", "denominator"), replaceCombisWithValues) %>%
+    purrr::modify_at(., c("numerator", "denominator"), replaceTotalsWithValues) %>%
     purrr::modify_at(., c("numerator", "denominator"), replaceExpressionsWithZeros) %>%
     purrr::modify_at(., c("numerator", "denominator"), evaluateExpression) %>%
     dplyr::mutate(value = numerator / denominator)

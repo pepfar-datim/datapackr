@@ -1,24 +1,3 @@
-# datapackr 5.4.1
-
-## Breaking changes
-- Removes api_version, api_get, api_filter, api_fields, and api_call as all of their usages have been replaced by datimutils functions.
-
-
-# datapackr 5.4.0
-
-## Breaking changes
-
-## New features
-* Adds support for COP22 OPU Data Pack processing
-* Adds `mergeDatapack` function for use in merging multiple datapacks along
-with related unit test.
-
-## Minor improvements and fixes
-* Fixes an issue with COP Memo indicator calculations
-* New unit tests for OPU generation
-* Fixes an issue with dedupes being dropped in the PSNUxIM tab
-
-
 # datapackr 5.3.2
 
 ## Breaking changes
@@ -34,7 +13,7 @@ changed.
 PSNU (e.g., for DREAMS SNUs in Rwanda & Eswatini).
 
 ## New features
-* Adds the functions `cache_is_fresh` and `fresh_cache_part` for use in
+* Adds the functions `cache_is_fresh` and `fresh_cache_part` for use in 
 anticipated functions allowing the caching of metadata objects retrieved from
 the DATIM API, allowing faster processing for repeat requests.
 * Adds the function `checkToolEmptySheets` to allow checking and unpacking

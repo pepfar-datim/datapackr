@@ -211,9 +211,32 @@ unPackSNUxIM <- function(d) {
                     value = DataPackTarget)
   }
 
+ #  TODO: Reverting this to 5.1.5. We ended up selecting
+ #  the FIRST set of mechanism columns which contained the decimal
+ #  percentage allocations instead of the second set of columns
+ #  which contain the actual values.
+ #  #Get the additional mechanisms added by the user
+ #  user_mechanisms <- stringr::str_extract(names(d$data$SNUxIM), "\\d{4,}_(DSD|TA)") %>%
+ #    purrr::keep(~ !is.na(.x))
+ # #Get the mandatory columns
+ #  mandatory_columns <- cols_to_keep %>%
+ #    dplyr::filter(!is.na(indicator_code)) %>%
+ #    dplyr::filter(!indicator_code == "") %>%
+ #    dplyr::pull(indicator_code) %>%
+ #    purrr::discard(~ .x == "12345_DSD")
+ #
+ #  d$data$SNUxIM <- d$data$SNUxIM %>%
+ #    dplyr::select(mandatory_columns,user_mechanisms)
 
-  #TODO: This test is overly simplistic, as we can
-  #simply drop blank columns.
+ #  Missing right side columns.
+ #  TODO: This should really be moved in to checkColStructure.
+ #  However, at the moment, we are not really validating the user mechanism columns there.
+ #  Users may delete columns on the right side resulting in fewer columns
+ #  in d$data$SNUxIM than are stated in the cols_to_keep. If this situation
+ #  occurs, end with a hard stop and inform the user.
+ #  Realistically, we should be able to handle missing columns, but for now,
+ # the check will remain strict until further changes are made here.
+
   if (NCOL(d$data$SNUxIM) < max(cols_to_keep$col)) {
     stop(
       paste(
@@ -292,8 +315,9 @@ unPackSNUxIM <- function(d) {
 
 
   # Pare down to populated, updated targets only ####
-  blank_cols_idx <- which(names(d$data$SNUxIM) == "")
+
   d$data$SNUxIM <- d$data$SNUxIM[, cols_to_keep$col]
+
   d$data$SNUxIM <- d$data$SNUxIM[!(names(d$data$SNUxIM) %in% c(""))]
 
   # TEST: Missing right-side formulas; Warn; Continue ####
@@ -312,9 +336,7 @@ unPackSNUxIM <- function(d) {
                                            formula)) %>%
     dplyr::select(-character) %>%
     dplyr::filter(is.na(formula)) %>%
-    dplyr::mutate(row_letter = openxlsx::int2col(col)) %>%
-    #Ignore missing right side formulas in columns which have no header information
-    dplyr::filter(!(col %in% blank_cols_idx))
+    dplyr::mutate(row_letter = openxlsx::int2col(col))
 
   attr(d$tests$psnuxim_missing_rs_fxs, "test_name") <- "Missing PSNUxIM R.S. Formulas"
 
@@ -737,8 +759,8 @@ unPackSNUxIM <- function(d) {
       dplyr::across(c(header_cols$indicator_code, "psnuid", "mechCode_supportType"))) %>%
     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
 
-  # TEST: Defunct disaggs; Error; Drop ####
-  d <- checkPSNUxIM_Disaggs(d)
+  # TODO: TEST: Defunct disaggs; Error; Drop ####
+  #d <- checkDisaggs(d, sheet)
 
   # Drop all zeros against IMs ####
   # d$data$SNUxIM %<>%

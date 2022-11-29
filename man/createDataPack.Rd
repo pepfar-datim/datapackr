@@ -9,8 +9,7 @@ createDataPack(
   country_uids,
   template_path = NULL,
   cop_year = NULL,
-  tool = NULL,
-  d2_session = dynGet("d2_default_session", inherits = TRUE)
+  tool = NULL
 )
 }
 \arguments{
@@ -29,9 +28,6 @@ FY22 targets = COP21.}
 
 \item{tool}{Type of tool this function will create or interact with. Either
 \code{OPU Data Pack} or \code{Data Pack}}
-
-\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
-authentication with DATIM.}
 }
 \value{
 Data Pack object
