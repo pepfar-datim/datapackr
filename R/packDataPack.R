@@ -28,7 +28,7 @@ packDataPack <- function(d,
     add_dp_label(.) %>%
     dplyr::arrange(dp_label) %>%
     ## Remove DSNUs
-    dplyr::filter(is.na(DREAMS)) %>%
+    dplyr::filter(org_type != "DSNU") %>%
     dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
 
   # TODO: Separate PSNUs as parameter for this function, allowing you to include
