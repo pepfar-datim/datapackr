@@ -79,9 +79,15 @@ packTool <- function(model_data_path = NULL,
 
   # Save & Export Workbook ####
   interactive_print("Saving...")
+  if (d$info$cop_year == 2023 && d$info$tool == "Data Pack") {
+    tool_name <- "Target Setting Tool"
+  } else {
+    tool_name <- d$info$tool
+  }
+
   d$info$output_file <- exportPackr(data = d$tool$wb,
               output_folder = d$keychain$output_folder,
-              tool = d$info$tool,
+              tool = tool_name,
               datapack_name = d$info$datapack_name)
 
   # Save & Export Archive ####
