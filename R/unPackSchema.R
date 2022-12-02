@@ -332,8 +332,8 @@ checkSchema <- function(schema,
   tests <- list()
 
   ## Sheet Names complete ####
-    tests$sheet_names_complete <-
-      checkSchema_SheetNames(schema, filepath_schema)
+  tests$sheet_names_complete <-
+    checkSchema_SheetNames(schema, filepath_schema)
 
   ## All Skipped sheets included  ####
   tests$skipped_sheets <- checkSchema_SkippedSheets(schema, tool, cop_year)
@@ -413,7 +413,8 @@ unPackSchema <- function(template_path = NULL,
   #
   # rm(params, p)
 
-  if (tool == "OPU Data Pack Template" && cop_year %in% c(2021, 2022)) {
+  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack")
+        && cop_year %in% c(2021, 2022)) {
     schema <- tidyxl::xlsx_cells(path = template_path, include_blank_cells = TRUE) %>%
       dplyr::select(sheet_name = sheet, col, row, character, formula, numeric, is_array)
   } else {
@@ -463,7 +464,7 @@ unPackSchema <- function(template_path = NULL,
     dplyr::mutate(formula = dplyr::if_else(is.na(formula), value, formula))
 
   # For OPU Data Packs, delete everything in metadata rows/cols
-  if (tool == "OPU Data Pack Template") {
+  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack")) {
     schema %<>%
       dplyr::mutate_at(
         dplyr::vars(
@@ -477,7 +478,7 @@ unPackSchema <- function(template_path = NULL,
     ~name, ~id,
     NA_character_, NA_character_))
 
-  if (tool == "OPU Data Pack Template") {
+  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack")) {
     disaggs <- list(tibble::tribble(
       ~name, ~id,
       NA_character_, NA_character_))
@@ -490,7 +491,7 @@ unPackSchema <- function(template_path = NULL,
       )
   }
 
-  if (tool == "Data Pack Template") {
+  if (tool %in% c("Data Pack Template", "Data Pack")) {
 
     # if (cop_year == 2021) {
     #   map_datapack_cogs <- datapackr::datapack_cogs$COP21

@@ -55,18 +55,16 @@ unPackDataPackSheet <- function(d,
       names(.),
       function(x, y) {
         x %>%
-          # Select only target-related columns ----
-        # tidyselect::any_of removes duplicates (takes 1st), ignores blank col names
-        dplyr::select(
-          tidyselect::any_of(
+        dplyr::select( # Select only target-related columns ----
+          tidyselect::any_of( # tidyselect::any_of removes duplicates (takes 1st), ignores blank col names
             unique(keep_cols$indicator_code[keep_cols$sheet_name == y]))) %>%
-          tidyr::pivot_longer(
-            cols = -tidyselect::any_of(
-              c(unique(header_cols$indicator_code[header_cols$sheet_name == y]))),
-            names_to = "indicator_code",
-            values_to = "value") %>%
-          tibble::add_column(sheet_name = y)
-      }) %>% # Tag sheet name ----
+        tidyr::pivot_longer(
+          cols = -tidyselect::any_of(
+            c(unique(header_cols$indicator_code[header_cols$sheet_name == y]))),
+          names_to = "indicator_code",
+          values_to = "value") %>%
+        tibble::add_column(sheet_name = y)
+      }) %>%
   # Add cols to allow compiling with other sheets ----
   addcols(c("KeyPop", "Age", "Sex")) %>%
     dplyr::mutate(psnuid = extract_uid(PSNU)) %>% # Extract PSNU uid ----
