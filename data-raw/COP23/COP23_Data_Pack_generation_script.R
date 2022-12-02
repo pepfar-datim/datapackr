@@ -4,10 +4,8 @@ library(datapackr)
 secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
 datimutils::loginToDATIM(secrets)
 
-output_folder <- "/Users/scott/Library/CloudStorage/GoogleDrive-sjackson@baosystems.com/My Drive/PEPFAR/COP Targets/COP 23/3) Testing & Deployment"
-model_data_path <- "/Users/scott/Library/CloudStorage/GoogleDrive-sjackson@baosystems.com/My Drive/PEPFAR/COP Targets/COP 23/3) Testing & Deployment/dropped_model_data_pack_input_22_20221117_1_flat.rds"
-#output_folder <- Sys.getenv("OUTPUT_FOLDER") %>% paste0(., "Beta Packs/")
-#model_data_path <- Sys.getenv("MODEL_DATA_PATH")
+output_folder <- Sys.getenv("OUTPUT_FOLDER") %>% paste0(., "Beta Packs/")
+model_data_path <- Sys.getenv("MODEL_DATA_PATH")
 
 # For Generating Individual Data Packs ####
 generation_list <- c("Malawi",
@@ -15,13 +13,14 @@ generation_list <- c("Malawi",
                      "Rwanda",
                      "Mozambique",
                      "Zimbabwe",
+                     "Tajikistan",
+                     "India",
                      "Thailand",
                      "Vietnam",
                      "South Africa",
                      "Central America and Brazil",
                      "Caribbean Region",
                      "Cameroon",
-                     "Ukraine",
                      "Cote d'Ivoire")
 
 pick <- datapackr::cop_datapack_countries %>%
