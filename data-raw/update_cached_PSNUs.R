@@ -15,6 +15,8 @@ compare_diffs <- datapackr::valid_OrgUnits %>%
   dplyr::full_join(valid_OrgUnits, by = "uid") %>%
   dplyr::filter(is.na(name.x) | is.na(name.y))
 
+waldo::compare(valid_OrgUnits, datapackr::valid_OrgUnits)
+
 # Overwriting default list with newly created list
 save(valid_OrgUnits,
      file = "./data/valid_OrgUnits.rda",
@@ -22,7 +24,7 @@ save(valid_OrgUnits,
 
 ## Rebuild the package
 
-# Update dataframe of data pack countries/names
+# If anything has changed at country level or above, update dataframe of data pack countries/names
 
 cop_datapack_countries <- datapackr::valid_OrgUnits %>%
   dplyr::select(ou, ou_uid, country_name, country_uid) %>%
