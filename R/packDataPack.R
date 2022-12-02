@@ -28,7 +28,7 @@ packDataPack <- function(d,
     add_dp_label(.) %>%
     dplyr::arrange(dp_label) %>%
     ## Remove DSNUs
-    dplyr::filter(!is.na(org_type)) %>%
+    dplyr::filter(is.na(DREAMS)) %>%
     dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
 
   # TODO: Separate PSNUs as parameter for this function, allowing you to include
@@ -52,13 +52,13 @@ packDataPack <- function(d,
   interactive_print("Cleaning up Styles...")
 
   #TODO: See if new openxlsx release addresses this issue
-  spectrumStyle1 <- openxlsx::createStyle(fgFill = "#9CBEBD")
+  spectrumStyle1 <- openxlsx::createStyle(fgFill = "#073763")
   spectrumStyle2 <- openxlsx::createStyle(fgFill = "#FFEB84")
 
   openxlsx::addStyle(d$tool$wb,
     sheet = "Spectrum",
     spectrumStyle1,
-    cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
+    cols = 1:3, rows = 1:200, gridExpand = TRUE, stack = TRUE)
 
   openxlsx::addStyle(d$tool$wb,
     sheet = "Spectrum",

@@ -45,7 +45,7 @@ packDataPackSheets <- function(wb,
         add_dp_label(.) %>%
         dplyr::arrange(dp_label) %>%
         ## Remove DSNUs
-        dplyr::filter(!is.na(org_type)) %>%
+        dplyr::filter(is.na(DREAMS)) %>%
         dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
       #TODO: Update Data Pack and here to use `OrgUnit as column header instead
       # of PSNU to allow custom org unit list.
