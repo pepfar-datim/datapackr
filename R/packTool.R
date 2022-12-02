@@ -86,17 +86,17 @@ packTool <- function(model_data_path = NULL,
   }
 
   d$info$output_file <- exportPackr(data = d$tool$wb,
-              output_folder = d$keychain$output_folder,
-              tool = tool_name,
-              datapack_name = d$info$datapack_name)
+                                    output_folder = d$keychain$output_folder,
+                                    tool = tool_name,
+                                    datapack_name = d$info$datapack_name)
 
   # Save & Export Archive ####
   if (results_archive) {
     interactive_print("Archiving...")
     d$info$output_file <- exportPackr(data = d,
-                output_folder = d$keychain$output_folder,
-                tool = "Results Archive",
-                datapack_name = d$info$datapack_name)
+                                      output_folder = d$keychain$output_folder,
+                                      tool = "Results Archive",
+                                      datapack_name = d$info$datapack_name)
   }
 
   # Print messages ####

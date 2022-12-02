@@ -32,7 +32,7 @@ exportPackr <- function(data, output_folder, tool, datapack_name) {
     )
   }
 
-  if (tool %in% c("Data Pack", "OPU Data Pack")) {
+  if (tool %in% c("Data Pack", "OPU Data Pack", "Target Setting Tool")) {
     if (class(data) != "Workbook") {
       stop("Output type and data do not match!")
     }
