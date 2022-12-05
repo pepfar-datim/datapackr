@@ -10,29 +10,34 @@
 #' @return Exports a Data Pack to Excel within \code{output_folder}.
 #'
 packDataPack <- function(d,
+                         model_data = NULL,
                          d2_session = dynGet("d2_default_session",
                                              inherits = TRUE)) {
 
-  # Checks and reads in Data Pack Model File ####
-  stopifnot(
-    "Model data file could not be read!" = canReadFile(d$keychain$model_data_path),
-    "Model data is not correct file type! File must have .rds extension." =
-      tools::file_ext(d$keychain$model_data_path) == "rds"
-  )
+  # is packDataPack receiving a model path or a model structure?
+  if (!is.null(model_data) && is.null(d$keychain$model_data_path)) {
+    # some sort of check on the model data?
 
-  d$data$model_data <- readRDS(d$keychain$model_data_path)
 
-  # Get PSNU List ####
-  d$data$PSNUs <- datapackr::valid_PSNUs %>%
-    dplyr::filter(country_uid %in% d$info$country_uids) %>%
-    add_dp_psnu(.) %>%
-    dplyr::arrange(dp_label) %>%
-    ## Remove DSNUs
-    dplyr::filter(!is.na(psnu_type)) %>%
-    dplyr::select(PSNU = dp_label, psnu_uid, snu1)
-
-  # TODO: Separate PSNUs as parameter for this function, allowing you to include
-  # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
+    # assign the model data
+    d$data$model_data <- model_data
+  } else if (is.null(model_data) && !is.null(d$keychain$model_data_path)) {
+    # Checks and reads in Data Pack Model File ####
+    stopifnot(
+      "Model data file could not be read!" = canReadFile(d$keychain$model_data_path),
+      "Model data is not correct file type! File must have .rds extension." =
+        tools::file_ext(d$keychain$model_data_path) == "rds"
+    )
+    d$data$model_data <- readRDS(d$keychain$model_data_path)
+  } else if (!is.null(model_data)  && !is.null(d$keychain$model_data_path)) {
+    stop(
+      "You have provided both a model path and model data to packTool. Please provide only one!"
+    )
+  } else {
+    stop(
+      "You have provided neither a model path nor model data to packTool, Please provide at least one!"
+    )
+  }
 
   # Write Main Sheets ####
   d$tool$wb <- packDataPackSheets(wb = d$tool$wb,

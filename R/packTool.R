@@ -11,7 +11,8 @@
 #' @return Exports a Data Pack or OPU Data Pack tool to Excel within
 #' \code{output_folder}.
 #'
-packTool <- function(model_data_path = NULL,
+packTool <- function(model_data = NULL,
+                     model_data_path = NULL,
                      snuxim_model_data_path = NULL,
                      undistributed_mer_data = NULL,
                      tool,
@@ -75,7 +76,9 @@ packTool <- function(model_data_path = NULL,
 
   # Pack file based on type ####
   if (d$info$tool == "Data Pack") {
-    d <- packDataPack(d, d2_session = d2_session)
+    d <- packDataPack(d,
+                      model_data = model_data,
+                      d2_session = d2_session)
   } else if (d$info$tool == "OPU Data Pack") {
     print(paste("Expand formulas is ", expand_formulas))
     d <- packOPUDataPack(d,
