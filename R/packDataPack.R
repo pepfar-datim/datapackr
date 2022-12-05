@@ -18,6 +18,7 @@ packDataPack <- function(d,
   if (!is.null(model_data) && is.null(d$keychain$model_data_path)) {
     # some sort of check on the model data?
 
+
     # assign the model data
     d$data$model_data <- model_data
   } else if (is.null(model_data) && !is.null(d$keychain$model_data_path)) {

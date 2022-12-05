@@ -86,14 +86,35 @@ evaluateIndicators <- function(combis, values, inds) {
     gsub(expression.pattern, "0", x)
   }
 
+
+  #Pare down to only valid numeric expressions at this point
+  expr_regexes <- list(plus  = "\\+",
+  minus = "\\-",
+  times = "\\*",
+  division = "\\/",
+  whitespace  = "\\s+",
+  number = "[+\\-]?(?:0|[1-9]\\d*)(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?",
+  lparen = "\\(",
+  rparent = "\\)")
+
+
+  sanitizeExpression <- function(expr) {
+    parsed_exp <- lapply(expr, function(x) datimvalidation::lex(x, expr_regexes))
+    exp_is_valid <-   !unlist(lapply(lapply(parsed_exp, function(x) names(x) == ".missing"), any))
+    expr[!exp_is_valid] <- "NA"
+    expr
+  }
+
+
   #Function to parse and evaluate the expression to return a numeric value
   evaluateExpression <- function(exp) {
-    vapply(exp, function(x) eval(parse(text = x)), FUN.VALUE = double(1))
+    vapply(exp, function(x) eval(str2lang(x)), FUN.VALUE = double(1))
   }
 
   matches %>%
     purrr::modify_at(., c("numerator", "denominator"), replaceCombisWithValues) %>%
     purrr::modify_at(., c("numerator", "denominator"), replaceExpressionsWithZeros) %>%
+    purrr::modify_at(., c("numerator", "denominator"), sanitizeExpression) %>%
     purrr::modify_at(., c("numerator", "denominator"), evaluateExpression) %>%
     dplyr::mutate(value = numerator / denominator)
 
