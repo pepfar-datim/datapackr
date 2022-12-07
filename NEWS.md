@@ -1,3 +1,17 @@
+# datapackr 5.5.0
+
+## Breaking changes
+
+## New features
+* Use datimvalidation's expression lexer to validate incoming indicator expression
+
+## Minor improvements and fixes
+* Refactored how `unPackSNUxIM` function operates.
+* Retire internal API utility functions and replace with datimutils functions
+* Removed duplicative code in `packDataPack` that was already in `packTool`
+* Added tests for `packDataPack`
+
+
 # datapackr 5.4.0
 
 ## Breaking changes
