@@ -117,13 +117,13 @@ dataPackName_homeCell <- function() {
 #'
 skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
   if (tool %in% c("Data Pack", "Data Pack Template")) {
-    if (cop_year %in% c(2021)) {
-      skip <- c("Home", "Summary", "Spectrum", "KP Validation")
-    } else if (cop_year %in% c(2022, 2023)) {
-      skip <- c("Home", "Spectrum", "KP Validation", "Year 2")
-    }
-  } else if (tool %in% c("OPU Data Pack Template", "OPU Data Pack")
-              && cop_year %in% c(2021, 2022)) {
+
+    skip <- switch(as.character(cop_year),
+           "2021" = c("Home", "Summary", "Spectrum", "KP Validation"),
+           "2022" = c("Home", "Spectrum", "KP Validation"),
+           "2023" = c("Home", "Spectrum", "KP Validation", "Year 2"),
+            NA_character_)
+  } else if (tool %in% c("OPU Data Pack Template", "OPU Data Pack") && cop_year %in% c(2021, 2022)) {
     skip <- c("Home")
   } else {
     skip <- c(NA_character_)
