@@ -188,6 +188,8 @@ prepareMemoDataByPSNU <- function(analytics,
         "GEND_GBV Physical and Emotional Violence",
       Indicator == "GEND_GBV" & N_OR_D == "Sexual" ~
         "GEND_GBV Sexual Violence",
+      Indicator == "TX_PVLS" & N_OR_D == "(D)" ~ "TX_PVLS (D)",
+      Indicator == "TX_PVLS" & N_OR_D == "(N)" ~ "TX_PVLS (N)",
       TRUE ~ Indicator)) %>%
     dplyr::select(-"N_OR_D") %>%
     dplyr::mutate(Age = dplyr::case_when(Age == "15-" ~ "<15",
