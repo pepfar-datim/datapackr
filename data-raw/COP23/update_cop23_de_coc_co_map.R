@@ -27,8 +27,7 @@ fullCodeList <-
     function(x) {
       cl <- datimutils::getSqlView(sql_view_uid = "DotdxKrNZxG",
                                    variable_keys = "dataSets",
-                                   variable_values = x,
-                                   d2_session = d2_session) %>%
+                                   variable_values = x) %>%
         dplyr::mutate(dataset_uid = x)
       ds <- rbind(ds, cl)
     }) %>%
@@ -90,7 +89,7 @@ fullCodeList %<>%
     categoryoptioncomboname = categoryoptioncombo)
 
 # Prep Data Pack schema for mapping ####
-schema <- datapackr::cop22_data_pack_schema
+schema <- datapackr::cop23_data_pack_schema
 
 dp_map <- schema %>%
   dplyr::filter((col_type == "target" & dataset %in% c("mer", "subnat", "impatt"))
@@ -395,9 +394,8 @@ waldo::compare(datapackr::cop22_map_DataPack_DATIM_DEs_COCs, dp_map)
 # - AGYW_PREV listed as "dreams" dataset instead of "mer"
 # - Updates to DEGS for HTS modalities and top level to reflect FY23 targets changes
 
-cop22_map_DataPack_DATIM_DEs_COCs <- dp_map
-
-save(cop22_map_DataPack_DATIM_DEs_COCs, file = "./data/cop22_map_DataPack_DATIM_DEs_COCs.rda", compress = "xz")
+cop23_map_DataPack_DATIM_DEs_COCs <- dp_map
+save(cop23_map_DataPack_DATIM_DEs_COCs, file = "./data/cop23_map_DataPack_DATIM_DEs_COCs.rda", compress = "xz")
 
 
 # Create map for adorning import files, to avoid issues with 50+ finer age bands
