@@ -265,7 +265,7 @@ renderPartnerTable <- function(memo_doc, partners_table, memoStructure, source_t
     dplyr::mutate_if(is.numeric, zerosToDashes)
 
   sub_heading <- names(partners_table)[4:length(partners_table)] %>%
-    stringr::str_extract(.,"<15|15\\+|<18|18\\+|Total") %>%
+    stringr::str_extract(., "<15|15\\+|<18|18\\+|Total") %>%
     c("Funding Agency", "Partner", "Mechanism", .)
 
   group_heading <- names(partners_table)[4:length(partners_table)] %>%
