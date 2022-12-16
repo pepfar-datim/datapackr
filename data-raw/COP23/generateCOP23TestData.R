@@ -1,4 +1,5 @@
 require(datapackr)
+require(magrittr)
 
 country <- "Angola"
 #Get Angola OUs
@@ -51,14 +52,9 @@ des_cocs_impatt <-  fullCodeList %>%
   dplyr::distinct() %>%
   dplyr::mutate(attributeOptionCombo = default_catOptCombo())
 
+
+
 des_cocs <- rbind(des_cocs_mer, des_cocs_impatt)
-
-set.seed(5883959)
-cop23_sample_data <- psnus %>%
-  dplyr::full_join(des_cocs , by = character()) %>%
-  dplyr::arrange(orgUnit, dataelementuid,categoryoptioncombouid, attributeOptionCombo) %>%
-  dplyr::mutate(period = "2023Oct", value=sample(0:200, dplyr::n(), replace=TRUE))
-
 
 #Mock a d object
 d <- list()
@@ -74,7 +70,37 @@ d$info$has_error <- FALSE
 d$info$sane_name <- country
 d$info$approval_status <- "UNAPPROVED"
 d$info$source_user <-"littlebobbytables"
+
+
+set.seed(5883959)
+cop23_sample_data <- psnus %>%
+  dplyr::full_join(des_cocs , by = character()) %>%
+  dplyr::arrange(orgUnit, dataelementuid,categoryoptioncombouid, attributeOptionCombo) %>%
+  dplyr::mutate(period = "2023Oct", value=sample(0:200, dplyr::n(), replace=TRUE)) %>%
+  dplyr::select(dataElement = dataelementuid,
+                period,
+                orgUnit,
+                categoryOptionCombo = categoryoptioncombouid,
+                attributeOptionCombo,
+                value)
+
+cop23_y2_sample_data <- cop23_sample_data %>%
+  dplyr::filter(attributeOptionCombo != datapackr::default_catOptCombo()) %>% #Remove IMPATT data
+  dplyr::group_by(dataElement,categoryOptionCombo) %>%
+  dplyr::summarise(value = sum(round(value * 1.25)), .groups = "drop") %>%
+  dplyr::mutate(orgUnit = d$info$country_uids[[1]],
+                period = "2024Oct",
+                attributeOptionCombo = datapackr::default_catOptCombo()) %>%
+  dplyr::select(dataElement,
+                period,
+                orgUnit,
+                categoryOptionCombo,
+                attributeOptionCombo,
+                value)
+
+
 d$datim$cop23_sample_data <-cop23_sample_data
+d$datim$cop23_year2_sample_data <- cop23_y2_sample_data
 
 createS3BucketTags <- function(d) {
   d$info$country_uids <- paste(d$info$country_uids, sep = "", collapse = "_")
@@ -154,7 +180,8 @@ sendDATIMExportToS3 <- function(d) {
   #Write the flatpacked output
   tmp <- tempfile()
 
-  datim_export <- d$datim$cop23_sample_data
+  datim_export <- d$datim$cop23_sample_data %>%
+    mutate(across(everything(), as.character))
 
   #Need better error checking here.
   write.table(
@@ -200,6 +227,57 @@ sendDATIMExportToS3 <- function(d) {
   return(r)
 }
 
+sendYear2ExportToS3 <- function(d, custom_object_name = NULL) {
+  #Write the flatpacked output
+  tmp <- tempfile()
+
+  datim_export <- d$datim$cop23_year2_sample_data %>%
+    mutate(across(everything(), as.character))
+
+  #Need better error checking here.
+  write.table(
+    datim_export,
+    file = tmp,
+    quote = FALSE,
+    sep = "|",
+    row.names = FALSE,
+    na = "",
+    fileEncoding = "UTF-8"
+  )
+
+  # Load the file as a raw binary
+  read_file <- file(tmp, "rb")
+  raw_file <- readBin(read_file, "raw", n = file.size(tmp))
+  close(read_file)
+
+  object_tags <- createS3BucketTags(d)
+
+  object_name <- paste0("datim_export/",gsub("^20", "cop",d$info$cop_year),
+                        ifelse(d$info$cop_year==2021,"_opu",""),
+                        "/",d$info$sane_name,"_Y2.csv")
+
+  s3 <- paws::s3()
+
+  r <- tryCatch({
+    foo <- s3$put_object(Bucket = Sys.getenv("AWS_S3_BUCKET"),
+                         Body = raw_file,
+                         Key = object_name,
+                         Tagging = object_tags,
+                         ContentType = "text/csv")
+    message("DATIM Export sent to S3", name = "datapack")
+    TRUE
+  },
+  error = function(err) {
+    message("DATIM Export could not be sent to S3", name = "datapack")
+    message(err, name = "datapack")
+    FALSE
+  })
+
+  unlink(tmp)
+
+  return(r)
+}
 
 sendTimeStampLogToS3(d)
 sendDATIMExportToS3(d)
+sendYear2ExportToS3(d)
