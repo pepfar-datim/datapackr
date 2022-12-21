@@ -36,6 +36,12 @@ packPSNUxIM <- function(wb, # Workbook object
   # if the cop year is not 2021 or 2022, stops and throws message. ####
   stopifnot("Packing PSNU x IM tabs is not supported for the requested COP year." = cop_year %in% c(2021, 2022))
 
+  #orgunits cannot be null
+  stopifnot("This function requires that orgunits is not null" = !is.null(org_units) || !missing(org_units))
+
+
+
+
   # Create data sidecar to eventually compile and return ####
   r <- list(
     wb = wb, # Workbook object xlsx

@@ -176,15 +176,27 @@ writePSNUxIM <- function(d,
       dplyr::summarise(value = sum(value)) %>%
       dplyr::ungroup()
 
+
+    org_units <- datapackr::valid_OrgUnits %>% # Load in valid_PSNUs list from package
+      dplyr::filter(country_uid %in% d$info$country_uids) %>%
+      add_dp_label(.) %>%
+      dplyr::arrange(dp_label) %>%
+      ## Remove DSNUs
+      dplyr::filter(!is.na(org_type)) %>%
+      dplyr::select(dp_label, orgUnit = uid)
+
     r <- packPSNUxIM(wb = d$tool$wb,
                      data = targets_data,
                      snuxim_model_data = d$data$snuxim_model_data,
+                     org_units = org_units,
                      cop_year = d$info$cop_year,
                      tool = d$info$tool,
                      schema = d$info$schema,
                      d2_session = d2_session)
 
     d$tool$wb <- r$wb
+    print(r$message)
+    print(r$level)
     d$info$messages <- appendMessage(d$info$messages, r$message, r$level)
     d$info$newSNUxIM <- TRUE
 

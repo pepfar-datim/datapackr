@@ -45,6 +45,12 @@ appendMessage <- function(x, message, level) {
 
 appendMessage.MessageQueue <- function(x, message = NA, level = NA) {
 
+
+  if (is.null(message) || is.null(level)) {
+    warning("Null messages or levels  detected. Not appending anything")
+    return(x)
+  }
+
   if (length(message) != length(level)) {
     stop("Messages and warnings must be of the same length")
   }
