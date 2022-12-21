@@ -86,7 +86,9 @@ writePSNUxIM <- function(d,
       p <- d
       p$data$MER <- p$data$missingCombos
       p <- packForDATIM(p, type = "Undistributed MER")
-      targets_data <- p$datim$UndistributedMER
+      targets_data <- p$data$UndistributedMER
+      #This is not null safe.
+
       rm(p)
     } else {
       targets_data <- d$data$UndistributedMER
