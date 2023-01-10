@@ -249,7 +249,18 @@ test_that("We can check datapack paramaters", {
 
   expect_silent(sheets <- checkSheets(sheets = c("HTS", "Cascade", "GEND"),
                                       tool = tool, cop_year = cop_year,
-                                      all_sheets = FALSE))
+                                      all_sheets = FALSE,
+                                      operation = "unpack"))
+
+  expect_silent(sheets <- checkSheets(sheets = c("HTS", "Cascade", "GEND"),
+                                      tool = tool, cop_year = cop_year,
+                                      all_sheets = FALSE,
+                                      operation = "pack"))
+
+  expect_silent(sheets <- checkSheets(sheets = c("HTS", "Cascade", "GEND"),
+                                      tool = tool, cop_year = cop_year,
+                                      all_sheets = FALSE,
+                                      operation = "schema"))
 
   expect_silent(sheets <- checkSheets(sheets = c("HTS", "Cascade", "GEND", "Home"),
                                       tool = tool, cop_year = cop_year,
@@ -273,6 +284,32 @@ test_that("We can check datapack paramaters", {
                                        tool = tool, cop_year = cop_year,
                                        all_sheets = FALSE,
                                        psnuxim = FALSE))
+
+  #2023 Sheets nuances
+  expect_warning(sheets <- checkSheets(sheets = c("HTS", "KP Validation"),
+                                       tool = tool, cop_year = 2023,
+                                       all_sheets = FALSE,
+                                       operation = "unpack"))
+
+  expect_warning(sheets <- checkSheets(sheets = c("HTS", "Year 2"),
+                                       tool = tool, cop_year = 2023,
+                                       all_sheets = FALSE,
+                                       operation = "pack"))
+
+  expect_silent(sheets <- checkSheets(sheets = c("HTS", "Year 2"),
+                                      tool = tool, cop_year = 2023,
+                                      all_sheets = FALSE,
+                                      operation = "unpack"))
+
+  expect_silent(sheets <- checkSheets(sheets = c("HTS", "KP Validation"),
+                                      tool = tool, cop_year = 2023,
+                                      all_sheets = FALSE,
+                                      operation = "pack"))
+
+  expect_silent(sheets <- checkSheets(sheets = c("HTS", "KP Validation", "Year 2"),
+                                      tool = tool, cop_year = 2023,
+                                      all_sheets = FALSE,
+                                      operation = "schema"))
 
   }
 )
