@@ -841,24 +841,23 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = TRUE) {
   names(data)[names(data) == "IMPATT.PRIORITY_SNU.T"] <- "value"
   data <- data[, c("PSNU", "value")]
   data$snu_uid <- extract_uid(data$PSNU)
-  valid_prio_units <- valid_OrgUnits[valid_OrgUnits$org_type %in% c("PSNU", "Military"),]
+  valid_prio_units <- valid_OrgUnits[valid_OrgUnits$org_type %in% c("PSNU", "Military"), ]
   #Does the PSNU exist in the list of valid PSNUs?
   data$isInvalidPSNU <- !(data$snu_uid %in% valid_prio_units$uid)
 
-  isInvalidPrioritization <- function(PSNU,value) {
+  isInvalidPrioritization <- function(PSNU, value) {
 
     if (grepl("_Military", PSNU)) {
        value != "M"
-    } else
-    {
+    } else {
       !(value %in% prioritization_dict()$value)
     }
 
   }
 
-  data$isInvalidPrioritization <- mapply(isInvalidPrioritization,data$PSNU,data$value)
+  data$isInvalidPrioritization <- mapply(isInvalidPrioritization, data$PSNU, data$value)
 
-  invalid_prioritizations <- data[data$isInvalidPSNU | data$isInvalidPrioritization,]
+  invalid_prioritizations <- data[data$isInvalidPSNU | data$isInvalidPrioritization, ]
 
 
   if (NROW(invalid_prioritizations) > 0) {

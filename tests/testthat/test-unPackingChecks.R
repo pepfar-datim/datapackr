@@ -644,12 +644,12 @@ test_that("Can check disaggs", {
   d$info$schema <-
     tribble(
       ~sheet_num, ~sheet_name, ~col, ~indicator_code, ~col_type, ~value_type,
-      8, "VMMC" ,1, "SNU1",  "row_header",     "string",
-      8, "VMMC" ,2, "PSNU",  "row_header",     "string",
-      8, "VMMC" ,3, "Age",   "row_header",     "string",
-      8, "VMMC" ,4, "Sex",   "row_header",     "string",
-      8, "VMMC" ,5, "ID",    "row_header",     "string",
-      8, "VMMC" ,17, "VMMC_CIRC_SUBNAT.T", "target", "integer"
+      8, "VMMC", 1, "SNU1",  "row_header",     "string",
+      8, "VMMC", 2, "PSNU",  "row_header",     "string",
+      8, "VMMC", 3, "Age",   "row_header",     "string",
+      8, "VMMC", 4, "Sex",   "row_header",     "string",
+      8, "VMMC", 5, "ID",    "row_header",     "string",
+      8, "VMMC", 17, "VMMC_CIRC_SUBNAT.T", "target", "integer"
     ) %>%
     dplyr::mutate(valid_ages = I(list(tibble(id = c("ttf9eZCHsTU", "GaScV37Kk29"), name = c("15-19", "20-24"))))) %>%
     dplyr::mutate(valid_sexes = I(list(tibble(id = c("Qn0I5FbKQOA"), name = "Male")))) %>%
