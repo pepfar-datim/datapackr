@@ -4,7 +4,7 @@ with_mock_api({
   test_that("We can prepare memo metadata", {
     d <- list()
     d$info$country_uids <- "cDGPF739ZZr"
-    d$info$cop_year <- "2022"
+    d$info$cop_year <- 2022
     d$data$analytics <-
       data.frame(psnu_uid = "uXwFHXCPYgj", prioritization = "Attained")
     d <- prepareMemoMetadata(d, "datapack", d2_session = training)

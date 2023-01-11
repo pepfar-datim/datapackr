@@ -10,6 +10,7 @@
 #' @return Exports a Data Pack to Excel within \code{output_folder}.
 #'
 packDataPack <- function(d,
+                         model_data = NULL,
                          d2_session = dynGet("d2_default_session",
                                              inherits = TRUE)) {
 

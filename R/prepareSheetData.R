@@ -79,7 +79,7 @@ prepareSheetData <- function(sheet,
   dataStructure <- schema %>% # Start with base schema
     dplyr::filter(sheet_name == sheet) %>% # Filter by sheet name
     dplyr::arrange(col) %>% # Arrange the data based upon columns
-    `row.names<-`(.[, "indicator_code"]) %>%
+    `row.names<-`(.$indicator_code) %>%
     dplyr::select(formula) %>%
     t() %>%
     tibble::as_tibble() %>%

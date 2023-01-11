@@ -43,7 +43,7 @@ prepareMemoMetadata <- function(d, memo_type,
   }
 
   if (memo_type %in% c("datim", "comparison")) {
-    #Get the existing prioritizations
+    #Get the existing prioritization
     d$memo$datim$prios <- fetchPrioritizationTable(d$info$psnus,
                                                      d$info$cop_year,
                                                      d2_session)
@@ -81,11 +81,16 @@ prepareExistingDataAnalytics <- function(d, d2_session =
 
   if (!is.null(df) && NROW(df) > 0) {
 
+    #TODO: Does adorn_import file need to be smarter
+    map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
+                                                            datasource = "DATIM")
+
     d$memo$datim$analytics <- df %>%
       adorn_import_file(
         .,
         cop_year = d$info$cop_year,
         psnu_prioritizations = d$memo$datim$prios,
+        map_des_cocs = map_des_cocs,
         d2_session = d2_session,
         include_default = TRUE
       )
@@ -183,6 +188,8 @@ prepareMemoDataByPSNU <- function(analytics,
         "GEND_GBV Physical and Emotional Violence",
       Indicator == "GEND_GBV" & N_OR_D == "Sexual" ~
         "GEND_GBV Sexual Violence",
+      Indicator == "TX_PVLS" & N_OR_D == "(D)" ~ "TX_PVLS_(D)",
+      Indicator == "TX_PVLS" & N_OR_D == "(N)" ~ "TX_PVLS_(N)",
       TRUE ~ Indicator)) %>%
     dplyr::select(-"N_OR_D") %>%
     dplyr::mutate(Age = dplyr::case_when(Age == "15-" ~ "<15",

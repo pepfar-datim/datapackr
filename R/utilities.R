@@ -1,4 +1,58 @@
 #' @export
+#'
+#' @title merge two datapacks into one d object.
+#'
+#' @description
+#' If two datapacks are supplied, they will be merged into one d object.
+#'
+#' @param d1 the first d object
+#' @param d2 the second d object
+#'
+#' @return combined d object
+#'
+mergeDatapack <- function(d1 = d1, d2 = d2) {
+
+    if (d1$info$datapack_name == d2$info$datapack_name) {
+
+      # bind data, datim and data
+      d <- d1
+      d$datim <- purrr::map2(d1$datim, d2$datim, dplyr::bind_rows)
+      d$data <- purrr::map2(d1$data, d2$data, dplyr::bind_rows)
+
+      # ensure all test results are coded as data frames or tibbles
+      d1$tests <- lapply(d1$tests, dplyr::tibble)
+      d2$tests <- lapply(d2$tests, dplyr::tibble)
+
+      # extract extras in each test list
+      d1$tests <- lapply(d1$tests, dplyr::tibble)
+      d2$tests <- lapply(d2$tests, dplyr::tibble)
+      d1_names <- names(d1$tests)
+      d2_names <- names(d2$tests)
+      d1_extras <- d1_names[!d1_names %in% d2_names]
+      d2_extras <- d2_names[!d2_names %in% d1_names]
+
+      # combine
+      d$tests <- purrr::map2(
+        d1$tests[!names(d1$tests) %in% d1_extras],
+        d2$tests[!names(d2$tests) %in% d2_extras],
+        dplyr::bind_rows
+      )
+
+      # add extras
+      d$tests <- c(d$tests, d1$tests[d1_extras], d2$tests[d2_extras])
+
+      # combine message information
+      d$info <- d1$info
+      d$info$messages <- rbind(d1$info$messages, d2$info$messages)
+
+      return(d)
+
+    } else {
+      stop("These are different datapacks, cannot merge!!!")
+    }
+}
+
+#' @export
 #' @title Returns `default` categoryOptionCombo uid.
 #'
 #' @return `Default` categoryOptionCombo uid.
@@ -336,16 +390,33 @@ rowMax <- function(df, cn, regex) {
 #' @title get_Map_DataPack_DATIM_DEs_COCs
 #'
 #' @param cop_year cop year to pull get map for
-#'
+#' @param datasource Type of datasource (Data Pack, OPU Data Pack, DATIM)
 #' @return {cop21, cop22}_map_DataPack_DATIM_DEs_COCs
 #'
-getMapDataPack_DATIM_DEs_COCs <- function(cop_year) {
+getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL) {
 
   switch(as.character(cop_year),
          "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
          "2022" = datapackr::cop22_map_DataPack_DATIM_DEs_COCs,
          stop("The COP year and configuration provided is not supported by get_Map_DataPack_DATIM_DEs_COCs"))
 
+  if (datasource %in%  c("Data Pack", "Data Pack Template") || is.null(datasource)) {
+    de_coc_map <- switch(as.character(cop_year),
+           "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
+           "2022" = datapackr::cop22_map_DataPack_DATIM_DEs_COCs,
+           stop("Invalid COP Year"))
+  return(de_coc_map)
+    }
+
+  if (datasource %in% c("OPU Data Pack", "OPU Data Pack Template", "DATIM")) {
+    de_coc_map <- switch(as.character(cop_year),
+                         "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
+                         "2022" = datapackr::cop22_map_adorn_import_file,
+                         stop("Invalid COP Year"))
+    return(de_coc_map)
+  }
+
+  stop("Could not find a data element/category option combo map for those paramaters")
 }
 
 

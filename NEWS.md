@@ -1,3 +1,42 @@
+# datapackr 5.5.1
+
+## Breaking changes
+
+## New features
+
+## Minor improvements and fixes
+* Added TX_PVLS(D) to memo
+
+
+# datapackr 5.5.0
+
+## Breaking changes
+
+## New features
+* Use datimvalidation's expression lexer to validate incoming indicator expression
+
+## Minor improvements and fixes
+* Refactored how `unPackSNUxIM` function operates.
+* Retire internal API utility functions and replace with datimutils functions
+* Removed duplicative code in `packDataPack` that was already in `packTool`
+* Added tests for `packDataPack`
+
+
+# datapackr 5.4.0
+
+## Breaking changes
+
+## New features
+* Adds support for COP22 OPU Data Pack processing
+* Adds `mergeDatapack` function for use in merging multiple datapacks along
+with related unit test.
+
+## Minor improvements and fixes
+* Fixes an issue with COP Memo indicator calculations
+* New unit tests for OPU generation
+* Fixes an issue with dedupes being dropped in the PSNUxIM tab
+
+
 # datapackr 5.3.2
 
 ## Breaking changes
