@@ -40,7 +40,7 @@ packDataPackSheets <- function(wb,
   # Get org_units to write into Data Pack based on provided parameters. ####
   if (is.null(org_units)) {
     if (ou_level == "Prioritization") {
-      org_units <- datapackr::valid_OrgUnits %>% # Load in valid_PSNUs list from package
+      org_units <- datapackr::valid_OrgUnits %>%
         dplyr::filter(country_uid %in% country_uids) %>%
         add_dp_label(.) %>%
         dplyr::arrange(dp_label) %>%
@@ -87,8 +87,10 @@ packDataPackSheets <- function(wb,
                     & sheet_name %in% names(wb)) %>%
       dplyr::pull(sheet_name) %>% # Extracts the column sheet_name
       unique()
+    skip_pack_tabs <- skip_tabs(tool = "Data Pack", cop_year = cop_year)$pack
 
     sheets <- wb_sheets[wb_sheets %in% schema_sheets]
+    sheets <- sheets[!sheets %in% skip_pack_tabs]
 
     if (length(sheets) == 0) {
       stop("This template file does not appear to be normal.")
@@ -100,7 +102,6 @@ packDataPackSheets <- function(wb,
 
   for (sheet in sheets) {
     interactive_print(sheet)
-    org_units_sheet <- org_units
     sheet_codes <- schema %>%
       dplyr::filter(sheet_name == sheet
                     & col_type %in% c("past", "calculation")) %>%
@@ -125,6 +126,8 @@ packDataPackSheets <- function(wb,
       if (NROW(org_units_sheet) == 0) {
         next
       }
+    } else {
+      org_units_sheet <- org_units
     }
 
     wb <- packDataPackSheet(wb = wb,

@@ -596,9 +596,14 @@ checkResultsArchive <- function(results_archive = FALSE) {
 #' @param all_sheets Logical. Return/check against all sheets (as opposed to only
 #'   those with targets)?
 #' @param psnuxim Logical. Return/check against PSNUxIM tab as well?
+#' @param operation String. Options = "unpack", "pack", "schema", or "other".
 #' @rdname parameter-checks
-checkSheets <- function(sheets, cop_year, tool,
-                        all_sheets = FALSE, psnuxim = FALSE) {
+checkSheets <- function(sheets,
+                        cop_year,
+                        tool,
+                        all_sheets = FALSE,
+                        operation = "schema",
+                        psnuxim = FALSE) {
 
   # Collect parameters
   sheets <- sheets %missing% NULL
@@ -622,6 +627,12 @@ checkSheets <- function(sheets, cop_year, tool,
     skips <- ""
   } else {
     skips <- skip_tabs(tool = tool, cop_year = cop_year)
+
+    skips <-
+      switch(operation,
+             pack = skips$pack,
+             unpack = skips$unpack,
+             schema = skips$schema)
   }
 
   sheets_schema <- schema %>%

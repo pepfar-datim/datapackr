@@ -113,20 +113,35 @@ dataPackName_homeCell <- function() {
 #' @param cop_year COP year for dating as well as selection of
 #' templates.
 #'
-#' @return Character vector of tab names to skip.
+#' @return List of tab names to skip.
 #'
 skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
-  if (tool %in% c("Data Pack", "Data Pack Template")) {
 
-    skip <- switch(as.character(cop_year),
-           "2021" = c("Home", "Summary", "Spectrum", "KP Validation"),
-           "2022" = c("Home", "Spectrum", "KP Validation"),
-           "2023" = c("Home", "Spectrum", "KP Validation", "Year 2"),
-            NA_character_)
-  } else if (tool %in% c("OPU Data Pack Template", "OPU Data Pack") && cop_year %in% c(2021, 2022)) {
-    skip <- c("Home")
-  } else {
-    skip <- c(NA_character_)
+  skip <- list("pack" = c(NA_character_),
+               "unpack" = c(NA_character_),
+               "schema" = c(NA_character_))
+
+  if (tool %in% c("Data Pack", "Data Pack Template")) {
+    skip$pack <-
+      switch(as.character(cop_year),
+             "2021" = c("Home", "Summary", "Spectrum", "KP Validation"),
+             "2022" = c("Home", "Spectrum", "KP Validation"),
+             "2023" = c("Home", "Spectrum", "Year 2"),
+             NA_character_)
+
+    skip$unpack <-
+      switch(as.character(cop_year),
+             "2021" = c("Home", "Summary", "Spectrum", "KP Validation"),
+             "2022" = c("Home", "Spectrum", "KP Validation"),
+             "2023" = c("Home", "Spectrum", "KP Validation"),
+             NA_character_)
+
+    skip$schema <- skip$pack[skip$pack %in% skip$unpack]
+
+  } else if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM Tool") && cop_year %in% c(2021, 2022, 2023)) {
+    skip$pack <- c("Home")
+    skip$unpack <- c("Home")
+    skip$schema <- c("Home")
   }
 
   return(skip)

@@ -38,12 +38,12 @@ getSkipSheets <- function(schema, tool, cop_year) {
 
   #Skip sheets which are defined in the schema
   schema_skip <- schema %>%
-    dplyr::filter(sheet_name %in% package_skip) %>%
+    dplyr::filter(sheet_name %in% package_skip$schema) %>%
     dplyr::select(sheet_name, sheet_num) %>%
     dplyr::distinct()
 
    list(
-    package_skip = package_skip,
+    package_skip = package_skip$schema,
     num = schema_skip$sheet_num,
     names = schema_skip$sheet_name)
 }
@@ -52,7 +52,7 @@ uid_pattern <- function() {
   "[A-Za-z][A-Za-z0-9]{10}"
 }
 multi_uid_pattern <- function() {
-  paste0("^(", uid_pattern(), ")(\\.((", uid_pattern(), ")))*$")
+  paste0("^(\\{EID\\})?(", uid_pattern(), ")(\\.((\\{KP\\})?(", uid_pattern(), ")))*$")
   }
 
 
@@ -415,12 +415,20 @@ unPackSchema <- function(template_path = NULL,
 
   if (tool %in% c("OPU Data Pack Template", "OPU Data Pack")
         && cop_year %in% c(2021, 2022)) {
-    schema <- tidyxl::xlsx_cells(path = template_path, include_blank_cells = TRUE) %>%
-      dplyr::select(sheet_name = sheet, col, row, character, formula, numeric, is_array)
+    include_blank_cells = TRUE
   } else {
-    schema <- tidyxl::xlsx_cells(path = template_path, include_blank_cells = FALSE) %>%
-      dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
+    include_blank_cells = FALSE
   }
+
+  schema <- tidyxl::xlsx_cells(path = template_path,
+                               include_blank_cells = include_blank_cells) %>%
+    dplyr::select(sheet_name = sheet,
+                  col,
+                  row,
+                  character,
+                  formula,
+                  numeric,
+                  is_array)
 
   sheet_nums <- data.frame(sheet_name = unique(schema$sheet_name), stringsAsFactors = FALSE)
   sheet_nums$sheet_num <- seq_len(NROW(sheet_nums))
@@ -432,8 +440,8 @@ unPackSchema <- function(template_path = NULL,
   if (is.null(skip)) {
     skip <- skip_tabs(tool = tool, cop_year = cop_year)
   }
-  sheets <- tidyxl::xlsx_sheet_names(template_path)
-  verbose_sheets <- sheets[!sheets %in% skip]
+  sheets <- unique(schema$sheet_name)
+  verbose_sheets <- sheets[!sheets %in% skip$schema]
 
   schema %<>%
     dplyr::filter(sheet_name %in% verbose_sheets,
@@ -580,13 +588,16 @@ unPackSchema <- function(template_path = NULL,
   schema %<>%
     dplyr::mutate(
       FY = dplyr::case_when(
-        stringr::str_detect(indicator_code, "\\.T$") ~ cop_year + 1,
-        (stringr::str_detect(indicator_code, "\\.T_1$")
-          & dataset == "impatt"
-          & !stringr::str_detect(indicator_code, "PRIORITY_SNU"))
-         ~ cop_year + 1,
+        stringr::str_detect(indicator_code, "\\.(T|M|C)$") ~ cop_year + 1,
+        # # Accommodate OGAC request to place Spectrum IMPATT data in planning FY
+        # # instead of projection year. (+1 FY)
+        # (stringr::str_detect(indicator_code, "\\.T_1$")
+        #   & dataset == "impatt"
+        #   & !stringr::str_detect(indicator_code, "PRIORITY_SNU"))
+        #  ~ cop_year + 1,
         stringr::str_detect(indicator_code, "\\.T_1$") ~ cop_year,
         stringr::str_detect(indicator_code, "\\.R$") ~ cop_year - 1,
+        stringr::str_detect(indicator_code, "\\.(T|M)2$") ~ cop_year + 2,
       # Apply default cop_year to blank cols in PSNUxIM tab
         dataset == "mer" & col_type == "target" ~ cop_year + 1,
         TRUE ~ NA_real_
@@ -605,7 +616,7 @@ unPackSchema <- function(template_path = NULL,
   skipped_schema[] <- mapply(FUN = as, skipped_schema, sapply(schema, class), SIMPLIFY = FALSE)
 
   skipped_schema %<>%
-    tibble::add_row(sheet_name = skip) %>%
+    tibble::add_row(sheet_name = skip$schema) %>%
     dplyr::mutate(valid_ages = empty, valid_sexes = empty, valid_kps = empty) %>%
     dplyr::select(-sheet_num) %>%
     dplyr::left_join(sheet_nums, by = "sheet_name")
@@ -614,7 +625,7 @@ unPackSchema <- function(template_path = NULL,
   schema <- dplyr::bind_rows(skipped_schema, schema) %>%
     dplyr::mutate(
       data_structure =
-        dplyr::case_when(sheet_name %in% skip ~ "skip",
+        dplyr::case_when(sheet_name %in% skip$schema ~ "skip",
                          TRUE ~ "normal")) %>%
     dplyr::select(sheet_num, sheet_name, data_structure, dplyr::everything()) %>%
     dplyr::arrange(sheet_num)

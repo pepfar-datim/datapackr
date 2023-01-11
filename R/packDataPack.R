@@ -20,16 +20,7 @@ packDataPack <- function(d,
       tools::file_ext(d$keychain$model_data_path) == "rds"
   )
 
-  d$data$model_data <- readRDS(d$keychain$model_data_path)
-
-  # Get Org Unit List####
-  d$data$PSNUs <- datapackr::valid_OrgUnits %>%
-    dplyr::filter(country_uid %in% d$info$country_uids) %>%
-    add_dp_label(.) %>%
-    dplyr::arrange(dp_label) %>%
-    ## Remove DSNUs
-    dplyr::filter(org_type != "DSNU") %>%
-    dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
+  d$data$model_data <- readRDS(d$keychain$model_data_path)[d$info$country_uids]
 
   # TODO: Separate PSNUs as parameter for this function, allowing you to include
   # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
@@ -38,7 +29,7 @@ packDataPack <- function(d,
   d$tool$wb <- packDataPackSheets(wb = d$tool$wb,
                                   country_uids = d$info$country_uids,
                                   ou_level = "Prioritization",
-                                  org_units = d$data$PSNUs,
+                                  org_units = NULL,
                                   model_data = d$data$model_data,
                                   schema = d$info$schema,
                                   sheets = NULL,
