@@ -638,33 +638,35 @@ test_that("Can check formulas", {
 # check disaggs ----
 test_that("Can check disaggs", {
 
-  skip("Defunct disaggs checks needs to be fixed")
+  #skip("Defunct disaggs checks needs to be fixed")
   # create minimal schema data
   d <- list()
   d$info$schema <-
     tribble(
       ~sheet_num, ~sheet_name, ~col, ~indicator_code, ~col_type, ~value_type,
-      3, "Prioritization", 1, "SNU1", "row_header", "string",
-      3, "Prioritization", 2,  "PSNU", "row_header", "string",
-      3, "Prioritization", 3, "IMPATT.PRIORITY_SNU.T_1", "past", "integer",
-      3, "Prioritization", 4,  "IMPATT.PRIORITY_SNU.T", "target", "integer",
-      3, "Prioritization", 5,  "PRIORITY_SNU.translation", "reference", "string"
+      8, "VMMC" ,1, "SNU1",  "row_header",     "string",
+      8, "VMMC" ,2, "PSNU",  "row_header",     "string",
+      8, "VMMC" ,3, "Age",   "row_header",     "string",
+      8, "VMMC" ,4, "Sex",   "row_header",     "string",
+      8, "VMMC" ,5, "ID",    "row_header",     "string",
+      8, "VMMC" ,17, "VMMC_CIRC_SUBNAT.T", "target", "integer"
     ) %>%
-    dplyr::mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
-    dplyr::mutate(valid_sexes = I(list(data.frame(id = NA, name = NA)))) %>%
+    dplyr::mutate(valid_ages = I(list(tibble(id = c("ttf9eZCHsTU", "GaScV37Kk29"), name = c("15-19", "20-24"))))) %>%
+    dplyr::mutate(valid_sexes = I(list(tibble(id = c("Qn0I5FbKQOA"), name = "Male")))) %>%
     dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
 
+
   # create minimal sheet needed
-  d$sheets$Prioritization <-
+  # vmcc with proper data note that org units are valid
+  d$sheets$VMMC <-
     tribble(
-      ~SNU1, ~PSNU, ~IMPATT.PRIORITY_SNU.T_1, ~IMPATT.PRIORITY_SNU.T, ~PRIORITY_SNU.translation,
-      "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", NA, "M", "Military",
-      "Central Region", "Lilongwe District [#SNU] [ScR9iFKAasW]", "4", "4", "Sustained",
-      "Central Region", "Dowa District [#SNU] [zphK9WV8JB4]", "4", NA, "Not a PSNU"
+      ~SNU1, ~PSNU, ~Age, ~Sex, ~ID, ~VMMC_CIRC_SUBNAT.T, #~VMMC_CIRC.R,
+      "Angola", "Bengo [#SNU] [uXwFHXCPYgj]", "15-19", "Male", "Bengo [#SNU] [uXwFHXCPYgj]|15-19|Male", "41146",
+      "Angola", "Bengo [#SNU] [uXwFHXCPYgj]", "20-24", "Male", "Bengo [#SNU] [uXwFHXCPYgj]|20-24|Male", "36043",
     )
 
   # next test
-  sheets <- c("Prioritization")
+  sheets <- c("VMMC")
 
   # test no issues
   res <- checkDisaggs(d = d, sheets = sheets)
@@ -672,21 +674,15 @@ test_that("Can check disaggs", {
   expect_equal(res$has_error, FALSE)
   rm(res)
 
-
   # test positive error
-  # add value to key pop
-  d$info$schema <-
+  # vmcc should not be female as that is an invalid disagg
+  d$sheets$VMMC <-
     tribble(
-      ~sheet_num, ~sheet_name, ~col, ~indicator_code, ~col_type, ~value_type,
-      3, "Prioritization", 1, "SNU1", "row_header", "string",
-      3, "Prioritization", 2,  "PSNU", "row_header", "string",
-      3, "Prioritization", 3, "IMPATT.PRIORITY_SNU.T_1", "past", "integer",
-      3, "Prioritization", 4,  "IMPATT.PRIORITY_SNU.T", "target", "integer",
-      3, "Prioritization", 5,  "PRIORITY_SNU.translation", "reference", "string"
-    ) %>%
-    dplyr::mutate(valid_ages = I(list(data.frame(id = NA, name = NA)))) %>%
-    dplyr::mutate(valid_sexes = I(list(data.frame(id = NA, name = NA)))) %>%
-    dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = "4"))))
+      ~SNU1, ~PSNU, ~Age, ~Sex, ~ID, ~VMMC_CIRC_SUBNAT.T, #~VMMC_CIRC.R,
+      "Angola", "Bengo [#SNU] [uXwFHXCPYgj]", "15-19", "Female", "Bengo [#SNU] [uXwFHXCPYgj]|15-19|Male", "41146",
+      "Angola", "Bengo [#SNU] [uXwFHXCPYgj]", "20-24", "Male", "Bengo [#SNU] [uXwFHXCPYgj]|20-24|Male", "36043",
+    )
+
 
   res <- checkDisaggs(d = d, sheets = sheets)
   expect_equal(nrow(res$result), 1L)
