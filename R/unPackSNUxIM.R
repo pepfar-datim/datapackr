@@ -720,7 +720,7 @@ unPackSNUxIM <- function(d) {
 
   #Test for invalid PSNUs
 
-  possible_psnus <- datapackr::valid_OrgUnits %>%
+  possible_psnus <- getValidOrgUnits(d$info$cop_year) %>%
     dplyr::filter(country_uid %in% d$info$country_uids) %>%
     dplyr::rename(psnu_uid = uid) %>%
     dplyr::pull(psnu_uid)

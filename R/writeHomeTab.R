@@ -85,7 +85,7 @@ writeHomeTab <- function(wb = NULL,
 
   # country_names ####
   country_names <-
-    check_params(country_uids = country_uids, datapack_name = NULL) %>%
+    check_params(country_uids = country_uids, datapack_name = NULL, cop_year = cop_year) %>%
     purrr::pluck("datapack_name")
 
   openxlsx::writeData(wb,

@@ -13,7 +13,7 @@ skip_tabs(tool = "Data Pack", cop_year = getCurrentCOPYear())
 templates.}
 }
 \value{
-Character vector of tab names to skip.
+List of tab names to skip.
 }
 \description{
 List of tabs to skip for given tool.

@@ -14,7 +14,7 @@
 #'
 unPackCountryUIDs <- function(submission_path,
                               tool = "Data Pack",
-                              cop_year = getCurrentCOPYear()) {
+                              cop_year) {
 
   if (!tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack", "OPU Data Pack Template")) {
     stop("Cannot unpack Country UIDs for that type of tool.")
@@ -32,6 +32,16 @@ unPackCountryUIDs <- function(submission_path,
     stringr::str_remove_all("\\s") %>%
     stringr::str_split(",") %>% #nolint
     purrr::pluck(1)
+
+
+  #If this has not been specified, we need to try and get it
+
+  cop_year <- cop_year %missing% NULL
+
+  if (is.null(cop_year)) {
+    home_tab_metadata <- unPackHomeTabMetadata(submission_path)
+    cop_year <- check_cop_year(cop_year = home_tab_metadata$cop_year)
+  }
 
   # Check that country_uids in correct cell
   if (length(country_uids) == 0) {
@@ -63,10 +73,11 @@ unPackCountryUIDs <- function(submission_path,
                 " tab. Attempting to deduce from Data Pack name on Home tab.")
        )
 
-      datapack_name <-
-        datapackr::unPackDataPackName(
+      datapack_name <- unPackDataPackName(
           submission_path = submission_path,
           tool = tool)
+
+      valid_orgunits_local <- getValidOrgUnits(cop_year)
 
       if (datapack_name == "Latin America Region") {
 
@@ -76,10 +87,10 @@ unPackCountryUIDs <- function(submission_path,
 
       } else if (datapack_name == "Caribbean Region") {
         country_uids <- c("RKoVudgb05Y", "PeOHqAwdtez", "WuxG6jzaypt", "zhJINyURZ5Y", "WSl5y9jxCpC")
-      } else if (datapack_name %in% unique(valid_OrgUnits$country_name)) {
-        country_uids <- unique(valid_OrgUnits$country_uid[valid_OrgUnits$country_name == datapack_name])
-      } else if (datapack_name %in% unique(valid_OrgUnits$ou)) {
-        country_uids <- unique(valid_OrgUnits$country_uid[valid_OrgUnits$ou == datapack_name])
+      } else if (datapack_name %in% unique(valid_orgunits_local$country_name)) {
+        country_uids <- unique(valid_orgunits_local$country_uid[valid_orgunits_local$country_name == datapack_name])
+      } else if (datapack_name %in% unique(valid_orgunits_local$ou)) {
+        country_uids <- unique(valid_orgunits_local$country_uid[valid_orgunits_local$ou == datapack_name])
       } else {
         stop("Impossible to deduce Country UIDs from submission.")
       }
@@ -149,6 +160,9 @@ unPackCountryUIDs <- function(submission_path,
 #' @return Data frame of parsed PSNUs.
 #'
 parsePSNUs <- function(submission_path, tool, cop_year) {
+
+  valid_orgunits_local <- getValidOrgUnits(cop_year)
+
   PSNUs <-
     readxl::read_excel(
       path = submission_path,
@@ -162,7 +176,7 @@ parsePSNUs <- function(submission_path, tool, cop_year) {
     # Add PSNU uid ####
   dplyr::mutate(
     psnu_uid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
-    dplyr::left_join(datapackr::valid_OrgUnits %>%
+    dplyr::left_join(valid_orgunits_local %>%
                        dplyr::select(psnu_uid = uid, country_name, country_uid),
                      by = "psnu_uid") %>%
     dplyr::filter_all(dplyr::any_vars(!is.na(.))) %>%

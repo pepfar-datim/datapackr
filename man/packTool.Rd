@@ -5,6 +5,7 @@
 \title{Pack a requested tool}
 \usage{
 packTool(
+  model_data = NULL,
   model_data_path = NULL,
   snuxim_model_data_path = NULL,
   undistributed_mer_data = NULL,
@@ -20,6 +21,8 @@ packTool(
 )
 }
 \arguments{
+\item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
+
 \item{model_data_path}{Local filepath to a Data Pack model data file.}
 
 \item{snuxim_model_data_path}{Local filepath to an SNUxIM Model Data file.}

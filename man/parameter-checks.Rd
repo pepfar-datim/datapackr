@@ -17,9 +17,9 @@
 \alias{check_params}
 \title{Standardized Parameter Defaults}
 \usage{
-check_country_uids(country_uids, force = TRUE)
+check_country_uids(country_uids, cop_year, force = TRUE)
 
-check_PSNUs(PSNUs = NULL, country_uids = NULL)
+check_PSNUs(PSNUs = NULL, country_uids = NULL, cop_year = NULL)
 
 check_cop_year(cop_year, tool)
 
@@ -29,7 +29,7 @@ check_season(season, tool)
 
 check_schema(schema, cop_year, tool, season)
 
-checkDataPackName(datapack_name, country_uids)
+checkDataPackName(datapack_name, country_uids, cop_year)
 
 checkTemplatePath(template_path, cop_year, tool, season)
 
@@ -46,7 +46,14 @@ checkOutputFolder(output_folder = NULL)
 
 checkResultsArchive(results_archive = FALSE)
 
-checkSheets(sheets, cop_year, tool, all_sheets = FALSE, psnuxim = FALSE)
+checkSheets(
+  sheets,
+  cop_year,
+  tool,
+  all_sheets = FALSE,
+  operation = "schema",
+  psnuxim = FALSE
+)
 
 check_params(
   country_uids,
@@ -70,13 +77,13 @@ check_params(
 \item{country_uids}{Unique IDs for countries to include in the Data Pack.
 For full list of these IDs, see \code{datapackr::valid_OrgUnits}.}
 
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
+
 \item{force}{logical. Should country_uids be required?}
 
 \item{PSNUs}{Dataframe of PSNUs to use in this function, containing at least
 \code{psnu_uid}.}
-
-\item{cop_year}{COP Year to use for tailoring functions. Remember,
-FY22 targets = COP21.}
 
 \item{tool}{Type of tool this function will create or interact with. Either
 \code{OPU Data Pack} or \code{Data Pack}}
@@ -103,6 +110,8 @@ processes to output_folder.}
 
 \item{all_sheets}{Logical. Return/check against all sheets (as opposed to only
 those with targets)?}
+
+\item{operation}{String. Options = "unpack", "pack", "schema", or "other".}
 
 \item{psnuxim}{Logical. Return/check against PSNUxIM tab as well?}
 
@@ -153,34 +162,44 @@ definition upfront, and then calculate the default only when this value is
 unsupplied or otherwise left \code{NULL}. The virtue of this approach is that not
 supplying this value at all still supplies \code{NULL} to the  function's internal
 logic without a \code{missing} error. In many cases, we use the following custom
-function to make this simpler and cleaner:\preformatted{`\%||\%` <- function(x, y) if (is.null(x)) y else x
-}
+function to make this simpler and cleaner:
 
-For example:\preformatted{example_function <- function(arg1 = NULL) \{
+\if{html}{\out{<div class="sourceCode">}}\preformatted{`\%||\%` <- function(x, y) if (is.null(x)) y else x
+}\if{html}{\out{</div>}}
+
+For example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{example_function <- function(arg1 = NULL) \{
   arg2 <- arg1 \%||\% 10
   arg2 + 10
 \}
 
 example_function()
 20
-}
+}\if{html}{\out{</div>}}
 
 However, in some cases within this package, \code{NULL} is an equally valid value
 that could be passed to a parameter from a higher-level function. To
 distinguish these from truly missing values, we have in some places left the
 default undefined in the function parameter and employed the following custom
-function:\preformatted{`\%missing\%` <- function(x, y = NULL) rlang::maybe_missing(x, y)
-}
+function:
 
-For example:\preformatted{example_function2 <- function(arg1) \{
+\if{html}{\out{<div class="sourceCode">}}\preformatted{`\%missing\%` <- function(x, y = NULL) rlang::maybe_missing(x, y)
+}\if{html}{\out{</div>}}
+
+For example:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{example_function2 <- function(arg1) \{
   arg1 <- arg1 \%missing\% NULL
   arg2 <- arg1 \%||\% 10
   arg2 + 10
 \}
-}
+}\if{html}{\out{</div>}}
 
 This function allows the following to return equivalent values without
-\code{missing} errors:\preformatted{test_arg <- rlang::missing_arg()
+\code{missing} errors:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{test_arg <- rlang::missing_arg()
 test_arg2 <- NULL
 example_function2()
 20
@@ -190,10 +209,12 @@ example_function2(test_arg)
 
 example_function2(test_arg2)
 20
-}
+}\if{html}{\out{</div>}}
 
 Similarly, when nested within a higher-level function, this approach also
-accommodates scenarios where \code{missing} or \code{NULL} values may be meaningful:\preformatted{example_function3 <- function(arg1, arg2) \{
+accommodates scenarios where \code{missing} or \code{NULL} values may be meaningful:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{example_function3 <- function(arg1, arg2) \{
   example_function2(arg1)
 \}
 
@@ -202,7 +223,7 @@ example_function3(arg1 = test_arg, arg2 = 3)
 
 example_function3(arg1 = test_arg2, arg2 = 3)
 20
-}
+}\if{html}{\out{</div>}}
 
 So, within this package, we alternatively use \verb{\%||\%} and \verb{\%missing\%} to
 determine default parameters based on the situation and package usage.

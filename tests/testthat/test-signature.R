@@ -2,7 +2,7 @@ context("test-signature")
 
 
 test_that("Can generate a key chain", {
-  d <- datapackr::createKeychainInfo(submission_path = test_sheet("COP21_Data_Pack_Template.xlsx"),
+  d <- createKeychainInfo(submission_path = test_sheet("COP21_Data_Pack_Template.xlsx"),
                         tool = "Data Pack",
                         country_uids = NULL,
                         cop_year = NULL,
