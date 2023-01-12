@@ -124,8 +124,7 @@ test_that("Can check sheet data...", {
    expect_true(any(grepl("In tab GEND, INVALID OR BLANK ORG UNITS", d$info$messages$message)))
    expect_true(any(grepl("ERROR! In tab Prioritization: INVALID PRIORITIZATIONS", d$info$messages$message)))
    expect_true(any(grepl("ALTERED FORMULAS", d$info$messages$message)))
-   #TODO: This is still broken
-   #expect_true(any(grepl("ERROR! In tab OVC: INVALID DISAGGS", d$info$messages$message)))
+   expect_true(any(grepl("ERROR! In tab OVC: INVALID DISAGGS", d$info$messages$message)))
 
    expect_equal(nrow(d$tests$duplicate_rows), 4L)
    expect_equal(nrow(d$tests$missing_cols), 1L)
@@ -137,8 +136,7 @@ test_that("Can check sheet data...", {
    expect_equal(nrow(d$tests$invalid_orgunits), 2L)
    expect_equal(nrow(d$tests$invalid_prioritizations), 4L)
    expect_equal(nrow(d$tests$altered_formulas), 22L)
-   #TODO: This is still broken
-   #expect_equal(nrow(d$tests$defunct_disaggs), 12L)
+   expect_equal(nrow(d$tests$defunct_disaggs), 12L)
 
   expect_true(d$info$has_error)
 })
