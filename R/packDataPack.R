@@ -18,17 +18,17 @@ packDataPack <- function(d,
   if (!is.null(model_data) && is.null(d$keychain$model_data_path)) {
     # some sort of check on the model data?
 
-
     # assign the model data
     d$data$model_data <- model_data
   } else if (is.null(model_data) && !is.null(d$keychain$model_data_path)) {
+
     # Checks and reads in Data Pack Model File ####
     stopifnot(
       "Model data file could not be read!" = canReadFile(d$keychain$model_data_path),
       "Model data is not correct file type! File must have .rds extension." =
         tools::file_ext(d$keychain$model_data_path) == "rds"
     )
-    d$data$model_data <- readRDS(d$keychain$model_data_path)
+    d$data$model_data <- readRDS(d$keychain$model_data_path)[d$info$country_uids]
   } else if (!is.null(model_data)  && !is.null(d$keychain$model_data_path)) {
     stop(
       "You have provided both a model path and model data to packTool. Please provide only one!"
@@ -39,7 +39,6 @@ packDataPack <- function(d,
     )
   }
 
-  d$data$model_data <- readRDS(d$keychain$model_data_path)[d$info$country_uids]
 
   # TODO: Separate PSNUs as parameter for this function, allowing you to include
   # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
