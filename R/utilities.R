@@ -379,7 +379,7 @@ getDatasetUids <-  function(cop_year, type) {
     unlist(use.names = FALSE) %>%
     purrr::discard(~ is.na(.))
 
-  if (is.null(datasets_filtered) || length(datasets_filtered) == 0) {
+  if (is.null(cop_datasets) || length(cop_datasets) == 0) {
     stop(paste("No datasets could be found for cop_year", cop_year, "and type(s)", type))
   }
 
