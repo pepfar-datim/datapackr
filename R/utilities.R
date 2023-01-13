@@ -274,8 +274,13 @@ getDatasetUids <-  function(cop_year, type) {
   #Convert to cop_year everywhere
 
   #cop_year <- check_cop_year(cop_year = cop_year)
+  #moved check down into logic
 
-     cop_datasets <- list(
+  type <- type %missing% c("mer_targets", "mer_results",
+                           "subnat_targets", "subnat_results",
+                           "impatt")
+
+  datasets_filtered <- list(
          "2022" = list(
              "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
                                  "o71WtN5JrUu", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
@@ -318,72 +323,21 @@ getDatasetUids <-  function(cop_year, type) {
                                  "mbdbMiLZ4AA"), # Host Country Results: DREAMS (USG) FY2020Q4
              "subnat_targets" = "N4X89PgW01w",
              "subnat_results" = "ctKXzmv2CVu",
-             "impatt" = "pTuDWXzkAkJ"))
+             "impatt" = "pTuDWXzkAkJ"))%>%
 
+       msg <- paste("COP Data cannot be retreieved for ",cop_year)
+       stopifnot(msg = cop_year %in% names(datasets_filtered))%>%
 
-      msg <- paste("COP Data cannot be retreieved for ",cop_year)
-      stopifnot(msg = cop_year %in% names(cop_datasets))
-
-  type <- type %missing% c("mer_targets", "mer_results",
-                           "subnat_targets", "subnat_results",
-                           "impatt")
-
-  # datasets_filtered <-
-  #   list(
-  #     "2022" = list(
-  #       "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
-  #                           "o71WtN5JrUu", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
-  #                           "vzhO50taykm"), # Host Country Targets: DREAMS (USG)
-  #       "mer_results" = NA,
-  #       "subnat_targets" = "J4tdiDEi08O",
-  #       "subnat_results" = NA,
-  #       "impatt" = "CxMsvlKepvE"),
-  #     "2021" = list(
-  #       "mer_targets" =   c("YfZot37BbTm", # MER Target Setting: PSNU (Facility and Community Combined) FY2022
-  #                           "cihuwjoY5xP", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
-  #                           "wvnouBMuLuE"), # Host Country Targets: DREAMS (USG) FY2022),
-  #       "mer_results" = c("BHlhyPmRTUY", # MER Results: Facility Based
-  #                         "HfhTPdnRWES", # MER Results: Community Based
-  #                         "MGNVwVicMVm"), # Host Country Results: DREAMS (USG),
-  #       "subnat_targets" = "Va7TYyHraRn",
-  #       "subnat_results" = "IXiORiVFqIv",
-  #       "impatt" = "Zn27xns9Fmx"),
-  #     "2020" = list(
-  #       "mer_targets" =   c("Pmc0yYAIi1t", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2021
-  #                            "s1sxJuqXsvV"),  # MER Target Setting: PSNU
-  #                                             #(Facility and Community Combined) - DoD ONLY) FY2021,
-  #                                             # Host Country Targets: DREAMS (USG) FY2022),
-  #       "mer_results" =   c("zL8TlPVzEBZ", # MER Results: Facility Based FY2021Q4
-  #                           "TBcmmtoaCBC", # MER Results: Community Based FY2021Q4
-  #                           "qHyrHc4zwx4"), # Host Country Results: DREAMS (USG) FY2021Q4
-  #       "subnat_targets" = "j7jzezIhgPj",
-  #       "subnat_results" = "xiTCzZJ2GPP",
-  #       "impatt" = "jxnjnBAb1VD"),
-  #     "2019" = list(
-  #       "mer_targets" = c("sBv1dj90IX6", # MER Targets: Facility Based FY2020
-  #                       "nIHNMxuPUOR", # MER Targets: Community Based FY2020
-  #                       "C2G7IyPPrvD", # MER Targets: Community Based - DoD ONLY FY2020
-  #                       "HiJieecLXxN"), # MER Targets: Facility Based - DoD ONLY FY2020
-  #         "mer_results" =   c("qzVASYuaIey", # MER Results: Community Based FY2020Q4
-  #                             "BPEyzcDb8fT", # MER Results: Community Based - DoD ONLY FY2021Q4
-  #                             "jKdHXpBfWop", # MER Results: Facility Based FY2020Q4
-  #                              "em1U5x9hhXh", # MER Results: Facility Based - DoD ONLY FY2021Q4
-  #                              "mbdbMiLZ4AA"), # Host Country Results: DREAMS (USG) FY2020Q4
-  #         "subnat_targets" = "N4X89PgW01w",
-  #         "subnat_results" = "ctKXzmv2CVu",
-  #         "impatt" = "pTuDWXzkAkJ")) %>%
-
-  cop_datasets %>%
     purrr::pluck(as.character(cop_year)) %>%
     .[type] %>%
     unlist(use.names = FALSE) %>%
     purrr::discard(~ is.na(.))
 
-  if (is.null(cop_datasets) || length(cop_datasets) == 0) {
+  if (is.null(datasets_filtered) || length(datasets_filtered) == 0) {
     stop(paste("No datasets could be found for cop_year", cop_year, "and type(s)", type))
   }
 
-  cop_datasets
+  datasets_filtered
   }
 
 #' @export
