@@ -383,7 +383,7 @@ getDatasetUids <-  function(cop_year, type) {
     stop(paste("No datasets could be found for cop_year", cop_year, "and type(s)", type))
   }
 
-  datasets_filtered
+  cop_datasets
   }
 
 #' @export
