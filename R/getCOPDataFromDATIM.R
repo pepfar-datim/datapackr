@@ -54,13 +54,13 @@ getCOPDataFromDATIM <- function(country_uids,
   datim_data <-
     tryCatch({
       datimutils::getDataValueSets(parameters$key,
-                     parameters$value,
-                     d2_session = d2_session)},
-             error = function(cond) {
-               message(cond)
-               warning("Could not retreive COP data from DATIM")
-               return(NULL)
-             })
+                                   parameters$value,
+                                   d2_session = d2_session)},
+      error = function(cond) {
+        message(cond)
+        warning("Could not retreive COP data from DATIM")
+        return(NULL)
+      })
 
   if (is.null(datim_data)) {
     return(NULL)
