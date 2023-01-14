@@ -258,28 +258,34 @@ addcols <- function(data, cnames, type = "character") {
 
 
 #' @export
-#' @title getDatasetUids
+#' @title getCOPDatasetUids
 #'
 #' @description returns character vector of dataset uids for a given FY:
 #' {"2019", "2020", ... , "2023"}
 #' and type {"mer_targets", "mer_results", "subnat_targets", "subnat_results",
 #' "impatt"}
-#' @param type character vector - one or more of:
+#' @param datastream character vector - one or more of:
 #' {"mer_targets", "mer_results", "subnat_targets", "subnat_results", "impatt"}
 #' @inheritParams datapackr_params
 #' @return returns a character vector of the related dataset uids
 #'
-getDatasetUids <-  function(cop_year, type) {
+getCOPDatasetUids <-  function(cop_year, datastreams) {
 
-  #Convert to cop_year everywhere
 
-  # cop_year <- check_cop_year(cop_year = cop_year)
+  #Datastream validation
+  all_datastreams <- c("mer_targets", "mer_results",
+                 "subnat_targets", "subnat_results",
+                 "impatt")
+  datastreams <- datastreams %missing% all_datastreams
 
-  type <- type %missing% c("mer_targets", "mer_results",
-                           "subnat_targets", "subnat_results",
-                           "impatt")
+  stopifnot("You must specify a vector of dataset types" = is.vector(datastreams))
 
-  datasets_filtered <-
+  if (!(all(datastreams %in% all_datastreams))) {
+    stop(paste("Could not find a data stream for", paste(datastreams, sep = "", collapse = ",")))
+  }
+
+  #List of COP Datasets by year
+  cop_datasets <-
     list(
       "2022" = list(
         "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
@@ -322,14 +328,32 @@ getDatasetUids <-  function(cop_year, type) {
                             "mbdbMiLZ4AA"), # Host Country Results: DREAMS (USG) FY2020Q4
         "subnat_targets" = "N4X89PgW01w",
         "subnat_results" = "ctKXzmv2CVu",
-        "impatt" = "pTuDWXzkAkJ")) %>%
+        "impatt" = "pTuDWXzkAkJ"))
+
+
+  # If cop_year is NULL or missing, use default from package
+  cop_year <- cop_year %missing% NULL
+  cop_year <- cop_year %||% getCurrentCOPYear()
+
+  if (length(cop_year) > 1) {
+    stop("You must specify a single COP Year")
+  }
+
+  if (!(cop_year %in% names(cop_datasets))) {
+    stop(paste("There are no COP datasets for ", cop_year))
+  }
+
+
+    datasets_filtered <- cop_datasets %>%
     purrr::pluck(as.character(cop_year)) %>%
-    .[type] %>%
+    .[datastreams] %>%
     unlist(use.names = FALSE) %>%
     purrr::discard(~ is.na(.))
 
   if (is.null(datasets_filtered) || length(datasets_filtered) == 0) {
-    stop(paste("No datasets could be found for cop_year", cop_year, "and type(s)", type))
+    stop(paste("No datasets could be found for cop_year",
+               cop_year, "and type(s)",
+               paste(datastreams, sep = "", collapse = ",")))
   }
 
   datasets_filtered
