@@ -31,7 +31,7 @@ getCOPDataFromDATIM <- function(country_uids,
   # COP21/FY22 datapack
   # need to be able to grab dataelements from FY22 subnat targets dataset for FY21 period
   if (cop_year == 2020 && "subnat_targets" %in% datastreams) {
-    dataset_uids <-  c(dataset_uids, getDatasetUids(2021, "subnat_targets"))
+    dataset_uids <-  c(dataset_uids, getCOPDatasetUids(2021, "subnat_targets"))
   }
 
 
