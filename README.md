@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/pepfar-datim/datapackr.svg?style=shield)](https://app.circleci.com/insights/github/pepfar-datim/datapackr/)
+
 # datapackr: A package for packing and unpacking Data Packs.
 
 **Repo Owner:** Scott Jackson [@jacksonsj](https://github.com/jacksonsj)
@@ -38,4 +40,4 @@ d <- unPackData()
 
 Have a question? Find us on [GitHub](https://github.com/pepfar-datim/datapackr/issues/new) or [DATIM Support](https://datim.zendesk.com) (DATIM users only).
 
-[![CircleCI](https://circleci.com/gh/pepfar-datim/datapackr.svg?style=shield)](https://app.circleci.com/insights/github/pepfar-datim/datapackr/)
+

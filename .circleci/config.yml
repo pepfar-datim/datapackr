@@ -15,7 +15,7 @@ jobs:
             sudo apt-get -qq -y install libcurl4-openssl-dev libxml2-dev libsodium-dev libgit2-dev libreoffice-calc-nogui
       - run:
           name: Install package dependencies
-          command: R -e "install.packages('renv')"
+          command: R -e "install.packages(c('renv','covr'))"
       - run:
           name: Restore from lock file
           command: R -e "options(renv.consent = TRUE); renv::restore()"
