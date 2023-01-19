@@ -137,7 +137,7 @@ packForDATIM <- function(d, type = NULL) {
          PSNUxIM = {d$datim$MER <- data},
          SUBNAT_IMPATT = {d$datim$subnat_impatt <- data},
          `OPU PSNUxIM` = {d$datim$OPU <- data},
-         `Undistributed MER` = {d$datim$UndistributedMER <- data})
+         `Undistributed MER` = {d$data$UndistributedMER <- data})
   # nolint end
 
 

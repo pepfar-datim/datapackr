@@ -265,7 +265,7 @@ pick_template_path <- function(cop_year, tool) {
 #' @param snuxim_model_data Export from DATIM needed to allocate data across
 #' mechanisms in the PSNUxIM tab.
 #' @param snuxim_model_data_path Local filepath to an SNUxIM Model Data file.
-#' @param undistributed_mer_data Data from the \code{d$datim$UndistributedMER}
+#' @param undistributed_mer_data Data from the \code{d$data$UndistributedMER}
 #' dataset that can be provided while generating an OPU tool such that the
 #' targets to be distributed will be sourced from this file.
 #' @param SNUxIM SNUxIM dataset extract from unPackSNUxIM
