@@ -32,6 +32,9 @@ jobs:
           command: |
             R -e "devtools::check(error_on='error')"
       - run:
+          name: Calculate code coverage
+          command: r -e 'covr::codecov()'
+      - run:
           name: Lint packages
           command: |
             R -e "foo<-unique(names(lintr::lint_package())); if ( length(foo) > 0 ) stop(foo)"
