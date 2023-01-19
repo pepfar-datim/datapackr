@@ -52,3 +52,16 @@ test_that("Can do nothing if message and level are empty", {
 
 }
 )
+
+test_that("Can error on if messages are not a vector", {
+
+  foo <- MessageQueue()
+  message <- c(NA, NULL, "")
+  level <- c(NULL, "", NA)
+  messages_df <- data.frame(message = message, level = level)
+  expect_error(appendMessage(foo, messages_df, level))
+
+  messages_list <- list(message = message, level = level)
+  expect_error(appendMessage(foo, messages_list, level))
+
+})
