@@ -12,7 +12,7 @@ test_that("Can error on a NA message with a level", {
   message <- c("INFO: Hello", NA_character_)
   level <- c("INFO", "WARNING")
 
-  expect_warning( foo <- appendMessage(foo, message, level))
+  expect_warning(foo <- appendMessage(foo, message, level))
   expect_equal("INFO: Hello", foo$message)
   expect_equal("INFO", foo$level)
 
@@ -26,8 +26,8 @@ test_that("Can proceed without a level if there is a message", {
   level <- c("INFO", NA)
 
   expect_warning(foo <- appendMessage(foo, message, level))
-  expect_setequal(message,foo$message)
-  expect_setequal(c("INFO","UNKNOWN"), foo$level)
+  expect_setequal(message, foo$message)
+  expect_setequal(c("INFO", "UNKNOWN"), foo$level)
   })
 
 test_that("Can append a simple message", {

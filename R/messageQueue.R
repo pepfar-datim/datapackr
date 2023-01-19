@@ -51,7 +51,7 @@ appendMessage.MessageQueue <- function(x, message = NA, level = NA) {
   }
 
 
-  empty_messages <- sapply(message,is_empty)
+  empty_messages <- sapply(message, is_empty)
   empty_levels <- sapply(level, is_empty)
 
   #Do nothing if everything is blank
@@ -78,7 +78,7 @@ appendMessage.MessageQueue <- function(x, message = NA, level = NA) {
   #Check to see if the message and level match.
   #If they don't issue a warning
 
-  inconsistent_messages <- mapply(function(m,l)  !grepl(l,substring(m,first=0,last=20)), message, level )
+  inconsistent_messages <- mapply(function(m, l)  !grepl(l, substring(m, first = 0, last = 20)), message, level)
 
   if (any(inconsistent_messages)) {
 
