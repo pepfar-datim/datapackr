@@ -47,7 +47,6 @@ checkHasPSNUxIM <- function(d) {
 #'
 #' @return Modified d object with documented and missing SNUxIM combos
 #'
-#' @example
 extractSNUxIMCombos <- function(d) {
 
   if (is.null(d$data$SNUxIM)) {

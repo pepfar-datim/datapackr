@@ -254,7 +254,7 @@ compareData_OpuDatapackVsDatim <-
 
 
     # Get mer target data from DATIM using data value sets
-    dataset_uids <- getDatasetUids(d$info$cop_year,
+    dataset_uids <- getCOPDatasetUids(d$info$cop_year,
                                    c("mer_targets"))
 
     # package parameters for getDataValueSets function call
