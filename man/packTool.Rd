@@ -5,6 +5,7 @@
 \title{Pack a requested tool}
 \usage{
 packTool(
+  model_data = NULL,
   model_data_path = NULL,
   snuxim_model_data_path = NULL,
   undistributed_mer_data = NULL,
@@ -20,11 +21,13 @@ packTool(
 )
 }
 \arguments{
+\item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
+
 \item{model_data_path}{Local filepath to a Data Pack model data file.}
 
 \item{snuxim_model_data_path}{Local filepath to an SNUxIM Model Data file.}
 
-\item{undistributed_mer_data}{Data from the \code{d$data$UndistributedMER}
+\item{undistributed_mer_data}{Data from the \code{d$datim$UndistributedMER}
 dataset that can be provided while generating an OPU tool such that the
 targets to be distributed will be sourced from this file.}
 
