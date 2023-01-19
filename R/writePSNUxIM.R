@@ -192,7 +192,7 @@ writePSNUxIM <- function(d,
                      d2_session = d2_session)
 
     d$tool$wb <- r$wb
-    d$info$messages <- appendMessage(d$info$messages, r$info$message$messages, r$info$message$level)
+    d$info$messages <- appendMessage(d$info$messages, r$info$messages$message, r$info$messages$level)
     d$info$newSNUxIM <- TRUE
 
   }
