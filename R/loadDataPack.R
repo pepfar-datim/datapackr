@@ -42,7 +42,7 @@ loadDataPack <- function(submission_path = NULL,
                   " ", d$info$tool,
                   " for ", d$info$datapack_name, ".")
 
-    print(msg)
+    interactive_print(msg)
   }
 
   d

@@ -58,7 +58,7 @@ exportPackr <- function(data, output_folder, tool, datapack_name) {
     saveRDS(data, output_file_name)
   }
 
-  print(paste0("Successfully saved ", tool, " to ", output_file_name))
+  interactive_print(paste0("Successfully saved ", tool, " to ", output_file_name))
   #Return this for testing purposes
   output_file_name
 }
