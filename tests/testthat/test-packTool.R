@@ -4,8 +4,10 @@ context("Create a COP22 Data Pack")
 
 test_that("Can pack a datapack", {
 
+    #  skip("Need to supply a valid model here")
       # For Generating Individual Data Packs ####
       generation_list <- c("Eswatini")
+      cop_year <- 2022
 
       pick <- datapackr::COP21_datapacks_countries %>%
         dplyr::filter(datapack_name %in% generation_list) %>%
@@ -27,7 +29,7 @@ test_that("Can pack a datapack", {
                     template_path = NULL,
                     model_data_path = NULL,
                     model_data = model_data,
-                    cop_year = 2022,
+                    cop_year = cop_year,
                     output_folder = output_folder,
                     results_archive = FALSE,
                     expand_formulas = TRUE,

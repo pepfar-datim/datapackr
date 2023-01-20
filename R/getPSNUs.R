@@ -23,6 +23,7 @@ getDataPackOrgUnits <- function(include_mil = TRUE,
                                 include_DREAMS = TRUE,
                                 additional_fields = NULL,
                                 use_cache = TRUE,
+                                cop_year = NULL,
                                 d2_session = dynGet("d2_default_session",
                                                     inherits = TRUE)) {
 
@@ -32,7 +33,7 @@ getDataPackOrgUnits <- function(include_mil = TRUE,
       stop("Sorry, can't use additional_fields and use_cache at the same time.")
     }
 
-    orgunits <- valid_OrgUnits
+    orgunits <- getValidOrgUnits(cop_year)
 
     if (!include_mil) {
       orgunits %<>%

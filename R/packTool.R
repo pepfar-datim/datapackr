@@ -48,7 +48,7 @@ packTool <- function(model_data = NULL,
   options("openxlsx.numFmt" = "#,##0")
 
   # Create data sidecar ####
-  d <- datapackr::createDataPack(datapack_name = datapack_name,
+  d <- createDataPack(datapack_name = datapack_name,
                                  country_uids = country_uids,
                                  template_path = template_path,
                                  cop_year = cop_year,

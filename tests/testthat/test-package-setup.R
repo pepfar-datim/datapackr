@@ -204,14 +204,17 @@ test_that("We can check datapack paramaters", {
 
   # datapack_name ####
   # Test valid combination
-  test_args <- list(datapack_name = "Zambia", country_uids = "f5RoebaDLMx")
+  test_args <- list(datapack_name = "Zambia", country_uids = "f5RoebaDLMx", cop_year = 2022)
   test_params <- do.call(check_params, test_args)
   expect_true(identical(sort(unlist(test_params)), sort(unlist(test_args))))
 
   # This will return a handled error, but will NOT return "Global"
   expect_error(test_params <-
-                 check_params(datapack_name = NULL, country_uids = NULL
+                 check_params(datapack_name = NULL, country_uids = NULL, cop_year = 2022,
                  ), "Must supply valid country_uids.")
+
+
+
 
   # Expect a message if datapack_name and country_uids do not match (but allow
   # custom names)

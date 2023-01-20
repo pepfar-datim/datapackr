@@ -415,9 +415,9 @@ unPackSchema <- function(template_path = NULL,
 
   if (tool %in% c("OPU Data Pack Template", "OPU Data Pack")
         && cop_year %in% c(2021, 2022)) {
-    include_blank_cells = TRUE
+    include_blank_cells <-  TRUE
   } else {
-    include_blank_cells = FALSE
+    include_blank_cells <-  FALSE
   }
 
   schema <- tidyxl::xlsx_cells(path = template_path,

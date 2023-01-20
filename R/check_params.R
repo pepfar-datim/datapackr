@@ -125,21 +125,25 @@ NULL
 #' @export
 #' @param force logical. Should country_uids be required?
 #' @rdname parameter-checks
-check_country_uids <- function(country_uids, force = TRUE) {
+check_country_uids <- function(country_uids, cop_year, force = TRUE) {
 
   country_uids <- country_uids %missing% NULL
+  cop_year <- cop_year %missing% NULL
+  cop_year %<>% check_cop_year(cop_year = cop_year)
+
+  valid_orgunits_local <- getValidOrgUnits(cop_year)
 
   # If any country_uids are invalid, warn but remove and still move on.
-  if (any(!country_uids %in% valid_OrgUnits$country_uid)) {
+  if (any(!country_uids %in% valid_orgunits_local$country_uid)) {
     # subset submitted list base on it values NOT being in valid_OrgUnits
-    invalid_country_uids <- country_uids[!country_uids %in% valid_OrgUnits$country_uid]
+    invalid_country_uids <- country_uids[!country_uids %in% valid_orgunits_local$country_uid]
 
     interactive_message(
       paste0("The following supplied country_uids appear to be invalid and will be removed: ",
              paste_oxford(invalid_country_uids, final = "&"))
     )
     # subset submitted list base on it values being in valid_OrgUnits
-    country_uids <- country_uids[country_uids %in% valid_OrgUnits$country_uid]
+    country_uids <- country_uids[country_uids %in% valid_orgunits_local$country_uid]
 
     if (length(country_uids) == 0) {
       interactive_message(
@@ -161,7 +165,7 @@ check_country_uids <- function(country_uids, force = TRUE) {
                "selected force = FALSE, all country_uids have been returned.")
       )
 
-      country_uids <- unique(valid_OrgUnits$country_uid)
+      country_uids <- unique(valid_orgunits_local$country_uid)
     }
   }
 
@@ -171,17 +175,21 @@ check_country_uids <- function(country_uids, force = TRUE) {
 
 #' @export
 #' @rdname parameter-checks
-check_PSNUs <- function(PSNUs = NULL, country_uids = NULL) {
+check_PSNUs <- function(PSNUs = NULL, country_uids = NULL, cop_year = NULL) {
   # TODO: Update how we use PSNUs everywhere to use a character vector of uids
   #   instead of dataframe of all metadata
 
+  cop_year <- cop_year %missing% NULL
+  cop_year %<>% check_cop_year(cop_year = cop_year)
+
+  valid_orgunits_local <- getValidOrgUnits(cop_year)
   # If no country_uids provided, return PSNUs across all country_uids.
   country_uids <- country_uids %missing% NULL
-  country_uids %<>% check_country_uids(force = FALSE)
+  country_uids %<>% check_country_uids(cop_year = cop_year, force = FALSE)
 
   # If PSNUs not provided, fill with all PSNUs
   if (is.null(PSNUs)) {
-    PSNUs <- datapackr::valid_OrgUnits %>% #found in data/
+    PSNUs <- valid_orgunits_local %>%
       dplyr::filter(., country_uid %in% country_uids) %>%
       add_dp_psnu(.) %>%
       dplyr::arrange(dp_label) %>%
@@ -189,9 +197,9 @@ check_PSNUs <- function(PSNUs = NULL, country_uids = NULL) {
   } else {
     # If PSNUs is provided, check to make sure these are all valid.
     # Warn and remove invalid PSNu's as needed.
-    if (any(!PSNUs$psnu_uid %in% valid_OrgUnits$uid)) {
+    if (any(!PSNUs$psnu_uid %in% valid_orgunits_local$uid)) {
       invalid_PSNUs <- PSNUs %>%
-        dplyr::filter(!psnu_uid %in% valid_OrgUnits$uid) %>%
+        dplyr::filter(!psnu_uid %in% valid_orgunits_local$uid) %>%
         add_dp_label(.) %>%
         dplyr::arrange(dp_label) %>%
         dplyr::select(PSNU = dp_label, psnu_uid)
@@ -202,7 +210,7 @@ check_PSNUs <- function(PSNUs = NULL, country_uids = NULL) {
                paste_dataframe(invalid_PSNUs)))
 
       PSNUs <- PSNUs %>%
-        dplyr::filter(psnu_uid %in% valid_OrgUnits$uid)
+        dplyr::filter(psnu_uid %in% valid_orgunits_local$uid)
     }
   }
 
@@ -231,12 +239,13 @@ check_cop_year <- function(cop_year, tool) {
                 "."))
   }
 
+  #TODO: @jacksons Do we need to check the tool here??
   # Check other parameters
-  tool <- tool %missing% NULL
-  tool_provided <- !is.null(tool)
-  if (tool_provided) {
-    tool <- check_tool(tool = tool, cop_year = cop_year)
-  }
+  #tool <- tool %missing% NULL
+  #tool_provided <- !is.null(tool)
+  #if (tool_provided) {
+  #  tool <- check_tool(tool = tool, cop_year = cop_year)
+  #}
 
   cop_year
 }
@@ -255,8 +264,10 @@ check_tool <- function(tool, season, cop_year) {
   season <- season %missing% NULL
   season_provided <- !is.null(season)
 
+
   cop_year <- cop_year %missing% NULL
   cop_year_provided <- !is.null(cop_year)
+
 
   # Rule out any bogus tools so only NULL or valid tools remain.
   if (tool_provided) {
@@ -268,6 +279,7 @@ check_tool <- function(tool, season, cop_year) {
 
   # Validate cop_year and season, if provided.
   if (cop_year_provided) cop_year %<>% check_cop_year()
+
   if (season_provided) {
     season %<>% check_season(season = ., tool = tool)
     deduced_tool <- switch(season, "OPU" = "OPU Data Pack", "COP" = "Data Pack")
@@ -407,9 +419,14 @@ check_schema <- function(schema, cop_year, tool, season) {
 
 #' @export
 #' @rdname parameter-checks
-checkDataPackName <- function(datapack_name, country_uids) {
+checkDataPackName <- function(datapack_name, country_uids, cop_year) {
 
-  valid_dp_names <- c(unique(valid_OrgUnits$country_name), "Caribbean Region", "Central America and Brazil")
+  # If cop_year is NULL or missing, use default from package
+  cop_year <- cop_year %missing% NULL
+  cop_year <- cop_year %||% getCurrentCOPYear()
+
+  valid_orgunits_local <- getValidOrgUnits(cop_year)
+  valid_dp_names <- c(unique(valid_orgunits_local$country_name), "Caribbean Region", "Central America and Brazil")
 
   # Collect parameters
   datapack_name <- datapack_name %missing% NULL
@@ -419,7 +436,7 @@ checkDataPackName <- function(datapack_name, country_uids) {
   country_uids_provided <- !is.null(country_uids)
 
   if (country_uids_provided) {
-    country_uids %<>% check_country_uids()
+    country_uids %<>% check_country_uids(cop_year = cop_year)
 
     caribbean <- c("RKoVudgb05Y", "PeOHqAwdtez", "WuxG6jzaypt",
                    "zhJINyURZ5Y", "WSl5y9jxCpC")
@@ -432,7 +449,7 @@ checkDataPackName <- function(datapack_name, country_uids) {
     } else if (all(country_uids %in% central_america)) {
       expected_dpname <- "Central America and Brazil"
     } else {
-      expected_dpname <- valid_OrgUnits %>%
+      expected_dpname <- valid_orgunits_local %>%
         dplyr::filter(country_uid %in% country_uids) %>%
         dplyr::pull(country_name) %>%
         unique() %>%
@@ -549,11 +566,11 @@ checkWB <- function(wb = NULL,
                     template_path = NULL) {
 
   if (is.null(wb)) {
-    country_uids <- check_country_uids(country_uids)
-    cop_year <- check_cop_year(cop_year)
-    tool <- check_tool(tool)
-    datapack_name <- checkDataPackName(datapack_name, country_uids)
-    template_path <- checkTemplatePath(template_path, cop_year, tool)
+    country_uids <- check_country_uids(country_uids = country_uids, cop_year = cop_year)
+    cop_year <- check_cop_year(cop_year = cop_year)
+    tool <- check_tool(tool = tool, cop_year = cop_year)
+    datapack_name <- checkDataPackName(datapack_name = datapack_name, country_uids = country_uids, cop_year = cop_year)
+    template_path <- checkTemplatePath(template_path = template_path, cop_year = cop_year, tool = tool)
 
     d <- createDataPack(datapack_name = datapack_name,
                         country_uids = country_uids,
@@ -692,19 +709,20 @@ check_params <- function(country_uids,
 
   dots <- list(...)
 
-  # Check Country UIDs ####
-  if (!missing(country_uids)) {
-    params$country_uids <- check_country_uids(country_uids, ...)
-  }
-
-  # Check PSNUs ####
-  if (!missing(PSNUs)) {
-    params$PSNUs <- check_PSNUs(PSNUs, country_uids)
-  }
 
   # Check cop_year ####
   if (!missing(cop_year)) {
     params$cop_year <- check_cop_year(cop_year)
+  }
+
+  # Check Country UIDs ####
+  if (!missing(country_uids)) {
+    params$country_uids <- check_country_uids(country_uids, cop_year, ...)
+  }
+
+  # Check PSNUs ####
+  if (!missing(PSNUs)) {
+    params$PSNUs <- check_PSNUs(PSNUs, country_uids, cop_year)
   }
 
   # Check tool ####
@@ -727,7 +745,8 @@ check_params <- function(country_uids,
 
   # Check datapack_name ####
   if (!missing(datapack_name)) {
-    params$datapack_name <- checkDataPackName(datapack_name, country_uids)
+    params$datapack_name <- checkDataPackName(datapack_name = datapack_name,
+    country_uids = country_uids, cop_year = cop_year)
   }
 
   # Check template path ####

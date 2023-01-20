@@ -9,9 +9,7 @@ prepareMemoMetadata <- function(d, memo_type,
                                   d2_session = dynGet("d2_default_session",
                                                       inherits = TRUE)) {
 
-  #This is still not sensitive to the COP year
-  #TODO: maybe valid_PSNUs a function of the COP year
-  d$info$psnus <- datapackr::valid_OrgUnits %>%
+  d$info$psnus <- getValidOrgUnits(d$info$cop_year) %>%
     dplyr::filter(country_uid %in% d$info$country_uids) %>%
     dplyr::select(ou, country_name, snu1, psnu = name, psnu_uid = uid)
 
@@ -44,7 +42,7 @@ prepareMemoMetadata <- function(d, memo_type,
 
   if (memo_type %in% c("datim", "comparison")) {
     #Get the existing prioritization
-    d$memo$datim$prios <- fetchPrioritizationTable(d$info$psnus,
+    d$memo$datim$prios <- fetchPrioritizationTable(d$info$psnus$psnu_uid,
                                                      d$info$cop_year,
                                                      d2_session)
   }
@@ -125,6 +123,7 @@ prepareMemoDataByPSNU <- function(analytics,
                                   prios,
                                   partners_agencies,
                                   psnus,
+                                  cop_year,
                                   n_cores = getMaxCores()) {
    #Now we need to calculate the indicators
 
@@ -153,7 +152,7 @@ prepareMemoDataByPSNU <- function(analytics,
 
   #Prepare the full list of prioritization PSNUs
   #These functions are reused from adorn_import_file
-  prio_map <- getPSNUInfo(df$psnu_uid) %>%
+  prio_map <- getPSNUInfo(df$psnu_uid, cop_year = cop_year) %>%
     dplyr::select(psnu_uid, uid) %>%
     dplyr::left_join(prios, by = c("psnu_uid" = "orgUnit")) %>%
     #Remove any invalid prioritizations
@@ -485,6 +484,7 @@ prepareMemoData <- function(d,
           prios = d$memo$datim$prios,
           partners_agencies = d$memo$partners_agencies,
           psnus = d$info$psnus,
+          cop_year = d$info$cop_year,
           n_cores = n_cores
         )
 
@@ -515,6 +515,7 @@ prepareMemoData <- function(d,
                               prios = d$memo$datapack$prios,
                               partners_agencies = d$memo$partners_agencies,
                               psnus = d$info$psnus,
+                              cop_year = d$info$cop_year,
                               n_cores = n_cores)
 
       d$memo$datapack$by_partner <-

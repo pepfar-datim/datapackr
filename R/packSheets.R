@@ -40,7 +40,7 @@ packDataPackSheets <- function(wb,
   # Get org_units to write into Data Pack based on provided parameters. ####
   if (is.null(org_units)) {
     if (ou_level == "Prioritization") {
-      org_units <- datapackr::valid_OrgUnits %>%
+      org_units <- getValidOrgUnits(cop_year) %>%
         dplyr::filter(country_uid %in% country_uids) %>%
         add_dp_label(.) %>%
         dplyr::arrange(dp_label) %>%
@@ -116,7 +116,7 @@ packDataPackSheets <- function(wb,
     }
 
     if (sheet == "AGYW") {
-      org_units_sheet <- datapackr::valid_OrgUnits %>% # Load in valid_PSNUs list from package
+      org_units_sheet <- getValidOrgUnits(cop_year) %>% # Load in valid_PSNUs list from package
         dplyr::filter(country_uid %in% country_uids) %>%
         add_dp_label(.) %>%
         dplyr::arrange(dp_label) %>% # Order rows based on dp_psnu col values

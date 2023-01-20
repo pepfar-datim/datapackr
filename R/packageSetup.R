@@ -138,7 +138,8 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 
     skip$schema <- skip$pack[skip$pack %in% skip$unpack]
 
-  } else if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM Tool") && cop_year %in% c(2021, 2022, 2023)) {
+  } else if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM Tool") &&
+             cop_year %in% c(2021, 2022, 2023)) {
     skip$pack <- c("Home")
     skip$unpack <- c("Home")
     skip$schema <- c("Home")
