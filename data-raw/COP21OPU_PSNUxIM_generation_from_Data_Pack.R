@@ -11,7 +11,7 @@ d1 <- unPackTool()
 
 d2 <- packTool(model_data_path = model_data_path,
                snuxim_model_data_path = snuxim_model_data_path,
-               undistributed_mer_data = d1$data$UndistributedMER,
+               undistributed_mer_data = d1$datim$UndistributedMER,
                tool = "OPU Data Pack",
                datapack_name = d1$info$datapack_name,
                country_uids = d1$info$country_uids,

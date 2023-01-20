@@ -45,26 +45,55 @@ appendMessage <- function(x, message, level) {
 
 appendMessage.MessageQueue <- function(x, message = NA, level = NA) {
 
+  if (!is.vector(message) || is.list(message)) {
+    stop("Please supply a vector of messages")
+  }
+
+  if (!is.vector(level) || is.list(level)) {
+    stop("Please supply a vector of levels")
+  }
+
   if (length(message) != length(level)) {
     stop("Messages and warnings must be of the same length")
   }
 
-  if (any(is.na(message))) {
-    warning("Empty message detected.")
+
+  empty_messages <- sapply(message, is_empty)
+  empty_levels <- sapply(level, is_empty)
+
+  #Do nothing if everything is blank
+  if (all(empty_messages) && all(empty_levels)) {
+    return(x)
   }
 
-  if (any(is.na(level))) {
-    level[is.na(level)] <- "UNKNOWN"
+  if (any(empty_levels)) {
+    warning("Empty level detected.")
+    level[empty_levels] <- "UNKNOWN"
+  }
+
+
+  if (any(empty_messages)) {
+    warning("Empty message detected.")
+    message <- message[!empty_messages]
+    level <- level[!empty_messages]
+
+    if (length(message) == 0) {
+      return(x)
+    }
   }
 
   #Check to see if the message and level match.
   #If they don't issue a warning
 
-  if (!grepl(level, substring(message, first = 0, last = 20))) {
-    warning(paste("Inconsistent message and level!", level, ":", message))
+  inconsistent_messages <- mapply(function(m, l)  !grepl(l, substring(m, first = 0, last = 20)), message, level)
+
+  if (any(inconsistent_messages)) {
+
+    warning(paste("At least one inconsistent message and level detected!"))
+
   }
 
-  new_me <- rbind.data.frame(x, list(message = message, level = level),
+  new_me <- rbind.data.frame(x, data.frame(message = message, level = level),
                            stringsAsFactors = FALSE)
   class(new_me) <- c("data.frame", "MessageQueue")
   return(new_me)
