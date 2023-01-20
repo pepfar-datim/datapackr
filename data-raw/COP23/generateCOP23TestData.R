@@ -38,13 +38,13 @@ fullCodeList <-
 
 #A few mechanisms
 #18437, 81002
-mechs <- data.frame(attributeOptionCombo = c("Nv8D9fP0IzS","eouPVGemcrh"))
+mechs <- data.frame(attributeOptionCombo = c("Nv8D9fP0IzS", "eouPVGemcrh"))
 
 des_cocs_mer <- fullCodeList %>%
   dplyr::filter(datastream == "mer") %>%
   dplyr::select(dataelementuid, categoryoptioncombouid) %>%
   dplyr::distinct() %>%
-  dplyr::full_join(mechs, by=character())
+  dplyr::full_join(mechs, by = character())
 
 des_cocs_impatt <-  fullCodeList %>%
   dplyr::filter(datastream == "impatt") %>%
@@ -64,19 +64,19 @@ d$info$country_uids <- COP21_datapacks_countries %>%
   dplyr::pull(country_uids)
 d$info$tool <- "Target Setting Tool"
 d$info$operating_unit$ou <- country
-d$info$datapack_name<- country
+d$info$datapack_name <- country
 d$info$operating_unit$ou_id <- d$info$country_uids
 d$info$has_error <- FALSE
 d$info$sane_name <- country
 d$info$approval_status <- "UNAPPROVED"
-d$info$source_user <-"littlebobbytables"
+d$info$source_user <- "littlebobbytables"
 
 
 set.seed(5883959)
 cop23_sample_data <- psnus %>%
-  dplyr::full_join(des_cocs , by = character()) %>%
-  dplyr::arrange(orgUnit, dataelementuid,categoryoptioncombouid, attributeOptionCombo) %>%
-  dplyr::mutate(period = "2023Oct", value=sample(0:200, dplyr::n(), replace=TRUE)) %>%
+  dplyr::full_join(des_cocs, by = character()) %>%
+  dplyr::arrange(orgUnit, dataelementuid, categoryoptioncombouid, attributeOptionCombo) %>%
+  dplyr::mutate(period = "2023Oct", value = sample(0:200, dplyr::n(), replace = TRUE)) %>%
   dplyr::select(dataElement = dataelementuid,
                 period,
                 orgUnit,
@@ -86,7 +86,7 @@ cop23_sample_data <- psnus %>%
 
 cop23_y2_sample_data <- cop23_sample_data %>%
   dplyr::filter(attributeOptionCombo != datapackr::default_catOptCombo()) %>% #Remove IMPATT data
-  dplyr::group_by(dataElement,categoryOptionCombo) %>%
+  dplyr::group_by(dataElement, categoryOptionCombo) %>%
   dplyr::summarise(value = sum(round(value * 1.25)), .groups = "drop") %>%
   dplyr::mutate(orgUnit = d$info$country_uids[[1]],
                 period = "2024Oct",
@@ -99,7 +99,7 @@ cop23_y2_sample_data <- cop23_sample_data %>%
                 value)
 
 
-d$datim$cop23_sample_data <-cop23_sample_data
+d$datim$cop23_sample_data <- cop23_sample_data
 d$datim$cop23_year2_sample_data <- cop23_y2_sample_data
 
 createS3BucketTags <- function(d) {
@@ -120,7 +120,7 @@ sendTimeStampLogToS3 <- function(d) {
   object_name <-
     paste0("processed/",
            gsub("^20", "cop", d$info$cop_year),
-           ifelse(d$info$cop_year==2021,"_opu",""),
+           ifelse(d$info$cop_year == 2021, "_opu", ""),
            "/",
            d$info$sane_name,
            ".csv")
@@ -153,7 +153,7 @@ sendTimeStampLogToS3 <- function(d) {
     paste0(
       "upload_timestamp/",
       gsub("^20", "cop", d$info$cop_year),
-      ifelse(d$info$cop_year==2021,"_opu",""),
+      ifelse(d$info$cop_year == 2021, "_opu", ""),
       "/",
       d$info$sane_name,
       ".csv"
@@ -201,9 +201,9 @@ sendDATIMExportToS3 <- function(d) {
 
   object_tags <- createS3BucketTags(d)
 
-  object_name <- paste0("datim_export/",gsub("^20", "cop",d$info$cop_year),
-                        ifelse(d$info$cop_year==2021,"_opu",""),
-                        "/",d$info$sane_name,".csv")
+  object_name <- paste0("datim_export/", gsub("^20", "cop", d$info$cop_year),
+                        ifelse(d$info$cop_year == 2021, "_opu", ""),
+                        "/", d$info$sane_name, ".csv")
 
   s3 <- paws::s3()
 
@@ -252,9 +252,9 @@ sendYear2ExportToS3 <- function(d, custom_object_name = NULL) {
 
   object_tags <- createS3BucketTags(d)
 
-  object_name <- paste0("datim_export/",gsub("^20", "cop",d$info$cop_year),
-                        ifelse(d$info$cop_year==2021,"_opu",""),
-                        "/",d$info$sane_name,"_Y2.csv")
+  object_name <- paste0("datim_export/", gsub("^20", "cop", d$info$cop_year),
+                        ifelse(d$info$cop_year == 2021, "_opu", ""),
+                        "/", d$info$sane_name, "_Y2.csv")
 
   s3 <- paws::s3()
 
