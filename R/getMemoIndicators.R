@@ -1,3 +1,30 @@
+indicator_regexes <- c(
+  indicator = "N\\{[a-zA-Z][a-zA-Z0-9]{10}\\}",
+  constant = "C\\{[a-zA-Z][a-zA-Z0-9]{10}\\}",
+  de_coc_operand  = "#\\{[a-zA-Z][a-zA-Z0-9]{10}\\.[a-zA-Z][a-zA-Z0-9]{10}\\}",
+  de_operand = "#\\{[a-zA-Z][a-zA-Z0-9]{10}\\}",
+  plus  = "\\+",
+  minus = "\\-",
+  times = "\\*",
+  division = "\\/",
+  whitespace  = "\\s+",
+  number = "[+\\-]?(?:0|[1-9]\\d*)(?:\\.\\d*)?(?:[eE][+\\-]?\\d+)?",
+  lparen = "\\(",
+  rparent = "\\)"
+)
+
+
+isValidIndicator <- function(parsed_inds) {
+
+  !unlist(lapply(lapply(parsed_inds, function(x) names(x) == ".missing"), any))
+}
+
+getValidIndicators <- function(inds) {
+  num_is_valid <- lapply(inds$numerator, function(x) datimvalidation::lex(x, indicator_regexes))
+  denom_is_valid <- lapply(inds$denominator, function(x) datimvalidation::lex(x, indicator_regexes))
+  is_valid <- isValidIndicator(num_is_valid) & isValidIndicator(denom_is_valid)
+  inds[is_valid, ]
+}
 #' @export
 #' @title Get COP Memo Indicators
 #'
@@ -32,7 +59,9 @@ getMemoIndicators <- function(cop_year,
   if (class(inds) != "data.frame") {
     warning("Could not find fetch indicators from DATIM!")
     return(NULL)
+  } else {
+    #Only return indicators which we can actually process
+    getValidIndicators(inds)
   }
 
-  inds
 }
