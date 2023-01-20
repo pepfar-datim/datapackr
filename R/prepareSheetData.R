@@ -31,9 +31,9 @@ prepareSheetData <- function(sheet,
     valid_disaggs %<>%
       dplyr::select(valid_ages, valid_sexes, valid_kps) %>%
       unique() %>%
-      tidyr::unnest(valid_ages, .drop = FALSE, .sep = ".") %>%
-      tidyr::unnest(valid_sexes, .drop = FALSE, .sep = ".") %>%
-      tidyr::unnest(valid_kps, .drop = FALSE, .sep = ".") %>%
+      tidyr::unnest(valid_ages, names_sep = ".") %>%
+      tidyr::unnest(valid_sexes, names_sep = ".") %>%
+      tidyr::unnest(valid_kps, names_sep = ".") %>%
       unique() %>%
       dplyr::rename(Age = valid_ages.name,
                     Sex = valid_sexes.name,
