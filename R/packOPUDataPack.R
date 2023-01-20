@@ -42,9 +42,9 @@ packOPUDataPack <- function(d, undistributed_mer_data = NULL,
 
   # Prepare totals data for allocation ####
   if (!is.null(undistributed_mer_data)) {
-    d$data$UndistributedMER <- undistributed_mer_data
+    d$datim$UndistributedMER <- undistributed_mer_data
   } else {
-    d$data$UndistributedMER <- d$data$snuxim_model_data %>%
+    d$datim$UndistributedMER <- d$data$snuxim_model_data %>%
       dplyr::mutate(attributeOptionCombo = default_catOptCombo(),
                     value = as.numeric(value)) %>%
       dplyr::group_by(dplyr::across(c(-value))) %>%
@@ -65,7 +65,7 @@ packOPUDataPack <- function(d, undistributed_mer_data = NULL,
 
   # Write PSNUxIM tab ####
   r <- packPSNUxIM(wb = d$tool$wb,
-                   data = d$data$UndistributedMER,
+                   data = d$datim$UndistributedMER,
                    snuxim_model_data = d$data$snuxim_model_data,
                    org_units = org_units,
                    cop_year = d$info$cop_year,

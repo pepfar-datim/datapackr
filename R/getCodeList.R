@@ -21,7 +21,7 @@ getCodeList <- function(cop_year = NULL,
   cop_year <- check_cop_year(cop_year %missing% NULL)
 
   if (is.null(datasets)) {
-    datasets <- getDatasetUids(cop_year, datastreams)
+    datasets <- getCOPDatasetUids(cop_year, datastreams)
   }
 
   datasets %<>% unique()

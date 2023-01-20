@@ -258,28 +258,34 @@ addcols <- function(data, cnames, type = "character") {
 
 
 #' @export
-#' @title getDatasetUids
+#' @title getCOPDatasetUids
 #'
 #' @description returns character vector of dataset uids for a given FY:
 #' {"2019", "2020", ... , "2023"}
 #' and type {"mer_targets", "mer_results", "subnat_targets", "subnat_results",
 #' "impatt"}
-#' @param type character vector - one or more of:
+#' @param datastream character vector - one or more of:
 #' {"mer_targets", "mer_results", "subnat_targets", "subnat_results", "impatt"}
 #' @inheritParams datapackr_params
 #' @return returns a character vector of the related dataset uids
 #'
-getDatasetUids <-  function(cop_year, type) {
+getCOPDatasetUids <-  function(cop_year, datastreams) {
 
-  #Convert to cop_year everywhere
 
-  cop_year <- check_cop_year(cop_year = cop_year)
+  #Datastream validation
+  all_datastreams <- c("mer_targets", "mer_results",
+                 "subnat_targets", "subnat_results",
+                 "impatt")
+  datastreams <- datastreams %missing% all_datastreams
 
-  type <- type %missing% c("mer_targets", "mer_results",
-                           "subnat_targets", "subnat_results",
-                           "impatt")
+  stopifnot("You must specify a vector of dataset types" = is.vector(datastreams))
 
-  datasets_filtered <-
+  if (!(all(datastreams %in% all_datastreams))) {
+    stop(paste("Could not find a data stream for", paste(datastreams, sep = "", collapse = ",")))
+  }
+
+  #List of COP Datasets by year
+  cop_datasets <-
     list(
       "2022" = list(
         "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
@@ -301,9 +307,9 @@ getDatasetUids <-  function(cop_year, type) {
         "impatt" = "Zn27xns9Fmx"),
       "2020" = list(
         "mer_targets" =   c("Pmc0yYAIi1t", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2021
-                             "s1sxJuqXsvV"),  # MER Target Setting: PSNU
-                                              #(Facility and Community Combined) - DoD ONLY) FY2021,
-                                              # Host Country Targets: DREAMS (USG) FY2022),
+                            "s1sxJuqXsvV"),  # MER Target Setting: PSNU
+        #(Facility and Community Combined) - DoD ONLY) FY2021,
+        # Host Country Targets: DREAMS (USG) FY2022),
         "mer_results" =   c("zL8TlPVzEBZ", # MER Results: Facility Based FY2021Q4
                             "TBcmmtoaCBC", # MER Results: Community Based FY2021Q4
                             "qHyrHc4zwx4"), # Host Country Results: DREAMS (USG) FY2021Q4
@@ -312,28 +318,46 @@ getDatasetUids <-  function(cop_year, type) {
         "impatt" = "jxnjnBAb1VD"),
       "2019" = list(
         "mer_targets" = c("sBv1dj90IX6", # MER Targets: Facility Based FY2020
-                        "nIHNMxuPUOR", # MER Targets: Community Based FY2020
-                        "C2G7IyPPrvD", # MER Targets: Community Based - DoD ONLY FY2020
-                        "HiJieecLXxN"), # MER Targets: Facility Based - DoD ONLY FY2020
-          "mer_results" =   c("qzVASYuaIey", # MER Results: Community Based FY2020Q4
-                              "BPEyzcDb8fT", # MER Results: Community Based - DoD ONLY FY2021Q4
-                              "jKdHXpBfWop", # MER Results: Facility Based FY2020Q4
-                               "em1U5x9hhXh", # MER Results: Facility Based - DoD ONLY FY2021Q4
-                               "mbdbMiLZ4AA"), # Host Country Results: DREAMS (USG) FY2020Q4
-          "subnat_targets" = "N4X89PgW01w",
-          "subnat_results" = "ctKXzmv2CVu",
-          "impatt" = "pTuDWXzkAkJ")) %>%
+                          "nIHNMxuPUOR", # MER Targets: Community Based FY2020
+                          "C2G7IyPPrvD", # MER Targets: Community Based - DoD ONLY FY2020
+                          "HiJieecLXxN"), # MER Targets: Facility Based - DoD ONLY FY2020
+        "mer_results" =   c("qzVASYuaIey", # MER Results: Community Based FY2020Q4
+                            "BPEyzcDb8fT", # MER Results: Community Based - DoD ONLY FY2021Q4
+                            "jKdHXpBfWop", # MER Results: Facility Based FY2020Q4
+                            "em1U5x9hhXh", # MER Results: Facility Based - DoD ONLY FY2021Q4
+                            "mbdbMiLZ4AA"), # Host Country Results: DREAMS (USG) FY2020Q4
+        "subnat_targets" = "N4X89PgW01w",
+        "subnat_results" = "ctKXzmv2CVu",
+        "impatt" = "pTuDWXzkAkJ"))
+
+
+  # If cop_year is NULL or missing, use default from package
+  cop_year <- cop_year %missing% NULL
+  cop_year <- cop_year %||% getCurrentCOPYear()
+
+  if (length(cop_year) > 1) {
+    stop("You must specify a single COP Year")
+  }
+
+  if (!(cop_year %in% names(cop_datasets))) {
+    stop(paste("There are no COP datasets for ", cop_year))
+  }
+
+
+    datasets_filtered <- cop_datasets %>%
     purrr::pluck(as.character(cop_year)) %>%
-    .[type] %>%
+    .[datastreams] %>%
     unlist(use.names = FALSE) %>%
     purrr::discard(~ is.na(.))
 
   if (is.null(datasets_filtered) || length(datasets_filtered) == 0) {
-    stop(paste("No datasets could be found for cop_year", cop_year, "and type(s)", type))
+    stop(paste("No datasets could be found for cop_year",
+               cop_year, "and type(s)",
+               paste(datastreams, sep = "", collapse = ",")))
   }
 
   datasets_filtered
-  }
+}
 
 #' @export
 #' @title Define prioritization values.
