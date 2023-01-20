@@ -287,6 +287,14 @@ getCOPDatasetUids <-  function(cop_year, datastreams) {
   #List of COP Datasets by year
   cop_datasets <-
     list(
+      "2023" = list(
+        "mer_targets" =   c("dA9C5bL44NX", # MER Target Setting: PSNU (Facility and Community Combined)
+                            "A2GxohPT9Hw", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
+                            "vpDd67HlZcT"), # Host Country Targets: DREAMS (USG)
+        "mer_results" = NA,
+        "subnat_targets" = "bKSmkDP5YTc",
+        "subnat_results" = "fZVvcMSA9mZ",
+        "impatt" = "kWKJQYP1uT7"),
       "2022" = list(
         "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
                             "o71WtN5JrUu", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
