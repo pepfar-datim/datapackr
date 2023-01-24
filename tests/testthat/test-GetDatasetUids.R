@@ -8,8 +8,7 @@ test_that("getCOPDatasetUids", {
   expect_error(getCOPDatasetUids("foo"))
   expect_error(getCOPDatasetUids("foo", NULL))
 
-
-
+  expect_true(all(is_uidish(getCOPDatasetUids(cop_year = 2021))))
   expect_true(all(is_uidish(getCOPDatasetUids())))
 
   expect_identical(getCOPDatasetUids(), getCOPDatasetUids(getCurrentCOPYear()))

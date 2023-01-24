@@ -44,7 +44,7 @@ getMechanismView <- function(country_uids = NULL,
     )
 
   # If Cached Mech list is available and fresh, use this to save processing time
-  print(cached_mechs_path)
+
   can_read_file <- file.access(cached_mechs_path, 4) == 0
   can_write_file <- file.access(dirname(cached_mechs_path), 2) == 0
 
@@ -97,8 +97,8 @@ getMechanismView <- function(country_uids = NULL,
 
   # Filter by OU from a vector of country UIDs
   if (!is.null(country_uids)) {
-    ous <- datapackr::valid_PSNUs %>%
-      dplyr::select(ou, ou_id, country_uid) %>%
+    ous <- getValidOrgUnits(cop_year) %>%
+      dplyr::select(ou, ou_uid, country_uid) %>%
       dplyr::distinct() %>%
       dplyr::filter(country_uid %in% country_uids) %>%
       dplyr::pull(ou) %>%

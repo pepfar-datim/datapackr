@@ -10,6 +10,7 @@ getDataPackOrgUnits(
   include_DREAMS = TRUE,
   additional_fields = NULL,
   use_cache = TRUE,
+  cop_year = NULL,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
@@ -26,6 +27,9 @@ API other than those returned by default.}
 \item{use_cache}{If \code{TRUE}, will first check to see if a cached export
 of Data Pack Org Units already exists. If so, will use this cached version to
 save time.}
+
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
 \item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
 authentication with DATIM.}

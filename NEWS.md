@@ -1,6 +1,20 @@
 # datapackr 5.5.1
 
 ## Breaking changes
+* Users are advised to use`getValidOrgunits(cop_year)` to obtain
+a list of valid organisation units for a given COP year.
+
+## New features
+* Support generation of COP23 target setting tools
+* Correctly supply a list of organisation units by COP year.
+
+## Minor improvements and fixes
+* Numerous code fixes and test improvements.
+
+
+# datapackr 5.5.1
+
+## Breaking changes
 
 ## New features
 

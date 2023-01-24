@@ -18,17 +18,17 @@ packDataPack <- function(d,
   if (!is.null(model_data) && is.null(d$keychain$model_data_path)) {
     # some sort of check on the model data?
 
-
     # assign the model data
     d$data$model_data <- model_data
   } else if (is.null(model_data) && !is.null(d$keychain$model_data_path)) {
+
     # Checks and reads in Data Pack Model File ####
     stopifnot(
       "Model data file could not be read!" = canReadFile(d$keychain$model_data_path),
       "Model data is not correct file type! File must have .rds extension." =
         tools::file_ext(d$keychain$model_data_path) == "rds"
     )
-    d$data$model_data <- readRDS(d$keychain$model_data_path)
+    d$data$model_data <- readRDS(d$keychain$model_data_path)[d$info$country_uids]
   } else if (!is.null(model_data)  && !is.null(d$keychain$model_data_path)) {
     stop(
       "You have provided both a model path and model data to packTool. Please provide only one!"
@@ -39,11 +39,15 @@ packDataPack <- function(d,
     )
   }
 
+
+  # TODO: Separate PSNUs as parameter for this function, allowing you to include
+  # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
+
   # Write Main Sheets ####
   d$tool$wb <- packDataPackSheets(wb = d$tool$wb,
                                   country_uids = d$info$country_uids,
                                   ou_level = "Prioritization",
-                                  org_units = d$data$PSNUs,
+                                  org_units = NULL,
                                   model_data = d$data$model_data,
                                   schema = d$info$schema,
                                   sheets = NULL,
@@ -57,13 +61,13 @@ packDataPack <- function(d,
   interactive_print("Cleaning up Styles...")
 
   #TODO: See if new openxlsx release addresses this issue
-  spectrumStyle1 <- openxlsx::createStyle(fgFill = "#9CBEBD")
+  spectrumStyle1 <- openxlsx::createStyle(fgFill = "#073763")
   spectrumStyle2 <- openxlsx::createStyle(fgFill = "#FFEB84")
 
   openxlsx::addStyle(d$tool$wb,
     sheet = "Spectrum",
     spectrumStyle1,
-    cols = 1:3, rows = 1:40, gridExpand = TRUE, stack = TRUE)
+    cols = 1:3, rows = 1:200, gridExpand = TRUE, stack = TRUE)
 
   openxlsx::addStyle(d$tool$wb,
     sheet = "Spectrum",

@@ -601,7 +601,7 @@ checkAnalytics <- function(d,
     dplyr::bind_rows() %>%
     tidyr::drop_na(value) %>%
     dplyr::left_join(
-      datapackr::valid_OrgUnits %>%
+      getValidOrgUnits(d$info$cop_year) %>%
         dplyr::filter(country_uid %in% d$info$country_uids) %>%
         dplyr::select(psnu = name, psnu_uid = uid),
       by = c("psnu_uid" = "psnu_uid")

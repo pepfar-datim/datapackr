@@ -34,6 +34,7 @@ unPackSheets <- function(d,
                         cop_year = d$info$cop_year,
                         tool = d$info$tool,
                         all_sheets = FALSE,
+                        operation = "unpack",
                         psnuxim = FALSE)
 
   # Check sheets against actual sheets found in d$sheets

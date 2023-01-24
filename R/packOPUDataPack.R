@@ -53,7 +53,7 @@ packOPUDataPack <- function(d, undistributed_mer_data = NULL,
       dplyr::filter(value != 0)
   }
 
-  org_units <- datapackr::valid_OrgUnits %>% # Load in valid_PSNUs list from package
+  org_units <- getValidOrgUnits(d$info$cop_year) %>% # Load in valid_PSNUs list from package
     dplyr::filter(country_uid %in% d$info$country_uids) %>%
     add_dp_label(.) %>%
     dplyr::arrange(dp_label) %>%

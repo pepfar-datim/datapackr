@@ -776,13 +776,15 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
             lvl = NULL,
             has_error = FALSE)
 
+  valid_orgunits_local <- getValidOrgUnits(d$info$cop_year)
+
   invalid_orgunits <- d$sheets[sheets] %>%
     dplyr::bind_rows(.id = "sheet_name") %>%
     dplyr::filter(dplyr::if_any(c("SNU1", "PSNU", "Age", "Sex"), ~!is.na(.))) %>%
     dplyr::select(sheet_name, PSNU) %>%
     dplyr::distinct() %>%
     dplyr::mutate(snu_uid = extract_uid(PSNU)) %>%
-    dplyr::anti_join(valid_OrgUnits, by = c("snu_uid" = "uid"))
+    dplyr::anti_join(valid_orgunits_local, by = c("snu_uid" = "uid"))
 
   na_orgunits <- invalid_orgunits[is.na(invalid_orgunits$PSNU), ]
 
@@ -837,13 +839,30 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = TRUE) {
             lvl = NULL,
             has_error = FALSE)
 
+  valid_orgunits_local <- getValidOrgUnits(d$info$cop_year)
+
   data <- d$sheets[["Prioritization"]][, c("PSNU", "IMPATT.PRIORITY_SNU.T")]
   names(data)[names(data) == "IMPATT.PRIORITY_SNU.T"] <- "value"
   data <- data[, c("PSNU", "value")]
   data$snu_uid <- extract_uid(data$PSNU)
-  data <- data[data$snu_uid %in% valid_OrgUnits$uid, ]
-  data <- data[!data$snu_uid %in% valid_OrgUnits$uid[valid_OrgUnits$org_type == "Military"], ]
-  invalid_prioritizations <- data[!data$value %in% prioritization_dict()$value, ]
+  valid_prio_units <- valid_orgunits_local[valid_orgunits_local$org_type %in% c("PSNU", "Military"), ]
+  #Does the PSNU exist in the list of valid PSNUs?
+  data$isInvalidPSNU <- !(data$snu_uid %in% valid_prio_units$uid)
+
+  isInvalidPrioritization <- function(PSNU, value) {
+
+    if (grepl("_Military", PSNU)) {
+       value != "M"
+    } else {
+      !(value %in% prioritization_dict()$value)
+    }
+
+  }
+
+  data$isInvalidPrioritization <- mapply(isInvalidPrioritization, data$PSNU, data$value)
+
+  invalid_prioritizations <- data[data$isInvalidPSNU | data$isInvalidPrioritization, ]
+
 
   if (NROW(invalid_prioritizations) > 0) {
 

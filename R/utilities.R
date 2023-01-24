@@ -287,6 +287,14 @@ getCOPDatasetUids <-  function(cop_year, datastreams) {
   #List of COP Datasets by year
   cop_datasets <-
     list(
+      "2023" = list(
+        "mer_targets" =   c("dA9C5bL44NX", # MER Target Setting: PSNU (Facility and Community Combined)
+                            "A2GxohPT9Hw", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
+                            "vpDd67HlZcT"), # Host Country Targets: DREAMS (USG)
+        "mer_results" = NA,
+        "subnat_targets" = "bKSmkDP5YTc",
+        "subnat_results" = "fZVvcMSA9mZ",
+        "impatt" = "kWKJQYP1uT7"),
       "2022" = list(
         "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
                             "o71WtN5JrUu", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
@@ -419,7 +427,10 @@ rowMax <- function(df, cn, regex) {
 #'
 getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL) {
 
-  stopifnot("The COP year must be specified" = !is.null(cop_year))
+  switch(as.character(cop_year),
+         "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
+         "2022" = datapackr::cop22_map_DataPack_DATIM_DEs_COCs,
+         stop("The COP year and configuration provided is not supported by get_Map_DataPack_DATIM_DEs_COCs"))
 
   if (datasource %in%  c("Data Pack", "Data Pack Template") || is.null(datasource)) {
     de_coc_map <- switch(as.character(cop_year),
@@ -441,74 +452,40 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL) {
 }
 
 
+
 #' @export
-#' @title Create a new Data Pack
-#' @author Scott Jackson
-#' @description Creates a brand new Data Pack with the supplied characteristics.
+#' @title Return a data frame of valid organisation units
+#' based on the COP year
 #'
-#' @inheritParams datapackr_params
+#' @param cop_year The COP Year
 #'
-#' @return Data Pack object
-#'
-createDataPack <- function(datapack_name = NULL,
-                           country_uids,
-                           template_path = NULL,
-                           cop_year = NULL,
-                           tool = NULL,
-                           d2_session = dynGet("d2_default_session",
-                                               inherits = TRUE)) {
+#' @return A data frame of organisation units along with their attributes.
+getValidOrgUnits <- function(cop_year = NA) {
 
-  if (tool %in% c("Data Pack Template", "OPU Data Pack Template")) {
-    tool <- stringr::str_remove(tool, " Template$")
+  cop_year <- cop_year %missing% NULL
+
+
+  if (length(cop_year) != 1L) {
+    stop("You must specify a single COP Year!")
   }
 
-  # Check & assign params
-  params <- check_params(
-    country_uids = country_uids,
-    cop_year = cop_year,
-    tool = tool,
-    template_path = template_path,
-    schema = NULL,
-    datapack_name = datapack_name)
 
-  for (p in names(params)) {
-    assign(p, purrr::pluck(params, p))
+  if (is.na(cop_year) || is.null(cop_year))  {
+
+    stop(paste("COP Year was not specified"))
   }
 
-  rm(params, p)
 
-  wb <- openxlsx::loadWorkbook(template_path)
-
-  options("openxlsx.numFmt" = "#,##0")
-
-  # Write Home Sheet info
-  wb <- writeHomeTab(wb = wb,
-                    datapack_name = datapack_name,
-                    country_uids = country_uids,
-                    cop_year = cop_year,
-                    tool = tool)
-
-  wb_copy <- paste0(tempfile(), ".xlsx")
-  openxlsx::saveWorkbook(wb = wb, file = wb_copy, overwrite = TRUE)
-
-  # Create DP object
-  d <- createKeychainInfo(submission_path = wb_copy,
-                          tool = tool,
-                          country_uids = country_uids,
-                          cop_year = cop_year,
-                          d2_session = d2_session)
-
-  d$tool$wb <- wb
-
-  unlink(wb_copy)
-
-  if (d$info$tool %in% c("Data Pack Template", "OPU Data Pack Template")) {
-    d$info$tool <- stringr::str_remove(d$info$tool, " Template$")
+  if (!(cop_year %in% supportedCOPYears())) {
+    stop(paste("COP Year", cop_year, "has no valid orgunits."))
   }
 
-  return(d)
+  switch(as.character(cop_year),
+         "2021" = valid_PSNUs,
+         "2022" = valid_PSNUs,
+         "2023" = valid_OrgUnits)
+
 }
-
 
 #' @export
 #' @title Compile a list ending with different final collapse
