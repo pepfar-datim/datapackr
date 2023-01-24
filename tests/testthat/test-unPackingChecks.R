@@ -555,8 +555,47 @@ test_that("Can check invalid org units", {
 
 })
 
-# check invalid prioritization ----
 test_that("Can check invalid prioritizations", {
+
+  test_sheets <- c(
+    "Prioritization"
+  )
+
+  # create minimal sheet needed
+  d <- list()
+  d$sheets$Prioritization <-
+    tribble(
+      ~SNU1, ~PSNU, ~IMPATT.PRIORITY_SNU.T_1, ~IMPATT.PRIORITY_SNU.T, ~PRIORITY_SNU.translation,
+      "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", NA, "M", "Military",
+      "Central Region", "Lilongwe District [#SNU] [ScR9iFKAasW]", "4", "4", "Sustained"
+    )
+  d$info$cop_year <- 2022
+
+  # test no errors/warnings
+  res <- checkInvalidPrioritizations(d, sheets = test_sheets)
+  expect_null(res$result)
+  expect_equal(res$has_error, FALSE)
+  rm(res)
+
+  # test positive flag
+  # add row with NA value that triggers invalid prioritization
+  d$sheets$Prioritization <- d$sheets$Prioritization %>%
+    add_row(!!!setNames(c("Central Region", "Dowa District [#SNU] [zphK9WV8JB4]",
+                          "4", NA, "Not a PSNU"), names(.)))
+
+  res <- checkInvalidPrioritizations(d = d, sheets = test_sheets)
+
+  expect_equal(nrow(res$result), 1L)
+  expect_equal(res$lvl, "ERROR")
+  expect_equal(res$has_error, TRUE)
+
+  rm(res, d)
+
+
+})
+
+# check invalid prioritization ----
+test_that("Can check invalid prioritizations COP23", {
 
   test_sheets <- c(
     "Prioritization"
