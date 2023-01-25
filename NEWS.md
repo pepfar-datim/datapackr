@@ -1,4 +1,4 @@
-# datapackr 5.5.1
+# datapackr 6.0.0
 
 ## Breaking changes
 * Users are advised to use`getValidOrgunits(cop_year)` to obtain

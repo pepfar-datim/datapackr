@@ -789,6 +789,15 @@ ndots <- function(...) nargs()
 
 bullet <- function(...) paste0(crayon::bold(crayon::silver(" * ")), sprintf(...))
 
+
+is_empty <- function(x) {
+
+  x <- stringr::str_trim(x)
+
+  is.null(x) || is.na(x) || length(x) == 0 || x == ""
+}
+
+
 # Re-exports ---------------------------------------------------
 
 #' Default value for `NULL`
