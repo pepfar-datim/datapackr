@@ -11,10 +11,12 @@ cop_year <- 2023
 datasets_to_pull <- tibble::tribble(
   ~dataset_uid, ~dataset_name, ~FY, ~targets_results, ~datastream, ~org_unit,
   "dA9C5bL44NX", "FY24 MER Targets", 2024, "targets", "mer", "psnu",
-  "cihuwjoY5xP", "FY24 MER DOD Targets", 2024, "targets", "mer", "_mil",
+  "A2GxohPT9Hw", "FY24 MER DOD Targets", 2024, "targets", "mer", "_mil",
   "vpDd67HlZcT", "FY24 DREAMS Targets", 2024, "targets", "dreams", "dsnu",
+  "kWKJQYP1uT7", "FY24 IMPATT", 2025, "targets", "impatt", "psnu",
   "kWKJQYP1uT7", "FY24 IMPATT", 2024, "targets", "impatt", "psnu",
   "CxMsvlKepvE", "FY23 IMPATT", 2023, "targets", "impatt", "psnu",
+  "bKSmkDP5YTc", "FY25 SUBNAT Targets", 2025, "targets", "subnat", "psnu",
   "bKSmkDP5YTc", "FY24 SUBNAT Targets", 2024, "targets", "subnat", "psnu",
   "J4tdiDEi08O", "FY23 SUBNAT Targets", 2023, "targets", "subnat", "psnu",
   "IXiORiVFqIv", "FY22 SUBNAT Results", 2022, "results", "subnat", "psnu")
