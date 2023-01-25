@@ -42,7 +42,7 @@ loadDataPack <- function(submission_path = NULL,
                   " ", d$info$tool,
                   " for ", d$info$datapack_name, ".")
 
-    print(msg)
+    interactive_print(msg)
   }
 
   d
@@ -118,7 +118,7 @@ loadSheets <- function(d,
 
   sheets <- sheets %missing% NULL
   actual_sheets <- readxl::excel_sheets(d$keychain$submission_path)
-  skip <- skip_tabs(tool = d$info$tool, cop_year = d$info$cop_year)
+  skip <- skip_tabs(tool = d$info$tool, cop_year = d$info$cop_year)$unpack
   sheets_to_read <- actual_sheets[!actual_sheets %in% skip]
   sheets <- sheets %||% sheets_to_read
 
@@ -127,6 +127,7 @@ loadSheets <- function(d,
                         cop_year = d$info$cop_year,
                         tool = d$info$tool,
                         all_sheets = FALSE,
+                        operation = "unpack",
                         psnuxim = TRUE)
 
   # Load Sheets

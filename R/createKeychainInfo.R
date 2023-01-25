@@ -1,3 +1,19 @@
+
+unPackHomeTabMetadata <- function(submission_path)  {
+  readxl::read_excel(
+    path = submission_path,
+    sheet = "Home",
+    range = datapackr::toolName_homeCell(),
+    col_names = c("home_cell"),
+    col_types = "text",
+    trim_ws = TRUE) %>%
+    dplyr::mutate(
+      cop_year = stringr::str_extract(home_cell, "COP\\d{2}"),
+      cop_year = as.numeric(stringr::str_replace(cop_year, "COP", "20")),
+      tool = stringr::str_extract(home_cell, "OPU Data Pack|Data Pack|Target Setting Tool"))
+}
+
+
 #' @export
 #' @title Create Keychain Info for use in DataPack object.
 #'
@@ -49,18 +65,12 @@ createKeychainInfo <- function(submission_path = NULL,
   }
 
   # Home Tab metadata ----
-  tool_metadata <-
-    readxl::read_excel(
-      path = d$keychain$submission_path,
-      sheet = "Home",
-      range = datapackr::toolName_homeCell(),
-      col_names = c("home_cell"),
-      col_types = "text",
-      trim_ws = TRUE) %>%
-    dplyr::mutate(
-      cop_year = stringr::str_extract(home_cell, "COP\\d{2}"),
-      cop_year = as.numeric(stringr::str_replace(cop_year, "COP", "20")),
-      tool = stringr::str_extract(home_cell, "OPU Data Pack|Data Pack"))
+  tool_metadata <- unPackHomeTabMetadata(d$keychain$submission_path)
+
+  # Accommodate COP23 Name Change ----
+  tool_metadata$tool <- stringr::str_replace(tool_metadata$tool,
+                                             "Target Setting Tool",
+                                             "Data Pack")
 
   # Is this even a DataPack tool? ----
   if (!tool_metadata$cop_year[1] %in% supportedCOPYears()
@@ -114,7 +124,8 @@ createKeychainInfo <- function(submission_path = NULL,
   # country_uids ----
   submitted_country_uids <-
     unPackCountryUIDs(submission_path = d$keychain$submission_path,
-                      tool = d$info$tool)
+                      tool = d$info$tool,
+                      cop_year = d$info$cop_year)
 
   d$info$country_uids <- d$info$country_uids %||% submitted_country_uids
 
@@ -122,15 +133,16 @@ createKeychainInfo <- function(submission_path = NULL,
     stop("The file submitted does not seem to match the country_uids you've specified.")
   }
 
-  d$info$country_uids %<>% check_country_uids()
+  d$info$country_uids %<>% check_country_uids(cop_year = d$info$cop_year)
 
   # datapack_name ----
   d$info$datapack_name <-
-    datapackr::unPackDataPackName(
+    unPackDataPackName(
       submission_path = d$keychain$submission_path,
       tool = d$info$tool)
 
-  d$info$datapack_name %<>% checkDataPackName(country_uids = d$info$country_uids)
+  d$info$datapack_name %<>% checkDataPackName(country_uids = d$info$country_uids,
+                                              cop_year = d$info$cop_year)
 
   # TEST to make sure tool type matches what we see in the submitted file's structure ####
   # TODO: Improve to use checkColumnStructure
@@ -154,7 +166,7 @@ createKeychainInfo <- function(submission_path = NULL,
 
   # Placeholders ####
   if (d$info$tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack", "OPU Data Pack Template")
-      && d$info$cop_year %in% c("2021", "2022")) {
+      && d$info$cop_year %in% c("2021", "2022", "2023")) {
     d$info$needs_psnuxim <- FALSE
     d$info$newSNUxIM <- FALSE
     d$info$has_psnuxim <- FALSE

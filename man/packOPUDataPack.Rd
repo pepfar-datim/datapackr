@@ -14,7 +14,7 @@ packOPUDataPack(
 \arguments{
 \item{d}{Datapackr sidecar object}
 
-\item{undistributed_mer_data}{Data from the \code{d$data$UndistributedMER}
+\item{undistributed_mer_data}{Data from the \code{d$datim$UndistributedMER}
 dataset that can be provided while generating an OPU tool such that the
 targets to be distributed will be sourced from this file.}
 

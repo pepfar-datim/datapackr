@@ -204,14 +204,17 @@ test_that("We can check datapack paramaters", {
 
   # datapack_name ####
   # Test valid combination
-  test_args <- list(datapack_name = "Zambia", country_uids = "f5RoebaDLMx")
+  test_args <- list(datapack_name = "Zambia", country_uids = "f5RoebaDLMx", cop_year = 2022)
   test_params <- do.call(check_params, test_args)
   expect_true(identical(sort(unlist(test_params)), sort(unlist(test_args))))
 
   # This will return a handled error, but will NOT return "Global"
   expect_error(test_params <-
-                 check_params(datapack_name = NULL, country_uids = NULL
+                 check_params(datapack_name = NULL, country_uids = NULL, cop_year = 2022,
                  ), "Must supply valid country_uids.")
+
+
+
 
   # Expect a message if datapack_name and country_uids do not match (but allow
   # custom names)
@@ -249,7 +252,18 @@ test_that("We can check datapack paramaters", {
 
   expect_silent(sheets <- checkSheets(sheets = c("HTS", "Cascade", "GEND"),
                                       tool = tool, cop_year = cop_year,
-                                      all_sheets = FALSE))
+                                      all_sheets = FALSE,
+                                      operation = "unpack"))
+
+  expect_silent(sheets <- checkSheets(sheets = c("HTS", "Cascade", "GEND"),
+                                      tool = tool, cop_year = cop_year,
+                                      all_sheets = FALSE,
+                                      operation = "pack"))
+
+  expect_silent(sheets <- checkSheets(sheets = c("HTS", "Cascade", "GEND"),
+                                      tool = tool, cop_year = cop_year,
+                                      all_sheets = FALSE,
+                                      operation = "schema"))
 
   expect_silent(sheets <- checkSheets(sheets = c("HTS", "Cascade", "GEND", "Home"),
                                       tool = tool, cop_year = cop_year,
@@ -273,6 +287,32 @@ test_that("We can check datapack paramaters", {
                                        tool = tool, cop_year = cop_year,
                                        all_sheets = FALSE,
                                        psnuxim = FALSE))
+
+  #2023 Sheets nuances
+  expect_warning(sheets <- checkSheets(sheets = c("HTS", "KP Validation"),
+                                       tool = tool, cop_year = 2023,
+                                       all_sheets = FALSE,
+                                       operation = "unpack"))
+
+  expect_warning(sheets <- checkSheets(sheets = c("HTS", "Year 2"),
+                                       tool = tool, cop_year = 2023,
+                                       all_sheets = FALSE,
+                                       operation = "pack"))
+
+  expect_silent(sheets <- checkSheets(sheets = c("HTS", "Year 2"),
+                                      tool = tool, cop_year = 2023,
+                                      all_sheets = FALSE,
+                                      operation = "unpack"))
+
+  expect_silent(sheets <- checkSheets(sheets = c("HTS", "KP Validation"),
+                                      tool = tool, cop_year = 2023,
+                                      all_sheets = FALSE,
+                                      operation = "pack"))
+
+  expect_silent(sheets <- checkSheets(sheets = c("HTS", "KP Validation", "Year 2"),
+                                      tool = tool, cop_year = 2023,
+                                      all_sheets = FALSE,
+                                      operation = "schema"))
 
   }
 )

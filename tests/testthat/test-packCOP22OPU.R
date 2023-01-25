@@ -13,6 +13,8 @@ with_mock_api({
     output_folder <- paste0("/tmp/", stringi::stri_rand_strings(1, 20))
     dir.create(output_folder)
 
+    #Suppress console output
+    sink(tempfile())
     d <- packTool(tool = "OPU Data Pack",
              datapack_name = pick$datapack_name[1],
              country_uids = unlist(pick$country_uids[1]),
@@ -22,9 +24,10 @@ with_mock_api({
              results_archive = FALSE,
              expand_formulas = TRUE,
              d2_session = training)
+  sink()
 
   #Write some more tests here to test metadata
-  testthat::expect_identical(d$info$datapack_name, "Eswatini")
+  expect_identical(d$info$datapack_name, "Eswatini")
 
   #Be sure we can unpack what we just wrote to a file
   d_out <- unPackTool(submission_path = d$info$output_file, d2_session = training)

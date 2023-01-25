@@ -258,29 +258,43 @@ addcols <- function(data, cnames, type = "character") {
 
 
 #' @export
-#' @title getDatasetUids
+#' @title getCOPDatasetUids
 #'
 #' @description returns character vector of dataset uids for a given FY:
 #' {"2019", "2020", ... , "2023"}
 #' and type {"mer_targets", "mer_results", "subnat_targets", "subnat_results",
 #' "impatt"}
-#' @param type character vector - one or more of:
+#' @param datastream character vector - one or more of:
 #' {"mer_targets", "mer_results", "subnat_targets", "subnat_results", "impatt"}
 #' @inheritParams datapackr_params
 #' @return returns a character vector of the related dataset uids
 #'
-getDatasetUids <-  function(cop_year, type) {
+getCOPDatasetUids <-  function(cop_year, datastreams) {
 
-  #Convert to cop_year everywhere
 
-  cop_year <- check_cop_year(cop_year = cop_year)
+  #Datastream validation
+  all_datastreams <- c("mer_targets", "mer_results",
+                 "subnat_targets", "subnat_results",
+                 "impatt")
+  datastreams <- datastreams %missing% all_datastreams
 
-  type <- type %missing% c("mer_targets", "mer_results",
-                           "subnat_targets", "subnat_results",
-                           "impatt")
+  stopifnot("You must specify a vector of dataset types" = is.vector(datastreams))
 
-  datasets_filtered <-
+  if (!(all(datastreams %in% all_datastreams))) {
+    stop(paste("Could not find a data stream for", paste(datastreams, sep = "", collapse = ",")))
+  }
+
+  #List of COP Datasets by year
+  cop_datasets <-
     list(
+      "2023" = list(
+        "mer_targets" =   c("dA9C5bL44NX", # MER Target Setting: PSNU (Facility and Community Combined)
+                            "A2GxohPT9Hw", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
+                            "vpDd67HlZcT"), # Host Country Targets: DREAMS (USG)
+        "mer_results" = NA,
+        "subnat_targets" = "bKSmkDP5YTc",
+        "subnat_results" = "fZVvcMSA9mZ",
+        "impatt" = "kWKJQYP1uT7"),
       "2022" = list(
         "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
                             "o71WtN5JrUu", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
@@ -301,9 +315,9 @@ getDatasetUids <-  function(cop_year, type) {
         "impatt" = "Zn27xns9Fmx"),
       "2020" = list(
         "mer_targets" =   c("Pmc0yYAIi1t", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2021
-                             "s1sxJuqXsvV"),  # MER Target Setting: PSNU
-                                              #(Facility and Community Combined) - DoD ONLY) FY2021,
-                                              # Host Country Targets: DREAMS (USG) FY2022),
+                            "s1sxJuqXsvV"),  # MER Target Setting: PSNU
+        #(Facility and Community Combined) - DoD ONLY) FY2021,
+        # Host Country Targets: DREAMS (USG) FY2022),
         "mer_results" =   c("zL8TlPVzEBZ", # MER Results: Facility Based FY2021Q4
                             "TBcmmtoaCBC", # MER Results: Community Based FY2021Q4
                             "qHyrHc4zwx4"), # Host Country Results: DREAMS (USG) FY2021Q4
@@ -312,28 +326,46 @@ getDatasetUids <-  function(cop_year, type) {
         "impatt" = "jxnjnBAb1VD"),
       "2019" = list(
         "mer_targets" = c("sBv1dj90IX6", # MER Targets: Facility Based FY2020
-                        "nIHNMxuPUOR", # MER Targets: Community Based FY2020
-                        "C2G7IyPPrvD", # MER Targets: Community Based - DoD ONLY FY2020
-                        "HiJieecLXxN"), # MER Targets: Facility Based - DoD ONLY FY2020
-          "mer_results" =   c("qzVASYuaIey", # MER Results: Community Based FY2020Q4
-                              "BPEyzcDb8fT", # MER Results: Community Based - DoD ONLY FY2021Q4
-                              "jKdHXpBfWop", # MER Results: Facility Based FY2020Q4
-                               "em1U5x9hhXh", # MER Results: Facility Based - DoD ONLY FY2021Q4
-                               "mbdbMiLZ4AA"), # Host Country Results: DREAMS (USG) FY2020Q4
-          "subnat_targets" = "N4X89PgW01w",
-          "subnat_results" = "ctKXzmv2CVu",
-          "impatt" = "pTuDWXzkAkJ")) %>%
+                          "nIHNMxuPUOR", # MER Targets: Community Based FY2020
+                          "C2G7IyPPrvD", # MER Targets: Community Based - DoD ONLY FY2020
+                          "HiJieecLXxN"), # MER Targets: Facility Based - DoD ONLY FY2020
+        "mer_results" =   c("qzVASYuaIey", # MER Results: Community Based FY2020Q4
+                            "BPEyzcDb8fT", # MER Results: Community Based - DoD ONLY FY2021Q4
+                            "jKdHXpBfWop", # MER Results: Facility Based FY2020Q4
+                            "em1U5x9hhXh", # MER Results: Facility Based - DoD ONLY FY2021Q4
+                            "mbdbMiLZ4AA"), # Host Country Results: DREAMS (USG) FY2020Q4
+        "subnat_targets" = "N4X89PgW01w",
+        "subnat_results" = "ctKXzmv2CVu",
+        "impatt" = "pTuDWXzkAkJ"))
+
+
+  # If cop_year is NULL or missing, use default from package
+  cop_year <- cop_year %missing% NULL
+  cop_year <- cop_year %||% getCurrentCOPYear()
+
+  if (length(cop_year) > 1) {
+    stop("You must specify a single COP Year")
+  }
+
+  if (!(cop_year %in% names(cop_datasets))) {
+    stop(paste("There are no COP datasets for ", cop_year))
+  }
+
+
+    datasets_filtered <- cop_datasets %>%
     purrr::pluck(as.character(cop_year)) %>%
-    .[type] %>%
+    .[datastreams] %>%
     unlist(use.names = FALSE) %>%
     purrr::discard(~ is.na(.))
 
   if (is.null(datasets_filtered) || length(datasets_filtered) == 0) {
-    stop(paste("No datasets could be found for cop_year", cop_year, "and type(s)", type))
+    stop(paste("No datasets could be found for cop_year",
+               cop_year, "and type(s)",
+               paste(datastreams, sep = "", collapse = ",")))
   }
 
   datasets_filtered
-  }
+}
 
 #' @export
 #' @title Define prioritization values.
@@ -395,7 +427,10 @@ rowMax <- function(df, cn, regex) {
 #'
 getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL) {
 
-  stopifnot("The COP year must be specified" = !is.null(cop_year))
+  switch(as.character(cop_year),
+         "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
+         "2022" = datapackr::cop22_map_DataPack_DATIM_DEs_COCs,
+         stop("The COP year and configuration provided is not supported by get_Map_DataPack_DATIM_DEs_COCs"))
 
   if (datasource %in%  c("Data Pack", "Data Pack Template") || is.null(datasource)) {
     de_coc_map <- switch(as.character(cop_year),
@@ -417,74 +452,40 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL) {
 }
 
 
+
 #' @export
-#' @title Create a new Data Pack
-#' @author Scott Jackson
-#' @description Creates a brand new Data Pack with the supplied characteristics.
+#' @title Return a data frame of valid organisation units
+#' based on the COP year
 #'
-#' @inheritParams datapackr_params
+#' @param cop_year The COP Year
 #'
-#' @return Data Pack object
-#'
-createDataPack <- function(datapack_name = NULL,
-                           country_uids,
-                           template_path = NULL,
-                           cop_year = NULL,
-                           tool = NULL,
-                           d2_session = dynGet("d2_default_session",
-                                               inherits = TRUE)) {
+#' @return A data frame of organisation units along with their attributes.
+getValidOrgUnits <- function(cop_year = NA) {
 
-  if (tool %in% c("Data Pack Template", "OPU Data Pack Template")) {
-    tool <- stringr::str_remove(tool, " Template$")
+  cop_year <- cop_year %missing% NULL
+
+
+  if (length(cop_year) != 1L) {
+    stop("You must specify a single COP Year!")
   }
 
-  # Check & assign params
-  params <- check_params(
-    country_uids = country_uids,
-    cop_year = cop_year,
-    tool = tool,
-    template_path = template_path,
-    schema = NULL,
-    datapack_name = datapack_name)
 
-  for (p in names(params)) {
-    assign(p, purrr::pluck(params, p))
+  if (is.na(cop_year) || is.null(cop_year))  {
+
+    stop(paste("COP Year was not specified"))
   }
 
-  rm(params, p)
 
-  wb <- openxlsx::loadWorkbook(template_path)
-
-  options("openxlsx.numFmt" = "#,##0")
-
-  # Write Home Sheet info
-  wb <- writeHomeTab(wb = wb,
-                    datapack_name = datapack_name,
-                    country_uids = country_uids,
-                    cop_year = cop_year,
-                    tool = tool)
-
-  wb_copy <- paste0(tempfile(), ".xlsx")
-  openxlsx::saveWorkbook(wb = wb, file = wb_copy, overwrite = TRUE)
-
-  # Create DP object
-  d <- createKeychainInfo(submission_path = wb_copy,
-                          tool = tool,
-                          country_uids = country_uids,
-                          cop_year = cop_year,
-                          d2_session = d2_session)
-
-  d$tool$wb <- wb
-
-  unlink(wb_copy)
-
-  if (d$info$tool %in% c("Data Pack Template", "OPU Data Pack Template")) {
-    d$info$tool <- stringr::str_remove(d$info$tool, " Template$")
+  if (!(cop_year %in% supportedCOPYears())) {
+    stop(paste("COP Year", cop_year, "has no valid orgunits."))
   }
 
-  return(d)
+  switch(as.character(cop_year),
+         "2021" = valid_PSNUs,
+         "2022" = valid_PSNUs,
+         "2023" = valid_OrgUnits)
+
 }
-
 
 #' @export
 #' @title Compile a list ending with different final collapse

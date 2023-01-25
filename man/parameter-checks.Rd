@@ -17,9 +17,9 @@
 \alias{check_params}
 \title{Standardized Parameter Defaults}
 \usage{
-check_country_uids(country_uids, force = TRUE)
+check_country_uids(country_uids, cop_year, force = TRUE)
 
-check_PSNUs(PSNUs = NULL, country_uids = NULL)
+check_PSNUs(PSNUs = NULL, country_uids = NULL, cop_year = NULL)
 
 check_cop_year(cop_year, tool)
 
@@ -29,7 +29,7 @@ check_season(season, tool)
 
 check_schema(schema, cop_year, tool, season)
 
-checkDataPackName(datapack_name, country_uids)
+checkDataPackName(datapack_name, country_uids, cop_year)
 
 checkTemplatePath(template_path, cop_year, tool, season)
 
@@ -46,7 +46,14 @@ checkOutputFolder(output_folder = NULL)
 
 checkResultsArchive(results_archive = FALSE)
 
-checkSheets(sheets, cop_year, tool, all_sheets = FALSE, psnuxim = FALSE)
+checkSheets(
+  sheets,
+  cop_year,
+  tool,
+  all_sheets = FALSE,
+  operation = "schema",
+  psnuxim = FALSE
+)
 
 check_params(
   country_uids,
@@ -70,13 +77,13 @@ check_params(
 \item{country_uids}{Unique IDs for countries to include in the Data Pack.
 For full list of these IDs, see \code{datapackr::valid_OrgUnits}.}
 
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
+
 \item{force}{logical. Should country_uids be required?}
 
 \item{PSNUs}{Dataframe of PSNUs to use in this function, containing at least
 \code{psnu_uid}.}
-
-\item{cop_year}{COP Year to use for tailoring functions. Remember,
-FY22 targets = COP21.}
 
 \item{tool}{Type of tool this function will create or interact with. Either
 \code{OPU Data Pack} or \code{Data Pack}}
@@ -103,6 +110,8 @@ processes to output_folder.}
 
 \item{all_sheets}{Logical. Return/check against all sheets (as opposed to only
 those with targets)?}
+
+\item{operation}{String. Options = "unpack", "pack", "schema", or "other".}
 
 \item{psnuxim}{Logical. Return/check against PSNUxIM tab as well?}
 

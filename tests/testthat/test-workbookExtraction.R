@@ -27,7 +27,7 @@ test_that("Can load a COP22 Data Pack.", {
   expect_named(d, c("keychain", "info", "tool", "sheets"))
   expect_true(file.exists(d$keychain$submission_path))
 
-  skip <- skip_tabs(tool = "Data Pack", cop_year = 2022)
+  skip <- skip_tabs(tool = "Data Pack", cop_year = 2022)$unpack
   all_sheets <- unique(cop22_data_pack_schema$sheet_name)
   targets_sheets <- all_sheets[!all_sheets %in% c(skip, "PSNUxIM")]
   expect_named(d$sheets, targets_sheets)

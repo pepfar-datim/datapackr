@@ -8,7 +8,7 @@ d <-
     submission_path = test_sheet("COP21_DP_random_no_psnuxim.xlsx"),
     tool = "Data Pack",
     country_uids = NULL,
-    cop_year = NULL,
+    cop_year = 2021,
     load_sheets = TRUE,
     d2_session = training)
 
@@ -51,21 +51,42 @@ with_mock_api({
 
     # Package the undistributed data for DATIM
     d <- packForDATIM(d, type = "Undistributed MER")
-    expect_true(!is.null(d$data$UndistributedMER))
-    expect_true(NROW(d$data$UndistributedMER) > 0)
+    expect_true(!is.null(d$datim$UndistributedMER))
+    expect_true(NROW(d$datim$UndistributedMER) > 0)
     expect_true(all(unlist(
-      lapply(d$data$UndistributedMER$dataElement, is_uidish)
+      lapply(d$datim$UndistributedMER$dataElement, is_uidish)
     )))
     expect_true(all(unlist(
-      lapply(d$data$UndistributedMER$categoryOptionCombo, is_uidish)
+      lapply(d$datim$UndistributedMER$categoryOptionCombo, is_uidish)
     )))
     expect_true(all(unlist(
-      lapply(d$data$UndistributedMER$period, function(x) {
+      lapply(d$datim$UndistributedMER$period, function(x) {
         grepl("^\\d{4}Oct$", x)
       })
     )))
 
-    expect_type(d$data$UndistributedMER$attributeOptionCombo, "character")
-    expect_type(d$data$UndistributedMER$value, "double")
+    expect_type(d$datim$UndistributedMER$attributeOptionCombo, "character")
+    expect_type(d$datim$UndistributedMER$value, "double")
   })
 })
+
+with_mock_api({
+  test_that("Can unpack a COP21 Datapack with PSNUxIM", {
+
+    d <- datapackr::loadDataPack(
+        submission_path = test_sheet("COP21_DP_random_no_psnuxim.xlsx"),
+        tool = "Data Pack",
+        country_uids = NULL,
+        cop_year = NULL,
+        load_sheets = TRUE,
+        d2_session = training)
+
+    d  <- unPackDataPack(d,
+        d2_session = training)
+
+    #Most of this is tested elsewhere, so only test the structure here
+    expect_named(d, c("keychain", "info", "sheets", "tests", "data", "datim"), ignore.order = TRUE)
+
+
+
+    })})

@@ -1,7 +1,39 @@
-# datapackr 5.4.1
+# datapackr 5.5.1
 
 ## Breaking changes
-- Removes api_version, api_get, api_filter, api_fields, and api_call as all of their usages have been replaced by datimutils functions.
+* Users are advised to use`getValidOrgunits(cop_year)` to obtain
+a list of valid organisation units for a given COP year.
+
+## New features
+* Support generation of COP23 target setting tools
+* Correctly supply a list of organisation units by COP year.
+
+## Minor improvements and fixes
+* Numerous code fixes and test improvements.
+
+
+# datapackr 5.5.1
+
+## Breaking changes
+
+## New features
+
+## Minor improvements and fixes
+* Added TX_PVLS(D) to memo
+
+
+# datapackr 5.5.0
+
+## Breaking changes
+
+## New features
+* Use datimvalidation's expression lexer to validate incoming indicator expression
+
+## Minor improvements and fixes
+* Refactored how `unPackSNUxIM` function operates.
+* Retire internal API utility functions and replace with datimutils functions
+* Removed duplicative code in `packDataPack` that was already in `packTool`
+* Added tests for `packDataPack`
 
 
 # datapackr 5.4.0

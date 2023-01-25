@@ -24,13 +24,14 @@ createAnalytics <- function(d,
   # Append the distributed MER data and subnat data together
   if (d$info$tool == "OPU Data Pack") {
 
+    #TODO: Fix the names here as this is not aligned with the orgunit structure now
     if (is.null(d$info$psnus)) {
-      d$info$psnus <- datapackr::valid_OrgUnits %>%
+      d$info$psnus <- getValidOrgUnits(d$info$cop_year) %>%
         dplyr::filter(country_uid %in% d$info$country_uids) %>%
         dplyr::select(ou, country_name, snu1, psnu = name, psnu_uid = uid)
     }
     #OPU datapacks have no prioritizations, so we need to get them from DATIM
-    prios <- fetchPrioritizationTable(psnus = d$info$psnus,
+    prios <- fetchPrioritizationTable(psnus = d$info$psnus$psnu_uid,
                                       cop_year = d$info$cop_year,
                                       d2_session = d2_session)
 
@@ -54,7 +55,7 @@ createAnalytics <- function(d,
   d$data$analytics <-
     switch(ifelse(d$info$has_psnuxim, "MER", "UndistributedMER"),
            MER = d$datim$MER,
-           UndistributedMER = d$data$UndistributedMER) %>%
+           UndistributedMER = d$datim$UndistributedMER) %>%
     dplyr::bind_rows(d$datim$subnat_impatt) %>%
     adorn_import_file(cop_year = d$info$cop_year,
                       psnu_prioritizations = pzns,

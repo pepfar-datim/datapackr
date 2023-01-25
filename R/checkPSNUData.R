@@ -65,7 +65,7 @@ checkPSNUData  <-  function(d) {
     }
 
   #Unnest the data
-  valid_Orgs <- datapackr::valid_OrgUnits %>%
+  valid_Orgs <- getValidOrgUnits(d$info$cop_year) %>%
     dplyr::rename(psnu = name, psnu_uid = uid)
 
   vr_data <- vr_data %>%

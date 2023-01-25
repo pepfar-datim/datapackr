@@ -4,10 +4,16 @@
 \alias{packDataPack}
 \title{Pack a Data Pack}
 \usage{
-packDataPack(d, d2_session = dynGet("d2_default_session", inherits = TRUE))
+packDataPack(
+  d,
+  model_data = NULL,
+  d2_session = dynGet("d2_default_session", inherits = TRUE)
+)
 }
 \arguments{
 \item{d}{Datapackr sidecar object}
+
+\item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
 
 \item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
 authentication with DATIM.}
