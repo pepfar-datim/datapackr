@@ -7,6 +7,7 @@ datimutils::loginToDATIM(secrets)
 # NOTE: Full documentation can be found in data.R
 # The current list can be viewed by running View(valid_OrgUnits)
 
+# valid_OrgUnits ----
 # Fetch PSNU values
 valid_OrgUnits <- getDataPackOrgUnits(use_cache = FALSE)
 
@@ -24,6 +25,7 @@ save(valid_OrgUnits,
 
 ## Rebuild the package
 
+# cop_datapack_countries ----
 # If anything has changed at country level or above, update dataframe of data pack countries/names
 
 cop_datapack_countries <- datapackr::valid_OrgUnits %>%

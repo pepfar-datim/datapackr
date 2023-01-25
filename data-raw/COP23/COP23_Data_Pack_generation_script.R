@@ -21,7 +21,9 @@ generation_list <- c("Malawi",
                      "Central America and Brazil",
                      "Caribbean Region",
                      "Cameroon",
-                     "Cote d'Ivoire")
+                     "Cote d'Ivoire",
+                     "Ghana",
+                     "Benin")
 
 pick <- datapackr::cop_datapack_countries %>%
   dplyr::filter(datapack_name %in% generation_list)
