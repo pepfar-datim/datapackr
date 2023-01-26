@@ -173,8 +173,8 @@ writePSNUxIM <- function(d,
       dplyr::group_by(dplyr::across(c(-value))) %>%
       dplyr::summarise(value = sum(value), .groups = "drop")
 
-    #TODO: Replace this with getValidOrgUnits
-    org_units <- datapackr::valid_OrgUnits %>% # Load in valid_PSNUs list from package
+
+    org_units <-  getValidOrgUnits(d$info$cop_year)%>%
       dplyr::filter(country_uid %in% d$info$country_uids) %>%
       add_dp_label(.) %>%
       dplyr::arrange(dp_label) %>%
