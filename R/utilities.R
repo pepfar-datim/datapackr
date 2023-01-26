@@ -203,10 +203,23 @@ getSaneName <- function(datapack_name) {
 #'
 #' @param country_uids List of country UIDs from the \code{d$info$country_uids} object.
 #'
-#' @return d
+#' @return A data frame consisting of the name of the operating unit
 #'
-getOUFromCountryUIDs <- function(country_uids) {
-  ou <- datapackr::valid_OrgUnits %>%
+getOUFromCountryUIDs <- function(country_uids, cop_year = NA) {
+
+
+  if (is.na(cop_year)) {
+    warning("No COP Year specified so using the current COP year")
+    cop_year <- getCurrentCOPYear()
+  }
+
+  if (length(cop_year) > 1) {
+    stop("You must supply a single COP Year!")
+  }
+
+  cop_year %<>% check_cop_year(cop_year = cop_year)
+
+  ou <- getValidOrgUnits(cop_year = cop_year) %>%
     dplyr::select(ou, ou_uid, country_name, country_uid) %>%
     dplyr::distinct() %>%
     dplyr::filter(country_uid %in% country_uids) %>%
