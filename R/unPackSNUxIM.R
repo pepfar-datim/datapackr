@@ -47,7 +47,6 @@ checkHasPSNUxIM <- function(d) {
 #'
 #' @return Modified d object with documented and missing SNUxIM combos
 #'
-#' @example
 extractSNUxIMCombos <- function(d) {
 
   if (is.null(d$data$SNUxIM)) {
@@ -720,7 +719,7 @@ unPackSNUxIM <- function(d) {
 
   #Test for invalid PSNUs
 
-  possible_psnus <- datapackr::valid_OrgUnits %>%
+  possible_psnus <- getValidOrgUnits(d$info$cop_year) %>%
     dplyr::filter(country_uid %in% d$info$country_uids) %>%
     dplyr::rename(psnu_uid = uid) %>%
     dplyr::pull(psnu_uid)

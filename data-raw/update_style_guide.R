@@ -7,11 +7,12 @@
                                   halign = "left",
                                   valign = "center"),
   ## Home Tab OU Name
-    datapack_name = openxlsx::createStyle(fontColour = "#9CBEBD",
+    datapack_name = openxlsx::createStyle(fontColour = "#073763",
                                           fontSize = 64,
                                           textDecoration = "bold",
                                           halign = "left",
                                           valign = "center"),
+
   ## Home Tab PEPFAR banner
     pepfar = openxlsx::createStyle(fontColour = "#7F7F7F",
                                    fontSize = 36,

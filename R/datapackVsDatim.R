@@ -29,7 +29,7 @@ compareData_DatapackVsDatim <-
                                                    d2session = d2_session)
 
       psnus <-
-        datapackr::valid_OrgUnits %>% dplyr::select(psnu = name, psnu_uid = uid)
+        getValidOrgUnits(d$info$cop_year) %>% dplyr::select(psnu = name, psnu_uid = uid)
 
   # calculate diff between data pack and datim handling NAs like a 0
   # round diff to 5 decimal places so we don't get differences due to floating point error
@@ -254,7 +254,7 @@ compareData_OpuDatapackVsDatim <-
 
 
     # Get mer target data from DATIM using data value sets
-    dataset_uids <- getDatasetUids(d$info$cop_year,
+    dataset_uids <- getCOPDatasetUids(d$info$cop_year,
                                    c("mer_targets"))
 
     # package parameters for getDataValueSets function call

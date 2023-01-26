@@ -40,12 +40,12 @@ packDataPackSheets <- function(wb,
   # Get org_units to write into Data Pack based on provided parameters. ####
   if (is.null(org_units)) {
     if (ou_level == "Prioritization") {
-      org_units <- datapackr::valid_OrgUnits %>% # Load in valid_PSNUs list from package
+      org_units <- getValidOrgUnits(cop_year) %>%
         dplyr::filter(country_uid %in% country_uids) %>%
         add_dp_label(.) %>%
         dplyr::arrange(dp_label) %>%
         ## Remove DSNUs
-        dplyr::filter(!is.na(org_type)) %>%
+        dplyr::filter(org_type != "DSNU") %>%
         dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
       #TODO: Update Data Pack and here to use `OrgUnit as column header instead
       # of PSNU to allow custom org unit list.
@@ -87,8 +87,10 @@ packDataPackSheets <- function(wb,
                     & sheet_name %in% names(wb)) %>%
       dplyr::pull(sheet_name) %>% # Extracts the column sheet_name
       unique()
+    skip_pack_tabs <- skip_tabs(tool = "Data Pack", cop_year = cop_year)$pack
 
     sheets <- wb_sheets[wb_sheets %in% schema_sheets]
+    sheets <- sheets[!sheets %in% skip_pack_tabs]
 
     if (length(sheets) == 0) {
       stop("This template file does not appear to be normal.")
@@ -100,11 +102,10 @@ packDataPackSheets <- function(wb,
 
   for (sheet in sheets) {
     interactive_print(sheet)
-    org_units_sheet <- org_units
     sheet_codes <- schema %>%
       dplyr::filter(sheet_name == sheet
                     & col_type %in% c("past", "calculation")) %>%
-      dplyr::pull(indicator_code)# Extracts the column indicator_code
+      dplyr::pull(indicator_code) # Extracts the column indicator_code
 
     ## If no model data needed for a sheet, forward a NULL dataset to prevent errors
     if (length(sheet_codes) != 0) {
@@ -115,7 +116,7 @@ packDataPackSheets <- function(wb,
     }
 
     if (sheet == "AGYW") {
-      org_units_sheet <- datapackr::valid_OrgUnits %>% # Load in valid_PSNUs list from package
+      org_units_sheet <- getValidOrgUnits(cop_year) %>% # Load in valid_PSNUs list from package
         dplyr::filter(country_uid %in% country_uids) %>%
         add_dp_label(.) %>%
         dplyr::arrange(dp_label) %>% # Order rows based on dp_psnu col values
@@ -125,6 +126,8 @@ packDataPackSheets <- function(wb,
       if (NROW(org_units_sheet) == 0) {
         next
       }
+    } else {
+      org_units_sheet <- org_units
     }
 
     wb <- packDataPackSheet(wb = wb,

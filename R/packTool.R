@@ -42,11 +42,13 @@ packTool <- function(model_data = NULL,
     assign(p, purrr::pluck(params, p))
   }
 
+  rm(params, p)
+
   # Set global numeric format ####
   options("openxlsx.numFmt" = "#,##0")
 
   # Create data sidecar ####
-  d <- datapackr::createDataPack(datapack_name = datapack_name,
+  d <- createDataPack(datapack_name = datapack_name,
                                  country_uids = country_uids,
                                  template_path = template_path,
                                  cop_year = cop_year,
@@ -62,25 +64,13 @@ packTool <- function(model_data = NULL,
   d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
 
-  # Get PSNU List####
-  d$data$PSNUs <- datapackr::valid_OrgUnits %>%
-    dplyr::filter(country_uid %in% country_uids) %>%
-    add_dp_label(.) %>%
-    dplyr::arrange(dp_label) %>%
-    ## Remove DSNUs
-    dplyr::filter(!is.na(org_type)) %>%
-    dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
-
-  # TODO: Separate PSNUs as parameter for this function, allowing you to include
-  # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
-
   # Pack file based on type ####
   if (d$info$tool == "Data Pack") {
     d <- packDataPack(d,
                       model_data = model_data,
                       d2_session = d2_session)
   } else if (d$info$tool == "OPU Data Pack") {
-    print(paste("Expand formulas is ", expand_formulas))
+
     d <- packOPUDataPack(d,
                          undistributed_mer_data = undistributed_mer_data,
                          expand_formulas = expand_formulas,
@@ -92,25 +82,31 @@ packTool <- function(model_data = NULL,
 
   # Save & Export Workbook ####
   interactive_print("Saving...")
+  if (d$info$cop_year == 2023 && d$info$tool == "Data Pack") {
+    tool_name <- "Target Setting Tool"
+  } else {
+    tool_name <- d$info$tool
+  }
+
   d$info$output_file <- exportPackr(data = d$tool$wb,
-              output_folder = d$keychain$output_folder,
-              tool = d$info$tool,
-              datapack_name = d$info$datapack_name)
+                                    output_folder = d$keychain$output_folder,
+                                    tool = tool_name,
+                                    datapack_name = d$info$datapack_name)
 
   # Save & Export Archive ####
   if (results_archive) {
     interactive_print("Archiving...")
     d$info$output_file <- exportPackr(data = d,
-                output_folder = d$keychain$output_folder,
-                tool = "Results Archive",
-                datapack_name = d$info$datapack_name)
+                                      output_folder = d$keychain$output_folder,
+                                      tool = "Results Archive",
+                                      datapack_name = d$info$datapack_name)
   }
 
   # Print messages ####
-  interactive_print(d$info$messages)
+  printMessages(d$info$messages)
 
   #Return the d object for testing purposes
-  d
+  return(d)
 
 
 }

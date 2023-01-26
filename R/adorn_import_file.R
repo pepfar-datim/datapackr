@@ -9,18 +9,20 @@
 #' the parent prioritization should be used.
 #'
 #' @param snu_uids List of UIDs corresponding to DATIM organisation units.
+#' @param cop_year The COP year for the data.
 #' @inheritParams datapackr_params
 #'
 #' @return Tibble of orgunits mapped to orgunit name, PSNU name, & PSNU uid.
 getPSNUInfo <- function(snu_uids,
+                        cop_year,
                         d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
 
-  orgunits <- valid_OrgUnits %>%
+  orgunits <- getValidOrgUnits(cop_year) %>%
     dplyr::filter(uid %in% unique(snu_uids)) %>%
     dplyr::select(name, uid, ancestors, organisationUnitGroups)
 
-  uids_not_cached <- snu_uids[!snu_uids %in% valid_OrgUnits$uid]
+  uids_not_cached <- snu_uids[!snu_uids %in% getValidOrgUnits(cop_year)$uid]
 
   if (length(uids_not_cached) > 0) {
     orgunits <-
@@ -98,9 +100,10 @@ adorn_import_file <- function(psnu_import_file,
 
   cop_year %<>% check_cop_year()
 
+  valid_orgunits_local <- getValidOrgUnits(cop_year)
   # Adorn orgunits ----
   psnu_import_file %<>%
-    dplyr::left_join(dplyr::select(valid_OrgUnits, -lastUpdated),
+    dplyr::left_join(dplyr::select(valid_orgunits_local, -lastUpdated),
                      by = c("orgUnit" = "uid"))
 
   # Utilizes row_num to ensure the join worked as expected
@@ -121,7 +124,7 @@ adorn_import_file <- function(psnu_import_file,
                        by = c("value")) %>%
       dplyr::filter(!is.na(prioritization)) %>%
       dplyr::select(-value) %>%
-      dplyr::semi_join(valid_OrgUnits %>%
+      dplyr::semi_join(getValidOrgUnits(cop_year) %>%
                          dplyr::filter(org_type %in% c("PSNU", "Country")),
                        by = c("orgUnit" = "uid"))
 

@@ -11,6 +11,7 @@ fetchPrioritizationTable <- function(psnus, cop_year,
                                                            inherits = TRUE)) {
   period <- paste0(cop_year, "Oct")
 
+  stopifnot("PSNUs must be a vector" =  is.vector(psnus))
   #We need to split up the requests if there are many PSNUs
   # Explicitly filter Military data which may have an assigned prioritization
   # level below the PSNU level. This will get aggregated in the analytics
@@ -34,18 +35,18 @@ fetchPrioritizationTable <- function(psnus, cop_year,
     })
   }
 
-  n_requests <- ceiling(nchar(paste(psnus$psnu_uid, sep = "", collapse = ";")) / 2048)
+  n_requests <- ceiling(nchar(paste(psnus, sep = "", collapse = ";")) / 2048)
 
   if (n_requests > 1) {
-    n_groups <- split(psnus$psnu_uid, cut(seq_along(psnus$psnu_uid), breaks = n_requests + 1, labels = FALSE))
+    n_groups <- split(psnus, cut(seq_along(psnus), breaks = n_requests + 1, labels = FALSE))
   } else {
-    n_groups <- list("1" = psnus$psnu_uid)
+    n_groups <- list("1" = psnus)
   }
 
   prios <- n_groups %>% purrr::map_dfr(function(x) getPriosFromDatim(x))
 
   if (NROW(prios) == 0) {
-    return(data.frame("orgUnit" = unique(psnus$psnu_uid),
+    return(data.frame("orgUnit" = unique(psnus),
                       "value" = 0))
   }
 

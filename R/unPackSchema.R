@@ -38,12 +38,12 @@ getSkipSheets <- function(schema, tool, cop_year) {
 
   #Skip sheets which are defined in the schema
   schema_skip <- schema %>%
-    dplyr::filter(sheet_name %in% package_skip) %>%
+    dplyr::filter(sheet_name %in% package_skip$schema) %>%
     dplyr::select(sheet_name, sheet_num) %>%
     dplyr::distinct()
 
    list(
-    package_skip = package_skip,
+    package_skip = package_skip$schema,
     num = schema_skip$sheet_num,
     names = schema_skip$sheet_name)
 }
@@ -52,7 +52,7 @@ uid_pattern <- function() {
   "[A-Za-z][A-Za-z0-9]{10}"
 }
 multi_uid_pattern <- function() {
-  paste0("^(", uid_pattern(), ")(\\.((", uid_pattern(), ")))*$")
+  paste0("^(\\{EID\\})?(", uid_pattern(), ")(\\.((\\{KP\\})?(", uid_pattern(), ")))*$")
   }
 
 
@@ -306,13 +306,14 @@ checkSchema <- function(schema,
     assign(p, purrr::pluck(params, p))
   }
 
-  # Checks to perform if template_path_provided is TRUE ####
-  if (template_path_provided) {
-    ## If template_path provided, check it and unpack it to create comparison schema.####
+  rm(params, p)
+
+  # Create comparison schema. ####
     filepath_schema <-
       unPackSchema(
         template_path = template_path,
         skip = skip_tabs(tool = tool, cop_year = cop_year),
+        tool = tool,
         cop_year = cop_year)
 
     ## If schema_object is provided, check schema against filepath_schema ####
@@ -324,16 +325,15 @@ checkSchema <- function(schema,
     ## If schema_object not provided, use filepath_schema ####
     schema <- schema %||% filepath_schema
 
-    ## Sheet Names complete ####
-    tests$sheet_names_complete <-
-      checkSchema_SheetNames(schema, filepath_schema)
-  }
-
   # Validate schema ####
   # No matter what, we now have a schema to work from.
   # For all the below tests, TRUE = test fail
 
   tests <- list()
+
+  ## Sheet Names complete ####
+  tests$sheet_names_complete <-
+    checkSchema_SheetNames(schema, filepath_schema)
 
   ## All Skipped sheets included  ####
   tests$skipped_sheets <- checkSchema_SkippedSheets(schema, tool, cop_year)
@@ -403,36 +403,45 @@ unPackSchema <- function(template_path = NULL,
                          cop_year = NULL) {
 
   # Validate parameters ####
-  params <- check_params(cop_year = cop_year %missing% NULL,
-                         tool = tool %missing% NULL,
-                         template_path = template_path %missing% NULL)
+  # params <- check_params(cop_year = cop_year %missing% NULL,
+  #                        tool = tool %missing% NULL,
+  #                        template_path = template_path %missing% NULL)
+  #
+  # for (p in names(params)) {
+  #   assign(p, purrr::pluck(params, p))
+  # }
+  #
+  # rm(params, p)
 
-  for (p in names(params)) {
-    assign(p, purrr::pluck(params, p))
-  }
-
-  rm(params, p)
-
-  if (tool == "OPU Data Pack Template" && cop_year %in% c(2021, 2022)) {
-    schema <- tidyxl::xlsx_cells(path = template_path, include_blank_cells = TRUE) %>%
-      dplyr::select(sheet_name = sheet, col, row, character, formula, numeric, is_array)
+  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack")
+        && cop_year %in% c(2021, 2022)) {
+    include_blank_cells <-  TRUE
   } else {
-    schema <- tidyxl::xlsx_cells(path = template_path, include_blank_cells = FALSE) %>%
-      dplyr::select(sheet_name = sheet, col, row, character, formula, numeric)
+    include_blank_cells <-  FALSE
   }
 
-  sheets <- data.frame(sheet_name = unique(schema$sheet_name), stringsAsFactors = FALSE)
-  sheets$sheet_num <- seq_len(NROW(sheets))
+  schema <- tidyxl::xlsx_cells(path = template_path,
+                               include_blank_cells = include_blank_cells) %>%
+    dplyr::select(sheet_name = sheet,
+                  col,
+                  row,
+                  character,
+                  formula,
+                  numeric,
+                  is_array)
+
+  sheet_nums <- data.frame(sheet_name = unique(schema$sheet_name), stringsAsFactors = FALSE)
+  sheet_nums$sheet_num <- seq_len(NROW(sheet_nums))
 
   schema <- schema %>%
-    dplyr::inner_join(sheets, by = c("sheet_name"))
+    dplyr::inner_join(sheet_nums, by = c("sheet_name"))
 
   # Skip detail on listed sheets. ####
   if (is.null(skip)) {
     skip <- skip_tabs(tool = tool, cop_year = cop_year)
   }
-  sheets <- tidyxl::xlsx_sheet_names(template_path)
-  verbose_sheets <- sheets[!sheets %in% skip]
+  sheets <- unique(schema$sheet_name)
+  verbose_sheets <- sheets[!sheets %in% skip$schema]
 
   schema %<>%
     dplyr::filter(sheet_name %in% verbose_sheets,
@@ -463,7 +472,7 @@ unPackSchema <- function(template_path = NULL,
     dplyr::mutate(formula = dplyr::if_else(is.na(formula), value, formula))
 
   # For OPU Data Packs, delete everything in metadata rows/cols
-  if (tool == "OPU Data Pack Template") {
+  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack")) {
     schema %<>%
       dplyr::mutate_at(
         dplyr::vars(
@@ -477,7 +486,7 @@ unPackSchema <- function(template_path = NULL,
     ~name, ~id,
     NA_character_, NA_character_))
 
-  if (tool == "OPU Data Pack Template") {
+  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack")) {
     disaggs <- list(tibble::tribble(
       ~name, ~id,
       NA_character_, NA_character_))
@@ -490,10 +499,17 @@ unPackSchema <- function(template_path = NULL,
       )
   }
 
-  if (tool == "Data Pack Template") {
+  if (tool %in% c("Data Pack Template", "Data Pack")) {
 
-    #TODO: Consider to change the structure of datapack_cogs
-    #to use the COP year instead of COPXX
+    # if (cop_year == 2021) {
+    #   map_datapack_cogs <- datapackr::datapack_cogs$COP21
+    # } else if (cop_year %in% c(2022)) {
+    #   map_datapack_cogs <- datapackr::datapack_cogs$COP22
+    # } else if (cop_year %in% c(2023)) {
+    #   map_datapack_cogs <- datapackr::datapack_cogs$COP23
+    # } else {
+    #   stop("Can't find categoryOptionGroups for that cop_year and tool.")
+    # }
 
     cop_year_select <- gsub("^20", "COP", as.character(cop_year))
     map_datapack_cogs <- datapackr::datapack_cogs %>%
@@ -572,13 +588,16 @@ unPackSchema <- function(template_path = NULL,
   schema %<>%
     dplyr::mutate(
       FY = dplyr::case_when(
-        stringr::str_detect(indicator_code, "\\.T$") ~ cop_year + 1,
-        (stringr::str_detect(indicator_code, "\\.T_1$")
-          & dataset == "impatt"
-          & !stringr::str_detect(indicator_code, "PRIORITY_SNU"))
-         ~ cop_year + 1,
+        stringr::str_detect(indicator_code, "\\.(T|M|C)$") ~ cop_year + 1,
+        # # Accommodate OGAC request to place Spectrum IMPATT data in planning FY
+        # # instead of projection year. (+1 FY)
+        # (stringr::str_detect(indicator_code, "\\.T_1$")
+        #   & dataset == "impatt"
+        #   & !stringr::str_detect(indicator_code, "PRIORITY_SNU"))
+        #  ~ cop_year + 1,
         stringr::str_detect(indicator_code, "\\.T_1$") ~ cop_year,
         stringr::str_detect(indicator_code, "\\.R$") ~ cop_year - 1,
+        stringr::str_detect(indicator_code, "\\.(T|M)2$") ~ cop_year + 2,
       # Apply default cop_year to blank cols in PSNUxIM tab
         dataset == "mer" & col_type == "target" ~ cop_year + 1,
         TRUE ~ NA_real_
@@ -597,15 +616,20 @@ unPackSchema <- function(template_path = NULL,
   skipped_schema[] <- mapply(FUN = as, skipped_schema, sapply(schema, class), SIMPLIFY = FALSE)
 
   skipped_schema %<>%
-    tibble::add_row(sheet_name = skip, sheet_num = seq_along(skip)) %>%
-    dplyr::mutate(valid_ages = empty, valid_sexes = empty, valid_kps = empty)
+    tibble::add_row(sheet_name = skip$schema) %>%
+    dplyr::mutate(valid_ages = empty, valid_sexes = empty, valid_kps = empty) %>%
+    dplyr::select(-sheet_num) %>%
+    dplyr::left_join(sheet_nums, by = "sheet_name")
 
    #Return the final schema
-    dplyr::bind_rows(skipped_schema, schema) %>%
+  schema <- dplyr::bind_rows(skipped_schema, schema) %>%
     dplyr::mutate(
       data_structure =
-        dplyr::case_when(sheet_name %in% skip ~ "skip",
+        dplyr::case_when(sheet_name %in% skip$schema ~ "skip",
                          TRUE ~ "normal")) %>%
-    dplyr::select(sheet_num, sheet_name, data_structure, dplyr::everything())
+    dplyr::select(sheet_num, sheet_name, data_structure, dplyr::everything()) %>%
+    dplyr::arrange(sheet_num)
+
+  return(schema)
 
 }

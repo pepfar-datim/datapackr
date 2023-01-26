@@ -6,7 +6,7 @@
 #' @return Current COP Year. (e.g., for COP19, returns 2019)
 #'
 getCurrentCOPYear <- function() {
-  2022
+  2023
 }
 
 
@@ -17,9 +17,9 @@ getCurrentCOPYear <- function() {
 datapackrSupports <- function() {
   tibble::tribble(
     ~tool, ~yrs,
-    "Data Pack", c(2021, 2022),
+    "Data Pack", c(2021, 2022, 2023),
     "OPU Data Pack", c(2021, 2022),
-    "Data Pack Template", c(2021, 2022),
+    "Data Pack Template", c(2021, 2022, 2023),
     "OPU Data Pack Template", c(2021, 2022))
 }
 
@@ -113,19 +113,36 @@ dataPackName_homeCell <- function() {
 #' @param cop_year COP year for dating as well as selection of
 #' templates.
 #'
-#' @return Character vector of tab names to skip.
+#' @return List of tab names to skip.
 #'
 skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
+
+  skip <- list("pack" = c(NA_character_),
+               "unpack" = c(NA_character_),
+               "schema" = c(NA_character_))
+
   if (tool %in% c("Data Pack", "Data Pack Template")) {
-    if (cop_year %in% c(2021)) {
-      skip <- c("Home", "Summary", "Spectrum", "KP Validation")
-    } else if (cop_year %in% c(2022)) {
-      skip <- c("Home", "Spectrum", "KP Validation")
-    }
-  } else if (tool == "OPU Data Pack Template" && cop_year %in% c(2021, 2022)) {
-    skip <- c("Home")
-  } else {
-    skip <- c(NA_character_)
+    skip$pack <-
+      switch(as.character(cop_year),
+             "2021" = c("Home", "Summary", "Spectrum", "KP Validation"),
+             "2022" = c("Home", "Spectrum", "KP Validation"),
+             "2023" = c("Home", "Spectrum", "Year 2"),
+             NA_character_)
+
+    skip$unpack <-
+      switch(as.character(cop_year),
+             "2021" = c("Home", "Summary", "Spectrum", "KP Validation"),
+             "2022" = c("Home", "Spectrum", "KP Validation"),
+             "2023" = c("Home", "Spectrum", "KP Validation"),
+             NA_character_)
+
+    skip$schema <- skip$pack[skip$pack %in% skip$unpack]
+
+  } else if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM Tool") &&
+             cop_year %in% c(2021, 2022, 2023)) {
+    skip$pack <- c("Home")
+    skip$unpack <- c("Home")
+    skip$schema <- c("Home")
   }
 
   return(skip)
@@ -142,8 +159,8 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 #'
 headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
 
-  if (cop_year %in% supportedCOPYears()) {
-    if (tool %in% supportedTools()) {
+  if (cop_year %in% c(2021, 2022, 2023)) {
+    if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
       header_row <- 14
     } else {
       stop("That tool type is not supported for that cop_year.")
@@ -193,6 +210,8 @@ pick_schema <- function(cop_year, tool) {
       schema <- datapackr::cop21_data_pack_schema
     } else if (cop_year == 2022) {
       schema <- datapackr::cop22_data_pack_schema
+    } else if (cop_year == 2023) {
+      schema <- datapackr::cop23_data_pack_schema
     } else {
       stop("Data Pack schema not available for the COP year provided.")
     }
@@ -237,6 +256,8 @@ pick_template_path <- function(cop_year, tool) {
       template_filename <- "COP21_Data_Pack_Template.xlsx"
     } else if (cop_year == 2022) {
       template_filename <- "COP22_Data_Pack_Template.xlsx"
+    } else if (cop_year == 2023) {
+      template_filename <- "COP23_Data_Pack_Template.xlsx"
     }
   }
 
