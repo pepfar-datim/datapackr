@@ -237,3 +237,25 @@ test_that("Can calculate a max by row for a data frame", {
   expect_named(test_result, c(names(test_data), "row_max"), ignore.order = TRUE)
   expect_true(all(is.na(test_result$row_max)))
 })
+
+test_that("Can get an operating unit from country UIDs", {
+  #Use Angola's UID
+  expect_warning(getOUFromCountryUIDs("XOivy2uDpMF"))
+  expect_error(getOUFromCountryUIDs(cop_year = 2023))
+  expect_error(getOUFromCountryUIDs("foo", 2023))
+  expect_error(getOUFromCountryUIDs("XOivy2uDpMF", 1776))
+  expect_error(getOUFromCountryUIDs("XOivy2uDpMF", c(2022, 2023)))
+
+  df <- getOUFromCountryUIDs("XOivy2uDpMF", 2023)
+  expect_named(df, c("ou", "ou_uid"))
+  expect_true(NROW(df) == 1)
+  expect_true(is_uidish(df$ou_uid))
+
+  #Kazakhstan and Kygrystan
+  df <- getOUFromCountryUIDs(country_uids = c("xVvOdyoS7wi", "vm58KTm9wvy"), cop_year = 2023)
+  expect_equal("Asia Region", df$ou)
+
+  #Kazakhstan and Angola
+  expect_error(getOUFromCountryUIDs(country_uids = c("XOivy2uDpMF", "vm58KTm9wvy"), cop_year = 2023))
+
+})

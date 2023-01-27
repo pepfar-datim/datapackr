@@ -158,7 +158,7 @@ createKeychainInfo <- function(submission_path = NULL,
 
   ## Determine additional Organisation Unit information and save
   ## under `d$info$operating_unit` for use in validating mechanisms
-  d$info$operating_unit <- getOUFromCountryUIDs(d$info$country_uids)
+  d$info$operating_unit <- getOUFromCountryUIDs(d$info$country_uids, d$info$cop_year)
 
   # submission_path ----
   d$keychain$submission_path <- handshakeFile(path = d$keychain$submission_path,
