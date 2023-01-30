@@ -22,7 +22,7 @@ library(datapackr)
 9. If you are prompted in the Console to select which packages to update, just hit Enter to bypass.
 10. If this presents issues, contact the development team via [DATIM Support](https://datim.zendesk.com) (DATIM users only).
 11. If the package loads without issue, restart your R session.
-12. Copy, paste, and run the following code in RStudio:
+12. Copy, paste, and run the following code in RStudio — make sure to insert your actual DATIM username and password.:
 
 ```R
 loginToDATIM(username = "MyUsername", password = "MyPassword123", base_url = "datim.org/")
