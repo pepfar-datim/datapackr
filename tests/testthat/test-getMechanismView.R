@@ -30,7 +30,7 @@ context("Get a mechanism view")
       expect_identical("Zambia", unique(zambia_mechs$ou))
 
       #Should not include dedupe
-      expect_false(any(zambia_mechs$mechanism_code %in% c("00000","000001")))
+      expect_false(any(zambia_mechs$mechanism_code %in% c("00000", "000001")))
 
       zambia_mechs <- getMechanismView(country_uids = "f5RoebaDLMx",
                                        include_dedupe = TRUE,

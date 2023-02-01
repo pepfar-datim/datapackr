@@ -5,7 +5,7 @@
   #We are going to make this large request once by partition it by COP year
   #This query usually times out if it is made without filters.
   cop_years <- supportedCOPYears()
-  mechs_list <- vector(mode='list', length=length(cop_years))
+  mechs_list <- vector(mode = "list", length = length(cop_years))
 
   for (i in seq_len(length(cop_years))) {
     url_filter <-
@@ -187,7 +187,7 @@ if (!is.null(cop_year)) {
   if (any(duplicated(mechs$mechanism_code))) {
 
     stop("Duplicated mechanisms codes detected: ",
-         paste(mechs$mechanism_code[duplicated(mechs$mechanism_code)], sep="", collapse=","))
+         paste(mechs$mechanism_code[duplicated(mechs$mechanism_code)], sep = "", collapse = ","))
   }
 
   if (!structure_ok) warning("Mechanism view names are not correct!")
