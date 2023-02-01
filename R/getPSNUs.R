@@ -139,6 +139,6 @@ add_dp_label <- function(orgunits) {
           country_count > 1 & country_uid != uid,
           paste0(country_name, " > "), ""),
         name,
-        " [#", org_type, "] ",
+        " [#", org_type, "]",
         " [", uid, "]"))
 }

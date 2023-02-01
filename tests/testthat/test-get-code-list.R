@@ -35,6 +35,29 @@ with_mock_api({
   })
 })
 
+
+test_that("We can add a DataPack Label", {
+
+  #Angola
+  df <- getValidOrgUnits(2022) %>%
+    dplyr::filter(ou == "Angola")
+  df2 <- add_dp_label(df)
+  expect_true(setequal(names(df2),  c(names(df), "dp_label")))
+  expect_true(all(stringr::str_detect(df2$dp_label, "^(.+) \\[#[A-Za-z0-9]+\\] \\[[A-Za-z0-9]+\\]$")))
+
+  #Asia region. The DP label takes a different form
+  df <- getValidOrgUnits(2022) %>%
+    dplyr::filter(ou == "Asia Region")
+  df2 <- add_dp_label(df)
+  expect_true(setequal(names(df2),  c(names(df), "dp_label")))
+
+  matches <- stringr::str_detect(df2$dp_label, "^(.+) > (.+) \\[#[A-Za-z0-9]+\\] \\[[A-Za-z0-9]+\\]$")
+  #There is an exception when a country is a PSNU
+  psnu_countries <- df2$country_uid == df2$uid
+  expect_true(all(matches | psnu_countries))
+
+})
+
 with_mock_api({
   test_that("We can get a map of COCs to COs", {
 
