@@ -66,11 +66,8 @@ packPSNUxIM <- function(wb, # Workbook object
   #how the data gets spread between DSD and TA.
 
   #Choose the correct adornment file based on the tool
-  if (tool == "OPU Data Pack" && cop_year == 2022) {
-    map_des_cocs <- cop22_map_adorn_import_file
-  } else {
-    map_des_cocs <- NULL
-  }
+  map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year = cop_year,
+                                                datasource = tool)
 
   ## Translate from import format ####
   snuxim_model_data %<>%
