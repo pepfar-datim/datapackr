@@ -1,3 +1,48 @@
+
+.fetchMechanismViewFromDATIM <- function(d2_session) {
+  interactive_print("Fetching new mechs file from DATIM")
+
+  #We are going to make this large request once by partition it by COP year
+  #This query usually times out if it is made without filters.
+  cop_years <- supportedCOPYears()
+  mechs_list <- vector(mode='list', length=length(cop_years))
+
+  for (i in seq_len(length(cop_years))) {
+    url_filter <-
+      c(
+        paste0("startdate:lt:", as.numeric(cop_years[i]) + 1, "-10-01"),
+        paste0("enddate:gt:", cop_years[i], "-09-30")
+      )
+
+    mechs_list[[i]] <- datimutils::getSqlView(
+      url_filter,
+      sql_view_uid = "fgUtV6e9YIX",
+      d2_session = d2_session,
+      timeout = 600
+    )
+
+  }
+
+  mechs <- purrr::map_df(mechs_list, rbind.data.frame) %>%
+    dplyr::distinct()
+
+  special_mechs  <- datimutils::getSqlView(
+    "code:^like:00",
+    sql_view_uid = "fgUtV6e9YIX",
+    d2_session = d2_session,
+    timeout = 600
+  )
+
+   dplyr::bind_rows(special_mechs, mechs) %>%
+     dplyr::rename(
+       mechanism_desc = mechanism,
+       attributeOptionCombo = uid,
+       mechanism_code = code,
+       partner_desc = partner,
+       partner_id = primeid)
+
+
+}
 #' @export
 #' @title getMechanismView
 #'
@@ -70,31 +115,12 @@ getMechanismView <- function(country_uids = NULL,
   }
 
   if (!is_fresh) {
-    interactive_print("Fetching new mechs file from DATIM")
-    mechs <- datimutils::getSqlView(sql_view_uid = "fgUtV6e9YIX", d2_session = d2_session)
-
-    mechs <- mechs %>%
-      dplyr::rename(
-        mechanism_desc = mechanism,
-        attributeOptionCombo = uid,
-        mechanism_code = code,
-        partner_desc = partner,
-        partner_id = primeid)
-
+    mechs <- .fetchMechanismViewFromDATIM(d2_session = d2_session)
     if (can_write_file) {
       interactive_print(paste0("Overwriting stale mechanisms view to ", cached_mechs_path))
       saveRDS(mechs, file = cached_mechs_path)
-      }
+    }
 }
-
-
-#Keep these separate if we need them after other filtering
-dedupe_mechs <- mechs %>%
-  dplyr::filter(mechanism_code %in% c("00000", "00001"))
-
-moh_mechs <- mechs %>%
-  dplyr::filter(mechanism_code %in% c("00100", "00200"))
-
 
 
 # Filter by COP Year ####
@@ -124,17 +150,19 @@ if (!is.null(cop_year)) {
       unique(.)
 
     mechs %<>%
-      dplyr::filter(ou %in% ous)
+      dplyr::filter(ou %in% ous | is.na(ou))
   }
 
 
   # Include Dedupe or MOH ####
-  if (include_MOH) {
-    mechs <- dplyr::bind_rows(mechs, moh_mechs)
+  if (!include_MOH) {
+    mechs <- mechs %>%
+      dplyr::filter(!(mechanism_code %in% c("00100", "00200")))
   }
 
-  if (include_dedupe) {
-    mechs <-  dplyr::bind_rows(mechs, dedupe_mechs)
+  if (!include_dedupe) {
+    mechs <-  mechs %>%
+      dplyr::filter(!(mechanism_code %in% c("00000", "00001")))
   }
 
   if (include_default) {
@@ -157,7 +185,9 @@ if (!is.null(cop_year)) {
   structure_ok <- dplyr::setequal(names(empty_mechs_view), names(mechs))
 
   if (any(duplicated(mechs$mechanism_code))) {
-    stop("Duplicated mechanisms codes detected¸")
+
+    stop("Duplicated mechanisms codes detected: ",
+         paste(mechs$mechanism_code[duplicated(mechs$mechanism_code)], sep="", collapse=","))
   }
 
   if (!structure_ok) warning("Mechanism view names are not correct!")

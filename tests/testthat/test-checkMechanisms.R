@@ -1,6 +1,6 @@
 context("Check mechanism validity")
 
-#Using mock data.csv-3b3c4f.json
+
 with_mock_api({
   test_that("Can flag invalid mechanisms", {
 
