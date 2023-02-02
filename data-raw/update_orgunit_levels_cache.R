@@ -27,11 +27,11 @@ cop21_ou_levels <- fetchOrgunitLevels(2021, prod)
 cop22_ou_levels <- fetchOrgunitLevels(2022, prod)
 cop23_ou_levels <- fetchOrgunitLevels(2023, cop_test)
 ou_levels <- rbind(cop21_ou_levels, cop22_ou_levels, cop23_ou_levels) %>%
-  dplyr::mutate(country_name = ifelse(country_name == "",ou, country_name),
+  dplyr::mutate(country_name = ifelse(country_name == "", ou, country_name),
                 iso4 = ifelse(iso4 == "", iso3, iso4))
 
 
-ous <- valid_OrgUnits %>% dplyr::select(country_name,ou_uid, country_uid) %>% dplyr::distinct()
+ous <- valid_OrgUnits %>% dplyr::select(country_name, ou_uid, country_uid) %>% dplyr::distinct()
 
 dataset_levels <- ou_levels %>% dplyr::left_join(ous, by = "country_name")
 
