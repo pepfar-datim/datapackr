@@ -1063,7 +1063,62 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
   return(ch)
 }
 
+#' Title checkPSNUxIMDisaggs
+#'
+#' @param d Datapack d object
+#'
+#' @return d Datapack d object
+#' @export
+#'
 
+checkPSNUxIMDisaggs <- function(d) {
+  #We use the DATIM DE/COC map here even if this is a datapack
+  #Since we assume that the disaggs in the PSNUxIM tab match
+  #DATIM.
+  de_coc_map <-
+    getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year, datasource = "DATIM") %>%
+    dplyr::select(indicator_code,
+                  "Age" = valid_ages.name,
+                  Sex = valid_sexes.name,
+                  "KeyPop" = valid_kps.name) %>%
+    dplyr::mutate(exists = TRUE)
+
+  data <- d$data$SNUxIM %>%
+    dplyr::select(PSNU, indicator_code, "Age", "Sex", "KeyPop")
+
+  defunct_disaggs <- dplyr::left_join(data, de_coc_map)
+
+  if (any(is.na(defunct_disaggs$exists))) {
+
+    affected_rows <- which(is.na(defunct_disaggs$exists))
+
+    d$tests$invalid_psnuxim_disaggs <- defunct_disaggs %>%
+      dplyr::filter(is.na(exists)) %>%
+      dplyr::select(-exists)
+
+    attr(d$tests$invalid_psnuxim_disaggs, "test_name") <- "Invalid PSNUxIM Disaggs"
+
+    lvl <- "ERROR"
+
+    msg <-
+            paste0(lvl, "! In tab PSNUxIM ", length(affected_rows),
+            " invalid disaggregate combinations found. Please review all rows of data flagged by this test to ensure",
+            " no Age, Sex, or Key Population disaggregates have been inadvertently or",
+            " incorrectly altered. If you believe this has been flagged in error, ",
+            " please first refer to MER Guidance to confirm valid disaggregates for",
+            " the data element flagged. (Check MER Guidance for correct alternatives.",
+            " Also note that single-digit ages should be left-padded with zeros,",
+            " e.g., 01-04 instead of 1-4.)",
+            " The following rows are implicated: ", formatSetStrings(affected_rows), "\n\t")
+
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
+    d$info$has_error <- TRUE
+  }
+
+  d
+
+
+}
 
 #' @export
 #' @rdname unPackDataChecks
