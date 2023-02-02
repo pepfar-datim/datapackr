@@ -280,6 +280,8 @@ test_that("Can flag invalid disaggs in PSNUxIM", {
   #Flag invalid disaggs
   d$data$SNUxIM <- tibble::tribble(
     ~PSNU, ~indicator_code, ~Age, ~Sex, ~KeyPop, ~DataPackTarget,
+    "Fish District [AYWv44mLzDN]", "TX_CURR.T", "25-29", "Female", NA, 10,
+    "Dog District [BYWv44mLzDN]", "TX_CURR.T", "25-29", "Female", NA, 10,
     "Cupcake District [NYWv44mLzDN]", "TX_CURR.T", "25-49", "F", NA, 10,
     "Bagel District [ZYWv44mLzDN]", "TX_CURR.T", "25-49", "F", NA, 10)
 
@@ -288,6 +290,9 @@ test_that("Can flag invalid disaggs in PSNUxIM", {
   expect_true(d$info$has_error)
   expect_equal(2L, NROW(d$tests$invalid_psnuxim_disaggs))
   expect_true(grepl("invalid disagg", d$info$messages$message))
+  expect_setequal(c("Cupcake District [NYWv44mLzDN]", "Bagel District [ZYWv44mLzDN]"), d$tests$invalid_psnuxim_disaggs$PSNU)
+  #Expect an offset here due to the header row
+  expect_setequal(c(17,18), d$tests$invalid_psnuxim_disaggs$row_number)
 
 })
 
