@@ -290,9 +290,11 @@ test_that("Can flag invalid disaggs in PSNUxIM", {
   expect_true(d$info$has_error)
   expect_equal(2L, NROW(d$tests$invalid_psnuxim_disaggs))
   expect_true(grepl("invalid disagg", d$info$messages$message))
-  expect_setequal(c("Cupcake District [NYWv44mLzDN]", "Bagel District [ZYWv44mLzDN]"), d$tests$invalid_psnuxim_disaggs$PSNU)
+  expect_setequal(c("Cupcake District [NYWv44mLzDN]",
+                    "Bagel District [ZYWv44mLzDN]"),
+                  d$tests$invalid_psnuxim_disaggs$PSNU)
   #Expect an offset here due to the header row
-  expect_setequal(c(17,18), d$tests$invalid_psnuxim_disaggs$row_number)
+  expect_setequal(c(17, 18), d$tests$invalid_psnuxim_disaggs$row_number)
 
 })
 
