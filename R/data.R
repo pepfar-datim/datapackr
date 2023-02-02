@@ -608,3 +608,22 @@
 #'
 #' @source \url{https://www.datim.org/}
 "cop_validation_rules"
+
+
+#' Structure for DATIM data set levels.
+#'
+#' @format ## `dataset_levels`
+#' \describe{
+#' * \item{iso3, iso4}{ISO codes of the Operating unit and country}
+#' * \item{ou}{Name of the operating unit}
+#' * \item{country_name}{Name of the country}
+#' * \item{country_level}{Level of the country in the DATIM hierarchy}
+#' * \item{facility_level}{Level of facilities in the DATIM hierarchy}
+#' * \item{community_level}{Community data set level in the DATIM hierarchy}
+#' * \item{prioritization}{Prioritization level / target setting level in the DATIM hierarchy}
+#' * \item{cop_year}{The COP Year for which the other values are valid}
+#' * \item{ou_uid}{UID of the countries operating unit for a given COP year}
+#' * \item{country_uid}{UID of the country.}
+#' }
+#' @source \url{https://www.datim.org/}
+"dataset_levels"
