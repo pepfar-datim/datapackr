@@ -92,7 +92,6 @@ testthat::test_that("can test prepare_model_data.PSNUXIM...", {
       unique(res[res$indicator_code %in% c("PMTCT_EID.N.2.T", "PMTCT_EID.N.12.T"), ]$Age)
       )
     )
-  rm(res)
 
   # test end result should look as it should
   expected_res <-
