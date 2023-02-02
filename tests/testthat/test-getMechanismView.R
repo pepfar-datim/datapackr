@@ -19,26 +19,26 @@ context("Get a mechanism view")
       expect_true(all(is_uidish(mechs$attributeOptionCombo)))
 
 
+      zambia_mechs <- getMechanismView(country_uids = "f5RoebaDLMx",
+                                       cop_year = 2022,
+                                       include_dedupe = FALSE,
+                                       include_default = FALSE,
+                                       include_MOH = FALSE,
+                                       d2_session = training)
+
       #Zambia mechs only
-      expect_identical("Zambia", unique(getMechanismView(country_uids = "f5RoebaDLMx",
-                                                        include_dedupe = FALSE,
-                                                        include_default = FALSE,
-                                                        include_MOH = FALSE,
-                                                        d2_session = training)$ou))
+      expect_identical("Zambia", unique(zambia_mechs$ou))
 
       #Should not include dedupe
-      expect_identical(0L, sum(getMechanismView(country_uids = "f5RoebaDLMx",
-                                                include_dedupe = FALSE,
-                                                include_default = FALSE,
-                                                include_MOH = FALSE,
-                                                d2_session = training)$mechanism_code %in% c("00000", "00001")))
+      expect_false(any(zambia_mechs$mechanism_code %in% c("00000", "000001")))
 
+      zambia_mechs <- getMechanismView(country_uids = "f5RoebaDLMx",
+                                       include_dedupe = TRUE,
+                                       include_default = FALSE,
+                                       include_MOH = FALSE,
+                                       d2_session = training)
       #Should include dedupe
-      expect_identical(2L, sum(getMechanismView(country_uids = "f5RoebaDLMx",
-                                                        include_dedupe = TRUE,
-                                                        include_default = FALSE,
-                                                        include_MOH = FALSE,
-                                                        d2_session = training)$mechanism_code %in% c("00000", "00001")))
+      expect_identical(2L, sum(zambia_mechs$mechanism_code %in% c("00000", "00001")))
 
       #Bogus country UIDS with no defaults produces no rows
       expect_warning(getMechanismView(country_uids = "abcdef12345",
