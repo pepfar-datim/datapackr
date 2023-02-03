@@ -436,19 +436,16 @@ rowMax <- function(df, cn, regex) {
 #'
 #' @param cop_year cop year to pull get map for
 #' @param datasource Type of datasource (Data Pack, OPU Data Pack, DATIM)
-#' @return {cop21, cop22}_map_DataPack_DATIM_DEs_COCs
+#' @return {cop21, cop22, cop23}_map_DataPack_DATIM_DEs_COCs
 #'
 getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL) {
 
-  switch(as.character(cop_year),
-         "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
-         "2022" = datapackr::cop22_map_DataPack_DATIM_DEs_COCs,
-         stop("The COP year and configuration provided is not supported by get_Map_DataPack_DATIM_DEs_COCs"))
 
   if (datasource %in%  c("Data Pack", "Data Pack Template") || is.null(datasource)) {
     de_coc_map <- switch(as.character(cop_year),
-           "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
-           "2022" = datapackr::cop22_map_DataPack_DATIM_DEs_COCs,
+           "2021" = cop21_map_DataPack_DATIM_DEs_COCs,
+           "2022" = cop22_map_DataPack_DATIM_DEs_COCs,
+           "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
            stop("Invalid COP Year"))
   return(de_coc_map)
     }
@@ -457,6 +454,7 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL) {
     de_coc_map <- switch(as.character(cop_year),
                          "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
                          "2022" = datapackr::cop22_map_adorn_import_file,
+                         "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
                          stop("Invalid COP Year"))
     return(de_coc_map)
   }
