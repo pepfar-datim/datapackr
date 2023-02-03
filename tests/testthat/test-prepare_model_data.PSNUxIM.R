@@ -5,8 +5,10 @@
 # psnuxim_model_data <- readRDS("/Users/faustolopezbao/Documents/psnuxim2023Models/PSNUxIM_COP22_2022-11-07 (1).rds")
 #
 
+
 testthat::test_that("can test prepare_model_data.PSNUXIM...", {
 
+  # data
   dummy_snuxim_data <-
     list(
     )
@@ -40,12 +42,11 @@ testthat::test_that("can test prepare_model_data.PSNUXIM...", {
     "Qh4XMQJhbk8"
   )
 
-  # test that we can filter out mechanism codes properly
-  # should filter out the mechanism code that has letters
-  res <- prepare_model_data.PSNUxIM(dummy_snuxim_data, country_uids)
-  testthat::expect_equal(nrow(res), 1)
-  rm(res)
-
+  # test filtering of mechanism codes and concatenation of the type
+  dummy_snuxim_data_df <- dummy_snuxim_data[country_uids] %>%
+    dplyr::bind_rows()
+  res <- .prepareMechs(dummy_snuxim_data_df)
+  testthat::expect_equal(res$mechcode_supporttype, "81566_DSD")
 
 
   # test that indicator codes PMTCT_EID.N.2.T and PMTCT_EID.N.12.T are NA
