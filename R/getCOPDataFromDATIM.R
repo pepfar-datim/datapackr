@@ -43,14 +43,14 @@ getCOPDataFromDATIM <- function(country_uids,
       tibble::tribble(~ key, ~ value,
                       "children", "true",
                       #TODO: We need to migrate this to use UIDs
+                      # added uid return below
                       "categoryOptionComboIdScheme", "code",
+                      "attributeOptionComboIdScheme", "code",
                       "includeDeleted", "false",
                       "period", paste0(cop_year, "Oct")
       )
     )
 
-  # get data from datim using dataValueSets
-  # rename to standard names
   datim_data <-
     tryCatch({
       datimutils::getDataValueSets(parameters$key,
