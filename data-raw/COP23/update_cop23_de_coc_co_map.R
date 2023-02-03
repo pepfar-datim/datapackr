@@ -7,13 +7,12 @@ secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
 datimutils::loginToDATIM(secrets)
 cop_year <- 2023
 
-# Pull code lists ####
+# List all datasets and correct FY mapping (not always captured in DATIM) ####
 datasets_to_pull <- tibble::tribble(
   ~dataset_uid, ~dataset_name, ~FY, ~targets_results, ~datastream, ~org_unit,
   "dA9C5bL44NX", "FY24 MER Targets", 2024, "targets", "mer", "psnu",
-  "A2GxohPT9Hw", "FY24 MER DOD Targets", 2024, "targets", "mer", "_mil",
   "vpDd67HlZcT", "FY24 DREAMS Targets", 2024, "targets", "dreams", "dsnu",
-  "kWKJQYP1uT7", "FY24 IMPATT", 2025, "targets", "impatt", "psnu",
+  "kWKJQYP1uT7", "FY25 IMPATT", 2025, "targets", "impatt", "psnu",
   "kWKJQYP1uT7", "FY24 IMPATT", 2024, "targets", "impatt", "psnu",
   "CxMsvlKepvE", "FY23 IMPATT", 2023, "targets", "impatt", "psnu",
   "bKSmkDP5YTc", "FY25 SUBNAT Targets", 2025, "targets", "subnat", "psnu",
@@ -21,43 +20,37 @@ datasets_to_pull <- tibble::tribble(
   "J4tdiDEi08O", "FY23 SUBNAT Targets", 2023, "targets", "subnat", "psnu",
   "IXiORiVFqIv", "FY22 SUBNAT Results", 2022, "results", "subnat", "psnu")
 
-ds <- data.frame()
+# Test that all dataSet uids are valid ----
+dataSetUIDs <- datimutils::getMetadata(dataSets, d2_session = d2_session)
 
+if (any(!datasets_to_pull$dataset_uid %in% dataSetUIDs$id)) {
+  invalid_ds_uids <-
+    datasets_to_pull$dataset_uid[!datasets_to_pull$dataset_uid %in% dataSetUIDs$id]
+
+  interactive_warning(
+    paste0(
+      "The following dataSet UIDs could not be found and will be excluded: ",
+      paste(invalid_ds_uids, collapse = ", ")))
+
+  datasets_to_pull <-
+    datasets_to_pull[datasets_to_pull$dataset_uid %in% dataSetUIDs$id, ]
+}
+
+# Compile all DATIM code lists ----
 fullCodeList <-
-  lapply(
-    datasets_to_pull$dataset_uid,
+  purrr::map_dfr(
+    unique(datasets_to_pull$dataset_uid),
     function(x) {
       cl <- datimutils::getSqlView(sql_view_uid = "DotdxKrNZxG",
                                    variable_keys = "dataSets",
                                    variable_values = x) %>%
         dplyr::mutate(dataset_uid = x)
-      ds <- rbind(ds, cl)
     }) %>%
-  do.call(rbind, .) %>%
-  dplyr::left_join(
-    dplyr::select(datasets_to_pull, -org_unit),
-    by = c("dataset_uid" = "dataset_uid"))
-
-dod_des <- fullCodeList %>%
-  dplyr::filter(dataset_uid == "o71WtN5JrUu") %>%
-  dplyr::pull(dataelementuid) %>%
-  unique()
-
-dsnu_des <- fullCodeList %>%
-  dplyr::filter(dataset_uid == "vzhO50taykm") %>%
-  dplyr::pull(dataelementuid) %>%
-  unique()
-
-fullCodeList %<>%
-  dplyr::mutate(
-    org_unit =
-      dplyr::case_when(
-        dataelementuid %in% dod_des ~ "_mil",
-        dataelementuid %in% dsnu_des ~ "dsnu")) %>%
+  dplyr::left_join(datasets_to_pull, by = c("dataset_uid" = "dataset_uid")) %>%
   dplyr::select(-dataset, -dataset_uid, -dataset_name) %>%
   dplyr::distinct()
 
-## Combine Code Lists ####
+## Add DATIM periods & FYs to code lists ####
 fullCodeList %<>%
   dplyr::mutate(
     period_dataset =
@@ -90,14 +83,17 @@ fullCodeList %<>%
     categoryOptions.ids = categoryOptions,
     categoryoptioncomboname = categoryoptioncombo)
 
-# Prep Data Pack schema for mapping ####
-schema <- datapackr::cop23_data_pack_schema
 
-dp_map <- schema %>%
+
+#############
+
+
+# Prep Data Pack schema for mapping ####
+dp_map <- pick_schema(2023, "Data Pack") %>%
   dplyr::filter((col_type == "target" & dataset %in% c("mer", "subnat", "impatt"))
                 | dataset == "subnat" & col_type == "result",
                 !is.na(FY)) %>%
-  dplyr::select(indicator_code, dataset, col_type, value_type,
+  dplyr::select(sheet_name, indicator_code, dataset, col_type, value_type,
                 dataelement_dsd, dataelement_ta,
                 categoryoption_specified, valid_ages, valid_sexes, valid_kps,
                 FY, period) %>%
@@ -111,10 +107,12 @@ dp_map %<>%
   dplyr::mutate(
     dataelement_dsd =
       dplyr::case_when(
-        indicator_code %in% c("OVC_SERV.Active.T", "OVC_SERV.Grad.T")
+        indicator_code %in% c("OVC_SERV.Active.T", "OVC_SERV.Grad.T",
+                              "OVC_SERV.Active.T2", "OVC_SERV.Grad.T2")
             & valid_ages.name == "18+"
           ~ stringr::str_extract(dataelement_dsd, "(?<=\\.)([A-Za-z][A-Za-z0-9]{10})$"),
-        indicator_code %in% c("OVC_SERV.Active.T", "OVC_SERV.Grad.T")
+        indicator_code %in% c("OVC_SERV.Active.T", "OVC_SERV.Grad.T",
+                              "OVC_SERV.Active.T2", "OVC_SERV.Grad.T2")
             & valid_ages.name != "18+"
           ~ stringr::str_extract(dataelement_dsd, "^([A-Za-z][A-Za-z0-9]{10})(?=\\.)"),
         TRUE ~ dataelement_dsd),
@@ -136,45 +134,11 @@ dp_map %<>%
                                      TRUE ~ .)) %>%
   dplyr::distinct()
 
-## Remap PMTCT_EID ages ####
-# dp_map %<>%
-#   dplyr::mutate(
-#     valid_ages.id =
-#       dplyr::case_when(
-#         indicator_code == "PMTCT_EID.N.2.T" ~ "J4SQd7SnDi2",
-#         indicator_code == "PMTCT_EID.N.12.T" ~ "pbXCUjm50XK",
-#         TRUE ~ valid_ages.id
-#       ),
-#     valid_ages.name =
-#       dplyr::case_when(
-#         indicator_code == "PMTCT_EID.N.2.T" ~ "02 - 12 months",
-#         indicator_code == "PMTCT_EID.N.12.T" ~ "<= 02 months",
-#         TRUE ~ valid_ages.name
-#       )
-#   )
-
-## Remap 50+ age bands where necessary ####
-fine_sr_age_des <- fullCodeList %>%
-  dplyr::filter(stringr::str_detect(categoryOptions.ids, "SMXPADytkkF|RQbUeV6OAVk|C0GAyd5PaGn|HuWOqxjK4D5")) %>%
-  dplyr::pull(dataelementuid) %>%
-  unique()
-
-dp_map %<>%
-  dplyr::mutate(
-    valid_ages.id_mapped =
-      dplyr::if_else(
-        !(dataelement_dsd %in% fine_sr_age_des | dataelement_ta %in% fine_sr_age_des),
-        stringr::str_replace(
-          string = valid_ages.id,
-          pattern = "SMXPADytkkF|RQbUeV6OAVk|C0GAyd5PaGn|HuWOqxjK4D5",
-          replacement = "TpXlQcoXGZF"),
-        valid_ages.id))
-
 ## Combine all categoryOptions into a joinable list. ####
 dp_map %<>%
   dplyr::mutate(
     categoryOptions.ids =
-      purrr::pmap(list(valid_ages.id_mapped,
+      purrr::pmap(list(valid_ages.id,
                        valid_sexes.id,
                        valid_kps.id,
                        categoryoption_specified),
@@ -204,17 +168,6 @@ dp_map %<>%
       dataset %in% c("impatt", "subnat") ~ "Sub-National",
       TRUE ~ support_type))
 
-# Accommodate oddities with FY21 PMTCT_SUBNAT
-# I believe this is now accommodated for in FY22-23
-# dp_map %<>%
-#   dplyr::mutate(
-#     FY = dplyr::case_when(
-#       stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~ FY+1,
-#       TRUE ~ FY),
-#     period = dplyr::case_when(
-#       stringr::str_detect(indicator_code, "PMTCT_(.*)_SUBNAT(.*)\\.T_1$") ~ paste0(FY-1, "Oct"),
-#       TRUE ~ period))
-
 # Join Full Code List with Schema ####
 dp_map %<>%
   dplyr::select(-dataset) %>%
@@ -240,7 +193,6 @@ dp_map %<>%
 #
 
 # Add additional metadata for use in analytics ####
-
 dp_map %<>%
   dplyr::left_join(getHTSModality(cop_year = cop_year),
                    by = c("dataelementuid" = "dataElement"))
@@ -374,7 +326,7 @@ dp_map %<>%
 new <- dp_map %>%
   dplyr::select(-categoryoption_specified)
 
-compare_diffs <- datapackr::cop22_map_DataPack_DATIM_DEs_COCs %>%
+compare_diffs <- datapackr::cop23_map_DataPack_DATIM_DEs_COCs %>%
   dplyr::select(-categoryoption_specified) %>%
   dplyr::full_join(new, by = c("indicator_code",
                                "dataelementuid",
@@ -385,7 +337,7 @@ compare_diffs <- datapackr::cop22_map_DataPack_DATIM_DEs_COCs %>%
                                "categoryOptions.ids", "support_type", "resultstatus", "resultstatus_inclusive")) %>%
   dplyr::filter(is.na(indicator_code) | is.na(dataelementname.x) | is.na(dataelementname.y))
 
-waldo::compare(datapackr::cop22_map_DataPack_DATIM_DEs_COCs, dp_map)
+waldo::compare(datapackr::cop23_map_DataPack_DATIM_DEs_COCs, dp_map)
 
 # Expected changes from COP21:
 # - finer age bands on DATIM side for TX_CURR only
@@ -398,29 +350,3 @@ waldo::compare(datapackr::cop22_map_DataPack_DATIM_DEs_COCs, dp_map)
 
 cop23_map_DataPack_DATIM_DEs_COCs <- dp_map
 save(cop23_map_DataPack_DATIM_DEs_COCs, file = "./data/cop23_map_DataPack_DATIM_DEs_COCs.rda", compress = "xz")
-
-
-# Create map for adorning import files, to avoid issues with 50+ finer age bands
-fine_sr_age_des <- fullCodeList %>%
-  dplyr::filter(stringr::str_detect(categoryOptions.ids, "SMXPADytkkF|RQbUeV6OAVk|C0GAyd5PaGn|HuWOqxjK4D5")) %>%
-  dplyr::pull(dataelementuid) %>%
-  unique()
-
-cop22_map_adorn_import_file <- dp_map %>%
-  dplyr::mutate(
-    valid_ages.id =
-      dplyr::if_else(
-        !dataelementuid %in% fine_sr_age_des,
-        stringr::str_replace(
-          string = valid_ages.id,
-          pattern = "SMXPADytkkF|RQbUeV6OAVk|C0GAyd5PaGn|HuWOqxjK4D5",
-          replacement = "TpXlQcoXGZF"),
-        valid_ages.id),
-    valid_ages.name =
-      dplyr::if_else(
-        valid_ages.id == "TpXlQcoXGZF",
-        "50+",
-        valid_ages.name)) %>%
-  dplyr::distinct()
-
-save(cop22_map_adorn_import_file, file = "./data/cop22_map_adorn_import_file.rda", compress = "xz")
