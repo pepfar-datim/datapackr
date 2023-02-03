@@ -4,13 +4,13 @@
 \alias{getOUFromCountryUIDs}
 \title{Get Operating Unit from Country UIDs}
 \usage{
-getOUFromCountryUIDs(country_uids)
+getOUFromCountryUIDs(country_uids, cop_year = NA)
 }
 \arguments{
 \item{country_uids}{List of country UIDs from the \code{d$info$country_uids} object.}
 }
 \value{
-d
+A data frame consisting of the name of the operating unit
 }
 \description{
 Takes in a set of Country UIDs and returns an Operating Unit name.
