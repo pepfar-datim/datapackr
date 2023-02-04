@@ -4,42 +4,20 @@
 
   #We are going to make this large request once by partition it by COP year
   #This query usually times out if it is made without filters.
-  cop_years <- supportedCOPYears()
-  mechs_list <- vector(mode = "list", length = length(cop_years))
+  min_cop_year <- min(supportedCOPYears())
 
-  for (i in seq_len(length(cop_years))) {
-    url_filter <-
-      c(
-        paste0("startdate:lt:", as.numeric(cop_years[i]) + 1, "-10-01"),
-        paste0("enddate:gt:", cop_years[i], "-09-30")
-      )
-
-    mechs_list[[i]] <- datimutils::getSqlView(
-      url_filter,
+    mechs <- datimutils::getSqlView(
       sql_view_uid = "fgUtV6e9YIX",
       d2_session = d2_session,
       timeout = 600
-    )
-
-  }
-
-  mechs <- purrr::map_df(mechs_list, rbind.data.frame) %>%
-    dplyr::distinct()
-
-  special_mechs  <- datimutils::getSqlView(
-    "code:^like:00",
-    sql_view_uid = "fgUtV6e9YIX",
-    d2_session = d2_session,
-    timeout = 600
-  )
-
-   dplyr::bind_rows(special_mechs, mechs) %>%
+    ) %>%
      dplyr::rename(
        mechanism_desc = mechanism,
        attributeOptionCombo = uid,
        mechanism_code = code,
        partner_desc = partner,
-       partner_id = primeid)
+       partner_id = primeid) %>%
+     dplyr::distinct()
 
 
 }
@@ -123,6 +101,14 @@ getMechanismView <- function(country_uids = NULL,
 }
 
 
+dedupe_mechs <- mechs %>%
+  dplyr::filter(mechanism_code %in% c("00000", "00001"))
+
+moh_mechs <- mechs %>%
+  dplyr::filter(mechanism_code %in% c("00100", "00200"))
+
+mechs %<>% dplyr::filter(!(mechanism_code %in% c("00000", "00001", "00100", "00200")))
+
 # Filter by COP Year ####
 if (!is.null(cop_year)) {
 
@@ -130,8 +116,8 @@ if (!is.null(cop_year)) {
 
   mechs %<>%
     dplyr::filter(
-      (startdate < paste0(max(as.numeric(cop_year)) + 1, "-10-01") &
-         enddate > paste0(min(as.numeric(cop_year)), "-09-30")))
+      (startdate < paste0(as.numeric(cop_year) + 1, "-10-01") &
+         enddate > paste0(as.numeric(cop_year), "-09-30")))
 }
 
 
@@ -150,19 +136,17 @@ if (!is.null(cop_year)) {
       unique(.)
 
     mechs %<>%
-      dplyr::filter(ou %in% ous | is.na(ou))
+      dplyr::filter(ou %in% ous)
   }
 
 
   # Include Dedupe or MOH ####
-  if (!include_MOH) {
-    mechs <- mechs %>%
-      dplyr::filter(!(mechanism_code %in% c("00100", "00200")))
+  if (include_MOH) {
+    mechs <- dplyr::bind_rows(moh_mechs, mechs)
   }
 
-  if (!include_dedupe) {
-    mechs <-  mechs %>%
-      dplyr::filter(!(mechanism_code %in% c("00000", "00001")))
+  if (include_dedupe) {
+    mechs <-  mechs %>% dplyr::bind_rows(dedupe_mechs)
   }
 
   if (include_default) {
@@ -186,7 +170,7 @@ if (!is.null(cop_year)) {
 
   if (any(duplicated(mechs$mechanism_code))) {
 
-    stop("Duplicated mechanisms codes detected: ",
+    warning("Duplicated mechanisms codes detected: ",
          paste(mechs$mechanism_code[duplicated(mechs$mechanism_code)], sep = "", collapse = ","))
   }
 

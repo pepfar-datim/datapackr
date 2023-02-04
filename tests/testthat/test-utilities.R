@@ -40,7 +40,7 @@ test_that("Testing swapping of columns...", {
 
 test_that("Get a map of data elements and category options", {
   expect_error(getMapDataPack_DATIM_DEs_COCs("foo"))
-  expect_error(getMapDataPack_DATIM_DEs_COCs(2023))
+  expect_error(getMapDataPack_DATIM_DEs_COCs(1776))
   expect_identical(getMapDataPack_DATIM_DEs_COCs(2021), datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
   expect_identical(getMapDataPack_DATIM_DEs_COCs(2022), datapackr::cop22_map_DataPack_DATIM_DEs_COCs)
   expect_identical(getMapDataPack_DATIM_DEs_COCs("2021"), datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
@@ -60,6 +60,9 @@ test_that("Get a map of data elements and category options", {
   expect_named(de_map, de_map_names)
   de_map <- getMapDataPack_DATIM_DEs_COCs(2021)
   expect_named(de_map, de_map_names)
+  de_map <- getMapDataPack_DATIM_DEs_COCs(2023)
+  expect_named(de_map, de_map_names)
+
 
   expect_true(is.data.frame(de_map))
 
