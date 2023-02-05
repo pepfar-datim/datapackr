@@ -176,7 +176,7 @@ writePSNUxIM <- function(d,
     #TODO: Replace this with getValidOrgUnits
     org_units <- datapackr::valid_OrgUnits %>% # Load in valid_PSNUs list from package
       dplyr::filter(country_uid %in% d$info$country_uids) %>%
-      add_dp_label(.) %>%
+      add_dp_label(orgunits = ., cop_year = d$info$cop_year) %>%
       dplyr::arrange(dp_label) %>%
       ## Remove DSNUs
       dplyr::filter(!is.na(org_type)) %>%

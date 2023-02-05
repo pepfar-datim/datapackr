@@ -42,7 +42,7 @@ packDataPackSheets <- function(wb,
     if (ou_level == "Prioritization") {
       org_units <- getValidOrgUnits(cop_year) %>%
         dplyr::filter(country_uid %in% country_uids) %>%
-        add_dp_label(.) %>%
+        add_dp_label(orgunits = ., cop_year = cop_year) %>%
         dplyr::arrange(dp_label) %>%
         ## Remove DSNUs
         dplyr::filter(org_type != "DSNU") %>%
@@ -118,7 +118,7 @@ packDataPackSheets <- function(wb,
     if (sheet == "AGYW") {
       org_units_sheet <- getValidOrgUnits(cop_year) %>% # Load in valid_PSNUs list from package
         dplyr::filter(country_uid %in% country_uids) %>%
-        add_dp_label(.) %>%
+        add_dp_label(orgunits = ., cop_year = cop_year) %>%
         dplyr::arrange(dp_label) %>% # Order rows based on dp_psnu col values
         dplyr::filter(!is.na(DREAMS)) %>%
         dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)# Only keep these columns

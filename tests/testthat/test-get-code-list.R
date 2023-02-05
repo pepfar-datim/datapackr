@@ -41,17 +41,26 @@ test_that("We can add a DataPack Label", {
   #Angola
   df <- getValidOrgUnits(2022) %>%
     dplyr::filter(ou == "Angola")
-  df2 <- add_dp_label(df)
+  df2 <- add_dp_label(df, 2022)
   expect_true(setequal(names(df2),  c(names(df), "dp_label")))
-  expect_true(all(stringr::str_detect(df2$dp_label, "^(.+) \\[#[A-Za-z0-9]+\\] \\[[A-Za-z0-9]+\\]$")))
+  expect_true(all(stringr::str_detect(df2$dp_label, "^(.+) \\[#[A-Za-z]+\\] \\[[A-Za-z0-9]+\\]$")))
+
+  #Angola for COP23 and above should not have the #PSNU
+  df <- getValidOrgUnits(2023) %>%
+    dplyr::filter(ou == "Angola")
+  df2 <- add_dp_label(df, 2023)
+  expect_true(setequal(names(df2),  c(names(df), "dp_label")))
+  expect_false(all(stringr::str_detect(df2$dp_label, "^(.+) \\[#[A-Za-z]+\\] \\[[A-Za-z0-9]+\\]$")))
+  expect_true(all(stringr::str_detect(df2$dp_label, "^(.+) \\[[A-Za-z0-9]+\\]$")))
+
 
   #Asia region. The DP label takes a different form
   df <- getValidOrgUnits(2022) %>%
     dplyr::filter(ou == "Asia Region")
-  df2 <- add_dp_label(df)
+  df2 <- add_dp_label(df, 2022)
   expect_true(setequal(names(df2),  c(names(df), "dp_label")))
 
-  matches <- stringr::str_detect(df2$dp_label, "^(.+) > (.+) \\[#[A-Za-z0-9]+\\] \\[[A-Za-z0-9]+\\]$")
+  matches <- stringr::str_detect(df2$dp_label, "^(.+) > (.+) \\[#[A-Za-z]+\\] \\[[A-Za-z0-9]+\\]$")
   #There is an exception when a country is a PSNU
   psnu_countries <- df2$country_uid == df2$uid
   expect_true(all(matches | psnu_countries))
