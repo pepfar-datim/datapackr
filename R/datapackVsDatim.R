@@ -265,6 +265,7 @@ compareData_OpuDatapackVsDatim <-
         tibble::tribble(~ key, ~ value,
                         "children", "true",
                         "categoryOptionComboIdScheme", "code",
+                        "attributeOptionComboIdScheme", "code",
                         "includeDeleted", "false",
                         "period", paste0(d$info$cop_year, "Oct")
         )
