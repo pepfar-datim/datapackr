@@ -125,6 +125,8 @@ getDataPackOrgUnits <- function(include_mil = TRUE,
 #' Adds Org Unit label used in Data Packs.
 #'
 #' @param orgunits Data frame of Data Pack org units produced by \code{\link{getDataPackOrgUnits}}.
+#' @param cop_year COP Year. For COP years less than 2023,
+#' the organisation unit type will be added to tbe DP label
 #'
 #' @return Data frame of Data Pack Org units with added Data Pack label, \code{dp_label}.
 #'
