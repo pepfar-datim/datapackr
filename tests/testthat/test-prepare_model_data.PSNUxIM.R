@@ -40,7 +40,7 @@ testthat::test_that("can test prepare_model_data.PSNUXIM...", {
   # test pivoting of data ----
   dummy_snuxim_data_df <- dummy_snuxim_data[country_uids] %>%
     dplyr::bind_rows() %>%
-    slice(1:3, )
+    dplyr::slice(1:3, )
   dummy_snuxim_data_df <-   .prepareMechs(snuxim_model_data = dummy_snuxim_data_df)
   res <- .pivotSnuximData(snuxim_model_data = dummy_snuxim_data_df)
   # expect these column names as output
