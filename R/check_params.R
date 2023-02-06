@@ -200,7 +200,7 @@ check_PSNUs <- function(PSNUs = NULL, country_uids = NULL, cop_year = NULL) {
     if (any(!PSNUs$psnu_uid %in% valid_orgunits_local$uid)) {
       invalid_PSNUs <- PSNUs %>%
         dplyr::filter(!psnu_uid %in% valid_orgunits_local$uid) %>%
-        add_dp_label(.) %>%
+        add_dp_label(orgunits = ., cop_year = cop_year) %>%
         dplyr::arrange(dp_label) %>%
         dplyr::select(PSNU = dp_label, psnu_uid)
 
