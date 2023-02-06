@@ -245,7 +245,7 @@ testthat::test_that("can test prepare_model_data.PSNUXIM...", {
   testthat::expect_equal(
     res$`TA Dedupe Resolution (FY22)`,
     (dummy_snuxim_data_df %>%
-       mutate(
+       dplyr::mutate(
          x = dplyr::case_when(
            `TA Duplicated Rollup` == 0 | ta_im_count <= 1 ~ NA_character_,
            # or where count(TA IMs) == 1
@@ -258,7 +258,7 @@ testthat::test_that("can test prepare_model_data.PSNUXIM...", {
   testthat::expect_equal(
     res$`DSD Dedupe Resolution (FY22)`,
     (dummy_snuxim_data_df %>%
-        mutate(
+        dplyr::mutate(
           x = dplyr::case_when(
             `DSD Duplicated Rollup` == 0 | dsd_im_count <= 1 ~ NA_character_,
             `Deduplicated DSD Rollup` == `DSD Duplicated Rollup` ~ "SUM",
@@ -270,7 +270,7 @@ testthat::test_that("can test prepare_model_data.PSNUXIM...", {
   testthat::expect_equal(
     res$`Crosswalk Dedupe Resolution (FY22)`,
     (dummy_snuxim_data_df %>%
-       mutate(
+       dplyr::mutate(
          x = dplyr::case_when(
            `Total Duplicated Rollup` == 0 | `Deduplicated TA Rollup` == 0 | `Deduplicated DSD Rollup` == 0
            ~ NA_character_,
