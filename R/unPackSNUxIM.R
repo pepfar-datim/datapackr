@@ -402,7 +402,7 @@ checkPSNUxIMDisaggs <- function(d) {
   #Since we assume that the disaggs in the PSNUxIM tab match
   #DATIM.
   de_coc_map <-
-    getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year, datasource = "DATIM") %>%
+    getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year, datasource = "PSNUxIM") %>%
     dplyr::select(indicator_code,
                   "Age" = valid_ages.name,
                   Sex = valid_sexes.name,

@@ -12,9 +12,7 @@
 #' @return d object
 packForDATIM <- function(d, type = NULL) {
 
-  # Choose the correct DE/COC map
-  datim_map <- datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
-                                                        datasource = d$info$tool)
+
   # Check params ----
   approved_types <- c("PSNUxIM", "SUBNAT_IMPATT",
                       "OPU PSNUxIM", "Undistributed MER")
@@ -59,6 +57,9 @@ packForDATIM <- function(d, type = NULL) {
 
     data %<>%
       dplyr::bind_rows(agyw_data)
+
+    datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
+                                                          datasource = "PSNUxIM")
   }
 
   if (type == "Undistributed MER") { ## Undistributed MER ----
@@ -68,6 +69,9 @@ packForDATIM <- function(d, type = NULL) {
           stringr::str_detect(indicator_code, "AGYW_PREV") ~ "No Support Type",
           TRUE ~ "DSD"),
         mech_code = default_catOptCombo())
+
+    datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
+                                               datasource = "Data Pack")
   }
 
   if (type == "SUBNAT_IMPATT") { ## SUBNAT_IMPATT ----
@@ -77,7 +81,18 @@ packForDATIM <- function(d, type = NULL) {
         support_type = "Sub-National") %>%
     # PATCH: Drop TX_CURR_SUBNAT.R for now
       dplyr::filter(indicator_code != "TX_CURR_SUBNAT.R")
+
+    datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
+                                               datasource = "Data Pack")
   }
+
+  if (type == "OPU PSNUxIM") { ## OPU PSNUxIM
+
+    datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
+                                               datasource = "PSNUxIM")
+
+  }
+
 
   data %<>%
     dplyr::select(expected_col_names)
@@ -102,27 +117,29 @@ packForDATIM <- function(d, type = NULL) {
                   orgUnit = psnuid,
                   categoryOptionCombo = categoryoptioncombouid,
                   attributeOptionCombo = mech_code,
-                  value) %>%
+                  value)
+  #Nothing should be NA at this point
+
+  #TEST: Blank Rows; Error ----
+  blank_rows <- data %>%
+    dplyr::filter_all(dplyr::any_vars(is.na(.)))
+
+  if (NROW(blank_rows) > 0) {
+    d$tests$blank_rows_datim_export <- d$tests$blank_rows_datim_export %>% dplyr::bind_rows(blank_rows)
+    attr(d$tests$blank_rows_datim_export, "test_name") <- "DATIM export values which are blank"
+    warning_msg <-
+      paste0(
+        "ERROR! DATIM Export has blank rows  of type ", type, ". These will be removed for further processing.")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$has_error <- TRUE
+  }
+
+  data %<>%
   # Aggregate across 50+ age bands ----
     dplyr::group_by(dplyr::across(c(-value))) %>%
-    dplyr::summarise(value = sum(value)) %>%
-    dplyr::ungroup() %>%
-  # Drop any rows with NA in any col to prevent breakage in iHub ----
+    dplyr::summarise(value = sum(value), .groups = "drop") %>%
     tidyr::drop_na()
 
-  # TEST: Blank Rows; Error ----
-  # blank_rows <- data %>%
-  #   dplyr::filter_all(dplyr::any_vars(is.na(.)))
-  #
-  # if (NROW(blank_rows) > 0) {
-  #   d$tests$blank_rows_datim_subnat_impatt <- blank_rows
-  #   attr(d$tests$blank_rows_datim_subnat_impatt, "test_name") <- "SUBNAT/IMPATT data with blanks"
-  #   warning_msg <-
-  #     paste0(
-  #       "ERROR! In tab SUBNATT/IMPATT. DATIM Export has blank rows. Contact support.")
-  #   d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-  #   d$info$has_error <- TRUE
-  # }
 
   # Prioritizations ----
   if (type == "SUBNAT_IMPATT") {
