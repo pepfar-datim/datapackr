@@ -25,6 +25,30 @@
 
 }
 
+.pivotSnuximData <- function(snuxim_model_data) {
+
+  percents <- snuxim_model_data %>%
+    dplyr::select(-value) %>%
+    tidyr::pivot_wider(names_from = mechcode_supporttype,
+                       values_from = percent)
+
+  values <- snuxim_model_data %>%
+    dplyr::select(-percent, -mechcode_supporttype) %>%
+    dplyr::group_by(dplyr::across(c(-value))) %>%
+    dplyr::summarise(value = sum(value)) %>%
+    dplyr::ungroup()
+
+  # if (NROW(percents) != NROW(values)) {
+  #   stop("Aggregating values and percents led to different row counts!")
+  # }
+
+  snuxim_model_data <- values %>%
+    dplyr::left_join(percents,
+                     by = c("psnu_uid", "indicator_code", "Age", "Sex", "KeyPop"))
+
+  return(snuxim_model_data)
+}
+
 # add NAs conditionally to Age variable based off indicator codes
 .treatAgeBands <- function(snuxim_model_data) {
   res <-  snuxim_model_data %>%
@@ -86,6 +110,7 @@
 
 }
 
+# create max columns
 .createMaxCols <- function(snuxim_model_data) {
   res <- snuxim_model_data %>%
     datapackr::rowMax(cn = "Max_TA.T_1", regex = "\\d{4,}_TA") %>%
@@ -97,30 +122,56 @@
   return(res)
 }
 
-.pivotSnuximData <- function(snuxim_model_data) {
-
-  percents <- snuxim_model_data %>%
-    dplyr::select(-value) %>%
-    tidyr::pivot_wider(names_from = mechcode_supporttype,
-                       values_from = percent)
-
-  values <- snuxim_model_data %>%
-    dplyr::select(-percent, -mechcode_supporttype) %>%
-    dplyr::group_by(dplyr::across(c(-value))) %>%
-    dplyr::summarise(value = sum(value)) %>%
+# create im count
+.createImCounts <- function(snuxim_model_data) {
+  res <- snuxim_model_data %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(ta_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_TA")))),
+                  dsd_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_DSD"))))) %>%
     dplyr::ungroup()
 
-  if (NROW(percents) != NROW(values)) {
-    stop("Aggregating values and percents led to different row counts!")
-  }
-
-  snuxim_model_data <- values %>%
-    dplyr::left_join(percents,
-                     by = c("psnu_uid", "indicator_code", "Age", "Sex", "KeyPop"))
-
-  return(snuxim_model_data)
+  return(res)
 }
 
+# create resolution columns
+.createResolutionCols <- function(snuxim_model_data) {
+
+  res <- snuxim_model_data %>%
+    dplyr::mutate(
+      `TA Dedupe Resolution (FY22)` = dplyr::case_when(
+        `TA Duplicated Rollup` == 0 | ta_im_count <= 1 ~ NA_character_,
+        # or where count(TA IMs) == 1
+        `Deduplicated TA Rollup` == `TA Duplicated Rollup` ~ "SUM",
+        `Deduplicated TA Rollup` == `Max_TA.T_1` ~ "MAX",
+        TRUE ~ "CUSTOM"),
+      `DSD Dedupe Resolution (FY22)` = dplyr::case_when(
+        `DSD Duplicated Rollup` == 0 | dsd_im_count <= 1 ~ NA_character_,
+        `Deduplicated DSD Rollup` == `DSD Duplicated Rollup` ~ "SUM",
+        `Deduplicated DSD Rollup` == `Max_DSD.T_1` ~ "MAX",
+        TRUE ~ "CUSTOM"),
+      `Crosswalk Dedupe Resolution (FY22)` = dplyr::case_when(
+        `Total Duplicated Rollup` == 0 | `Deduplicated TA Rollup` == 0 | `Deduplicated DSD Rollup` == 0
+        ~ NA_character_,
+        `Total Deduplicated Rollup` == `Total Duplicated Rollup` ~ "SUM",
+        `Total Deduplicated Rollup` == `Max_Crosswalk.T_1` ~ "MAX",
+        TRUE ~ "CUSTOM"),
+      `Custom DSD Dedupe Allocation (FY22) (% of DataPackTarget)` = `DSD Dedupe`,
+      `Custom TA Dedupe Allocation (FY22) (% of DataPackTarget)` = `TA Dedupe`,
+      `Custom Crosswalk Dedupe Allocation (FY22) (% of DataPackTarget)` = `Crosswalk Dedupe`
+    ) %>%
+    dplyr::select(psnu_uid, indicator_code, Age, Sex, KeyPop,
+                  tidyselect::matches("\\d{4,}"),
+                  `Custom DSD Dedupe Allocation (FY22) (% of DataPackTarget)`,
+                  `Custom TA Dedupe Allocation (FY22) (% of DataPackTarget)`,
+                  `Custom Crosswalk Dedupe Allocation (FY22) (% of DataPackTarget)`,
+                  `DSD Dedupe Resolution (FY22)`,
+                  `TA Dedupe Resolution (FY22)`,
+                  `Crosswalk Dedupe Resolution (FY22)`,
+                  `DSD Dedupe`, `TA Dedupe`, `Crosswalk Dedupe`)
+
+  return(res)
+
+}
 
 #' @export
 #' @title prepare_model_data.PSNUxIM()
@@ -166,42 +217,17 @@ prepare_model_data.PSNUxIM <- function(snuxim_model_data,
   # Create Dedupe Resolution columns
   interactive_print("Studying your deduplication patterns...")
 
-  snuxim_model_data %<>%
-    dplyr::rowwise() %>%
-    dplyr::mutate(ta_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_TA")))),
-                  dsd_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_DSD"))))) %>%
-    dplyr::ungroup() %>%
-    dplyr::mutate(
-      `TA Dedupe Resolution (FY22)` = dplyr::case_when(
-        `TA Duplicated Rollup` == 0 | ta_im_count <= 1 ~ NA_character_,
-        # or where count(TA IMs) == 1
-        `Deduplicated TA Rollup` == `TA Duplicated Rollup` ~ "SUM",
-        `Deduplicated TA Rollup` == `Max_TA.T_1` ~ "MAX",
-        TRUE ~ "CUSTOM"),
-      `DSD Dedupe Resolution (FY22)` = dplyr::case_when(
-        `DSD Duplicated Rollup` == 0 | dsd_im_count <= 1 ~ NA_character_,
-        `Deduplicated DSD Rollup` == `DSD Duplicated Rollup` ~ "SUM",
-        `Deduplicated DSD Rollup` == `Max_DSD.T_1` ~ "MAX",
-        TRUE ~ "CUSTOM"),
-      `Crosswalk Dedupe Resolution (FY22)` = dplyr::case_when(
-        `Total Duplicated Rollup` == 0 | `Deduplicated TA Rollup` == 0 | `Deduplicated DSD Rollup` == 0
-        ~ NA_character_,
-        `Total Deduplicated Rollup` == `Total Duplicated Rollup` ~ "SUM",
-        `Total Deduplicated Rollup` == `Max_Crosswalk.T_1` ~ "MAX",
-        TRUE ~ "CUSTOM"),
-      `Custom DSD Dedupe Allocation (FY22) (% of DataPackTarget)` = `DSD Dedupe`,
-      `Custom TA Dedupe Allocation (FY22) (% of DataPackTarget)` = `TA Dedupe`,
-      `Custom Crosswalk Dedupe Allocation (FY22) (% of DataPackTarget)` = `Crosswalk Dedupe`
-    ) %>%
-    dplyr::select(psnu_uid, indicator_code, Age, Sex, KeyPop,
-                  tidyselect::matches("\\d{4,}"),
-                  `Custom DSD Dedupe Allocation (FY22) (% of DataPackTarget)`,
-                  `Custom TA Dedupe Allocation (FY22) (% of DataPackTarget)`,
-                  `Custom Crosswalk Dedupe Allocation (FY22) (% of DataPackTarget)`,
-                  `DSD Dedupe Resolution (FY22)`,
-                  `TA Dedupe Resolution (FY22)`,
-                  `Crosswalk Dedupe Resolution (FY22)`,
-                  `DSD Dedupe`, `TA Dedupe`, `Crosswalk Dedupe`)
+  snuxim_model_data <- .createImCount(snuxim_model_data = snuxim_model_data)
+
+
+
+  # snuxim_model_data %<>%
+  #   dplyr::rowwise() %>%
+  #   dplyr::mutate(ta_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_TA")))),
+  #                 dsd_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_DSD"))))) %>%
+  #   dplyr::ungroup() %>%
+
+  snuxim_model_data <- .createResolutionCols(snuxim_model_data = snuxim_model_data)
 
   return(snuxim_model_data)
 
