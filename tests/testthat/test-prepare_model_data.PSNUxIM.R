@@ -39,22 +39,23 @@ testthat::test_that("can test prepare_model_data.PSNUXIM...", {
 
   # test pivoting of data ----
   dummy_snuxim_data_df <- dummy_snuxim_data[country_uids] %>%
-    dplyr::bind_rows() %>%
-    dplyr::slice(1:3, )
+    dplyr::bind_rows()
   dummy_snuxim_data_df <-   .prepareMechs(snuxim_model_data = dummy_snuxim_data_df)
   res <- .pivotSnuximData(snuxim_model_data = dummy_snuxim_data_df)
   # expect these column names as output
   testthat::expect_identical(
     names(res),
-    c("psnu_uid", "indicator_code", "Age", "Sex", "KeyPop", "value", "81566_DSD", "81573_DSD")
+    c("psnu_uid", "indicator_code", "Age", "Sex", "KeyPop", "value", "81566_DSD", "81573_DSD", "18579_DSD")
   )
   # expect pivoted data frame with percent followed by value
   testthat::expect_identical(
     res,
     tibble::tribble(
-      ~"psnu_uid", ~"indicator_code", ~"Age", ~"Sex", ~"KeyPop", ~"value", ~"81566_DSD", ~"81573_DSD",
-      "bRAFS0BaYNS", "GEND_GBV.PE.T",  "NA",    "NA",        41,    NA,           1,          NA,
-      "bRAFS0BaYNS", "GEND_GBV.PE.T",  "NA",    "NA",        43,    NA,          NA,           1
+      ~"psnu_uid", ~"indicator_code", ~"Age", ~"Sex", ~"KeyPop", ~"value", ~"81566_DSD", ~"81573_DSD", ~"18579_DSD",
+      "BDfJLRZI6JM", "PMTCT_EID.N.12.T", "<= 02 months", NA,        NA,     1,          NA,          NA,           1,
+      "BDfJLRZI6JM", "PMTCT_EID.N.2.T",  "<= 02 months", NA,        NA,    16,          NA,          NA,           1,
+      "bRAFS0BaYNS", "GEND_GBV.PE.T",  "NA",    "NA",        41,    NA,           1,          NA, NA,
+      "bRAFS0BaYNS", "GEND_GBV.PE.T",  "NA",    "NA",        43,    NA,          NA,           1, NA
       ) %>%
       dplyr::mutate(
         dplyr::across(value, as.numeric)
@@ -80,6 +81,7 @@ testthat::test_that("can test prepare_model_data.PSNUXIM...", {
     .treatAgeBands(.)
 
   # expect the columns were added
+  # run the above segment to produce the input for testing this funcion
   res <- .addDedupeCols(dummy_snuxim_data_df)
   testthat::expect_true(
     all(c("DSD Dedupe",
@@ -102,6 +104,7 @@ testthat::test_that("can test prepare_model_data.PSNUXIM...", {
     .treatAgeBands(.) %>%
     .addDedupeCols(.)
 
+  # run the above segment to produce the input for testing this funcion
   res <- .createDeduplicatedRollups(dummy_snuxim_data_df)
 
   testthat::expect_equal(
@@ -161,6 +164,7 @@ testthat::test_that("can test prepare_model_data.PSNUXIM...", {
     .addDedupeCols(.) %>%
     .createDeduplicatedRollups(.)
 
+  # run the above segment to produce the input for testing this funcion
   res <- .createMaxCols(dummy_snuxim_data_df)
 
   testthat::expect_equal(
@@ -194,6 +198,7 @@ testthat::test_that("can test prepare_model_data.PSNUXIM...", {
     .createDeduplicatedRollups(.) %>%
     .createMaxCols(.)
 
+  # run the above segment to produce the input for testing this funcion
   res <- .createImCounts(snuxim_model_data = dummy_snuxim_data_df)
 
   testthat::expect_equal(
@@ -224,6 +229,7 @@ testthat::test_that("can test prepare_model_data.PSNUXIM...", {
     .createMaxCols(.) %>%
     .createImCounts(.)
 
+  # run the above segment to produce the input for testing this funcion
   res <- .createResolutionCols(snuxim_model_data = dummy_snuxim_data_df)
 
   # these are the columns we expect based on our input

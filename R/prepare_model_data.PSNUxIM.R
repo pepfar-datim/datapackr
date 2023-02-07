@@ -20,9 +20,6 @@
         TRUE ~ mechcode_supporttype
       )
     )
-
-  return(res)
-
 }
 
 .pivotSnuximData <- function(snuxim_model_data) {
@@ -59,8 +56,6 @@
         Age
       )
     )
-
-  return(res)
 }
 
 # add dedupe columns to the model data
@@ -71,23 +66,19 @@
                                   "TA Dedupe",
                                   "Crosswalk Dedupe"),
                        type = "numeric")
-
-  return(res)
-
-
 }
 
 # create deduplicated rollups
 .createDeduplicatedRollups <- function(snuxim_model_data) {
 
-  # Create Deduplicated Rollups ####
+  # Create Deduplicated Rollups
   res <- snuxim_model_data %>%
     dplyr::mutate(
       `Total Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}|HllvX50cXC0")), na.rm = TRUE),
       `DSD Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_DSD")), na.rm = TRUE),
       `TA Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_TA")), na.rm = TRUE)) %>%
 
-    # Create Duplicated Rollups ####
+    # Create Duplicated Rollups
   dplyr::mutate(
     `Deduplicated DSD Rollup` =
       rowSums(dplyr::select(., tidyselect::all_of(c("DSD Duplicated Rollup", "DSD Dedupe"))),
@@ -105,9 +96,6 @@
           na.rm = TRUE
         )
     )
-
-  return(res)
-
 }
 
 # create max columns
@@ -118,8 +106,6 @@
     dplyr::mutate(
       `Max_Crosswalk.T_1` =
         pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = TRUE))
-
-  return(res)
 }
 
 # create im count
@@ -129,8 +115,6 @@
     dplyr::mutate(ta_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_TA")))),
                   dsd_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_DSD"))))) %>%
     dplyr::ungroup()
-
-  return(res)
 }
 
 # create resolution columns
@@ -168,9 +152,6 @@
                   `TA Dedupe Resolution (FY22)`,
                   `Crosswalk Dedupe Resolution (FY22)`,
                   `DSD Dedupe`, `TA Dedupe`, `Crosswalk Dedupe`)
-
-  return(res)
-
 }
 
 #' @export
@@ -217,16 +198,10 @@ prepare_model_data.PSNUxIM <- function(snuxim_model_data,
   # Create Dedupe Resolution columns
   interactive_print("Studying your deduplication patterns...")
 
+  # add im counts which are used for resolution columns
   snuxim_model_data <- .createImCount(snuxim_model_data = snuxim_model_data)
 
-
-
-  # snuxim_model_data %<>%
-  #   dplyr::rowwise() %>%
-  #   dplyr::mutate(ta_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_TA")))),
-  #                 dsd_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_DSD"))))) %>%
-  #   dplyr::ungroup() %>%
-
+  # add dedupe resolution columns
   snuxim_model_data <- .createResolutionCols(snuxim_model_data = snuxim_model_data)
 
   return(snuxim_model_data)
