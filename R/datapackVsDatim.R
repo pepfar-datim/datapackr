@@ -307,8 +307,6 @@ compareData_OpuDatapackVsDatim <-
 
 # cases in which datapack has a new orupdated value
     updates <- dplyr::filter(data_differences, !is.na(datapack_value)) %>%
-      dplyr::filter(!(attributeOptionCombo %in%
-                        c("00000", "00001"))) %>%
       dplyr::select(-datim_value) %>%
       dplyr::rename(value = datapack_value)
 
