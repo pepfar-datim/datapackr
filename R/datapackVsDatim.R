@@ -298,9 +298,7 @@ compareData_OpuDatapackVsDatim <-
     data_differences <- dplyr::full_join(datapack_data, datim_data) %>%
       dplyr::filter(datapack_value != datim_value |
                       is.na(datapack_value) |
-                      is.na(datim_value)) %>%
-      dplyr::filter(!(attributeOptionCombo %in%
-                      c("00000", "00001")))
+                      is.na(datim_value))
 
 # cases in which datim has a value but datapack does not
     deletes <- dplyr::filter(data_differences, is.na(datapack_value)) %>%
