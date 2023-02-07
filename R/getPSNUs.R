@@ -125,19 +125,45 @@ getDataPackOrgUnits <- function(include_mil = TRUE,
 #' Adds Org Unit label used in Data Packs.
 #'
 #' @param orgunits Data frame of Data Pack org units produced by \code{\link{getDataPackOrgUnits}}.
+#' @param cop_year COP Year. For COP years less than 2023,
+#' the organisation unit type will be added to tbe DP label
 #'
 #' @return Data frame of Data Pack Org units with added Data Pack label, \code{dp_label}.
 #'
-add_dp_label <- function(orgunits) {
+add_dp_label <- function(orgunits, cop_year) {
+  this_cop_year <- as.numeric(cop_year)
 
   country_count <- unique(orgunits$country_uid) %>% length()
 
-  orgunits %>%
-    dplyr::mutate(
-      dp_label = paste0(
+  if (cop_year <= 2022) {
+    orgunits %>%
+      dplyr::mutate(dp_label = paste0(
         dplyr::if_else(
           country_count > 1 & country_uid != uid,
-          paste0(country_name, " > "), ""),
+          paste0(country_name, " > "),
+          ""
+        ),
         name,
-        " [", uid, "]"))
+        " [#",
+        org_type,
+        "]",
+        " [",
+        uid,
+        "]"
+      ))
+  } else {
+    orgunits %>%
+      dplyr::mutate(dp_label = paste0(
+        dplyr::if_else(
+          country_count > 1 & country_uid != uid,
+          paste0(country_name, " > "),
+          ""
+        ),
+        name,
+        " [",
+        uid,
+        "]"
+      ))
+  }
+
 }
