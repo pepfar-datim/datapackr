@@ -1,3 +1,21 @@
+# datapackr 6.1.0
+
+## Breaking changes
+* Fixes issues with getMechanismView. The current implementation was too slow, and prone to timing out. The entire view will be downloaded (which is time consuming) once and then all filters happen on the full cached file.
+* Fixes a bug with COP22 data element/category option combo maps. 50+ age bands were being dropped with full COP22 datapacks.
+
+## New features
+* Adds a check for defunct disaggregates in the PSNUxim tab.
+* Adds an object dataset_levels which provides the organisation unit hierarchy of each country by COP year.
+* Adds a test for blank_rows_datim_export which should inform if any rows of any export files to DATIM contain any blanks.
+* Fixes dedupe handling in regards to OPU's
+
+## Minor improvements and fixes
+* Fixes an issue with add_dp_label for COP22 datapacks. The orgunit type was missing.
+* Removes deprecated DATIM API functions, which have been moved to datimutils.
+* Add various unit tests.
+
+
 # datapackr 6.0.0
 
 ## Breaking changes
