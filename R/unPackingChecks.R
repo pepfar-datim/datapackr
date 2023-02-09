@@ -1064,7 +1064,6 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
 }
 
 
-
 #' @export
 #' @rdname unPackDataChecks
 checkDisaggs <- function(sheets, d, quiet = TRUE) {

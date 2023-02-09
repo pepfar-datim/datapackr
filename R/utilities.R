@@ -203,10 +203,23 @@ getSaneName <- function(datapack_name) {
 #'
 #' @param country_uids List of country UIDs from the \code{d$info$country_uids} object.
 #'
-#' @return d
+#' @return A data frame consisting of the name of the operating unit
 #'
-getOUFromCountryUIDs <- function(country_uids) {
-  ou <- datapackr::valid_OrgUnits %>%
+getOUFromCountryUIDs <- function(country_uids, cop_year = NA) {
+
+
+  if (is.na(cop_year)) {
+    warning("No COP Year specified so using the current COP year")
+    cop_year <- getCurrentCOPYear()
+  }
+
+  if (length(cop_year) > 1) {
+    stop("You must supply a single COP Year!")
+  }
+
+  cop_year %<>% check_cop_year(cop_year = cop_year)
+
+  ou <- getValidOrgUnits(cop_year = cop_year) %>%
     dplyr::select(ou, ou_uid, country_name, country_uid) %>%
     dplyr::distinct() %>%
     dplyr::filter(country_uid %in% country_uids) %>%
@@ -423,27 +436,25 @@ rowMax <- function(df, cn, regex) {
 #'
 #' @param cop_year cop year to pull get map for
 #' @param datasource Type of datasource (Data Pack, OPU Data Pack, DATIM)
-#' @return {cop21, cop22}_map_DataPack_DATIM_DEs_COCs
+#' @return {cop21, cop22, cop23}_map_DataPack_DATIM_DEs_COCs
 #'
 getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL) {
 
-  switch(as.character(cop_year),
-         "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
-         "2022" = datapackr::cop22_map_DataPack_DATIM_DEs_COCs,
-         stop("The COP year and configuration provided is not supported by get_Map_DataPack_DATIM_DEs_COCs"))
 
   if (datasource %in%  c("Data Pack", "Data Pack Template") || is.null(datasource)) {
     de_coc_map <- switch(as.character(cop_year),
-           "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
-           "2022" = datapackr::cop22_map_DataPack_DATIM_DEs_COCs,
+           "2021" = cop21_map_DataPack_DATIM_DEs_COCs,
+           "2022" = cop22_map_DataPack_DATIM_DEs_COCs,
+           "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
            stop("Invalid COP Year"))
   return(de_coc_map)
     }
 
-  if (datasource %in% c("OPU Data Pack", "OPU Data Pack Template", "DATIM")) {
+  if (datasource %in% c("OPU Data Pack", "OPU Data Pack Template", "DATIM", "PSNUxIM")) {
     de_coc_map <- switch(as.character(cop_year),
                          "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
                          "2022" = datapackr::cop22_map_adorn_import_file,
+                         "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
                          stop("Invalid COP Year"))
     return(de_coc_map)
   }

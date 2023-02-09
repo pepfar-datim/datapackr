@@ -242,6 +242,8 @@ adorn_import_file <- function(psnu_import_file,
              "period" = "period"))
 
   assertthat::are_equal(NROW(psnu_import_file), row_num)
+  assertthat::are_equal(TRUE, all(is_uidish(psnu_import_file$dataElement)))
+
   # Select/order columns ####
   # Flag set in original function, approx line 20
   if (filter_rename_output) {# If flag is true, Keep the below columns from data
