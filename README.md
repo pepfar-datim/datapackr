@@ -5,7 +5,7 @@
 ### Installation
 
 1. Go to https://cran.rstudio.com/ to download and install R. Leave all default settings in the installation options.
-2. Go to https://dailies.rstudio.com/version/2022.07.2+576.pro12/ to download and install R Studio. Leave all default settings in the installation options.
+2. Go to https://rstudio.org/download/desktop/ to download and install R Studio. Leave all default settings in the installation options.
 3. Open RStudio on your computer.
 4. Go to the “Packages” tab and click on “Install Packages”. The first time you do this you’ll be prompted to choose a CRAN mirror. R will download all necessary files from the server you select here. Choose the location closest to you.
 5. Type in "devtools". Ensure that "Install dependencies" is checked, and click "Install". If you get permission errors while installing packages, close RStudio and reopen it with administrator privileges.
@@ -25,7 +25,7 @@ library(datapackr)
 12. Copy, paste, and run the following code in RStudio — make sure to insert your actual DATIM username and password.:
 
 ```R
-loginToDATIM(username = "MyUsername", password = "MyPassword123", base_url = "datim.org/")
+loginToDATIM(username = "MyUsername", password = "MyPassword123", base_url = "https://www.datim.org/")
 
 d <- unPackTool()
 

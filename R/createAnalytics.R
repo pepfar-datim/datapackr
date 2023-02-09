@@ -17,13 +17,12 @@ createAnalytics <- function(d,
     stop("createAnalytics does not work on tools for that COP Year.")
   }
 
-  #Choose the correct DE/COC map
-  map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
-                                                datasource = d$info$tool)
 
   # Append the distributed MER data and subnat data together
   if (d$info$tool == "OPU Data Pack") {
 
+    map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
+                                                  datasource = d$info$tool)
     #TODO: Fix the names here as this is not aligned with the orgunit structure now
     if (is.null(d$info$psnus)) {
       d$info$psnus <- getValidOrgUnits(d$info$cop_year) %>%
@@ -52,12 +51,21 @@ createAnalytics <- function(d,
   pzns <- d$datim$prioritizations %>%
     dplyr::select(orgUnit, value)
 
+  #TODO: We need to clean this logic up.
+  if (d$info$has_psnuxim) {
+    data <- d$datim$MER %>%
+      dplyr::bind_rows(d$datim$subnat_impatt)
+    map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(d$info$cop_year, "PSNUxIM")
+  } else {
+    data <- d$datim$UndistributedMER %>%
+      dplyr::bind_rows(d$datim$subnat_impatt)
+    map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(d$info$cop_year, "Data Pack")
+  }
+
   d$data$analytics <-
-    switch(ifelse(d$info$has_psnuxim, "MER", "UndistributedMER"),
-           MER = d$datim$MER,
-           UndistributedMER = d$datim$UndistributedMER) %>%
-    dplyr::bind_rows(d$datim$subnat_impatt) %>%
-    adorn_import_file(cop_year = d$info$cop_year,
+    adorn_import_file(
+      psnu_import_file = data,
+      cop_year = d$info$cop_year,
                       psnu_prioritizations = pzns,
                       map_des_cocs = map_des_cocs,
                       d2_session = d2_session)
