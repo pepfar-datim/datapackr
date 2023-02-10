@@ -11,6 +11,7 @@ prepareMemoDataByPSNU(
   prios,
   partners_agencies,
   psnus,
+  cop_year,
   n_cores = getMaxCores()
 )
 }
@@ -31,6 +32,9 @@ comparison: Create a comparison memo with data from both DATIM and datapack}
 
 \item{psnus}{Dataframe of PSNUs to use in this function, containing at least
 \code{psnu_uid}.}
+
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 
 \item{n_cores}{Indicates how many cores should be used.}
 }

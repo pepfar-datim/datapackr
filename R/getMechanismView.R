@@ -1,3 +1,26 @@
+
+.fetchMechanismViewFromDATIM <- function(d2_session) {
+  interactive_print("Fetching new mechs file from DATIM")
+
+  #We are going to make this large request once by partition it by COP year
+  #This query usually times out if it is made without filters.
+  min_cop_year <- min(supportedCOPYears())
+
+    mechs <- datimutils::getSqlView(
+      sql_view_uid = "fgUtV6e9YIX",
+      d2_session = d2_session,
+      timeout = 600
+    ) %>%
+     dplyr::rename(
+       mechanism_desc = mechanism,
+       attributeOptionCombo = uid,
+       mechanism_code = code,
+       partner_desc = partner,
+       partner_id = primeid) %>%
+     dplyr::distinct()
+
+
+}
 #' @export
 #' @title getMechanismView
 #'
@@ -70,33 +93,41 @@ getMechanismView <- function(country_uids = NULL,
   }
 
   if (!is_fresh) {
-    interactive_print("Fetching new mechs file from DATIM")
-
-    mechs <- if (is.null(cop_year)) {
-      datimutils::getSqlView(sql_view_uid = "fgUtV6e9YIX", d2_session = d2_session)
-    } else {
-      url_filter <- c(paste0("startdate:lt:", as.numeric(cop_year) + 1, "-10-01"),
-                      paste0("enddate:gt:", cop_year, "-09-30"))
-
-      datimutils::getSqlView(url_filter, sql_view_uid = "fgUtV6e9YIX", d2_session = d2_session)
-    }
-
-    mechs <- mechs %>%
-      dplyr::rename(
-        mechanism_desc = mechanism,
-        attributeOptionCombo = uid,
-        mechanism_code = code,
-        partner_desc = partner,
-        partner_id = primeid)
-
+    mechs <- .fetchMechanismViewFromDATIM(d2_session = d2_session)
     if (can_write_file) {
       interactive_print(paste0("Overwriting stale mechanisms view to ", cached_mechs_path))
       saveRDS(mechs, file = cached_mechs_path)
     }
-  }
+}
+
+
+dedupe_mechs <- mechs %>%
+  dplyr::filter(mechanism_code %in% c("00000", "00001"))
+
+moh_mechs <- mechs %>%
+  dplyr::filter(mechanism_code %in% c("00100", "00200"))
+
+mechs %<>% dplyr::filter(!(mechanism_code %in% c("00000", "00001", "00100", "00200")))
+
+# Filter by COP Year ####
+if (!is.null(cop_year)) {
+
+  cop_year %<>% check_cop_year(cop_year = cop_year)
+
+  mechs %<>%
+    dplyr::filter(
+      (startdate < paste0(as.numeric(cop_year) + 1, "-10-01") &
+         enddate > paste0(as.numeric(cop_year), "-09-30")))
+}
+
+
 
   # Filter by OU from a vector of country UIDs
   if (!is.null(country_uids)) {
+
+    cop_year <- cop_year %missing% NULL
+    cop_year %<>% check_cop_year(cop_year = cop_year)
+
     ous <- getValidOrgUnits(cop_year) %>%
       dplyr::select(ou, ou_uid, country_uid) %>%
       dplyr::distinct() %>%
@@ -105,29 +136,17 @@ getMechanismView <- function(country_uids = NULL,
       unique(.)
 
     mechs %<>%
-      dplyr::filter(ou %in% ous | is.na(ou))
+      dplyr::filter(ou %in% ous)
   }
 
-  # Filter by COP Year ####
-  if (!is.null(cop_year)) {
-    mechs %<>%
-        dplyr::filter(
-          (startdate < paste0(max(as.numeric(cop_year)) + 1, "-10-01") &
-            enddate > paste0(min(as.numeric(cop_year)), "-09-30"))
-          | is.na(startdate))
-  }
 
   # Include Dedupe or MOH ####
-  if (!include_MOH) {
-    MOH <- c("QCJpv5aDCJU", "TRX0yuTsJA9")
-    mechs %<>%
-      dplyr::filter(!attributeOptionCombo %in% MOH)
+  if (include_MOH) {
+    mechs <- dplyr::bind_rows(moh_mechs, mechs)
   }
 
-  if (!include_dedupe) {
-    dedupe <- c("X8hrDf6bLDC", "YGT1o7UxfFu")
-    mechs %<>%
-      dplyr::filter(!attributeOptionCombo %in% dedupe)
+  if (include_dedupe) {
+    mechs <-  mechs %>% dplyr::bind_rows(dedupe_mechs)
   }
 
   if (include_default) {
@@ -139,17 +158,27 @@ getMechanismView <- function(country_uids = NULL,
       partner_desc = "None",
       partner_id = "None",
       agency = "None",
-      ou = NA,
-      startdate = NA,
-      enddate = NA
+      ou = "",
+      startdate = "",
+      enddate = ""
     )
 
-    mechs <- rbind(mechs, default_mech)
+    mechs <- dplyr::bind_rows(mechs, default_mech)
   }
 
   structure_ok <- dplyr::setequal(names(empty_mechs_view), names(mechs))
 
+  if (any(duplicated(mechs$mechanism_code))) {
+
+    warning("Duplicated mechanisms codes detected: ",
+         paste(mechs$mechanism_code[duplicated(mechs$mechanism_code)], sep = "", collapse = ","))
+  }
+
   if (!structure_ok) warning("Mechanism view names are not correct!")
+
+  if (NROW(mechs) == 0) {
+    warning("No mechanisms for the combination of paramaters were found")
+  }
 
   return(mechs)
 

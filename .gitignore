@@ -13,4 +13,5 @@ renv/
 .vscode/
 support_files/
 workspace.code-workspace
-
+# Temporary excel files
+~$*

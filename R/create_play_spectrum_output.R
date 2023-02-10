@@ -25,7 +25,7 @@ create_play_spectrum_output <- function(country_uids,
   PSNUs <- getValidOrgUnits(cop_year) %>%
     dplyr::filter(country_uid %in% country_uids,
                   psnu_type != "Military") %>%
-    datapackr::add_dp_label(.) %>%
+    datapackr::add_dp_label(orgunits = ., cop_year = cop_year) %>%
     dplyr::arrange(dp_label) %>%
     dplyr::select(PSNU = dp_label, psnu_uid = uid)
 

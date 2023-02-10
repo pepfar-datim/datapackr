@@ -4,11 +4,7 @@
 \alias{unPackCountryUIDs}
 \title{Extract country uids from submitted file}
 \usage{
-unPackCountryUIDs(
-  submission_path,
-  tool = "Data Pack",
-  cop_year = getCurrentCOPYear()
-)
+unPackCountryUIDs(submission_path, tool = "Data Pack", cop_year)
 }
 \arguments{
 \item{submission_path}{Local path to the file to import.}

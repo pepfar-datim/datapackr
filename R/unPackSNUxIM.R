@@ -385,6 +385,69 @@ dropInvalidMechColumns <- function(d, cols_to_keep, sheet = "PSNUxIM") {
 
 }
 
+
+
+#' Title checkPSNUxIMDisaggs
+#'
+#' @param d Datapack d object
+#'
+#' @return d Datapack d object
+#' @export
+#'
+
+checkPSNUxIMDisaggs <- function(d) {
+
+  header_row <- headerRow(d$info$tool, d$info$cop_year)
+  #We use the DATIM DE/COC map here even if this is a datapack
+  #Since we assume that the disaggs in the PSNUxIM tab match
+  #DATIM.
+  de_coc_map <-
+    getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year, datasource = "PSNUxIM") %>%
+    dplyr::select(indicator_code,
+                  "Age" = valid_ages.name,
+                  Sex = valid_sexes.name,
+                  "KeyPop" = valid_kps.name) %>%
+    dplyr::mutate(exists = TRUE)
+
+  data <- d$data$SNUxIM %>%
+    dplyr::select(PSNU, indicator_code, "Age", "Sex", "KeyPop") %>%
+    dplyr::mutate(row_number = dplyr::row_number() + header_row)
+
+  defunct_disaggs <- dplyr::left_join(data, de_coc_map)
+
+  if (any(is.na(defunct_disaggs$exists))) {
+
+
+    d$tests$invalid_psnuxim_disaggs <- defunct_disaggs %>%
+      dplyr::filter(is.na(exists)) %>%
+      dplyr::select(-exists)
+
+    affected_rows <- d$tests$invalid_psnuxim_disaggs$row_number
+
+    attr(d$tests$invalid_psnuxim_disaggs, "test_name") <- "Invalid PSNUxIM Disaggs"
+
+    lvl <- "ERROR"
+
+    msg <-
+      paste0(lvl, "! In tab PSNUxIM ", length(affected_rows),
+             " invalid disaggregate combinations found. Please review all rows of data flagged by this test to ensure",
+             " no Age, Sex, or Key Population disaggregates have been inadvertently or",
+             " incorrectly altered. If you believe this has been flagged in error, ",
+             " please first refer to MER Guidance to confirm valid disaggregates for",
+             " the data element flagged. (Check MER Guidance for correct alternatives.",
+             " Also note that single-digit ages should be left-padded with zeros,",
+             " e.g., 01-04 instead of 1-4.)",
+             " The following rows are implicated: ", formatSetStrings(affected_rows), "\n\t")
+
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
+    d$info$has_error <- TRUE
+  }
+
+  d
+
+
+}
+
 #' @export
 #' @title unPackSNUxIM(d)
 #'
@@ -433,6 +496,9 @@ unPackSNUxIM <- function(d) {
     extractSNUxIMCombos(.) %>%
     extractDuplicateRows(., sheet) %>%
     checkColStructure(., sheet)
+
+  #Check invalid disaggs before any deletions or reshaping
+  d <- checkPSNUxIMDisaggs(d)
 
   # Save snapshot of original targets ####
 
@@ -818,8 +884,7 @@ unPackSNUxIM <- function(d) {
       dplyr::across(c(header_cols$indicator_code, "psnuid", "mechCode_supportType"))) %>%
     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
 
-  # TODO: TEST: Defunct disaggs; Error; Drop ####
-  #d <- checkDisaggs(d, sheet)
+
 
   # Drop all zeros against IMs ####
   # d$data$SNUxIM %<>%
