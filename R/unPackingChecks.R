@@ -780,8 +780,8 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
 
   #There may be some variation in the columns between cop years
   cols_to_filter <- switch(as.character(d$info$cop_year),
-                           "2021" = c("SNU1","PSNU", "Age", "Sex"),
-                           "2022" = c("SNU1","PSNU", "Age", "Sex"),
+                           "2021" = c("SNU1", "PSNU", "Age", "Sex"),
+                           "2022" = c("SNU1", "PSNU", "Age", "Sex"),
                            "2023" = c("PSNU", "Age", "Sex"))
 
   invalid_orgunits <- d$sheets[sheets] %>%
