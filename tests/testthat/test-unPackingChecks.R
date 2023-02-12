@@ -604,9 +604,9 @@ test_that("Can check invalid prioritizations COP23", {
   d <- list()
   d$sheets$Prioritization <-
     tribble(
-      ~SNU1, ~PSNU, ~IMPATT.PRIORITY_SNU.T_1, ~IMPATT.PRIORITY_SNU.T, ~PRIORITY_SNU.translation,
-      "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", NA, "M", "Military",
-      "Central Eastern Zone", "Central Eastern Zone [#SNU] [EGgIZbN4s1P]", "4", "4", "Sustained"
+      ~PSNU, ~IMPATT.PRIORITY_SNU.T_1, ~IMPATT.PRIORITY_SNU.T, ~PRIORITY_SNU.translation,
+      "_Military Malawi [#Military] [PQZgU9dagaH]", NA, "M", "Military",
+      "Dedza District [PekKUkKHAzY]", "4", "4", "Sustained"
     )
   d$info$cop_year <- 2023
 
@@ -620,8 +620,7 @@ test_that("Can check invalid prioritizations COP23", {
   # test positive flag
   # add row with NA value that triggers invalid prioritization
   d$sheets$Prioritization <- d$sheets$Prioritization %>%
-    add_row(!!!setNames(c("Central Region", "Dowa District [#SNU] [zphK9WV8JB4]",
-                          "4", NA, "Not a PSNU"), names(.)))
+    add_row(!!!setNames(c("Kasungu District [JQKLKuVuY61]", "4", NA, "Not a PSNU"), names(.)))
 
   res <- checkInvalidPrioritizations(d = d, sheets = test_sheets)
 
