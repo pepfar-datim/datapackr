@@ -19,6 +19,8 @@ with_mock_api({
 
     #Suppress console output
 
+    spectrum_data <- readRDS(test_sheet("COP23_spectrum_data_random_MW.rds"))
+
     d <- packTool(model_data_path = test_sheet("COP23_datapack_model_data_random_MW.rds"),
       tool = "Data Pack",
                   datapack_name = pick$datapack_name[1],
@@ -28,6 +30,7 @@ with_mock_api({
                   output_folder = output_folder,
                   results_archive = FALSE,
                   expand_formulas = TRUE,
+                  spectrum_data = spectrum_data,
                   d2_session = training)
 
   expect_setequal(names(d), c("keychain", "info", "tool", "data"))
@@ -64,6 +67,9 @@ with_mock_api({
   #Unpack this tool which has been "opened" in libreoffice
   d_opened <- unPackTool(submission_path = out_file, d2_session = training)
   expect_identical(d$info$datapack_name, d_opened$info$datapack_name)
+  expect_setequal(names(d_opened), c("keychain", "info", "data", "tests", "datim", "sheets"))
+  expect_true(NROW(d_opened$data$analytics) > 0)
+  expect_true(all(d_opened$data$analytics$mechanism_desc == "default"))
 
 })
 })
