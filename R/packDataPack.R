@@ -11,6 +11,7 @@
 #'
 packDataPack <- function(d,
                          model_data = NULL,
+                         spectrum_data = NULL,
                          d2_session = dynGet("d2_default_session",
                                              inherits = TRUE)) {
 
@@ -52,6 +53,12 @@ packDataPack <- function(d,
                                   schema = d$info$schema,
                                   sheets = NULL,
                                   cop_year = d$info$cop_year)
+
+  if (!is.null(spectrum_data)) {
+    interactive_print("Writing Spectrum data...")
+    d$tool$wb <- writeSpectrumData(wb = d$tool$wb,
+                                   spectrum_data = spectrum_data)
+  }
 
   # Hide unneeded sheets ####
   sheets_to_hide <- which(stringr::str_detect(names(d$tool$wb), "PSNUxIM"))
