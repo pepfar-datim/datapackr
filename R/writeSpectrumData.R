@@ -28,7 +28,7 @@ writeSpectrumData <- function(wb, spectrum_data) {
   openxlsx::writeData(wb = wb,
                       sheet = "Spectrum",
                       x = spectrum_data, # Object to be written.
-                      xy = c(4,2),
+                      xy = c(4, 2),
                       colNames = FALSE,
                       rowNames = FALSE,
                       withFilter = FALSE) # Filters are not applied to column name row
@@ -36,7 +36,7 @@ writeSpectrumData <- function(wb, spectrum_data) {
   rows_to_write <- seq_len(NROW(spectrum_data)) + 1
   #Write parse age formulas to sheet
   parse_age_fomula <- paste0("=SUBSTITUTE(SUBSTITUTE($I",
-                             rows_to_write ,
+                             rows_to_write,
   ",CHAR(61),\"\"),CHAR(34),\"\")")
 
   openxlsx::writeFormula(
