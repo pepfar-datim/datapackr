@@ -15,6 +15,7 @@ d <-
 d <- unPackSheets(d, check_sheets = TRUE)
 
 with_mock_api({
+  skip("COP21 DataPack has been deprecated.")
   test_that("Can unpack all Data Pack sheets", {
 
     expect_true(!is.null(d$data$MER))

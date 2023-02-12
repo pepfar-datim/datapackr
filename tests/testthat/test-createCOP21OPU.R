@@ -1,6 +1,7 @@
 context("Create a COP21 OPU")
 
 with_mock_api({
+  skip("COP21 OPUs are deprecated.")
   test_that("We can write an COP21 OPU tool", {
 
     # For Generating Individual Data Packs ####
