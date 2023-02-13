@@ -8,7 +8,7 @@ Sys.setlocale(category = "LC_COLLATE", locale = "en_US.UTF-8")
 with_mock_api({
   test_that("We can create a COP21 OPU Data Pack Schema", {
 
-    template_file <- "../../inst/extdata/COP21_OPU_Data_Pack_Template.xlsx"
+    template_file <- getTemplate("inst/extdata/COP21_OPU_Data_Pack_Template.xlsx")
     expect_true(file.exists(template_file))
     test_dataset <- unPackSchema(
       template_path = template_file,
@@ -67,7 +67,7 @@ with_mock_api({
 with_mock_api({
   test_that("We can create a COP22 OPU DataPack Schema", {
 
-    template_file <- "../../inst/extdata/COP22_OPU_Data_Pack_Template.xlsx"
+    template_file <- getTemplate("inst/extdata/COP22_OPU_Data_Pack_Template.xlsx")
     expect_true(file.exists(template_file))
     test_dataset <- unPackSchema(
       template_path = template_file,
@@ -127,7 +127,7 @@ with_mock_api({
 with_mock_api({
   test_that("We can create a COP22 DataPack Schema", {
 
-    template_file <- "../../inst/extdata/COP22_Data_Pack_Template.xlsx"
+    template_file <- getTemplate("inst/extdata/COP22_Data_Pack_Template.xlsx")
     expect_true(file.exists(template_file))
     test_dataset <- unPackSchema(
       template_path = template_file,
@@ -183,7 +183,7 @@ with_mock_api({
 
 with_mock_api({
   test_that("We can create a COP23 DataPack Schema", {
-    template_file <- rprojroot::find_package_root_file("inst/extdata/COP23_Data_Pack_Template.xlsx")
+    template_file <- getTemplate("inst/extdata/COP23_Data_Pack_Template.xlsx")
     expect_true(file.exists(template_file))
     test_dataset <-   unPackSchema(
       template_path = template_file,
