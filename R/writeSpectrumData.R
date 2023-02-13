@@ -16,7 +16,7 @@ writeSpectrumData <- function(wb, spectrum_data) {
     return(wb)
   }
 
-  expected_names <- c("psnu", "psnu_uid", "area_id", "indicaator_code", "dataelement_uid",
+  expected_names <- c("psnu", "psnu_uid", "area_id", "indicator_code", "dataelement_uid",
                       "age", "age_uid", "sex", "sex_uid", "calendar_quarter", "value", "age_sex_rse", "district_rse")
 
   if (!identical(names(spectrum_data), expected_names)) {
