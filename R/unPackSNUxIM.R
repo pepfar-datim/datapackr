@@ -255,7 +255,7 @@ extractOriginalTargets <- function(d, cols_to_keep, header_cols, sheet = "PSNUxI
                                           as.numeric))
       } %>%
       dplyr::group_by(dplyr::across(header_cols$indicator_code)) %>%
-      dplyr::summarise(DataPackTarget = sum(DataPackTarget)) %>%
+      dplyr::summarise(DataPackTarget = sum(DataPackTarget), .groups = "drop") %>%
       dplyr::mutate(
         psnuid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)"),
         sheet_name = sheet
@@ -448,6 +448,91 @@ checkPSNUxIMDisaggs <- function(d) {
 
 }
 
+combineDuplicatePSNUxIMColumns <- function(d, cols_to_keep) {
+  # TEST: Duplicate Cols; Warn; Combine ####
+  col_names <- names(d$data$SNUxIM) %>%
+    tibble::tibble(col_name = .) %>%
+    dplyr::mutate(
+      # This also creates a standardized mech_code/support_type name
+      col_name_new = dplyr::case_when(
+        !col_name %in% cols_to_keep$indicator_code
+        ~ paste0(stringr::str_extract(col_name, "\\d+"),
+                 "_",
+                 stringr::str_extract(col_name, "DSD|TA")),
+        TRUE ~ col_name),
+      id = 1) %>%
+    dplyr::group_by(col_name_new) %>%
+    dplyr::mutate(
+      id = cumsum(id),
+      col_name_new = dplyr::case_when(
+        id > 1 ~ paste0(col_name_new, "_", id),
+        TRUE ~ col_name_new)
+    ) %>%
+    dplyr::ungroup()
+
+  d$tests$duplicate_cols <- col_names %>%
+    dplyr::filter(id > 1) %>%
+    dplyr::mutate(
+      duplicate_cols = paste0(stringr::str_extract(col_name_new, "\\d+"),
+                              "_",
+                              stringr::str_extract(col_name_new, "DSD|TA"))) %>%
+    dplyr::select(duplicate_cols)
+
+  attr(d$tests$duplicate_cols, "test_name") <- "Duplicate columns"
+
+  if (NROW(d$tests$duplicate_cols) > 0) {
+    warning_msg <-
+      paste0(
+        "WARNING! In tab ",
+        sheet,
+        ", DUPLICATE COLUMNS: The following columns appear to be duplicates and",
+        " should be consolidated in your submission. While duplicates will be combined",
+        " in processing, we cannot guarantee this will work as you might expect. ->  \n\t* ",
+        paste(d$tests$duplicate_cols, collapse = "\n\t* "),
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+  }
+
+  # --> This also removes non-essential text from IM name to leave only 12345_DSD format.
+
+  names(d$data$SNUxIM) <- col_names$col_name_new
+
+
+  d
+
+}
+
+checkNonNumericPSNUxIMValues <- function(d, header_cols) {
+
+  df <- d$data$SNUxIM %>%
+    dplyr::select(-tidyselect::any_of(header_cols$indicator_code))
+
+  #Find anything which is not numeric.
+  #Note, decimals and negatives are allowed.
+  df_list <- lapply(as.list(df), function(x) which(!(grepl("^0|(-)?[1-9]\\d*(\\.\\d+)?$", x) | is.na(x))))
+  #Remove empty lists
+  df_list <- purrr::compact(df_list)
+  if (length(df_list) > 0) {
+    d$tests$non_numeric_psnuxim_values <- data.frame(columns = names(df_list),
+                                                     rows = do.call(rbind, lapply(df_list, formatSetStrings)))
+
+    attr(d$tests$non_numeric_psnuxim_values, "test_name") <- "Non-numeric PSNUxIM values"
+      warning_msg <-
+        paste0(
+          "WARNING! In tab PSNUxIM: Non-numeric values! found in columns",
+          paste0(names(df_list), sep = "", collapse = ","),
+          ". Please consult the validation report for the specific rows where these values were found.\n\t* ",
+          "\n")
+
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+
+  }
+
+  d
+
+}
+
 #' @export
 #' @title unPackSNUxIM(d)
 #'
@@ -553,60 +638,10 @@ unPackSNUxIM <- function(d) {
   d <- dropInvalidMechColumns(d, cols_to_keep)
 
   # TEST: Duplicate Cols; Warn; Combine ####
-  col_names <- names(d$data$SNUxIM) %>%
-    tibble::tibble(col_name = .) %>%
-    dplyr::mutate(
-      # This also creates a standardized mech_code/support_type name
-      col_name_new = dplyr::case_when(
-        !col_name %in% cols_to_keep$indicator_code
-        ~ paste0(stringr::str_extract(col_name, "\\d+"),
-                 "_",
-                 stringr::str_extract(col_name, "DSD|TA")),
-        TRUE ~ col_name),
-      id = 1) %>%
-    dplyr::group_by(col_name_new) %>%
-    dplyr::mutate(
-      id = cumsum(id),
-      col_name_new = dplyr::case_when(
-        id > 1 ~ paste0(col_name_new, "_", id),
-        TRUE ~ col_name_new)
-    ) %>%
-    dplyr::ungroup()
+  d <- combineDuplicatePSNUxIMColumns(d, cols_to_keep)
 
-  d$tests$duplicate_cols <- col_names %>%
-    dplyr::filter(id > 1) %>%
-    dplyr::mutate(
-      duplicate_cols = paste0(stringr::str_extract(col_name_new, "\\d+"),
-                              "_",
-                              stringr::str_extract(col_name_new, "DSD|TA"))) %>%
-    dplyr::select(duplicate_cols)
-
-  attr(d$tests$duplicate_cols, "test_name") <- "Duplicate columns"
-
-  if (NROW(d$tests$duplicate_cols) > 0) {
-    warning_msg <-
-      paste0(
-        "WARNING! In tab ",
-        sheet,
-        ", DUPLICATE COLUMNS: The following columns appear to be duplicates and",
-        " should be consolidated in your submission. While duplicates will be combined",
-        " in processing, we cannot guarantee this will work as you might expect. ->  \n\t* ",
-        paste(d$tests$duplicate_cols, collapse = "\n\t* "),
-        "\n")
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
-  }
-
-  names(d$data$SNUxIM) <- col_names$col_name_new
-  # --> This also removes non-essential text from IM name to leave only 12345_DSD format.
-
-  # TEST: Non-numeric data; Warn; Convert & Drop ####
-  # TODO: Make compatible for OPUs
-  if (d$info$tool == "Data Pack") {
-    #d <- checkNumericValues(d, sheet, header_cols)
-  }
-
-  # sapply(d$data$extract, function(x) which(stringr::str_detect(x, "[^[:digit:][:space:][:punct:]]+")))
+  # TEST: Non-numeric data. Does not drop any data at this point.
+  d <- checkNonNumericPSNUxIMValues(d, header_cols)
 
   d$data$SNUxIM %<>%
     { suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)), #nolint

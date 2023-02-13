@@ -317,22 +317,26 @@ test_that("Do not  flag valid  disaggs in PSNUxIM", {
   d <- checkPSNUxIMDisaggs(d)
 
   expect_false(d$info$has_error)
+
   expect_null(d$tests$invalid_psnuxim_disaggs)
 
 })
 
-# test_that("Can extract original targets", {
-#   d <- list()
-#   d$info$tool <- "OPU Data Pack"
-#   d$info$messages <- MessageQueue()
-#
-#   d$data$SNUxIM <- tibble::tribble(
-#     ~PSNU, ~indicator_code, ~Age, ~Sex, ~KeyPop, ~DataPackTarget,
-#     "Cupcake District [NYWv44mLzDN]", "TX_CURR.T", "25-49", "F", NA, 10,
-#     "Cupcake District [NYWv44mLzDN]", "TX_CURR.T", "15-24", "F", NA, 10)
-#
-#   original_targets <- extractOriginalTargets(d)
-#   PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop,
-#   value = DataPackTarget
-#
-#   })
+
+test_that("Can identify non-numeric values in PSNUxIM", {
+
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  d$data$SNUxIM <- tibble::tribble(
+    ~"A", ~"B", ~"C", ~"PSNU",
+    "1", "foo", "bar", "Fish District",
+    "-2", "2.2", "baz", "Pizza District")
+  header_cols <- data.frame(indicator_code = c("PSNU"))
+  d <- checkNonNumericPSNUxIMValues(d,  header_cols)
+  expect_true(any(grepl("WARNING! In tab PSNUxIM: Non-numeric values!", d$info$messages$message)))
+  expect_setequal(d$tests$non_numeric_psnuxim_values$columns, c("B", "C"))
+  expect_equal("1", d$tests$non_numeric_psnuxim_values$rows[which(d$tests$non_numeric_psnuxim_values == "B")])
+  expect_equal("1:2", d$tests$non_numeric_psnuxim_values$rows[which(d$tests$non_numeric_psnuxim_values == "C")])
+
+})
