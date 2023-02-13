@@ -3,7 +3,7 @@ context("Create a COP23 Target Setting Tool")
 with_mock_api({
   test_that("We can write an COP23 Target Setting tool", {
 
-    template_path <- getTemplate("inst/extdata/COP23_Data_Pack_Template.xlsx")
+    template_path <- getTemplate("COP23_Data_Pack_Template.xlsx")
 
     expect_true(file.exists(template_path))
 
