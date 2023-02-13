@@ -183,7 +183,7 @@ with_mock_api({
 
 with_mock_api({
   test_that("We can create a COP23 DataPack Schema", {
-    template_file <- getTemplate("inst/extdata/COP23_Data_Pack_Template.xlsx")
+    template_file <- getTemplate("COP23_Data_Pack_Template.xlsx")
     expect_true(file.exists(template_file))
     test_dataset <-   unPackSchema(
       template_path = template_file,
