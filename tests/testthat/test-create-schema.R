@@ -173,7 +173,8 @@ with_mock_api({
     expect_type(test_dataset$formula, "character")
     expect_type(test_dataset$FY, "double")
     expect_type(test_dataset$period, "character")
-    expect_identical(test_dataset, datapackr::cop22_data_pack_schema)
+    load(getRDA("cop22_data_pack_schema"))
+    expect_identical(test_dataset, cop22_data_pack_schema)
 
   })
 
@@ -230,6 +231,7 @@ with_mock_api({
     expect_type(test_dataset$formula, "character")
     expect_type(test_dataset$FY, "double")
     expect_type(test_dataset$period, "character")
+    load(getRDA("cop23_data_pack_schema"))
     expect_identical(test_dataset, cop23_data_pack_schema)
 
 

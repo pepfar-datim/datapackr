@@ -14,6 +14,14 @@ getTemplate <- function(path) {
     rprojroot::find_package_root_file(paste0("inst/extdata/", path)))
 }
 
+getRDA <- function(object_name) {
+  ifelse(
+    onCI,
+    paste0("/root/project/data/", object_name,".rda"),
+    rprojroot::find_package_root_file(paste0("data/", object_name, ".rda")))
+
+}
+
 # login object stubs sufficient for use in mocked api calls
 # one needed for each server with mock calls
 play2361 <- list(base_url = "https://play.dhis2.org/2.36.1/",
