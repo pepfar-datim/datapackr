@@ -19,9 +19,8 @@ compare_diffs <- datapackr::valid_OrgUnits %>%
 waldo::compare(valid_OrgUnits, datapackr::valid_OrgUnits)
 
 # Overwriting default list with newly created list
-save(valid_OrgUnits,
-     file = "./data/valid_OrgUnits.rda",
-     compress = "xz")
+usethis::use_data(valid_OrgUnits,
+                  compress = "xz", overwrite = TRUE)
 
 ## Rebuild the package
 
