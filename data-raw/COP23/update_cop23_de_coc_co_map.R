@@ -339,14 +339,7 @@ compare_diffs <- datapackr::cop23_map_DataPack_DATIM_DEs_COCs %>%
 
 waldo::compare(datapackr::cop23_map_DataPack_DATIM_DEs_COCs, dp_map)
 
-# Expected changes from COP21:
-# - finer age bands on DATIM side for TX_CURR only
-# - finer age bands on DP side, mapped to 50+ on DATIM side
-# - PrEP_CT instead of PrEP_CURR
-# - New SNS modality in HTS_TST and HTS_RECENT
-# - No need to remap PMTCT_STAT_SUBNAT in weird ways
-# - AGYW_PREV listed as "dreams" dataset instead of "mer"
-# - Updates to DEGS for HTS modalities and top level to reflect FY23 targets changes
+
 
 cop23_map_DataPack_DATIM_DEs_COCs <- dp_map
 save(cop23_map_DataPack_DATIM_DEs_COCs, file = "./data/cop23_map_DataPack_DATIM_DEs_COCs.rda", compress = "xz")
