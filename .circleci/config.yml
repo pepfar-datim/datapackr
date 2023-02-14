@@ -6,7 +6,6 @@ jobs:
       - image: rocker/verse:4.1.1
     steps:
       - checkout
-          path: ~/datapackr
       - restore_cache:
           key: deps1-{{ checksum "renv.lock" }}
       - run:

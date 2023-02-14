@@ -10,7 +10,7 @@ onCI <- isTRUE(as.logical(Sys.getenv("CI")))
 getTemplate <- function(path) {
   ifelse(
     onCI,
-    path= paste("/root/datapackr/inst/extdata/", path),
+    path= paste("/root/project/datapackr/inst/extdata/", path),
     rprojroot::find_package_root_file(path))
 }
 
