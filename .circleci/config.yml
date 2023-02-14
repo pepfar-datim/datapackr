@@ -5,8 +5,8 @@ jobs:
     docker:
       - image: rocker/verse:4.1.1
     steps:
-      - working_directory ~/datapackr
       - checkout
+          path: ~/datapackr
       - restore_cache:
           key: deps1-{{ checksum "renv.lock" }}
       - run:
