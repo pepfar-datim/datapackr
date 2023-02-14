@@ -166,7 +166,6 @@ sendTimeStampLogToS3 <- function(d) {
   object_name <-
     paste0("processed/",
            gsub("^20", "cop", d$info$cop_year),
-           ifelse(d$info$cop_year == 2021, "_opu", ""),
            "/",
            d$info$sane_name,
            ".csv")
@@ -199,7 +198,6 @@ sendTimeStampLogToS3 <- function(d) {
     paste0(
       "upload_timestamp/",
       gsub("^20", "cop", d$info$cop_year),
-      ifelse(d$info$cop_year == 2021, "_opu", ""),
       "/",
       d$info$sane_name,
       ".csv"
@@ -248,7 +246,6 @@ sendDATIMExportToS3 <- function(d) {
   object_tags <- createS3BucketTags(d)
 
   object_name <- paste0("datim_export/", gsub("^20", "cop", d$info$cop_year),
-                        ifelse(d$info$cop_year == 2021, "_opu", ""),
                         "/", d$info$sane_name, ".csv")
 
   s3 <- paws::s3()
@@ -302,7 +299,6 @@ sendYear2ExportToS3 <- function(d, custom_object_name = NULL) {
     object_tags <- createS3BucketTags(d)
 
     object_name <- paste0("datim_export/", gsub("^20", "cop", d$info$cop_year),
-                          ifelse(d$info$cop_year == 2021, "_opu", ""),
                           "/", d$info$sane_name, "_Y2.csv")
 
     s3 <- paws::s3()
