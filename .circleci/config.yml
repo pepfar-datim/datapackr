@@ -27,9 +27,6 @@ jobs:
           name: Build package
           command: R CMD build --no-build-vignettes --no-manual .
       - run:
-          name: Install package
-          command: R CMD install .
-      - run:
           name: Test package
           no_output_timeout: 30m
           command: |
