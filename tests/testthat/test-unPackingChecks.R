@@ -35,7 +35,7 @@ test_that("Can detect invalid comment types ...", {
   expect_true(d$info$has_error)
 
 
-  d  <- loadDataPack(submission_path = test_sheet("COP21_Data_Pack_Template.xlsx"),
+  d  <- loadDataPack(submission_path = getTemplate("COP23_Data_Pack_Template.xlsx"),
                      tool = "Data Pack",
                      country_uids = NULL,
                      cop_year = NULL,
@@ -63,7 +63,7 @@ test_that("Can detect external links in a file ...", {
 })
 
 test_that("Can check Tool structure...", {
-  d  <- loadDataPack(submission_path = test_sheet("COP21_Data_Pack_Template.xlsx"),
+  d  <- loadDataPack(submission_path = getTemplate("COP21_Data_Pack_Template.xlsx"),
                      tool = "Data Pack",
                      country_uids = NULL,
                      cop_year = NULL,
@@ -72,7 +72,7 @@ test_that("Can check Tool structure...", {
   expect_equal(NROW(d$tests$missing_sheets), 0L)
 
   template_copy <- paste0(tempfile(), ".xlsx")
-  file.copy(from = test_sheet("COP21_Data_Pack_Template.xlsx"), to = template_copy)
+  file.copy(from = getTemplate("COP21_Data_Pack_Template.xlsx"), to = template_copy)
   wb <- openxlsx::loadWorkbook(template_copy)
   openxlsx::removeWorksheet(wb, "PMTCT")
   openxlsx::saveWorkbook(wb, file = template_copy, overwrite = TRUE)
