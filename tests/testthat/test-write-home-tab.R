@@ -1,4 +1,4 @@
-context("test-write-home-tab")
+context("Write a DataPack Home tab")
 
 test_that("Can write a home tab", {
   template_copy <- paste0(tempfile(), ".xlsx")
