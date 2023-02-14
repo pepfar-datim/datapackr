@@ -30,7 +30,7 @@ jobs:
           name: Test package
           no_output_timeout: 30m
           command: |
-            R -e "devtools::check(error_on='error')"
+            R -e "devtools::test(stop_on_failure = TRUE, error_on='error')"
       - run:
           name: Lint packages
           command: |
