@@ -30,6 +30,7 @@ with_mock_api({
 
 with_mock_api({
   test_that("We can create Datapack memo data", {
+    testthat_print("Update this to COP23 when possible")
     d <-
       loadDataPack(
         submission_path = test_sheet("COP21_DP_random_with_psnuxim.xlsx"),
