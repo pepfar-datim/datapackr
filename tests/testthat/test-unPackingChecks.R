@@ -35,7 +35,7 @@ test_that("Can detect invalid comment types ...", {
   expect_true(d$info$has_error)
 
 
-  d  <- loadDataPack(submission_path = getTemplate("COP23_Data_Pack_Template.xlsx"),
+  d  <- loadDataPack(submission_path = test_sheet("COP21_Data_Pack_Template.xlsx"),
                      tool = "Data Pack",
                      country_uids = NULL,
                      cop_year = NULL,
@@ -605,7 +605,7 @@ test_that("Can check invalid prioritizations COP23", {
   d$sheets$Prioritization <-
     tribble(
       ~PSNU, ~IMPATT.PRIORITY_SNU.T_1, ~IMPATT.PRIORITY_SNU.T, ~PRIORITY_SNU.translation,
-      "_Military Malawi [#Military] [PQZgU9dagaH]", NA, "M", "Military",
+      "_Military Malawi[PQZgU9dagaH]", NA, "M", "Military",
       "Dedza District [PekKUkKHAzY]", "4", "4", "Sustained"
     )
   d$info$cop_year <- 2023
@@ -615,7 +615,7 @@ test_that("Can check invalid prioritizations COP23", {
   res <- checkInvalidPrioritizations(d, sheets = test_sheets)
   expect_null(res$result)
   expect_equal(res$has_error, FALSE)
-  rm(res)
+
 
   # test positive flag
   # add row with NA value that triggers invalid prioritization
@@ -627,8 +627,6 @@ test_that("Can check invalid prioritizations COP23", {
   expect_equal(nrow(res$result), 1L)
   expect_equal(res$lvl, "ERROR")
   expect_equal(res$has_error, TRUE)
-
-  rm(res, d)
 
 
 })

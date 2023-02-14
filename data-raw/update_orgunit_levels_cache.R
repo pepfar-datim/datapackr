@@ -27,11 +27,11 @@ ous <- valid_OrgUnits %>% dplyr::select(country_name, ou_uid, country_uid) %>% d
 
 cop21_ou_levels <- dataset_levels %>%  dplyr::filter(cop_year == 2021)
 cop22_ou_levels <- dataset_levels %>%  dplyr::filter(cop_year == 2022)
-cop23_ou_levels <- fetchOrgunitLevels(2023, prod) %>% dplyr::left_join(ous, by = "country_name")
-
-dataset_levels <- rbind(cop21_ou_levels, cop22_ou_levels, cop23_ou_levels) %>%
+cop23_ou_levels <- fetchOrgunitLevels(2023, prod) %>%
   dplyr::mutate(country_name = ifelse(country_name == "", ou, country_name),
-                iso4 = ifelse(iso4 == "", iso3, iso4))
+                iso4 = ifelse(iso4 == "", iso3, iso4)) %>%
+  dplyr::left_join(ous, by = "country_name")
 
+dataset_levels <- rbind(cop21_ou_levels, cop22_ou_levels, cop23_ou_levels)
 
 usethis::use_data(dataset_levels,  compress = "xz", overwrite = TRUE)
