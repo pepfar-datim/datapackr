@@ -10,8 +10,8 @@ onCI <- isTRUE(as.logical(Sys.getenv("CI")))
 getTemplate <- function(path) {
   ifelse(
     onCI,
-    paste0("/root/project/datapackr/inst/extdata/", path),
-    rprojroot::find_package_root_file(path))
+    paste0("/root/project/inst/extdata/", path),
+    rprojroot::find_package_root_file(paste0("inst/extdata/", path)))
 }
 
 # login object stubs sufficient for use in mocked api calls
