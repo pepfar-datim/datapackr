@@ -17,6 +17,7 @@ context("test-unPackingChecks")
 #
 # })
 
+
 test_that("Can detect invalid comment types ...", {
 
   #Note: A warning is thrown here on the command line  for "invalid parameter"
