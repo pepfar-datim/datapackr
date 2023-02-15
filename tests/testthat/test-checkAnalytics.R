@@ -33,8 +33,11 @@ test_that("PMTCT_EID coverage by 2 months missing data", {
     "a", 1, "<1", "F", NA, 0
   )
 
-  foo <- expect_warning(analyze_eid_2mo(data))
-  expect_null(foo)
+  foo <- analyze_eid_2mo(data)
+  testthat::expect_equal(class(foo), "list")
+  testthat::expect_setequal(names(foo), c("test_results", "msg"))
+  testthat::expect_equal(NROW(foo$test_results), 1)
+  expect_equal(foo$test_results$msg, "Missing data.")
 
 })
 
@@ -61,6 +64,21 @@ test_that("VMMC_CIRC Indeterminate Rate < 5% expect message", {
   testthat::expect_setequal(names(foo), c("test_results", "msg"))
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$VMMC_CIRC.indeterminateRate, 0.498, tolerance = 1e-3)
+
+})
+
+test_that("VMMC_CIRC Indeterminate Rate > 5% missing data expect NULL", {
+  data <- tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~VMMC_CIRC.Pos.T, ~VMMC_CIRC.Neg.T,
+    "a", 1, "<1", "M", NA, 1, 100,
+    "b", 2, "<1", "M", NA, 0, 0
+  )
+
+  foo <- analyze_vmmc_indeterminate(data)
+  testthat::expect_equal(class(foo), "list")
+  testthat::expect_setequal(names(foo), c("test_results", "msg"))
+  testthat::expect_equal(NROW(foo$test_results), 1)
+  expect_equal(foo$test_results$msg, "Missing data.")
 
 })
 

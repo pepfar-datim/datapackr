@@ -31,16 +31,17 @@ HTS_POS_Modalities <- function(cop_year) {
 #'
 analyze_eid_2mo <- function(data) {
 
+  a <- NULL
 
   required_names <- c("PMTCT_EID.N.12.T",
                       "PMTCT_EID.N.2.T")
 
   if (any(!(required_names %in% names(data)))) {
-    warning("Could not analyze PMTCT EID due to missing data.")
-    return(NULL)
+    a$test_results <- data.frame(msg = "Missing data.")
+    attr(a$test_results, "test_name") <- "PMTCT_EID coverage by 2 months issues"
+    a$msg <- "Could not analyze PMTCT EID due to missing data."
+    return(a)
   }
-
-  a <- NULL
 
   analysis <- data %>%
     dplyr::mutate(
@@ -111,7 +112,18 @@ analyze_eid_2mo <- function(data) {
 #' @return a
 #'
 analyze_vmmc_indeterminate <- function(data) {
+
   a <- NULL
+  required_names <- c("VMMC_CIRC.Pos.T",
+                      "VMMC_CIRC.Neg.T",
+                      "VMMC_CIRC.Unk.T")
+
+  if (any(!(required_names %in% names(data)))) {
+    a$test_results <- data.frame(msg = "Missing data.")
+    attr(a$test_results, "test_name") <- "VMMC Indeterminate rate issues"
+    a$msg <- "Could not analyze VMMC_CIRC Indeterminate Rate due to missing data."
+    return(a)
+  }
 
   issues <- data %>%
     dplyr::mutate(
