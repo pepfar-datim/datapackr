@@ -8,7 +8,7 @@
 memoStructure <- function(d, d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
 
-  if (!(d$info$cop_year %in% c("2021", "2022"))) {
+  if (!(d$info$cop_year %in% supportedCOPYears())) {
     warning("COP Memo structure unknown for given COP year")
     return(d)
   }
@@ -77,7 +77,7 @@ memoStructure <- function(d, d2_session = dynGet("d2_default_session",
       "AGYW_PREV", "Total", NA)
   }
 
-  if (d$info$cop_year == "2022") {
+  if (d$info$cop_year %in% c("2022", "2023")) {
     row_order <- tibble::tribble(
       ~ind, ~options, ~partner_chunk,
       "TX_NEW", "<15", 1,
