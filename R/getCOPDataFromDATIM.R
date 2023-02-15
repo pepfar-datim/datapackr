@@ -61,7 +61,7 @@ getCOPDataFromDATIM <- function(country_uids,
                return(NULL)
              })
 
-  if (is.null(datim_data)) {
+  if (is.null(datim_data) || NROW(datim_data) == 0) {
     return(NULL)
   } else {
     datim_data %>%
