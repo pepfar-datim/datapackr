@@ -204,7 +204,6 @@ test_that("TB Known Pos ratio > 75% expect message", {
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$msg, "Missing data.")
 
-
 })
 
 test_that("TB Known Pos ratio < 75% expect message expect null", {
@@ -241,6 +240,21 @@ test_that(" Test retention < 98% expect message", {
   testthat::expect_setequal(names(foo), c("test_results", "msg"))
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$TX.Retention.T, 0.97, tolerance = 1e-3)
+
+})
+
+test_that(" Test retention < 98% missing required data", {
+  data <- tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TX_CURR.T, ~TX_CURR.T_1,
+    "a", 1, "<1", "F", NA, 97, 97,
+    "b", 2, "<1", "M", NA, 0, 0
+  )
+
+  foo <- analyze_retention(data)
+  testthat::expect_equal(class(foo), "list")
+  testthat::expect_setequal(names(foo), c("test_results", "msg"))
+  testthat::expect_equal(NROW(foo$test_results), 1)
+  expect_equal(foo$test_results$msg, "Missing data.")
 
 })
 
@@ -295,6 +309,23 @@ test_that(" Test linkage < 95% expect message", {
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$HTS_TST.Linkage.T, 0.94, tolerance = 1e-3)
 })
+
+
+test_that(" Test linkage < 95% missing data", {
+  data <- tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
+    ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T,  ~cop_year,
+    "a", 1, "25-49", "F", NA, 95, 5, 94, 0,  2021,
+    "b", 2, "25-49", "M", NA, 95, 5, 95, 0,  2021
+  )
+
+  foo <- analyze_linkage(data)
+  testthat::expect_equal(class(foo), "list")
+  testthat::expect_setequal(names(foo), c("test_results", "msg"))
+  testthat::expect_equal(NROW(foo$test_results), 1)
+  expect_equal(foo$test_results$msg, "Missing data.")
+})
+
 
 test_that(" Test KP linkage < 95% expect message", {
   data <- tribble(
@@ -377,13 +408,23 @@ test_that(" Test linkage all zeros expect NULL", {
 
 })
 
-test_that(" Test index pos ratio", {
-  #Return null if required data is not present
-  data <- tribble(~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.,
-                  "A", 1, "24-59", "F", NA, 10)
-  foo <- expect_warning(analyze_indexpos_ratio(data))
-  testthat::expect_null(foo)
+test_that(" Test index pos ratio missing data", {
 
+  data <- tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
+    ~HTS_INDEX_FAC.New.Pos.T, ~HTS_TST.PostANC1.Pos.T, ~TX_CURR_SUBNAT.T_1,  ~cop_year,
+    "a", 1, "25-49", "F", NA, 5, 5, 100, 5,  2022
+
+  )
+
+  foo <- analyze_indexpos_ratio(data)
+  testthat::expect_equal(class(foo), "list")
+  testthat::expect_setequal(names(foo), c("test_results", "msg"))
+  testthat::expect_equal(NROW(foo$test_results), 1)
+  expect_equal(foo$test_results$msg, "Missing data.")
+})
+
+test_that(" Test index pos ratio", {
 
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
