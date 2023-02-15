@@ -30,6 +30,16 @@ HTS_POS_Modalities <- function(cop_year) {
 #' @return a
 #'
 analyze_eid_2mo <- function(data) {
+
+
+  required_names <- c("PMTCT_EID.N.12.T",
+                      "PMTCT_EID.N.2.T")
+
+  if (any(!(required_names %in% names(data)))) {
+    warning("Could not analyze PMTCT EID due to missing data.")
+    return(NULL)
+  }
+
   a <- NULL
 
   analysis <- data %>%

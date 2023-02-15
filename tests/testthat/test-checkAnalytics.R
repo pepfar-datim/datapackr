@@ -1,6 +1,7 @@
 context("test-check-analytics")
 
 test_that("PMTCT_EID coverage by 2 months old < 90% expect message", {
+
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~PMTCT_EID.N.2.T, ~PMTCT_EID.N.12.T,
     "a", 1, "<1", "F", NA, 1, 100,
@@ -22,6 +23,17 @@ test_that("PMTCT_EID coverage by 2 months old < 90% all zeros expect NULL", {
   )
 
   foo <- analyze_eid_2mo(data)
+  expect_null(foo)
+
+})
+
+test_that("PMTCT_EID coverage by 2 months missing data", {
+  data <- tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~PMTCT_EID.N.2.T,
+    "a", 1, "<1", "F", NA, 0
+  )
+
+  foo <- expect_warning(analyze_eid_2mo(data))
   expect_null(foo)
 
 })
