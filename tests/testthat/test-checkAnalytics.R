@@ -316,6 +316,13 @@ test_that(" Test linkage all zeros expect NULL", {
 })
 
 test_that(" Test index pos ratio", {
+  #Return null if required data is not present
+  data <- tribble(~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.,
+                  "A", 1, "24-59", "F", NA, 10)
+  foo <- expect_warning(analyze_indexpos_ratio(data))
+  testthat::expect_null(foo)
+
+
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
     ~HTS_INDEX_FAC.New.Pos.T, ~HTS_TST.PostANC1.Pos.T, ~TX_CURR_SUBNAT.T_1, ~PLHIV.T_1, ~cop_year,

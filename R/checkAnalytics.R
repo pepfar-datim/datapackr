@@ -9,10 +9,11 @@ HTS_POS_Modalities <- function(cop_year) {
     # a reference to the cop year. Since the modalities
     # differ from year to year though, this list needs
     # to be determined based on the year we are dealing with.
+    # TODO:
 
     datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year) %>%
     dplyr::select(indicator_code, hts_modality, resultstatus) %>%
-    dplyr::filter(!is.na(hts_modality)) %>%
+    tidyr::drop_na() %>%
     dplyr::filter(resultstatus %in% c("Newly Tested Positives", "Positive")) %>%
     dplyr::distinct() %>%
     dplyr::pull(indicator_code)
@@ -473,8 +474,19 @@ analyze_linkage <- function(data) {
 #' @return a
 #'
 analyze_indexpos_ratio <- function(data) {
-  a <- NULL
 
+
+  required_names <- c("HTS_INDEX_COM.New.Pos.T",
+                      "HTS_INDEX_FAC.New.Pos.T",
+                      "PLHIV.T_1",
+                      "TX_CURR_SUBNAT.T_1")
+
+  if (any(!(required_names %in% names(data)))) {
+    warning("Could not analyze index positive ratio due to missing data.")
+    return(NULL)
+  }
+
+  a <- NULL
   hts_modalities <- HTS_POS_Modalities(data$cop_year[1])
 
   analysis <- data %>%
@@ -541,7 +553,7 @@ analyze_indexpos_ratio <- function(data) {
         "\n")
   }
 
-  return(a)
+  a
 
 }
 
@@ -629,13 +641,11 @@ checkAnalytics <- function(d,
     addcols((d$info$schema %>%
                 dplyr::filter(col_type %in% c("target", "past"),
                               sheet_name != "PSNUxIM") %>%
-                dplyr::pull(indicator_code)),
+                dplyr::pull(indicator_code) %>% unique(.)),
             type = "numeric") %>%
     dplyr::mutate(dplyr::across(c(-psnu, -psnu_uid, -age, -sex, -key_population),
                      ~tidyr::replace_na(.x, 0))) %>%
     dplyr::mutate(cop_year = d$info$cop_year)
-
-
 
   #Apply the list of analytics checks functions
   funs <- list(
