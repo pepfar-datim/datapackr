@@ -131,7 +131,6 @@ test_that("PMTCT Known Pos/PMTCT Total >  0.75 expect message", {
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$knownpos_ratio, 0.833, tolerance = 1e-3)
 
-
 })
 
 test_that("PMTCT Known Pos/PMTCT Total >  0.75 missing data", {
@@ -188,6 +187,22 @@ test_that("TB Known Pos ratio > 75% expect message", {
   testthat::expect_setequal(names(foo), c("test_results", "msg"))
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$knownpos_ratio, 0.751, tolerance = 1e-3)
+
+
+})
+
+test_that("TB Known Pos ratio > 75% expect message", {
+  data <- tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T, ~TB_STAT.N.KnownPos.T,
+    "a", 1, "<1", "M", NA, 25, 151,
+    "b", 2, "<1", "M", NA, 0, 0
+  )
+
+  foo <- analyze_tbknownpos(data)
+  testthat::expect_equal(class(foo), "list")
+  testthat::expect_setequal(names(foo), c("test_results", "msg"))
+  testthat::expect_equal(NROW(foo$test_results), 1)
+  expect_equal(foo$test_results$msg, "Missing data.")
 
 
 })

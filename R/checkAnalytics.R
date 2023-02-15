@@ -277,6 +277,17 @@ analyze_pmtctknownpos <- function(data) {
 analyze_tbknownpos <- function(data) {
   a <- NULL
 
+  required_names <- c("TB_STAT.N.New.Pos.T",
+                      "TB_STAT.N.KnownPos.T",
+                      "TB_STAT.N.New.Neg.T")
+
+  if (any(!(required_names %in% names(data)))) {
+    a$test_results <- data.frame(msg = "Missing data.")
+    attr(a$test_results, "test_name") <- "TB Known Pos issues"
+    a$msg <- "Could not analyze TB Known Pos issues due to missing data."
+    return(a)
+  }
+
   issues <- data %>%
     dplyr::mutate(
       TB_STAT.N.Total =
