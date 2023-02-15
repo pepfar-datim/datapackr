@@ -208,6 +208,17 @@ analyze_vmmc_indeterminate <- function(data) {
 analyze_pmtctknownpos <- function(data) {
   a <- NULL
 
+  required_names <- c("PMTCT_STAT.N.New.Pos.T",
+                      "PMTCT_STAT.N.KnownPos.T",
+                      "PMTCT_STAT.N.New.Neg.T")
+
+  if (any(!(required_names %in% names(data)))) {
+    a$test_results <- data.frame(msg = "Missing data.")
+    attr(a$test_results, "test_name") <- "PMTCT Known Pos issues"
+    a$msg <- "Could not analyze PMTCT Known Pos issues due to missing data."
+    return(a)
+  }
+
   issues <- data %>%
     dplyr::filter(is.na(key_population)) %>%
     dplyr::mutate(

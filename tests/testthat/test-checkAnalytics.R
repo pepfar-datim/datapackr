@@ -134,6 +134,23 @@ test_that("PMTCT Known Pos/PMTCT Total >  0.75 expect message", {
 
 })
 
+test_that("PMTCT Known Pos/PMTCT Total >  0.75 missing data", {
+  data <- tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,
+    ~PMTCT_STAT.N.New.Pos.T, ~PMTCT_STAT.N.KnownPos.T,
+    "a", 1, "<1", "M", NA, 10, 100,
+    "b", 2, "<1", "M", NA, 0, 0
+  )
+
+  foo <- analyze_pmtctknownpos(data)
+  testthat::expect_equal(class(foo), "list")
+  testthat::expect_setequal(names(foo), c("test_results", "msg"))
+  testthat::expect_equal(NROW(foo$test_results), 1)
+  expect_equal(foo$test_results$msg, "Missing data.")
+
+
+})
+
 test_that("PMTCT Known Pos/PMTCT Total <  0.75 expect null", {
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,
