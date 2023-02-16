@@ -1,3 +1,16 @@
+# datapackr 6.1.1
+
+## Breaking changes
+
+## New features
+* Script for generating COP 23 test data
+
+## Minor improvements and fixes
+* Add additional unit tests to support COP 23
+* Various formatting improvements as it relates to the exported file
+* Updated valid Org Units and Dataset Levels. 
+
+
 # datapackr 6.1.0
 
 ## Breaking changes
