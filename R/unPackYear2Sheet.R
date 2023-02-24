@@ -91,6 +91,12 @@ y2TestColumnStructure <- function(d) {
 #'
 unpackYear2Sheet <- function(d) {
 
+  #We will not process any Year2 data for regional data packs
+  #Or any datapacks which have more than one country UID.
+  if (length(d$info$country_uids) != 1) {
+    return(d)
+  }
+
   sheet <- "Year 2"
 
   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
@@ -154,12 +160,12 @@ unpackYear2Sheet <- function(d) {
   #Create the DATIM export file
 
   d$datim$year2 <- d$data$Year2 %>%
-    dplyr::mutate(orgunit = d$info$country_uids,
-                  period = paste0(d$info$cop_year + 1, "Oct"),
+    dplyr::mutate(orgUnit = d$info$country_uids,
+                  period = paste0(as.numeric(d$info$cop_year) + 1, "Oct"),
                   attributeOptionCombo = default_catOptCombo()) %>%
     dplyr::select(dataElement = dataelementuid,
                   period,
-                  orgunit,
+                  orgUnit,
                   categoryOptionCombo = categoryoptioncombouid,
                   attributeOptionCombo,
                   value = value) %>%
