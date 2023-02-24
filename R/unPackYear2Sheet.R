@@ -82,6 +82,42 @@ y2TestColumnStructure <- function(d) {
 
 }
 
+pickUIDFromType <- function(type, de_uid_list) {
+
+  uid_regex <- "[A-Za-z][A-Za-z0-9]{10}"
+  pick <- ""
+
+  if (is.na(type)) {
+    return(NA)
+  }
+
+  if (type == "AgeSex") {
+    idx <- which(grepl(paste0("^",uid_regex,"$"), de_uid_list))
+    pick <- de_uid_list[idx]
+  }
+
+  if (type == "KP") {
+    idx <- which(grepl("\\{KP\\}", de_uid_list))
+    pick <- stringr::str_extract(de_uid_list[idx],uid_regex)
+  }
+
+  if (type == "EID") {
+    idx <- which(grepl("\\{EID\\}", de_uid_list))
+    pick <- stringr::str_extract(de_uid_list[idx],uid_regex)
+  }
+
+  if (length(idx) == 0) {
+    return(NA)
+  }
+
+  if (!is_uidish(pick)) {
+     return(NA)
+   }
+
+  pick
+
+}
+
 #' Title unpackYear2Sheet
 #'
 #' @param d
@@ -121,19 +157,15 @@ unpackYear2Sheet <- function(d) {
   header_cols <- getHeaderColumns(cols_to_keep, sheet)
 
 
-  #Use this to map back to Year1 targets
   de_map_local <-  datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
-    dplyr::select(indicator_code,valid_ages.name, valid_sexes.name, valid_kps.name, categoryoptioncombouid, dataelementuid) %>%
-    dplyr::mutate(indicator_code = stringr::str_replace(indicator_code, "\\.T$", ".T2")) %>%
-    dplyr::mutate(indicator_code = stringr::str_replace(indicator_code, "\\.KP\\.T2", ".T2"))
-
-  # Pare down to populated, updated targets only ####
-  #blank_cols_idx <- which(names(d$data$Year2) == "")
-  d$data$Year2 <- d$data$Year2 %>%
-    dplyr::select(tidyselect::any_of(cols_to_keep$indicator_code))
-
+    dplyr::select(valid_ages.name, valid_sexes.name, valid_kps.name, categoryoptioncombouid, dataelementuid)
 
   d$data$Year2 <- d$data$Year2 %>%
+    dplyr::select(tidyselect::any_of(cols_to_keep$indicator_code)) %>%
+  #Deal with HTS_TST
+    dplyr::mutate(dplyr::across(!header_cols$indicator_code, as.numeric)) %>%
+    dplyr::mutate(dplyr::across(tidyselect::contains("Share"), ~ .x * HTS_TST.Pos.Total_With_HEI.T2 )) %>%
+  #Pivot longer
     tidyr::pivot_longer(cols = !tidyselect::any_of(header_cols$indicator_code),
                         names_to = "indicator_code",
                         values_to = "value",
@@ -145,13 +177,11 @@ unpackYear2Sheet <- function(d) {
     dplyr::left_join((datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
                       %>% dplyr::select(indicator_code, dataelementuid) %>%
                       dplyr::distinct())) %>%
-    #TODO: Need  to sort out how to actually get the definitive UIDs
-    dplyr::mutate(dataelementuid = dplyr::case_when(nchar(dataelementuid) == 11 ~ dataelementuid,
-                                                        is.na(valid_kps.name) ~ substring(dataelementuid,0,11),
-                                                        !is.na(valid_kps.name) ~ stringr::str_extract(dataelementuid, "(?<=\\{KP\\})[A-Za-z][A-Za-z0-9]{10}"),
-                                                        TRUE ~ "FOO")) %>%
-    dplyr::left_join(de_map_local)
-
+     dplyr::mutate(de_uid_list = stringr::str_split(dataelementuid, "\\."),
+                   type = dplyr::case_when(!is.na(valid_kps.name) ~ "KP",
+                                           TRUE ~"AgeSex"),
+                   dataelementuid = unlist(purrr::map2(type, de_uid_list,pickUIDFromType))) %>%
+    dplyr::left_join(de_map_local, by = c("dataelementuid","valid_ages.name", "valid_sexes.name", "valid_kps.name"))
 
   #No data should have any missing data element uids or category option combo
   #uids at this poinbt
