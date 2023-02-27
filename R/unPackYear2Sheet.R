@@ -43,7 +43,8 @@ y2ExtractInvalidDisaggs <- function(d) {
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
     d$tests$year2_invalid_disaggs  <- d$data$Year2[year2_invalid_disaggs, ]
     attr(d$tests$year2_invalid_disaggs, "test_name") <- "Invalid Year 2 disaggs"
-    d$data$Year2 <- d$data$Year2[!year2_invalid_disaggs, ]
+    #TODO: Re-enable this once the data element /COC map is fixed
+    #d$data$Year2 <- d$data$Year2[!year2_invalid_disaggs, ]
   }
 
   d
@@ -225,6 +226,7 @@ unpackYear2Sheet <- function(d) {
                   categoryOptionCombo = categoryoptioncombouid,
                   attributeOptionCombo,
                   value = value) %>%
+    tidyr::drop_na() %>%  #TODO: Remove this. We should not have any NAs at this point
     dplyr::distinct() #TODO: Remove this. We need to be sure we have no duplicates from the join
 
   d
