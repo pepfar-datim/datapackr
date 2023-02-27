@@ -172,16 +172,14 @@ unpackYear2Sheet <- function(d) {
   map_ind_code_des <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
     dplyr::filter(indicator_code %in% cols_to_keep$indicator_code) %>%
       dplyr::select(indicator_code,
-                    dataelementuid,
-                    valid_ages.name,
-                    valid_sexes.name,
-                    valid_kps.name,
-                    categoryoptioncombouid,
-                    categoryoptioncomboname,
-                    dataelementuid,
-                    dataelementname) %>%
+                    dataelementuid) %>%
       dplyr::distinct()
 
+  #A map of dataelement uids and COCs
+  map_year1_des_cocs <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+    dplyr::filter(grepl("\\.T$", indicator_code)) %>%
+    dplyr::select(dataelementuid,  valid_ages.name, valid_sexes.name, valid_kps.name, categoryoptioncombouid, dataelementname, categoryoptioncomboname ) %>%
+    dplyr::distinct()
 
   d$data$Year2 <- d$data$Year2 %>%
     dplyr::select(tidyselect::any_of(cols_to_keep$indicator_code)) %>%
@@ -200,15 +198,16 @@ unpackYear2Sheet <- function(d) {
     #Get the raw data element codes from the map
     #We will need to do a bit more processing to determine the actual UID
     #Based on what type of disagg we are dealing with
-    dplyr::left_join(map_ind_code_des, by =  c("indicator_code", "valid_ages.name",
-                                               "valid_sexes.name", "valid_kps.name")) %>%
+    dplyr::left_join(map_ind_code_des, by =  c("indicator_code")) %>%
     #Split the data element UID codes in the schema into a nested list
     #Determine the type of value we are dealing with (AgeSex/KP/EID)
     #TODO: How to determine when we need to use the EID data element?
      dplyr::mutate(de_uid_list = stringr::str_split(dataelementuid, "\\."),
                    type = dplyr::case_when(!is.na(valid_kps.name) ~ "KP",
                                            TRUE ~"AgeSex"),
-                   dataelementuid = unlist(purrr::map2(type, de_uid_list,pickUIDFromType)))
+                   dataelementuid = unlist(purrr::map2(type, de_uid_list,pickUIDFromType))) %>%
+    dplyr::left_join(map_year1_des_cocs, by = c("dataelementuid", "valid_ages.name", "valid_sexes.name", "valid_kps.name"))
+
 
   #No data should have any missing data element uids or category option combo
   #uids at this poinbt
