@@ -82,6 +82,17 @@ y2TestColumnStructure <- function(d) {
 
 }
 
+#' Title pickUIDFromType is a utility function used to obtain a
+#' particular UID from a supplied list based on the type of
+#' value we are dealing with. In the Year2 tab, values disaggregated
+#' by AgeSex, KP and EID are co-mingled and must be separated based
+#' on available disaggregates.
+#'
+#' @param type Disaggregate type (e.g. AgeSex, KP, EID)
+#' @param de_uid_list A list of possible UIDs (e.g. c("UID1","{KP}UID2" )
+#'
+#' @return A UID based on the supplied type. Returns NA if no UID is matched.
+#'
 pickUIDFromType <- function(type, de_uid_list) {
 
   uid_regex <- "[A-Za-z][A-Za-z0-9]{10}"
@@ -114,7 +125,7 @@ pickUIDFromType <- function(type, de_uid_list) {
      return(NA)
    }
 
-  pick
+ pick
 
 }
 
@@ -156,9 +167,20 @@ unpackYear2Sheet <- function(d) {
   cols_to_keep <- getColumnsToKeep(d, sheet)
   header_cols <- getHeaderColumns(cols_to_keep, sheet)
 
+  #A map of indicator codes and data element uids
+  map_ind_code_des <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+    dplyr::filter(indicator_code %in% cols_to_keep$indicator_code) %>%
+      dplyr::select(indicator_code,
+                    dataelementuid,
+                    valid_ages.name,
+                    valid_sexes.name,
+                    valid_kps.name,
+                    categoryoptioncombouid,
+                    categoryoptioncomboname,
+                    dataelementuid,
+                    dataelementname) %>%
+      dplyr::distinct()
 
-  de_map_local <-  datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
-    dplyr::select(valid_ages.name, valid_sexes.name, valid_kps.name, categoryoptioncombouid, dataelementuid)
 
   d$data$Year2 <- d$data$Year2 %>%
     dplyr::select(tidyselect::any_of(cols_to_keep$indicator_code)) %>%
@@ -174,14 +196,18 @@ unpackYear2Sheet <- function(d) {
                   valid_sexes.name = "Sex",
                   valid_ages.name = "Age",
                   valid_kps.name = "KeyPop") %>%
-    dplyr::left_join((datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year)
-                      %>% dplyr::select(indicator_code, dataelementuid) %>%
-                      dplyr::distinct())) %>%
+    #Get the raw data element codes from the map
+    #We will need to do a bit more processing to determine the actual UID
+    #Based on what type of disagg we are dealing with
+    dplyr::left_join(map_ind_code_des, by =  c("indicator_code", "valid_ages.name",
+                                               "valid_sexes.name", "valid_kps.name")) %>%
+    #Split the data element UID codes in the schema into a nested list
+    #Determine the type of value we are dealing with (AgeSex/KP/EID)
+    #TODO: How to determine when we need to use the EID data element?
      dplyr::mutate(de_uid_list = stringr::str_split(dataelementuid, "\\."),
                    type = dplyr::case_when(!is.na(valid_kps.name) ~ "KP",
                                            TRUE ~"AgeSex"),
-                   dataelementuid = unlist(purrr::map2(type, de_uid_list,pickUIDFromType))) %>%
-    dplyr::left_join(de_map_local, by = c("dataelementuid","valid_ages.name", "valid_sexes.name", "valid_kps.name"))
+                   dataelementuid = unlist(purrr::map2(type, de_uid_list,pickUIDFromType)))
 
   #No data should have any missing data element uids or category option combo
   #uids at this poinbt
