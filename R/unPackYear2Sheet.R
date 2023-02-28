@@ -199,16 +199,34 @@ unpackYear2Sheet <- function(d) {
       indicator_code == "PMTCT_STAT.N.KnownPos.T2" ~ "Known Positives",
       indicator_code == "PMTCT_STAT.N.New.Neg.T2" ~ "New Negatives",
       indicator_code == "PMTCT_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
+      indicator_code == "PMTCT_ART.Already.T2" ~ "Known Positives",
+      indicator_code == "PMTCT_ART.New.T2" ~  "Newly Tested Positives",
       TRUE ~ resultstatus)) %>%
       dplyr::distinct()
 
   #A map of dataelement uids and COCs
-  map_year1_des_cocs <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+  map_year1_des_cocs <-
+    datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
     dplyr::filter(grepl("\\.T$", indicator_code)) %>%
-    dplyr::select(dataelementuid,  valid_ages.name,
-                  valid_sexes.name, valid_kps.name,resultstatus, categoryoptioncombouid,
-                  dataelementname, categoryoptioncomboname ) %>%
-    dplyr::distinct()
+    dplyr::select(
+      dataelementuid,
+      valid_ages.name,
+      valid_sexes.name,
+      valid_kps.name,
+      resultstatus,
+      categoryoptioncombouid,
+      dataelementname,
+      categoryoptioncomboname
+    ) %>%
+    dplyr::distinct() %>%
+    #Classify PMTCT_ART
+    dplyr::mutate(
+      resultstatus = dplyr::case_when(
+        grepl("Already", categoryoptioncomboname) &
+          dataelementname == "PMTCT_ART (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: ART" ~ "Known Positives",
+        grepl("New", categoryoptioncomboname) &
+          dataelementname == "PMTCT_ART (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: ART" ~ "Newly Tested Positives",
+        TRUE ~ resultstatus))
 
   d$data$Year2 <- d$data$Year2 %>%
     dplyr::select(tidyselect::any_of(cols_to_keep$indicator_code)) %>%
