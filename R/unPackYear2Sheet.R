@@ -196,8 +196,9 @@ unpackYear2Sheet <- function(d) {
       indicator_code == "HTS_TST.PMTCT.Pos.Share.T2" ~ "Newly Tested Positives",
       indicator_code == "TB_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
       indicator_code == "TB_STAT.N.New.Neg.T2" ~ "New Negatives",
-
-      Newly Tested Positives
+      indicator_code == "PMTCT_STAT.N.KnownPos.T2" ~ "Known Positives",
+      indicator_code == "PMTCT_STAT.N.New.Neg.T2" ~ "New Negatives",
+      indicator_code == "PMTCT_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
       TRUE ~ resultstatus)) %>%
       dplyr::distinct()
 
