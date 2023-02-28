@@ -97,28 +97,34 @@ y2TestColumnStructure <- function(d) {
 pickUIDFromType <- function(type, de_uid_list) {
 
   uid_regex <- "[A-Za-z][A-Za-z0-9]{10}"
-  pick <- ""
+  pick <- NA
 
-  if (is.na(type)) {
+  if (is.na(type) || length(de_uid_list) == 0) {
     return(NA)
   }
 
-  if (type == "AgeSex") {
-    idx <- which(grepl(paste0("^",uid_regex,"$"), de_uid_list))
-    pick <- de_uid_list[idx]
+  if (length(de_uid_list) == 1) {
+    pick <- stringr::str_extract(de_uid_list[1],paste0("^",uid_regex,"$"))
+  } else {
+
+    if (type == "AgeSex") {
+      idx <- which(grepl(paste0("^",uid_regex,"$"), de_uid_list))
+      pick <- de_uid_list[idx]
+    }
+
+    if (type == "KP") {
+      idx <- which(grepl("\\{KP\\}", de_uid_list))
+      pick <- stringr::str_extract(de_uid_list[idx],uid_regex)
+    }
+
+    if (type == "EID") {
+      idx <- which(grepl("\\{EID\\}", de_uid_list))
+      pick <- stringr::str_extract(de_uid_list[idx],uid_regex)
+    }
+
   }
 
-  if (type == "KP") {
-    idx <- which(grepl("\\{KP\\}", de_uid_list))
-    pick <- stringr::str_extract(de_uid_list[idx],uid_regex)
-  }
-
-  if (type == "EID") {
-    idx <- which(grepl("\\{EID\\}", de_uid_list))
-    pick <- stringr::str_extract(de_uid_list[idx],uid_regex)
-  }
-
-  if (length(idx) == 0) {
+  if (is.na(pick)) {
     return(NA)
   }
 
@@ -169,16 +175,38 @@ unpackYear2Sheet <- function(d) {
   header_cols <- getHeaderColumns(cols_to_keep, sheet)
 
   #A map of indicator codes and data element uids
+
+  is_positive <- c("PLHIV|TX_CURR|TX_NEW|TX_PVLS|HTS_TST|HTS_RECENT|CXCA_SCRN|TB_ART|TX_TB|TB_PREV")
+
   map_ind_code_des <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
     dplyr::filter(indicator_code %in% cols_to_keep$indicator_code) %>%
       dplyr::select(indicator_code,
-                    dataelementuid) %>%
+                    dataelementuid,
+                    resultstatus) %>%
+    dplyr::mutate(resultstatus = dplyr::case_when(grepl(is_positive, indicator_code) ~ "Positive",
+                                                  TRUE ~ resultstatus)) %>%
+    #TODO: This likely needs to be moved into the map
+    dplyr::mutate(resultstatus = dplyr::case_when(
+      indicator_code == "VMMC_CIRC.Neg.T2" ~ "Negative",
+      indicator_code == "VMMC_CIRC.Pos.T2" ~ "Positive",
+      indicator_code == "VMMC_CIRC.Unk.T2" ~ "Status Unknown",
+      indicator_code == "HTS_TST.Index.Pos.Share.T2" ~ "Newly Tested Positives",
+      indicator_code == "HTS_TST.Index.Pos.Share.T2" ~ "Newly Tested Positives",
+      indicator_code == "HTS_TST.TB.Pos.Share.T2" ~ "Newly Tested Positives",
+      indicator_code == "HTS_TST.PMTCT.Pos.Share.T2" ~ "Newly Tested Positives",
+      indicator_code == "TB_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
+      indicator_code == "TB_STAT.N.New.Neg.T2" ~ "New Negatives",
+
+      Newly Tested Positives
+      TRUE ~ resultstatus)) %>%
       dplyr::distinct()
 
   #A map of dataelement uids and COCs
   map_year1_des_cocs <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
     dplyr::filter(grepl("\\.T$", indicator_code)) %>%
-    dplyr::select(dataelementuid,  valid_ages.name, valid_sexes.name, valid_kps.name, categoryoptioncombouid, dataelementname, categoryoptioncomboname ) %>%
+    dplyr::select(dataelementuid,  valid_ages.name,
+                  valid_sexes.name, valid_kps.name,resultstatus, categoryoptioncombouid,
+                  dataelementname, categoryoptioncomboname ) %>%
     dplyr::distinct()
 
   d$data$Year2 <- d$data$Year2 %>%
@@ -191,10 +219,23 @@ unpackYear2Sheet <- function(d) {
                         names_to = "indicator_code",
                         values_to = "value",
                         values_drop_na = TRUE) %>%
+    #Drop HTS_TST.POS
+    dplyr::filter(indicator_code != "HTS_TST.Pos.Total_With_HEI.T2") %>%
     dplyr::select(-`Indicator Group`,
                   valid_sexes.name = "Sex",
                   valid_ages.name = "Age",
                   valid_kps.name = "KeyPop") %>%
+    #OVC_HIVSTAT needs to be aggregated
+    dplyr::mutate(
+      valid_sexes.name = dplyr::case_when(
+        indicator_code == "OVC_HIVSTAT.T2" ~ NA_character_,
+        TRUE ~ valid_sexes.name),
+      valid_ages.name = dplyr::case_when(
+        indicator_code == "OVC_HIVSTAT.T2" ~ NA_character_,
+        TRUE ~ valid_ages.name)) %>%
+    dplyr::group_by(valid_sexes.name, valid_ages.name, valid_kps.name, indicator_code) %>%
+    #TODO: This feels a bit risky. Should we only limit to OVC_HIVSTAT?
+    dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop") %>%
     #Get the raw data element codes from the map
     #We will need to do a bit more processing to determine the actual UID
     #Based on what type of disagg we are dealing with
@@ -206,7 +247,10 @@ unpackYear2Sheet <- function(d) {
                    type = dplyr::case_when(!is.na(valid_kps.name) ~ "KP",
                                            TRUE ~"AgeSex"),
                    dataelementuid = unlist(purrr::map2(type, de_uid_list,pickUIDFromType))) %>%
-    dplyr::left_join(map_year1_des_cocs, by = c("dataelementuid", "valid_ages.name", "valid_sexes.name", "valid_kps.name"))
+    dplyr::left_join(map_year1_des_cocs,
+                     by = c("dataelementuid", "valid_ages.name", "valid_sexes.name", "valid_kps.name","resultstatus"))
+    #TODO: Special handling for OVC_HIVSTAT, which is disaggegated in Year 2, but not in DATIM
+
 
 
   #No data should have any missing data element uids or category option combo
