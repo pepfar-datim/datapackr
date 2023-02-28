@@ -1,5 +1,5 @@
-## If you've made any edits to the Excel template, rebuild package first to
-## capture these, then run the below.
+## If you've made any edits to the Excel template, rebuild package first
+## (Cmd+Shift+B) to capture these, then run the below.
 
 library(datapackr)
 
@@ -23,4 +23,4 @@ save(cop23_data_pack_schema,
      file = "./data/cop23_data_pack_schema.rda",
      compress = "xz")
 
-## Rebuild package again.
+## Rebuild package again. (Cmd+Shift+B)
