@@ -176,7 +176,7 @@ unpackYear2Sheet <- function(d) {
 
   #A map of indicator codes and data element uids
 
-  is_positive <- c("PLHIV|TX_CURR|TX_NEW|TX_PVLS|HTS_TST|HTS_RECENT|CXCA_SCRN|TB_ART|TX_TB|TB_PREV")
+  is_positive <- c("PLHIV|TX_CURR|TX_NEW|TX_PVLS|HTS_TST|HTS_RECENT|CXCA_SCRN")
 
   map_ind_code_des <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
     dplyr::filter(indicator_code %in% cols_to_keep$indicator_code) %>%
@@ -191,18 +191,27 @@ unpackYear2Sheet <- function(d) {
       indicator_code == "VMMC_CIRC.Pos.T2" ~ "Positive",
       indicator_code == "VMMC_CIRC.Unk.T2" ~ "Status Unknown",
       indicator_code == "HTS_TST.Index.Pos.Share.T2" ~ "Newly Tested Positives",
-      indicator_code == "HTS_TST.Index.Pos.Share.T2" ~ "Newly Tested Positives",
       indicator_code == "HTS_TST.TB.Pos.Share.T2" ~ "Newly Tested Positives",
       indicator_code == "HTS_TST.PMTCT.Pos.Share.T2" ~ "Newly Tested Positives",
       indicator_code == "TB_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
       indicator_code == "TB_STAT.N.New.Neg.T2" ~ "New Negatives",
+      indicator_code == "TB_STAT.N.KnownPos.T" ~ "Known Positives",
       indicator_code == "PMTCT_STAT.N.KnownPos.T2" ~ "Known Positives",
       indicator_code == "PMTCT_STAT.N.New.Neg.T2" ~ "New Negatives",
       indicator_code == "PMTCT_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
       indicator_code == "PMTCT_ART.Already.T2" ~ "Known Positives",
       indicator_code == "PMTCT_ART.New.T2" ~  "Newly Tested Positives",
-      indicator_code == "	OVC_SERV.Grad.T2" ~ "Graduated",
+      indicator_code == "OVC_SERV.Grad.T2" ~ "Graduated",
       indicator_code == "OVC_SERV.Active.T2" ~ "Active",
+      indicator_code == "TB_PREV.D.New.T2" ~ "Newly Tested Positives",
+      indicator_code ==  "TB_PREV.D.Already.T2" ~ "Known Positives",
+      indicator_code == "TB_PREV.N.New.T2" ~ "Newly Tested Positives",
+      indicator_code ==  "TB_PREV.N.Already.T2" ~ "Known Positives",
+      indicator_code == "TB_ART.New.T2" ~ "Newly Tested Positives",
+      indicator_code == "TB_ART.Already.T2" ~  "Known Positives",
+      indicator_code == "TB_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
+      indicator_code == "TB_STAT.N.New.Neg.T2" ~ "New Negatives",
+      indicator_code == "TX_TB.D.Already.Neg.T2" ~ "Known Negatives",
       TRUE ~ resultstatus)) %>%
       dplyr::distinct()
 
@@ -233,6 +242,28 @@ unpackYear2Sheet <- function(d) {
         dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET: Beneficiaries Served" ~ "Graduated",
       grepl("Active", categoryoptioncomboname) &
         dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET: Beneficiaries Served" ~ "Active",
+      grepl("Graduated", categoryoptioncomboname) &
+        dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatusCaregiver) TARGET: Beneficiaries Served" ~ "Graduated",
+      grepl("Active", categoryoptioncomboname) &
+        dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatusCaregiver) TARGET: Beneficiaries Served" ~ "Active",
+      grepl("New", categoryoptioncomboname) &
+        dataelementname == "TB_PREV (D, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: IPT" ~ "Newly Tested Positives",
+      grepl("Already", categoryoptioncomboname) &
+        dataelementname == "TB_PREV (D, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: IPT" ~ "Known Positives",
+      grepl("New", categoryoptioncomboname) &
+        dataelementname == "TB_PREV (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: IPT" ~ "Newly Tested Positives",
+      grepl("Already", categoryoptioncomboname) &
+        dataelementname == "TB_PREV (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: IPT" ~ "Known Positives",
+      grepl("New", categoryoptioncomboname) &
+        dataelementname == "TB_ART (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: Registered TB/HIV" ~  "Newly Tested Positives" ,
+      grepl("Already", categoryoptioncomboname) &
+        dataelementname == "TB_ART (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: Registered TB/HIV" ~ "Known Positives",
+      grepl("Newly Tested Positives", categoryoptioncomboname) &
+        dataelementname == "TB_STAT (N, DSD, Age/Sex/KnownNewPosNeg) TARGET: New/Relapsed TB" ~ "Newly Tested Positives",
+      grepl("New Negatives", categoryoptioncomboname) &
+        dataelementname == "TB_STAT (N, DSD, Age/Sex/KnownNewPosNeg) TARGET: New/Relapsed TB" ~ "New Negatives",
+      grepl("Known Positives", categoryoptioncomboname) &
+        dataelementname == "TB_STAT (N, DSD, Age/Sex/KnownNewPosNeg) TARGET: New/Relapsed TB" ~ "Known Positives",
         TRUE ~ resultstatus))
 
   d$data$Year2 <- d$data$Year2 %>%
@@ -274,9 +305,12 @@ unpackYear2Sheet <- function(d) {
                                            TRUE ~"AgeSex"),
                    dataelementuid = unlist(purrr::map2(type, de_uid_list,pickUIDFromType))) %>%
     dplyr::left_join(map_year1_des_cocs,
-                     by = c("dataelementuid", "valid_ages.name", "valid_sexes.name", "valid_kps.name","resultstatus"))
-    #TODO: Special handling for OVC_HIVSTAT, which is disaggegated in Year 2, but not in DATIM
-
+                     by = c("dataelementuid", "valid_ages.name", "valid_sexes.name", "valid_kps.name","resultstatus")) %>%
+    #Deal with duplications in OVC_SERV
+    dplyr::mutate(is_invalid = dplyr::case_when(dataelementuid == "cx8hxarh4Ke" & valid_ages.name != "18+" ~ TRUE,
+                                                dataelementuid == "HVzzfyVVIs1" & valid_ages.name == "18+" ~ TRUE,
+                                                TRUE ~ FALSE)) %>%
+    dplyr::filter(!is_invalid)
 
 
   #No data should have any missing data element uids or category option combo
