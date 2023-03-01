@@ -211,6 +211,7 @@ unpackYear2Sheet <- function(d) {
       indicator_code == "TB_ART.Already.T2" ~  "Known Positives",
       indicator_code == "TB_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
       indicator_code == "TB_STAT.N.New.Neg.T2" ~ "New Negatives",
+      indicator_code == "TB_STAT.N.KnownPos.T2" ~ "Known Positives",
       indicator_code == "TX_TB.D.Already.Neg.T2" ~ "Known Negatives",
       TRUE ~ resultstatus)) %>%
       dplyr::distinct()
@@ -219,6 +220,8 @@ unpackYear2Sheet <- function(d) {
   map_year1_des_cocs <-
     datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
     dplyr::filter(grepl("\\.T$", indicator_code)) %>%
+    #Get rid of trash in the map
+    dplyr::filter(!is.na(indicator_code)) %>%
     dplyr::select(
       dataelementuid,
       valid_ages.name,
@@ -230,14 +233,12 @@ unpackYear2Sheet <- function(d) {
       categoryoptioncomboname
     ) %>%
     dplyr::distinct() %>%
-    #Classify PMTCT_ART
     dplyr::mutate(
       resultstatus = dplyr::case_when(
         grepl("Already", categoryoptioncomboname) &
           dataelementname == "PMTCT_ART (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: ART" ~ "Known Positives",
         grepl("New", categoryoptioncomboname) &
           dataelementname == "PMTCT_ART (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: ART" ~ "Newly Tested Positives",
-      #Classify OVC_SERV
       grepl("Graduated", categoryoptioncomboname) &
         dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET: Beneficiaries Served" ~ "Graduated",
       grepl("Active", categoryoptioncomboname) &
