@@ -204,15 +204,18 @@ unpackYear2Sheet <- function(d) {
       indicator_code == "OVC_SERV.Grad.T2" ~ "Graduated",
       indicator_code == "OVC_SERV.Active.T2" ~ "Active",
       indicator_code == "TB_PREV.D.New.T2" ~ "Newly Tested Positives",
-      indicator_code ==  "TB_PREV.D.Already.T2" ~ "Known Positives",
+      indicator_code == "TB_PREV.D.Already.T2" ~ "Known Positives",
       indicator_code == "TB_PREV.N.New.T2" ~ "Newly Tested Positives",
-      indicator_code ==  "TB_PREV.N.Already.T2" ~ "Known Positives",
+      indicator_code == "TB_PREV.N.Already.T2" ~ "Known Positives",
       indicator_code == "TB_ART.New.T2" ~ "Newly Tested Positives",
       indicator_code == "TB_ART.Already.T2" ~  "Known Positives",
       indicator_code == "TB_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
       indicator_code == "TB_STAT.N.New.Neg.T2" ~ "New Negatives",
       indicator_code == "TB_STAT.N.KnownPos.T2" ~ "Known Positives",
-      indicator_code == "TX_TB.D.Already.Neg.T2" ~ "Known Negatives",
+      indicator_code == "TX_TB.D.Already.Neg.T2" ~ "TB Screen - Negative, Life-long ART, Already, Positive",
+      indicator_code == "TX_TB.D.Already.Pos.T2" ~ "TB Screen - Positive, Life-long ART, Already, Positive",
+      indicator_code == "TX_TB.D.New.Neg.T2" ~ "TB Screen - Negative, Life-long ART, New, Positive",
+      indicator_code == "TX_TB.D.New.Pos.T2" ~ "TB Screen - Positive, Life-long ART, New, Positive",
       TRUE ~ resultstatus)) %>%
       dplyr::distinct()
 
@@ -265,6 +268,14 @@ unpackYear2Sheet <- function(d) {
         dataelementname == "TB_STAT (N, DSD, Age/Sex/KnownNewPosNeg) TARGET: New/Relapsed TB" ~ "New Negatives",
       grepl("Known Positives", categoryoptioncomboname) &
         dataelementname == "TB_STAT (N, DSD, Age/Sex/KnownNewPosNeg) TARGET: New/Relapsed TB" ~ "Known Positives",
+      grepl("TB Screen - Negative, Life-long ART, Already, Positive", categoryoptioncomboname) &
+        dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Negative, Life-long ART, Already, Positive",
+      grepl("TB Screen - Positive, Life-long ART, Already, Positive", categoryoptioncomboname) &
+        dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Positive, Life-long ART, Already, Positive",
+      grepl("TB Screen - Negative, Life-long ART, New, Positive", categoryoptioncomboname) &
+        dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Negative, Life-long ART, New, Positive",
+      grepl("TB Screen - Positive, Life-long ART, New, Positive", categoryoptioncomboname) &
+        dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Positive, Life-long ART, New, Positive",
         TRUE ~ resultstatus))
 
   d$data$Year2 <- d$data$Year2 %>%
