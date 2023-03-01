@@ -201,6 +201,8 @@ unpackYear2Sheet <- function(d) {
       indicator_code == "PMTCT_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
       indicator_code == "PMTCT_ART.Already.T2" ~ "Known Positives",
       indicator_code == "PMTCT_ART.New.T2" ~  "Newly Tested Positives",
+      indicator_code == "	OVC_SERV.Grad.T2" ~ "Graduated",
+      indicator_code == "OVC_SERV.Active.T2" ~ "Active",
       TRUE ~ resultstatus)) %>%
       dplyr::distinct()
 
@@ -226,6 +228,11 @@ unpackYear2Sheet <- function(d) {
           dataelementname == "PMTCT_ART (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: ART" ~ "Known Positives",
         grepl("New", categoryoptioncomboname) &
           dataelementname == "PMTCT_ART (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: ART" ~ "Newly Tested Positives",
+      #Classify OVC_SERV
+      grepl("Graduated", categoryoptioncomboname) &
+        dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET: Beneficiaries Served" ~ "Graduated",
+      grepl("Active", categoryoptioncomboname) &
+        dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET: Beneficiaries Served" ~ "Active",
         TRUE ~ resultstatus))
 
   d$data$Year2 <- d$data$Year2 %>%
