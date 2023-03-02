@@ -171,8 +171,8 @@ unpackYear2Sheet <- function(d) {
   #Test column structure before any restructuring.
   d <- y2TestColumnStructure(d)
 
-  cols_to_keep <- getColumnsToKeep(d, sheet)
-  header_cols <- getHeaderColumns(cols_to_keep, sheet)
+  cols_to_keep <- datapackr:::getColumnsToKeep(d, sheet)
+  header_cols <- datapackr:::getHeaderColumns(cols_to_keep, sheet)
 
   #A map of indicator codes and data element uids
 
@@ -181,43 +181,54 @@ unpackYear2Sheet <- function(d) {
   map_ind_code_des <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
     dplyr::filter(indicator_code %in% cols_to_keep$indicator_code) %>%
       dplyr::select(indicator_code,
+                    valid_ages.name,
+                    valid_sexes.name,
+                    valid_kps.name,
                     dataelementuid,
-                    resultstatus) %>%
+                    resultstatus,
+                    disagg_type) %>%
     dplyr::mutate(resultstatus = dplyr::case_when(grepl(is_positive, indicator_code) ~ "Positive",
-                                                  TRUE ~ resultstatus)) %>%
+                                                   TRUE ~ resultstatus)) %>%
     #TODO: This likely needs to be moved into the map
-    dplyr::mutate(resultstatus = dplyr::case_when(
-      indicator_code == "VMMC_CIRC.Neg.T2" ~ "Negative",
-      indicator_code == "VMMC_CIRC.Pos.T2" ~ "Positive",
-      indicator_code == "VMMC_CIRC.Unk.T2" ~ "Status Unknown",
-      indicator_code == "HTS_TST.Index.Pos.Share.T2" ~ "Newly Tested Positives",
-      indicator_code == "HTS_TST.TB.Pos.Share.T2" ~ "Newly Tested Positives",
-      indicator_code == "HTS_TST.PMTCT.Pos.Share.T2" ~ "Newly Tested Positives",
-      indicator_code == "TB_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
-      indicator_code == "TB_STAT.N.New.Neg.T2" ~ "New Negatives",
-      indicator_code == "TB_STAT.N.KnownPos.T" ~ "Known Positives",
-      indicator_code == "PMTCT_STAT.N.KnownPos.T2" ~ "Known Positives",
-      indicator_code == "PMTCT_STAT.N.New.Neg.T2" ~ "New Negatives",
-      indicator_code == "PMTCT_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
-      indicator_code == "PMTCT_ART.Already.T2" ~ "Known Positives",
-      indicator_code == "PMTCT_ART.New.T2" ~  "Newly Tested Positives",
-      indicator_code == "OVC_SERV.Grad.T2" ~ "Graduated",
-      indicator_code == "OVC_SERV.Active.T2" ~ "Active",
-      indicator_code == "TB_PREV.D.New.T2" ~ "Newly Tested Positives",
-      indicator_code == "TB_PREV.D.Already.T2" ~ "Known Positives",
-      indicator_code == "TB_PREV.N.New.T2" ~ "Newly Tested Positives",
-      indicator_code == "TB_PREV.N.Already.T2" ~ "Known Positives",
-      indicator_code == "TB_ART.New.T2" ~ "Newly Tested Positives",
-      indicator_code == "TB_ART.Already.T2" ~  "Known Positives",
-      indicator_code == "TB_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
-      indicator_code == "TB_STAT.N.New.Neg.T2" ~ "New Negatives",
-      indicator_code == "TB_STAT.N.KnownPos.T2" ~ "Known Positives",
-      indicator_code == "TX_TB.D.Already.Neg.T2" ~ "TB Screen - Negative, Life-long ART, Already, Positive",
-      indicator_code == "TX_TB.D.Already.Pos.T2" ~ "TB Screen - Positive, Life-long ART, Already, Positive",
-      indicator_code == "TX_TB.D.New.Neg.T2" ~ "TB Screen - Negative, Life-long ART, New, Positive",
-      indicator_code == "TX_TB.D.New.Pos.T2" ~ "TB Screen - Positive, Life-long ART, New, Positive",
-      TRUE ~ resultstatus)) %>%
-      dplyr::distinct()
+     dplyr::mutate(resultstatus = dplyr::case_when(
+       indicator_code == "VMMC_CIRC.Neg.T2" ~ "Negative",
+       indicator_code == "VMMC_CIRC.Pos.T2" ~ "Positive",
+       indicator_code == "VMMC_CIRC.Unk.T2" ~ "Status Unknown",
+       indicator_code == "HTS_TST.Index.Pos.Share.T2" ~ "Newly Tested Positives",
+       indicator_code == "HTS_TST.TB.Pos.Share.T2" ~ "Newly Tested Positives",
+       indicator_code == "HTS_TST.PMTCT.Pos.Share.T2" ~ "Newly Tested Positives",
+       indicator_code == "TB_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
+       indicator_code == "TB_STAT.N.New.Neg.T2" ~ "New Negatives",
+       indicator_code == "TB_STAT.N.KnownPos.T" ~ "Known Positives",
+       indicator_code == "PMTCT_STAT.N.KnownPos.T2" ~ "Known Positives",
+       indicator_code == "PMTCT_STAT.N.New.Neg.T2" ~ "New Negatives",
+       indicator_code == "PMTCT_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
+       indicator_code == "PMTCT_ART.Already.T2" ~ "Known Positives",
+       indicator_code == "PMTCT_ART.New.T2" ~  "Newly Tested Positives",
+       indicator_code == "TB_PREV.D.New.T2" ~ "Newly Tested Positives",
+       indicator_code == "TB_PREV.D.Already.T2" ~ "Known Positives",
+       indicator_code == "TB_PREV.N.New.T2" ~ "Newly Tested Positives",
+       indicator_code == "TB_PREV.N.Already.T2" ~ "Known Positives",
+       indicator_code == "TB_ART.New.T2" ~ "Newly Tested Positives",
+       indicator_code == "TB_ART.Already.T2" ~  "Known Positives",
+       indicator_code == "TB_STAT.N.New.Pos.T2" ~ "Newly Tested Positives",
+       indicator_code == "TB_STAT.N.New.Neg.T2" ~ "New Negatives",
+       indicator_code == "TB_STAT.N.KnownPos.T2" ~ "Known Positives",
+       indicator_code == "TX_TB.D.Already.Neg.T2" ~ "TB Screen - Negative, Life-long ART, Already, Positive",
+       indicator_code == "TX_TB.D.Already.Pos.T2" ~ "TB Screen - Positive, Life-long ART, Already, Positive",
+       indicator_code == "TX_TB.D.New.Neg.T2" ~ "TB Screen - Negative, Life-long ART, New, Positive",
+       indicator_code == "TX_TB.D.New.Pos.T2" ~ "TB Screen - Positive, Life-long ART, New, Positive",
+       indicator_code == "OVC_SERV.Active.T2" & dataelementuid == "HVzzfyVVIs1" ~ "Active, Beneficiary",
+       indicator_code == "OVC_SERV.Active.T2" & dataelementuid == "cx8hxarh4Ke" ~ "Active, Caregiver",
+       indicator_code == "OVC_SERV.Grad.T2" & dataelementuid == "HVzzfyVVIs1" ~ "Graduated, Beneficiary",
+       indicator_code == "OVC_SERV.Grad.T2" & dataelementuid == "cx8hxarh4Ke" ~ "Graduated, Caregiver",
+       TRUE ~ resultstatus)) %>%
+    # dplyr::distinct()
+    # #Account for PMCTCT_EID
+    # dplyr::bind_rows(list(indicator_code = "PMTCT_EID.N.2.T",
+    #                       dataelementuid = "euzbW4INAqn",
+    #                       resultstatus = NA)) %>%
+    dplyr::distinct()
 
   #A map of dataelement uids and COCs
   map_year1_des_cocs <-
@@ -230,6 +241,7 @@ unpackYear2Sheet <- function(d) {
       valid_ages.name,
       valid_sexes.name,
       valid_kps.name,
+      disagg_type,
       resultstatus,
       categoryoptioncombouid,
       dataelementname,
@@ -276,6 +288,12 @@ unpackYear2Sheet <- function(d) {
         dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Negative, Life-long ART, New, Positive",
       grepl("TB Screen - Positive, Life-long ART, New, Positive", categoryoptioncomboname) &
         dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Positive, Life-long ART, New, Positive",
+      grepl("TB Screen - Positive, Life-long ART, New, Positive", categoryoptioncomboname) &
+        dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Positive, Life-long ART, New, Positive",
+      grepl("TB Screen - Positive, Life-long ART, New, Positive", categoryoptioncomboname) &
+        dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Positive, Life-long ART, New, Positive",
+
+
         TRUE ~ resultstatus))
 
   d$data$Year2 <- d$data$Year2 %>%
@@ -288,7 +306,11 @@ unpackYear2Sheet <- function(d) {
                         names_to = "indicator_code",
                         values_to = "value",
                         values_drop_na = TRUE) %>%
-    #Drop HTS_TST.POS
+    #Drop HTS_TST.POS but keep the under 1s and map it to PMTCT_EID <2 months
+    dplyr::mutate(indicator_code = dplyr::case_when(indicator_code == "HTS_TST.Pos.Total_With_HEI.T2" & Age == "<01" ~ "PMTCT_EID.N.2.T",
+                  TRUE ~ indicator_code)) %>%
+    dplyr::mutate(Age = dplyr::case_when(indicator_code == "PMTCT_EID.N.2.T" ~ "<= 2 months",
+                                         TRUE ~ Age)) %>%
     dplyr::filter(indicator_code != "HTS_TST.Pos.Total_With_HEI.T2") %>%
     dplyr::select(-`Indicator Group`,
                   valid_sexes.name = "Sex",
@@ -308,7 +330,7 @@ unpackYear2Sheet <- function(d) {
     #Get the raw data element codes from the map
     #We will need to do a bit more processing to determine the actual UID
     #Based on what type of disagg we are dealing with
-    dplyr::left_join(map_ind_code_des, by =  c("indicator_code")) %>%
+    dplyr::left_join(map_ind_code_des, by =  c("indicator_code","valid_ages.name", "valid_sexes.name","valid_kps.name")) %>%
     #Split the data element UID codes in the schema into a nested list
     #Determine the type of value we are dealing with (AgeSex/KP/EID)
     #TODO: How to determine when we need to use the EID data element?
@@ -317,7 +339,7 @@ unpackYear2Sheet <- function(d) {
                                            TRUE ~"AgeSex"),
                    dataelementuid = unlist(purrr::map2(type, de_uid_list,pickUIDFromType))) %>%
     dplyr::left_join(map_year1_des_cocs,
-                     by = c("dataelementuid", "valid_ages.name", "valid_sexes.name", "valid_kps.name","resultstatus")) %>%
+                     by = c("dataelementuid", "valid_ages.name", "valid_sexes.name", "valid_kps.name","resultstatus", "disagg_type")) %>%
     #Deal with duplications in OVC_SERV
     dplyr::mutate(is_invalid = dplyr::case_when(dataelementuid == "cx8hxarh4Ke" & valid_ages.name != "18+" ~ TRUE,
                                                 dataelementuid == "HVzzfyVVIs1" & valid_ages.name == "18+" ~ TRUE,
