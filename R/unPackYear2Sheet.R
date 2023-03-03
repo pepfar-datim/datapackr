@@ -176,7 +176,139 @@ unpackYear2Sheet <- function(d) {
 
   #A map of indicator codes and data element uids
 
-  is_positive <- c("PLHIV|TX_CURR|TX_NEW|TX_PVLS|HTS_TST|HTS_RECENT|CXCA_SCRN")
+  #TODO: Fix this in the main map
+  hts_recent_kps <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+    dplyr::filter(support_type == "DSD") %>%
+    dplyr::filter(indicator_code == "HTS_RECENT.KP.T") %>%
+    dplyr::select(indicator_code,
+                  valid_ages.name,
+                  valid_sexes.name,
+                  valid_kps.name,
+                  dataelementuid,
+                  resultstatus,
+                  disagg_type) %>%
+    dplyr::mutate(indicator_code = "HTS_RECENT.T2",
+                  dataelementuid = "SsqfZeIs1Va.{KP}y42bZItNsea")
+
+  tx_new_kps <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+    dplyr::filter(support_type == "DSD") %>%
+    dplyr::filter(indicator_code == "TX_NEW.KP.T") %>%
+    dplyr::select(indicator_code,
+                  valid_ages.name,
+                  valid_sexes.name,
+                  valid_kps.name,
+                  dataelementuid,
+                  resultstatus,
+                  disagg_type) %>%
+    dplyr::mutate(indicator_code = "TX_NEW.T2",
+                  dataelementuid = "vmfKLKi1NBA.{KP}ktZYUSS0Zjo")
+
+  tx_curr_kps <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+    dplyr::filter(support_type == "DSD") %>%
+    dplyr::filter(indicator_code == "TX_CURR.KP.T") %>%
+    dplyr::select(indicator_code,
+                  valid_ages.name,
+                  valid_sexes.name,
+                  valid_kps.name,
+                  dataelementuid,
+                  resultstatus,
+                  disagg_type) %>%
+    dplyr::mutate(indicator_code = "TX_CURR.T2",
+                  dataelementuid = "di4b6joXm84.{KP}OLbhrUez4dP")
+
+  tx_curr_subnat_kps <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+    dplyr::filter(support_type == "DSD") %>%
+    dplyr::filter(indicator_code == "TX_CURR_SUBNAT.KP.T") %>%
+    dplyr::select(indicator_code,
+                  valid_ages.name,
+                  valid_sexes.name,
+                  valid_kps.name,
+                  dataelementuid,
+                  resultstatus,
+                  disagg_type) %>%
+    dplyr::mutate(indicator_code = "TX_CURR.T2",
+                  dataelementuid = "di4b6joXm84.{KP}OLbhrUez4dP")
+
+  tx_pvls_d_kps <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+    dplyr::filter(support_type == "DSD") %>%
+    dplyr::filter(indicator_code == "TX_PVLS.D.KP.T") %>%
+    dplyr::select(indicator_code,
+                  valid_ages.name,
+                  valid_sexes.name,
+                  valid_kps.name,
+                  dataelementuid,
+                  resultstatus,
+                  disagg_type) %>%
+    dplyr::mutate(indicator_code = "TX_PVLS.D.Routine.T2",
+                  dataelementuid = "WpZwPieQ060.{KP}P9OjdVVMHMW")
+
+  tx_pvls_n_kps <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+    dplyr::filter(support_type == "DSD") %>%
+    dplyr::filter(indicator_code == "TX_PVLS.N.KP.T") %>%
+    dplyr::select(indicator_code,
+                  valid_ages.name,
+                  valid_sexes.name,
+                  valid_kps.name,
+                  dataelementuid,
+                  resultstatus,
+                  disagg_type) %>%
+    dplyr::mutate(indicator_code = "TX_PVLS.N.Routine.T2",
+                  dataelementuid = "N55pM5ZuWcI.{KP}tGtB1nLnQjC")
+
+  prep_new_kps <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+    dplyr::filter(support_type == "DSD") %>%
+    dplyr::filter(indicator_code == "PrEP_NEW.KP.T") %>%
+    dplyr::select(indicator_code,
+                  valid_ages.name,
+                  valid_sexes.name,
+                  valid_kps.name,
+                  dataelementuid,
+                  resultstatus,
+                  disagg_type) %>%
+    dplyr::mutate(indicator_code = "PrEP_NEW.T2",
+                  dataelementuid = "rXV784LlUQ4.{KP}lXqlw8UxoqF")
+
+
+  prep_ct_kps <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+    dplyr::filter(support_type == "DSD") %>%
+    dplyr::filter(indicator_code == "PrEP_CT.KP.T") %>%
+    dplyr::select(indicator_code,
+                  valid_ages.name,
+                  valid_sexes.name,
+                  valid_kps.name,
+                  dataelementuid,
+                  resultstatus,
+                  disagg_type) %>%
+    dplyr::mutate(indicator_code = "PrEP_CT.T2",
+                  dataelementuid = "agoURWZyPpn.{KP}bwlf1Jfww0L")
+
+
+  #TB_STAT.KnownPos.T2 seems to be missing entirely from the map
+  tb_stat_known_pos_t2 <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+    dplyr::filter(support_type == "DSD") %>%
+    dplyr::filter(indicator_code == "TB_STAT.N.KnownPos.T") %>%
+    dplyr::select(indicator_code,
+                  valid_ages.name,
+                  valid_sexes.name,
+                  valid_kps.name,
+                  dataelementuid,
+                  resultstatus,
+                  disagg_type) %>%
+    dplyr::mutate(indicator_code = "TB_STAT.N.KnownPos.T2")
+
+  pmtct_eid <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+    dplyr::filter(dataelementuid == "euzbW4INAqn" & indicator_code == "PMTCT_EID.N.2.T" ) %>%
+    dplyr::select(indicator_code,
+                  valid_ages.name,
+                  valid_sexes.name,
+                  valid_kps.name,
+                  dataelementuid,
+                  resultstatus,
+                  disagg_type)
+
+
+  is_positive <- c("PLHIV|TX_CURR|TX_NEW|TX_PVLS|HTS_TST|HTS_RECENT|CXCA_SCRN|HTS_RECENT")
+
 
   map_ind_code_des <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
     dplyr::filter(indicator_code %in% cols_to_keep$indicator_code) %>%
@@ -222,7 +354,29 @@ unpackYear2Sheet <- function(d) {
        indicator_code == "OVC_SERV.Active.T2" & dataelementuid == "cx8hxarh4Ke" ~ "Active, Caregiver",
        indicator_code == "OVC_SERV.Grad.T2" & dataelementuid == "HVzzfyVVIs1" ~ "Graduated, Beneficiary",
        indicator_code == "OVC_SERV.Grad.T2" & dataelementuid == "cx8hxarh4Ke" ~ "Graduated, Caregiver",
+       indicator_code == "GEND_GBV.PE.T2" ~ "Physical and/or Emotional Violence",
+       indicator_code == "GEND_GBV.S.T2" ~ "Sexual Violence (Post-Rape Care)",
        TRUE ~ resultstatus)) %>%
+    dplyr::mutate(disagg_type = dplyr::case_when(
+      indicator_code == "PLHIV.T2" ~ "Age/Sex/HIVStatus",
+      indicator_code == "TX_PVLS.D.Routine.T2" ~ "Age/Sex/Indication/HIVStatus",
+      indicator_code == "TX_PVLS.N.Routine.T2" ~ "Age/Sex/Indication/HIVStatus",
+      indicator_code == "TX_CURR.T2" ~ 'Age/Sex/HIVStatus',
+      indicator_code == "TX_NEW.T2" ~ 'Age/Sex/HIVStatus',
+      indicator_code == "HTS_RECENT.T2" ~ "Age/Sex/HIVStatus",
+      indicator_code == "HTS_SELF.T2" ~ "Age/Sex",
+      indicator_code == "PrEP_NEW.T2" ~ "Age/Sex",
+      indicator_code == "PrEP_CT.T2"  ~ "Age/Sex",
+      TRUE ~ disagg_type
+    )) %>%
+    #Munge OVC_HIVSTAT
+    dplyr::mutate(valid_sexes.name = dplyr::case_when(
+      indicator_code == "OVC_HIVSTAT.T2" ~ NA_character_,
+      TRUE ~ valid_sexes.name)) %>%
+    dplyr::mutate(valid_ages.name = dplyr::case_when(
+      indicator_code == "OVC_HIVSTAT.T2" ~ NA_character_,
+      TRUE ~ valid_ages.name)) %>%
+    dplyr::bind_rows(hts_recent_kps, tx_new_kps, tx_curr_kps, tx_pvls_d_kps, tx_pvls_n_kps, tb_stat_known_pos_t2, prep_new_kps, prep_ct_kps, pmtct_eid) %>%
     # dplyr::distinct()
     # #Account for PMCTCT_EID
     # dplyr::bind_rows(list(indicator_code = "PMTCT_EID.N.2.T",
@@ -231,8 +385,7 @@ unpackYear2Sheet <- function(d) {
     dplyr::distinct()
 
   #A map of dataelement uids and COCs
-  map_year1_des_cocs <-
-    datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+  map_year1_des_cocs <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
     dplyr::filter(grepl("\\.T$", indicator_code)) %>%
     #Get rid of trash in the map
     dplyr::filter(!is.na(indicator_code)) %>%
@@ -250,18 +403,18 @@ unpackYear2Sheet <- function(d) {
     dplyr::distinct() %>%
     dplyr::mutate(
       resultstatus = dplyr::case_when(
+        grepl("Active", categoryoptioncomboname) &
+          dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET: Beneficiaries Served" ~ "Active, Beneficiary",
+        grepl("Graduated", categoryoptioncomboname) &
+          dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET: Beneficiaries Served" ~ "Graduated, Beneficiary",
+        grepl("Active", categoryoptioncomboname) &
+          dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatusCaregiver) TARGET: Beneficiaries Served" ~ "Active, Caregiver",
+        grepl("Graduated", categoryoptioncomboname) &
+          dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatusCaregiver) TARGET: Beneficiaries Served" ~ "Graduated, Caregiver",
         grepl("Already", categoryoptioncomboname) &
           dataelementname == "PMTCT_ART (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: ART" ~ "Known Positives",
         grepl("New", categoryoptioncomboname) &
           dataelementname == "PMTCT_ART (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: ART" ~ "Newly Tested Positives",
-      grepl("Graduated", categoryoptioncomboname) &
-        dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET: Beneficiaries Served" ~ "Graduated",
-      grepl("Active", categoryoptioncomboname) &
-        dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET: Beneficiaries Served" ~ "Active",
-      grepl("Graduated", categoryoptioncomboname) &
-        dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatusCaregiver) TARGET: Beneficiaries Served" ~ "Graduated",
-      grepl("Active", categoryoptioncomboname) &
-        dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatusCaregiver) TARGET: Beneficiaries Served" ~ "Active",
       grepl("New", categoryoptioncomboname) &
         dataelementname == "TB_PREV (D, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: IPT" ~ "Newly Tested Positives",
       grepl("Already", categoryoptioncomboname) &
@@ -292,9 +445,14 @@ unpackYear2Sheet <- function(d) {
         dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Positive, Life-long ART, New, Positive",
       grepl("TB Screen - Positive, Life-long ART, New, Positive", categoryoptioncomboname) &
         dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Positive, Life-long ART, New, Positive",
-
-
-        TRUE ~ resultstatus))
+      grepl("Physical", categoryoptioncomboname) &
+        dataelementname == "GEND_GBV (N, DSD, ViolenceServiceType) TARGET v2: GBV Care" ~ "Physical and/or Emotional Violence",
+      grepl("Sexual", categoryoptioncomboname) &
+        dataelementname == "GEND_GBV (N, DSD, ViolenceServiceType) TARGET v2: GBV Care" ~ "Sexual Violence (Post-Rape Care)",
+        TRUE ~ resultstatus)) %>%
+    #Filter PMTCT_EID 2-12 months
+    dplyr::filter(!(dataelementuid  == "euzbW4INAqn" & categoryoptioncombouid == "El4ysmXTL9r")) %>%
+    dplyr::distinct()
 
   d$data$Year2 <- d$data$Year2 %>%
     dplyr::select(tidyselect::any_of(cols_to_keep$indicator_code)) %>%
@@ -309,8 +467,10 @@ unpackYear2Sheet <- function(d) {
     #Drop HTS_TST.POS but keep the under 1s and map it to PMTCT_EID <2 months
     dplyr::mutate(indicator_code = dplyr::case_when(indicator_code == "HTS_TST.Pos.Total_With_HEI.T2" & Age == "<01" ~ "PMTCT_EID.N.2.T",
                   TRUE ~ indicator_code)) %>%
-    dplyr::mutate(Age = dplyr::case_when(indicator_code == "PMTCT_EID.N.2.T" ~ "<= 2 months",
+    dplyr::mutate(Age = dplyr::case_when(indicator_code == "PMTCT_EID.N.2.T" ~ NA_character_,
                                          TRUE ~ Age)) %>%
+    dplyr::mutate(Sex = dplyr::case_when(indicator_code == "PMTCT_EID.N.2.T" ~ NA_character_,
+                                         TRUE ~ Sex)) %>%
     dplyr::filter(indicator_code != "HTS_TST.Pos.Total_With_HEI.T2") %>%
     dplyr::select(-`Indicator Group`,
                   valid_sexes.name = "Sex",
@@ -330,7 +490,7 @@ unpackYear2Sheet <- function(d) {
     #Get the raw data element codes from the map
     #We will need to do a bit more processing to determine the actual UID
     #Based on what type of disagg we are dealing with
-    dplyr::left_join(map_ind_code_des, by =  c("indicator_code","valid_ages.name", "valid_sexes.name","valid_kps.name")) %>%
+    dplyr::left_join(map_ind_code_des, by = c("indicator_code","valid_ages.name", "valid_sexes.name","valid_kps.name")) %>%
     #Split the data element UID codes in the schema into a nested list
     #Determine the type of value we are dealing with (AgeSex/KP/EID)
     #TODO: How to determine when we need to use the EID data element?
@@ -338,6 +498,15 @@ unpackYear2Sheet <- function(d) {
                    type = dplyr::case_when(!is.na(valid_kps.name) ~ "KP",
                                            TRUE ~"AgeSex"),
                    dataelementuid = unlist(purrr::map2(type, de_uid_list,pickUIDFromType))) %>%
+    dplyr::mutate(disagg_type = dplyr::case_when(
+      indicator_code == "PrEP_CT.T2" & !is.na(valid_kps.name) ~ "KeyPop",
+      indicator_code == "PrEP_NEW.T2" & !is.na(valid_kps.name) ~ "KeyPop",
+      indicator_code == "TX_PVLS.N.Routine.T2" & !is.na(valid_kps.name) ~ "KeyPop/HIVStatus",
+      indicator_code == "TX_PVLS.D.Routine.T2" & !is.na(valid_kps.name) ~ "KeyPop/HIVStatus",
+      indicator_code == "HTS_RECENT.T2" & !is.na(valid_kps.name) ~ "KeyPop/HIVStatus",
+                                                  indicator_code == "TX_NEW.T2" & !is.na(valid_kps.name) ~ "KeyPop/HIVStatus",
+                                                  indicator_code == "TX_CURR.T2" & !is.na(valid_kps.name) ~ "KeyPop/HIVStatus",
+                                                  TRUE ~ disagg_type)) %>%
     dplyr::left_join(map_year1_des_cocs,
                      by = c("dataelementuid", "valid_ages.name", "valid_sexes.name", "valid_kps.name","resultstatus", "disagg_type")) %>%
     #Deal with duplications in OVC_SERV
