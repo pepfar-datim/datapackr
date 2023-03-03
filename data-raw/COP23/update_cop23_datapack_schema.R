@@ -18,6 +18,7 @@ checkSchema(schema = datapackr::cop23_data_pack_schema,
             template_path = datapack_template_filepath,
             cop_year = 2023,
             tool = "Data Pack")
+# TODO: Fix issue here where checkSchema flags issues in package schema as if they were in the template
 
 save(cop23_data_pack_schema,
      file = "./data/cop23_data_pack_schema.rda",
