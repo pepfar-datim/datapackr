@@ -40,7 +40,8 @@ datasets_to_pull <- tibble::tribble(
   "bKSmkDP5YTc", "FY23 SUBNAT Targets", 2023, "targets", "subnat", "psnu",
   # May not be able to map FY22 SUBNAT Results, since these are results instead
   #   of Targets
-  "IXiORiVFqIv", "FY22 SUBNAT Results", 2022, "results", "subnat", "psnu")
+  #"IXiORiVFqIv", "FY22 SUBNAT Results", 2022, "results", "subnat", "psnu")
+)
 
 # Test that all dataSet uids are valid ----
 dataSetUIDs <- datimutils::getMetadata(dataSets, d2_session = d2_session)
@@ -285,9 +286,9 @@ dp_map %<>%
       TRUE ~ support_type))
 
 # Join Full Code List with Schema ####
-sj <- dp_map %>%
+dp_map %<>%
   dplyr::select(-dataset) %>%
-  dplyr::anti_join(fullCodeList,
+  dplyr::inner_join(fullCodeList,
                    by = c("dataelementuid" = "dataelementuid",
                           "categoryOptions.ids" = "categoryOptions.ids",
                           "period" = "period",
