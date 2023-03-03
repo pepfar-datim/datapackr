@@ -471,21 +471,19 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL) {
 #' @param cop_year The COP Year
 #'
 #' @return A data frame of organisation units along with their attributes.
-getValidOrgUnits <- function(cop_year = NA) {
+getValidOrgUnits <- function(cop_year = NULL) {
 
   cop_year <- cop_year %missing% NULL
 
-
   if (length(cop_year) != 1L) {
+
     stop("You must specify a single COP Year!")
   }
-
 
   if (is.na(cop_year) || is.null(cop_year))  {
 
     stop(paste("COP Year was not specified"))
   }
-
 
   if (!(cop_year %in% supportedCOPYears())) {
     stop(paste("COP Year", cop_year, "has no valid orgunits."))

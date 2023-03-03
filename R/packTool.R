@@ -23,6 +23,7 @@ packTool <- function(model_data = NULL,
                      output_folder,
                      results_archive = TRUE,
                      expand_formulas = FALSE,
+                     spectrum_data = NULL,
                      d2_session = dynGet("d2_default_session",
                                          inherits = TRUE)) {
 
@@ -68,6 +69,7 @@ packTool <- function(model_data = NULL,
   if (d$info$tool == "Data Pack") {
     d <- packDataPack(d,
                       model_data = model_data,
+                      spectrum_data = spectrum_data,
                       d2_session = d2_session)
   } else if (d$info$tool == "OPU Data Pack") {
 

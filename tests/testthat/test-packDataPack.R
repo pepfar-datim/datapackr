@@ -1,4 +1,4 @@
-context("test-packDataPack")
+context("Test Datapack model paramaters")
 
 test_that("Can test different combinations of model param passing", {
 
@@ -12,7 +12,7 @@ test_that("Can test different combinations of model param passing", {
 
   # have both model_path and model data
    d <- list()
-   d$keychain$model_data_path <- test_sheet("datapack_model_data.rds")
+   d$keychain$model_data_path <- test_sheet("COP23_model_data_random.rds")
    model_data <- data.frame()
    testthat::expect_error(
      packDataPack(d, model_data = model_data),

@@ -12,7 +12,7 @@ getMapDataPack_DATIM_DEs_COCs(cop_year, datasource = NULL)
 \item{datasource}{Type of datasource (Data Pack, OPU Data Pack, DATIM)}
 }
 \value{
-{cop21, cop22}_map_DataPack_DATIM_DEs_COCs
+{cop21, cop22, cop23}_map_DataPack_DATIM_DEs_COCs
 }
 \description{
 get_Map_DataPack_DATIM_DEs_COCs

@@ -5,7 +5,7 @@
 \title{Return a data frame of valid organisation units
 based on the COP year}
 \usage{
-getValidOrgUnits(cop_year = NA)
+getValidOrgUnits(cop_year = NULL)
 }
 \arguments{
 \item{cop_year}{The COP Year}

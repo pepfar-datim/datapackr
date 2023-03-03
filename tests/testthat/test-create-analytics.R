@@ -2,11 +2,11 @@ context("Analytics creation tests")
 
 
 with_mock_api({
-  test_that("We can create analytics", {
+  test_that("We can create analytics for a COP23 Data Pack", {
 
     d <-
       loadDataPack(
-        submission_path = test_sheet("COP21_DP_random_with_psnuxim.xlsx"),
+        submission_path = test_sheet("COP23_sample_DataPack_Malawi.xlsx"),
         tool = "Data Pack",
         country_uids = NULL,
         cop_year = NULL,
@@ -15,10 +15,8 @@ with_mock_api({
 
     d %<>%
       unPackSheets(., check_sheets = FALSE) %>%
-      unPackSNUxIM(.) %>%
       packForDATIM(., type = "Undistributed MER") %>%
-      packForDATIM(., type = "SUBNAT_IMPATT") %>%
-      packForDATIM(., type = "PSNUxIM")
+      packForDATIM(., type = "SUBNAT_IMPATT")
 
     expect_named(d,
                  c("keychain", "info", "tests", "sheets", "data", "datim"),

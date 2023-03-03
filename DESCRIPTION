@@ -55,7 +55,8 @@ Suggests:
     gdtools,
     flextable,
     officer,
-    lintr (>= 3.0.0)
+    lintr (>= 3.0.0),
+    stringi
 Remotes:
     pepfar-datim/datimutils,
     pepfar-datim/datim-validation

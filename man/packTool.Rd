@@ -17,6 +17,7 @@ packTool(
   output_folder,
   results_archive = TRUE,
   expand_formulas = FALSE,
+  spectrum_data = NULL,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }
