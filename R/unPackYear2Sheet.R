@@ -451,108 +451,11 @@ unpackYear2Sheet <- function(d) {
   cols_to_keep <- datapackr:::getColumnsToKeep(d, sheet)
   header_cols <- datapackr:::getHeaderColumns(cols_to_keep, sheet)
 
+  Year2_KP_stacked <- pick_schema(d$info$cop_year, d$info$tool) %>%
+    dplyr::filter(sheet_name == "Year 2",
+                  stringr::str_detect(dataelement_dsd, "\\.\\{KP\\}"))
 
-  map_ind_code_des <- generateY2IndicatorCodeDataElementMap(cols_to_keep, d$info$cop_year)
-
-  #A map of dataelement uids and COCs
-  map_year1_des_cocs <-
-    datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
-    dplyr::filter(grepl("\\.T$", indicator_code)) %>%
-    #Get rid of trash in the map
-    dplyr::filter(!is.na(indicator_code)) %>%
-    dplyr::select(
-      dataelementuid,
-      valid_ages.name,
-      valid_sexes.name,
-      valid_kps.name,
-      disagg_type,
-      resultstatus,
-      categoryoptioncombouid,
-      dataelementname,
-      categoryoptioncomboname
-    ) %>%
-    dplyr::distinct() %>%
-    dplyr::mutate(
-      #Turning off linting due to long data element names
-      #We could use UIDs but this obscures things a bit.
-      # nolint start
-      resultstatus = dplyr::case_when(
-        grepl("Active", categoryoptioncomboname) &
-          dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET: Beneficiaries Served" ~ "Active, Beneficiary",
-        grepl("Graduated", categoryoptioncomboname) &
-          dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatus) TARGET: Beneficiaries Served" ~ "Graduated, Beneficiary",
-        grepl("Active", categoryoptioncomboname) &
-          dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatusCaregiver) TARGET: Beneficiaries Served" ~ "Active, Caregiver",
-        grepl("Graduated", categoryoptioncomboname) &
-          dataelementname == "OVC_SERV (N, DSD, Age/Sex/ProgramStatusCaregiver) TARGET: Beneficiaries Served" ~ "Graduated, Caregiver",
-        grepl("Already", categoryoptioncomboname) &
-          dataelementname == "PMTCT_ART (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: ART" ~ "Known Positives",
-        grepl("New", categoryoptioncomboname) &
-          dataelementname == "PMTCT_ART (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: ART" ~ "Newly Tested Positives",
-        grepl("New", categoryoptioncomboname) &
-          dataelementname == "TB_PREV (D, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: IPT" ~ "Newly Tested Positives",
-        grepl("Already", categoryoptioncomboname) &
-          dataelementname == "TB_PREV (D, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: IPT" ~ "Known Positives",
-        grepl("New", categoryoptioncomboname) &
-          dataelementname == "TB_PREV (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: IPT" ~ "Newly Tested Positives",
-        grepl("Already", categoryoptioncomboname) &
-          dataelementname == "TB_PREV (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: IPT" ~ "Known Positives",
-        grepl("New", categoryoptioncomboname) &
-          dataelementname == "TB_ART (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: Registered TB/HIV" ~  "Newly Tested Positives" ,
-        grepl("Already", categoryoptioncomboname) &
-          dataelementname == "TB_ART (N, DSD, Age/Sex/NewExistingArt/HIVStatus) TARGET: Registered TB/HIV" ~ "Known Positives",
-        grepl("Newly Tested Positives", categoryoptioncomboname) &
-          dataelementname == "TB_STAT (N, DSD, Age/Sex/KnownNewPosNeg) TARGET: New/Relapsed TB" ~ "Newly Tested Positives",
-        grepl("New Negatives", categoryoptioncomboname) &
-          dataelementname == "TB_STAT (N, DSD, Age/Sex/KnownNewPosNeg) TARGET: New/Relapsed TB" ~ "New Negatives",
-        grepl("Known Positives", categoryoptioncomboname) &
-          dataelementname == "TB_STAT (N, DSD, Age/Sex/KnownNewPosNeg) TARGET: New/Relapsed TB" ~ "Known Positives",
-        grepl(
-          "TB Screen - Negative, Life-long ART, Already, Positive",
-          categoryoptioncomboname
-        ) &
-          dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Negative, Life-long ART, Already, Positive",
-        grepl(
-          "TB Screen - Positive, Life-long ART, Already, Positive",
-          categoryoptioncomboname
-        ) &
-          dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Positive, Life-long ART, Already, Positive",
-        grepl(
-          "TB Screen - Negative, Life-long ART, New, Positive",
-          categoryoptioncomboname
-        ) &
-          dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Negative, Life-long ART, New, Positive",
-        grepl(
-          "TB Screen - Positive, Life-long ART, New, Positive",
-          categoryoptioncomboname
-        ) &
-          dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Positive, Life-long ART, New, Positive",
-        grepl(
-          "TB Screen - Positive, Life-long ART, New, Positive",
-          categoryoptioncomboname
-        ) &
-          dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Positive, Life-long ART, New, Positive",
-        grepl(
-          "TB Screen - Positive, Life-long ART, New, Positive",
-          categoryoptioncomboname
-        ) &
-          dataelementname == "TX_TB (D, DSD, Age/Sex/TBScreen/NewExistingART/HIVStatus) TARGET: TB Screening" ~ "TB Screen - Positive, Life-long ART, New, Positive",
-        grepl("Physical", categoryoptioncomboname) &
-          dataelementname == "GEND_GBV (N, DSD, ViolenceServiceType) TARGET v2: GBV Care" ~ "Physical and/or Emotional Violence",
-        grepl("Sexual", categoryoptioncomboname) &
-          dataelementname == "GEND_GBV (N, DSD, ViolenceServiceType) TARGET v2: GBV Care" ~ "Sexual Violence (Post-Rape Care)",
-        TRUE ~ resultstatus
-      )
-    ) %>%
-    #Filter PMTCT_EID 2-12 months
-    dplyr::filter(!(
-      dataelementuid  == "euzbW4INAqn" &
-        categoryoptioncombouid == "El4ysmXTL9r"
-    )) %>%
-    dplyr::distinct()
-  # nolint end
-
-  d$data$Year2 <- d$data$Year2 %>%
+  d$data$Year2 %<>%
     dplyr::select(tidyselect::any_of(cols_to_keep$indicator_code)) %>%
     #Deal with HTS_TST
     dplyr::mutate(dplyr::across(!header_cols$indicator_code, as.numeric)) %>%
@@ -571,16 +474,25 @@ unpackYear2Sheet <- function(d) {
     # nolint start
     dplyr::mutate(
       indicator_code = dplyr::case_when(
-        indicator_code == "HTS_TST.Pos.Total_With_HEI.T2" &
-          Age == "<01" ~ "PMTCT_EID.N.2.T",
-        TRUE ~ indicator_code
-      )
-    ) %>%
+        indicator_code == "HTS_TST.Pos.Total_With_HEI.T2"
+          & Age == "<01"
+          ~ paste0(indicator_code, ".EID.2"),
+        indicator_code %in% Year2_KP_stacked$indicator_code
+          & !is.na(KeyPop)
+          ~ paste0(indicator_code, (".KP")),
+        TRUE ~ indicator_code)) %>%
     # nolint end
-    dplyr::mutate(Age = dplyr::case_when(indicator_code == "PMTCT_EID.N.2.T" ~ NA_character_,
-                                         TRUE ~ Age)) %>%
-    dplyr::mutate(Sex = dplyr::case_when(indicator_code == "PMTCT_EID.N.2.T" ~ NA_character_,
-                                         TRUE ~ Sex)) %>%
+    # Allow mapping of EID
+    # OVC_HIVSTAT needs to be aggregated
+    dplyr::mutate(
+      Age = dplyr::case_when(
+        indicator_code %in% c("HTS_TST.Pos.Total_With_HEI.T2.EID.2", "OVC_HIVSTAT.T2")
+          ~ NA_character_,
+        TRUE ~ Age),
+      Sex = dplyr::case_when(
+        indicator_code %in% c("HTS_TST.Pos.Total_With_HEI.T2.EID.2", "OVC_HIVSTAT.T2")
+          ~ NA_character_,
+        TRUE ~ Sex)) %>%
     #Get rid of the HTS_TST Pos at this point
     dplyr::filter(indicator_code != "HTS_TST.Pos.Total_With_HEI.T2") %>%
     #Drop TX_CURR_SUBNAT data for KPs. It should not be there.
@@ -592,95 +504,31 @@ unpackYear2Sheet <- function(d) {
       valid_ages.name = "Age",
       valid_kps.name = "KeyPop"
     ) %>%
-    #OVC_HIVSTAT needs to be aggregated
-    dplyr::mutate(
-      valid_sexes.name = dplyr::case_when(
-        indicator_code == "OVC_HIVSTAT.T2" ~ NA_character_,
-        TRUE ~ valid_sexes.name
-      ),
-      valid_ages.name = dplyr::case_when(
-        indicator_code == "OVC_HIVSTAT.T2" ~ NA_character_,
-        TRUE ~ valid_ages.name
-      )
-    ) %>%
     dplyr::group_by(valid_sexes.name,
                     valid_ages.name,
                     valid_kps.name,
                     indicator_code) %>%
-    #TODO: This feels a bit risky. Should we only limit to OVC_HIVSTAT?
-    dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop") %>%
-    #Get the raw data element codes from the map
-    #We will need to do a bit more processing to determine the actual UID
-    #Based on what type of disagg we are dealing with
+    #TODO: This feels a bit risky. Should we only limit to OVC_HIVSTAT & PMTCT_EID?
+    dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
+
+  # Get the raw data element codes from the map ----
+  d$data$Year2 %<>%
     dplyr::left_join(
-      map_ind_code_des,
+      getMapDataPack_DATIM_DEs_COCs(d$info$cop_year),
       by = c(
         "indicator_code",
         "valid_ages.name",
         "valid_sexes.name",
-        "valid_kps.name"
-      )
-    ) %>%
-    #Split the data element UID codes in the schema into a nested list
-    #Determine the type of value we are dealing with (AgeSex/KP/EID)
-    dplyr::mutate(
-      de_uid_list = stringr::str_split(dataelementuid, "\\."),
-      type = dplyr::case_when(!is.na(valid_kps.name) ~ "KP",
-                              TRUE ~ "AgeSex"),
-      dataelementuid = unlist(purrr::map2(type, de_uid_list, pickUIDFromType))
-    ) %>%
-    #Split the KP n
-    dplyr::mutate(
-      disagg_type = dplyr::case_when(
-        indicator_code == "PrEP_CT.T2" & !is.na(valid_kps.name) ~ "KeyPop",
-        indicator_code == "PrEP_NEW.T2" &
-          !is.na(valid_kps.name) ~ "KeyPop",
-        indicator_code == "TX_PVLS.N.Routine.T2" &
-          !is.na(valid_kps.name) ~ "KeyPop/HIVStatus",
-        indicator_code == "TX_PVLS.D.Routine.T2" &
-          !is.na(valid_kps.name) ~ "KeyPop/HIVStatus",
-        indicator_code == "HTS_RECENT.T2" &
-          !is.na(valid_kps.name) ~ "KeyPop/HIVStatus",
-        indicator_code == "TX_NEW.T2" &
-          !is.na(valid_kps.name) ~ "KeyPop/HIVStatus",
-        indicator_code == "TX_CURR.T2" &
-          !is.na(valid_kps.name) ~ "KeyPop/HIVStatus",
-        TRUE ~ disagg_type
-      )
-    ) %>%
-    dplyr::left_join(
-      map_year1_des_cocs,
-      by = c(
-        "dataelementuid",
-        "valid_ages.name",
-        "valid_sexes.name",
-        "valid_kps.name",
-        "resultstatus",
-        "disagg_type"
-      )
-    ) %>%
-    #Deal with duplications in OVC_SERV
-    dplyr::mutate(
-      is_invalid = dplyr::case_when(
-        dataelementuid == "cx8hxarh4Ke" & valid_ages.name != "18+" ~ TRUE,
-        dataelementuid == "HVzzfyVVIs1" &
-          valid_ages.name == "18+" ~ TRUE,
-        TRUE ~ FALSE
-      )
-    ) %>%
-    dplyr::filter(!is_invalid)
-
+        "valid_kps.name"))
 
   #No data should have any missing data element uids or category option combo
   #uids at this poinbt
   d <- y2ExtractInvalidDisaggs(d)
 
-  #Create the DATIM export file
-
+  # Create the DATIM export file ----
   d$datim$year2 <- d$data$Year2 %>%
     dplyr::mutate(
       orgUnit = d$info$country_uids,
-      period = paste0(as.numeric(d$info$cop_year) + 1, "Oct"),
       attributeOptionCombo = default_catOptCombo()
     ) %>%
     dplyr::select(
