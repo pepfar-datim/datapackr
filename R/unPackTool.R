@@ -32,6 +32,11 @@ unPackTool <- function(submission_path = NULL,
   if (d$info$tool == "Data Pack") {
     d <- unPackDataPack(d,
                         d2_session = d2_session)
+
+    if (d$info$cop_year == "2023") {
+      d <- unpackYear2Sheet(d)
+    }
+
   } else if (d$info$tool == "OPU Data Pack") {
     d <- unPackOPUDataPack(d,
                            d2_session = d2_session)
