@@ -19,7 +19,7 @@ with_mock_api({
       packForDATIM(., type = "SUBNAT_IMPATT")
 
     expect_named(d,
-                 c("keychain", "info", "tests", "sheets", "data", "datim"),
+                 c("keychain", "info",  "sheets", "data", "datim"),
                  ignore.order = TRUE)
 
     d %<>% createAnalytics(d2_session = training)
