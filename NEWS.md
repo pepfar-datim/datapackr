@@ -23,7 +23,6 @@
 * Disabled two unit tests for COP21.
 * Altered test method from devtools::check to devtools::test, which skips CRAN package checks.
 
-
 # datapackr 6.1.1
 
 ## Breaking changes
