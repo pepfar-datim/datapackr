@@ -2,7 +2,7 @@ context("test-get-datapack-name")
 
 test_that("Can read a Datapack Name and UIDs", {
   template_copy <- paste0(tempfile(), ".xlsx")
-  file.copy(from = test_sheet("COP21_Data_Pack_Template.xlsx"), to = template_copy)
+  file.copy(from = getTemplate("COP23_Data_Pack_Template.xlsx"), to = template_copy)
   foo <- unPackDataPackName(submission_path = template_copy,
                           "Data Pack")
   expect_equal(foo, "Lesotho")
@@ -14,7 +14,7 @@ test_that("Can read a Datapack Name and UIDs", {
 
 test_that("Can error on an invalid regional DataPack UID", {
   template_copy <- paste0(tempfile(), ".xlsx")
-  file.copy(from = test_sheet("COP21_Data_Pack_Template.xlsx"), to = template_copy)
+  file.copy(from = getTemplate("COP23_Data_Pack_Template.xlsx"), to = template_copy)
   wb <- openxlsx::loadWorkbook(template_copy)
 
   home_address <- cellranger::as.cell_addr(countryUIDs_homeCell(), strict = FALSE)
@@ -24,13 +24,13 @@ test_that("Can error on an invalid regional DataPack UID", {
   openxlsx::saveWorkbook(wb = wb, file = template_copy, overwrite = TRUE)
   expect_error(unPackCountryUIDs(submission_path = template_copy,
                                                tool = "Data Pack",
-                                               cop_year = 2021))
+                                               cop_year = 2023))
   unlink(template_copy)
 })
 
-test_that("Can read a COP21 OPU DataPack name and country_uid", {
+test_that("Can read a COP22 OPU DataPack name and country_uid", {
   template_copy <- paste0(tempfile(), ".xlsx")
-  file.copy(from = test_sheet("COP21_OPU_Data_Pack_Template.xlsx"), to = template_copy)
+  file.copy(from = getTemplate("COP22_OPU_Data_Pack_Template.xlsx"), to = template_copy)
 
   foo <- unPackDataPackName(submission_path = template_copy,
                           "OPU Data Pack")
@@ -42,21 +42,21 @@ test_that("Can read a COP21 OPU DataPack name and country_uid", {
   unlink(template_copy)
 })
 
-test_that("Can parse valid PSNU UIDs for COP21 OPU Datapack", {
+test_that("Can parse valid PSNU UIDs for COP23 OPU Datapack", {
   template_copy <- paste0(tempfile(), ".xlsx")
-  file.copy(from = test_sheet("COP21_OPU_Data_Pack_Template.xlsx"), to = template_copy)
+  file.copy(from = getTemplate("COP22_OPU_Data_Pack_Template.xlsx"), to = template_copy)
   wb <- openxlsx::loadWorkbook(template_copy)
 
   openxlsx::writeData(wb = wb, sheet = "PSNUxIM",
-                      x = "Lesotho >Berea [#SNU] [wpg5evyl1OL]",
+                      x = "Lesotho > Berea [#SNU] [wpg5evyl1OL]",
                       startCol = 1,
                       startRow = 15)
 
   openxlsx::saveWorkbook(wb = wb, file = template_copy, overwrite = TRUE)
-  foo <- parsePSNUs(template_copy, "OPU Data Pack", "2021")
+  foo <- parsePSNUs(template_copy, "OPU Data Pack", "2022")
   expect_equal(typeof(foo), "list")
   expect_setequal(names(foo), c("PSNU", "psnu_uid", "country_name", "country_uid"))
-  expect_equal(foo$PSNU, "Lesotho >Berea [#SNU] [wpg5evyl1OL]")
+  expect_equal(foo$PSNU, "Lesotho > Berea [#SNU] [wpg5evyl1OL]")
   expect_equal(foo$psnu_uid, "wpg5evyl1OL")
   expect_equal(foo$country_name, "Lesotho")
   expect_equal(foo$country_uid, "qllxzIjjurr")
@@ -64,9 +64,9 @@ test_that("Can parse valid PSNU UIDs for COP21 OPU Datapack", {
 })
 
 
-test_that("Can error on  invlid PSNU UIDs for COP21 OPU Datapack", {
+test_that("Can error on  invlid PSNU UIDs for COP22 OPU Datapack", {
   template_copy <- paste0(tempfile(), ".xlsx")
-  file.copy(from = test_sheet("COP21_OPU_Data_Pack_Template.xlsx"), to = template_copy)
+  file.copy(from = getTemplate("COP22_OPU_Data_Pack_Template.xlsx"), to = template_copy)
   wb <- openxlsx::loadWorkbook(template_copy)
 
   openxlsx::writeData(wb = wb, sheet = "PSNUxIM",
@@ -75,7 +75,7 @@ test_that("Can error on  invlid PSNU UIDs for COP21 OPU Datapack", {
                       startRow = 15)
 
   openxlsx::saveWorkbook(wb = wb, file = template_copy, overwrite = TRUE)
-  expect_error(parsePSNUs(template_copy, "OPU Data Pack", "2021"))
+  expect_error(parsePSNUs(template_copy, "OPU Data Pack", "2022"))
 
   unlink(template_copy)
 })

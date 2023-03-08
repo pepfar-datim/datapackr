@@ -2,6 +2,21 @@
 # metadata, then combines this with the Data Pack schema to create a full map between
 # Data Packs and DATIM for the purpose of generating import and analytics tables.
 
+# For new `Year 2` data, this file assumes:
+#
+# - All positives within modalities have already been multiplied against total
+#   positives to make integers.
+#
+# - EID is already split into separate rows for each of <2 & 2-12 months
+#
+# - EID & KP indicator_codes first use their overarching Age/Sex indicator code
+#   equivalents, then are suffixed with `.EID.2`, `.EID.12`, or `.KP`.
+#
+# - OVC_SERV have already been tagged with correct dataElements (Caregivers, vs. OVC)
+#
+# - OVC_HIVSTAT has already been aggregated to have no age/sex disaggregation.
+
+
 # Point to DATIM login secrets ####
 secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
 datimutils::loginToDATIM(secrets)
@@ -11,14 +26,22 @@ cop_year <- 2023
 datasets_to_pull <- tibble::tribble(
   ~dataset_uid, ~dataset_name, ~FY, ~targets_results, ~datastream, ~org_unit,
   "dA9C5bL44NX", "FY24 MER Targets", 2024, "targets", "mer", "psnu",
+  "dA9C5bL44NX", "FY25 MER Targets", 2025, "targets", "mer", "psnu",
   "vpDd67HlZcT", "FY24 DREAMS Targets", 2024, "targets", "dreams", "dsnu",
+  "vpDd67HlZcT", "FY25 DREAMS Targets", 2025, "targets", "dreams", "dsnu",
+  # For all FY25 SUBNAT/IMPATT, mimic FY24
   "kWKJQYP1uT7", "FY25 IMPATT", 2025, "targets", "impatt", "psnu",
   "kWKJQYP1uT7", "FY24 IMPATT", 2024, "targets", "impatt", "psnu",
-  "CxMsvlKepvE", "FY23 IMPATT", 2023, "targets", "impatt", "psnu",
+  # For all FY23 SUBNAT/IMPATT, remap to FY24 disaggs, as these won't go to
+  #   DATIM, but must go to PAW alongside FY24.
+  "kWKJQYP1uT7", "FY23 IMPATT", 2023, "targets", "impatt", "psnu",
   "bKSmkDP5YTc", "FY25 SUBNAT Targets", 2025, "targets", "subnat", "psnu",
   "bKSmkDP5YTc", "FY24 SUBNAT Targets", 2024, "targets", "subnat", "psnu",
-  "J4tdiDEi08O", "FY23 SUBNAT Targets", 2023, "targets", "subnat", "psnu",
-  "IXiORiVFqIv", "FY22 SUBNAT Results", 2022, "results", "subnat", "psnu")
+  "bKSmkDP5YTc", "FY23 SUBNAT Targets", 2023, "targets", "subnat", "psnu",
+  # May not be able to map FY22 SUBNAT Results, since these are results instead
+  #   of Targets
+  #"IXiORiVFqIv", "FY22 SUBNAT Results", 2022, "results", "subnat", "psnu")
+)
 
 # Test that all dataSet uids are valid ----
 dataSetUIDs <- datimutils::getMetadata(dataSets, d2_session = d2_session)
@@ -89,14 +112,107 @@ fullCodeList %<>%
 
 
 # Prep Data Pack schema for mapping ####
-dp_map <- pick_schema(2023, "Data Pack") %>%
+dp_map <- pick_schema(cop_year, "Data Pack") %>%
   dplyr::filter((col_type == "target" & dataset %in% c("mer", "subnat", "impatt"))
                 | dataset == "subnat" & col_type == "result",
                 !is.na(FY)) %>%
   dplyr::select(sheet_name, indicator_code, dataset, col_type, value_type,
                 dataelement_dsd, dataelement_ta,
                 categoryoption_specified, valid_ages, valid_sexes, valid_kps,
-                FY, period) %>%
+                FY, period)
+
+# Prep Year 2 data ----
+Year2 <- dp_map %>%
+  dplyr::filter(sheet_name == "Year 2") %>%
+
+## Handle unique KP & EID data ----
+  # KP
+  tidyr::separate_wider_regex(
+    dataelement_dsd,
+    c(dataelement_dsd = ".*",
+      "\\.\\{KP\\}",
+      dataelement_dsd_KP = ".*"),
+    too_few = "align_start") %>%
+  tidyr::separate_wider_regex(
+     categoryoption_specified,
+    c(categoryoption_specified = ".*",
+      "\\.\\{KP\\}",
+      categoryoption_specified_KP = ".*"),
+    too_few = "align_start") %>%
+
+  # EID
+  tidyr::separate_wider_regex(
+    dataelement_dsd,
+    c(dataelement_dsd = ".*",
+      "\\{EID\\}",
+      dataelement_dsd_EID = ".*"),
+    too_few = "align_start") %>%
+  tidyr::separate_wider_regex(
+    categoryoption_specified,
+    c(categoryoption_specified = ".*",
+      "\\{EID\\}",
+      categoryoption_specified_EID = ".*"),
+    too_few = "align_start")
+
+  # Remove empty string written where nothing left after removing KP & EID
+Year2$dataelement_dsd[Year2$dataelement_dsd == ""] <- NA
+Year2$categoryoption_specified[Year2$categoryoption_specified == ""] <- NA
+
+  # Split KP, Age/Sex, EID into separate rows
+
+empty <- list(tibble::tribble(
+  ~name, ~id,
+  NA_character_, NA_character_))
+
+  ## KP
+Year2_KP <- Year2 %>%
+  dplyr::filter(!is.na(dataelement_dsd_KP)) %>%
+  dplyr::select(-dataelement_dsd, -dataelement_dsd_EID,
+                -categoryoption_specified, -categoryoption_specified_EID) %>%
+  dplyr::rename(dataelement_dsd = dataelement_dsd_KP,
+                categoryoption_specified = categoryoption_specified_KP) %>%
+  dplyr::mutate(valid_ages = empty,
+                valid_sexes = empty,
+                indicator_code = paste0(indicator_code, ".KP"))
+
+  ## EID
+Year2_EID <- Year2 %>%
+  dplyr::filter(!is.na(dataelement_dsd_EID)) %>%
+  dplyr::select(-dataelement_dsd, -dataelement_dsd_KP,
+                -categoryoption_specified, -categoryoption_specified_KP) %>%
+  dplyr::rename(dataelement_dsd = dataelement_dsd_EID,
+                categoryoption_specified = categoryoption_specified_EID) %>%
+  dplyr::mutate(valid_ages = empty,
+                valid_sexes = empty,
+                valid_kps = empty,
+                indicator_code = paste0(indicator_code, ".EID")) %>%
+  tidyr::separate_longer_delim(categoryoption_specified, ".") %>%
+  dplyr::mutate(
+    indicator_code =
+      dplyr::case_when(
+        categoryoption_specified == "J4SQd7SnDi2" ~ paste0(indicator_code, ".2"),
+        categoryoption_specified == "pbXCUjm50XK" ~ paste0(indicator_code, ".12"),
+        TRUE ~ categoryoption_specified))
+
+  ## Recombine
+Year2 %<>%
+  dplyr::select(-dataelement_dsd_EID, -dataelement_dsd_KP,
+                -categoryoption_specified_EID,
+                -categoryoption_specified_KP) %>%
+  dplyr::filter(!is.na(dataelement_dsd)) %>%
+  dplyr::mutate(
+    valid_kps = dplyr::case_when(
+      indicator_code == "KP_PREV.T2" ~ valid_kps,
+      TRUE ~ empty)) %>%
+  dplyr::bind_rows(Year2_KP, Year2_EID)
+
+dp_map %<>%
+  dplyr::filter(sheet_name != "Year 2") %>%
+  dplyr::bind_rows(Year2)
+
+
+## Unfold Age, Sex, KP disaggs ----
+dp_map %<>%
   tidyr::unnest(cols = valid_ages, names_sep  = ".") %>%
   tidyr::unnest(cols = valid_sexes, names_sep  = ".") %>%
   tidyr::unnest(cols = valid_kps, names_sep  = ".") %>%
@@ -128,10 +244,11 @@ dp_map %<>%
 
 ## Allow aggregation of OVC_HIVSTAT ####
 dp_map %<>%
-  dplyr::mutate_at(c("valid_ages.name", "valid_ages.id", "valid_sexes.name", "valid_sexes.id"),
-                   ~dplyr::case_when(indicator_code == "OVC_HIVSTAT.T"
-                                     ~ NA_character_,
-                                     TRUE ~ .)) %>%
+  dplyr::mutate_at(
+    c("valid_ages.name", "valid_ages.id", "valid_sexes.name", "valid_sexes.id"),
+    ~dplyr::case_when(indicator_code %in% c("OVC_HIVSTAT.T", "OVC_HIVSTAT.T2")
+                      ~ NA_character_,
+                      TRUE ~ .)) %>%
   dplyr::distinct()
 
 ## Combine all categoryOptions into a joinable list. ####
@@ -171,7 +288,7 @@ dp_map %<>%
 # Join Full Code List with Schema ####
 dp_map %<>%
   dplyr::select(-dataset) %>%
-  dplyr::full_join(fullCodeList,
+  dplyr::inner_join(fullCodeList,
                    by = c("dataelementuid" = "dataelementuid",
                           "categoryOptions.ids" = "categoryOptions.ids",
                           "period" = "period",
@@ -339,14 +456,7 @@ compare_diffs <- datapackr::cop23_map_DataPack_DATIM_DEs_COCs %>%
 
 waldo::compare(datapackr::cop23_map_DataPack_DATIM_DEs_COCs, dp_map)
 
-# Expected changes from COP21:
-# - finer age bands on DATIM side for TX_CURR only
-# - finer age bands on DP side, mapped to 50+ on DATIM side
-# - PrEP_CT instead of PrEP_CURR
-# - New SNS modality in HTS_TST and HTS_RECENT
-# - No need to remap PMTCT_STAT_SUBNAT in weird ways
-# - AGYW_PREV listed as "dreams" dataset instead of "mer"
-# - Updates to DEGS for HTS modalities and top level to reflect FY23 targets changes
+
 
 cop23_map_DataPack_DATIM_DEs_COCs <- dp_map
 save(cop23_map_DataPack_DATIM_DEs_COCs, file = "./data/cop23_map_DataPack_DATIM_DEs_COCs.rda", compress = "xz")

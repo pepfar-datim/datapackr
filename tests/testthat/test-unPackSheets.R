@@ -3,7 +3,7 @@ context("test-unPackSheets")
 
 test_that("Can load sheets if empty ...", {
 
-  d  <- loadDataPack(submission_path = test_sheet("COP21_Data_Pack_Template.xlsx"),
+  d  <- loadDataPack(submission_path = test_sheet("COP22_Data_Pack_Template_minimal.xlsx"),
                      tool = "Data Pack",
                      country_uids = NULL,
                      cop_year = NULL,
@@ -14,7 +14,7 @@ test_that("Can load sheets if empty ...", {
   d <- unPackSheets(d)
   # when d$sheets is explicitly NULL, unPackSheets should call
   # loadSheets and therefore fix the NULL value
-  testthat::expect_equal(length(d$sheets), 18)
+  testthat::expect_equal(length(d$sheets), 17)
 
 })
 
@@ -43,9 +43,9 @@ test_that("Can test sheets are valid...", {
       "Lilongwe District [#SNU] [ScR9iFKAasW]", "20"
     )
 
-  # TODO: need to figure out right warning equivalent
-  # test that interactive warning is produced
-  # couldn't match warning perfectly so expectation is some warning
-  testthat::expect_warning(unPackSheets(d, check_sheets = FALSE, sheets = c("Prioritization", "Cascade")))
+  #We need to pretend we are interactive to get this warning, otherwise, its
+  #silent
+  options(rlang_interactive = TRUE)
+  expect_warning(unPackSheets(d, check_sheets = FALSE, sheets = c("Prioritization", "Cascade")))
 
 })

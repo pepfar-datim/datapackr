@@ -145,11 +145,12 @@ checkSchema_InvalidColType <- function(schema, tool, cop_year) {
   skip_sheets <- getSkipSheets(schema, tool, cop_year)
 
   col_type_invalid <- schema %>%
+    dplyr::filter(!(sheet_name %in% skip_sheets$names)) %>%
+    dplyr::filter(!is.na(col_type)) %>%
     dplyr::mutate(
       invalid_col_type =
         (!col_type %in% c("target", "reference", "assumption", "calculation", "past",
-                          "row_header", "allocation", "result"))
-      & (sheet_name %in% skip_sheets$names & !is.na(col_type))) %>%
+                          "row_header", "allocation", "result"))) %>%
     dplyr::filter(invalid_col_type == TRUE) %>%
     dplyr::select(sheet_name, col, indicator_code, data_structure, col_type)
 
@@ -162,10 +163,10 @@ checkSchema_InvalidValueType <- function(schema, tool, cop_year) {
   skip_sheets <- getSkipSheets(schema, tool, cop_year)
 
   value_type_invalid <- schema %>%
-    dplyr::mutate(
-      invalid_value_type =
-        (!value_type %in% c("integer", "percentage", "string"))
-      & (sheet_name %in% skip_sheets$names & !is.na(value_type))) %>%
+    dplyr::filter(!(sheet_name %in% skip_sheets$names)) %>%
+    dplyr::filter(!is.na(value_type)) %>%
+      dplyr::mutate(
+      invalid_value_type = !(value_type %in% c("integer", "percentage", "string"))) %>%
     dplyr::filter(invalid_value_type == TRUE) %>%
     dplyr::select(sheet_name, col, indicator_code, value_type)
 

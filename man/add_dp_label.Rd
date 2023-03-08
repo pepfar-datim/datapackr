@@ -4,10 +4,13 @@
 \alias{add_dp_label}
 \title{Modify Data Pack Org Unit list to add datapackr IDs.}
 \usage{
-add_dp_label(orgunits)
+add_dp_label(orgunits, cop_year)
 }
 \arguments{
 \item{orgunits}{Data frame of Data Pack org units produced by \code{\link{getDataPackOrgUnits}}.}
+
+\item{cop_year}{COP Year. For COP years less than 2023,
+the organisation unit type will be added to tbe DP label}
 }
 \value{
 Data frame of Data Pack Org units with added Data Pack label, \code{dp_label}.

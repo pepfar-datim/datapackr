@@ -136,11 +136,9 @@ unPackCountryUIDs <- function(submission_path,
                             ~ .x %in% country_uids))) {
       warning("Deduced or provided Country UIDs do no match Country UIDs observed in submission.")
     }
-  } else {
-    warning("No PSNUs were detected.")
   }
 
-  return(country_uids)
+  country_uids
 
 }
 

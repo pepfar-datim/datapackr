@@ -7,6 +7,7 @@
 packDataPack(
   d,
   model_data = NULL,
+  spectrum_data = NULL,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }

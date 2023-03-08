@@ -134,7 +134,9 @@ adorn_import_file <- function(psnu_import_file,
       unique()
 
     if (length(unknown_psnu) > 0) {
-      psnus <- getPSNUInfo(unknown_psnu, d2_session = d2_session) %>%
+      psnus <- getPSNUInfo(snu_uids = unknown_psnu,
+                           cop_year = cop_year,
+                           d2_session = d2_session) %>%
         dplyr::select(-name)
 
       psnu_import_file %<>%
