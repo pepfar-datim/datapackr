@@ -1,14 +1,15 @@
 # datapackr 6.2.0
 
 ## Breaking changes
+* Initial compatibility & tests created in relation to COP23
 
 ## New features
 * 
 
 ## Minor improvements and fixes
-* 
-* 
-*  
+* Numerous metadata updates across multiple tabs and columns.
+* Year 2 tab updates
+* Unit tests to cover new functionality
 
 
 # datapackr 6.1.1
