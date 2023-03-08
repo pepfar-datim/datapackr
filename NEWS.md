@@ -1,3 +1,28 @@
+# datapackr 6.2.0
+
+## Breaking changes
+* Removed support for COP21
+
+## New features
+* Added  initial support for parsing COP23 Datapacks
+* Added functionality to export COP23 data to export formats
+* Added function writeSpectrumData which can be used to populate the DataPack Spectrum tab during testing.
+* Added testing helper functions to deal with peculiarities of the CI testing environment.
+* Added various tests and testing files for COP23 tools.
+* Adds initial parsing methods for COP23 Year2 tabs
+
+
+## Minor improvements and fixes
+* Upgraded CI testing environment to R 4.2.1
+* Fixed bug in unPackSchemarelated to detecting invalid column and value types.
+* Fixed create schema unit test.
+* Removed superfluous warning related to missing PSNUs.
+* Fixed issue in unPackingChecks related to the lack of the SNU1 column in COP23 tools.
+* Fixed a testing issue related to choosing the correct template to use for testing.
+* Updated several unit tests to favor COP23 over COP21.
+* Disabled two unit tests for COP21.
+* Altered test method from devtools::check to devtools::test, which skips CRAN package checks.
+
 # datapackr 6.1.1
 
 ## Breaking changes
