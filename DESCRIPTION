@@ -1,8 +1,8 @@
 Package: datapackr
 Type: Package
 Title: A Package that Packs and Unpacks all Data Packs and Target Setting Tools
-Version: 6.1.1
-Date: 2023-02-14
+Version: 6.2.0
+Date: 2023-03-08
 Authors@R: c(
     person("Scott", "Jackson", email = "sjackson@baosystems.com",
         role = c("aut", "cre")),

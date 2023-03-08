@@ -1,3 +1,16 @@
+# datapackr 6.2.0
+
+## Breaking changes
+
+## New features
+* 
+
+## Minor improvements and fixes
+* 
+* 
+*  
+
+
 # datapackr 6.1.1
 
 ## Breaking changes
