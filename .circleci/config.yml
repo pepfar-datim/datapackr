@@ -3,7 +3,7 @@ description: Datapackr Test Suite
 jobs:
   build:
     docker:
-      - image: rocker/verse:4.1.1
+      - image: rocker/verse:4.2.1
     steps:
       - checkout
       - restore_cache:
@@ -12,7 +12,7 @@ jobs:
           name: Install curl sytem deps
           command: |
             sudo apt-get update
-            sudo apt-get -qq -y install libcurl4-openssl-dev libxml2-dev libsodium-dev libgit2-dev libreoffice-calc-nogui
+            sudo apt-get -qq -y install libcurl4-openssl-dev libxml2-dev libsodium-dev libgit2-dev libreoffice-calc-nogui libicu-dev
       - run:
           name: Install package dependencies
           command: R -e "install.packages(c('renv','rlang'))"
@@ -30,7 +30,7 @@ jobs:
           name: Test package
           no_output_timeout: 30m
           command: |
-            R -e "devtools::check(error_on='error')"
+            R -e "devtools::test(stop_on_failure = TRUE, error_on='error')"
       - run:
           name: Lint packages
           command: |

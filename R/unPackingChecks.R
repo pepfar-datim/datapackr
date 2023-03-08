@@ -778,9 +778,15 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
 
   valid_orgunits_local <- getValidOrgUnits(d$info$cop_year)
 
+  #There may be some variation in the columns between cop years
+  cols_to_filter <- switch(as.character(d$info$cop_year),
+                           "2021" = c("SNU1", "PSNU", "Age", "Sex"),
+                           "2022" = c("SNU1", "PSNU", "Age", "Sex"),
+                           "2023" = c("PSNU", "Age", "Sex"))
+
   invalid_orgunits <- d$sheets[sheets] %>%
     dplyr::bind_rows(.id = "sheet_name") %>%
-    dplyr::filter(dplyr::if_any(c("SNU1", "PSNU", "Age", "Sex"), ~!is.na(.))) %>%
+    dplyr::filter(dplyr::if_any(cols_to_filter, ~ !is.na(.))) %>%
     dplyr::select(sheet_name, PSNU) %>%
     dplyr::distinct() %>%
     dplyr::mutate(snu_uid = extract_uid(PSNU)) %>%

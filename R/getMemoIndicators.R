@@ -41,6 +41,7 @@ getMemoIndicators <- function(cop_year,
   ind_group <- switch(as.character(cop_year),
                       "2021" = "TslxbFe3VUZ",
                       "2022" = "zRApVEi7qjo",
+                      "2023" = "ZTGhB3qIPsi",
                       NULL)
   #Bail out early if don't have a group
   if (is.null(ind_group)) {

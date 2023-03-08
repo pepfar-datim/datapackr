@@ -51,8 +51,10 @@ unPackDataPack <- function(d,
   d <- unPackSheets(d)
 
   # Unpack the SNU x IM sheet ####
-  interactive_print("Unpacking the PSNUxIM tab...")
-  d <- unPackSNUxIM(d)
+  if (d$info$cop_year < 2023) {
+    interactive_print("Unpacking the PSNUxIM tab...")
+    d <- unPackSNUxIM(d)
+  }
 
   # Prepare undistributed import file for use in analytics if necessary ####
   # TODO: Allow packForDATIM to auto-detect what is present and what should be packed.

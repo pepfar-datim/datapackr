@@ -28,7 +28,10 @@ unPackSheets <- function(d,
     d <- loadSheets(d)
   }
 
-  sheets <- sheets %||% grep("PSNUxIM", names(d$sheets), value = TRUE, invert = TRUE)
+  #TODO: Fix this
+  sheet_names <- names(d$sheets)[names(d$sheets) != "Year 2"]
+
+  sheets <- sheets %||% grep("PSNUxIM", sheet_names, value = TRUE, invert = TRUE)
 
   sheets <- checkSheets(sheets = sheets,
                         cop_year = d$info$cop_year,

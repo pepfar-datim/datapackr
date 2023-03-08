@@ -4,7 +4,7 @@ require(jsonlite)
 require(purrr)
 require(dplyr)
 require(magrittr)
-
+#
 # paste0("https://www.datim.org/api/validationRules.json?
 #        filter=name:like:TARGET&fields=id,name,periodType,description,operator,
 #        leftSide[expression,missingValueStrategy],
@@ -47,11 +47,11 @@ processValidationRules <- function(r) {
 }
 
 
-cop21 <- processValidationRules("./data-raw/cop21_validation_rules.json")
-cop22 <- processValidationRules("./data-raw/cop22_validation_rules.json") %>%
+cop21 <- processValidationRules("./data-raw/COP21/cop21_validation_rules.json")
+cop22 <- processValidationRules("./data-raw/COP22/cop22_validation_rules.json") %>%
   dplyr::filter(id != "h6ACV56qnvz") # Patch for DP-552
+cop23 <- processValidationRules("./data-raw/COP23/cop23_validation_rules.json")
 
-
-cop_validation_rules <- list("2021" = cop21, "2022" = cop22)
+cop_validation_rules <- list("2021" = cop21, "2022" = cop22, "2023" = cop23)
 
 usethis::use_data(cop_validation_rules, overwrite = TRUE)

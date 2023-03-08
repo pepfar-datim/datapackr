@@ -9,10 +9,11 @@ HTS_POS_Modalities <- function(cop_year) {
     # a reference to the cop year. Since the modalities
     # differ from year to year though, this list needs
     # to be determined based on the year we are dealing with.
+    # TODO:
 
     datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year) %>%
     dplyr::select(indicator_code, hts_modality, resultstatus) %>%
-    dplyr::filter(!is.na(hts_modality)) %>%
+    tidyr::drop_na() %>%
     dplyr::filter(resultstatus %in% c("Newly Tested Positives", "Positive")) %>%
     dplyr::distinct() %>%
     dplyr::pull(indicator_code)
@@ -29,7 +30,18 @@ HTS_POS_Modalities <- function(cop_year) {
 #' @return a
 #'
 analyze_eid_2mo <- function(data) {
+
   a <- NULL
+
+  required_names <- c("PMTCT_EID.N.12.T",
+                      "PMTCT_EID.N.2.T")
+
+  if (any(!(required_names %in% names(data)))) {
+    a$test_results <- data.frame(msg = "Missing data.")
+    attr(a$test_results, "test_name") <- "PMTCT_EID coverage by 2 months issues"
+    a$msg <- "Could not analyze PMTCT EID due to missing data."
+    return(a)
+  }
 
   analysis <- data %>%
     dplyr::mutate(
@@ -100,7 +112,18 @@ analyze_eid_2mo <- function(data) {
 #' @return a
 #'
 analyze_vmmc_indeterminate <- function(data) {
+
   a <- NULL
+  required_names <- c("VMMC_CIRC.Pos.T",
+                      "VMMC_CIRC.Neg.T",
+                      "VMMC_CIRC.Unk.T")
+
+  if (any(!(required_names %in% names(data)))) {
+    a$test_results <- data.frame(msg = "Missing data.")
+    attr(a$test_results, "test_name") <- "VMMC Indeterminate rate issues"
+    a$msg <- "Could not analyze VMMC_CIRC Indeterminate Rate due to missing data."
+    return(a)
+  }
 
   issues <- data %>%
     dplyr::mutate(
@@ -185,6 +208,17 @@ analyze_vmmc_indeterminate <- function(data) {
 analyze_pmtctknownpos <- function(data) {
   a <- NULL
 
+  required_names <- c("PMTCT_STAT.N.New.Pos.T",
+                      "PMTCT_STAT.N.KnownPos.T",
+                      "PMTCT_STAT.N.New.Neg.T")
+
+  if (any(!(required_names %in% names(data)))) {
+    a$test_results <- data.frame(msg = "Missing data.")
+    attr(a$test_results, "test_name") <- "PMTCT Known Pos issues"
+    a$msg <- "Could not analyze PMTCT Known Pos issues due to missing data."
+    return(a)
+  }
+
   issues <- data %>%
     dplyr::filter(is.na(key_population)) %>%
     dplyr::mutate(
@@ -243,6 +277,17 @@ analyze_pmtctknownpos <- function(data) {
 analyze_tbknownpos <- function(data) {
   a <- NULL
 
+  required_names <- c("TB_STAT.N.New.Pos.T",
+                      "TB_STAT.N.KnownPos.T",
+                      "TB_STAT.N.New.Neg.T")
+
+  if (any(!(required_names %in% names(data)))) {
+    a$test_results <- data.frame(msg = "Missing data.")
+    attr(a$test_results, "test_name") <- "TB Known Pos issues"
+    a$msg <- "Could not analyze TB Known Pos issues due to missing data."
+    return(a)
+  }
+
   issues <- data %>%
     dplyr::mutate(
       TB_STAT.N.Total =
@@ -296,6 +341,18 @@ analyze_tbknownpos <- function(data) {
 #'
 analyze_retention <- function(data) {
   a <- NULL
+
+
+  required_names <- c("TX_CURR.T",
+                      "TX_CURR.T_1",
+                      "TX_NEW.T")
+
+  if (any(!(required_names %in% names(data)))) {
+    a$test_results <- data.frame(msg = "Missing data.")
+    attr(a$test_results, "test_name") <- "Retention rate issues"
+    a$msg <- "Could not analyze Retention rate issues due to missing data."
+    return(a)
+  }
 
   analysis <- data %>%
     #For COP22, we need to collapse the finer 50+ age bands back to 50+
@@ -377,7 +434,19 @@ analyze_retention <- function(data) {
 analyze_linkage <- function(data) {
   a <- NULL
 
+
   hts_modalities <- HTS_POS_Modalities(data$cop_year[1])
+
+  required_names <- c("TX_NEW.T", "TX_NEW.KP.T")
+
+  if (any(!(required_names %in% names(data)))) {
+    a$test_results <- data.frame(msg = "Missing data.")
+    attr(a$test_results, "test_name") <- "Linkage rate issues"
+    a$msg <- "Could not analyze Linkage rate issues due to missing data."
+    return(a)
+  }
+
+
 
   analysis <- data %>%
     dplyr::mutate(age = dplyr::case_when(age %in% c("50-54", "55-59", "60-64", "65+") ~ "50+",
@@ -473,7 +542,19 @@ analyze_linkage <- function(data) {
 #' @return a
 #'
 analyze_indexpos_ratio <- function(data) {
+
   a <- NULL
+  required_names <- c("HTS_INDEX_COM.New.Pos.T",
+                      "HTS_INDEX_FAC.New.Pos.T",
+                      "PLHIV.T_1",
+                      "TX_CURR_SUBNAT.T_1")
+
+  if (any(!(required_names %in% names(data)))) {
+    a$test_results <- data.frame(msg = "Missing data.")
+    attr(a$test_results, "test_name") <- "HTS_INDEX_POS Rate Issues"
+    a$msg <- "Could not analyze HTS_INDEX_POS Rate Issues due to missing data."
+    return(a)
+  }
 
   hts_modalities <- HTS_POS_Modalities(data$cop_year[1])
 
@@ -481,8 +562,7 @@ analyze_indexpos_ratio <- function(data) {
     dplyr::filter(is.na(key_population)) %>%
     dplyr::select(-age, -sex, -key_population) %>%
     dplyr::group_by(psnu, psnu_uid) %>%
-    dplyr::summarise(dplyr::across(dplyr::everything(), sum)) %>%
-    dplyr::ungroup() %>%
+    dplyr::summarise(dplyr::across(dplyr::everything(), sum), .groups = "drop") %>%
     dplyr::mutate(
       HTS_TST_POS.T = rowSums(dplyr::select(., tidyselect::any_of(hts_modalities))),
       HTS_INDEX.total =
@@ -541,7 +621,7 @@ analyze_indexpos_ratio <- function(data) {
         "\n")
   }
 
-  return(a)
+  a
 
 }
 
@@ -629,13 +709,12 @@ checkAnalytics <- function(d,
     addcols((d$info$schema %>%
                 dplyr::filter(col_type %in% c("target", "past"),
                               sheet_name != "PSNUxIM") %>%
-                dplyr::pull(indicator_code)),
+                dplyr::pull(indicator_code) %>%
+               unique(.)),
             type = "numeric") %>%
     dplyr::mutate(dplyr::across(c(-psnu, -psnu_uid, -age, -sex, -key_population),
                      ~tidyr::replace_na(.x, 0))) %>%
     dplyr::mutate(cop_year = d$info$cop_year)
-
-
 
   #Apply the list of analytics checks functions
   funs <- list(

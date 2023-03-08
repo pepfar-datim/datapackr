@@ -2,14 +2,14 @@ context("test-handshake")
 
 
 test_that("Can handshake template", {
-  d <- datapackr:::handshakeFile(path = test_sheet("COP21_Data_Pack_Template.xlsx"),
+  d <- datapackr:::handshakeFile(path = getTemplate("COP23_Data_Pack_Template.xlsx"),
                      tool = "Data Pack Template")
   expect_true(file.exists(d))
 })
 
 test_that("Can error on bad type", {
 
-  expect_error(datapackr:::handshakeFile(test_sheet("COP21_Data_Pack_Template.xlsx"),
+  expect_error(datapackr:::handshakeFile(getTemplate("COP23_Data_Pack_Template.xlsx"),
                    "Foo Template"),
                    "Please specify correct file type: Data Pack, Data Pack Template, OPU Data Pack Template.")
 
