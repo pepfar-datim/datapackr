@@ -914,8 +914,10 @@ getCriticalColumns <- function()  {
   cells <- tidyxl::xlsx_cells(template_file)
   formats <- formats <- tidyxl::xlsx_formats(template_file)
 
-  critical_columns <- cells %>%
-    filter(local_format_id %in% which(formats$local$fill$patternFill$fgColor$rgb == "FFFFFFFF")) %>%
+  grey_cells <- which(formats$local$fill$patternFill$fgColor$rgb == "FFFFFFFF")
+  critical_cols <- cells$local_format_id %in% grey_cells
+
+  critical_columns <- cells[critical_cols, ] %>%
     dplyr::filter(row == 3)  %>%
     dplyr::select(sheet_name = sheet, col) %>%
     dplyr::mutate(critical = "Y")
@@ -955,8 +957,7 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
     dplyr::mutate(
       formula = stringr::str_replace_all(formula,
                                          "(?<=[:upper:])\\d+",
-                                         "\\\\d+")) %>%
-    dplyr::select(sheet_num, sheet_name, col, indicator_code, fx_schema = formula)
+                                         "\\\\d+"))
 
    if (d$info$cop_year == "2022") {
      formulas_schema %<>% dplyr::mutate(critical =
@@ -968,7 +969,6 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
 
   if (d$info$cop_year == "2023") {
 
-
     critical_columns <- getCriticalColumns()
 
     formulas_schema <- formulas_schema %>%
@@ -979,6 +979,8 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
 
   }
 
+  formulas_schema %<>% dplyr::select(sheet_num, sheet_name, indicator_code, fx_schema = formula,
+                                     critical)
   # Pull in formulas from Data Pack sheet
   formulas_datapack <-
     tidyxl::xlsx_cells(path = d$keychain$submission_path,
