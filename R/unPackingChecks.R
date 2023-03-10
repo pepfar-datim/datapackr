@@ -917,7 +917,7 @@ getCriticalColumns <- function()  {
   critical_columns <- cells %>%
     filter(local_format_id %in% which(formats$local$fill$patternFill$fgColor$rgb == "FFFFFFFF")) %>%
     dplyr::filter(row == 3)  %>%
-    dplyr::select(sheet_name = sheet,col) %>%
+    dplyr::select(sheet_name = sheet, col) %>%
     dplyr::mutate(critical = "Y")
 
   critical_columns
@@ -956,7 +956,7 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
       formula = stringr::str_replace_all(formula,
                                          "(?<=[:upper:])\\d+",
                                          "\\\\d+")) %>%
-    dplyr::select(sheet_num, sheet_name,col, indicator_code, fx_schema = formula)
+    dplyr::select(sheet_num, sheet_name, col, indicator_code, fx_schema = formula)
 
    if (d$info$cop_year == "2022") {
      formulas_schema %<>% dplyr::mutate(critical =
@@ -972,7 +972,7 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
     critical_columns <- getCriticalColumns()
 
     formulas_schema <- formulas_schema %>%
-      dplyr::left_join(critical_columns, by = c("sheet_name","col")) %>%
+      dplyr::left_join(critical_columns, by = c("sheet_name", "col")) %>%
       dplyr::mutate(critical = dplyr::case_when(is.na(critical) ~ "N",
                                                 TRUE ~ critical)) %>%
       dplyr::select(-col)
