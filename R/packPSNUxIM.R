@@ -34,7 +34,7 @@ packPSNUxIM <- function(wb, # Workbook object
   rm(params, p)
 
   # if the cop year is not 2021 or 2022, stops and throws message. ####
-  stopifnot("Packing PSNU x IM tabs is not supported for the requested COP year." = cop_year %in% c(2021, 2022))
+  stopifnot("Packing PSNU x IM tabs is not supported for the requested COP year." = cop_year %in% c(2021, 2022, 2023))
 
   # Create data sidecar to eventually compile and return ####
   r <- list(
@@ -69,6 +69,9 @@ packPSNUxIM <- function(wb, # Workbook object
   map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year = cop_year,
                                                 datasource = tool)
 
+  if (cop_year == 2023) {
+    map_des_cocs %<>% dplyr::filter(!grepl("\\.T2$", indicator_code))
+  }
   ## Translate from import format ####
   snuxim_model_data %<>%
     datapackr::adorn_import_file(cop_year = cop_year, #adorn_import_file.R

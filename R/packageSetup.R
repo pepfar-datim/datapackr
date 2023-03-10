@@ -18,9 +18,9 @@ datapackrSupports <- function() {
   tibble::tribble(
     ~tool, ~yrs,
     "Data Pack", c(2021, 2022, 2023),
-    "OPU Data Pack", c(2021, 2022),
+    "OPU Data Pack", c(2021, 2022, 2023),
     "Data Pack Template", c(2021, 2022, 2023),
-    "OPU Data Pack Template", c(2021, 2022))
+    "OPU Data Pack Template", c(2021, 2022, 2023))
 }
 
 
@@ -202,7 +202,10 @@ pick_schema <- function(cop_year, tool) {
       schema <- datapackr::cop21OPU_data_pack_schema
     } else if (cop_year == 2022) {
       schema <- datapackr::cop22OPU_data_pack_schema
-    } else {
+    } else if (cop_year == 2023) {
+      schema <- datapackr::cop22OPU_data_pack_schema
+    }
+    else {
       stop("OPU Data Pack schema not available for the COP year provided.")
     }
   } else if (tool %in% c("Data Pack", "Data Pack Template")) {

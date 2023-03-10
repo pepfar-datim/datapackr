@@ -171,7 +171,8 @@ adorn_import_file <- function(psnu_import_file,
     # details can be found in adornMechanism.R
     getMechanismView(
       country_uids = unique(psnu_import_file$country_uid),
-      cop_year = cop_year,
+      #This was commented out due to lack of COP23 mechanisms
+      #cop_year = cop_year,
       include_dedupe = TRUE,
       include_MOH = TRUE,
       d2_session = d2_session,
