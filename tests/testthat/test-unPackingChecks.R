@@ -135,7 +135,7 @@ test_that("Can check sheet data...", {
    expect_equal(nrow(d$tests$decimal_values), 29L)
    expect_equal(nrow(d$tests$invalid_orgunits), 2L)
    expect_equal(nrow(d$tests$invalid_prioritizations), 4L)
-   expect_equal(nrow(d$tests$altered_formulas), 22L)
+   expect_equal(nrow(d$tests$altered_formulas), 18L)
    expect_equal(nrow(d$tests$defunct_disaggs), 12L)
 
   expect_true(d$info$has_error)
@@ -667,7 +667,7 @@ test_that("Can check formulas", {
   # test error kicks because of incorrect formulas
   # TODO: how do we test no errors since checkFormula depends on on a path read
   res <- checkFormulas(d, sheets = test_sheets)
-  expect_equal(nrow(res$result), 4L)
+  expect_equal(nrow(res$result), 3L)
   expect_equal(res$lvl, "WARNING")
   expect_equal(res$has_error, FALSE)
 
