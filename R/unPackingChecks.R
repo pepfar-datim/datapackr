@@ -905,6 +905,26 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = TRUE) {
 }
 
 
+#Extracts grey cells from Row3 for all sheets
+getCriticalColumns <- function()  {
+
+  template_file <- system.file("extdata/COP23_Data_Pack_Template.xlsx", package = "datapackr")
+
+  template <- readxl::read_excel(template_file)
+  cells <- tidyxl::xlsx_cells(template_file)
+  formats <- formats <- tidyxl::xlsx_formats(template_file)
+
+  grey_cells <- which(formats$local$fill$patternFill$fgColor$rgb == "FFFFFFFF")
+  critical_cols <- cells$local_format_id %in% grey_cells
+
+  critical_columns <- cells[critical_cols, ] %>%
+    dplyr::filter(row == 3)  %>%
+    dplyr::select(sheet_name = sheet, col) %>%
+    dplyr::mutate(critical = "Y")
+
+  critical_columns
+}
+
 
 #' @export
 #' @rdname unPackDataChecks
@@ -937,14 +957,30 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
     dplyr::mutate(
       formula = stringr::str_replace_all(formula,
                                          "(?<=[:upper:])\\d+",
-                                         "\\\\d+"),
-      critical =
-        dplyr::case_when(
-          indicator_code == "ID" | col_type == "target" ~ "Y",
-          TRUE ~ "N")) %>%
-    dplyr::select(sheet_num, sheet_name, indicator_code, fx_schema = formula,
-                  critical)
+                                         "\\\\d+"))
 
+   if (d$info$cop_year == "2022") {
+     formulas_schema %<>% dplyr::mutate(critical =
+       dplyr::case_when(
+         indicator_code == "ID" | col_type == "target" ~ "Y",
+         TRUE ~ "N")) %>%
+       dplyr::select(-col)
+   }
+
+  if (d$info$cop_year == "2023") {
+
+    critical_columns <- getCriticalColumns()
+
+    formulas_schema <- formulas_schema %>%
+      dplyr::left_join(critical_columns, by = c("sheet_name", "col")) %>%
+      dplyr::mutate(critical = dplyr::case_when(is.na(critical) ~ "N",
+                                                TRUE ~ critical)) %>%
+      dplyr::select(-col)
+
+  }
+
+  formulas_schema %<>% dplyr::select(sheet_num, sheet_name, indicator_code, fx_schema = formula,
+                                     critical)
   # Pull in formulas from Data Pack sheet
   formulas_datapack <-
     tidyxl::xlsx_cells(path = d$keychain$submission_path,
@@ -1000,7 +1036,8 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
     # purrr::when(sheet == "PSNUxIM" & d$info$tool == "Data Pack" ~ dplyr::rename(., indicator_code = indicator_code.y),
     #             ~ .) %>%
     dplyr::select(sheet_num, sheet_name, row, indicator_code,
-                  correct_fx = fx_schema, submitted_fx = formula, critical)
+                  correct_fx = fx_schema, submitted_fx = formula, critical) %>%
+    dplyr::filter(critical == "Y") #Ignore non-critical formulas
 
   if (NROW(altered_formulas) > 0) {
 
@@ -1011,7 +1048,6 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
       dplyr::mutate(fx_violations = paste0(indicator_code, ":  ", count))
 
     critical <- cols_affected[cols_affected$critical == "Y", ]
-    non_critical <- cols_affected[cols_affected$critical == "N", ]
 
     ch$msg <- unique(cols_affected$sheet_name) %>%
       purrr::set_names() %>%
@@ -1020,9 +1056,7 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
           paste0(
             ch$lvl, "! In tab ", x, ", ",
             sum(critical$count[critical$sheet_name == x]),
-            " CRITICAL ALTERED FORMULAS & ",
-            sum(non_critical$count[non_critical$sheet_name == x]),
-            " NON-CRITICAL ALTERED FORMULAS:",
+            " CRITICAL ALTERED FORMULAS",
             " Altering formulas in Grey colored columns without DUIT and PPM",
             " approval may lead to programmatic and technical issues in your Data ",
             " Pack. This warning may be triggered by deleting or overwriting a",
