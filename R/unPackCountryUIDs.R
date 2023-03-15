@@ -16,7 +16,7 @@ unPackCountryUIDs <- function(submission_path,
                               tool = "Data Pack",
                               cop_year) {
 
-  if (!tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack", "OPU Data Pack Template")) {
+  if (!tool %in% supportedTools()) {
     stop("Cannot unpack Country UIDs for that type of tool.")
   }
 
