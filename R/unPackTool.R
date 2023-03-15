@@ -37,7 +37,7 @@ unPackTool <- function(submission_path = NULL,
       d <- unpackYear2Sheet(d)
     }
 
-  } else if (d$info$tool == "OPU Data Pack") {
+  } else if (d$info$tool %in% c("OPU Data Pack", "PSNUxIM")) {
     d <- unPackOPUDataPack(d,
                            d2_session = d2_session)
   } else {

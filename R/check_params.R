@@ -282,6 +282,7 @@ check_tool <- function(tool, season, cop_year) {
 
   if (season_provided) {
     season %<>% check_season(season = ., tool = tool)
+
     if (cop_year == 2023) {
       deduced_tool <- switch(season, "OPU" = "PSNUxIM", "COP" = "Data Pack")
     } else {
@@ -303,6 +304,7 @@ check_tool <- function(tool, season, cop_year) {
 
   # No matter what, we now have a tool. If we also have season, use it to
   # validate tool type.
+  #TODO: This needs to be fixed, since PSNUxIM tabs are also valid in COP
   } else if (season_provided) {
     if (!tool %in% c(deduced_tool, paste0(deduced_tool, " Template"))) {
       interactive_message("That tool is not valid for that season.")
