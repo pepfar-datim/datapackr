@@ -16,7 +16,7 @@ packPSNUxIM <- function(wb, # Workbook object
                         snuxim_model_data,
                         org_units,
                         cop_year = NULL, # Cop year based on the file
-                        tool = "OPU Data Pack",
+                        tool = "PSNUxIM",
                         schema = NULL,
                         expand_formulas = FALSE,
                         d2_session = dynGet("d2_default_session",
