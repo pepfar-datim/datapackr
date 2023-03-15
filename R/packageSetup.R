@@ -18,9 +18,12 @@ datapackrSupports <- function() {
   tibble::tribble(
     ~tool, ~yrs,
     "Data Pack", c(2021, 2022, 2023),
-    "OPU Data Pack", c(2021, 2022, 2023),
+    "OPU Data Pack", c(2021, 2022),
     "Data Pack Template", c(2021, 2022, 2023),
-    "OPU Data Pack Template", c(2021, 2022, 2023))
+    "OPU Data Pack Template", c(2021, 2022),
+    "PSNUxIM", c(2023),
+    "PSNUxIM Template", c(2023))
+
 }
 
 
@@ -138,7 +141,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 
     skip$schema <- skip$pack[skip$pack %in% skip$unpack]
 
-  } else if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM Tool") &&
+  } else if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM", "PSNUxIM Template") &&
              cop_year %in% c(2021, 2022, 2023)) {
     skip$pack <- c("Home")
     skip$unpack <- c("Home")
@@ -159,17 +162,16 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 #'
 headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
 
+  #Currently all tools use row 14 as the header.
   if (cop_year %in% c(2021, 2022, 2023)) {
-    if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
-      header_row <- 14
+    if (tool %in% datapackrSupports()$tool) {
+      return(14)
     } else {
       stop("That tool type is not supported for that cop_year.")
       }
   } else {
     stop("That cop_year is not currently supported.")
   }
-
-  return(header_row)
 }
 
 #' @export
@@ -198,26 +200,24 @@ pick_schema <- function(cop_year, tool) {
   invisible(utils::capture.output(tool %<>% check_tool(tool = ., cop_year = cop_year)))
 
   if (tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
-    if (cop_year == 2021) {
-      schema <- datapackr::cop21OPU_data_pack_schema
-    } else if (cop_year == 2022) {
-      schema <- datapackr::cop22OPU_data_pack_schema
-    } else if (cop_year == 2023) {
-      schema <- datapackr::cop22OPU_data_pack_schema
-    }
-    else {
-      stop("OPU Data Pack schema not available for the COP year provided.")
-    }
+    schema <- switch(as.character(cop_year),
+                     "2021" =  cop21OPU_data_pack_schema,
+                     "2022" = cop22OPU_data_pack_schema,
+                     stop("OPU Data Pack schema not available for the COP year provided."))
+
   } else if (tool %in% c("Data Pack", "Data Pack Template")) {
-    if (cop_year == 2021) {
-      schema <- datapackr::cop21_data_pack_schema
-    } else if (cop_year == 2022) {
-      schema <- datapackr::cop22_data_pack_schema
-    } else if (cop_year == 2023) {
-      schema <- datapackr::cop23_data_pack_schema
-    } else {
-      stop("Data Pack schema not available for the COP year provided.")
-    }
+    schema <- switch(as.character(cop_year),
+                     "2021" = cop21_data_pack_schema,
+                     "2022" = cop22_data_pack_schema,
+                     "2023" =  cop23_data_pack_schema,
+                     stop("Data Pack schema not available for the COP year provided."))
+
+  } else if (tool %in% c("PSNUxIM", "PSNUxIM Template")) {
+    schema <- switch(as.character(cop_year),
+                     "2023" =  cop23_psnuxim_schema,
+                     stop("PSNUxIM schema not available for the COP year provided."))
+  } else {
+    stop("No schema could be found for the combination of tool and COP year provided.")
   }
 
   schema
@@ -247,21 +247,27 @@ pick_template_path <- function(cop_year, tool) {
   template_filename <- NULL
 
   if (tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
-    if (cop_year == 2021) {
-      template_filename <- "COP21_OPU_Data_Pack_Template.xlsx"
-    } else if (cop_year == 2022) {
-      template_filename <- "COP22_OPU_Data_Pack_Template.xlsx"
-    }
+
+    template_filename <- switch(as.character(cop_year),
+      "2021"  = "COP21_OPU_Data_Pack_Template.xlsx",
+      "2022" = "COP22_OPU_Data_Pack_Template.xlsx",
+      NULL)
   }
 
   if (tool %in% c("Data Pack", "Data Pack Template")) {
-    if (cop_year == 2021) {
-      template_filename <- "COP21_Data_Pack_Template.xlsx"
-    } else if (cop_year == 2022) {
-      template_filename <- "COP22_Data_Pack_Template.xlsx"
-    } else if (cop_year == 2023) {
-      template_filename <- "COP23_Data_Pack_Template.xlsx"
-    }
+    template_filename <- switch(as.character(cop_year),
+                                "2021" = "COP21_Data_Pack_Template.xlsx",
+                                "2022" = "COP22_Data_Pack_Template.xlsx",
+                                "2023" = "COP23_Data_Pack_Template.xlsx",
+                                NULL)
+
+  }
+
+  if (tool %in% c("PSNUxIM", "PSNUxIM Template")) {
+    template_filename <- switch(as.character(cop_year),
+                                "2023" = "COP23_PSNUxIM_Template.xlsx",
+                                NULL)
+
   }
 
   if (is.null(template_filename)) {

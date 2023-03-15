@@ -16,7 +16,7 @@ packPSNUxIM <- function(wb, # Workbook object
                         snuxim_model_data,
                         org_units,
                         cop_year = NULL, # Cop year based on the file
-                        tool = "OPU Data Pack",
+                        tool = "PSNUxIM",
                         schema = NULL,
                         expand_formulas = FALSE,
                         d2_session = dynGet("d2_default_session",
@@ -693,6 +693,19 @@ packPSNUxIM <- function(wb, # Workbook object
                       colNames = FALSE)
 
 
+  if (cop_year == 2023) {
+
+    country_uids <-  getValidOrgUnits(d$info$cop_year) %>%
+      dplyr::filter(uid %in% org_units$orgUnit) %>%
+      dplyr::pull(country_uid) %>%
+      unique()
+
+    r$wb <- writeHomeTab(wb = r$wb,
+                 datapack_name = d$info$datapack_name,
+                 country_uids = country_uids,
+                 cop_year = d$info$cop_year,
+                 tool = tool)
+  }
 
   # Warning Messages ####
   interactive_print("Compiling alert messages...")

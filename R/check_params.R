@@ -277,12 +277,17 @@ check_tool <- function(tool, season, cop_year) {
     }
   }
 
-  # Validate cop_year and season, if provided.
-  if (cop_year_provided) cop_year %<>% check_cop_year()
+  # Validate cop_year. If its still NULL here, assume the current COP Year.
+  cop_year %<>% check_cop_year()
 
   if (season_provided) {
     season %<>% check_season(season = ., tool = tool)
-    deduced_tool <- switch(season, "OPU" = "OPU Data Pack", "COP" = "Data Pack")
+    if (cop_year == 2023) {
+      deduced_tool <- switch(season, "OPU" = "PSNUxIM", "COP" = "Data Pack")
+    } else {
+      deduced_tool <- switch(season, "OPU" = "OPU Data Pack", "COP" = "Data Pack")
+    }
+
   }
 
   # For NULL tools, attempt to deduce from season.
@@ -330,6 +335,7 @@ check_season <- function(season, tool) {
   # If tool provided, validate it.
   tool <- tool %missing% NULL
   tool_provided <- !is.null(tool)
+
   if (tool_provided) {
     tool %<>% check_tool()
     deduced_season <- switch(tool,
@@ -337,6 +343,8 @@ check_season <- function(season, tool) {
                              "OPU Data Pack" = "OPU",
                              "Data Pack Template" = "COP",
                              "OPU Data Pack Template" = "OPU",
+                             "PSNUxIM" = "COP",
+                             "PSNUxIM Template" = "COP",
                              stop("Invalid tool type provided."))
   }
 
@@ -361,11 +369,15 @@ check_season <- function(season, tool) {
     stop("Cannot support any seasons other than `COP` or `OPU`.")
   }
 
-  if (tool_provided) {
-    if (season != deduced_season) {
-      interactive_message("That season is not valid for that tool.")
-    }
-  }
+  #Commenting this out for DP-947. It is only an warning
+  #In general, datapacks and PSNUxIM tabs are valid in either season
+  #Only COP22 OPU data packs are only valid for OPU season.
+
+  # if (tool_provided) {
+  #   if (season != deduced_season) {
+  #     interactive_message("That season is not valid for that tool.")
+  #   }
+  # }
 
   season
 }
