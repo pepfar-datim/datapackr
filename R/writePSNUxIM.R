@@ -262,8 +262,8 @@ writePSNUxIM <- function(d,
       dplyr::filter(!is.na(org_type)) %>%
       dplyr::select(dp_label, orgUnit = uid)
 
-    schema <- cop22OPU_data_pack_schema
-    tool <- "OPU Data Pack"
+    schema <- cop23_psnuxim_schema
+    tool <- "SNUxIM"
 
     r <- packPSNUxIM(wb = d$tool$wb,
                      data = targets_data,
