@@ -122,7 +122,7 @@ writePSNUxIM <- function(d,
   # Prepare data to distribute ####
     d$info$has_psnuxim <- !(NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM$PSNU[1]))
 
-    targets_data <- prepareTargetData(d)
+    targets_data <- prepareTargetsData(d)
 
     # Prepare d$tool$wb ####
     # If append is true, add the missing PSNUxIM combos to the existing
@@ -212,7 +212,7 @@ writePSNUxIM <- function(d,
   if (d$info$cop_year == 2023) {
     d$info$has_psnuxim <- !is.null(d$data$SNUxIM)
 
-    targets_data <- prepareTargetData(d)
+    targets_data <- prepareTargetsData(d)
 
 
     template_file <- system.file("extdata", "COP22_OPU_Data_Pack_Template.xlsx", package = "datapackr")
