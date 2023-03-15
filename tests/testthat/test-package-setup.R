@@ -3,14 +3,14 @@ context("Package setup")
 test_that("We can pick a schema", {
 
   test_schema <-  pick_schema(2021, "OPU Data Pack")
-  testthat::expect_identical(test_schema, datapackr::cop21OPU_data_pack_schema)
+  testthat::expect_identical(test_schema, cop21OPU_data_pack_schema)
 
   expect_error(pick_schema(1999, "OPU Data Pack"))
 
   test_schema <-  pick_schema(2021, "Data Pack")
-  testthat::expect_identical(test_schema, datapackr::cop21_data_pack_schema)
+  testthat::expect_identical(test_schema, cop21_data_pack_schema)
   test_schema <-  pick_schema(2022, "Data Pack")
-  testthat::expect_identical(test_schema, datapackr::cop22_data_pack_schema)
+  testthat::expect_identical(test_schema, cop22_data_pack_schema)
 
   expect_error(pick_schema(1999, "OPU Data Pack"))
 
@@ -37,6 +37,17 @@ test_that("We can pick template file", {
   expect_true(grepl("COP22_Data_Pack_Template.xlsx",
                     test_template))
   expect_true(file.exists(test_template))
+
+  test_template <-  pick_template_path(2023, "Data Pack")
+  expect_true(grepl("COP23_Data_Pack_Template.xlsx",
+                    test_template))
+  expect_true(file.exists(test_template))
+
+  test_template <-  pick_template_path(2023, "PSNUxIM")
+  expect_true(grepl("COP23_PSNUxIM_Template.xlsx",
+                    test_template))
+  expect_true(file.exists(test_template))
+
 
   #Throw an error for garbage inputs
   expect_error(pick_template_path(1999, "Foo Pack"))
