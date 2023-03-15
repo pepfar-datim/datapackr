@@ -210,12 +210,13 @@ writePSNUxIM <- function(d,
   }
 
   if (d$info$cop_year == 2023) {
+
     d$info$has_psnuxim <- !is.null(d$data$SNUxIM)
 
     targets_data <- prepareTargetsData(d)
 
 
-    template_file <- system.file("extdata", "COP22_OPU_Data_Pack_Template.xlsx", package = "datapackr")
+    template_file <- system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr")
     wb <- openxlsx::loadWorkbook(template_file)
     openxlsx::activeSheet(wb) <- "PSNUxIM"
 
@@ -263,9 +264,9 @@ writePSNUxIM <- function(d,
       dplyr::select(dp_label, orgUnit = uid)
 
     schema <- cop23_psnuxim_schema
-    tool <- "SNUxIM"
+    tool <- "PSNUxIM"
 
-    r <- packPSNUxIM(wb = d$tool$wb,
+    r <- packPSNUxIM(wb = wb,
                      data = targets_data,
                      snuxim_model_data = d$data$snuxim_model_data,
                      org_units = org_units,
@@ -275,6 +276,7 @@ writePSNUxIM <- function(d,
                      d2_session = d2_session)
 
     d$tool$wb <- r$wb
+
     d$info$messages <- appendMessage(d$info$messages, r$info$messages$message, r$info$messages$level)
     d$info$newSNUxIM <- TRUE
 
@@ -285,11 +287,16 @@ writePSNUxIM <- function(d,
     interactive_print("Removing troublesome NAs that may have been added inadvertently...")
     d <- strip_wb_NAs(d)
 
+    tool <- switch(as.character(d$info$cop_year),
+                   "2022" = "OPU Data Pack",
+                   "2023" = "PSNUxIM",
+                   stop("We do not seem to have a tool for that year"))
+
     interactive_print("Exporting your new Data Pack...")
     exportPackr(
       data = d$tool$wb,
       output_folder = d$keychain$output_folder,
-      tool = "OPU Data Pack",
+      tool = tool,
       datapack_name = d$info$datapack_name)
 
   }
