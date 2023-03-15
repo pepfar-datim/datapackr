@@ -2,17 +2,23 @@ context("Package setup")
 
 test_that("We can pick a schema", {
 
-  test_schema <-  pick_schema(2021, "OPU Data Pack")
-  testthat::expect_identical(test_schema, cop21OPU_data_pack_schema)
+  test_schema <-  pick_schema(2022, "OPU Data Pack")
+  testthat::expect_identical(test_schema, cop22OPU_data_pack_schema)
 
-  expect_error(pick_schema(1999, "OPU Data Pack"))
+
 
   test_schema <-  pick_schema(2021, "Data Pack")
   testthat::expect_identical(test_schema, cop21_data_pack_schema)
   test_schema <-  pick_schema(2022, "Data Pack")
   testthat::expect_identical(test_schema, cop22_data_pack_schema)
+  test_schema <-  pick_schema(2023, "Data Pack")
+  testthat::expect_identical(test_schema, cop23_data_pack_schema)
 
-  expect_error(pick_schema(1999, "OPU Data Pack"))
+
+  expect_error(pick_schema(1999, "PSNUxIM"))
+  test_schema <-  pick_schema(2023, "PSNUxIM")
+  testthat::expect_identical(test_schema, cop23_psnuxim_schema)
+
 
 
   #Throw an error for garbage inputs
@@ -43,10 +49,18 @@ test_that("We can pick template file", {
                     test_template))
   expect_true(file.exists(test_template))
 
+  test_template <-  pick_template_path(2022, "OPU Data Pack")
+  expect_true(grepl("COP22_OPU_Data_Pack_Template.xlsx",
+                    test_template))
+  expect_true(file.exists(test_template))
+
+
   test_template <-  pick_template_path(2023, "PSNUxIM")
   expect_true(grepl("COP23_PSNUxIM_Template.xlsx",
                     test_template))
   expect_true(file.exists(test_template))
+
+  expect_error(pick_template_path(2023, "OPU Data Pack"))
 
 
   #Throw an error for garbage inputs
@@ -167,12 +181,12 @@ test_that("We can check datapack paramaters", {
 
   # Return the season automatically if an OPU DataPack and season is
   # explicit set to NULL
-  test_params <- check_params(tool = "OPU Data Pack", season = NULL)
+  test_params <- check_params(tool = "PSNUxIM", season = NULL)
   expect_type(test_params, "list")
   expect_named(test_params, c("tool", "season"))
-  expect_equal(test_params$season, "OPU")
-  expect_equal(test_params$tool, "OPU Data Pack")
-  expect_message(check_params(tool = "OPU Data Pack", season = NULL))
+  expect_equal(test_params$season, "COP")
+  expect_equal(test_params$tool, "PSNUxIM")
+  expect_message(check_params(tool = "PSNUxIM", season = NULL))
 
   # Deduce the season if not provided
   test_params <- check_params(season = NULL)
@@ -183,12 +197,12 @@ test_that("We can check datapack paramaters", {
 
   # If season and tool both provided, but don't match, issue warning, but leave
   # both in place.
-  test_params <- check_params(tool = "OPU Data Pack", season = "COP")
+  test_params <- check_params(tool = "PSNUxIM", season = "COP")
   expect_type(test_params, "list")
   expect_named(test_params, c("tool", "season"))
   expect_equal(test_params$season, "COP")
-  expect_equal(test_params$tool, "OPU Data Pack")
-  expect_message(check_params(tool = "OPU Data Pack", season = "COP"))
+  expect_equal(test_params$tool, "PSNUxIM")
+  expect_message(check_params(tool = "PSNUxIM", season = "COP"))
 
 
   # schema ####
@@ -246,15 +260,15 @@ test_that("We can check datapack paramaters", {
   expect_true(identical(sort(unlist(test_params)), sort(unlist(test_args))))
 
   # Test deduction power
-  test_args <- list(template_path = NULL, cop_year = 2021, tool = "OPU Data Pack")
+  test_args <- list(template_path = NULL, cop_year = 2023, tool = "PSNUxIM")
   test_params <- do.call(check_params, test_args)
   expect_setequal(names(test_params), c("cop_year", "tool", "template_path"))
-  expected_path <- pick_template_path(cop_year = 2021, tool = "OPU Data Pack")
+  expected_path <- pick_template_path(cop_year = 2023, tool = "PSNUxIM")
   expect_identical(test_params$template_path, expected_path)
 
   # Test invalid combination
-  template_path <- pick_template_path(cop_year = 2021, tool = "Data Pack")
-  test_args <- list(template_path = template_path, cop_year = 2021, tool = "OPU Data Pack")
+  template_path <- pick_template_path(cop_year = 2023, tool = "Data Pack")
+  test_args <- list(template_path = template_path, cop_year = 2023, tool = "PSNUxIM")
   expect_message(do.call(check_params, test_args))
 
   # Sheets ----
