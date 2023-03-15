@@ -9,7 +9,7 @@ test_that("Can handshake template", {
 
 test_that("Can error on bad type", {
 
-  expect_error(handshakeFile(getTemplate("COP23_Data_Pack_Template.xlsx"),"Foo Template"))
+  expect_error(handshakeFile(getTemplate("COP23_Data_Pack_Template.xlsx"), "Foo Template"))
 })
 
 test_that("Can error on bad file location", {
