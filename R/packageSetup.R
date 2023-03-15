@@ -18,9 +18,12 @@ datapackrSupports <- function() {
   tibble::tribble(
     ~tool, ~yrs,
     "Data Pack", c(2021, 2022, 2023),
-    "OPU Data Pack", c(2021, 2022, 2023),
+    "OPU Data Pack", c(2021, 2022),
     "Data Pack Template", c(2021, 2022, 2023),
-    "OPU Data Pack Template", c(2021, 2022, 2023))
+    "OPU Data Pack Template", c(2021, 2022),
+    "PSNUxIM", c(2023),
+    "PSNUxIM Template", c(2023))
+
 }
 
 
