@@ -25,8 +25,21 @@ unPackOPUDataPack <- function(d,
                               d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
 
+  #We must assume that the PSNUxIM tab is not needed.
+  #This may be overridden if we are dealing with a DataPack + PSNUxIM.
+  d$info$has_psnuxim <- TRUE
+  d$info$needs_psnuxim <- FALSE
+  #TODO: Are we dealing with a PSNUxIM (season is COP)
+  #or an OPU (Season is OPU)
+
   # Check integrity of Workbook tabs ####
   d <- checkToolStructure(d)
+
+  # Check whether there exist any troublesome comments in the file
+  d <- checkToolComments(d)
+
+  # Check whether there exist any troublesome connections in the file
+  d <- checkToolConnections(d)
 
   # Unpack updated PSNUxIM data ####
   d <- unPackSNUxIM(d)
