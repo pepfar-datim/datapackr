@@ -52,11 +52,15 @@ unPackToolSet <- function(datapack_path = NULL,
   #Are they reasonably comptaible with each other?
   are_compatible <- checkToolSetMetadata(d, p)
 
+  if (are_compatible) {
+    d <- mergeDatapack(d, p)
+  }
+
   d$data$SNUxIM <- p$data$SNUxIM
   d$data$PSNUxIM_combos <- p$data$PSNUxIM_combos
   d <- datapackr:::checkNonEqualTargets(d, d$data$MER)
+  d <- extractSNUxIMCombos(d)
   #TODO: Not clear how to handle the two analytics objects?
-  #
   #d$data$analytics <- p$data$analytics
 
 

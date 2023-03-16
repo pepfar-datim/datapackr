@@ -12,12 +12,22 @@
 #'
 mergeDatapack <- function(d1 = d1, d2 = d2) {
 
-    if (d1$info$datapack_name == d2$info$datapack_name) {
+   same_name <- d1$info$datapack_name == d2$info$datapack_name
+
+   if (!same_name) {
+     stop("We cannot merge those two tools.")
+     }
+
+    #Do not attempt to merge data from a PSNUxIM and a Datapack
+    if (d1$info$tool == d2$info$tool) {
 
       # bind data, datim and data
       d <- d1
       d$datim <- purrr::map2(d1$datim, d2$datim, dplyr::bind_rows)
-      d$data <- purrr::map2(d1$data, d2$data, dplyr::bind_rows)
+      d$data <- purrr::map2(d1$data, d2$data, dplyr::bind_rows) } else {
+
+      }
+
 
       # ensure all test results are coded as data frames or tibbles
       d1$tests <- lapply(d1$tests, dplyr::tibble)
@@ -45,11 +55,7 @@ mergeDatapack <- function(d1 = d1, d2 = d2) {
       d$info <- d1$info
       d$info$messages <- rbind(d1$info$messages, d2$info$messages)
 
-      return(d)
-
-    } else {
-      stop("These are different datapacks, cannot merge!!!")
-    }
+      d
 }
 
 #' @export
