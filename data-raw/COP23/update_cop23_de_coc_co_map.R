@@ -44,7 +44,7 @@ datasets_to_pull <- tibble::tribble(
 )
 
 # Test that all dataSet uids are valid ----
-dataSetUIDs <- datimutils::getMetadata(dataSets, d2_session = d2_session)
+dataSetUIDs <- datimutils::getMetadata(dataSets, d2_session = d2_default_session)
 
 if (any(!datasets_to_pull$dataset_uid %in% dataSetUIDs$id)) {
   invalid_ds_uids <-
