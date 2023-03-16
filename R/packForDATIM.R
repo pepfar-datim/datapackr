@@ -60,6 +60,11 @@ packForDATIM <- function(d, type = NULL) {
 
     datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
                                                           datasource = "PSNUxIM")
+    if (d$info$cop_year == 2023) {
+      datim_map %<>%
+        dplyr::filter(!grepl("\\.T2$", indicator_code))
+    }
+
   }
 
   if (type == "Undistributed MER") { ## Undistributed MER ----
@@ -72,6 +77,11 @@ packForDATIM <- function(d, type = NULL) {
 
     datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
                                                datasource = "Data Pack")
+
+    if (d$info$cop_year == 2023) {
+      datim_map %<>%
+        dplyr::filter(!grepl("\\.T2$", indicator_code))
+    }
   }
 
   if (type == "SUBNAT_IMPATT") { ## SUBNAT_IMPATT ----
@@ -84,12 +94,23 @@ packForDATIM <- function(d, type = NULL) {
 
     datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
                                                datasource = "Data Pack")
+
+    if (d$info$cop_year == 2023) {
+      datim_map %<>%
+        dplyr::filter(!grepl("\\.T2$", indicator_code))
+    }
+
   }
 
   if (type == "OPU PSNUxIM") { ## OPU PSNUxIM
 
     datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
                                                datasource = "PSNUxIM")
+
+    if (d$info$cop_year == 2023) {
+      datim_map %<>%
+        dplyr::filter(!grepl("\\.T2$", indicator_code))
+    }
 
   }
 
