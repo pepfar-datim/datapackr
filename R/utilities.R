@@ -472,12 +472,12 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1)
 
      if (year == 1) {
        de_coc_map <- de_coc_map %>%
-         dplyr::filter(!grepl("\\.T2$", indicator_code))
+         dplyr::filter(!grepl("\\.T2", indicator_code))
      }
 
     if (year == 2) {
       de_coc_map <- de_coc_map %>%
-        dplyr::filter(grepl("\\.T2$", indicator_code))
+        dplyr::filter(grepl("\\.T2", indicator_code))
     }
 
   }
