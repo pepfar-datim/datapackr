@@ -12,50 +12,50 @@
 #'
 mergeDatapack <- function(d1 = d1, d2 = d2) {
 
-   same_name <- d1$info$datapack_name == d2$info$datapack_name
 
-   if (!same_name) {
-     stop("We cannot merge those two tools.")
-     }
+  same_name <- d1$info$datapack_name == d2$info$datapack_name
 
-    #Do not attempt to merge data from a PSNUxIM and a Datapack
-    if (d1$info$tool == d2$info$tool) {
+  if (!same_name) {
+    stop("We cannot merge those two tools.")
+  } else {
+    d <- d1
+  }
 
-      # bind data, datim and data
-      d <- d1
-      d$datim <- purrr::map2(d1$datim, d2$datim, dplyr::bind_rows)
-      d$data <- purrr::map2(d1$data, d2$data, dplyr::bind_rows) } else {
-
-      }
+  #Do not attempt to merge data from a PSNUxIM and a Datapack
+  # bind data, datim and data
 
 
-      # ensure all test results are coded as data frames or tibbles
-      d1$tests <- lapply(d1$tests, dplyr::tibble)
-      d2$tests <- lapply(d2$tests, dplyr::tibble)
+  if (d1$info$tool == d2$info$tool) {
+    d$datim <- purrr::map2(d1$datim, d2$datim, dplyr::bind_rows)
+    d$data <- purrr::map2(d1$data, d2$data, dplyr::bind_rows)
+  }
 
-      # extract extras in each test list
-      d1$tests <- lapply(d1$tests, dplyr::tibble)
-      d2$tests <- lapply(d2$tests, dplyr::tibble)
-      d1_names <- names(d1$tests)
-      d2_names <- names(d2$tests)
-      d1_extras <- d1_names[!d1_names %in% d2_names]
-      d2_extras <- d2_names[!d2_names %in% d1_names]
+  # ensure all test results are coded as data frames or tibbles
+  d1$tests <- lapply(d1$tests, dplyr::tibble)
+  d2$tests <- lapply(d2$tests, dplyr::tibble)
 
-      # combine
-      d$tests <- purrr::map2(
-        d1$tests[!names(d1$tests) %in% d1_extras],
-        d2$tests[!names(d2$tests) %in% d2_extras],
-        dplyr::bind_rows
-      )
+  # extract extras in each test list
+  d1$tests <- lapply(d1$tests, dplyr::tibble)
+  d2$tests <- lapply(d2$tests, dplyr::tibble)
+  d1_names <- names(d1$tests)
+  d2_names <- names(d2$tests)
+  d1_extras <- d1_names[!d1_names %in% d2_names]
+  d2_extras <- d2_names[!d2_names %in% d1_names]
 
-      # add extras
-      d$tests <- c(d$tests, d1$tests[d1_extras], d2$tests[d2_extras])
+  # combine
+  d$tests <- purrr::map2(d1$tests[!names(d1$tests) %in% d1_extras],
+                         d2$tests[!names(d2$tests) %in% d2_extras],
+                         dplyr::bind_rows)
 
-      # combine message information
-      d$info <- d1$info
-      d$info$messages <- rbind(d1$info$messages, d2$info$messages)
+  # add extras
+  d$tests <-
+    c(d$tests, d1$tests[d1_extras], d2$tests[d2_extras])
 
-      d
+  # combine message information
+  d$info <- d1$info
+  d$info$messages <- rbind(d1$info$messages, d2$info$messages)
+
+  d
 }
 
 #' @export
