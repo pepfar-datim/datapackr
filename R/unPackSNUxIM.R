@@ -214,7 +214,7 @@ checkNonEqualTargets <- function(d, original_targets) {
         dplyr::rename(DataPackTarget = value)
     }
 
-    d$tests$non_equal_targets  <- snu_targets%>%
+    d$tests$non_equal_targets  <- snu_targets %>%
       dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget) %>%
       dplyr::mutate(DataPackTarget = as.numeric(DataPackTarget)) %>%
       dplyr::full_join(main_tab_data, by = c("PSNU", "indicator_code", "Age", "Sex", "KeyPop")) %>%

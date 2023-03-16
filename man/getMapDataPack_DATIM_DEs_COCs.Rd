@@ -4,12 +4,17 @@
 \alias{getMapDataPack_DATIM_DEs_COCs}
 \title{get_Map_DataPack_DATIM_DEs_COCs}
 \usage{
-getMapDataPack_DATIM_DEs_COCs(cop_year, datasource = NULL)
+getMapDataPack_DATIM_DEs_COCs(cop_year, datasource = NULL, year = 1)
 }
 \arguments{
 \item{cop_year}{cop year to pull get map for}
 
 \item{datasource}{Type of datasource (Data Pack, OPU Data Pack, DATIM)}
+
+\item{year}{A vector of numeric values (either 1 or 2) which indicate which
+Year should be returned. If year = 1, then the DataPack data elements
+will be return. If Year = 2, then the Year 2 data elements will be returned
+If Year = c(1,2) then both years will be returned.}
 }
 \value{
 {cop21, cop22, cop23}_map_DataPack_DATIM_DEs_COCs
