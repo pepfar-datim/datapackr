@@ -19,7 +19,7 @@
 
 # Point to DATIM login secrets ####
 secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
-datimutils::loginToDATIM(secrets)
+datimutils::loginToDATIM(secrets, d2_session_name = "d2_session")
 cop_year <- 2023
 
 # List all datasets and correct FY mapping (not always captured in DATIM) ####
