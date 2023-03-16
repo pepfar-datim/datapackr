@@ -19,7 +19,7 @@
 
 # Point to DATIM login secrets ####
 secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
-datimutils::loginToDATIM(secrets, d2_session_name = "d2_session")
+datimutils::loginToDATIM(secrets)
 cop_year <- 2023
 
 # List all datasets and correct FY mapping (not always captured in DATIM) ####
@@ -44,7 +44,7 @@ datasets_to_pull <- tibble::tribble(
 )
 
 # Test that all dataSet uids are valid ----
-dataSetUIDs <- datimutils::getMetadata(dataSets, d2_session = d2_session)
+dataSetUIDs <- datimutils::getMetadata(dataSets, d2_session = d2_default_session)
 
 if (any(!datasets_to_pull$dataset_uid %in% dataSetUIDs$id)) {
   invalid_ds_uids <-
