@@ -436,18 +436,28 @@ rowMax <- function(df, cn, regex) {
 #'
 #' @param cop_year cop year to pull get map for
 #' @param datasource Type of datasource (Data Pack, OPU Data Pack, DATIM)
+#' @param year A vector of numeric values (either 1 or 2) which indicate which
+#' Year should be returned. If year = 1, then the DataPack data elements
+#' will be return. If Year = 2, then the Year 2 data elements will be returned
+#' If Year = c(1,2) then both years will be returned.
 #' @return {cop21, cop22, cop23}_map_DataPack_DATIM_DEs_COCs
 #'
-getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL) {
+getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1) {
 
+  if (!all(year %in% c(1, 2))) {
+    stop("You must specify either year 1, 2 or both.")
+  }
 
-  if (datasource %in%  c("Data Pack", "Data Pack Template") || is.null(datasource)) {
+  if (is.null(datasource))  {
+    datasource <- "Data Pack"
+  }
+
+  if (datasource %in%  c("Data Pack", "Data Pack Template")) {
     de_coc_map <- switch(as.character(cop_year),
            "2021" = cop21_map_DataPack_DATIM_DEs_COCs,
            "2022" = cop22_map_DataPack_DATIM_DEs_COCs,
            "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
            stop("Invalid COP Year"))
-  return(de_coc_map)
     }
 
   if (datasource %in% c("OPU Data Pack", "OPU Data Pack Template", "DATIM", "PSNUxIM")) {
@@ -456,10 +466,24 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL) {
                          "2022" = datapackr::cop22_map_adorn_import_file,
                          "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
                          stop("Invalid COP Year"))
-    return(de_coc_map)
   }
 
-  stop("Could not find a data element/category option combo map for those paramaters")
+  if (cop_year == 2023) {
+
+     if (year == 1) {
+       de_coc_map <- de_coc_map %>%
+         dplyr::filter(!grepl("\\.T2$", indicator_code))
+     }
+
+    if (year == 2) {
+      de_coc_map <- de_coc_map %>%
+        dplyr::filter(grepl("\\.T2$", indicator_code))
+    }
+
+  }
+
+  de_coc_map
+
 }
 
 

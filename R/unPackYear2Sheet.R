@@ -514,7 +514,7 @@ unpackYear2Sheet <- function(d) {
   # Get the raw data element codes from the map ----
   d$data$Year2 %<>%
     dplyr::left_join(
-      getMapDataPack_DATIM_DEs_COCs(d$info$cop_year),
+      getMapDataPack_DATIM_DEs_COCs(d$info$cop_year, year = 2),
       by = c(
         "indicator_code",
         "valid_ages.name",

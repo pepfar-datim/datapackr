@@ -31,9 +31,6 @@ prepareTargetsData <- function(d) {
   dsd_ta_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
                                               datasource = d$info$tool)
 
-  if (d$info$cop_year == 2023) {
-    dsd_ta_map %<>% dplyr::filter(!grepl("\\.T2$", indicator_code))
-  }
 
   dsd_ta_map <- dsd_ta_map %>%
     dplyr::select(indicator_code,
@@ -224,10 +221,6 @@ writePSNUxIM <- function(d,
     d$data$snuxim_model_data <- smd[d$info$country_uids] %>%
       dplyr::bind_rows()
     rm(smd)
-
-    dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year) %>%
-      dplyr::filter(!grepl("\\.T2$", indicator_code))
-
 
     d$data$snuxim_model_data %<>%
       ## Address issues with PMTCT_EID ####

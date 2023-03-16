@@ -69,9 +69,6 @@ packPSNUxIM <- function(wb, # Workbook object
   map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year = cop_year,
                                                 datasource = tool)
 
-  if (cop_year == 2023) {
-    map_des_cocs %<>% dplyr::filter(!grepl("\\.T2$", indicator_code))
-  }
   ## Translate from import format ####
   snuxim_model_data %<>%
     datapackr::adorn_import_file(cop_year = cop_year, #adorn_import_file.R
