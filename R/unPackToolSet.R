@@ -60,8 +60,11 @@ unPackToolSet <- function(datapack_path = NULL,
   d$data$PSNUxIM_combos <- p$data$PSNUxIM_combos
   d <- datapackr:::checkNonEqualTargets(d, d$data$MER)
   d <- extractSNUxIMCombos(d)
-  #TODO: Not clear how to handle the two analytics objects?
-  #d$data$analytics <- p$data$analytics
+  #TODO: Check to be sure that the analytics should
+  #be coming from the PSNUxIM tab. This should be correct
+  #but we may want to expand this to allow both anaalytics objects
+  #to exist
+  d$data$analytics <- p$data$analytics
 
 
   d
