@@ -66,10 +66,41 @@ with_mock_api({
 
   #Unpack this tool which has been "opened" in libreoffice
   d_opened <- unPackTool(submission_path = out_file, d2_session = training)
+
   expect_identical(d$info$datapack_name, d_opened$info$datapack_name)
   expect_setequal(names(d_opened), c("keychain", "info", "data", "tests", "datim", "sheets"))
   expect_true(NROW(d_opened$data$analytics) > 0)
   expect_true(all(d_opened$data$analytics$mechanism_desc == "default"))
+
+
+  d_data_targets_names <- c("PSNU", "psnuid", "sheet_name", "indicator_code", "Age", "Sex", "KeyPop", "value")
+  d_data_tests_types <- c("tbl_df", "tbl", "data.frame")
+
+
+  d <- unPackSheets(d_opened, check_sheets = TRUE)
+
+
+  expect_true(!is.null(d_opened$data$MER))
+  expect_setequal(class(d_opened$data$MER), c("tbl_df", "tbl", "data.frame"))
+  expect_identical(unname(sapply(d_opened$data$MER, typeof)), c(rep("character", 7), "double"))
+  expect_setequal(names(d_opened$data$MER), d_data_targets_names)
+  expect_true((NROW(d_opened$data$MER) > 0))
+
+  expect_true(!is.null(d_opened$data$SUBNAT_IMPATT))
+  expect_setequal(class(d_opened$data$SUBNAT_IMPATT), c("tbl_df", "tbl", "data.frame"))
+  expect_identical(unname(sapply(d_opened$data$SUBNAT_IMPATT, typeof)), c(rep("character", 7), "double"))
+  expect_setequal(names(d_opened$data$SUBNAT_IMPATT), d_data_targets_names)
+  expect_true((NROW(d_opened$data$SUBNAT_IMPATT) > 0))
+
+
+  validation_summary <- validationSummary(d_opened)
+  expect_named(validation_summary,
+               c("count", "country_name", "country_uid",
+                 "ou", "ou_id", "test_name", "validation_issue_category"),
+               ignore.order = TRUE)
+
+
+  #TODO: Add additional tests for data
 
 })
 })

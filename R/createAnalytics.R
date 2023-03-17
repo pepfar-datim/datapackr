@@ -19,15 +19,10 @@ createAnalytics <- function(d,
 
 
   # Append the distributed MER data and subnat data together
-  if (d$info$tool %in% c("OPU Data Pack", "PSNUxIM")) {
+  if (d$info$tool %in% c("OPU Data Pack", "PSNUxIM", "PSNUxIM Template")) {
 
     map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
                                                   datasource = d$info$tool)
-    #Ignore T2 data elements in COP23
-    if (d$info$cop_year == 2023) {
-      map_des_cocs <- map_des_cocs %>%
-        dplyr::filter(!grepl("\\.T2", indicator_code))
-    }
 
     #TODO: Fix the names here as this is not aligned with the orgunit structure now
     if (is.null(d$info$psnus)) {

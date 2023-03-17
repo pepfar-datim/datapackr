@@ -270,8 +270,21 @@ writePSNUxIM <- function(d,
                      schema = schema,
                      d2_session = d2_session)
 
-    d$tool$wb <- r$wb
+    if (d$info$cop_year == 2023) {
 
+      country_uids <-  getValidOrgUnits(d$info$cop_year) %>%
+        dplyr::filter(uid %in% org_units$orgUnit) %>%
+        dplyr::pull(country_uid) %>%
+        unique()
+
+      r$wb <- writeHomeTab(wb = r$wb,
+                           datapack_name = d$info$datapack_name,
+                           country_uids = country_uids,
+                           cop_year = d$info$cop_year,
+                           tool = tool)
+    }
+
+    d$tool$wb <- r$wb
     d$info$messages <- appendMessage(d$info$messages, r$info$messages$message, r$info$messages$level)
     d$info$newSNUxIM <- TRUE
 
@@ -288,7 +301,7 @@ writePSNUxIM <- function(d,
                    stop("We do not seem to have a tool for that year"))
 
     interactive_print("Exporting your new Data Pack...")
-    exportPackr(
+    d$info$output_file <- exportPackr(
       data = d$tool$wb,
       output_folder = d$keychain$output_folder,
       tool = tool,

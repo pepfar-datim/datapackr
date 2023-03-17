@@ -14,10 +14,14 @@ packOPUDataPack <- function(d, undistributed_mer_data = NULL,
                             d2_session = dynGet("d2_default_session",
                                                 inherits = TRUE)) {
 
+  #Case 1: We supply a model
   # Check if provided model data is empty ####
-  if (!is.null(d$info$snuxim_model_data_path)) {
+  if (!is.null(d$keychain$snuxim_model_data_path)) {
 
-    d$data$snuxim_model_data <- readRDS(d$info$snuxim_model_data_path)
+    smd <- readRDS(d$keychain$snuxim_model_data_path)
+    d$data$snuxim_model_data <- smd[d$info$country_uids] %>%
+      dplyr::bind_rows()
+    rm(smd)
 
     empty_snuxim_model_data <- d$data$snuxim_model_data %>%
       dplyr::filter(rowSums(is.na(.)) != ncol(.))
@@ -30,8 +34,9 @@ packOPUDataPack <- function(d, undistributed_mer_data = NULL,
     }
   }
 
+  #Case 2: We get the model from DATIM
   # If empty or unprovided, pull model data from DATIM ####
-  if (is.null(d$info$snuxim_model_data)) {
+  if (is.null(d$keychain$snuxim_model_data)) {
     d$data$snuxim_model_data <- getOPUDataFromDATIM(cop_year = d$info$cop_year,
                                                     country_uids = d$info$country_uids,
                                                     d2_session = d2_session)
@@ -39,6 +44,9 @@ packOPUDataPack <- function(d, undistributed_mer_data = NULL,
       stop("SNUxIM Model data pull seems to have returned no data from DATIM. Please check with DATIM.")
     }
   }
+
+  #Case 3: We have existing distributed data from the PSNUxIM tab and need to repack it.
+
 
   # Prepare totals data for allocation ####
   if (!is.null(undistributed_mer_data)) {
