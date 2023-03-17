@@ -2,7 +2,7 @@ context("Create a COP23 PSNUxIM Tool")
 
 with_mock_api({
   test_that(
-    "We can write an COP23 PSNUxIM tool", {
+    "We can write an COP23 PSNUxIM tool",{
       d <-
         unPackTool(
           submission_path = test_sheet("COP23_sample_DataPack_Malawi.xlsx"),
@@ -54,7 +54,7 @@ with_mock_api({
     #Unpack this tool which has been "opened" in libreoffice
     d_opened <- unPackTool(submission_path = out_file, d2_session = training)
 
-    expect_setequal(names(d_opened), c("keychain", "info", "data", "tests", "datim"))
+    expect_setequal(names(d_opened), c("keychain", "info", "data", "tests", "datim", "sheets"))
 
 
 

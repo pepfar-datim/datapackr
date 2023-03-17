@@ -33,7 +33,7 @@ with_mock_api({
   d_out <- unPackTool(submission_path = d$info$output_file, d2_session = training)
 
   expect_identical(d$info$datapack_name, d_out$info$datapack_name)
-  expect_setequal(names(d_out), c("keychain", "info", "data", "tests", "datim"))
+  expect_setequal(names(d_out), c("keychain", "info", "data", "tests", "datim", "sheets"))
   expect_setequal(names(d_out$datim$OPU), c("dataElement", "period",
                                            "orgUnit", "categoryOptionCombo", "attributeOptionCombo", "value"))
 
@@ -68,7 +68,7 @@ with_mock_api({
    #Unpack this tool which has been "opened" in libreoffice
    d_opened <- unPackTool(submission_path = out_file, d2_session = training)
    expect_identical(d$info$datapack_name, d_opened$info$datapack_name)
-   expect_setequal(names(d_opened), c("keychain", "info", "data", "tests", "datim"))
+   expect_setequal(names(d_opened), c("keychain", "info", "data", "tests", "datim", "sheets"))
    expect_setequal(names(d_opened$datim$OPU), c("dataElement", "period",
                                              "orgUnit", "categoryOptionCombo", "attributeOptionCombo", "value"))
 

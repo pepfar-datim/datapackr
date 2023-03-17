@@ -49,6 +49,12 @@ mergeDatapack <- function(d1 = d1, d2 = d2) {
   d$tests <-
     c(d$tests, d1$tests[d1_extras], d2$tests[d2_extras])
 
+  #In case we have a DataPack and a PSNU
+  if (setequal( c(d1$info$tool, d2$info$tool), c("Data Pack", "PSNUxIM"))) {
+    d$sheets <- c(d1$sheets, d2$sheets)
+  }
+
+
   # combine message information
   d$info <- d1$info
   d$info$messages <- rbind(d1$info$messages, d2$info$messages)

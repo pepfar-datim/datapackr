@@ -29,6 +29,10 @@ unPackOPUDataPack <- function(d,
   #This may be overridden if we are dealing with a DataPack + PSNUxIM.
   d$info$has_psnuxim <- TRUE
   d$info$needs_psnuxim <- FALSE
+
+  #Keep the sheets since we are going to need the original targets
+
+  d <- loadSheets(d)
   #TODO: Are we dealing with a PSNUxIM (season is COP)
   #or an OPU (Season is OPU)
 
@@ -52,6 +56,7 @@ unPackOPUDataPack <- function(d,
 
   # Check for invalid mechanisms
   d <- checkMechanisms(d, d2_session = d2_session)
+
 
   return(d)
 

@@ -208,12 +208,8 @@ checkNonEqualTargets <- function(d, original_targets) {
       dplyr::group_by(dplyr::across(c(-MainTabsTarget))) %>%
       dplyr::summarise(MainTabsTarget = sum(MainTabsTarget, na.rm = TRUE), .groups = "drop")
 
-    snu_targets <-  d$data$SNUxIM
-
-    #TODO: Not entirely clear why names are different here in some cases.
-    if (any(names(d$data$SNUxIM) == "value")) {
-      snu_targets %<>%  dplyr::rename(DataPackTarget = value)
-    }
+    #Grab this from the raw sheet data prior to any processing/reshaping
+    snu_targets <-  d$sheets$PSNUxIM
 
     d$tests$non_equal_targets  <- snu_targets %>%
       dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget) %>%
