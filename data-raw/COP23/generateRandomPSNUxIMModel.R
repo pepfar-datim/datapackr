@@ -13,7 +13,7 @@ dp_map <- getMapDataPack_DATIM_DEs_COCs(2023) %>%
 
 mechs_dist <- data.frame(
   mechanism_code = c("18025", "84562"),
-  mechanism_uid = c("NNHq2qVK085","t7xQ6GDj57P" ),
+  mechanism_uid = c("NNHq2qVK085", "t7xQ6GDj57P"),
   percent = c(0.75, 0.25)
 )
 
@@ -38,9 +38,10 @@ p <- d$data$analytics %>%
 model <- list()
 
 model$`lZsCb6y0KDX` <-   p %>%
-  dplyr::select( "indicator_code",
+  dplyr::select("indicator_code",
                  "psnu_uid",
-                 "mechanism_uid","mechanism_code",
+                 "mechanism_uid",
+                  "mechanism_code",
                  "type",
                  "age_option_name",
                  "age_option_uid",
