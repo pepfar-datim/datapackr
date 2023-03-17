@@ -13,7 +13,7 @@
 mergeDatapack <- function(d1 = d1, d2 = d2) {
 
 
-  same_name <- d1$info$datapack_name == d2$info$datapack_name
+  same_name <- identical(d1$info$datapack_name, d2$info$datapack_name)
 
   if (!same_name) {
     stop("We cannot merge those two tools.")
@@ -23,9 +23,7 @@ mergeDatapack <- function(d1 = d1, d2 = d2) {
 
   #Do not attempt to merge data from a PSNUxIM and a Datapack
   # bind data, datim and data
-
-
-  if (d1$info$tool == d2$info$tool) {
+  if (identical(d1$info$tool, d2$info$tool)) {
     d$datim <- purrr::map2(d1$datim, d2$datim, dplyr::bind_rows)
     d$data <- purrr::map2(d1$data, d2$data, dplyr::bind_rows)
   }
