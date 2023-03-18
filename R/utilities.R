@@ -50,7 +50,7 @@ mergeDatapack <- function(d1 = d1, d2 = d2) {
     c(d$tests, d1$tests[d1_extras], d2$tests[d2_extras])
 
   #In case we have a DataPack and a PSNU
-  if (setequal( c(d1$info$tool, d2$info$tool), c("Data Pack", "PSNUxIM"))) {
+  if (setequal(c(d1$info$tool, d2$info$tool), c("Data Pack", "PSNUxIM"))) {
     d$sheets <- c(d1$sheets, d2$sheets)
   }
 

@@ -29,11 +29,30 @@ checkToolSetMetadata <- function(d, p) {
 #' @return Datapackr d object merged from a Datapack and standalone PSNUxIM tab
 #' @export
 
-unPackToolSet <- function(datapack_path = NULL,
-                          psnuxim_path = NULL,
+unPackToolSet <- function(d1_path = NULL,
+                          d2_path = NULL,
                           country_uids = NULL,
                           cop_year = NULL,
                           d2_session = dynGet("d2_default_session", inherits = TRUE)) {
+
+  d1 <- createKeychainInfo(d1_path)
+  d2 <- createKeychainInfo(d2_path)
+
+
+  #Are they reasonably comptaible with each other?
+  are_compatible <- checkToolSetMetadata(d1, d2)
+
+
+  d1_path <- d1$keychain$submission_path
+  d2_path <- d2$keychain$submission_path
+
+  if (!setequal(c(d1$info$tool, d2$info$tool), c("Data Pack", "PSNUxIM"))) {
+    stop("Cannot unpack that combination of tools.")
+  }
+
+  datapack_path <- ifelse(d1$info$tool == "Data Pack", d1_path, d2_path)
+  psnuxim_path <- ifelse(d1$info$tool == "PSNUxIM", d1_path, d2_path)
+
 
   #Get the datapack
   d <- unPackTool(submission_path = datapack_path,
@@ -49,12 +68,9 @@ unPackToolSet <- function(datapack_path = NULL,
                   cop_year = cop_year,
                   d2_session = d2_session)
 
-  #Are they reasonably comptaible with each other?
-  are_compatible <- checkToolSetMetadata(d, p)
 
-  if (are_compatible) {
-    d <- mergeDatapack(d, p)
-  }
+  d <- mergeDatapack(d, p)
+
 
   d$data$SNUxIM <- p$data$SNUxIM
   d$data$PSNUxIM_combos <- p$data$PSNUxIM_combos
