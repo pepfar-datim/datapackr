@@ -44,27 +44,30 @@ checkHasPSNUxIM <- function(d) {
 #' Title
 #'
 #' @inheritParams datapackr_params
-#'
+#' @p An optional PSNUxIM object.
 #' @return Modified d object with documented and missing SNUxIM combos
 #'
-extractSNUxIMCombos <- function(d) {
+extractSNUxIMCombos <- function(d, p = NULL) {
 
-  if (is.null(d$data$SNUxIM)) {
+  if (is.null(d$data$SNUxIM) && is.null(p$data$SNUxIM)) {
     stop("PSNUxIM cannot be null")
   }
 
-
-  # Document all combos used in submitted PSNUxIM tab ####
-  # This ensures tests for new combinations are correctly matched
-  d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
-    dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop) %>%
-    dplyr::mutate(
-      psnuid =
-        stringr::str_extract(
-          PSNU,
-          "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
-    dplyr::distinct() %>%
-    dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop)
+  if (!is.null(p$data$PSNUxIM_combos))  {
+    d$data$PSNUxIM_combos <- p$data$PSNUxIM_combos
+  } else {
+    # Document all combos used in submitted PSNUxIM tab ####
+    # This ensures tests for new combinations are correctly matched
+    d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
+      dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop) %>%
+      dplyr::mutate(
+        psnuid =
+          stringr::str_extract(
+            PSNU,
+            "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
+      dplyr::distinct() %>%
+      dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop)
+  }
 
   if (d$info$tool == "Data Pack") {
 

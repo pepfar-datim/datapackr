@@ -66,6 +66,7 @@ unPackToolSet <- function(d1_path = NULL,
                   tool = "PSNUxIM",
                   country_uids = country_uids,
                   cop_year = cop_year,
+                  pzns = d$datim$prioritizations,
                   d2_session = d2_session)
 
 
@@ -73,9 +74,8 @@ unPackToolSet <- function(d1_path = NULL,
 
 
   d$data$SNUxIM <- p$data$SNUxIM
-  d$data$PSNUxIM_combos <- p$data$PSNUxIM_combos
-  d <- datapackr:::checkNonEqualTargets(d, d$data$MER)
-  d <- extractSNUxIMCombos(d)
+  d <- checkNonEqualTargets(d, d$data$MER)
+  d <- extractSNUxIMCombos(d, p)
   #TODO: Check to be sure that the analytics should
   #be coming from the PSNUxIM tab. This should be correct
   #but we may want to expand this to allow both anaalytics objects

@@ -41,6 +41,8 @@ createAnalytics <- function(d,
       prios <- fetchPrioritizationTable(psnus = d$info$psnus$psnu_uid,
                                         cop_year = d$info$cop_year,
                                         d2_session = d2_session)
+    } else {
+      prios <- d$datim$prioritizations
     }
 
     d$data$analytics <- d$datim$OPU %>%

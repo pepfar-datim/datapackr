@@ -22,6 +22,7 @@
 #' Pack being processed.
 #'
 unPackOPUDataPack <- function(d,
+                              pzns = NULL,
                               d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
 
@@ -29,6 +30,9 @@ unPackOPUDataPack <- function(d,
   #This may be overridden if we are dealing with a DataPack + PSNUxIM.
   d$info$has_psnuxim <- TRUE
   d$info$needs_psnuxim <- FALSE
+  #Use the existing prioritizations if one is supplied
+  d$datim$prioritizations <- pzns
+
 
   #Keep the sheets since we are going to need the original targets
 

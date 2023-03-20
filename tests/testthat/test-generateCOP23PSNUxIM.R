@@ -2,7 +2,7 @@ context("Create a COP23 PSNUxIM Tool")
 
 with_mock_api({
   test_that(
-    "We can write an COP23 PSNUxIM tool",{
+    "We can write an COP23 PSNUxIM tool", {
       d <-
         unPackTool(
           submission_path = test_sheet("COP23_sample_DataPack_Malawi.xlsx"),

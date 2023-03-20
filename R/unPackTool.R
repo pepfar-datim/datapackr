@@ -17,6 +17,7 @@ unPackTool <- function(submission_path = NULL,
                        tool = NULL,
                        country_uids = NULL,
                        cop_year = NULL,
+                       pzns = NULL,
                        d2_session = dynGet("d2_default_session",
                                            inherits = TRUE)) {
 
@@ -39,6 +40,7 @@ unPackTool <- function(submission_path = NULL,
 
   } else if (d$info$tool %in% c("OPU Data Pack", "PSNUxIM")) {
     d <- unPackOPUDataPack(d,
+                           pzns = pzns,
                            d2_session = d2_session)
   } else {
     stop("Selected tool not currently supported.")
