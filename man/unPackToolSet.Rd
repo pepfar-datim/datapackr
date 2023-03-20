@@ -5,8 +5,8 @@
 \title{Title}
 \usage{
 unPackToolSet(
-  datapack_path = NULL,
-  psnuxim_path = NULL,
+  d1_path = NULL,
+  d2_path = NULL,
   country_uids = NULL,
   cop_year = NULL,
   d2_session = dynGet("d2_default_session", inherits = TRUE)

@@ -4,7 +4,7 @@
 \alias{extractSNUxIMCombos}
 \title{Title}
 \usage{
-extractSNUxIMCombos(d)
+extractSNUxIMCombos(d, p = NULL)
 }
 \arguments{
 \item{d}{Datapackr sidecar object}

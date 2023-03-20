@@ -215,8 +215,13 @@ writePSNUxIM <- function(d,
 
     dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
 
-    template_file <- system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr")
-    wb <- openxlsx::loadWorkbook(template_file)
+    if (!d$info$has_psnuxim || append) {
+      template_file <- system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr")
+      wb <- openxlsx::loadWorkbook(template_file)
+    } else {
+      wb <- openxlsx::loadWorkbook(d$keychain$psnuxim_file_path)
+    }
+
     openxlsx::activeSheet(wb) <- "PSNUxIM"
 
     smd <- readRDS(d$keychain$snuxim_model_data_path)

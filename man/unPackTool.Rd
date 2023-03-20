@@ -9,6 +9,9 @@ unPackTool(
   tool = NULL,
   country_uids = NULL,
   cop_year = NULL,
+  pzns = NULL,
+  load_wb = FALSE,
+  load_sheets = FALSE,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }

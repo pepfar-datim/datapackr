@@ -68,6 +68,7 @@ unPackToolSet <- function(d1_path = NULL,
     pzns <- d$datim$prioritizations %>%
     dplyr::select(orgUnit, value)
   }
+
   p <- unPackTool(submission_path = psnuxim_path,
                   tool = "PSNUxIM",
                   country_uids = d$info$country_uids,
@@ -82,6 +83,9 @@ unPackToolSet <- function(d1_path = NULL,
   d$data$SNUxIM <- p$data$SNUxIM
   d <- checkNonEqualTargets(d, d$data$MER)
   d <- extractSNUxIMCombos(d, p)
+  #We may need the path to the PSNUxIM tab, if they need to regenerated
+  d$keychain$psnuxim_file_path <- p$keychain$submission_path
+
   #TODO: Check to be sure that the analytics should
   #be coming from the PSNUxIM tab. This should be correct
   #but we may want to expand this to allow both anaalytics objects

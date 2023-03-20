@@ -33,7 +33,6 @@ unPackOPUDataPack <- function(d,
   #Use the existing prioritizations if one is supplied
   d$datim$prioritizations <- pzns
 
-
   #Keep the sheets since we are going to need the original targets
 
   d <- loadSheets(d)
