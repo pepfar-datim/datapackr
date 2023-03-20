@@ -30,12 +30,18 @@ createAnalytics <- function(d,
         dplyr::filter(country_uid %in% d$info$country_uids) %>%
         dplyr::select(ou, country_name, snu1, psnu = name, psnu_uid = uid)
     }
+
+
     #OPU datapacks have no prioritizations, so we need to get them from DATIM
-    prios <- fetchPrioritizationTable(psnus = d$info$psnus$psnu_uid,
-                                      cop_year = d$info$cop_year,
-                                      d2_session = d2_session)
+    #PSNUxIM tools in COP23 May have incoming prioritizations if they are
+    #used with a datapack, but may be missing them if the tool is validated
+    #as a standalone tool.
 
-
+    if (is.null(d$datim$prioritizations)) {
+      prios <- fetchPrioritizationTable(psnus = d$info$psnus$psnu_uid,
+                                        cop_year = d$info$cop_year,
+                                        d2_session = d2_session)
+    }
 
     d$data$analytics <- d$datim$OPU %>%
       adorn_import_file(cop_year = d$info$cop_year,
