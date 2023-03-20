@@ -62,11 +62,17 @@ unPackToolSet <- function(d1_path = NULL,
                   d2_session =  d2_session)
 
   #Unpack the PSNUxIM
+  #Use existing prioritizations if they are part of the datapack
+  if (!is.null(d$datim$prioritizations)) {
+
+    pzns <- d$datim$prioritizations %>%
+    dplyr::select(orgUnit, value)
+  }
   p <- unPackTool(submission_path = psnuxim_path,
                   tool = "PSNUxIM",
-                  country_uids = country_uids,
-                  cop_year = cop_year,
-                  pzns = d$datim$prioritizations,
+                  country_uids = d$info$country_uids,
+                  cop_year = d$info$cop_year,
+                  pzns = pzns,
                   d2_session = d2_session)
 
 
