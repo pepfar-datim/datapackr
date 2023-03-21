@@ -227,7 +227,8 @@ checkNonEqualTargets <- function(d, original_targets) {
       #Filter non-allocated data to prevent false positives with this test
       #Other tests should catch whether there is data in the main tabs
       #but which has not been allocated
-      dplyr::filter(!is.na(DataPackTarget))
+      dplyr::filter(!is.na(DataPackTarget)) %>%
+      dplyr::rename("PSNUxIM Target" = DataPackTarget)
 
     attr(d$tests$non_equal_targets, "test_name") <- "Non-equal targets"
 

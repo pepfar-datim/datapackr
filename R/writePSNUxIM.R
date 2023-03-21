@@ -159,6 +159,7 @@ writePSNUxIM <- function(d,
     # If append is true, add the missing PSNUxIM combos to the existing
     # workbook, otherwise, use a template.
     if (append == TRUE) {
+
       if (is.null(d$tool$wb)) {
         d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
       }
@@ -245,13 +246,20 @@ writePSNUxIM <- function(d,
     d$info$has_psnuxim <- !is.null(d$data$SNUxIM)
 
     dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
-    targets_data <- prepareTargetsData(d)
+    targets_data <- prepareTargetsData(d, append)
+    template_file <- system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr")
 
-    if (!d$info$has_psnuxim || !append) {
-      template_file <- system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr")
+    if (!d$info$has_psnuxim) {
+      print("Loading PSNUxIM Template")
       wb <- openxlsx::loadWorkbook(template_file)
-    } else {
-      wb <- openxlsx::loadWorkbook(d$keychain$psnuxim_file_path)
+    }  else {
+      if (append) {
+        print("Loading Existing PSNUxIM")
+        wb <- openxlsx::loadWorkbook(d$keychain$psnuxim_file_path)
+      } else {
+
+        wb <- openxlsx::loadWorkbook(template_file)
+      }
     }
 
     openxlsx::activeSheet(wb) <- "PSNUxIM"
