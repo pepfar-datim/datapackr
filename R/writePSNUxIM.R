@@ -245,6 +245,7 @@ writePSNUxIM <- function(d,
     d$info$has_psnuxim <- !is.null(d$data$SNUxIM)
 
     dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
+    targets_data <- prepareTargetsData(d)
 
     if (!d$info$has_psnuxim || !append) {
       template_file <- system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr")
@@ -257,6 +258,7 @@ writePSNUxIM <- function(d,
 
     #This is if we are dealing with no existing PSNUxIM data
     if (!d$info$has_psnuxim) {
+
       smd <- readRDS(d$keychain$snuxim_model_data_path)
       d$data$snuxim_model_data <- smd[d$info$country_uids] %>%
         dplyr::bind_rows()
@@ -288,7 +290,7 @@ writePSNUxIM <- function(d,
         dplyr::summarise(value = sum(value), .groups = "drop")
 
     } else {
-      d$data$snuxim_model_data <- prepareTargetsData(d, append)
+      d$data$snuxim_model_data <- targets_data
     }
 
 
