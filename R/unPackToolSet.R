@@ -81,6 +81,8 @@ unPackToolSet <- function(d1_path = NULL,
 
 
   d$data$SNUxIM <- p$data$SNUxIM
+  d$datim$OPU <- p$datim$OPU
+
   d <- checkNonEqualTargets(d, d$data$MER)
   d <- extractSNUxIMCombos(d, p)
   #We may need the path to the PSNUxIM tab, if they need to regenerated

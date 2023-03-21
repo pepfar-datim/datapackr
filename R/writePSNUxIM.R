@@ -1,4 +1,4 @@
-prepareTargetsData <- function(d) {
+prepareTargetsData <- function(d, append = TRUE) {
   # # If does exist, extract missing combos ####
   # if (d$info$has_psnuxim) {
   #   d$data$missingCombos <- d$data$MER %>%
@@ -15,13 +15,46 @@ prepareTargetsData <- function(d) {
     return(d)
   }
 
-  # Prepare targets to distribute ####
-  if (d$info$has_psnuxim && d$info$missing_psnuxim_combos) {
+  #One of two things can happen here.
+  #1) We are only appending new rows to the existing PSNUxIM
+  #2) We already have allocated data, but are missing some combos
+  #which requires that we write a completely new PSNUxIM tab
+  #3) We want to keep existing allocation percentages,
+  #But update the targets values which exist. We have to write a
+  #New PSNU
+
+  has_non_equal_targets <- NROW(d$tests$non_equal_targets) > 0
+
+  if ((d$info$has_psnuxim && d$info$missing_psnuxim_combos) || has_non_equal_targets) {
+
     p <- d
     p$data$MER <- p$data$missingCombos
     p <- packForDATIM(p, type = "Undistributed MER")
-    targets_data <- p$datim$UndistributedMER
-    rm(p)
+
+    if (append == TRUE) {
+      targets_data <- p$datim$UndistributedMER
+    } else {
+
+      if (!has_non_equal_targets) {
+        dp_data <- dplyr::bind_rows(p$datim$UndistributedMER, d$datim$OPU) %>%
+          dplyr::filter(attributeOptionCombo %in% c("00000", "00001"))
+        } else {
+          print("Using existing model data")
+        psnuxim_model <- extractDataPackModel(d)
+
+      #Get the original targets
+          targets_data <-  d$datim$UndistributedMER %>%
+          dplyr::select(-attributeOptionCombo) %>%
+          dplyr::left_join(psnuxim_model, by = c("dataElement", "period", "orgUnit", "categoryOptionCombo")) %>%
+          dplyr::mutate(percent = dplyr::case_when(is.na(percent) ~ 1,
+                                                   TRUE ~ as.numeric(percent)),
+                        attributeOptionCombo = dplyr::case_when(is.na(attributeOptionCombo) ~ default_catOptCombo(),
+                                                                TRUE ~ attributeOptionCombo),
+                        #Very likely this is going to cause problems if we round here....
+                        value = value * percent) %>%
+         dplyr::select(dataElement, period, orgUnit, categoryOptionCombo, attributeOptionCombo, value)
+      }
+    }
   } else {
     targets_data <- d$datim$UndistributedMER
   }
@@ -211,8 +244,6 @@ writePSNUxIM <- function(d,
 
     d$info$has_psnuxim <- !is.null(d$data$SNUxIM)
 
-    targets_data <- prepareTargetsData(d)
-
     dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
 
     if (!d$info$has_psnuxim || !append) {
@@ -224,35 +255,41 @@ writePSNUxIM <- function(d,
 
     openxlsx::activeSheet(wb) <- "PSNUxIM"
 
-    smd <- readRDS(d$keychain$snuxim_model_data_path)
-    d$data$snuxim_model_data <- smd[d$info$country_uids] %>%
-      dplyr::bind_rows()
-    rm(smd)
+    #This is if we are dealing with no existing PSNUxIM data
+    if (!d$info$has_psnuxim) {
+      smd <- readRDS(d$keychain$snuxim_model_data_path)
+      d$data$snuxim_model_data <- smd[d$info$country_uids] %>%
+        dplyr::bind_rows()
+      rm(smd)
 
-    d$data$snuxim_model_data %<>%
-      ## Address issues with PMTCT_EID ####
-    dplyr::mutate_at(
-      c("age_option_name", "age_option_uid"),
-      ~dplyr::case_when(indicator_code %in% c("PMTCT_EID.N.2.T", "PMTCT_EID.N.12.T")
-                        ~ NA_character_,
-                        TRUE ~ .)) %>%
-      ## Convert to import file format ####
-    dplyr::left_join(
-      dp_datim_map,
-      by = c("indicator_code" = "indicator_code",
-             "age_option_uid" = "valid_ages.id",
-             "sex_option_uid" = "valid_sexes.id",
-             "kp_option_uid" = "valid_kps.id",
-             "type" = "support_type")) %>%
-      dplyr::select(dataElement = dataelementuid,
-                    period,
-                    orgUnit = psnu_uid,
-                    categoryOptionCombo = categoryoptioncombouid,
-                    attributeOptionCombo = mechanism_uid,
-                    value) %>%
-      ## Aggregate across 50+ age bands ####
-    dplyr::group_by(dplyr::across(c(-value))) %>%
-      dplyr::summarise(value = sum(value), .groups = "drop")
+      d$data$snuxim_model_data %<>%
+        ## Address issues with PMTCT_EID ####
+      dplyr::mutate_at(
+        c("age_option_name", "age_option_uid"),
+        ~dplyr::case_when(indicator_code %in% c("PMTCT_EID.N.2.T", "PMTCT_EID.N.12.T")
+                          ~ NA_character_,
+                          TRUE ~ .)) %>%
+        ## Convert to import file format ####
+      dplyr::left_join(
+        dp_datim_map,
+        by = c("indicator_code" = "indicator_code",
+               "age_option_uid" = "valid_ages.id",
+               "sex_option_uid" = "valid_sexes.id",
+               "kp_option_uid" = "valid_kps.id",
+               "type" = "support_type")) %>%
+        dplyr::select(dataElement = dataelementuid,
+                      period,
+                      orgUnit = psnu_uid,
+                      categoryOptionCombo = categoryoptioncombouid,
+                      attributeOptionCombo = mechanism_uid,
+                      value) %>%
+        ## Aggregate across 50+ age bands ####
+      dplyr::group_by(dplyr::across(c(-value))) %>%
+        dplyr::summarise(value = sum(value), .groups = "drop")
+
+    } else {
+      d$data$snuxim_model_data <- prepareTargetsData(d, append)
+    }
 
 
     org_units <-  getValidOrgUnits(d$info$cop_year) %>%
