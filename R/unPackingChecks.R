@@ -71,6 +71,11 @@ checkToolStructure <- function(d, quiet = TRUE) {
 
   submission_sheets <- readxl::excel_sheets(d$keychain$submission_path)
   schema_sheets <- unique(d$info$schema$sheet_name)
+  #TODO: Why is Spectrum part of the PSNUxIM schema?
+  if (d$info$tool == "PSNUxIM") {
+    schema_sheets <- schema_sheets[schema_sheets != "Spectrum"]
+  }
+
   missing_sheets <- schema_sheets[!schema_sheets %in% submission_sheets]
 
   if (length(missing_sheets) > 0) {
