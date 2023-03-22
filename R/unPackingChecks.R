@@ -940,7 +940,7 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
             lvl = NULL,
             has_error = FALSE)
 
-  header_row <- headerRow(tool = "Data Pack", cop_year = d$info$cop_year)
+  header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
 
   # Pull in formulas from schema
   formulas_schema <- d$info$schema %>%
@@ -990,7 +990,19 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
   formulas_datapack <-
     tidyxl::xlsx_cells(path = d$keychain$submission_path,
                        sheets = sheets,
-                       include_blank_cells = TRUE) %>%
+                       include_blank_cells = TRUE)
+
+  #By default, tidyxl scans forward when include_blank_cells
+  #is true is TRUE.
+  #Lets try and define where the last row of data is and exclude these blank
+
+  last_row_of_data <- formulas_datapack %>%
+    dplyr::filter(data_type != "blank") %>%
+    dplyr::pull(row) %>%
+    max()
+
+  formulas_datapack %<>%
+    dplyr::filter(row <= last_row_of_data) %>%
     # Note that this function won't pick up any cols with blank indicator_code
     dplyr::filter(row >= header_row) %>%
     dplyr::mutate(formula = dplyr::if_else(is.na(formula),
