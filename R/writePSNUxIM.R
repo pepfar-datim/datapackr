@@ -1,4 +1,5 @@
 prepareTargetsData <- function(d, append = TRUE) {
+
   if (d$info$has_psnuxim) {
 
     has_non_equal_targets <- NROW(d$tests$non_equal_targets) > 0
@@ -9,6 +10,7 @@ prepareTargetsData <- function(d, append = TRUE) {
       p$data$MER <- p$data$missingCombos
       p <- packForDATIM(p, type = "Undistributed MER")
       targets_data <- p$datim$UndistributedMER
+
       if (append) {
         return(targets_data)
       } else {
@@ -45,10 +47,12 @@ prepareTargetsData <- function(d, append = TRUE) {
               attributeOptionCombo,
               value
             )
+          return(targets_data)
         } else {
           targets_data <- d$datim$OPU %>%
             dplyr::filter(!(attributeOptionCombo %in% c("000000", "00001"))) %>%
             dplyr::bind_rows(targets_data)
+          return(targets_data)
         }
       }
     }
@@ -58,7 +62,6 @@ prepareTargetsData <- function(d, append = TRUE) {
   }
 
   targets_data
-
 
 }
 
