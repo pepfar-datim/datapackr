@@ -93,7 +93,8 @@ unPackToolSet <- function(d1_path = NULL,
   #but we may want to expand this to allow both anaalytics objects
   #to exist
   d$data$analytics <- p$data$analytics
-
+  d$info$has_psnuxim <- TRUE
+  d$info$needs_psnuxim <- NROW(d$tests$non_equal_targets) > 0 || NROW(d$data$missingCombos) > 0
 
   d
 

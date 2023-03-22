@@ -6,7 +6,7 @@ prepareTargetsData <- function(d, append = TRUE) {
 
     if (d$info$missing_psnuxim_combos || has_non_equal_targets) {
 
-      if(has_non_equal_targets) {
+      if (has_non_equal_targets) {
           psnuxim_model <- extractDataPackModel(d)
           #Get the original targets
           targets_data <-  d$datim$UndistributedMER %>%
