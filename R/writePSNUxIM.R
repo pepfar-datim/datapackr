@@ -114,7 +114,7 @@ writePSNUxIM <- function(d,
       = d$info$cop_year %in% supportedCOPYears(d$info$tool)
   )
 
-  if (!d$info$needs_psnuxim || !d$has_psnuxim) {
+  if (!d$info$needs_psnuxim && d$info$has_psnuxim) {
      interactive_warning("It does not appear that you need a new PSNUxIM tab.")
     return(d)
   }
