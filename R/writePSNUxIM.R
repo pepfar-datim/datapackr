@@ -1,5 +1,6 @@
 prepareTargetsData <- function(d, append = TRUE) {
   if (d$info$has_psnuxim) {
+
     has_non_equal_targets <- NROW(d$tests$non_equal_targets) > 0
 
     if (d$info$missing_psnuxim_combos || has_non_equal_targets) {
@@ -10,7 +11,6 @@ prepareTargetsData <- function(d, append = TRUE) {
         p <- packForDATIM(p, type = "Undistributed MER")
         targets_data <- p$datim$UndistributedMER
       } else {
-
         if (has_non_equal_targets) {
           psnuxim_model <- extractDataPackModel(d)
           #Get the original targets
@@ -51,6 +51,7 @@ prepareTargetsData <- function(d, append = TRUE) {
       }
     }
   } else {
+    print("Using undistributed MER data")
     targets_data <- d$datim$UndistributedMER
   }
 
@@ -253,7 +254,7 @@ writePSNUxIM <- function(d,
       wb <- openxlsx::loadWorkbook(template_file)
     }  else {
 
-      if (append) {
+      if (append && NROW(d$tests$non_equal_targets) == 0) {
         print("Loading Existing PSNUxIM")
         wb <- openxlsx::loadWorkbook(d$keychain$psnuxim_file_path)
       } else {
