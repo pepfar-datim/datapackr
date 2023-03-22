@@ -5,10 +5,11 @@ prepareTargetsData <- function(d, append = TRUE) {
 
     if (d$info$missing_psnuxim_combos || has_non_equal_targets) {
 
+      p <- d
+      p$data$MER <- p$data$missingCombos
+      p <- packForDATIM(p, type = "Undistributed MER")
+
       if (append) {
-        p <- d
-        p$data$MER <- p$data$missingCombos
-        p <- packForDATIM(p, type = "Undistributed MER")
         targets_data <- p$datim$UndistributedMER
       } else {
         if (has_non_equal_targets) {
@@ -54,29 +55,6 @@ prepareTargetsData <- function(d, append = TRUE) {
     print("Using undistributed MER data")
     targets_data <- d$datim$UndistributedMER
   }
-
-  #TODO: Do we really need to mirror the data for a PSNUxIM tab?
-  # #Mirror the data in TA as well
-  # dsd_ta_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
-  #                                             datasource = d$info$tool)
-  #
-  #
-  # dsd_ta_map <- dsd_ta_map %>%
-  #   dplyr::select(indicator_code,
-  #                 dataelementuid,
-  #                 support_type,
-  #                 numerator_denominator,
-  #                 disagg_type)  %>%
-  #   dplyr::filter(support_type %in% c("DSD", "TA")) %>%
-  #   dplyr::distinct() %>%
-  #   tidyr::pivot_wider(names_from = "support_type", values_from = "dataelementuid") %>%
-  #   dplyr::select(DSD, TA)
-  #
-  # ta_targets_data <- dplyr::inner_join(targets_data, dsd_ta_map, by = c("dataElement" = "DSD")) %>%
-  #   dplyr::select(-dataElement) %>%
-  #   dplyr::rename(dataElement = TA)
-  #
-  # targets_data <- dplyr::bind_rows(targets_data, ta_targets_data)
 
   targets_data
 
