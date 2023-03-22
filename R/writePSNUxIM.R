@@ -114,6 +114,11 @@ writePSNUxIM <- function(d,
       = d$info$cop_year %in% supportedCOPYears(d$info$tool)
   )
 
+  if (!d$info$needs_psnuxim) {
+     interactive_warning("It does not appear that you need a new PSNUxIM tab.")
+    return(d)
+  }
+
   if (is.null(output_folder)) {
     interactive_warning("If no output_folder is provided, new Data Packs will not be written.")
   }
@@ -245,19 +250,20 @@ writePSNUxIM <- function(d,
 
     d$info$has_psnuxim <- !is.null(d$data$SNUxIM)
 
+
     dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
     targets_data <- prepareTargetsData(d, append)
     template_file <- system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr")
 
     if (!d$info$has_psnuxim) {
-      print("Loading PSNUxIM Template")
+      print("Loading initial PSNUxIM Template")
       wb <- openxlsx::loadWorkbook(template_file)
     }  else {
       if (append) {
         print("Loading Existing PSNUxIM")
         wb <- openxlsx::loadWorkbook(d$keychain$psnuxim_file_path)
       } else {
-
+        print("Loading PSNUxIM Template")
         wb <- openxlsx::loadWorkbook(template_file)
       }
     }
