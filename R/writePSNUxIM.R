@@ -6,22 +6,7 @@ prepareTargetsData <- function(d, append = TRUE) {
 
     if (d$info$missing_psnuxim_combos || has_non_equal_targets) {
 
-
-      #We always need the Undistributed MER
-      p <- d
-      p$data$MER <- p$data$missingCombos
-      p <- packForDATIM(p, type = "Undistributed MER")
-      targets_data <- p$datim$UndistributedMER
-
-      if (!append) {
-
-        if (!has_non_equal_targets) {
-          #If there are equal targets and we are not appending, then use the existing
-          #allocated data combined with the missing data
-          targets_data <-
-            dplyr::bind_rows(targets_data, d$datim$OPU) %>%
-            dplyr::filter(!(attributeOptionCombo %in% c("00000", "00001")))
-        } else {
+      if(has_non_equal_targets) {
           psnuxim_model <- extractDataPackModel(d)
           #Get the original targets
           targets_data <-  d$datim$UndistributedMER %>%
@@ -53,9 +38,13 @@ prepareTargetsData <- function(d, append = TRUE) {
               attributeOptionCombo,
               value
             )
+      } else {
+        p <- d
+        p$data$MER <- p$data$missingCombos
+        p <- packForDATIM(p, type = "Undistributed MER")
+        targets_data <- p$datim$UndistributedMER
         }
 
-      }
     }
 
     } else {
