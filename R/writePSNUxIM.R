@@ -1,12 +1,17 @@
 prepareTargetsData <- function(d, append = TRUE) {
-
   if (d$info$has_psnuxim) {
-
     has_non_equal_targets <- NROW(d$tests$non_equal_targets) > 0
 
     if (d$info$missing_psnuxim_combos || has_non_equal_targets) {
 
-      if (has_non_equal_targets && !append) {
+      if (append) {
+        p <- d
+        p$data$MER <- p$data$missingCombos
+        p <- packForDATIM(p, type = "Undistributed MER")
+        targets_data <- p$datim$UndistributedMER
+      } else {
+
+        if (has_non_equal_targets) {
           psnuxim_model <- extractDataPackModel(d)
           #Get the original targets
           targets_data <-  d$datim$UndistributedMER %>%
@@ -38,20 +43,16 @@ prepareTargetsData <- function(d, append = TRUE) {
               attributeOptionCombo,
               value
             )
-      } else {
-        p <- d
-        p$data$MER <- p$data$missingCombos
-        p <- packForDATIM(p, type = "Undistributed MER")
-        targets_data <- p$datim$UndistributedMER
+        } else {
+          targets_data <- d$datim$OPU %>%
+            dplyr::filter(!(attributeOptionCombo %in% c("000000", "00001"))) %>%
+            dplyr::bind_rows(targets_data)
         }
-
+      }
     }
-
-    } else {
-
+  } else {
     targets_data <- d$datim$UndistributedMER
   }
-
 
   #TODO: Do we really need to mirror the data for a PSNUxIM tab?
   # #Mirror the data in TA as well
