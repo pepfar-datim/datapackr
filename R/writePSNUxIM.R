@@ -8,10 +8,11 @@ prepareTargetsData <- function(d, append = TRUE) {
       p <- d
       p$data$MER <- p$data$missingCombos
       p <- packForDATIM(p, type = "Undistributed MER")
-
+      targets_data <- p$datim$UndistributedMER
       if (append) {
-        targets_data <- p$datim$UndistributedMER
+        return(targets_data)
       } else {
+
         if (has_non_equal_targets) {
           psnuxim_model <- extractDataPackModel(d)
           #Get the original targets
