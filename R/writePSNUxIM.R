@@ -1,6 +1,7 @@
 prepareTargetsData <- function(d, append = TRUE) {
 
   if (d$info$has_psnuxim) {
+
     has_non_equal_targets <- NROW(d$tests$non_equal_targets) > 0
 
     if (d$info$missing_psnuxim_combos || has_non_equal_targets) {
@@ -13,8 +14,8 @@ prepareTargetsData <- function(d, append = TRUE) {
       if (!append) {
 
         if (has_non_equal_targets) {
-          psnuxim_model <- extractDataPackModel(d)
 
+          psnuxim_model <- extractDataPackModel(d)
           #Get the original targets
           targets_data <-  d$datim$UndistributedMER %>%
             dplyr::select(-attributeOptionCombo) %>%
@@ -47,11 +48,13 @@ prepareTargetsData <- function(d, append = TRUE) {
             )
 
         } else {
-          #If there are non-equal targets and we are not appending, then use the existing
-          #allocated data combined with the missing data
-          targets_data <-
-            dplyr::bind_rows(targets_data, d$datim$OPU) %>%
-            dplyr::filter(!(attributeOptionCombo %in% c("00000", "00001")))
+          if (d$info$missing_psnuxim_combos) {
+            #If there are non-equal targets and we are not appending, then use the existing
+            #allocated data combined with the missing data
+            targets_data <-
+              dplyr::bind_rows(targets_data, d$datim$OPU) %>%
+              dplyr::filter(!(attributeOptionCombo %in% c("00000", "00001")))
+          }
         }
       }
     }
