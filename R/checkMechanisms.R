@@ -39,6 +39,10 @@ checkMechanisms <- function(d,
     mechs_datim <- append(c("00000", "00001"), mechs_datim)
   }
 
+  if (d$info$tool == "PSNUxIM" && d$info$cop_year == 2023) {
+    mechs_datim <- append(c("00000", "00001"), mechs_datim)
+  }
+
   bad_mechs <- mechs_data[!(mechs_data %in% mechs_datim)]
 
   if (length(bad_mechs) > 0) {
