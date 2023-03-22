@@ -236,12 +236,16 @@ writePSNUxIM <- function(d,
       wb <- openxlsx::loadWorkbook(template_file)
     }  else {
 
-      if (append && NROW(d$tests$non_equal_targets) == 0) {
-        print("Loading Existing PSNUxIM")
-        wb <- openxlsx::loadWorkbook(d$keychain$psnuxim_file_path)
-      } else {
-        print("Loading PSNUxIM Template")
-        wb <- openxlsx::loadWorkbook(template_file)
+      if (append) {
+        if (NROW(d$tests$non_equal_targets) == 0) {
+          print("Loading Existing PSNUxIM")
+          wb <- openxlsx::loadWorkbook(d$keychain$psnuxim_file_path)
+        } else {
+          print("Loading PSNUxIM Template")
+          wb <- openxlsx::loadWorkbook(template_file)
+        } else {
+          print("Loading PSNUxIM Template")
+          wb <- openxlsx::loadWorkbook(template_file)
       }
     }
 
