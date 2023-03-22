@@ -46,8 +46,8 @@ checkMechanisms <- function(d,
   bad_mechs <- sort(mechs_data[!(mechs_data %in% mechs_datim)])
 
   if (length(bad_mechs) > 0) {
-    msg <- paste0("ERROR!: Invalid mechanisms found in the PSNUxIM tab.",
-                  "Please ensure that these mechanisms have been marked",
+    msg <- paste0("ERROR!: Invalid mechanisms found in the PSNUxIM tab. ",
+                  "Please ensure that these mechanisms have been marked ",
                   "as active for COP",
                   substr(d$info$cop_year, 3, 4), " in FACTS Info!:",
                   paste(bad_mechs, sep = "", collapse = ", "))
