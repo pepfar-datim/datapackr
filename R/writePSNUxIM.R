@@ -1,65 +1,71 @@
 prepareTargetsData <- function(d, append = TRUE) {
 
   if (d$info$has_psnuxim) {
-
     has_non_equal_targets <- NROW(d$tests$non_equal_targets) > 0
 
     if (d$info$missing_psnuxim_combos || has_non_equal_targets) {
-
       p <- d
       p$data$MER <- p$data$missingCombos
       p <- packForDATIM(p, type = "Undistributed MER")
       targets_data <- p$datim$UndistributedMER
 
-      if (append) {
+      #Only the missing rows
+      if (append && !has_non_equal_targets) {
         return(targets_data)
-      } else {
+      }
 
-        if (has_non_equal_targets) {
-          psnuxim_model <- extractDataPackModel(d)
-          #Get the original targets
-          targets_data <-  d$datim$UndistributedMER %>%
-            dplyr::select(-attributeOptionCombo) %>%
-            dplyr::left_join(
-              psnuxim_model,
-              by = c(
-                "dataElement",
-                "period",
-                "orgUnit",
-                "categoryOptionCombo"
-              )
-            ) %>%
-            dplyr::mutate(
-              percent = dplyr::case_when(is.na(percent) ~ 1,
-                                         TRUE ~ as.numeric(percent)),
-              attributeOptionCombo = dplyr::case_when(
-                is.na(attributeOptionCombo) ~ default_catOptCombo(),
-                TRUE ~ attributeOptionCombo
-              ),
-              #Very likely this is going to cause problems if we round here....
-              value = value * percent
-            ) %>%
-            dplyr::select(
-              dataElement,
-              period,
-              orgUnit,
-              categoryOptionCombo,
-              attributeOptionCombo,
-              value
+      #In this case, we need a full refresh
+      #From the existing model
+      if (append && has_non_equal_targets) {
+        psnuxim_model <- extractDataPackModel(d)
+        #Get the original targets
+        targets_data <-  d$datim$UndistributedMER %>%
+          dplyr::select(-attributeOptionCombo) %>%
+          dplyr::left_join(
+            psnuxim_model,
+            by = c(
+              "dataElement",
+              "period",
+              "orgUnit",
+              "categoryOptionCombo"
             )
-          return(targets_data)
-        } else {
-          targets_data <- d$datim$OPU %>%
-            dplyr::filter(!(attributeOptionCombo %in% c("000000", "00001"))) %>%
-            dplyr::bind_rows(targets_data)
-          return(targets_data)
-        }
+          ) %>%
+          dplyr::mutate(
+            percent = dplyr::case_when(is.na(percent) ~ 1,
+                                       TRUE ~ as.numeric(percent)),
+            attributeOptionCombo = dplyr::case_when(
+              is.na(attributeOptionCombo) ~ default_catOptCombo(),
+              TRUE ~ attributeOptionCombo
+            ),
+            #Very likely this is going to cause problems if we round here....
+            value = value * percent
+          ) %>%
+          dplyr::select(
+            dataElement,
+            period,
+            orgUnit,
+            categoryOptionCombo,
+            attributeOptionCombo,
+            value
+          )
+        return(targets_data)
+      }
+
+      if (!append && !has_non_equal_targets) {
+
+        targets_data <- d$datim$OPU %>%
+          dplyr::filter(!(attributeOptionCombo %in% c("000000", "00001"))) %>%
+          dplyr::bind_rows(targets_data)}
+
+      #In this case, we are only going to return the missing rows.
+      #They will need to rectify the targets themselves
+      if (!append && has_non_equal_targets) {
+        return(targets_data)
       }
     }
-  } else {
-    print("Using undistributed MER data")
-    targets_data <- d$datim$UndistributedMER
-  }
+    } else {
+      return(d$datim$UndistributedMER)
+    }
 
   targets_data
 
@@ -83,7 +89,9 @@ writePSNUxIM <- function(d,
                          output_folder = NULL,
                          d2_session = dynGet("d2_default_session",
                                              inherits = TRUE),
-                         append = TRUE) {
+                         append = TRUE,
+                         use_template = FALSE
+                         ) {
 
   stopifnot(
     "Cannot update PSNUxIM tab without model data." = !is.null(snuxim_model_data_path),
@@ -231,21 +239,15 @@ writePSNUxIM <- function(d,
     targets_data <- prepareTargetsData(d, append)
     template_file <- system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr")
 
+
     if (!d$info$has_psnuxim) {
       print("Loading initial PSNUxIM Template")
       wb <- openxlsx::loadWorkbook(template_file)
     }  else {
-
-      if (append) {
-        if (NROW(d$tests$non_equal_targets) == 0) {
-          print("Loading Existing PSNUxIM")
-          wb <- openxlsx::loadWorkbook(d$keychain$psnuxim_file_path)
-        } else {
-          print("Loading PSNUxIM Template")
-          wb <- openxlsx::loadWorkbook(template_file)
-        } else {
-          print("Loading PSNUxIM Template")
-          wb <- openxlsx::loadWorkbook(template_file)
+      if (use_template) {
+        wb <- openxlsx::loadWorkbook(template_file)
+      } else {
+        wb <- openxlsx::loadWorkbook(d$keychain$psnuxim_file_path)
       }
     }
 
