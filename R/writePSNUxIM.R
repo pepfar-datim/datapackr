@@ -55,7 +55,8 @@ prepareTargetsData <- function(d, append = TRUE) {
 
         targets_data <- d$datim$OPU %>%
           dplyr::filter(!(attributeOptionCombo %in% c("000000", "00001"))) %>%
-          dplyr::bind_rows(targets_data)}
+          dplyr::bind_rows(targets_data)
+        }
 
       #In this case, we are only going to return the missing rows.
       #They will need to rectify the targets themselves
