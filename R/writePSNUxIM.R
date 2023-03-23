@@ -10,13 +10,13 @@ prepareTargetsData <- function(d, append = TRUE) {
       targets_data <- p$datim$UndistributedMER
 
       #Only the missing rows
-      if (append && !has_non_equal_targets) {
+      if (append) {
         return(targets_data)
       }
 
       #In this case, we need a full refresh
       #From the existing model
-      if (append && has_non_equal_targets) {
+      if (!append && has_non_equal_targets) {
         psnuxim_model <- extractDataPackModel(d)
         #Get the original targets
         targets_data <-  d$datim$UndistributedMER %>%
@@ -58,11 +58,6 @@ prepareTargetsData <- function(d, append = TRUE) {
           dplyr::bind_rows(targets_data)
         }
 
-      #In this case, we are only going to return the missing rows.
-      #They will need to rectify the targets themselves
-      if (!append && has_non_equal_targets) {
-        return(targets_data)
-      }
     }
     } else {
       return(d$datim$UndistributedMER)
