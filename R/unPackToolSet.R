@@ -89,10 +89,18 @@ unPackToolSet <- function(d1_path = NULL,
   d$keychain$psnuxim_file_path <- p$keychain$submission_path
 
   #TODO: Check to be sure that the analytics should
-  #be coming from the PSNUxIM tab. This should be correct
-  #but we may want to expand this to allow both anaalytics objects
-  #to exist
-  d$data$analytics <- p$data$analytics
+  #be coming from the PSNUxIM tab, but we will merge everything
+  #SUBNAT, IMPATT, DREAMS which is only in the datapack
+
+  dp_indicators <- unique(d$data$analytics$indicator_code)
+  dp_indicators <- dp_indicators[!dp_indicators %in% unique(p$data$analytics$indicator_code)]
+
+
+  dp_analytics <- d$data$analytics %>%
+    dplyr::filter(indicator_code %in% dp_indicators)
+
+  d$data$analytics <- dplyr::bind_rows(p$data$analytics, dp_analytics)
+
   d$info$has_psnuxim <- TRUE
   d$info$needs_psnuxim <- NROW(d$tests$non_equal_targets) > 0 || NROW(d$data$missingCombos) > 0
 
