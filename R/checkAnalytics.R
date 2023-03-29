@@ -696,6 +696,7 @@ checkAnalytics <- function(d,
     # have leading zeros in the Datapack
     dplyr::mutate(age = dplyr::case_when(age == "5-9" ~ "05-09",
                                          age == "1-4" ~ "01-04",
+                                         age == "1-9" ~ "01-09",
                                          age == "<1" ~ "<01",
                                          TRUE ~ age)) %>%
     dplyr::select(names(data))
