@@ -18,12 +18,15 @@ checkToolSetMetadata <- function(d, p) {
 }
 
 
-#' Title
+#' @title unPackToolSet
 #'
-#' @param datapack_path
-#' @param psnuxim_path
-#' @param country_uids
-#' @param cop_year
+#' @description Packs the PSNUxIM tab in either a COP or OPU Data Pack.
+#'
+#'
+#' @param d1_path Path to a DataPack
+#' @param d2_path Path to a PSNUxIM tool
+#' @param country_uids List of country UIDs
+#' @param cop_year COP year
 #' @param d2_session
 #'
 #' @return Datapackr d object merged from a Datapack and standalone PSNUxIM tab
