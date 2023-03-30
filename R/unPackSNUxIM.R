@@ -44,7 +44,7 @@ checkHasPSNUxIM <- function(d) {
 #' Title
 #'
 #' @inheritParams datapackr_params
-#' @p An optional PSNUxIM object.
+#' @param p An optional PSNUxIM object.
 #' @return Modified d object with documented and missing SNUxIM combos
 #'
 extractSNUxIMCombos <- function(d, p = NULL) {

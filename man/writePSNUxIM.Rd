@@ -9,7 +9,8 @@ writePSNUxIM(
   snuxim_model_data_path = NULL,
   output_folder = NULL,
   d2_session = dynGet("d2_default_session", inherits = TRUE),
-  append = TRUE
+  append = TRUE,
+  use_template = FALSE
 )
 }
 \arguments{
