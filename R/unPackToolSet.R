@@ -77,6 +77,7 @@ unPackToolSet <- function(d1_path = NULL,
                   country_uids = d$info$country_uids,
                   cop_year = d$info$cop_year,
                   pzns = pzns,
+                  mer_data = d$data$MER,
                   d2_session = d2_session)
 
 

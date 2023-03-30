@@ -23,6 +23,7 @@
 #'
 unPackOPUDataPack <- function(d,
                               pzns = NULL,
+                              mer_data = NULL,
                               d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
 
@@ -30,6 +31,7 @@ unPackOPUDataPack <- function(d,
   #This may be overridden if we are dealing with a DataPack + PSNUxIM.
   d$info$has_psnuxim <- TRUE
   d$info$needs_psnuxim <- FALSE
+
   #Use the existing prioritizations if one is supplied
   d$datim$prioritizations <- pzns
 
@@ -52,6 +54,11 @@ unPackOPUDataPack <- function(d,
   d <- unPackSNUxIM(d)
 
   # Prepare SNU x IM dataset for DATIM import & validation ####
+
+  if (!is.null(mer_data)) {
+    d$data$MER <- mer_data
+  }
+
   d <- packForDATIM(d, type = "OPU PSNUxIM")
 
   # Prepare data for sharing with other systems ####

@@ -46,25 +46,25 @@ packForDATIM <- function(d, type = NULL) {
   expected_col_names <- c("PSNU", "indicator_code", "Age", "Sex", "KeyPop",
                           "psnuid", "mech_code", "support_type", "value")
 
-  if (type == "PSNUxIM") { ## PSNUxIM ----
-    # Combine PSNUxIM distributed data with undistributed AGYW_PREV
-    agyw_data <- d$data$MER %>%
-      dplyr::filter(stringr::str_detect(indicator_code, "^AGYW_PREV")) %>%
-      dplyr::mutate(
-        support_type = "No Support Type",
-        mech_code = datapackr::default_catOptCombo()) %>%
-      dplyr::select(expected_col_names)
+  #TODO: Get rid of this OPU PSNUxIM type entirely.
 
-    data %<>%
-      dplyr::bind_rows(agyw_data)
+  if (type %in%  c("PSNUxIM", "OPU PSNUxIM")) { ## PSNUxIM ----
+
+    if (!is.null(d$data$MER)) {
+      # Combine PSNUxIM distributed data with undistributed AGYW_PREV
+      agyw_data <- d$data$MER %>%
+        dplyr::filter(stringr::str_detect(indicator_code, "^AGYW_PREV")) %>%
+        dplyr::mutate(
+          support_type = "No Support Type",
+          mech_code = datapackr::default_catOptCombo()) %>%
+        dplyr::select(expected_col_names)
+
+      data %<>%
+        dplyr::bind_rows(agyw_data)
+    }
 
     datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
                                                           datasource = "PSNUxIM")
-    if (d$info$cop_year == 2023) {
-      datim_map %<>%
-        dplyr::filter(!grepl("\\.T2$", indicator_code))
-    }
-
   }
 
   if (type == "Undistributed MER") { ## Undistributed MER ----
@@ -78,10 +78,6 @@ packForDATIM <- function(d, type = NULL) {
     datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
                                                datasource = "Data Pack")
 
-    if (d$info$cop_year == 2023) {
-      datim_map %<>%
-        dplyr::filter(!grepl("\\.T2$", indicator_code))
-    }
   }
 
   if (type == "SUBNAT_IMPATT") { ## SUBNAT_IMPATT ----
@@ -95,25 +91,7 @@ packForDATIM <- function(d, type = NULL) {
     datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
                                                datasource = "Data Pack")
 
-    if (d$info$cop_year == 2023) {
-      datim_map %<>%
-        dplyr::filter(!grepl("\\.T2$", indicator_code))
-    }
-
   }
-
-  if (type == "OPU PSNUxIM") { ## OPU PSNUxIM
-
-    datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
-                                               datasource = "PSNUxIM")
-
-    if (d$info$cop_year == 2023) {
-      datim_map %<>%
-        dplyr::filter(!grepl("\\.T2$", indicator_code))
-    }
-
-  }
-
 
   data %<>%
     dplyr::select(expected_col_names)
