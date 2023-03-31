@@ -161,7 +161,7 @@ test_that("Can get columns to keep", {
   expect_setequal(names(cols_to_keep), names(cop22OPU_data_pack_schema))
 })
 with_mock_api({
-test_that("Can detected missing right side formulas", {
+test_that("Can detect missing right side formulas", {
 
 
   generation_list <- c("Eswatini")

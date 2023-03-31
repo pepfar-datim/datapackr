@@ -2,7 +2,7 @@
 % Please edit documentation in R/unPackToolSet.R
 \name{unPackToolSet}
 \alias{unPackToolSet}
-\title{Title}
+\title{unPackToolSet}
 \usage{
 unPackToolSet(
   d1_path = NULL,
@@ -13,11 +13,19 @@ unPackToolSet(
 )
 }
 \arguments{
+\item{d1_path}{Path to a DataPack}
+
+\item{d2_path}{Path to a PSNUxIM tool}
+
+\item{country_uids}{List of country UIDs}
+
+\item{cop_year}{COP year}
+
 \item{d2_session}{}
 }
 \value{
 Datapackr d object merged from a Datapack and standalone PSNUxIM tab
 }
 \description{
-Title
+Packs the PSNUxIM tab in either a COP or OPU Data Pack.
 }
