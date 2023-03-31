@@ -8,6 +8,8 @@ extractSNUxIMCombos(d, p = NULL)
 }
 \arguments{
 \item{d}{Datapackr sidecar object}
+
+\item{p}{An optional PSNUxIM object.}
 }
 \value{
 Modified d object with documented and missing SNUxIM combos
