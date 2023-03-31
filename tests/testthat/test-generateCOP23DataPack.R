@@ -102,5 +102,52 @@ with_mock_api({
 
   #TODO: Add additional tests for data
 
+  #DP-837
+  #Specific test of AGYW_PREV orgunits
+  agyw_have <- d$sheets$AGYW %>%
+    dplyr::select(PSNU) %>%
+    dplyr::distinct() %>%
+    dplyr::mutate(psnu_uid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
+    dplyr::arrange(PSNU)
+
+  agyw_want <- getValidOrgUnits("2023") %>%
+    dplyr::filter(country_uid %in% d$info$country_uids) %>%
+    add_dp_label(., "2023") %>%
+    dplyr::arrange(dp_label) %>%
+    dplyr::filter(!is.na(DREAMS)) %>%
+    dplyr::select(PSNU = dp_label, psnu_uid = uid) %>%
+    dplyr::arrange(PSNU)
+
+  expect_identical(agyw_want, agyw_have)
+
+
+#Check the PSNUs in normal sheets, excluding the PSNUxIM tab, Year 2 and AGYW
+  discard_names <- function(l, kn) {
+    l[!(names(l) %in% kn)]
+  }
+
+  extract_PSNU <- function(df) {
+    df %>%
+      dplyr::select(PSNU) %>%
+      dplyr::distinct() %>%
+      dplyr::mutate(psnu_uid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
+      dplyr::arrange(PSNU)
+  }
+
+  sheet_psnus <- d$sheets %>%
+    discard_names(c("PSNUxIM", "Year 2", "AGYW")) %>%
+    purrr::map(extract_PSNU)
+
+   wanted_psnus <-
+     getValidOrgUnits("2023") %>%
+     dplyr::filter(country_uid %in% d$info$country_uids) %>%
+     add_dp_label(., "2023") %>%
+     dplyr::arrange(dp_label) %>%
+     ## Remove DSNUs
+     dplyr::filter(org_type != "DSNU") %>%
+     dplyr::select(PSNU = dp_label, psnu_uid = uid)
+
+   expect_true(all(unlist(purrr::map(sheet_psnus, function(x) identical(x, wanted_psnus)))))
+
 })
 })
