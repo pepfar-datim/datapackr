@@ -479,7 +479,8 @@ test_that(" Test index pos ratio", {
 
 
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS.Index.Pos.T, ~HTS_TST.PostANC1.Pos.T, ~TX_CURR_SUBNAT.T, ~PLHIV.T, ~cop_year,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,
+      ~HTS.Index.Pos.T, ~HTS_TST.PostANC1.Pos.T, ~TX_CURR_SUBNAT.T, ~PLHIV.T, ~cop_year,
     "a", 1, "25-49", "F", NA, 10,  100, 5, 100, 2023
 
   )

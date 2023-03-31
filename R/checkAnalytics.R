@@ -691,7 +691,7 @@ analyze_indexpos_ratio <- function(data) {
                     HTS_INDEX.total, HTS_TST_POS.T, HTS_TST_POS.index_rate)
   }
 
-  if (this_cop_year== "2023")  {
+  if (this_cop_year == "2023")  {
     analysis <- data %>%
       dplyr::filter(is.na(key_population)) %>%
       dplyr::select(-age, -sex, -key_population) %>%
