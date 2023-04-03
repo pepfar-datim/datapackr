@@ -1,3 +1,22 @@
+# datapackr 6.2.1
+
+## Breaking changes
+
+## New features
+* Adds initial support for parsing COP23 PSNUxIM sheets
+* Adds functionality for handling Year 2 exports
+* Adds utility function `extractRawColumnData()` which can retrieve raw data from a sheet
+* Created a centralized method for creating DATIM exports
+
+## Minor improvements and fixes
+* Added unit tests for PSNU's for COP23 generation
+* Updated COP 23 validation rules to match DATIM
+* Now compares with rounding figures to two significant digits
+* Altered checks for EID, Retention and Index testing for COP23
+* Resolved issue with 1-9/01-09 in `checkAnalytics()`
+* Fixed critical formulas
+* Updated DE/COC map
+
 # datapackr 6.2.0
 
 ## Breaking changes
