@@ -149,5 +149,16 @@ with_mock_api({
 
    expect_true(all(unlist(purrr::map(sheet_psnus, function(x) identical(x, wanted_psnus)))))
 
+
+
+   #DP-970--Duplicates in the Year2 tab
+   duplicated_export_rows <- d$datim$year2 %>%
+     dplyr::select(dataElement, period, orgUnit, categoryOptionCombo, attributeOptionCombo) %>%
+     dplyr::group_by_all() %>%
+     dplyr::mutate(n = dplyr::n()) %>%
+     dplyr::filter(n > 1) %>%
+     NROW()
+
+   expect_equal(0L, duplicated_export_rows)
 })
 })
