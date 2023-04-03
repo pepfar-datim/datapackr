@@ -446,7 +446,7 @@ unpackYear2Sheet <- function(d) {
   d$data$Year2 <- d$data$Year2[!(names(d$data$Year2) %in% c(""))]
 
   #Test column structure before any restructuring.
-  d <- y2TestColumnStructure(d)
+  d <- datapackr:::y2TestColumnStructure(d)
 
   cols_to_keep <- datapackr:::getColumnsToKeep(d, sheet)
   header_cols <- datapackr:::getHeaderColumns(cols_to_keep, sheet)
@@ -461,7 +461,7 @@ unpackYear2Sheet <- function(d) {
     dplyr::mutate(dplyr::across(!header_cols$indicator_code, as.numeric)) %>%
     dplyr::mutate(dplyr::across(
       tidyselect::contains("Share"),
-      ~ .x * HTS_TST.Pos.Total_With_HEI.T2
+      ~ round(.x * HTS_TST.Pos.Total_With_HEI.T2)
     )) %>%
     #Pivot longer
     tidyr::pivot_longer(
@@ -511,19 +511,25 @@ unpackYear2Sheet <- function(d) {
     #TODO: This feels a bit risky. Should we only limit to OVC_HIVSTAT & PMTCT_EID?
     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
 
+  start_rows <- NROW(d$data$Year2)
   # Get the raw data element codes from the map ----
   d$data$Year2 %<>%
     dplyr::left_join(
-      getMapDataPack_DATIM_DEs_COCs(d$info$cop_year),
+      getMapDataPack_DATIM_DEs_COCs(d$info$cop_year, year = 2),
       by = c(
         "indicator_code",
         "valid_ages.name",
         "valid_sexes.name",
         "valid_kps.name"))
 
+  new_rows <- NROW(d$data$Year2)
+  if (start_rows != new_rows) {
+    warning("Rows were duplicated in a join.")
+  }
+
   #No data should have any missing data element uids or category option combo
   #uids at this poinbt
-  d <- y2ExtractInvalidDisaggs(d)
+  d <- datapackr:::y2ExtractInvalidDisaggs(d)
 
   # Create the DATIM export file ----
   d$datim$year2 <- d$data$Year2 %>%
@@ -539,8 +545,15 @@ unpackYear2Sheet <- function(d) {
       attributeOptionCombo,
       value = value
     ) %>%
-    tidyr::drop_na() %>%  #TODO: Remove this. We should not have any NAs at this point
-    dplyr::distinct() #TODO: Remove this. We need to be sure we have no duplicates from the join
+    tidyr::drop_na() %>%
+    dplyr::distinct()
+
+
+  #DP-970
+  #TODO: This needs to be fixed in the DE/COC map
+  export_dups_vec <- duplicated(d$datim$year2[, 1:5])
+  d$datim$year2 <- d$datim$year2[!export_dups_vec, ]
+
 
   d
 

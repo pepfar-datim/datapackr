@@ -39,12 +39,19 @@ checkMechanisms <- function(d,
     mechs_datim <- append(c("00000", "00001"), mechs_datim)
   }
 
-  bad_mechs <- mechs_data[!(mechs_data %in% mechs_datim)]
+  if (d$info$tool == "PSNUxIM" && d$info$cop_year == 2023) {
+    mechs_datim <- append(c("00000", "00001"), mechs_datim)
+  }
+
+  bad_mechs <- sort(mechs_data[!(mechs_data %in% mechs_datim)])
 
   if (length(bad_mechs) > 0) {
-    msg <- paste0("ERROR!: Invalid mechanisms found in the PSNUxIM tab.
-                  These MUST be reallocated to a valid mechanism
-                  ", paste(bad_mechs, sep = "", collapse = ", "))
+    msg <- paste0("ERROR!: Invalid mechanisms found in the PSNUxIM tab. ",
+                  "Please ensure that these mechanisms have been marked ",
+                  "as active for COP",
+                  substr(d$info$cop_year, 3, 4), " in FACTS-Info or ",
+                  "reallocate values to a valid mechanism:",
+                  paste(bad_mechs, sep = "", collapse = ", "))
     d$tests$bad_mechs <- data.frame(mechanism_code = bad_mechs)
     d$info$messages <- appendMessage(d$info$messages, msg, "ERROR")
     d$info$has_error <- TRUE

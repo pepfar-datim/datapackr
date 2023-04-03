@@ -27,14 +27,6 @@
         "stringr"
       ]
     },
-    "KernSmooth": {
-      "Package": "KernSmooth",
-      "Version": "2.23-20",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "8dcfa99b14c296bc9f1fd64d52fd3ce7",
-      "Requirements": []
-    },
     "MASS": {
       "Package": "MASS",
       "Version": "7.3-57",
@@ -140,14 +132,6 @@
         "vctrs"
       ]
     },
-    "boot": {
-      "Package": "boot",
-      "Version": "1.3-28",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "0baa960e3b49c6176a4f42addcbacc59",
-      "Requirements": []
-    },
     "brew": {
       "Package": "brew",
       "Version": "1.0-7",
@@ -231,16 +215,6 @@
         "tibble"
       ]
     },
-    "class": {
-      "Package": "class",
-      "Version": "7.3-20",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "da09d82223e669d270e47ed24ac8686e",
-      "Requirements": [
-        "MASS"
-      ]
-    },
     "cli": {
       "Package": "cli",
       "Version": "3.3.0",
@@ -257,14 +231,6 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "3f038e5ac7f41d4ac41ce658c85e3042",
-      "Requirements": []
-    },
-    "cluster": {
-      "Package": "cluster",
-      "Version": "2.1.4",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "5edbbabab6ce0bf7900a74fd4358628e",
       "Requirements": []
     },
     "codetools": {
@@ -357,11 +323,11 @@
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
-      "RemoteUsername": "pepfar-datim",
       "RemoteRepo": "datimutils",
+      "RemoteUsername": "pepfar-datim",
       "RemoteRef": "master",
-      "RemoteSha": "3346faec3d1c0a6d180a1b60cab4176c2b27fa95",
-      "Hash": "b38f9407699a3f75b74a0b3349d8684a",
+      "RemoteSha": "2c93869b001202ad298529302df618a7bbbacc93",
+      "Hash": "b0ea7b258f4774b02092da5a0e54f904",
       "Requirements": [
         "R6",
         "httr",
@@ -383,7 +349,7 @@
       "RemoteRef": "master",
       "RemoteSha": "0bc5c0285931e95741d63eb13e0d28c4e0069f46",
       "Remotes": "pepfar-datim/datimutils",
-      "Hash": "7b35359c222ba12d7e95d95d19c971df",
+      "Hash": "e06d915ce81a997dad1a66d223b3040d",
       "Requirements": [
         "ISOweek",
         "assertthat",
@@ -604,14 +570,6 @@
         "rlang",
         "tibble"
       ]
-    },
-    "foreign": {
-      "Package": "foreign",
-      "Version": "0.8-82",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "32b25c97ce306a760c4d9f787991b5d9",
-      "Requirements": []
     },
     "fs": {
       "Package": "fs",
@@ -1088,14 +1046,6 @@
         "lattice"
       ]
     },
-    "nnet": {
-      "Package": "nnet",
-      "Version": "7.3-18",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "170da2130d5332bea7d6ede01875ba1d",
-      "Requirements": []
-    },
     "officer": {
       "Package": "officer",
       "Version": "0.4.2",
@@ -1457,14 +1407,6 @@
         "xml2"
       ]
     },
-    "rpart": {
-      "Package": "rpart",
-      "Version": "4.1.19",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "b3c892a81783376cc2204af0f5805a80",
-      "Requirements": []
-    },
     "rprojroot": {
       "Package": "rprojroot",
       "Version": "2.0.3",
@@ -1568,14 +1510,6 @@
       "Hash": "07060494360a48fc8a2e282f0dc8f2cf",
       "Requirements": []
     },
-    "spatial": {
-      "Package": "spatial",
-      "Version": "7.3-15",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "c23666fdb7789c8a45e65340bb334607",
-      "Requirements": []
-    },
     "stringi": {
       "Package": "stringi",
       "Version": "1.7.8",
@@ -1594,16 +1528,6 @@
         "glue",
         "magrittr",
         "stringi"
-      ]
-    },
-    "survival": {
-      "Package": "survival",
-      "Version": "3.4-0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "04411ae66ab4659230c067c32966fc20",
-      "Requirements": [
-        "Matrix"
       ]
     },
     "sys": {

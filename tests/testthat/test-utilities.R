@@ -217,7 +217,7 @@ test_that("Testing can merge data packs...", {
 
   # test error out from different data pack
   d2$info$datapack_name <- "Cameroon"
-  testthat::expect_error(mergeDatapack(d1, d2), "These are different datapacks, cannot merge!!!")
+  testthat::expect_error(mergeDatapack(d1, d2), "We cannot merge those two tools.")
 
 })
 

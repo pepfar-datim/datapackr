@@ -44,27 +44,30 @@ checkHasPSNUxIM <- function(d) {
 #' Title
 #'
 #' @inheritParams datapackr_params
-#'
+#' @param p An optional PSNUxIM object.
 #' @return Modified d object with documented and missing SNUxIM combos
 #'
-extractSNUxIMCombos <- function(d) {
+extractSNUxIMCombos <- function(d, p = NULL) {
 
-  if (is.null(d$data$SNUxIM)) {
+  if (is.null(d$data$SNUxIM) && is.null(p$data$SNUxIM)) {
     stop("PSNUxIM cannot be null")
   }
 
-
-  # Document all combos used in submitted PSNUxIM tab ####
-  # This ensures tests for new combinations are correctly matched
-  d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
-    dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop) %>%
-    dplyr::mutate(
-      psnuid =
-        stringr::str_extract(
-          PSNU,
-          "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
-    dplyr::distinct() %>%
-    dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop)
+  if (!is.null(p$data$PSNUxIM_combos))  {
+    d$data$PSNUxIM_combos <- p$data$PSNUxIM_combos
+  } else {
+    # Document all combos used in submitted PSNUxIM tab ####
+    # This ensures tests for new combinations are correctly matched
+    d$data$PSNUxIM_combos <- d$data$SNUxIM %>%
+      dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop) %>%
+      dplyr::mutate(
+        psnuid =
+          stringr::str_extract(
+            PSNU,
+            "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
+      dplyr::distinct() %>%
+      dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop)
+  }
 
   if (d$info$tool == "Data Pack") {
 
@@ -208,7 +211,10 @@ checkNonEqualTargets <- function(d, original_targets) {
       dplyr::group_by(dplyr::across(c(-MainTabsTarget))) %>%
       dplyr::summarise(MainTabsTarget = sum(MainTabsTarget, na.rm = TRUE), .groups = "drop")
 
-    d$tests$non_equal_targets  <- d$data$SNUxIM %>%
+    #Grab this from the raw sheet data prior to any processing/reshaping
+    snu_targets <-  d$sheets$PSNUxIM
+
+    d$tests$non_equal_targets  <- snu_targets %>%
       dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget) %>%
       dplyr::mutate(DataPackTarget = as.numeric(DataPackTarget)) %>%
       dplyr::full_join(main_tab_data, by = c("PSNU", "indicator_code", "Age", "Sex", "KeyPop")) %>%
@@ -221,7 +227,8 @@ checkNonEqualTargets <- function(d, original_targets) {
       #Filter non-allocated data to prevent false positives with this test
       #Other tests should catch whether there is data in the main tabs
       #but which has not been allocated
-      dplyr::filter(!is.na(DataPackTarget))
+      dplyr::filter(!is.na(DataPackTarget)) %>%
+      dplyr::rename("PSNUxIM Target" = DataPackTarget)
 
     attr(d$tests$non_equal_targets, "test_name") <- "Non-equal targets"
 
