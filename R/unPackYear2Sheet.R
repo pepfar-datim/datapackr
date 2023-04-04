@@ -446,10 +446,10 @@ unpackYear2Sheet <- function(d) {
   d$data$Year2 <- d$data$Year2[!(names(d$data$Year2) %in% c(""))]
 
   #Test column structure before any restructuring.
-  d <- datapackr:::y2TestColumnStructure(d)
+  d <- y2TestColumnStructure(d)
 
-  cols_to_keep <- datapackr:::getColumnsToKeep(d, sheet)
-  header_cols <- datapackr:::getHeaderColumns(cols_to_keep, sheet)
+  cols_to_keep <- getColumnsToKeep(d, sheet)
+  header_cols <- getHeaderColumns(cols_to_keep, sheet)
 
   Year2_KP_stacked <- pick_schema(d$info$cop_year, d$info$tool) %>%
     dplyr::filter(sheet_name == "Year 2",
@@ -529,7 +529,7 @@ unpackYear2Sheet <- function(d) {
 
   #No data should have any missing data element uids or category option combo
   #uids at this poinbt
-  d <- datapackr:::y2ExtractInvalidDisaggs(d)
+  d <- y2ExtractInvalidDisaggs(d)
 
   # Create the DATIM export file ----
   d$datim$year2 <- d$data$Year2 %>%
@@ -552,6 +552,11 @@ unpackYear2Sheet <- function(d) {
   #DP-970
   #TODO: This needs to be fixed in the DE/COC map
   export_dups_vec <- duplicated(d$datim$year2[, 1:5])
+
+  if (any(export_dups_vec)) {
+    warning("Removing duplicates in final Year2 export.")
+  }
+
   d$datim$year2 <- d$datim$year2[!export_dups_vec, ]
 
 
