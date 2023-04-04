@@ -22,16 +22,43 @@
 #' Pack being processed.
 #'
 unPackOPUDataPack <- function(d,
+                              pzns = NULL,
+                              mer_data = NULL,
                               d2_session = dynGet("d2_default_session",
                                                   inherits = TRUE)) {
 
+  #We must assume that the PSNUxIM tab is not needed.
+  #This may be overridden if we are dealing with a DataPack + PSNUxIM.
+  d$info$has_psnuxim <- TRUE
+  d$info$needs_psnuxim <- FALSE
+
+  #Use the existing prioritizations if one is supplied
+  d$datim$prioritizations <- pzns
+
+  #Keep the sheets since we are going to need the original targets
+
+  d <- loadSheets(d)
+  #TODO: Are we dealing with a PSNUxIM (season is COP)
+  #or an OPU (Season is OPU)
+
   # Check integrity of Workbook tabs ####
   d <- checkToolStructure(d)
+
+  # Check whether there exist any troublesome comments in the file
+  d <- checkToolComments(d)
+
+  # Check whether there exist any troublesome connections in the file
+  d <- checkToolConnections(d)
 
   # Unpack updated PSNUxIM data ####
   d <- unPackSNUxIM(d)
 
   # Prepare SNU x IM dataset for DATIM import & validation ####
+
+  if (!is.null(mer_data)) {
+    d$data$MER <- mer_data
+  }
+
   d <- packForDATIM(d, type = "OPU PSNUxIM")
 
   # Prepare data for sharing with other systems ####
@@ -39,6 +66,7 @@ unPackOPUDataPack <- function(d,
 
   # Check for invalid mechanisms
   d <- checkMechanisms(d, d2_session = d2_session)
+
 
   return(d)
 

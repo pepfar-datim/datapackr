@@ -12,44 +12,54 @@
 #'
 mergeDatapack <- function(d1 = d1, d2 = d2) {
 
-    if (d1$info$datapack_name == d2$info$datapack_name) {
 
-      # bind data, datim and data
-      d <- d1
-      d$datim <- purrr::map2(d1$datim, d2$datim, dplyr::bind_rows)
-      d$data <- purrr::map2(d1$data, d2$data, dplyr::bind_rows)
+  same_name <- identical(d1$info$datapack_name, d2$info$datapack_name)
 
-      # ensure all test results are coded as data frames or tibbles
-      d1$tests <- lapply(d1$tests, dplyr::tibble)
-      d2$tests <- lapply(d2$tests, dplyr::tibble)
+  if (!same_name) {
+    stop("We cannot merge those two tools.")
+  } else {
+    d <- d1
+  }
 
-      # extract extras in each test list
-      d1$tests <- lapply(d1$tests, dplyr::tibble)
-      d2$tests <- lapply(d2$tests, dplyr::tibble)
-      d1_names <- names(d1$tests)
-      d2_names <- names(d2$tests)
-      d1_extras <- d1_names[!d1_names %in% d2_names]
-      d2_extras <- d2_names[!d2_names %in% d1_names]
+  #Do not attempt to merge data from a PSNUxIM and a Datapack
+  # bind data, datim and data
+  if (identical(d1$info$tool, d2$info$tool)) {
+    d$datim <- purrr::map2(d1$datim, d2$datim, dplyr::bind_rows)
+    d$data <- purrr::map2(d1$data, d2$data, dplyr::bind_rows)
+  }
 
-      # combine
-      d$tests <- purrr::map2(
-        d1$tests[!names(d1$tests) %in% d1_extras],
-        d2$tests[!names(d2$tests) %in% d2_extras],
-        dplyr::bind_rows
-      )
+  # ensure all test results are coded as data frames or tibbles
+  d1$tests <- lapply(d1$tests, dplyr::tibble)
+  d2$tests <- lapply(d2$tests, dplyr::tibble)
 
-      # add extras
-      d$tests <- c(d$tests, d1$tests[d1_extras], d2$tests[d2_extras])
+  # extract extras in each test list
+  d1$tests <- lapply(d1$tests, dplyr::tibble)
+  d2$tests <- lapply(d2$tests, dplyr::tibble)
+  d1_names <- names(d1$tests)
+  d2_names <- names(d2$tests)
+  d1_extras <- d1_names[!d1_names %in% d2_names]
+  d2_extras <- d2_names[!d2_names %in% d1_names]
 
-      # combine message information
-      d$info <- d1$info
-      d$info$messages <- rbind(d1$info$messages, d2$info$messages)
+  # combine
+  d$tests <- purrr::map2(d1$tests[!names(d1$tests) %in% d1_extras],
+                         d2$tests[!names(d2$tests) %in% d2_extras],
+                         dplyr::bind_rows)
 
-      return(d)
+  # add extras
+  d$tests <-
+    c(d$tests, d1$tests[d1_extras], d2$tests[d2_extras])
 
-    } else {
-      stop("These are different datapacks, cannot merge!!!")
-    }
+  #In case we have a DataPack and a PSNU
+  if (setequal(c(d1$info$tool, d2$info$tool), c("Data Pack", "PSNUxIM"))) {
+    d$sheets <- c(d1$sheets, d2$sheets)
+  }
+
+
+  # combine message information
+  d$info <- d1$info
+  d$info$messages <- rbind(d1$info$messages, d2$info$messages)
+
+  d
 }
 
 #' @export
@@ -436,30 +446,54 @@ rowMax <- function(df, cn, regex) {
 #'
 #' @param cop_year cop year to pull get map for
 #' @param datasource Type of datasource (Data Pack, OPU Data Pack, DATIM)
+#' @param year A vector of numeric values (either 1 or 2) which indicate which
+#' Year should be returned. If year = 1, then the DataPack data elements
+#' will be return. If Year = 2, then the Year 2 data elements will be returned
+#' If Year = c(1,2) then both years will be returned.
 #' @return {cop21, cop22, cop23}_map_DataPack_DATIM_DEs_COCs
 #'
-getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL) {
+getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1) {
 
+  if (!all(year %in% c(1, 2))) {
+    stop("You must specify either year 1, 2 or both.")
+  }
 
-  if (datasource %in%  c("Data Pack", "Data Pack Template") || is.null(datasource)) {
+  if (is.null(datasource))  {
+    datasource <- "Data Pack"
+  }
+
+  if (datasource %in%  c("Data Pack", "Data Pack Template")) {
     de_coc_map <- switch(as.character(cop_year),
            "2021" = cop21_map_DataPack_DATIM_DEs_COCs,
            "2022" = cop22_map_DataPack_DATIM_DEs_COCs,
            "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
            stop("Invalid COP Year"))
-  return(de_coc_map)
     }
 
-  if (datasource %in% c("OPU Data Pack", "OPU Data Pack Template", "DATIM", "PSNUxIM")) {
+  if (datasource %in% c("OPU Data Pack", "OPU Data Pack Template", "DATIM", "PSNUxIM", "PSNUxIM Template")) {
     de_coc_map <- switch(as.character(cop_year),
                          "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
                          "2022" = datapackr::cop22_map_adorn_import_file,
                          "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
                          stop("Invalid COP Year"))
-    return(de_coc_map)
   }
 
-  stop("Could not find a data element/category option combo map for those paramaters")
+  if (cop_year == 2023) {
+
+     if (year == 1) {
+       de_coc_map <- de_coc_map %>%
+         dplyr::filter(!grepl("\\.T2", indicator_code))
+     }
+
+    if (year == 2) {
+      de_coc_map <- de_coc_map %>%
+        dplyr::filter(grepl("\\.T2", indicator_code))
+    }
+
+  }
+
+  de_coc_map
+
 }
 
 

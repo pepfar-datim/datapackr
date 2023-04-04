@@ -473,7 +473,7 @@ unPackSchema <- function(template_path = NULL,
     dplyr::mutate(formula = dplyr::if_else(is.na(formula), value, formula))
 
   # For OPU Data Packs, delete everything in metadata rows/cols
-  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack")) {
+  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM", "PSNUxIM Template")) {
     schema %<>%
       dplyr::mutate_at(
         dplyr::vars(
@@ -487,7 +487,7 @@ unPackSchema <- function(template_path = NULL,
     ~name, ~id,
     NA_character_, NA_character_))
 
-  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack")) {
+  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM", "PSNUxIM Template")) {
     disaggs <- list(tibble::tribble(
       ~name, ~id,
       NA_character_, NA_character_))

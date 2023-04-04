@@ -33,8 +33,18 @@ analyze_eid_2mo <- function(data) {
 
   a <- NULL
 
-  required_names <- c("PMTCT_EID.N.12.T",
-                      "PMTCT_EID.N.2.T")
+  this_cop_year <- data$cop_year[[1]]
+
+  if (this_cop_year == "2022") {
+    required_names <- c("PMTCT_EID.N.12.T",
+                        "PMTCT_EID.N.2.T")
+  }
+  if (this_cop_year == "2023") {
+    required_names <- c("PMTCT_EID.D.T",
+                        "PMTCT_EID.N.2.T")
+  }
+
+
 
   if (any(!(required_names %in% names(data)))) {
     a$test_results <- data.frame(msg = "Missing data.")
@@ -43,39 +53,73 @@ analyze_eid_2mo <- function(data) {
     return(a)
   }
 
-  analysis <- data %>%
-    dplyr::mutate(
-      PMTCT_EID.T = PMTCT_EID.N.12.T + PMTCT_EID.N.2.T,
-      PMTCT_EID.2mo.rate = PMTCT_EID.N.2.T / PMTCT_EID.T
-    ) %>%
-    dplyr::filter(!is.na(PMTCT_EID.2mo.rate)) %>%
-    dplyr::select(
-      psnu, psnu_uid, age, sex, key_population,
-      PMTCT_EID.T,
-      PMTCT_EID.N.2.T,
-      PMTCT_EID.N.12.T,
-      PMTCT_EID.2mo.rate)
+  if (this_cop_year == "2022") {
+    analysis <- data %>%
+      dplyr::mutate(
+        PMTCT_EID.T = PMTCT_EID.N.12.T + PMTCT_EID.N.2.T,
+        PMTCT_EID.2mo.rate = PMTCT_EID.N.2.T / PMTCT_EID.T
+      ) %>%
+      dplyr::filter(!is.na(PMTCT_EID.2mo.rate)) %>%
+      dplyr::mutate(PMTCT_EID.2mo.rate = round(PMTCT_EID.2mo.rate, 2)) %>%
+      dplyr::select(
+        psnu, psnu_uid, age, sex, key_population,
+        PMTCT_EID.T,
+        PMTCT_EID.N.2.T,
+        PMTCT_EID.N.12.T,
+        PMTCT_EID.2mo.rate)
+  }
+
+  if (this_cop_year == "2023") {
+    analysis <- data %>%
+      dplyr::mutate(
+        PMTCT_EID.2mo.rate = PMTCT_EID.N.2.T / PMTCT_EID.D.T
+      ) %>%
+      dplyr::filter(!is.na(PMTCT_EID.2mo.rate)) %>%
+      dplyr::select(
+        psnu, psnu_uid, age, sex, key_population,
+        PMTCT_EID.N.2.T,
+        PMTCT_EID.D.T,
+        PMTCT_EID.2mo.rate)
+  }
 
   issues <- analysis %>%
-    dplyr::filter(PMTCT_EID.2mo.rate < 0.9)
+    dplyr::filter(round(PMTCT_EID.2mo.rate, 2) < 0.90)
 
   if (NROW(issues) > 0) {
 
     a$test_results <- issues
     attr(a$test_results, "test_name") <- "PMTCT_EID coverage by 2 months issues"
 
-    national_avg <- analysis %>%
-      dplyr::select(
-        PMTCT_EID.T,
-        PMTCT_EID.N.2.T) %>%
-      dplyr::summarise(
-        PMTCT_EID.T =
-          sum(PMTCT_EID.T, na.rm = TRUE),
-        PMTCT_EID.N.2.T =
-          sum(PMTCT_EID.N.2.T, na.rm = TRUE)) %>%
-      dplyr::mutate(
-        PMTCT_EID.2mo.rate =
-          PMTCT_EID.N.2.T / PMTCT_EID.T)
+    if (this_cop_year == "2022") {
+      national_avg <- analysis %>%
+        dplyr::select(
+          PMTCT_EID.T,
+          PMTCT_EID.N.2.T) %>%
+        dplyr::summarise(
+          PMTCT_EID.T =
+            sum(PMTCT_EID.T, na.rm = TRUE),
+          PMTCT_EID.N.2.T =
+            sum(PMTCT_EID.N.2.T, na.rm = TRUE)) %>%
+        dplyr::mutate(
+          PMTCT_EID.2mo.rate =
+            PMTCT_EID.N.2.T / PMTCT_EID.T)
+    }
+
+    if (this_cop_year == "2023") {
+      national_avg <- analysis %>%
+        dplyr::select(
+          PMTCT_EID.D.T,
+          PMTCT_EID.N.2.T) %>%
+        dplyr::summarise(
+          PMTCT_EID.D.T =
+            sum(PMTCT_EID.D.T, na.rm = TRUE),
+          PMTCT_EID.N.2.T =
+            sum(PMTCT_EID.N.2.T, na.rm = TRUE)) %>%
+        dplyr::mutate(
+          PMTCT_EID.2mo.rate =
+            PMTCT_EID.N.2.T / PMTCT_EID.D.T)
+    }
+
 
     a$msg <-
       paste0(
@@ -134,7 +178,7 @@ analyze_vmmc_indeterminate <- function(data) {
       VMMC_CIRC.indeterminateRate =
         (VMMC_CIRC.Unk.T) /
         (VMMC_CIRC.T)) %>%
-    dplyr::filter(VMMC_CIRC.indeterminateRate > 0.05, is.na(key_population)) %>%
+    dplyr::filter(round(VMMC_CIRC.indeterminateRate, 2) > 0.05, is.na(key_population)) %>%
     dplyr::select(
       psnu, psnu_uid, age, sex, key_population,
       VMMC_CIRC.T,
@@ -238,7 +282,7 @@ analyze_pmtctknownpos <- function(data) {
     ) %>%
     dplyr::filter(!is.na(knownpos_ratio)) %>%
     dplyr::filter(
-      knownpos_ratio > 0.75
+      round(knownpos_ratio, 2) > 0.75
     )
 
   if (NROW(issues) > 0) {
@@ -304,7 +348,7 @@ analyze_tbknownpos <- function(data) {
       knownpos_ratio) %>%
     dplyr::filter(!is.na(knownpos_ratio)) %>%
     dplyr::filter(
-      knownpos_ratio > 0.75)
+      round(knownpos_ratio, 2) > 0.75)
 
   if (NROW(issues) > 0) {
 
@@ -342,10 +386,17 @@ analyze_tbknownpos <- function(data) {
 analyze_retention <- function(data) {
   a <- NULL
 
+  this_cop_year <- as.character(data$cop_year[1])
 
-  required_names <- c("TX_CURR.T",
-                      "TX_CURR.T_1",
-                      "TX_NEW.T")
+  required_names <- switch(this_cop_year,
+                           "2022" =  c("TX_CURR.T",
+                                       "TX_CURR.T_1",
+                                       "TX_NEW.T"),
+                           "2023" =  c("TX_CURR.T",
+                                       "TX_CURR.Expected.T_1",
+                                       "TX_NEW.T"),
+                           stop("Unsupported COP Year"))
+
 
   if (any(!(required_names %in% names(data)))) {
     a$test_results <- data.frame(msg = "Missing data.")
@@ -354,35 +405,62 @@ analyze_retention <- function(data) {
     return(a)
   }
 
-  analysis <- data %>%
-    #For COP22, we need to collapse the finer 50+ age bands back to 50+
-    # since TX_NEW is not allocated at these finer age bands
-    dplyr::mutate(age = dplyr::case_when(age %in% c("50-54", "55-59", "60-64", "65+") ~ "50+",
-                                          TRUE ~ age)) %>%
-    dplyr::group_by(psnu, psnu_uid, age, sex, key_population, cop_year) %>%
-    dplyr::summarise_all(sum) %>%
-    dplyr::ungroup() %>%
-    dplyr::mutate(
-      TX.Retention.T =
-        (TX_CURR.T)
-      / (TX_CURR.T_1 + TX_NEW.T)
-    ) %>%
-    dplyr::filter(!is.na(TX.Retention.T))
+  if (this_cop_year == "2022") {
+    analysis <- data %>%
+      #For COP22, we need to collapse the finer 50+ age bands back to 50+
+      # since TX_NEW is not allocated at these finer age bands
+      dplyr::mutate(age = dplyr::case_when(age %in% c("50-54", "55-59", "60-64", "65+") ~ "50+",
+                                           TRUE ~ age)) %>%
+      dplyr::group_by(psnu, psnu_uid, age, sex, key_population, cop_year) %>%
+      dplyr::summarise_all(sum) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(
+        TX.Retention.T =
+          (TX_CURR.T)
+        / (TX_CURR.T_1 + TX_NEW.T)
+      ) %>%
+      dplyr::filter(!is.na(TX.Retention.T))
 
-  issues <- analysis %>%
-    dplyr::filter(TX.Retention.T < 0.98 | TX.Retention.T > 1) %>%
-    dplyr::select(
-      psnu, psnu_uid, age, sex, key_population,
-      TX.Retention.T,
-      TX_CURR.T,
-      TX_CURR.T_1,
-      TX_NEW.T)
+    issues <- analysis %>%
+      dplyr::filter(round(TX.Retention.T, 2) < 0.98 | round(TX.Retention.T, 2) > 1) %>%
+      dplyr::select(
+        psnu, psnu_uid, age, sex, key_population,
+        TX.Retention.T,
+        TX_CURR.T,
+        TX_CURR.T_1,
+        TX_NEW.T)
+  }
+
+  if (this_cop_year == "2023") {
+    analysis <- data %>%
+      dplyr::group_by(psnu, psnu_uid, age, sex, key_population, cop_year) %>%
+      dplyr::summarise_all(sum) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(
+        TX.Retention.T =
+          (TX_CURR.T)
+        / (TX_CURR.Expected.T_1 + TX_NEW.T)
+      ) %>%
+      dplyr::filter(!is.na(TX.Retention.T)) %>%
+      dplyr::mutate(TX.Retention.T = round(TX.Retention.T, 2))
+
+    issues <- analysis %>%
+      dplyr::filter(TX.Retention.T < 0.98 | TX.Retention.T > 1) %>%
+      dplyr::select(
+        psnu, psnu_uid, age, sex, key_population,
+        TX.Retention.T,
+        TX_CURR.T,
+        TX_CURR.Expected.T_1,
+        TX_NEW.T)
+  }
+
 
   if (NROW(issues) > 0) {
 
     a$test_results <- issues
     attr(a$test_results, "test_name") <- "Retention rate issues"
 
+  if (this_cop_year == "2022") {
     national_avg <- data %>%
       dplyr::select(
         TX_CURR.T,
@@ -397,6 +475,25 @@ analyze_retention <- function(data) {
           (TX_CURR.T)
         / (TX_CURR.T_1 + TX_NEW.T)
       )
+  }
+
+    if (this_cop_year == "2023") {
+      national_avg <- data %>%
+        dplyr::select(
+          TX_CURR.T,
+          TX_CURR.Expected.T_1,
+          TX_NEW.T) %>%
+        dplyr::summarise(
+          TX_CURR.T = sum(TX_CURR.T, na.rm = TRUE),
+          TX_CURR.Expected.T_1  = sum(TX_CURR.Expected.T_1, na.rm = TRUE),
+          TX_NEW.T = sum(TX_NEW.T, na.rm = TRUE)) %>%
+        dplyr::mutate(
+          TX.Retention.T =
+            (TX_CURR.T)
+          / (TX_CURR.Expected.T_1 + TX_NEW.T)
+        )
+    }
+
 
     a$msg <-
       paste0(
@@ -470,8 +567,8 @@ analyze_linkage <- function(data) {
     )
 
   issues <- analysis %>%
-    dplyr::filter((HTS_TST.Linkage.T < 0.95 | HTS_TST.Linkage.T > 1
-                   | HTS_TST.KP.Linkage.T < 0.95 | HTS_TST.KP.Linkage.T > 1)
+    dplyr::filter((round(HTS_TST.Linkage.T, 2) < 0.95 | round(HTS_TST.Linkage.T, 2) > 1.0
+                   | round(HTS_TST.KP.Linkage.T, 2) < 0.95 | round(HTS_TST.KP.Linkage.T, 2) > 1.0)
   # Need to analyze <01 linkage separately due to EID
                    & (age != "<01" | is.na(age))) %>%
     dplyr::select(psnu, psnu_uid, age, sex, key_population,
@@ -544,10 +641,21 @@ analyze_linkage <- function(data) {
 analyze_indexpos_ratio <- function(data) {
 
   a <- NULL
-  required_names <- c("HTS_INDEX_COM.New.Pos.T",
-                      "HTS_INDEX_FAC.New.Pos.T",
-                      "PLHIV.T_1",
-                      "TX_CURR_SUBNAT.T_1")
+
+  this_cop_year <- data$cop_year[[1]]
+   if (this_cop_year == "2022") {
+    required_names <- c("HTS_INDEX_COM.New.Pos.T",
+                        "HTS_INDEX_FAC.New.Pos.T",
+                        "PLHIV.T_1",
+                        "TX_CURR_SUBNAT.T_1")
+   }
+
+   if (this_cop_year == "2023") {
+     required_names <- c("HTS.Index.Pos.T",
+                         "PLHIV.T",
+                         "TX_CURR_SUBNAT.T")
+   }
+
 
   if (any(!(required_names %in% names(data)))) {
     a$test_results <- data.frame(msg = "Missing data.")
@@ -556,42 +664,67 @@ analyze_indexpos_ratio <- function(data) {
     return(a)
   }
 
-  hts_modalities <- HTS_POS_Modalities(data$cop_year[1])
+  hts_modalities <- HTS_POS_Modalities(this_cop_year)
 
-  analysis <- data %>%
-    dplyr::filter(is.na(key_population)) %>%
-    dplyr::select(-age, -sex, -key_population) %>%
-    dplyr::group_by(psnu, psnu_uid) %>%
-    dplyr::summarise(dplyr::across(dplyr::everything(), sum), .groups = "drop") %>%
-    dplyr::mutate(
-      HTS_TST_POS.T = rowSums(dplyr::select(., tidyselect::any_of(hts_modalities))),
-      HTS_INDEX.total =
-        HTS_INDEX_COM.New.Pos.T
+  if (this_cop_year == "2022")  {
+    analysis <- data %>%
+      dplyr::filter(is.na(key_population)) %>%
+      dplyr::select(-age, -sex, -key_population) %>%
+      dplyr::group_by(psnu, psnu_uid) %>%
+      dplyr::summarise(dplyr::across(dplyr::everything(), sum), .groups = "drop") %>%
+      dplyr::mutate(
+        HTS_TST_POS.T = rowSums(dplyr::select(., tidyselect::any_of(hts_modalities))),
+        HTS_INDEX.total =
+          HTS_INDEX_COM.New.Pos.T
         + HTS_INDEX_FAC.New.Pos.T,
-      HTS_TST_POS.index_rate =
-        dplyr::case_when(
-          HTS_TST_POS.T == 0 ~ NA_real_,
-          TRUE ~ HTS_INDEX.total
-                / (HTS_TST_POS.T)
-        ),
-      ART_coverage = dplyr::case_when(
+        HTS_TST_POS.index_rate =
+          dplyr::case_when(
+            HTS_TST_POS.T == 0 ~ NA_real_,
+            TRUE ~ HTS_INDEX.total
+            / (HTS_TST_POS.T)
+          ),
+        ART_coverage = dplyr::case_when(
           PLHIV.T_1 == 0 ~ NA_real_,
           TRUE ~ TX_CURR_SUBNAT.T_1
-                / PLHIV.T_1)) %>%
-    dplyr::select(psnu, psnu_uid, TX_CURR_SUBNAT.T_1, PLHIV.T_1, ART_coverage,
-                  HTS_INDEX.total, HTS_TST_POS.T, HTS_TST_POS.index_rate)
+          / PLHIV.T_1)) %>%
+      dplyr::select(psnu, psnu_uid, TX_CURR_SUBNAT.T_1, PLHIV.T_1, ART_coverage,
+                    HTS_INDEX.total, HTS_TST_POS.T, HTS_TST_POS.index_rate)
+  }
+
+  if (this_cop_year == "2023")  {
+    analysis <- data %>%
+      dplyr::filter(is.na(key_population)) %>%
+      dplyr::select(-age, -sex, -key_population) %>%
+      dplyr::group_by(psnu, psnu_uid) %>%
+      dplyr::summarise(dplyr::across(dplyr::everything(), sum), .groups = "drop") %>%
+      dplyr::mutate(
+        HTS_TST_POS.T = rowSums(dplyr::select(., tidyselect::any_of(hts_modalities))),
+        HTS_INDEX.total = HTS.Index.Pos.T,
+        HTS_TST_POS.index_rate =
+          dplyr::case_when(
+            HTS_TST_POS.T == 0 ~ NA_real_,
+            TRUE ~ HTS_INDEX.total
+            / (HTS_TST_POS.T)
+          ),
+        ART_coverage = dplyr::case_when(
+          PLHIV.T == 0 ~ NA_real_,
+          TRUE ~ TX_CURR_SUBNAT.T
+          / PLHIV.T)) %>%
+      dplyr::select(psnu, psnu_uid, TX_CURR_SUBNAT.T, PLHIV.T, ART_coverage,
+                    HTS_INDEX.total, HTS_TST_POS.T, HTS_TST_POS.index_rate)
+  }
 
   issues <- analysis %>%
     dplyr::mutate(
       index_issues =
-        (ART_coverage < 0.7 & HTS_TST_POS.index_rate < 0.3)
-        | (ART_coverage >= 0.7 & ART_coverage < 0.8 & HTS_TST_POS.index_rate < 0.5)
-        | (ART_coverage >= 0.8 & HTS_TST_POS.index_rate < 0.75)) %>%
+        (round(ART_coverage, 2) < 0.70 & round(HTS_TST_POS.index_rate, 2) < 0.30)
+        | (round(ART_coverage, 2) >= 0.70 & round(ART_coverage, 2) < 0.80 & round(HTS_TST_POS.index_rate, 2) < 0.50)
+        | (round(ART_coverage, 2) >= 0.80 & round(HTS_TST_POS.index_rate, 2) < 0.75)) %>%
     dplyr::filter(index_issues) %>%
     dplyr::mutate(
       category = dplyr::case_when(
-        (ART_coverage > 1) | (ART_coverage == 0) | is.na(ART_coverage) ~ "Inspect ART Coverage",
-        HTS_TST_POS.T < 10 ~ "Low baseline HTS_TST_POS",
+        (ART_coverage > 1.0) | (ART_coverage == 0.0) | is.na(ART_coverage) ~ "Inspect ART Coverage",
+        HTS_TST_POS.T < 10.0 ~ "Low baseline HTS_TST_POS",
         TRUE ~ "Possible under-utilization of Index testing"
       )
     )
@@ -657,6 +790,17 @@ checkAnalytics <- function(d,
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup()
 
+  #Special analytics indicators needed for some checksin COP23
+  if (d$info$cop_year == "2023") {
+    pmtct_eid_d <- datapackr:::extractRawColumnData(d, "EID", "PMTCT_EID.D.T")
+    tx_curr_expected <- datapackr:::extractRawColumnData(d, "Cascade", c("Age", "Sex", "TX_CURR.Expected.T_1"))
+    data <- data %>%
+      dplyr::bind_rows(pmtct_eid_d, tx_curr_expected)
+  }
+
+
+
+
   # Prepare model data ####
   #TODO: Generalize this as function
   model_data <- readRDS(d$keychain$model_data_path)
@@ -696,6 +840,7 @@ checkAnalytics <- function(d,
     # have leading zeros in the Datapack
     dplyr::mutate(age = dplyr::case_when(age == "5-9" ~ "05-09",
                                          age == "1-4" ~ "01-04",
+                                         age == "1-9" ~ "01-09",
                                          age == "<1" ~ "<01",
                                          TRUE ~ age)) %>%
     dplyr::select(names(data))

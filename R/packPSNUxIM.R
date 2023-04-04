@@ -16,7 +16,7 @@ packPSNUxIM <- function(wb, # Workbook object
                         snuxim_model_data,
                         org_units,
                         cop_year = NULL, # Cop year based on the file
-                        tool = "OPU Data Pack",
+                        tool = "PSNUxIM",
                         schema = NULL,
                         expand_formulas = FALSE,
                         d2_session = dynGet("d2_default_session",
@@ -34,7 +34,7 @@ packPSNUxIM <- function(wb, # Workbook object
   rm(params, p)
 
   # if the cop year is not 2021 or 2022, stops and throws message. ####
-  stopifnot("Packing PSNU x IM tabs is not supported for the requested COP year." = cop_year %in% c(2021, 2022))
+  stopifnot("Packing PSNU x IM tabs is not supported for the requested COP year." = cop_year %in% c(2021, 2022, 2023))
 
   # Create data sidecar to eventually compile and return ####
   r <- list(
@@ -688,7 +688,6 @@ packPSNUxIM <- function(wb, # Workbook object
                                 as.character(utils::packageVersion("datapackr"))),
                       xy = c(2, 2),
                       colNames = FALSE)
-
 
 
   # Warning Messages ####

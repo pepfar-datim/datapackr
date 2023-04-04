@@ -1,3 +1,19 @@
+packName <- function(output_folder, tool, datapack_name, extension) {
+  paste0(
+    output_folder,
+    if (is.na(stringr::str_extract(output_folder, "/$"))) {
+      "/"
+    } else {
+    },
+    tool, "_",
+    datapack_name, "_",
+
+    format(Sys.time(), "%Y%m%d%H%M%S"),
+    extension
+  )
+}
+
+
 #' @export
 #' @title Export output.
 #'
@@ -17,22 +33,9 @@
 #' @inheritParams datapackr_params
 #'
 exportPackr <- function(data, output_folder, tool, datapack_name) {
-  packName <- function(output_folder, tool, datapack_name, extension) {
-    paste0(
-      output_folder,
-      if (is.na(stringr::str_extract(output_folder, "/$"))) {
-        "/"
-      } else {
-      },
-      tool, "_",
-      datapack_name, "_",
 
-      format(Sys.time(), "%Y%m%d%H%M%S"),
-      extension
-    )
-  }
 
-  if (tool %in% c("Data Pack", "OPU Data Pack", "Target Setting Tool")) {
+  if (tool %in% c("Data Pack", "OPU Data Pack", "PSNUxIM", "Target Setting Tool")) {
     if (class(data) != "Workbook") {
       stop("Output type and data do not match!")
     }

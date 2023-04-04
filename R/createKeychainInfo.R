@@ -10,7 +10,7 @@ unPackHomeTabMetadata <- function(submission_path)  {
     dplyr::mutate(
       cop_year = stringr::str_extract(home_cell, "COP\\d{2}"),
       cop_year = as.numeric(stringr::str_replace(cop_year, "COP", "20")),
-      tool = stringr::str_extract(home_cell, "OPU Data Pack|Data Pack|Target Setting Tool"))
+      tool = stringr::str_extract(home_cell, "OPU Data Pack|Data Pack|Target Setting Tool|PSNUxIM"))
 }
 
 
@@ -109,7 +109,7 @@ createKeychainInfo <- function(submission_path = NULL,
       path = d$keychain$submission_path,
       sheet =
         dplyr::if_else(
-          d$info$tool == "OPU Data Pack", "PSNUxIM", "Prioritization"),
+          d$info$tool %in% c("OPU Data Pack", "PSNUxIM"), "PSNUxIM", "Prioritization"),
       range = readxl::cell_limits(c(header_row, 1), c(NA, 10)),
       col_types = "text",
       .name_repair = "minimal") %>%

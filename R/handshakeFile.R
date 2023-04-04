@@ -42,11 +42,12 @@ handshakeFile <- function(path,
   tool <- tool %missing% NULL
   tool_provided <- !is.null(tool)
 
-  if (tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack Template", "OPU Data Pack")) {
+  if (tool %in% datapackrSupports()$tool) {
     extension <- "xlsx"
   } else {
-    stop(
-      "Please specify correct file type: Data Pack, Data Pack Template, OPU Data Pack Template, OPU Data Pack.")
+    msg <- paste0("Please specify correct file type:",
+                  paste(datapackrSupports()$tool, sep = "", collapse = ","))
+    stop(msg)
   }
 
   tool <- stringr::str_remove(tool, " Template$")

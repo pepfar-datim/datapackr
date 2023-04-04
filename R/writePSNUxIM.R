@@ -1,3 +1,72 @@
+prepareTargetsData <- function(d, append = TRUE) {
+
+  if (d$info$has_psnuxim) {
+    has_non_equal_targets <- NROW(d$tests$non_equal_targets) > 0
+
+    if (d$info$missing_psnuxim_combos || has_non_equal_targets) {
+      p <- d
+      p$data$MER <- p$data$missingCombos
+      p <- packForDATIM(p, type = "Undistributed MER")
+      targets_data <- p$datim$UndistributedMER
+
+      #Only the missing rows
+      if (append) {
+        return(targets_data)
+      }
+
+      #In this case, we need a full refresh
+      #From the existing model
+      if (!append && has_non_equal_targets) {
+        psnuxim_model <- extractDataPackModel(d)
+        #Get the original targets
+        targets_data <-  d$datim$UndistributedMER %>%
+          dplyr::select(-attributeOptionCombo) %>%
+          dplyr::left_join(
+            psnuxim_model,
+            by = c(
+              "dataElement",
+              "period",
+              "orgUnit",
+              "categoryOptionCombo"
+            )
+          ) %>%
+          dplyr::mutate(
+            percent = dplyr::case_when(is.na(percent) ~ 1,
+                                       TRUE ~ as.numeric(percent)),
+            attributeOptionCombo = dplyr::case_when(
+              is.na(attributeOptionCombo) ~ default_catOptCombo(),
+              TRUE ~ attributeOptionCombo
+            ),
+            #Very likely this is going to cause problems if we round here....
+            value = value * percent
+          ) %>%
+          dplyr::select(
+            dataElement,
+            period,
+            orgUnit,
+            categoryOptionCombo,
+            attributeOptionCombo,
+            value
+          )
+        return(targets_data)
+      }
+
+      if (!append && !has_non_equal_targets) {
+
+        targets_data <- d$datim$OPU %>%
+          dplyr::filter(!(attributeOptionCombo %in% c("000000", "00001"))) %>%
+          dplyr::bind_rows(targets_data)
+        }
+
+    }
+    } else {
+      return(d$datim$UndistributedMER)
+    }
+
+  targets_data
+
+}
+
 #' @export
 #' @title Write PSNUxIM Tab
 #'
@@ -16,13 +85,20 @@ writePSNUxIM <- function(d,
                          output_folder = NULL,
                          d2_session = dynGet("d2_default_session",
                                              inherits = TRUE),
-                         append = TRUE) {
+                         append = TRUE,
+                         use_template = FALSE
+                         ) {
 
   stopifnot(
     "Cannot update PSNUxIM tab without model data." = !is.null(snuxim_model_data_path),
     "Packing SNU x IM tabs is not supported for the requested COP year."
       = d$info$cop_year %in% supportedCOPYears(d$info$tool)
   )
+
+  if (!d$info$needs_psnuxim && d$info$has_psnuxim) {
+     interactive_warning("It does not appear that you need a new PSNUxIM tab.")
+    return(d)
+  }
 
   if (is.null(output_folder)) {
     interactive_warning("If no output_folder is provided, new Data Packs will not be written.")
@@ -59,64 +135,17 @@ writePSNUxIM <- function(d,
   }
 
   # Check whether to write anything into SNU x IM tab and write if needed ####
-  if (d$info$cop_year == 2021) {
-    d <- packSNUxIM(d, d2_session = d2_session)
-  } else {
+  if (d$info$cop_year == 2022) {
   # Prepare data to distribute ####
     d$info$has_psnuxim <- !(NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM$PSNU[1]))
 
-    # # If does exist, extract missing combos ####
-    # if (d$info$has_psnuxim) {
-    #   d$data$missingCombos <- d$data$MER %>%
-    #     # TODO: Create this here rather than upstream
-    #     dplyr::anti_join(d$data$PSNUxIM_combos)
-
-    #   d$info$missing_psnuxim_combos <- (NROW(d$data$missingCombos) > 0)
-    # }
-
-    # TODO: Move this into packPSNUxIM to allow that function to exit early if all good
-    # Proceed IFF no PSNU x IM tab exists, or exists but with missing combos ####
-    if (d$info$has_psnuxim && !d$info$missing_psnuxim_combos) {
-      interactive_warning("No new information available to write to PSNUxIM tab.")
-      return(d)
-    }
-
-    # Prepare targets to distribute ####
-    if (d$info$has_psnuxim && d$info$missing_psnuxim_combos) {
-      p <- d
-      p$data$MER <- p$data$missingCombos
-      p <- packForDATIM(p, type = "Undistributed MER")
-      targets_data <- p$datim$UndistributedMER
-      rm(p)
-    } else {
-      targets_data <- d$datim$UndistributedMER
-    }
-
-    #Mirror the data in TA as well
-    dsd_ta_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
-                                                datasource = d$info$tool)
-
-    dsd_ta_map <- dsd_ta_map %>%
-      dplyr::select(indicator_code,
-                    dataelementuid,
-                    support_type,
-                    numerator_denominator,
-                    disagg_type)  %>%
-      dplyr::filter(support_type %in% c("DSD", "TA")) %>%
-      dplyr::distinct() %>%
-      tidyr::pivot_wider(names_from = "support_type", values_from = "dataelementuid") %>%
-      dplyr::select(DSD, TA)
-
-    ta_targets_data <- dplyr::inner_join(targets_data, dsd_ta_map, by = c("dataElement" = "DSD")) %>%
-      dplyr::select(-dataElement) %>%
-      dplyr::rename(dataElement = TA)
-
-    targets_data <- dplyr::bind_rows(targets_data, ta_targets_data)
+    targets_data <- prepareTargetsData(d)
 
     # Prepare d$tool$wb ####
     # If append is true, add the missing PSNUxIM combos to the existing
     # workbook, otherwise, use a template.
     if (append == TRUE) {
+
       if (is.null(d$tool$wb)) {
         d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
       }
@@ -146,6 +175,7 @@ writePSNUxIM <- function(d,
     d$data$snuxim_model_data <- smd[d$info$country_uids] %>%
       dplyr::bind_rows()
     rm(smd)
+
     dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
 
     d$data$snuxim_model_data %<>%
@@ -197,16 +227,121 @@ writePSNUxIM <- function(d,
 
   }
 
+  if (d$info$cop_year == 2023) {
+
+    d$info$has_psnuxim <- !is.null(d$data$SNUxIM)
+
+    dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
+    targets_data <- prepareTargetsData(d, append)
+    template_file <- system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr")
+
+
+    if (!d$info$has_psnuxim) {
+      print("Loading initial PSNUxIM Template")
+      wb <- openxlsx::loadWorkbook(template_file)
+    }  else {
+      if (use_template) {
+        wb <- openxlsx::loadWorkbook(template_file)
+      } else {
+        wb <- openxlsx::loadWorkbook(d$keychain$psnuxim_file_path)
+      }
+    }
+
+    openxlsx::activeSheet(wb) <- "PSNUxIM"
+
+    #This is if we are dealing with no existing PSNUxIM data
+    if (!d$info$has_psnuxim) {
+
+      smd <- readRDS(d$keychain$snuxim_model_data_path)
+      d$data$snuxim_model_data <- smd[d$info$country_uids] %>%
+        dplyr::bind_rows()
+      rm(smd)
+
+      d$data$snuxim_model_data %<>%
+        ## Address issues with PMTCT_EID ####
+      dplyr::mutate_at(
+        c("age_option_name", "age_option_uid"),
+        ~dplyr::case_when(indicator_code %in% c("PMTCT_EID.N.2.T", "PMTCT_EID.N.12.T")
+                          ~ NA_character_,
+                          TRUE ~ .)) %>%
+        ## Convert to import file format ####
+      dplyr::left_join(
+        dp_datim_map,
+        by = c("indicator_code" = "indicator_code",
+               "age_option_uid" = "valid_ages.id",
+               "sex_option_uid" = "valid_sexes.id",
+               "kp_option_uid" = "valid_kps.id",
+               "type" = "support_type")) %>%
+        dplyr::select(dataElement = dataelementuid,
+                      period,
+                      orgUnit = psnu_uid,
+                      categoryOptionCombo = categoryoptioncombouid,
+                      attributeOptionCombo = mechanism_uid,
+                      value) %>%
+        ## Aggregate across 50+ age bands ####
+      dplyr::group_by(dplyr::across(c(-value))) %>%
+        dplyr::summarise(value = sum(value), .groups = "drop")
+
+    } else {
+      d$data$snuxim_model_data <- targets_data
+    }
+
+
+    org_units <-  getValidOrgUnits(d$info$cop_year) %>%
+      dplyr::filter(country_uid %in% d$info$country_uids) %>%
+      add_dp_label(orgunits = ., cop_year = d$info$cop_year) %>%
+      dplyr::arrange(dp_label) %>%
+      ## Remove DSNUs
+      dplyr::filter(!is.na(org_type)) %>%
+      dplyr::select(dp_label, orgUnit = uid)
+
+    schema <- cop23_psnuxim_schema
+    tool <- "PSNUxIM"
+
+    r <- packPSNUxIM(wb = wb,
+                     data = targets_data,
+                     snuxim_model_data = d$data$snuxim_model_data,
+                     org_units = org_units,
+                     cop_year = d$info$cop_year,
+                     tool = tool,
+                     schema = schema,
+                     d2_session = d2_session)
+
+    if (d$info$cop_year == 2023) {
+
+      country_uids <-  getValidOrgUnits(d$info$cop_year) %>%
+        dplyr::filter(uid %in% org_units$orgUnit) %>%
+        dplyr::pull(country_uid) %>%
+        unique()
+
+      r$wb <- writeHomeTab(wb = r$wb,
+                           datapack_name = d$info$datapack_name,
+                           country_uids = country_uids,
+                           cop_year = d$info$cop_year,
+                           tool = tool)
+    }
+
+    d$tool$wb <- r$wb
+    d$info$messages <- appendMessage(d$info$messages, r$info$messages$message, r$info$messages$level)
+    d$info$newSNUxIM <- TRUE
+
+  }
+
   # If new information added to SNU x IM tab, reexport Data Pack for user ####
   if (d$info$newSNUxIM && !is.null(output_folder)) {
     interactive_print("Removing troublesome NAs that may have been added inadvertently...")
     d <- strip_wb_NAs(d)
 
+    tool <- switch(as.character(d$info$cop_year),
+                   "2022" = "OPU Data Pack",
+                   "2023" = "PSNUxIM",
+                   stop("We do not seem to have a tool for that year"))
+
     interactive_print("Exporting your new Data Pack...")
-    exportPackr(
+    d$info$output_file <- exportPackr(
       data = d$tool$wb,
       output_folder = d$keychain$output_folder,
-      tool = "Data Pack",
+      tool = tool,
       datapack_name = d$info$datapack_name)
 
   }

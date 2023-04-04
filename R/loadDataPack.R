@@ -19,6 +19,7 @@ loadDataPack <- function(submission_path = NULL,
                          cop_year = NULL,
                          load_wb = FALSE,
                          load_sheets = FALSE,
+                         pzns = NULL,
                          d2_session = dynGet("d2_default_session",
                                              inherits = TRUE)) {
 
@@ -34,6 +35,10 @@ loadDataPack <- function(submission_path = NULL,
 
   if (load_sheets) {
     d <- loadSheets(d)
+  }
+
+  if (!is.null(pzns)) {
+    d$datim$prioritizations <- pzns
   }
 
   if (interactive()) {
