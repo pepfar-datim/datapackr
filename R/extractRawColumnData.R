@@ -14,7 +14,8 @@
 extractRawColumnData <- function(d, sheet, cols) {
 
   if (is.null(sheet) || !(sheet %in% names(d$sheets))) {
-    stop(paste("That sheet could not be found: ", sheet))
+    warning(paste("That sheet could not be found: ", sheet))
+    return(NULL)
   }
 
   if (!("PSNU" %in% cols)) {
