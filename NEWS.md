@@ -3,17 +3,18 @@
 ## Breaking changes
 
 ## New features
-* Adds initial support for parsing COP23 PSNUxIM sheets
+* Adds support for parsing COP23 PSNUxIM sheets
+* Adds wrapper function `unPackToolSet` to handle multiple tools
 * Adds functionality for handling Year 2 exports
-* Adds utility function `extractRawColumnData()` which can retrieve raw data from a sheet
+* Adds utility function `extractRawColumnData` which can retrieve raw data from a sheet
 * Created a centralized method for creating DATIM exports
 
 ## Minor improvements and fixes
 * Added unit tests for PSNU's for COP23 generation
 * Updated COP 23 validation rules to match DATIM
-* Now compares with rounding figures to two significant digits
-* Altered checks for EID, Retention and Index testing for COP23
-* Resolved issue with 1-9/01-09 in `checkAnalytics()`
+* Updated analytics checks for COP23
+* Analytics checks comparisons are made with rounded numbers to two significant digits
+* Resolved issue with age band differences between tools and DATIM
 * Fixed critical formulas
 * Updated DE/COC map
 
