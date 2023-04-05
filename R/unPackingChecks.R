@@ -851,14 +851,33 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = TRUE) {
             has_error = FALSE)
 
   valid_orgunits_local <- getValidOrgUnits(d$info$cop_year)
+  valid_orgunits_local$hierarchy_level  <- unlist(lapply(valid_orgunits_local$ancestors, function(x) NROW(x) + 1))
+  valid_orgunits_local <- valid_orgunits_local[, c("uid", "ou_uid", "country_uid", "hierarchy_level")]
+
 
   data <- d$sheets[["Prioritization"]][, c("PSNU", "IMPATT.PRIORITY_SNU.T")]
   names(data)[names(data) == "IMPATT.PRIORITY_SNU.T"] <- "value"
   data <- data[, c("PSNU", "value")]
   data$snu_uid <- extract_uid(data$PSNU)
-  valid_prio_units <- valid_orgunits_local[valid_orgunits_local$org_type %in% c("PSNU", "Military"), ]
-  #Does the PSNU exist in the list of valid PSNUs?
-  data$isInvalidPSNU <- !(data$snu_uid %in% valid_prio_units$uid)
+
+  data %<>% dplyr::left_join(valid_orgunits_local, by = c("snu_uid" = "uid"))
+
+  dataset_levels_local <-   dataset_levels %>%
+    dplyr::filter(cop_year == d$info$cop_year, ou_uid == d$info$operating_unit$ou_uid) %>%
+    dplyr::select(ou_uid, country_uid, prioritization)
+
+  data %<>% dplyr::left_join(dataset_levels_local)
+
+  #
+  data <- data %>%
+    dplyr::mutate(
+      isInvalidPSNU = dplyr::case_when(
+        is.na(ou_uid) | is.na(country_uid) ~ TRUE,
+        grepl("_Military", PSNU) ~ FALSE,
+        as.integer(hierarchy_level) == prioritization ~ FALSE,
+        TRUE ~ TRUE
+      )
+    )
 
   isInvalidPrioritization <- function(PSNU, value) {
 
@@ -873,7 +892,6 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = TRUE) {
   data$isInvalidPrioritization <- mapply(isInvalidPrioritization, data$PSNU, data$value)
 
   invalid_prioritizations <- data[data$isInvalidPSNU | data$isInvalidPrioritization, ]
-
 
   if (NROW(invalid_prioritizations) > 0) {
 
