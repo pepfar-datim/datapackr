@@ -1,3 +1,9 @@
+# datapackr 6.2.2
+
+## Bug fixes
+* Fixed an issue with countries in regions being flagged as having invalid prioritizations
+* Fixed an issue with analytics checks when only using a PSNUxIM tool
+
 # datapackr 6.2.1
 
 ## Breaking changes
