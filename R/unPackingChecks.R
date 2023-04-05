@@ -851,7 +851,7 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = TRUE) {
             has_error = FALSE)
 
   valid_orgunits_local <- getValidOrgUnits(d$info$cop_year)
-  valid_orgunits_local$hierarchy_level  <- unlist(lapply(valid_orgunits_local$ancestors, function(x) NROW(x) + 1))
+  valid_orgunits_local$hierarchy_level  <- unlist(lapply(valid_orgunits_local$ancestors, function(x) NROW(x) + 1L))
   valid_orgunits_local <- valid_orgunits_local[, c("uid", "ou_uid", "country_uid", "hierarchy_level")]
 
 
@@ -874,7 +874,7 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = TRUE) {
       isInvalidPSNU = dplyr::case_when(
         is.na(ou_uid) | is.na(country_uid) ~ TRUE,
         grepl("_Military", PSNU) ~ FALSE,
-        as.integer(hierarchy_level) == prioritization ~ FALSE,
+        hierarchy_level == prioritization ~ FALSE,
         TRUE ~ TRUE
       )
     )
