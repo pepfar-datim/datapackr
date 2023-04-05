@@ -570,6 +570,7 @@ test_that("Can check invalid prioritizations", {
       "Central Region", "Lilongwe District [#SNU] [ScR9iFKAasW]", "4", "4", "Sustained"
     )
   d$info$cop_year <- 2022
+  d$info$operating_unit$ou_uid <- "lZsCb6y0KDX"
 
   # test no errors/warnings
   res <- checkInvalidPrioritizations(d, sheets = test_sheets)
@@ -609,6 +610,7 @@ test_that("Can check invalid prioritizations COP23", {
       "Dedza District [PekKUkKHAzY]", "4", "4", "Sustained"
     )
   d$info$cop_year <- 2023
+  d$info$operating_unit$ou_uid <- "lZsCb6y0KDX"
 
 
   # test no errors/warnings
@@ -623,6 +625,39 @@ test_that("Can check invalid prioritizations COP23", {
     add_row(!!!setNames(c("Kasungu District [JQKLKuVuY61]", "4", NA, "Not a PSNU"), names(.)))
 
   res <- checkInvalidPrioritizations(d = d, sheets = test_sheets)
+
+  expect_equal(nrow(res$result), 1L)
+  expect_equal(res$lvl, "ERROR")
+  expect_equal(res$has_error, TRUE)
+
+
+
+  #In the list of valid PSNUs but at the wrong level
+  #Take a DSNU from Eswatini which should not have an assigned prioritization
+  d <- list()
+  d$sheets$Prioritization <-
+    tribble(
+      ~SNU1, ~PSNU, ~IMPATT.PRIORITY_SNU.T_1, ~IMPATT.PRIORITY_SNU.T, ~PRIORITY_SNU.translation,
+      "Hhohho", "Hhohho [qYzGABaWyCf]", "4", "4", "Sustained",
+      "Lobamba", "Lobamba [ciLrwlyi1dv]", "4", "4", "Sustained"
+    )
+  d$info$cop_year <- 2023
+  d$info$operating_unit$ou_uid <- "V0qMZH29CtN"
+
+  expect_equal(nrow(res$result), 1L)
+  expect_equal(res$lvl, "ERROR")
+  expect_equal(res$has_error, TRUE)
+
+  #It looks like a PSNU, but its not
+  d <- list()
+  d$sheets$Prioritization <-
+    tribble(
+      ~SNU1, ~PSNU, ~IMPATT.PRIORITY_SNU.T_1, ~IMPATT.PRIORITY_SNU.T, ~PRIORITY_SNU.translation,
+      "Hhohho", "Hhohho [qYzGABaWyCf]", "4", "4", "Sustained",
+      "Bogus PSNU", "Bogus PSNU [ARVh1xCeJhU]", "4", "4", "Sustained"
+    )
+  d$info$cop_year <- 2023
+  d$info$operating_unit$ou_uid <- "V0qMZH29CtN"
 
   expect_equal(nrow(res$result), 1L)
   expect_equal(res$lvl, "ERROR")
