@@ -49,6 +49,8 @@ valid_orgunits_local <- getValidOrgUnits(d$info$cop_year) %>%
                                                          names_to = "indicator_code",
                                                          values_to = "value") %>%
    dplyr::select(psnu, psnu_uid, indicator_code, age, sex, key_population, value) %>%
-   dplyr::mutate(value = as.numeric(value))
+   dplyr::mutate(value = as.numeric(value)) %>%
+   #Drop any NA values here...this would correspond to non-numeric values
+   dplyr::filter(!is.na(value))
 
 }
