@@ -785,7 +785,11 @@ checkAnalytics <- function(d,
   # Prepare analytics data ####
   data <- d$data$analytics %>%
     dplyr::select(psnu, psnu_uid,
-                  indicator_code, age, sex, key_population, value = target_value) %>%
+                  indicator_code,
+                  age,
+                  sex,
+                  key_population,
+                  value = target_value) %>%
     dplyr::group_by(dplyr::across(-value)) %>%
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup()
@@ -849,6 +853,7 @@ checkAnalytics <- function(d,
   data %<>%
     dplyr::bind_rows(model_data_country) %>%
     dplyr::arrange(dplyr::across(-value)) %>%
+    dplyr::filter(!is.na(value)) %>%
     tidyr::pivot_wider(names_from = indicator_code,
                        values_from = value) %>%
     addcols((d$info$schema %>%
