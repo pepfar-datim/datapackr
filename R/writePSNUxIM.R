@@ -3,20 +3,29 @@ prepareTargetsData <- function(d, append = TRUE) {
   if (d$info$has_psnuxim) {
     has_non_equal_targets <- NROW(d$tests$non_equal_targets) > 0
 
+
     if (d$info$missing_psnuxim_combos || has_non_equal_targets) {
+
       p <- d
-      p$data$MER <- p$data$missingCombos
-      p <- packForDATIM(p, type = "Undistributed MER")
-      targets_data <- p$datim$UndistributedMER
+
+      if (NROW(p$data$missingCombos) > 0) {
+        p$data$MER <- p$data$missingCombos
+        p <- packForDATIM(p, type = "Undistributed MER")
+        missing_targets <- p$datim$UndistributedMER
+      } else {
+        missing_targets <- NULL
+      }
+
 
       #Only the missing rows
       if (append) {
-        return(targets_data)
+        return(missing_targets)
       }
 
       #In this case, we need a full refresh
       #From the existing model
       if (!append && has_non_equal_targets) {
+
         psnuxim_model <- extractDataPackModel(d)
         #Get the original targets
         targets_data <-  d$datim$UndistributedMER %>%
@@ -47,14 +56,16 @@ prepareTargetsData <- function(d, append = TRUE) {
             categoryOptionCombo,
             attributeOptionCombo,
             value
-          )
+          ) %>%
+          dplyr::bind_rows(missing_targets)
+
         return(targets_data)
       }
 
       if (!append && !has_non_equal_targets) {
 
         targets_data <- d$datim$OPU %>%
-          dplyr::filter(!(attributeOptionCombo %in% c("000000", "00001"))) %>%
+          dplyr::filter(!(attributeOptionCombo %in% c("00000", "00001"))) %>%
           dplyr::bind_rows(targets_data)
         }
 
