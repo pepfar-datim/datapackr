@@ -17,7 +17,9 @@ updatePSNUxIMTargetValues <- function(d) {
     dplyr::left_join(d$tests$non_equal_targets, by = c("PSNU", "indicator_code", "Age", "Sex", "KeyPop")) %>%
     dplyr::mutate(are_equal = ifelse(is.na(are_equal), TRUE, FALSE)) %>%
     dplyr::mutate(final_target = ifelse(!are_equal, MainTabsTarget, original_target)) %>%
-    dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget = final_target)
+    dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget = final_target) %>%
+    #TODO: Should we round here?
+    dplyr::mutate(final_target = suppressWarnings(as.numeric(final_target)))
 
 
   if (NROW(updated_targets) == 0) {
