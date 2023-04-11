@@ -28,6 +28,19 @@ generation_list <- c("Malawi",
 pick <- datapackr::cop_datapack_countries %>%
   dplyr::filter(datapack_name %in% generation_list)
 
+# test valid org units against cached ####
+valid_OrgUnits <- getDataPackOrgUnits(use_cache = FALSE)
+
+compare_diffs <- datapackr::valid_OrgUnits %>%
+  dplyr::full_join(valid_OrgUnits, by = "uid") %>%
+  dplyr::filter(is.na(name.x) | is.na(name.y))
+
+if(NROW(compare_diffs) > 0) {
+  stop("Valid org units are not up to date! Please update valid org units.")
+} else {
+  rm(valid_OrgUnits, compare_diffs)
+}
+
 # # For Production run ####
 # pick <- datapackr::cop_datapack_countries
 
