@@ -35,7 +35,7 @@ compare_diffs <- datapackr::valid_OrgUnits %>%
   dplyr::full_join(valid_OrgUnits, by = "uid") %>%
   dplyr::filter(is.na(name.x) | is.na(name.y))
 
-if(NROW(compare_diffs) > 0) {
+if (NROW(compare_diffs) > 0) {
   stop("Valid org units are not up to date! Please update valid org units.")
 } else {
   rm(valid_OrgUnits, compare_diffs)
