@@ -21,11 +21,10 @@ test_that("Can error on bad type", {
 
 test_that("Can error on bad file location", {
 
-  #This will bring up a file dialog if run directly with devtools::test()
-  skip_if(interactive())
   expect_error(handshakeFile("/home/littlebobbytables/DataPack.xlsx",
                                          tool = "Data Pack"),
                                          "File could not be read!")
+
 })
 
 test_that("canReadFalse if path is NULL", {

@@ -7,7 +7,6 @@
 unPackOPUDataPack(
   d,
   pzns = NULL,
-  mer_data = NULL,
   d2_session = dynGet("d2_default_session", inherits = TRUE)
 )
 }

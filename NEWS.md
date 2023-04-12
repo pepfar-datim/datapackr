@@ -1,16 +1,3 @@
-# datapackr 6.2.3
-
-## New features
-* Adds function to update PSNUxIM values from the main tabs
-
-## Bug fixes
-* Addresses some minor issues with duplication in the Data element/COC map
-
-## Minor improvements and fixes
-* Fixed an issue with certain tests failing in certain testing infrastructures
-* Updated cached organisation unit map from DATIM
-
-
 # datapackr 6.2.2
 
 ## Bug fixes
