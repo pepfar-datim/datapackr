@@ -2,12 +2,9 @@
 .prepareMechs <- function(snuxim_model_data) {
 
   # Drop all data that can't be allocated across mech & DSD/TA
-  res <- snuxim_model_data %>%
+  snuxim_model_data %>%
     dplyr::filter(stringr::str_detect(mechanism_code, "\\d{4,}"),
-                  stringr::str_detect(type, "DSD|TA"))
-
-  # Pivot mechs/type wider
-  res <- res %>%
+                  stringr::str_detect(type, "DSD|TA")) %>%
     tidyr::unite(col = mechcode_supporttype, mechanism_code, type) %>%
     dplyr::select(psnu_uid, indicator_code, Age = age_option_name,
                   Sex = sex_option_name, KeyPop = kp_option_name,
