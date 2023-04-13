@@ -79,13 +79,8 @@ y2TestColumnStructure <- function(d) {
         "\n"
       )
 
-    warning_msg <-
-      paste0(
-        "WARNING! Negative values found in the Year 2 sheet!",
-        "\n"
-      )
 
-    d$info$messages <- appendMessage(d$info$messages, message, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
 
     d$tests$year2_cols_out_of_order  <-
       cols_compare %>% dplyr::filter(!is_equal)
