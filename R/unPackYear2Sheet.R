@@ -125,6 +125,36 @@ y2NegativeValues <- function(d) {
 
     d
 }
+
+y2DecimalValues <- function(d) {
+
+
+  decimal_values <- d$data$Year2 %>%
+    dplyr::filter(value %% 1 != 0)
+
+  if (NROW(decimal_values) > 0) {
+    warning_msg <-
+      paste0(
+        "WARNING! Decimal values found in the Year 2 sheet! These will be rounded.",
+        "\n"
+      )
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$tests$year2_decimal_values <-
+      decimal_values %>%
+      dplyr::select(indicator_code,
+                    Sex = valid_sexes.name,
+                    Age = valid_ages.name,
+                    KP = valid_kps.name,
+                    value)
+    attr(d$tests$year2_decimal_values, "test_name") <- "Year 2 decimal values"
+
+  }
+
+
+  d
+
+}
 #' Title pickUIDFromType is a utility function used to obtain a
 #' particular UID from a supplied list based on the type of
 #' value we are dealing with. In the Year2 tab, values disaggregated
