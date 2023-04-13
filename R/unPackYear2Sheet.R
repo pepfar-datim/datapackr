@@ -578,6 +578,7 @@ unpackYear2Sheet <- function(d) {
 
   #Data tests once we have the final shape
   d <- y2NegativeValues(d)
+  d <- y2DecimalValues(d)
 
 
   start_rows <- NROW(d$data$Year2)
