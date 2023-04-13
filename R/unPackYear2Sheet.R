@@ -79,6 +79,14 @@ y2TestColumnStructure <- function(d) {
         "\n"
       )
 
+    warning_msg <-
+      paste0(
+        "WARNING! Negative values found in the Year 2 sheet!",
+        "\n"
+      )
+
+    d$info$messages <- appendMessage(d$info$messages, message, "WARNING")
+
     d$tests$year2_cols_out_of_order  <-
       cols_compare %>% dplyr::filter(!is_equal)
     attr(d$tests$year2_cols_out_of_order, "test_name") <-
@@ -90,6 +98,33 @@ y2TestColumnStructure <- function(d) {
 
 }
 
+y2NegativeValues <- function(d) {
+
+  neg_values <- d$data$Year2 %>%
+    dplyr::filter(value < 0)
+
+  if (NROW(neg_values) > 0) {
+    warning_msg <-
+      paste0(
+        "WARNING! Negative values found in the Year 2 sheet!",
+        "\n"
+      )
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$tests$year2_negative_values  <-
+      neg_values %>%
+      dplyr::select(indicator_code,
+                    Sex = valid_sexes.name,
+                    Age = valid_ages.name,
+                    KP = valid_kps.name,
+                    value)
+    attr(d$tests$year2_negative_values, "test_name") <- "Year 2 negative values"
+
+      }
+
+
+    d
+}
 #' Title pickUIDFromType is a utility function used to obtain a
 #' particular UID from a supplied list based on the type of
 #' value we are dealing with. In the Year2 tab, values disaggregated
@@ -511,6 +546,10 @@ unpackYear2Sheet <- function(d) {
     #TODO: This feels a bit risky. Should we only limit to OVC_HIVSTAT & PMTCT_EID?
     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
 
+  #Data tests once we have the final shape
+  d <- y2NegativeValues(d)
+
+
   start_rows <- NROW(d$data$Year2)
   # Get the raw data element codes from the map ----
   d$data$Year2 %<>%
@@ -558,7 +597,6 @@ unpackYear2Sheet <- function(d) {
   }
 
   d$datim$year2 <- d$datim$year2[!export_dups_vec, ]
-
 
   d
 
