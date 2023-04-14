@@ -34,7 +34,7 @@ createDATIMExport <- function(d) {
     }
   }
 
-  if (d$info$tool == "OPU Data Pack") {
+  if (d$info$tool %in% c("OPU Data Pack", "PSNUxIM")) {
     datim_export <-  d$datim$OPU
   }
 
