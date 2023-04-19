@@ -413,8 +413,8 @@
       "RemoteUsername": "pepfar-datim",
       "RemoteRepo": "datimutils",
       "RemoteRef": "oauth-headers",
-      "RemoteSha": "78977e4202b597cf7b12ab1a95c0c4afff448acd",
-      "Hash": "4c6f4e4aa18937e94ebb1bc7023fa27d",
+      "RemoteSha": "5fc8e4627887e50c5a74cb4f0062109015b9522a",
+      "Hash": "2b85d658ba87c7514afd72814d868bb9",
       "Requirements": [
         "R6",
         "httr",
