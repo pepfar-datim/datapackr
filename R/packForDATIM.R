@@ -94,7 +94,7 @@ packForDATIM <- function(d, type = NULL) {
   }
 
   data %<>%
-    dplyr::select(expected_col_names)
+    dplyr::select(tidyselect::all_of(expected_col_names)) # updated to reflect tidyselect 1.1.0
 
   data %<>%
   # Map to dataElement & categoryOptionCombo ----
@@ -117,6 +117,15 @@ packForDATIM <- function(d, type = NULL) {
                   categoryOptionCombo = categoryoptioncombouid,
                   attributeOptionCombo = mech_code,
                   value)
+
+  # DP-901: Drop SUBNAT/IMPATT data from past and future years. Keep COP Year data only ----
+  if (type == "SUBNAT_IMPATT") {
+    current_period <- paste0(d$info$cop_year, "Oct")
+
+    data %<>%
+      dplyr::filter(period == current_period)
+  }
+
   #Nothing should be NA at this point
 
   #TEST: Blank Rows; Error ----
@@ -146,6 +155,13 @@ packForDATIM <- function(d, type = NULL) {
       dplyr::filter(
         dataElement %in%
           datim_map$dataelementuid[which(datim_map$indicator_code == "IMPATT.PRIORITY_SNU.T")])
+
+    #Removing prioritizations from SUBNAT/IMPATT to avoid duplication in createDATIMExport
+    data %<>%
+      dplyr::filter(
+        !dataElement %in%
+          datim_map$dataelementuid[which(datim_map$indicator_code == "IMPATT.PRIORITY_SNU.T")])
+
   }
 
   # nolint start
