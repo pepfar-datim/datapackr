@@ -94,7 +94,7 @@ packForDATIM <- function(d, type = NULL) {
   }
 
   data %<>%
-    dplyr::select(tidyselect::all_of(expected_col_names)) # updated to reflect tidyselect 1.1.0
+    dplyr::select(tidyselect::all_of(expected_col_names))
 
   data %<>%
   # Map to dataElement & categoryOptionCombo ----
