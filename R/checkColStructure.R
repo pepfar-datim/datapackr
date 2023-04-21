@@ -23,10 +23,14 @@ checkColStructure <- function(d, sheet) {
     dplyr::select(indicator_code = value) %>%
     dplyr::mutate(
       sheet = sheet,
-      submission_order = as.integer(1:(dplyr::n()))) %>%
-      purrr::when(sheet == "PSNUxIM" ~ dplyr::filter(.,
-        !stringr::str_detect(indicator_code, to_keep_regex)),
-        ~ .)
+      submission_order = as.integer(1:(dplyr::n())))
+
+      if(sheet == "PSNUxIM") {
+        submission_cols <- dplyr::filter(submission_cols,
+                                         !stringr::str_detect(indicator_code, to_keep_regex))
+      }
+
+
 
   col_check <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet) %>%
