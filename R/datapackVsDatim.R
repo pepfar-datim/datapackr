@@ -88,7 +88,10 @@ compareData_DatapackVsDatim <-
     #   dplyr::bind_rows(d$datim$MER, d$datim$subnat_impatt)
 
     datapack_data <- datapackr::createDATIMExport(d)  # Update for COP 23
-    datapack_data <- datapack_data[datapack_data$period=="2023Oct",]
+    datapack_data <- datapack_data[datapack_data$period=="2023Oct",] #Not sure we should do this?
+
+    #Need to make value a numeric
+    datapack_data$value <- as.numeric(datapack_data$value)
 
 # recoding to account for code change in DATIM for the default COC
 # if all other code is updated to use uids instead of codes this can be removed
