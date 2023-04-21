@@ -71,12 +71,12 @@ evaluateIndicators <- function(combis, values, inds) {
   #Function to substitute values based on the
   #dataelement_id.categoryoptioncombo_id
   replaceCombisWithValues <- function(x,
-                                         expressions = combis,
-                                         v = values) {
-    for (i in seq_along(expressions)) {
-       x <- stringr::str_replace_all(x, expressions[i], as.character(values[i]))
-    }
-    x
+                                      expressions = combis,
+                                      v = values) {
+    stringi::stri_replace_all(x,
+                              regex = expressions,
+                              replacement = values,
+                              vectorize_all = FALSE)
   }
 
 
@@ -111,11 +111,19 @@ evaluateIndicators <- function(combis, values, inds) {
     vapply(exp, function(x) eval(str2lang(x)), FUN.VALUE = double(1))
   }
 
-  matches %>%
+  matches %<>%
     purrr::modify_at(., c("numerator", "denominator"), replaceCombisWithValues) %>%
     purrr::modify_at(., c("numerator", "denominator"), replaceExpressionsWithZeros) %>%
     purrr::modify_at(., c("numerator", "denominator"), sanitizeExpression) %>%
     purrr::modify_at(., c("numerator", "denominator"), evaluateExpression) %>%
     dplyr::mutate(value = numerator / denominator)
+
+  #TODO: Figure out these names attributes
+
+  data.frame(id = matches$id,
+             name = matches$name,
+             numerator = unname(matches$numerator),
+             denominator = unname(matches$denominator),
+             value = unname(matches$value))
 
 }
