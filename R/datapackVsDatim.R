@@ -15,76 +15,80 @@ compareData_DatapackVsDatim <-
 
 # internal beutify function to avoid repeated code used in the main function
 # just handles some formatting/ decoding of UIDs
-    beautify <- function(data) {
-      data$data_element <-
-        datimvalidation::remapDEs(data$dataElement,
-                                  mode_in = "id",
-                                  mode_out = "shortName",
-                                  d2session = d2_session)
-
-      data$disagg <-
-        datimvalidation::remapCategoryOptionCombos(data$categoryOptionCombo,
-                                                   mode_in = "id",
-                                                   mode_out = "name",
-                                                   d2session = d2_session)
-
-      psnus <-
-        getValidOrgUnits(d$info$cop_year) %>% dplyr::select(psnu = name, psnu_uid = uid)
-
-  # calculate diff between data pack and datim handling NAs like a 0
-  # round diff to 5 decimal places so we don't get differences due to floating point error
-  # add column summarizing the difference
-
-      data %<>%
-        dplyr::left_join(psnus, by = c("orgUnit" = "psnu_uid")) %>%
-        dplyr::mutate(
-          difference = dplyr::case_when(
-            is.na(datapack_value) ~ -datim_value,
-            is.na(datim_value) ~ datapack_value,
-            TRUE ~ round(datapack_value - datim_value, 5)
-          )
-        ) %>%
-        dplyr::mutate(
-          effect = dplyr::case_when(
-            is.na(difference) & is.na(datapack_value) ~ "Delete",
-            is.na(difference) &
-              is.na(datim_value) ~ "Create", !is.na(difference) &
-              difference != 0 ~ "Update",
-            difference == 0 ~ "No Change"
-          )
-        )
-# select the columns of interest
-# use one_of since the PSNU without dedups won't have mechanism
-      suppressWarnings(dplyr::select(
-        data,
-        dplyr::one_of(
-          "psnu",
-          "data_element",
-          "disagg",
-          "attributeOptionCombo",
-          "datapack_value",
-          "datim_value",
-          "difference",
-          "effect"
-        )
-      ))
-    }
+#     beautify <- function(data) {
+#       data$data_element <-
+#         datimvalidation::remapDEs(data$dataElement,
+#                                   mode_in = "id",
+#                                   mode_out = "shortName",
+#                                   d2session = d2_session)
+#
+#       data$disagg <-
+#         datimvalidation::remapCategoryOptionCombos(data$categoryOptionCombo,
+#                                                    mode_in = "id",
+#                                                    mode_out = "name",
+#                                                    d2session = d2_session)
+#
+#       psnus <-
+#         getValidOrgUnits(d$info$cop_year) %>% dplyr::select(psnu = name, psnu_uid = uid)
+#
+#   # calculate diff between data pack and datim handling NAs like a 0
+#   # round diff to 5 decimal places so we don't get differences due to floating point error
+#   # add column summarizing the difference
+#
+#       data %<>%
+#         dplyr::left_join(psnus, by = c("orgUnit" = "psnu_uid")) %>%
+#         dplyr::mutate(
+#           difference = dplyr::case_when(
+#             is.na(datapack_value) ~ -datim_value,
+#             is.na(datim_value) ~ datapack_value,
+#             TRUE ~ round(as.numeric(datapack_value) - datim_value, 5)
+#           )
+#         ) %>%
+#         dplyr::mutate(
+#           effect = dplyr::case_when(
+#             is.na(difference) & is.na(datapack_value) ~ "Delete",
+#             is.na(difference) &
+#               is.na(datim_value) ~ "Create", !is.na(difference) &
+#               difference != 0 ~ "Update",
+#             difference == 0 ~ "No Change"
+#           )
+#         )
+# # select the columns of interest
+# # use one_of since the PSNU without dedups won't have mechanism
+#       suppressWarnings(dplyr::select(
+#         data,
+#         dplyr::one_of(
+#           "psnu",
+#           "data_element",
+#           "disagg",
+#           "attributeOptionCombo",
+#           "datapack_value",
+#           "datim_value",
+#           "difference",
+#           "effect"
+#         )
+#       ))
+#     }
 # End Beautify function
 
 # start main processing
 # start off with dedups included
 
-    if (!(d$info$cop_year %in% c(2021, 2022))) {
+    if (!(d$info$cop_year %in% c(2021, 2022,2023))) {
       stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
     }
+    #Was removed before I touched it # Thu Apr 20 22:13:14 2023
     # d <- datapackr::exportDistributedDataToDATIM(d, keep_dedup = TRUE)
 
-    d$datim$MER$value <- as.numeric(d$datim$MER$value)
+    # d$datim$MER$value <- as.numeric(d$datim$MER$value)
+    #
+    # d$datim$subnat_impatt$value <-
+    #   as.numeric(d$datim$subnat_impatt$value)
+    # datapack_data <-
+    #   dplyr::bind_rows(d$datim$MER, d$datim$subnat_impatt)
 
-    d$datim$subnat_impatt$value <-
-      as.numeric(d$datim$subnat_impatt$value)
-    datapack_data <-
-      dplyr::bind_rows(d$datim$MER, d$datim$subnat_impatt)
+    datapack_data <- datapackr::createDATIMExport(d)  # Update for COP 23
+    datapack_data <- datapack_data[datapack_data$period=="2023Oct",]
 
 # recoding to account for code change in DATIM for the default COC
 # if all other code is updated to use uids instead of codes this can be removed
@@ -119,17 +123,17 @@ compareData_DatapackVsDatim <-
                                                   dataElement,
                                                   orgUnit,
                                                   categoryOptionCombo) %>%
-      dplyr::summarise(datapack_value = sum(datapack_value)) %>%
+      dplyr::summarise(datapack_value = sum(as.numeric(datapack_value))) %>% #issue 1
       dplyr::ungroup()
 
     datapack_data_psnu_x_im <- datapack_data
 
 # Get data from DATIM using data value sets
 
-    datim_data <- dplyr::bind_rows(
+    datim_data <- dplyr::bind_rows(#NOTE ONLY 2022 Data
       getCOPDataFromDATIM(country_uids = d$info$country_uids,
                           cop_year = d$info$cop_year,
-                          d2_session = d2_session),
+                          d2_session = d2_session), #returns null???
       getCOPDataFromDATIM(country_uids = d$info$country_uids,
                           cop_year = d$info$cop_year - 1,
                           datastreams = c("subnat_targets"),
@@ -162,7 +166,7 @@ compareData_DatapackVsDatim <-
     data_different_value <-
       dplyr::filter(
         data_psnu_x_im,
-        abs(datapack_value - datim_value) > .000001 |
+        abs(as.numeric(datapack_value) - datim_value) > .000001 |
           is.na(datim_value)
       ) %>%
       dplyr::select(
@@ -187,9 +191,9 @@ compareData_DatapackVsDatim <-
         datim_value
       )
 
-    data_psnu_x_im %<>% beautify()
-
-    data_psnu %<>% beautify() %>% dplyr::select(-effect)
+    # data_psnu_x_im %<>% beautify()
+    #
+    # data_psnu %<>% beautify() %>% dplyr::select(-effect)
 
     list(
       psnu_x_im = data_psnu_x_im,
@@ -223,7 +227,7 @@ compareData_OpuDatapackVsDatim <-
     if (!(d$info$cop_year %in% c(2021, 2022))) {
       stop("Attempting to use compareData_OpuDatapackVsDatim for unsupported COP year")
     }
-    datapack_data <- d$datim$OPU
+    datapack_data <- d$datim$OPU #PROBS needs to go too
 
 # recoding to account for code change in DATIM for the default COC
 # if all other code is updated to use uids instead of codes this can be removed
