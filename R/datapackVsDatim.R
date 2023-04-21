@@ -126,7 +126,7 @@ compareData_DatapackVsDatim <-
                                                   dataElement,
                                                   orgUnit,
                                                   categoryOptionCombo) %>%
-      dplyr::summarise(datapack_value = sum(as.numeric(datapack_value))) %>% #issue 1
+      dplyr::summarise(datapack_value = sum(datapack_value)) %>%
       dplyr::ungroup()
 
     datapack_data_psnu_x_im <- datapack_data
@@ -169,7 +169,7 @@ compareData_DatapackVsDatim <-
     data_different_value <-
       dplyr::filter(
         data_psnu_x_im,
-        abs(as.numeric(datapack_value) - datim_value) > .000001 |
+        abs(datapack_value - datim_value) > .000001 |
           is.na(datim_value)
       ) %>%
       dplyr::select(
