@@ -57,7 +57,7 @@ packForDATIM <- function(d, type = NULL) {
         dplyr::mutate(
           support_type = "No Support Type",
           mech_code = datapackr::default_catOptCombo()) %>%
-        dplyr::select(expected_col_names)
+        dplyr::select(tidyselect::all_of(expected_col_names))
 
       data %<>%
         dplyr::bind_rows(agyw_data)
