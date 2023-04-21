@@ -23,20 +23,24 @@ checkColStructure <- function(d, sheet) {
     dplyr::select(indicator_code = value) %>%
     dplyr::mutate(
       sheet = sheet,
-      submission_order = as.integer(1:(dplyr::n())))
+      submission_order = as.integer(1:(dplyr::n()))) %>%
+     { if (sheet == "PSNUxIM")
+         dplyr::filter(.,
+                       !stringr::str_detect(indicator_code, to_keep_regex)) else .
+     }
 
-      if(sheet == "PSNUxIM") {
-        submission_cols <- dplyr::filter(submission_cols,
-                                         !stringr::str_detect(indicator_code, to_keep_regex))
-      }
-
-
+      # purrr::when(sheet == "PSNUxIM" ~ dplyr::filter(.,
+      #   !stringr::str_detect(indicator_code, to_keep_regex)),
+      #   ~ .)
 
   col_check <- d$info$schema %>%
     dplyr::filter(sheet_name == sheet) %>%
     dplyr::select(indicator_code, template_order = col) %>%
-    purrr::when(sheet == "PSNUxIM" ~ dplyr::filter(., !stringr::str_detect(indicator_code, to_keep_regex)),
-    ~ .) %>%
+    {
+      if (sheet == "PSNUxIM")
+        dplyr::filter(.,
+                      !stringr::str_detect(indicator_code, to_keep_regex)) else .
+    } %>%
     dplyr::left_join(submission_cols, by = c("indicator_code" = "indicator_code")) %>%
     dplyr::mutate(order_check = template_order == submission_order)
 
