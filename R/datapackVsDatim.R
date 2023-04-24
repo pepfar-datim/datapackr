@@ -1,6 +1,7 @@
 # internal beutify function to avoid repeated code used in the main function
 # just handles some formatting/ decoding of UIDs
 .compare_beautify <-  function(data,
+                               cop_year,
                                d2_session = dynGet("d2_default_session",
                                                                     inherits = TRUE)) {
     data$data_element <-
@@ -16,7 +17,7 @@
                                                  d2session = d2_session)
 
     psnus <-
-      getValidOrgUnits(d$info$cop_year) %>% dplyr::select(psnu = name, psnu_uid = uid)
+      getValidOrgUnits(cop_year) %>% dplyr::select(psnu = name, psnu_uid = uid)
 
     # calculate diff between data pack and datim handling NAs like a 0
     # round diff to 5 decimal places so we don't get differences due to floating point error
@@ -190,7 +191,7 @@ if (d$info$cop_year == 2022) {
         datapack_value
       )
 
-# data in datim but not in the data pack
+    # data in datim but not in the data pack
     data_datim_only <-
       dplyr::filter(data_psnu_x_im,
                     is.na(datapack_value)) %>%
@@ -203,9 +204,11 @@ if (d$info$cop_year == 2022) {
         datim_value
       )
 
-    data_psnu_x_im %<>% .compare_beautify(d2_session = d2_session)
+    data_psnu_x_im %<>% .compare_beautify(cop_year = d$info$cop_year,
+                                          d2_session = d2_session)
 
-    data_psnu %<>% .compare_beautify(d2_session = d2_session) %>% dplyr::select(-effect)
+    data_psnu %<>% .compare_beautify(cop_year = d$info$cop_year,
+                                     d2_session = d2_session) %>% dplyr::select(-effect)
 
     list(
       psnu_x_im = data_psnu_x_im,
