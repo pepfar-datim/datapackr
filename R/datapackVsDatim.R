@@ -34,11 +34,10 @@
       ) %>%
       dplyr::mutate(
         effect = dplyr::case_when(
-          is.na(difference) & is.na(datapack_value) ~ "Delete",
-          is.na(difference) &
-            is.na(datim_value) ~ "Create", !is.na(difference) &
-            difference != 0 ~ "Update",
-          difference == 0 ~ "No Change"
+          is.na(datapack_value) ~ "Delete",
+            is.na(datim_value) ~ "Create",
+           abs(difference) < 1e-5 ~ "Update",
+          abs(difference) >= 1e-5 ~ "No Change"
         )
       ) %>%
      dplyr::select(tidyselect::any_of(c(
@@ -60,6 +59,8 @@
 #' @description Compares the data in a parsed data pack that would be destined for DATIM with target data in in DATIM.
 #' @param d list object - parsed data pack object
 #' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @param datim_data A data frame resulting from datimutils::getDataValueSets. If null, the data will be fetched
+#' from DATIM.
 #' @return  list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,
 #' $updates (import to bring DATIM up to date with datapack), $deletes
 #' (import to bring DATIM up to date with datapack)
@@ -67,7 +68,8 @@
 compareData_DatapackVsDatim <-
   function(d,
            d2_session = dynGet("d2_default_session",
-                               inherits = TRUE)) {
+                               inherits = TRUE),
+           datim_data = NULL) {
 
 
 
@@ -122,31 +124,44 @@ compareData_DatapackVsDatim <-
 
 # Get data from DATIM using data value sets
 if (d$info$cop_year == 2022) {
-  datim_data <- dplyr::bind_rows(#NOTE ONLY 2022 Data
-    getCOPDataFromDATIM(country_uids = d$info$country_uids,
-                        cop_year = d$info$cop_year,
-                        d2_session = d2_session), #returns null???
-    getCOPDataFromDATIM(country_uids = d$info$country_uids,
-                        cop_year = d$info$cop_year - 1,
-                        datastreams = c("subnat_targets"),
-                        d2_session = d2_session)) %>%
-    dplyr::filter(value != 0) %>% # we don't import 0s up front so we should ignore any here
-    dplyr::filter(value != "") %>%
-    dplyr::rename(datim_value = value)
+  if (is.null(datim_data)) {
+    datim_data <- dplyr::bind_rows(#NOTE ONLY 2022 Data
+      getCOPDataFromDATIM(country_uids = d$info$country_uids,
+                          cop_year = d$info$cop_year,
+                          d2_session = d2_session), #returns null???
+      getCOPDataFromDATIM(country_uids = d$info$country_uids,
+                          cop_year = d$info$cop_year - 1,
+                          datastreams = c("subnat_targets"),
+                          d2_session = d2_session))
 
+    if (!is.null(datim_data))  {
+      datim_data %<>%
+        dplyr::filter(value != 0) %>% # we don't import 0s up front so we should ignore any here
+        dplyr::filter(value != "") %>%
+        dplyr::rename(datim_value = value)
+    }
+
+  }
 
 } else if (d$info$cop_year == 2023) {
+
+if (is.null(datim_data)) {
   datim_data <-
     getCOPDataFromDATIM(country_uids = d$info$country_uids,
                         cop_year = d$info$cop_year,
-                        d2_session = d2_session)
+                        d2_session = d2_session) }
 
-  #There might not be any data in DAITM
+
   if (!is.null(datim_data)) {
     datim_data %<>%
       dplyr::filter(value != "") %>%
       dplyr::rename(datim_value = value)
-  } else {
+  }
+
+}
+
+  #There might not be any data in DAITM
+if (is.null(datim_data)) {
     datim_data <- datapack_data_psnu_x_im %>%
       dplyr::mutate(datim_value = NA_real_) %>%
       dplyr::select(-datapack_value)
@@ -170,17 +185,13 @@ if (d$info$cop_year == 2022) {
       dplyr::full_join(datim_data_psnu_x_im,
                        datapack_data_psnu_x_im)
 
-}
-
-
 
 
 # Find the cases with different values. These should be  imported into DATIM
     data_different_value <-
       dplyr::filter(
         data_psnu_x_im,
-        dplyr::near(datapack_value, datim_value, 1e-5) |
-          is.na(datim_value)
+         !dplyr::near(datim_value, datapack_value, 1e-5) | is.na(datim_value)
       ) %>%
       dplyr::select(
         dataElement,

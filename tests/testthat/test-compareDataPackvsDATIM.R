@@ -42,6 +42,9 @@ with_mock_api({
       diff_names
     )
 
+    #No data in DATIM, so everything should be create
+    expect_true(all(compare$psnu_x_im$effect == "Create"))
+
     #In this case, expect no DATIM values
     expect_true(all(is.na(compare$psnu_x_im$datim_value)))
     #Values should be positive here, since the sign
@@ -79,9 +82,41 @@ with_mock_api({
     expect_true(all(compare$updates$attributeOptionCombo  == "default"))
     expect_true(inherits(compare$updates$datapack_value,"numeric"))
 
-    skip("Remove this after merging with DP-901")
-    #For COP23, there should only be 2023Oct data
-    expect_true(all(compare$updates$period  == "2023Oct"))
+    # skip("Remove this after merging with DP-901")
+    # #For COP23, there should only be 2023Oct data
+    # expect_true(all(compare$updates$period  == "2023Oct"))
+
+
+    #Lets simulate that the exact same data is in DATIM
+    datim_data <- createDATIMExport(d) %>%
+      dplyr::mutate(categoryOptionCombo = dplyr::case_when( categoryOptionCombo == default_catOptCombo() ~"default",
+                                                            TRUE ~ categoryOptionCombo),
+                    attributeOptionCombo = "default",
+                    value = as.numeric(value))
+
+    compare <- compareData_DatapackVsDatim(d, d2_session = training, datim_data = datim_data)
+    #There should be no updates or deletes
+    expect_true(NROW(compare$deletes) == 0)
+    expect_true(NROW(compare$updates) == 0)
+
+    #Lets up the targets in the datapack
+
+    original_data <- d$datim$UndistributedMER
+
+    d$datim$UndistributedMER$value  <- round(original_data$value * 2)
+    compare <- compareData_DatapackVsDatim(d, d2_session = training, datim_data = datim_data)
+    #There should be no updates or deletes
+    expect_true(NROW(compare$deletes) == 0)
+    expect_true(NROW(compare$updates) == NROW(original_data))
+    #Everything should be an update
+
+    #Lets just delete half of the data
+    half_the_data <- dplyr::slice_sample(original_data, n = 0.50)
+    d$datim$UndistributedMER <- half_the_data
+    compare <- compareData_DatapackVsDatim(d, d2_session = training, datim_data = datim_data)
+    #There should be no updates or deletes
+    expect_identical(NROW(compare$deletes), NROW(original_data) - NROW(half_the_data))
+    expect_true(NROW(compare$updates) == 0)
 
   })
 })
