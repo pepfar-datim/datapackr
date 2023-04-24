@@ -16,6 +16,7 @@ checkSchema(schema = cop23_data_pack_schema,
             template_path = datapack_template_filepath,
             cop_year = 2023,
             tool = "Data Pack")
+
 usethis::use_data(cop23_data_pack_schema, overwrite = TRUE, compress = "xz")
 
 ## Rebuild package again. (Cmd+Shift+B)
