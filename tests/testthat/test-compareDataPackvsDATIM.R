@@ -84,7 +84,7 @@ with_mock_api({
 
     # skip("Remove this after merging with DP-901")
     # #For COP23, there should only be 2023Oct data
-    # expect_true(all(compare$updates$period  == "2023Oct"))
+    expect_true(all(compare$updates$period  == "2023Oct"))
 
 
     #Lets simulate that the exact same data is in DATIM
