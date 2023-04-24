@@ -149,7 +149,8 @@ if (is.null(datim_data)) {
   datim_data <-
     getCOPDataFromDATIM(country_uids = d$info$country_uids,
                         cop_year = d$info$cop_year,
-                        d2_session = d2_session) }
+                        d2_session = d2_session)
+  }
 
 
   if (!is.null(datim_data)) {

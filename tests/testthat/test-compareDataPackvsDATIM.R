@@ -80,7 +80,7 @@ with_mock_api({
       compare$updates$categoryOptionCombo == "default"))
     #Since this is undistributed data, we should only be dealing with the default mechanism
     expect_true(all(compare$updates$attributeOptionCombo  == "default"))
-    expect_true(inherits(compare$updates$datapack_value,"numeric"))
+    expect_true(inherits(compare$updates$datapack_value, "numeric"))
 
     # skip("Remove this after merging with DP-901")
     # #For COP23, there should only be 2023Oct data
@@ -89,7 +89,7 @@ with_mock_api({
 
     #Lets simulate that the exact same data is in DATIM
     datim_data <- createDATIMExport(d) %>%
-      dplyr::mutate(categoryOptionCombo = dplyr::case_when( categoryOptionCombo == default_catOptCombo() ~"default",
+      dplyr::mutate(categoryOptionCombo = dplyr::case_when(categoryOptionCombo == default_catOptCombo() ~ "default",
                                                             TRUE ~ categoryOptionCombo),
                     attributeOptionCombo = "default",
                     value = as.numeric(value))
