@@ -23,7 +23,7 @@ checkColStructure <- function(d, sheet) {
     dplyr::select(indicator_code = value) %>%
     dplyr::mutate(
       sheet = sheet,
-      submission_order = as.integer(1:(dplyr::n()))) %>%
+      submission_order = as.integer(seq_len(dplyr::n()))) %>%
      { if (sheet == "PSNUxIM")
          dplyr::filter(.,
                        !stringr::str_detect(indicator_code, to_keep_regex)) else .

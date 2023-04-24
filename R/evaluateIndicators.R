@@ -66,7 +66,7 @@ evaluateIndicators <- function(combis, values, inds) {
   values <- c(values, totals_df$values)
 
   #Must escape the ornamentation, as these will be substituted
-  combis <- escapeIndicatorOrnamentation(combis)
+  #combis <- escapeIndicatorOrnamentation(combis)
 
   #Function to substitute values based on the
   #dataelement_id.categoryoptioncombo_id
@@ -74,7 +74,7 @@ evaluateIndicators <- function(combis, values, inds) {
                                       expressions = combis,
                                       v = values) {
     stringi::stri_replace_all(x,
-                              regex = expressions,
+                              fixed =  expressions,
                               replacement = values,
                               vectorize_all = FALSE)
   }

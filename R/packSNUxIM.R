@@ -126,7 +126,7 @@ packSNUxIM <- function(d,
       target_cols, by = c("indicator_code" = "indicator_code",
                           "sheet_name" = "sheet_name")) %>%
     dplyr::mutate(
-      row = as.integer((1:dplyr::n()) + existing_rows),
+      row = as.integer((seq_len(dplyr::n())) + existing_rows),
 
   # Accommodate OGAC request to aggregate OVC_HIVSTAT.T across age/sex ####
       id_col = dplyr::case_when(
@@ -191,7 +191,7 @@ packSNUxIM <- function(d,
     t() %>%
     tibble::as_tibble() %>%
     ## Setup formulas
-    dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
+    dplyr::slice(rep(seq_len(dplyr::n()), times = NROW(snuxim_model_data))) %>%
     dplyr::mutate(
       dplyr::across(dplyr::all_of(col.formulas),
         ~stringr::str_replace_all(
