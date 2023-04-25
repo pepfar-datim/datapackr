@@ -102,7 +102,7 @@ renderPrioTable <- function(memo_doc, prio_table, ou_name, source_type) {
                           "prioritization areas outlined above")
 
   #Format totals bottom horizontal line
-  totals_bottom_border <- officer::fp_border(color="black", width = 1.5)
+  totals_bottom_border <- officer::fp_border(color = "black", width = 1.5)
 
   prio_table <- flextable::flextable(prio_table) %>%
     flextable::merge_v(j = "Indicator") %>%
@@ -194,7 +194,7 @@ renderAgencyTable <- function(memo_doc, agency_table, ou_name, source_type) {
                           "deduplication adjustments.")
 
   #Format totals bottom horizontal line
-  totals_bottom_border <- officer::fp_border(color="black", width = 1.5)
+  totals_bottom_border <- officer::fp_border(color = "black", width = 1.5)
 
   agency_table_ft <- flextable::flextable(agency_table) %>%
     flextable::add_header_row(top = TRUE, values = header_new) %>%
@@ -264,7 +264,7 @@ renderPartnerTable <- function(memo_doc, partners_table, memoStructure, source_t
   style_header <- defaultMemoStyleHeader()
 
   #Format totals bottom horizontal line
-  totals_bottom_border <- officer::fp_border(color="black", width = 1.5)
+  totals_bottom_border <- officer::fp_border(color = "black", width = 1.5)
 
   #Partners tables
   partners_table <- partners_table %>%
