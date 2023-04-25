@@ -293,7 +293,7 @@ addcols <- function(data, cnames, type = "character") {
 #' @return returns a character vector of the related dataset uids
 #'
 getCOPDatasetUids <-  function(cop_year, datastreams) {
-
+  # TODO: Need to move this into R/packageSetup.R!
 
   #Datastream validation
   all_datastreams <- c("mer_targets", "mer_results",

@@ -1,3 +1,14 @@
+# datapackr 6.3.0
+
+## New features
+* 
+
+## Bug fixes
+* 
+
+## Minor improvements and fixes
+* Updated handling of KP_ESTIMATES dataElements to tag with the current COP_YEAR period, rather than the previous. This is different from how other IMPATT estimates are handled, but was a direct request from OGAC.
+
 # datapackr 6.2.3
 
 ## New features
