@@ -575,6 +575,8 @@ unPackSchema <- function(template_path = NULL,
       )
   }
 
+
+
   schema %<>%
     dplyr::select(sheet_num, sheet_name, col, indicator_code,
                   dataset, col_type, value_type,
@@ -590,12 +592,18 @@ unPackSchema <- function(template_path = NULL,
     dplyr::mutate(
       FY = dplyr::case_when(
         stringr::str_detect(indicator_code, "\\.(T|M|C)$") ~ cop_year + 1,
+
         # # Accommodate OGAC request to place Spectrum IMPATT data in planning FY
         # # instead of projection year. (+1 FY)
         # (stringr::str_detect(indicator_code, "\\.T_1$")
         #   & dataset == "impatt"
         #   & !stringr::str_detect(indicator_code, "PRIORITY_SNU"))
         #  ~ cop_year + 1,
+
+        # PATCH: DP-995: OGAC request to import KP_ESTIMATES into cop_year period
+        # unlike other `.T_1` IMPATT estimates.
+        stringr::str_detect(indicator_code, "^KP_ESTIMATES(.+)T_1$") ~ cop_year + 1,
+
         stringr::str_detect(indicator_code, "\\.T_1$") ~ cop_year,
         stringr::str_detect(indicator_code, "\\.R$") ~ cop_year - 1,
         stringr::str_detect(indicator_code, "\\.(T|M)2$") ~ cop_year + 2,
