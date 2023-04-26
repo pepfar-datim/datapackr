@@ -101,6 +101,9 @@ renderPrioTable <- function(memo_doc, prio_table, ou_name, source_type) {
                           "due to activities outside of the SNU",
                           "prioritization areas outlined above")
 
+  #Format totals bottom horizontal line
+  totals_bottom_border <- officer::fp_border(color = "black", width = 1.5)
+
   prio_table <- flextable::flextable(prio_table) %>%
     flextable::merge_v(j = "Indicator") %>%
     flextable::delete_part(part = "header") %>%
@@ -114,6 +117,7 @@ renderPrioTable <- function(memo_doc, prio_table, ou_name, source_type) {
     flextable::bg(i = ~ Age == "Total",
                   bg = "#E4DFEC",
                   part = "body") %>% #Highlight total rows
+    flextable::hline(i = ~ Age == "Total", border = totals_bottom_border) %>%
     flextable::bold(i = ~ Age == "Total", bold = TRUE, part = "body") %>%
     flextable::bg(j = "Indicator", bg = "#FFFFFF", part = "body") %>%
     flextable::bold(j = "Indicator", bold = FALSE) %>%
@@ -127,12 +131,7 @@ renderPrioTable <- function(memo_doc, prio_table, ou_name, source_type) {
     if (has_no_prio) {
       prio_table <- flextable::bg(prio_table,
                                   j = "No Prioritization - USG Only",
-                                  bg = "#D3D3D3", part = "body") %>%
-        flextable::bg(i = ~ Age == "Total",
-                      bg = "#E4DFEC",
-                      part = "body") #Highlight total rows
-
-
+                                  bg = "#D3D3D3", part = "body")
     }
 
 
@@ -194,6 +193,9 @@ renderAgencyTable <- function(memo_doc, agency_table, ou_name, source_type) {
                           "the sum of the rows of the data presented due to",
                           "deduplication adjustments.")
 
+  #Format totals bottom horizontal line
+  totals_bottom_border <- officer::fp_border(color = "black", width = 1.5)
+
   agency_table_ft <- flextable::flextable(agency_table) %>%
     flextable::add_header_row(top = TRUE, values = header_new) %>%
     flextable::merge_v(part = "header") %>%
@@ -203,6 +205,7 @@ renderAgencyTable <- function(memo_doc, agency_table, ou_name, source_type) {
     flextable::bg(i = ~ Age == "Total",
                   bg = "#E4DFEC",
                   part = "body") %>% #Highlight total rows
+    flextable::hline(i = ~ Age == "Total", border = totals_bottom_border) %>%
     flextable::bold(i = ~ Age == "Total", bold = TRUE, part = "body") %>%
     flextable::bg(j = "Indicator", bg = "#FFFFFF", part = "body") %>%
     flextable::bold(j = "Indicator", bold = FALSE) %>%
@@ -260,6 +263,9 @@ renderPartnerTable <- function(memo_doc, partners_table, memoStructure, source_t
 
   style_header <- defaultMemoStyleHeader()
 
+  #Format totals bottom horizontal line
+  totals_bottom_border <- officer::fp_border(color = "black", width = 1.5)
+
   #Partners tables
   partners_table <- partners_table %>%
     dplyr::mutate_if(is.numeric, zerosToDashes)
@@ -292,7 +298,9 @@ renderPartnerTable <- function(memo_doc, partners_table, memoStructure, source_t
       flextable::style(pr_p = style_header, part = "header") %>%
       flextable::style(pr_p = style_para, part = "body") %>%
       flextable::width(j = 1:3, 0.75) %>%
-      flextable::width(j = 4:(length(chunk)), 0.4)
+      flextable::width(j = 4:(length(chunk)), 0.4) %>%
+      flextable::hline(border = totals_bottom_border, part = "body") %>%
+      flextable::hline_bottom(border = totals_bottom_border, part = "header")
 
     fontname <- defaultMemoFont()
     if (gdtools::font_family_exists(fontname)) {
