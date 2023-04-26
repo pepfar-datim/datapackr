@@ -40,7 +40,7 @@ createDATIMExport <- function(d) {
 
   if (NROW(datim_export) > 0) {
     datim_export %>%
-      dplyr::mutate(value = as.character("value"))
+      dplyr::mutate(value = as.character(value))
   } else {
     return(NULL)
   }
