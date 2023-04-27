@@ -160,5 +160,10 @@ with_mock_api({
      NROW()
 
    expect_equal(0L, duplicated_export_rows)
+
+
+   #There should be no zeros in d$data$SNUxIM except for dedpe
+   expect_false(any(d$data$SNUxIM[d$data$SNUxIM$value == 0 & !grepl("^0000[01]", d$data$SNUxIM$mech_code),]))
+
 })
 })
