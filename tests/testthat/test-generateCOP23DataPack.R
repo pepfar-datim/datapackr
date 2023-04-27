@@ -163,7 +163,7 @@ with_mock_api({
 
 
    #There should be no zeros in d$data$SNUxIM except for dedpe
-   expect_false(any(d$data$SNUxIM[d$data$SNUxIM$value == 0 & !grepl("^0000[01]", d$data$SNUxIM$mech_code),]))
+   expect_false(any(d$data$SNUxIM[d$data$SNUxIM$value == 0 & !grepl("^0000[01]", d$data$SNUxIM$mech_code), ]))
 
 })
 })
