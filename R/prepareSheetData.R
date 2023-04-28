@@ -84,7 +84,7 @@ prepareSheetData <- function(sheet,
     t() %>%
     tibble::as_tibble() %>%
     ## Setup formulas by modifying char columns
-    dplyr::slice(rep(1:dplyr::n(), times = NROW(row_headers))) %>%
+    dplyr::slice(rep(seq_len(dplyr::n()), times = NROW(row_headers))) %>%
     dplyr::mutate_if(
       is.character,
       stringr::str_replace_all,
