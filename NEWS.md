@@ -1,14 +1,3 @@
-# datapackr 6.3.1
-
-## New features
-* 
-
-## Bug fixes
-* 
-
-## Minor improvements and fixes
-* Updated handling of zero values for non dedupe mechs.
-
 # datapackr 6.3.0
 
 ## New features
