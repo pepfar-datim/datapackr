@@ -38,12 +38,9 @@ createDATIMExport <- function(d) {
     datim_export <-  d$datim$OPU
   }
 
-  if (NROW(datim_export) > 0) {
-    datim_export %>%
-      dplyr::mutate(value = as.character(value))
-  } else {
-    return(NULL)
-  }
-
+  datim_export %>%
+    dplyr::mutate(value = as.character(value)) %>%
+  #Filter any non-dedupe zeros
+  dplyr::filter(!(value == "0" & !grepl("^0000[01]", attributeOptionCombo)))
 
 }
