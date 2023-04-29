@@ -791,7 +791,7 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
 
   invalid_orgunits <- d$sheets[sheets] %>%
     dplyr::bind_rows(.id = "sheet_name") %>%
-    dplyr::filter(dplyr::if_any(cols_to_filter, ~ !is.na(.))) %>%
+    #dplyr::filter(dplyr::if_all(tidyselect::all_of(cols_to_filter), ~ !is.na(.x))) %>%
     dplyr::select(sheet_name, PSNU) %>%
     dplyr::distinct() %>%
     dplyr::mutate(snu_uid = extract_uid(PSNU)) %>%
