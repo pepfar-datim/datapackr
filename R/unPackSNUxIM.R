@@ -885,8 +885,7 @@ unPackSNUxIM <- function(d) {
   }
 
   d$data$SNUxIM %<>%
-    dplyr::mutate(value = round_trunc(value)) %>%
-    dplyr::filter(value > 0)
+    dplyr::mutate(value = round_trunc(value))
 
   #Remove any zeros at this point
 
