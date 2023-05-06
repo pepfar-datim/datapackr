@@ -58,7 +58,9 @@ mergeDatapack <- function(d1 = d1, d2 = d2) {
   # combine message information
   d$info <- d1$info
 
-  d$info$messages <- appendMessage(d1$info$messages, d2$info$messages$message, d2$info$messages$level)
+  d$info$messages <- appendMessage(d1$info$messages,
+                                   d2$info$messages$message,
+                                   d2$info$messages$level)
 
   d
 }
