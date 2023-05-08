@@ -6,7 +6,7 @@
   #This query usually times out if it is made without filters.
   min_cop_year <- min(supportedCOPYears())
 
-    mechs <- datimutils::getSqlView(
+    mechs <- tryCatch( {datimutils::getSqlView(
       sql_view_uid = "fgUtV6e9YIX",
       d2_session = d2_session,
       timeout = 600
@@ -17,7 +17,11 @@
        mechanism_code = code,
        partner_desc = partner,
        partner_id = primeid) %>%
-     dplyr::distinct()
+     dplyr::distinct()},
+    error = function(e) {
+      interactive_warning("Could not retreive mechanism view from the server")
+      return(NULL)
+    })
 
 
 }
@@ -87,19 +91,24 @@ getMechanismView <- function(country_uids = NULL,
     is_fresh <- FALSE
   }
 
-  if (is_fresh && can_read_file) {
-    interactive_print("Loading cached mechs file")
-    mechs <- readRDS(cached_mechs_path)
-  }
+
+  mechs <- NULL
 
   if (!is_fresh) {
     mechs <- .fetchMechanismViewFromDATIM(d2_session = d2_session)
-    if (can_write_file) {
+    if (can_write_file && !is.null(mechs)) {
       interactive_print(paste0("Overwriting stale mechanisms view to ", cached_mechs_path))
       saveRDS(mechs, file = cached_mechs_path)
     }
 }
 
+  #Load this as a fall back in case we cannot get the fresh file
+  if (can_read_file && is.null(mechs)) {
+    interactive_print("Loading cached mechs file")
+    mechs <- readRDS(cached_mechs_path)
+  } else {
+    stop("No mechanism information could be obtained!")
+  }
 
 dedupe_mechs <- mechs %>%
   dplyr::filter(mechanism_code %in% c("00000", "00001"))
