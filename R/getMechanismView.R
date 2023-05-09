@@ -6,7 +6,8 @@
   #This query usually times out if it is made without filters.
   min_cop_year <- min(supportedCOPYears())
 
-    mechs <- tryCatch( {datimutils::getSqlView(
+    mechs <- tryCatch({
+      datimutils::getSqlView(
       sql_view_uid = "fgUtV6e9YIX",
       d2_session = d2_session,
       timeout = 600
@@ -82,7 +83,7 @@ getMechanismView <- function(country_uids = NULL,
     max_cache_age <- d2_session$max_cache_age
   }
 
-  if (file.exists(cached_mechs_path) && can_read_file) {
+  if (can_read_file) {
     is_lt <- function(x, y)  x < y
     cache_age_dur <- lubridate::as.duration(lubridate::interval(file.info(cached_mechs_path)$mtime, Sys.time()))
     max_cache_age_dur <- lubridate::duration(max_cache_age)
@@ -91,23 +92,25 @@ getMechanismView <- function(country_uids = NULL,
     is_fresh <- FALSE
   }
 
-
   mechs <- NULL
 
-  if (!is_fresh) {
+  if (!is_fresh || !can_read_file) {
+
     mechs <- .fetchMechanismViewFromDATIM(d2_session = d2_session)
+
     if (can_write_file && !is.null(mechs)) {
       interactive_print(paste0("Overwriting stale mechanisms view to ", cached_mechs_path))
       saveRDS(mechs, file = cached_mechs_path)
     }
 }
 
-  #Load this as a fall back in case we cannot get the fresh file
-  if (can_read_file && is.null(mechs)) {
-    interactive_print("Loading cached mechs file")
-    mechs <- readRDS(cached_mechs_path)
-  } else {
-    stop("No mechanism information could be obtained!")
+  #Fall back to the cached file
+  if (is.null(mechs)) {
+    if (can_read_file) {
+      mechs <- readRDS(cached_mechs_path)
+    } else {
+      stop("Could not read cached mechs file")
+    }
   }
 
 dedupe_mechs <- mechs %>%
