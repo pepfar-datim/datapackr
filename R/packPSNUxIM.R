@@ -50,9 +50,7 @@ packPSNUxIM <- function(wb, # Workbook object
   # all(is.na(snuxim_model_data))
 
   if (NROW(empty_snuxim_model_data) == 0 || is.null(snuxim_model_data)) {
-    interactive_warning(paste0("Provided SNUxIM model data seems empty or ",
-      "fatally flawed. Please provide acceptable model data."))
-    snuxim_model_data <- NULL
+    interactive_warning(paste0("Provided SNUxIM model data was empty!"))
   }
 
   #TODO: Clean this section up. Notes from Slack on March 18 2022.
