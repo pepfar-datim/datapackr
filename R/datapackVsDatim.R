@@ -144,7 +144,7 @@ if (d$info$cop_year == 2022) {
         dplyr::rename(datim_value = value)
       
     #Ignore SUBNATT/IMPATT if we are dealing with a standalone OPU
-    if (!d$info$hybrid_tool || is.null(d$info$hybrid_tool)) {
+    if (is.null(d$data$SUBNAT_IMPATT)) {
       
       mer_des <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>% 
         dplyr::filter(dataset == "mer") %>% 
@@ -175,7 +175,7 @@ if (is.null(datim_data)) {
       dplyr::rename(datim_value = value)
     
     #Ignore SUBNATT/IMPATT if we are dealing with a standalone OPU
-    if (!d$info$hybrid_tool || is.null(d$info$hybrid_tool)) {
+    if (is.null(d$data$SUBNAT_IMPATT)) {
       
       mer_des <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>% 
         dplyr::filter(dataset == "mer") %>% 
