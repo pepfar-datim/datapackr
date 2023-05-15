@@ -58,8 +58,7 @@
 #' @title compareData_DatapackVsDatim
 #'
 #' @description Compares the data in a parsed data pack that would be destined for DATIM with target data in in DATIM.
-#' @param d list object - parsed data pack object
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
 #' @param datim_data A data frame resulting from datimutils::getDataValueSets. If null, the data will be fetched
 #' from DATIM.
 #' @return  list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,
@@ -70,7 +69,8 @@ compareData_DatapackVsDatim <-
   function(d,
            d2_session = dynGet("d2_default_session",
                                inherits = TRUE),
-           datim_data = NULL) {
+           datim_data = NULL,
+           datastreams = c("mer_targets", "subnat_targets", "impatt")) {
 
 
 
@@ -131,6 +131,7 @@ if (d$info$cop_year == 2022) {
     datim_data <- dplyr::bind_rows(#NOTE ONLY 2022 Data
       getCOPDataFromDATIM(country_uids = d$info$country_uids,
                           cop_year = d$info$cop_year,
+                          datastreams = datastreams,
                           d2_session = d2_session),
       getCOPDataFromDATIM(country_uids = d$info$country_uids,
                           cop_year = d$info$cop_year - 1,
@@ -165,6 +166,7 @@ if (is.null(datim_data)) {
   datim_data <-
     getCOPDataFromDATIM(country_uids = d$info$country_uids,
                         cop_year = d$info$cop_year,
+                        datastreams = datastreams,
                         d2_session = d2_session)
   }
 

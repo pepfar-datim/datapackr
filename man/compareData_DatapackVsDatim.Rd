@@ -7,16 +7,23 @@
 compareData_DatapackVsDatim(
   d,
   d2_session = dynGet("d2_default_session", inherits = TRUE),
-  datim_data = NULL
+  datim_data = NULL,
+  datastreams = c("mer_targets", "subnat_targets", "impatt")
 )
 }
 \arguments{
-\item{d}{list object - parsed data pack object}
+\item{d}{Datapackr sidecar object}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
 
 \item{datim_data}{A data frame resulting from datimutils::getDataValueSets. If null, the data will be fetched
 from DATIM.}
+
+\item{datastreams}{Data stream or streams. One or more of \code{mer_targets},
+\code{mer_results}, \code{subnat_targets}, \code{subnat_results}, or
+\code{impatt}. If not specified, then all data streams
+are returned.}
 }
 \value{
 list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,
