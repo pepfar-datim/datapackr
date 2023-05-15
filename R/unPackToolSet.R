@@ -109,7 +109,7 @@ unPackToolSet <- function(d1_path = NULL,
   d$info$needs_psnuxim <- NROW(d$tests$non_equal_targets) > 0 || NROW(d$data$missingCombos) > 0
 
   d$info$hybrid_tool <- TRUE
-  
+
   d
 
 }

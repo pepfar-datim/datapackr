@@ -73,7 +73,7 @@ compareData_DatapackVsDatim <-
            datim_data = NULL) {
 
 
-  
+
 # start main processing
 # start off with dedups included
 
@@ -125,13 +125,13 @@ compareData_DatapackVsDatim <-
 
 # Get data from DATIM using data value sets
 if (d$info$cop_year == 2022) {
-  
+
   if (is.null(datim_data)) {
-    
+
     datim_data <- dplyr::bind_rows(#NOTE ONLY 2022 Data
       getCOPDataFromDATIM(country_uids = d$info$country_uids,
                           cop_year = d$info$cop_year,
-                          d2_session = d2_session), 
+                          d2_session = d2_session),
       getCOPDataFromDATIM(country_uids = d$info$country_uids,
                           cop_year = d$info$cop_year - 1,
                           datastreams = c("subnat_targets"),
@@ -142,19 +142,19 @@ if (d$info$cop_year == 2022) {
         dplyr::filter(value != 0) %>% # we don't import 0s up front so we should ignore any here
         dplyr::filter(value != "") %>%
         dplyr::rename(datim_value = value)
-      
+
     #Ignore SUBNATT/IMPATT if we are dealing with a standalone OPU
     if (is.null(d$data$SUBNAT_IMPATT)) {
-      
-      mer_des <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>% 
-        dplyr::filter(dataset == "mer") %>% 
-        dplyr::pull(dataelementuid) %>% 
+
+      mer_des <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+        dplyr::filter(dataset == "mer") %>%
+        dplyr::pull(dataelementuid) %>%
         unique()
-      
-      datim_data %<>% 
+
+      datim_data %<>%
         dplyr::filter(dataElement %in% mer_des)
     }
-      
+
     }
 
   }
@@ -173,16 +173,16 @@ if (is.null(datim_data)) {
     datim_data %<>%
       dplyr::filter(value != "") %>%
       dplyr::rename(datim_value = value)
-    
+
     #Ignore SUBNATT/IMPATT if we are dealing with a standalone OPU
     if (is.null(d$data$SUBNAT_IMPATT)) {
-      
-      mer_des <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>% 
-        dplyr::filter(dataset == "mer") %>% 
-        dplyr::pull(dataelementuid) %>% 
+
+      mer_des <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+        dplyr::filter(dataset == "mer") %>%
+        dplyr::pull(dataelementuid) %>%
         unique()
-      
-      datim_data %<>% 
+
+      datim_data %<>%
         dplyr::filter(dataElement %in% mer_des)
     }
   }
