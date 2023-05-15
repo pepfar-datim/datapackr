@@ -319,7 +319,7 @@ packPSNUxIM <- function(wb, # Workbook object
         tibble::enframe(name = NULL) %>%
         dplyr::rename(indicator_code = value) %>%
         dplyr::mutate(sheet_name = sheet,
-                      submission_order = 1:dplyr::n(),
+                      submission_order = seq_len(dplyr::n()),
                       col_ltr = openxlsx::int2col(submission_order)) %>%
         dplyr::left_join(schema %>% dplyr::select(indicator_code, sheet_name, dataset, col_type),
                          by = c("indicator_code", "sheet_name"))
@@ -345,7 +345,7 @@ packPSNUxIM <- function(wb, # Workbook object
       dplyr::left_join(
         col_ltrs, by = "indicator_code") %>%
       dplyr::mutate(
-        row = as.integer((1:dplyr::n()) + first_blank_row - 1),
+        row = as.integer((seq_len(dplyr::n())) + first_blank_row - 1),
 
     # nolint start
         DataPackTarget =
@@ -420,7 +420,7 @@ packPSNUxIM <- function(wb, # Workbook object
       t() %>%
       tibble::as_tibble() %>%
       ## Setup formulas
-      dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
+      dplyr::slice(rep(seq_len(dplyr::n()), times = NROW(snuxim_model_data))) %>%
       dplyr::mutate(
         dplyr::across(
           dplyr::all_of(col.formulas),
@@ -455,7 +455,7 @@ packPSNUxIM <- function(wb, # Workbook object
       t() %>%
       tibble::as_tibble() %>%
       ## Setup formulas
-      dplyr::slice(rep(1:dplyr::n(), times = NROW(snuxim_model_data))) %>%
+      dplyr::slice(rep(seq_len(dplyr::n()), times = NROW(snuxim_model_data))) %>%
       dplyr::mutate(
         dplyr::across(
           dplyr::all_of(col.formulas),
