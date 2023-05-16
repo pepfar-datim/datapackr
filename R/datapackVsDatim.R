@@ -81,9 +81,24 @@ compareData_DatapackVsDatim <-
       stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
     }
 
-    included_data_elements <-
 
-    datapack_data <- datapackr::createDATIMExport(d)
+    included_data_elements <- getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+      dplyr::select(dataelementuid, dataset) %>%
+      dplyr::distinct() %>%
+      dplyr::mutate(dataset = dplyr::case_when(dataset == "impatt" ~ "subnat_targets",
+                                               dataset == "mer" ~ "mer_tagets",
+                                               dataset == "subnat" ~ "subnat_tagets",
+                                               TRUE ~ dataset)) %>%
+      dplyr::filter(dataset %in% datastreams)
+
+    # Do not consider AGYW_PREV if this is a OPU Data Pack aka PSNUxIM
+    if (d$info$tool == "OPU Data Pack") {
+      included_data_elements <- included_data_elements %>%
+        dplyr::filter(dataset != "dreams")
+    }
+
+    datapack_data <- createDATIMExport(d) %>%
+      dplyr::filter(dataElement %in% included_data_elements$dataelementuid)
 
 
     #Need to make value a numeric
