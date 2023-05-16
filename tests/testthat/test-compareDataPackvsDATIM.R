@@ -24,7 +24,7 @@ with_mock_api({
 
     compare <- compareData_DatapackVsDatim(d, d2_session = training)
 
-    expect_named(compare, c("psnu_x_im", "psnu", "updates", "deletes"))
+    expect_named(compare, c("psnu_x_im", "psnu", "updates", "deletes", "dedupes"))
 
     diff_names <- c(
       "psnu",
