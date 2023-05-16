@@ -81,7 +81,10 @@ compareData_DatapackVsDatim <-
       stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
     }
 
-    datapack_data <- datapackr::createDATIMExport(d)  #
+    included_data_elements <-
+
+    datapack_data <- datapackr::createDATIMExport(d)
+
 
     #Need to make value a numeric
     datapack_data$value <- as.numeric(datapack_data$value)
@@ -107,6 +110,11 @@ compareData_DatapackVsDatim <-
     )) {
       stop("The column names of your data aren't as expected by compareData_DatapackVsDatim.")
     }
+
+    # extract dedupes from import file to handle separately
+    dedupes <-  dplyr::filter(datapack_data,
+                             attributeOptionCombo %in%
+                               c("00000", "00001"))
 
     # rename columns to fit standards
     datapack_data <- datapack_data %>%
@@ -256,6 +264,34 @@ if (is.null(datim_data)) {
       psnu_x_im = data_psnu_x_im,
       psnu = data_psnu,
       updates = data_different_value,
-      deletes = data_datim_only
+      deletes = data_datim_only,
+      dedupes = dedupes
+    )
+  }
+
+
+
+#' @export
+#' @title compareData_OpuDatapackVsDatim
+#'
+#' @description Legacy function maintained for backwards compatibility. If
+#' processing an Datapack (either Datapack or a standalone PSNU tab)
+#' as an OPU, only MER targets should be considered for processing.
+#' @inheritParams datapackr_params
+#' @param datim_data A data frame resulting from datimutils::getDataValueSets. If null, the data will be fetched
+#' from DATIM.
+#' @return  list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,
+#' $updates (import to bring DATIM up to date with datapack), $deletes
+#' (import to bring DATIM up to date with datapack)
+compareData_OpuDatapackVsDatim <-
+  function(d,
+           d2_session = dynGet("d2_default_session",
+                               inherits = TRUE),
+           datim_data = NULL) {
+    compareData_DatapackVsDatim(
+      d,
+      d2_session = d2_session,
+      datim_data = datim_data,
+      datastreams = "mer_targets"
     )
   }
