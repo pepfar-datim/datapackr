@@ -6,13 +6,17 @@
 \usage{
 compareData_DatapackVsDatim(
   d,
-  d2_session = dynGet("d2_default_session", inherits = TRUE)
+  d2_session = dynGet("d2_default_session", inherits = TRUE),
+  datim_data = NULL
 )
 }
 \arguments{
 \item{d}{list object - parsed data pack object}
 
 \item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+
+\item{datim_data}{A data frame resulting from datimutils::getDataValueSets. If null, the data will be fetched
+from DATIM.}
 }
 \value{
 list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,
