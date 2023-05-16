@@ -100,7 +100,6 @@ compareData_DatapackVsDatim <-
     datapack_data <- createDATIMExport(d) %>%
       dplyr::filter(dataElement %in% included_data_elements$dataelementuid)
 
-
     #Need to make value a numeric
     datapack_data$value <- as.numeric(datapack_data$value)
 
@@ -142,7 +141,7 @@ compareData_DatapackVsDatim <-
                                                   dataElement,
                                                   orgUnit,
                                                   categoryOptionCombo) %>%
-      dplyr::summarise(datapack_value = sum(datapack_value), .groups = "drop")
+      dplyr::summarise(datapack_value = sum(datapack_value, na.rm = TRUE), .groups = "drop")
 
     datapack_data_psnu_x_im <- datapack_data
 
