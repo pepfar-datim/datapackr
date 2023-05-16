@@ -288,6 +288,7 @@ compareData_OpuDatapackVsDatim <-
            d2_session = dynGet("d2_default_session",
                                inherits = TRUE),
            datim_data = NULL) {
+    warning("This function is deprecated. Please use compareData_DatapackVsDatim instead. ")
     compareData_DatapackVsDatim(
       d,
       d2_session = d2_session,
