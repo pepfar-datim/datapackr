@@ -86,8 +86,8 @@ compareData_DatapackVsDatim <-
       dplyr::select(dataelementuid, dataset) %>%
       dplyr::distinct() %>%
       dplyr::mutate(dataset = dplyr::case_when(dataset == "impatt" ~ "subnat_targets",
-                                               dataset == "mer" ~ "mer_tagets",
-                                               dataset == "subnat" ~ "subnat_tagets",
+                                               dataset == "mer" ~ "mer_targets",
+                                               dataset == "subnat" ~ "subnat_targets",
                                                TRUE ~ dataset)) %>%
       dplyr::filter(dataset %in% datastreams)
 
