@@ -4,10 +4,12 @@
 * 
 
 ## Bug fixes
-* 
+* Fixed issue with merging of message queues when unpacking multiple tools
 
 ## Minor improvements and fixes
-* 
+* Dedupe Handling
+* Tool to Datim comparison improvements
+* Handling of mech file refresh
 
 # datapackr 6.3.1
 
