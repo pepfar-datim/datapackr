@@ -10,6 +10,7 @@
 * Dedupe Handling
 * Tool to Datim comparison improvements
 * Handling of mech file refresh
+* Updated all dependencies to current versions
 
 # datapackr 6.3.1
 
