@@ -414,13 +414,16 @@ checkPSNUxIMDisaggs <- function(d) {
                   "Age" = valid_ages.name,
                   Sex = valid_sexes.name,
                   "KeyPop" = valid_kps.name) %>%
-    dplyr::mutate(exists = TRUE)
+    dplyr::mutate(exists = TRUE) %>%
+    dplyr::distinct() #Ignore differences with DSD and TA at this point
 
   data <- d$data$SNUxIM %>%
     dplyr::select(PSNU, indicator_code, "Age", "Sex", "KeyPop") %>%
     dplyr::mutate(row_number = dplyr::row_number() + header_row)
 
-  defunct_disaggs <- dplyr::left_join(data, de_coc_map)
+
+  defunct_disaggs <-
+    dplyr::left_join(data, de_coc_map, by = c("indicator_code", "Age", "Sex", "KeyPop"))
 
   if (any(is.na(defunct_disaggs$exists))) {
 
