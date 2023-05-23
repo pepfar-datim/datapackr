@@ -987,9 +987,9 @@ unPackSNUxIM <- function(d) {
         TRUE ~ `TA Dedupe`
       ),
       `Crosswalk Dedupe` = dplyr::case_when(
-        Total_count < 2  ~ NA_real_,
-        Total_count >= 2 & TA_count > 1 & DSD_count > 1 & is.na(`Crosswalk Dedupe`) ~ 0,
-        Total_count >= 2 & TA_count > 1 & DSD_count > 1 & !is.na(`Crosswalk Dedupe`) ~ `Crosswalk Dedupe`,
+        TA_count <= 1 | DSD_count <= 1  ~ NA_real_,
+        TA_count > 1 & DSD_count > 1 & is.na(`Crosswalk Dedupe`) ~ 0,
+        TA_count > 1 & DSD_count > 1 & !is.na(`Crosswalk Dedupe`) ~ `Crosswalk Dedupe`,
         TRUE ~ `Crosswalk Dedupe`
       )
     ) %>%
