@@ -278,9 +278,19 @@ testMissingRightSideFormulas <- function(d, cols_to_keep, header_cols,
                                          header_row, blank_cols_idx, parsed_cells = NULL) {
 
     if (is.null(parsed_cells)) {
-      parsed_cells <-  tidyxl::xlsx_cells(path = d$keychain$submission_path,
+
+      #For hybrid tools, choose the PSNUxIM file.
+      psnuxim_path <-
+        ifelse(
+          !is.null(d$keychain$psnuxim_file_path),
+          d$keychain$psnuxim_file_path,
+          d$keychain$submission_path
+        )
+
+      parsed_cells <-  tidyxl::xlsx_cells(path = psnuxim_path,
                                              sheets = "PSNUxIM",
                                              include_blank_cells = TRUE)
+
     }
     # TEST: Missing right-side formulas; Warn; Continue ####
     # TODO: This seems not particularly efficient to
@@ -414,13 +424,16 @@ checkPSNUxIMDisaggs <- function(d) {
                   "Age" = valid_ages.name,
                   Sex = valid_sexes.name,
                   "KeyPop" = valid_kps.name) %>%
-    dplyr::mutate(exists = TRUE)
+    dplyr::mutate(exists = TRUE) %>%
+    dplyr::distinct() #Ignore differences with DSD and TA at this point
 
   data <- d$data$SNUxIM %>%
     dplyr::select(PSNU, indicator_code, "Age", "Sex", "KeyPop") %>%
     dplyr::mutate(row_number = dplyr::row_number() + header_row)
 
-  defunct_disaggs <- dplyr::left_join(data, de_coc_map)
+
+  defunct_disaggs <-
+    dplyr::left_join(data, de_coc_map, by = c("indicator_code", "Age", "Sex", "KeyPop"))
 
   if (any(is.na(defunct_disaggs$exists))) {
 
@@ -565,9 +578,18 @@ unPackSNUxIM <- function(d) {
   # first step to be able to functionalize and test everything else
   # below.
   if (is.null(d$data$SNUxIM)) {
+
+    #For hybrid tools, choose the PSNUxIM file.
+    psnuxim_path <-
+      ifelse(
+        !is.null(d$keychain$psnuxim_file_path),
+        d$keychain$psnuxim_file_path,
+        d$keychain$submission_path
+      )
+
     d$data$SNUxIM <-
       readxl::read_excel(
-        path = d$keychain$submission_path,
+        path = psnuxim_path,
         sheet = sheet,
         range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
         col_types = "text",
@@ -885,17 +907,7 @@ unPackSNUxIM <- function(d) {
   }
 
   d$data$SNUxIM %<>%
-    dplyr::mutate(value = round_trunc(value)) %>%
-    dplyr::filter(value > 0)
-
-  #Remove any zeros at this point
-
-
-  #Remove any zeros at this point
-
-
-  #Remove any zeros at this point
-
+    dplyr::mutate(value = round_trunc(value))
 
   # TEST: Positive Dedupes; Error; Drop ####
   d$tests$positive_dedupes <- d$data$SNUxIM %>%
@@ -975,9 +987,9 @@ unPackSNUxIM <- function(d) {
         TRUE ~ `TA Dedupe`
       ),
       `Crosswalk Dedupe` = dplyr::case_when(
-        TA_count == 0 | DSD_count == 0 ~ NA_real_,
-        TA_count > 0 & DSD_count > 0 & is.na(`Crosswalk Dedupe`) ~ 0,
-        TA_count > 0 & DSD_count > 0 & !is.na(`Crosswalk Dedupe`) ~ `Crosswalk Dedupe`,
+        Total_count < 2  ~ NA_real_,
+        Total_count >= 2 & TA_count > 1 & DSD_count > 1 & is.na(`Crosswalk Dedupe`) ~ 0,
+        TA_count + DSD_count >=2 & !is.na(`Crosswalk Dedupe`) ~ `Crosswalk Dedupe`,
         TRUE ~ `Crosswalk Dedupe`
       )
     ) %>%
