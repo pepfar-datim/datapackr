@@ -222,12 +222,11 @@ checkNonEqualTargets <- function(d, original_targets) {
       #If the main tab value is missing and the DataPackTarget is zero, ignore
       dplyr::mutate(are_equal = dplyr::case_when(is.na(MainTabsTarget) & DataPackTarget == 0 ~ TRUE,
                                                  is.na(MainTabsTarget) & DataPackTarget != 0 ~ FALSE,
+                                                 !is.na(MainTabsTarget) & is.na(DataPackTarget) ~ FALSE,
                                                  TRUE ~ are_equal)) %>%
       dplyr::filter(!are_equal | is.na(are_equal)) %>%
-      #Filter non-allocated data to prevent false positives with this test
-      #Other tests should catch whether there is data in the main tabs
-      #but which has not been allocated
-      dplyr::filter(!is.na(DataPackTarget)) %>%
+      #Filter instances where both the DP and PSNUxIM Target are NA
+      dplyr::filter(!(is.na(DataPackTarget) & is.na(MainTabsTarget))) %>%
       dplyr::rename("PSNUxIM Target" = DataPackTarget)
 
     attr(d$tests$non_equal_targets, "test_name") <- "Non-equal targets"
