@@ -175,9 +175,20 @@ extractDuplicateRows <- function(d, sheet = "PSNUxIM") {
 }
 
 getColumnsToKeep <- function(d, sheet = "PSNUxIM") {
-    d$info$schema %>%
-    dplyr::filter(sheet_name == sheet,
-                  !is.na(indicator_code),
+
+  #If we have a hybrid tool, then use the PSNUxIM schema
+  #Otherwise, for a standalone PSNUxIM tool, the schema
+  #will be in the normal location d$info$schema
+
+  if (isTRUE(d$info$hybrid_tool)) {
+    schema <- d$info$psnuxim_schema
+  } else {
+    schema <- d$info$schema %>%
+      dplyr::filter(sheet_name == sheet)
+  }
+
+    schema %>%
+    dplyr::filter(!is.na(indicator_code),
                   !indicator_code %in% c("sheet_num", "ID", "SNU1"),
                   col_type %in% c("row_header", "target"))
 }
@@ -553,6 +564,209 @@ checkNonNumericPSNUxIMValues <- function(d, header_cols) {
 
 }
 
+
+testMissingDedupeRollupColumns <- function(d, cols_to_keep) {
+
+  # TEST: Missing Dedupe Rollup or Not PEPFAR cols; Error; Add ####
+  dedupe_rollup_cols <- cols_to_keep %>%
+    dplyr::filter(dataset == "mer" & col_type == "target" & !indicator_code %in% c("", "12345_DSD")) %>%
+    dplyr::pull(indicator_code)
+
+  missing_cols_fatal <- dedupe_rollup_cols[!dedupe_rollup_cols %in% names(d$data$SNUxIM)]
+
+  d$tests$missing_cols_fatal <- data.frame(missing_cols_fatal = missing_cols_fatal)
+  attr(d$tests$missing_cols_fatal, "test_name") <- "Fatally missing Dedupe Rollup columns"
+
+  if (length(missing_cols_fatal) > 0) {
+    d$info$has_error <- TRUE
+
+    warning_msg <-
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ", FATALLY MISSING COLUMNS: The following columns are missing, or have",
+        " unexpected or blank column headers. Please check your submission. ->  \n\t* ",
+        paste(missing_cols_fatal, collapse = "\n\t* "),
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$has_error <- TRUE
+  }
+
+  d$data$SNUxIM %<>%
+    datapackr::addcols(
+      missing_cols_fatal,
+      type = "numeric")
+
+  d
+}
+
+recalculateDedupeValues <- function(d) {
+  # Recalculate dedupes ####
+  ## Other than IM cols, only the following should be considered safe for reuse here:
+  # - Deduplicated DSD Rollup
+  # - Deduplicated TA Rollup
+  # - Total Deduplicated Rollup
+  ## All others must be recalculated to protect against formula breakers.
+
+  d$data$SNUxIM %<>%
+    datapackr::rowMax(cn = "MAX - TA", regex = "\\d{4,6}_TA") %>%
+    datapackr::rowMax(cn = "MAX - DSD", regex = "\\d{4,6}_DSD") %>%
+    dplyr::mutate(
+      `TA Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_TA")), na.rm = TRUE),
+      `DSD Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_DSD")), na.rm = TRUE),
+      `SUM - TA` = `TA Duplicated Rollup`,
+      `SUM - DSD` = `DSD Duplicated Rollup`,
+      `SUM - Crosswalk Total` =
+        rowSums(dplyr::select(.,
+                              `Deduplicated DSD Rollup`, `Deduplicated TA Rollup`),
+                na.rm = TRUE),
+      `MAX - Crosswalk Total` =
+        pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = TRUE),
+      `DSD Dedupe` = `Deduplicated DSD Rollup` - `SUM - DSD`,
+      `TA Dedupe` = `Deduplicated TA Rollup` - `SUM - TA`,
+      `Crosswalk Dedupe` = `Total Deduplicated Rollup` - `SUM - Crosswalk Total`
+    )
+
+  d
+}
+
+testInvalidDedupeValues <- function(d, header_cols) {
+  # TEST: Improper dedupe values; Error; Continue ####
+  dedupe_cols <- names(d$data$SNUxIM)[which(grepl("Deduplicated", names(d$data$SNUxIM)))]
+
+  # Deduplicated DSD within range
+  d$tests$dedupes_outside_range <- d$data$SNUxIM %>%
+    dplyr::mutate(
+      dplyr::across(dplyr::all_of(dedupe_cols), ~tidyr::replace_na(.x, 0))
+    ) %>%
+    dplyr::mutate(
+      `issues.Deduplicated DSD Rollup` =
+        !(`Deduplicated DSD Rollup` >= `MAX - DSD`
+          & `Deduplicated DSD Rollup` <= `SUM - DSD`),
+
+      # Deduplicated TA within range
+      `issues.Deduplicated TA Rollup` =
+        !(`Deduplicated TA Rollup` >= `MAX - TA`
+          & `Deduplicated TA Rollup` <= `SUM - TA`),
+
+      # Crosswalk dedupe within range
+      `issues.Total Deduplicated Rollup` =
+        !(`Total Deduplicated Rollup` >= `MAX - Crosswalk Total`
+          & `Total Deduplicated Rollup` <= `SUM - Crosswalk Total`)
+    ) %>%
+    dplyr::select(dplyr::all_of(c(header_cols$indicator_code, dedupe_cols)),
+                  `MAX - DSD`, `SUM - DSD`, `MAX - TA`, `SUM - TA`,
+                  `MAX - Crosswalk Total`, `SUM - Crosswalk Total`,
+                  tidyselect::matches("issues\\.")) %>%
+    dplyr::filter(
+      `issues.Deduplicated DSD Rollup`
+      | `issues.Deduplicated TA Rollup`
+      | `issues.Total Deduplicated Rollup`
+    )
+
+  attr(d$tests$dedupes_outside_range, "test_name") <- "Dedupes Outside Acceptable Range"
+
+  if (NROW(d$tests$dedupes_outside_range) > 0) {
+    d$info$has_error <- TRUE
+
+    dedupe_issue_cols <-
+      tibble::tribble(
+        ~col, ~warn,
+        "Deduplicated DSD Rollup", any(d$tests$dedupes_outside_range$`issues.Deduplicated DSD Rollup`),
+        "Deduplicated TA Rollup", any(d$tests$dedupes_outside_range$`issues.Deduplicated TA Rollup`),
+        "Total Deduplicated Rollup", any(d$tests$dedupes_outside_range$`issues.Total Deduplicated Rollup`)
+      ) %>%
+      dplyr::filter(warn)
+
+    warning_msg <-
+      paste0(
+        "ERROR! In tab ",
+        sheet,
+        ", DEDUPES OUTSIDE ACCEPTABLE RANGE: The following columns contain total",
+        " deduplicated targets that are outside acceptable maximum/minimum ranges.",
+        " (Your Data Pack notes these with red highlighting.) You must resolve",
+        " these issues prior to DATIM import. ->  \n\t* ",
+        paste(
+          dedupe_issue_cols$col,
+          collapse = "\n\t* "),
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+  }
+
+  d
+
+}
+
+testNegativeTargetValues <- function(d, header_cols) {
+  # TEST: Negative IM Targets; Error; Drop ####
+  d$tests$negative_IM_targets <- d$data$SNUxIM %>%
+    tidyr::gather(key = "mechCode_supportType",
+                  value = "value",
+                  -tidyselect::all_of(header_cols$indicator_code)) %>%
+    dplyr::filter(stringr::str_detect(mechCode_supportType, "\\d{4,}_(DSD|TA)")
+                  & value < 0)
+
+  attr(d$tests$negative_IM_targets, "test_name") <- "Negative Mechanism Targets"
+
+  if (NROW(d$tests$negative_IM_targets) > 0) {
+    d$info$has_error <- TRUE
+
+    warning_msg <-
+      paste0(
+        "ERROR!: ",
+        NROW(d$tests$negative_IM_targets),
+        " cases where negative numbers are being used for mechanism allocations.",
+        " The following mechanisms have been affected. These values will be dropped. -> \n\t* ",
+        paste(unique(d$tests$negative_IM_targets$mechCode_supportType), collapse = "\n\t* "),
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+  }
+
+  d$data$SNUxIM %<>%
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::matches("\\d{4,}_(DSD|TA)"),
+        ~ dplyr::if_else(.x < 0, NA_real_, .x))
+    )
+
+  d
+}
+
+testInvalidPSNUs <- function(d) {
+  #Test for invalid PSNUs
+
+  possible_psnus <- getValidOrgUnits(d$info$cop_year) %>%
+    dplyr::filter(country_uid %in% d$info$country_uids) %>%
+    dplyr::rename(psnu_uid = uid) %>%
+    dplyr::pull(psnu_uid)
+
+  d$tests$invalid_psnus <- d$data$SNUxIM %>%
+    dplyr::filter(!(psnuid %in% possible_psnus)) %>%
+    dplyr::select(PSNU) %>%
+    dplyr::distinct() %>%
+    dplyr::pull(PSNU)
+
+  attr(d$tests$invalid_psnus, "test_name") <- "Invalid PSNUs"
+
+  if (length(d$tests$invalid_psnus) > 0) {
+    d$info$has_error <- TRUE
+
+    warning_msg <-
+      paste0(
+        "ERROR!: ",
+        NROW(d$tests$invalid_psnus),
+        " invalid PSNU identifiers were detected. Please check the UID and fix the following PSNUs:",
+        paste(d$tests$invalid_psnus, sep = "", collapse = ";"))
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+  }
+
+  d
+}
+
 #' @export
 #' @title unPackSNUxIM(d)
 #'
@@ -677,163 +891,13 @@ unPackSNUxIM <- function(d) {
                                        as.numeric))
     }
 
-  # TEST: Missing Dedupe Rollup or Not PEPFAR cols; Error; Add ####
-  dedupe_rollup_cols <- cols_to_keep %>%
-    dplyr::filter(dataset == "mer" & col_type == "target" & !indicator_code %in% c("", "12345_DSD")) %>%
-    dplyr::pull(indicator_code)
+  d <- testMissingDedupeRollupColumns(d, cols_to_keep)
 
-  missing_cols_fatal <- dedupe_rollup_cols[!dedupe_rollup_cols %in% names(d$data$SNUxIM)]
+  d <- recalculateDedupeValues(d)
 
-  d$tests$missing_cols_fatal <- data.frame(missing_cols_fatal = missing_cols_fatal)
-  attr(d$tests$missing_cols_fatal, "test_name") <- "Fatally missing Dedupe Rollup columns"
+  d <- testInvalidDedupeValues(d, header_cols)
 
-  if (length(missing_cols_fatal) > 0) {
-    d$info$has_error <- TRUE
-
-    warning_msg <-
-      paste0(
-        "ERROR! In tab ",
-        sheet,
-        ", FATALLY MISSING COLUMNS: The following columns are missing, or have",
-        " unexpected or blank column headers. Please check your submission. ->  \n\t* ",
-        paste(missing_cols_fatal, collapse = "\n\t* "),
-        "\n")
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-    d$info$has_error <- TRUE
-  }
-
-  d$data$SNUxIM %<>%
-    datapackr::addcols(
-      missing_cols_fatal,
-      type = "numeric")
-
-  # Recalculate dedupes ####
-    ## Other than IM cols, only the following should be considered safe for reuse here:
-    # - Deduplicated DSD Rollup
-    # - Deduplicated TA Rollup
-    # - Total Deduplicated Rollup
-    ## All others must be recalculated to protect against formula breakers.
-
-  d$data$SNUxIM %<>%
-    datapackr::rowMax(cn = "MAX - TA", regex = "\\d{4,6}_TA") %>%
-    datapackr::rowMax(cn = "MAX - DSD", regex = "\\d{4,6}_DSD") %>%
-    dplyr::mutate(
-      `TA Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_TA")), na.rm = TRUE),
-      `DSD Duplicated Rollup` = rowSums(dplyr::select(., tidyselect::matches("\\d{4,}_DSD")), na.rm = TRUE),
-      `SUM - TA` = `TA Duplicated Rollup`,
-      `SUM - DSD` = `DSD Duplicated Rollup`,
-      `SUM - Crosswalk Total` =
-        rowSums(dplyr::select(.,
-                              `Deduplicated DSD Rollup`, `Deduplicated TA Rollup`),
-                na.rm = TRUE),
-      `MAX - Crosswalk Total` =
-        pmax(`Deduplicated DSD Rollup`, `Deduplicated TA Rollup`, na.rm = TRUE),
-      `DSD Dedupe` = `Deduplicated DSD Rollup` - `SUM - DSD`,
-      `TA Dedupe` = `Deduplicated TA Rollup` - `SUM - TA`,
-      `Crosswalk Dedupe` = `Total Deduplicated Rollup` - `SUM - Crosswalk Total`
-    )
-
-  # TEST: Improper dedupe values; Error; Continue ####
-  dedupe_cols <- names(d$data$SNUxIM)[which(grepl("Deduplicated", names(d$data$SNUxIM)))]
-
-    # Deduplicated DSD within range
-  d$tests$dedupes_outside_range <- d$data$SNUxIM %>%
-    dplyr::mutate(
-      dplyr::across(dplyr::all_of(dedupe_cols), ~tidyr::replace_na(.x, 0))
-    ) %>%
-    dplyr::mutate(
-      `issues.Deduplicated DSD Rollup` =
-        !(`Deduplicated DSD Rollup` >= `MAX - DSD`
-          & `Deduplicated DSD Rollup` <= `SUM - DSD`),
-
-      # Deduplicated TA within range
-      `issues.Deduplicated TA Rollup` =
-        !(`Deduplicated TA Rollup` >= `MAX - TA`
-          & `Deduplicated TA Rollup` <= `SUM - TA`),
-
-      # Crosswalk dedupe within range
-      `issues.Total Deduplicated Rollup` =
-        !(`Total Deduplicated Rollup` >= `MAX - Crosswalk Total`
-          & `Total Deduplicated Rollup` <= `SUM - Crosswalk Total`)
-    ) %>%
-    dplyr::select(dplyr::all_of(c(header_cols$indicator_code, dedupe_cols)),
-                  `MAX - DSD`, `SUM - DSD`, `MAX - TA`, `SUM - TA`,
-                  `MAX - Crosswalk Total`, `SUM - Crosswalk Total`,
-                  tidyselect::matches("issues\\.")) %>%
-    dplyr::filter(
-      `issues.Deduplicated DSD Rollup`
-      | `issues.Deduplicated TA Rollup`
-      | `issues.Total Deduplicated Rollup`
-    )
-
-  attr(d$tests$dedupes_outside_range, "test_name") <- "Dedupes Outside Acceptable Range"
-
-  if (NROW(d$tests$dedupes_outside_range) > 0) {
-    d$info$has_error <- TRUE
-
-    dedupe_issue_cols <-
-      tibble::tribble(
-        ~col, ~warn,
-        "Deduplicated DSD Rollup", any(d$tests$dedupes_outside_range$`issues.Deduplicated DSD Rollup`),
-        "Deduplicated TA Rollup", any(d$tests$dedupes_outside_range$`issues.Deduplicated TA Rollup`),
-        "Total Deduplicated Rollup", any(d$tests$dedupes_outside_range$`issues.Total Deduplicated Rollup`)
-      ) %>%
-      dplyr::filter(warn)
-
-    warning_msg <-
-      paste0(
-        "ERROR! In tab ",
-        sheet,
-        ", DEDUPES OUTSIDE ACCEPTABLE RANGE: The following columns contain total",
-        " deduplicated targets that are outside acceptable maximum/minimum ranges.",
-        " (Your Data Pack notes these with red highlighting.) You must resolve",
-        " these issues prior to DATIM import. ->  \n\t* ",
-        paste(
-          dedupe_issue_cols$col,
-          collapse = "\n\t* "),
-        "\n")
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-  }
-
-  # TEST: Negative IM Targets; Error; Drop ####
-  d$tests$negative_IM_targets <- d$data$SNUxIM %>%
-    tidyr::gather(key = "mechCode_supportType",
-                  value = "value",
-                  -tidyselect::all_of(header_cols$indicator_code)) %>%
-    dplyr::filter(stringr::str_detect(mechCode_supportType, "\\d{4,}_(DSD|TA)")
-                  & value < 0)
-
-  attr(d$tests$negative_IM_targets, "test_name") <- "Negative Mechanism Targets"
-
-  if (NROW(d$tests$negative_IM_targets) > 0) {
-    d$info$has_error <- TRUE
-
-    warning_msg <-
-      paste0(
-        "ERROR!: ",
-        NROW(d$tests$negative_IM_targets),
-        " cases where negative numbers are being used for mechanism allocations.",
-        " The following mechanisms have been affected. These values will be dropped. -> \n\t* ",
-        paste(unique(d$tests$negative_IM_targets$mechCode_supportType), collapse = "\n\t* "),
-        "\n")
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-  }
-
-  d$data$SNUxIM %<>%
-    dplyr::mutate(
-      dplyr::across(
-        dplyr::matches("\\d{4,}_(DSD|TA)"),
-        ~ dplyr::if_else(.x < 0, NA_real_, .x))
-    )
-
-  # TEST: Formula changes; Warning; Continue ####
-  # TODO: We have already read in the sheet with tidyxl
-  # in an earlier test but in this test we read it yet again
-  # Lets recycle from above?
-  #d <- checkFormulas(d = d, sheet = sheet)
+  d <- testNegativeTargetValues(d, header_cols)
 
   # Remove all unneeded columns ####
   d$data$SNUxIM %<>%
@@ -847,44 +911,17 @@ unPackSNUxIM <- function(d) {
     dplyr::select(PSNU, psnuid, indicator_code, Age, Sex, KeyPop,
                   dplyr::everything())
 
-  #Test for invalid PSNUs
-
-  possible_psnus <- getValidOrgUnits(d$info$cop_year) %>%
-    dplyr::filter(country_uid %in% d$info$country_uids) %>%
-    dplyr::rename(psnu_uid = uid) %>%
-    dplyr::pull(psnu_uid)
-
-  d$tests$invalid_psnus <- d$data$SNUxIM %>%
-    dplyr::filter(!(psnuid %in% possible_psnus)) %>%
-    dplyr::select(PSNU) %>%
-    dplyr::distinct() %>%
-    dplyr::pull(PSNU)
-
-  attr(d$tests$invalid_psnus, "test_name") <- "Invalid PSNUs"
-
-  if (length(d$tests$invalid_psnus) > 0) {
-    d$info$has_error <- TRUE
-
-    warning_msg <-
-      paste0(
-        "ERROR!: ",
-        NROW(d$tests$invalid_psnus),
-        " invalid PSNU identifiers were detected. Please check the UID and fix the following PSNUs:",
-        paste(d$tests$invalid_psnus, sep = "", collapse = ";"))
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-  }
+  d <- testInvalidPSNUs(d)
 
   # Gather all values in single column ####
+  # Data is now in LONG format.
   d$data$SNUxIM %<>%
     tidyr::gather(key = "mechCode_supportType",
                   value = "value",
                   -tidyselect::all_of(c(header_cols$indicator_code, "psnuid"))) %>%
     dplyr::select(dplyr::all_of(header_cols$indicator_code), psnuid,
-                  mechCode_supportType, value)
-
-  # Drop NAs ####
-  d$data$SNUxIM %<>% tidyr::drop_na(value)
+                  mechCode_supportType, value) %>%
+    tidyr::drop_na(value)
 
   # TEST: Decimals; Error; Round ####
   d$tests$decimals <- d$data$SNUxIM %>%

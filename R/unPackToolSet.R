@@ -91,6 +91,8 @@ unPackToolSet <- function(d1_path = NULL,
   d <- extractSNUxIMCombos(d, p)
   #We may need the path to the PSNUxIM tab, if they need to regenerated
   d$keychain$psnuxim_file_path <- p$keychain$submission_path
+  #Keep PSNUxIM Schema for later
+  d$info$psnuxim_schema <- p$info$schema
 
   #TODO: Check to be sure that the analytics should
   #be coming from the PSNUxIM tab, but we will merge everything
@@ -106,6 +108,7 @@ unPackToolSet <- function(d1_path = NULL,
   d$data$analytics <- dplyr::bind_rows(p$data$analytics, dp_analytics)
 
   d$info$has_psnuxim <- TRUE
+  d$info$hybrid_tool <- TRUE
   d$info$needs_psnuxim <- NROW(d$tests$non_equal_targets) > 0 || NROW(d$data$missingCombos) > 0
 
   d
