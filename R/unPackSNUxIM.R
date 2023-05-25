@@ -301,7 +301,6 @@ testMissingRightSideFormulas <- function(d, cols_to_keep, header_cols,
       parsed_cells <-  tidyxl::xlsx_cells(path = psnuxim_path,
                                              sheets = "PSNUxIM",
                                              include_blank_cells = TRUE)
-
     }
     # TEST: Missing right-side formulas; Warn; Continue ####
     # TODO: This seems not particularly efficient to
