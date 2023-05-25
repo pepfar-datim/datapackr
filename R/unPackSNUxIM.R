@@ -680,8 +680,7 @@ testInvalidDedupeValues <- function(d, header_cols) {
 
     warning_msg <-
       paste0(
-        "ERROR! In tab ",
-        sheet,
+        "ERROR! In tab PSNUxIM",
         ", DEDUPES OUTSIDE ACCEPTABLE RANGE: The following columns contain total",
         " deduplicated targets that are outside acceptable maximum/minimum ranges.",
         " (Your Data Pack notes these with red highlighting.) You must resolve",
