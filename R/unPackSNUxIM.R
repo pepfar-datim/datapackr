@@ -767,6 +767,73 @@ testInvalidPSNUs <- function(d) {
   d
 }
 
+
+testRoundDecimalValues <- function(d) {
+  # TEST: Decimals; Error; Round ####
+  d$tests$decimals <- d$data$SNUxIM %>%
+    dplyr::filter(value %% 1 != 0)
+
+  attr(d$tests$decimals, "test_name") <- "Decimal values"
+
+  if (NROW(d$tests$decimals) > 0) {
+    d$info$has_error <- TRUE
+
+    warning_msg <-
+      paste0(
+        "WARNING! In tab ",
+        sheet,
+        ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
+        paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+  }
+
+  d$data$SNUxIM %<>%
+    dplyr::mutate(value = round_trunc(value))
+
+  d
+}
+
+testDropPositiveDedupe <- function(d) {
+  # TEST: Positive Dedupes; Error; Drop ####
+  d$tests$positive_dedupes <- d$data$SNUxIM %>%
+    dplyr::filter(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0)
+  attr(d$tests$positive_dedupes, "test_name") <- "Positive dedupes"
+
+  if (NROW(d$tests$positive_dedupes) > 0) {
+    d$info$has_error <- TRUE
+
+    warning_msg <-
+      paste0(
+        "ERROR!: ",
+        NROW(d$tests$positive_dedupes),
+        " cases where Deduplicated Rollups are greater than allowed maximum.",
+        " You can find these by filtering to positive values in the `DSD Dedupe`, ",
+        " `TA Dedupe`, and `Crosswalk Dedupe` columns (columns CX, CY, and CZ) in the PSNUxIM tab.",
+        "\n")
+
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+  }
+
+  d$data$SNUxIM %<>%
+    dplyr::filter(!(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0))
+
+  # Remove unneeded strings from mechanism codes ####
+  d$data$SNUxIM %<>%
+    dplyr::mutate(
+      mechCode_supportType = dplyr::case_when(
+        stringr::str_detect(mechCode_supportType, "Dedupe|Not PEPFAR") ~ mechCode_supportType,
+        TRUE ~ paste0(stringr::str_extract(mechCode_supportType, "\\d{4,}"),
+                      "_",
+                      stringr::str_extract(mechCode_supportType, "DSD|TA"))
+      )
+    )
+
+  d
+
+}
+
 #' @export
 #' @title unPackSNUxIM(d)
 #'
@@ -923,74 +990,18 @@ unPackSNUxIM <- function(d) {
                   mechCode_supportType, value) %>%
     tidyr::drop_na(value)
 
-  # TEST: Decimals; Error; Round ####
-  d$tests$decimals <- d$data$SNUxIM %>%
-    dplyr::filter(value %% 1 != 0)
 
-  attr(d$tests$decimals, "test_name") <- "Decimal values"
+  d <- testRoundDecimalValues(d)
 
-  if (NROW(d$tests$decimals) > 0) {
-    d$info$has_error <- TRUE
+  d <- testDropPositiveDedupe(d)
 
-    warning_msg <-
-      paste0(
-        "WARNING! In tab ",
-        sheet,
-        ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
-        paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
-        "\n")
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
-  }
-
-  d$data$SNUxIM %<>%
-    dplyr::mutate(value = round_trunc(value))
-
-  # TEST: Positive Dedupes; Error; Drop ####
-  d$tests$positive_dedupes <- d$data$SNUxIM %>%
-    dplyr::filter(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0)
-  attr(d$tests$positive_dedupes, "test_name") <- "Positive dedupes"
-
-  if (NROW(d$tests$positive_dedupes) > 0) {
-    d$info$has_error <- TRUE
-
-    warning_msg <-
-      paste0(
-        "ERROR!: ",
-        NROW(d$tests$positive_dedupes),
-        " cases where Deduplicated Rollups are greater than allowed maximum.",
-        " You can find these by filtering to positive values in the `DSD Dedupe`, ",
-        " `TA Dedupe`, and `Crosswalk Dedupe` columns (columns CX, CY, and CZ) in the PSNUxIM tab.",
-        "\n")
-
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-  }
-
-  d$data$SNUxIM %<>%
-    dplyr::filter(!(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0))
-
-  # Remove unneeded strings from mechanism codes ####
-  d$data$SNUxIM %<>%
-    dplyr::mutate(
-      mechCode_supportType = dplyr::case_when(
-        stringr::str_detect(mechCode_supportType, "Dedupe|Not PEPFAR") ~ mechCode_supportType,
-        TRUE ~ paste0(stringr::str_extract(mechCode_supportType, "\\d{4,}"),
-                      "_",
-                      stringr::str_extract(mechCode_supportType, "DSD|TA"))
-      )
-    )
-
+  #Remove any potential duplicates by summing.
+  #TODO: We should really flag anything which is a duplicate at this point.
   d$data$SNUxIM %<>%
     dplyr::group_by(
       dplyr::across(c(header_cols$indicator_code, "psnuid", "mechCode_supportType"))) %>%
     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
 
-
-
-  # Drop all zeros against IMs ####
-  # d$data$SNUxIM %<>%
-  #   dplyr::filter(!(!stringr::str_detect(mechCode_supportType, "Dedupe")
-  #                   & value == 0))
 
   # Drop unneeded Dedupes ####
   d$data$SNUxIM %<>%
