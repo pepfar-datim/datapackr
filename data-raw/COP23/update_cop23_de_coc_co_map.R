@@ -1,3 +1,17 @@
+#' @export
+#' @title Generate a map from Data Pack indicators to Data Pack DEs, COCs, & COs
+#'
+#' @description For a given COP Year, produces a dataframe mapping from Data Pack
+#' indicators to DATIM dataElements, categoryOptionCombos, & categoryOptions.
+#'
+#' @inheritParams datapackr_params
+#'
+#' @return dp_map
+#'
+update_de_coc_co_map <- function(cop_year = NULL,
+                                 d2_session = dynGet("d2_default_session",
+                                                     inherits = TRUE)) {
+
 # This script begins with the Full Code List from DATIM, then combines categoryOption
 # metadata, then combines this with the Data Pack schema to create a full map between
 # Data Packs and DATIM for the purpose of generating import and analytics tables.
@@ -16,11 +30,15 @@
 #
 # - OVC_HIVSTAT has already been aggregated to have no age/sex disaggregation.
 
+  # Check params ####
+  params <- check_params(
+    cop_year = cop_year)
 
-# Point to DATIM login secrets ####
-secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
-datimutils::loginToDATIM(secrets)
-cop_year <- 2023
+  for (p in names(params)) {
+    assign(p, purrr::pluck(params, p))
+  }
+
+  rm(params, p)
 
 # List all datasets and correct FY mapping (not always captured in DATIM) ####
 datasets_to_pull <- tibble::tribble(
@@ -445,6 +463,20 @@ dp_map %<>%
     dataset, resultstatus, resultstatus_inclusive, disagg_type, technical_area,
     top_level, support_type, numerator_denominator
   )
+
+  return(dp_map)
+}
+
+# Point to DATIM login secrets ----
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
+# datimutils::loginToDATIM("~/.secrets/datim.json")
+datimutils::loginToDATIM(secrets)
+cop_year <- 2023
+
+dp_map <- update_de_coc_co_map(cop_year = 2023,
+                               d2_session = dynGet("d2_default_session",
+                                                   inherits = TRUE))
+#dp_map <- update_de_coc_co_map(cop_year, d2_session)
 
 # Compare old and new maps for accuracy ####
 new <- dp_map %>%
