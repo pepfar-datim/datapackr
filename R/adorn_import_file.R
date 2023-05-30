@@ -114,8 +114,6 @@ adorn_import_file <- function(psnu_import_file,
   if (is.null(psnu_prioritizations)) {
     psnu_import_file %<>%
       addcols("prioritization")
-    #TODO: Rename this everywhere to something specifying it means psnu
-    # prioritization, instead of facility/community
   } else {
     # Check prioritizations
     psnu_prioritizations %<>%
