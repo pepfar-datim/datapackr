@@ -8,6 +8,7 @@
 
 ## Minor improvements and fixes
 * Updated handling of zero values for non dedupe mechs.
+* Functionalized the process for mapping mechanism data from Data Pack indicators to DATIM dataElements & categoryOptionCombos.
 
 # datapackr 6.3.0
 
