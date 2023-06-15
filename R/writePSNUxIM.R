@@ -86,12 +86,14 @@ writePSNUxIM <- function(d,
                          d2_session = dynGet("d2_default_session",
                                              inherits = TRUE),
                          append = TRUE,
-                         use_template = FALSE
-                         ) {
+                         use_template = FALSE) {
+
+  snuxim_model_data_path <- snuxim_model_data_path %||% d$keychain$snuxim_model_data_path
+  output_folder <- output_folder %||% d$keychain$output_folder
 
   stopifnot(
     "Cannot update PSNUxIM tab without model data." = !is.null(snuxim_model_data_path),
-    "Packing SNU x IM tabs is not supported for the requested COP year."
+    "Packing PSNUxIM tabs is not supported for the requested COP year."
       = d$info$cop_year %in% supportedCOPYears(d$info$tool)
   )
 
@@ -103,9 +105,6 @@ writePSNUxIM <- function(d,
   if (is.null(output_folder)) {
     interactive_warning("If no output_folder is provided, new Data Packs will not be written.")
   }
-
-  d$keychain$snuxim_model_data_path <- snuxim_model_data_path
-  d$keychain$output_folder <- output_folder
 
   # Start running log of all warning and information messages ####
   d$info$messages <- MessageQueue()
@@ -239,7 +238,7 @@ writePSNUxIM <- function(d,
     if (!d$info$has_psnuxim) {
       print("Loading initial PSNUxIM Template")
       wb <- openxlsx::loadWorkbook(template_file)
-    }  else {
+    } else {
       if (use_template) {
         wb <- openxlsx::loadWorkbook(template_file)
       } else {

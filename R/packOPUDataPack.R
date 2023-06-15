@@ -9,7 +9,8 @@
 #'
 #' @return Exports an OPU Data Pack to Excel within \code{output_folder}.
 #'
-packOPUDataPack <- function(d, undistributed_mer_data = NULL,
+packOPUDataPack <- function(d,
+                            undistributed_mer_data = NULL,
                             expand_formulas = FALSE,
                             d2_session = dynGet("d2_default_session",
                                                 inherits = TRUE)) {

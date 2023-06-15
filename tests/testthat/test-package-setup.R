@@ -163,46 +163,81 @@ test_that("We can check datapack paramaters", {
 
   # season ####
   # Can check a valid season
-  test_params <- check_params(season = "COP")
-  expect_type(test_params, "list")
-  expect_equal(test_params$season, "COP")
+  season <- check_season(season = "COP")
+  expect_equal(season, "COP")
+  season <- check_season(season = "OPU")
+  expect_equal(season, "OPU")
 
   # Can error on a bogus season
-  expect_error(check_params(season = "The Long Winter"))
+  expect_error(check_season(season = "The Long Winter"))
 
-  # Return the season automatically if a DataPack and season is
-  # explicit set to NULL
-  test_params <- check_params(tool = "Data Pack", season = NULL)
-  expect_type(test_params, "list")
-  expect_named(test_params, c("tool", "season"))
-  expect_equal(test_params$season, "COP")
-  expect_equal(test_params$tool, "Data Pack")
-  expect_message(test_params <- check_params(tool = "Data Pack", season = NULL))
+  # Deduce seasons
+  season <- check_season(tool = "Data Pack", season = NULL)
+  expect_equal(season, "COP")
+  expect_message(check_season(tool = "Data Pack", season = NULL))
 
-  # Return the season automatically if an OPU DataPack and season is
-  # explicit set to NULL
-  test_params <- check_params(tool = "PSNUxIM", season = NULL)
-  expect_type(test_params, "list")
-  expect_named(test_params, c("tool", "season"))
-  expect_equal(test_params$season, "COP")
-  expect_equal(test_params$tool, "PSNUxIM")
-  expect_message(check_params(tool = "PSNUxIM", season = NULL))
+  season <- check_season(tool = "PSNUxIM", season = NULL)
+  expect_equal(season, "COP")
+  expect_message(check_season(tool = "PSNUxIM", season = NULL))
 
-  # Deduce the season if not provided
-  test_params <- check_params(season = NULL)
-  expect_type(test_params, "list")
-  expect_named(test_params, c("season"))
-  expect_equal(test_params$season, "COP")
-  expect_message(check_params(season = NULL))
+  season <- check_season(tool = "PSNUxIM Template", season = NULL)
+  expect_equal(season, "COP")
+  expect_message(check_season(tool = "PSNUxIM Template", season = NULL))
+
+  season <- check_season(tool = "OPU Data Pack", season = NULL)
+  expect_equal(season, "OPU")
+  expect_message(check_season(tool = "OPU Data Pack", season = NULL))
+
+  season <- check_season(tool = "OPU Data Pack Template", season = NULL)
+  expect_equal(season, "OPU")
+  expect_message(check_season(tool = "OPU Data Pack Template", season = NULL))
+
+  # Default season if nothing provided
+  season <- check_season()
+  expect_equal(season, "COP")
+  expect_message(check_season())
 
   # If season and tool both provided, but don't match, issue warning, but leave
   # both in place.
-  test_params <- check_params(tool = "PSNUxIM", season = "COP")
-  expect_type(test_params, "list")
-  expect_named(test_params, c("tool", "season"))
-  expect_equal(test_params$season, "COP")
-  expect_equal(test_params$tool, "PSNUxIM")
-  expect_message(check_params(tool = "PSNUxIM", season = "COP"))
+  season <- check_season(tool = "OPU Data Pack", season = "COP")
+  expect_equal(season, "COP")
+  expect_warning(check_season(tool = "OPU Data Pack", season = "COP"))
+  season <- check_season(tool = "OPU Data Pack Template", season = "COP")
+  expect_equal(season, "COP")
+  expect_warning(check_season(tool = "OPU Data Pack Template", season = "COP"))
+
+  # If season & tool both provided, check they match with no warning.
+  season <- check_season(tool = "Data Pack", season = "COP")
+  expect_equal(season, "COP")
+  expect_warning(check_season(tool = "Data Pack", season = "COP"), regexp = NA)
+  season <- check_season(tool = "Data Pack Template", season = "COP")
+  expect_equal(season, "COP")
+  expect_warning(check_season(tool = "Data Pack", season = "COP"), regexp = NA)
+  season <- check_season(tool = "PSNUxIM", season = "COP")
+  expect_equal(season, "COP")
+  expect_warning(check_season(tool = "PSNUxIM", season = "COP"), regexp = NA)
+  season <- check_season(tool = "PSNUxIM Template", season = "COP")
+  expect_equal(season, "COP")
+  expect_warning(check_season(tool = "PSNUxIM Template", season = "COP"), regexp = NA)
+  season <- check_season(tool = "OPU Data Pack", season = "OPU")
+  expect_equal(season, "OPU")
+  expect_warning(check_season(tool = "OPU Data Pack", season = "OPU"), regexp = NA)
+  season <- check_season(tool = "OPU Data Pack Template", season = "OPU")
+  expect_equal(season, "OPU")
+  expect_warning(check_season(tool = "OPU Data Pack Template", season = "OPU"), regexp = NA)
+  season <- check_season(tool = "Data Pack", season = "OPU")
+  expect_equal(season, "OPU")
+  expect_warning(check_season(tool = "Data Pack", season = "OPU"), regexp = NA)
+  season <- check_season(tool = "Data Pack Template", season = "OPU")
+  expect_equal(season, "OPU")
+  expect_warning(check_season(tool = "Data Pack Template", season = "OPU"), regexp = NA)
+  season <- check_season(tool = "PSNUxIM", season = "OPU")
+  expect_equal(season, "OPU")
+  expect_warning(check_season(tool = "PSNUxIM", season = "OPU"), regexp = NA)
+  season <- check_season(tool = "PSNUxIM Template", season = "OPU")
+  expect_equal(season, "OPU")
+  expect_warning(check_season(tool = "PSNUxIM Template", season = "OPU"), regexp = NA)
+
 
 
   # schema ####

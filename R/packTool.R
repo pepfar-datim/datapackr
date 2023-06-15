@@ -20,6 +20,7 @@ packTool <- function(model_data = NULL,
                      country_uids,
                      template_path,
                      cop_year,
+                     season,
                      output_folder,
                      results_archive = TRUE,
                      expand_formulas = FALSE,
@@ -33,6 +34,7 @@ packTool <- function(model_data = NULL,
   # Checks parameters ####
   params <- check_params(cop_year = cop_year %missing% NULL,
                          country_uids = country_uids,
+                         season = season %missing% NULL,
                          datapack_name = datapack_name %missing% NULL,
                          output_folder = output_folder %missing% NULL,
                          results_archive = results_archive,
@@ -49,12 +51,15 @@ packTool <- function(model_data = NULL,
   options("openxlsx.numFmt" = "#,##0")
 
   # Create data sidecar ####
-  d <- createDataPack(datapack_name = datapack_name,
-                                 country_uids = country_uids,
-                                 template_path = template_path,
-                                 cop_year = cop_year,
-                                 tool = tool,
-                                 d2_session = d2_session)
+  d <- suppressWarnings(
+    createDataPack(datapack_name = datapack_name,
+                   country_uids = country_uids,
+                   template_path = template_path,
+                   cop_year = cop_year,
+                   season = season,
+                   tool = tool,
+                   d2_session = d2_session)
+  )
 
   # Adds additional folder and file paths to d object ####
   d$keychain$output_folder <- output_folder
@@ -115,6 +120,5 @@ packTool <- function(model_data = NULL,
 
   #Return the d object for testing purposes
   return(d)
-
 
 }
