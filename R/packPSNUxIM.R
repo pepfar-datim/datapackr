@@ -651,10 +651,10 @@ packPSNUxIM <- function(wb, # Workbook object
                           heights = 0)
 
   ## Hide unused columns in left section ####
-  openxlsx::setColWidths(wb = r$wb,
-                         sheet = "PSNUxIM",
-                         cols = col.im.percents[1]:col.im.percents[2],
-                         hidden = FALSE)
+  # openxlsx::setColWidths(wb = r$wb,
+  #                        sheet = "PSNUxIM",
+  #                        cols = col.im.percents[1]:col.im.percents[2],
+  #                        hidden = FALSE)
 
   hiddenCols <- schema %>%
     dplyr::filter(sheet_name == "PSNUxIM",
@@ -664,10 +664,10 @@ packPSNUxIM <- function(wb, # Workbook object
     c(.,
       (length(left_side) + 1):col.im.percents[2])
 
-  openxlsx::setColWidths(wb = r$wb,
-                         sheet = "PSNUxIM",
-                         cols = hiddenCols,
-                         hidden = TRUE)
+  # openxlsx::setColWidths(wb = r$wb,
+  #                        sheet = "PSNUxIM",
+  #                        cols = hiddenCols,
+  #                        hidden = TRUE)
 
   # Tab generation date ####
   openxlsx::writeData(r$wb,

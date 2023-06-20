@@ -88,8 +88,8 @@ writePSNUxIM <- function(d,
                          append = TRUE,
                          use_template = FALSE) {
 
-  snuxim_model_data_path <- snuxim_model_data_path %||% d$keychain$snuxim_model_data_path
-  output_folder <- output_folder %||% d$keychain$output_folder
+  d$keychain$snuxim_model_data_path <- snuxim_model_data_path %||% d$keychain$snuxim_model_data_path
+  d$keychain$output_folder <- output_folder %||% d$keychain$output_folder
 
   stopifnot(
     "Cannot update PSNUxIM tab without model data." = !is.null(snuxim_model_data_path),
