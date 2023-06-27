@@ -60,7 +60,7 @@ test_that("We can pick template file", {
                     test_template))
   expect_true(file.exists(test_template))
 
-  expect_error(pick_template_path(2023, "OPU Data Pack"))
+  expect_error(pick_template_path(2030, "OPU Data Pack"))
 
 
   #Throw an error for garbage inputs
