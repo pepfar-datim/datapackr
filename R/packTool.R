@@ -51,15 +51,13 @@ packTool <- function(model_data = NULL,
   options("openxlsx.numFmt" = "#,##0")
 
   # Create data sidecar ####
-  d <- suppressWarnings(
-    createDataPack(datapack_name = datapack_name,
-                   country_uids = country_uids,
-                   template_path = template_path,
-                   cop_year = cop_year,
-                   season = season,
-                   tool = tool,
-                   d2_session = d2_session)
-  )
+  d <- createDataPack(datapack_name = datapack_name,
+                      country_uids = country_uids,
+                      template_path = template_path,
+                      cop_year = cop_year,
+                      season = season,
+                      tool = tool,
+                      d2_session = d2_session)
 
   # Adds additional folder and file paths to d object ####
   d$keychain$output_folder <- output_folder
