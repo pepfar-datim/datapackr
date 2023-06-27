@@ -34,7 +34,11 @@ packPSNUxIM <- function(wb, # Workbook object
   rm(params, p)
 
   # if the cop year is not 2021 or 2022, stops and throws message. ####
-  stopifnot("Packing PSNU x IM tabs is not supported for the requested COP year." = cop_year %in% c(2021, 2022, 2023))
+  years.in.play <- c("PSNUxIM", "OPU Data Pack") %>%
+    purrr::map(supportedCOPYears) %>%
+    purrr::list_c() %>%
+    unique()
+  stopifnot("Packing PSNU x IM tabs is not supported for the requested COP year." = cop_year %in% years.in.play)
 
   # Create data sidecar to eventually compile and return ####
   r <- list(
@@ -654,7 +658,17 @@ packPSNUxIM <- function(wb, # Workbook object
   # openxlsx::setColWidths(wb = r$wb,
   #                        sheet = "PSNUxIM",
   #                        cols = col.im.percents[1]:col.im.percents[2],
-  #                        hidden = FALSE)
+  #                        widths = 10)
+  # 6/27/23 SJJ - For some reason the above throws this error, while
+  # removeColWidths does not:
+  #
+  # Error in sprintf("<col min=\"%s\" max=\"%s\" width=\"%s\" hidden=\"%s\" customWidth=\"1\"/>", :
+  # arguments cannot be recycled to the same length
+
+
+  openxlsx::removeColWidths(wb = r$wb,
+                            sheet = "PSNUxIM",
+                            cols = col.im.percents[1]:col.im.percents[2])
 
   hiddenCols <- schema %>%
     dplyr::filter(sheet_name == "PSNUxIM",
@@ -664,10 +678,17 @@ packPSNUxIM <- function(wb, # Workbook object
     c(.,
       (length(left_side) + 1):col.im.percents[2])
 
-  # openxlsx::setColWidths(wb = r$wb,
-  #                        sheet = "PSNUxIM",
-  #                        cols = hiddenCols,
-  #                        hidden = TRUE)
+  # for (col in hiddenCols) {
+  #   openxlsx::setColWidths(wb = r$wb,
+  #                          sheet = "PSNUxIM",
+  #                          cols = col,
+  #                          hidden = TRUE)
+  # }
+
+  # 6/27/23 SJJ - This also throws the same error... Cause unknown. Seems to be
+  # an issue with underlying openxlsx. Even when setting one col at a time,
+  # error still throws if hiding more than 1 column or setting more than 1
+  # column width.
 
   # Tab generation date ####
   openxlsx::writeData(r$wb,
