@@ -50,15 +50,15 @@
         "difference",
         "effect"
       )))
-  }
-# End Beautify function
+}
+
+
 
 #' @export
 #' @title compareData_DatapackVsDatim
 #'
 #' @description Compares the data in a parsed data pack that would be destined for DATIM with target data in in DATIM.
-#' @param d list object - parsed data pack object
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @inheritParams datapackr_params
 #' @param datim_data A data frame resulting from datimutils::getDataValueSets. If null, the data will be fetched
 #' from DATIM.
 #' @return  list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,
@@ -69,7 +69,8 @@ compareData_DatapackVsDatim <-
   function(d,
            d2_session = dynGet("d2_default_session",
                                inherits = TRUE),
-           datim_data = NULL) {
+           datim_data = NULL,
+           datastreams = c("mer_targets", "subnat_targets", "impatt")) {
 
 
 
@@ -80,7 +81,24 @@ compareData_DatapackVsDatim <-
       stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
     }
 
-    datapack_data <- createDATIMExport(d)  #
+
+    included_data_elements <- getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+      dplyr::select(dataelementuid, dataset) %>%
+      dplyr::distinct() %>%
+      dplyr::mutate(dataset = dplyr::case_when(dataset == "impatt" ~ "subnat_targets",
+                                               dataset == "mer" ~ "mer_targets",
+                                               dataset == "subnat" ~ "subnat_targets",
+                                               TRUE ~ dataset)) %>%
+      dplyr::filter(dataset %in% datastreams)
+
+    # Do not consider AGYW_PREV if this is a OPU Data Pack aka PSNUxIM
+    if (d$info$tool == "OPU Data Pack") {
+      included_data_elements <- included_data_elements %>%
+        dplyr::filter(dataset != "dreams")
+    }
+
+    datapack_data <- createDATIMExport(d) %>%
+      dplyr::filter(dataElement %in% included_data_elements$dataelementuid)
 
     #Need to make value a numeric
     datapack_data$value <- as.numeric(datapack_data$value)
@@ -107,6 +125,11 @@ compareData_DatapackVsDatim <-
       stop("The column names of your data aren't as expected by compareData_DatapackVsDatim.")
     }
 
+    # extract dedupes from import file to handle separately
+    dedupes <-  dplyr::filter(datapack_data,
+                             attributeOptionCombo %in%
+                               c("00000", "00001"))
+
     # rename columns to fit standards
     datapack_data <- datapack_data %>%
       dplyr::rename(
@@ -124,11 +147,14 @@ compareData_DatapackVsDatim <-
 
 # Get data from DATIM using data value sets
 if (d$info$cop_year == 2022) {
+
   if (is.null(datim_data)) {
+
     datim_data <- dplyr::bind_rows(#NOTE ONLY 2022 Data
       getCOPDataFromDATIM(country_uids = d$info$country_uids,
                           cop_year = d$info$cop_year,
-                          d2_session = d2_session), #returns null???
+                          datastreams = datastreams,
+                          d2_session = d2_session),
       getCOPDataFromDATIM(country_uids = d$info$country_uids,
                           cop_year = d$info$cop_year - 1,
                           datastreams = c("subnat_targets"),
@@ -139,6 +165,19 @@ if (d$info$cop_year == 2022) {
         dplyr::filter(value != 0) %>% # we don't import 0s up front so we should ignore any here
         dplyr::filter(value != "") %>%
         dplyr::rename(datim_value = value)
+
+    #Ignore SUBNATT/IMPATT if we are dealing with a standalone OPU
+    if (is.null(d$data$SUBNAT_IMPATT)) {
+
+      mer_des <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+        dplyr::filter(dataset == "mer") %>%
+        dplyr::pull(dataelementuid) %>%
+        unique()
+
+      datim_data %<>%
+        dplyr::filter(dataElement %in% mer_des)
+    }
+
     }
 
   }
@@ -149,6 +188,7 @@ if (is.null(datim_data)) {
   datim_data <-
     getCOPDataFromDATIM(country_uids = d$info$country_uids,
                         cop_year = d$info$cop_year,
+                        datastreams = datastreams,
                         d2_session = d2_session)
   }
 
@@ -157,6 +197,18 @@ if (is.null(datim_data)) {
     datim_data %<>%
       dplyr::filter(value != "") %>%
       dplyr::rename(datim_value = value)
+
+    #Ignore SUBNATT/IMPATT if we are dealing with a standalone OPU
+    if (is.null(d$data$SUBNAT_IMPATT)) {
+
+      mer_des <- datapackr::getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+        dplyr::filter(dataset == "mer") %>%
+        dplyr::pull(dataelementuid) %>%
+        unique()
+
+      datim_data %<>%
+        dplyr::filter(dataElement %in% mer_des)
+    }
   }
 
 }
@@ -226,124 +278,35 @@ if (is.null(datim_data)) {
       psnu_x_im = data_psnu_x_im,
       psnu = data_psnu,
       updates = data_different_value,
-      deletes = data_datim_only
+      deletes = data_datim_only,
+      dedupes = dedupes
     )
   }
+
 
 
 #' @export
 #' @title compareData_OpuDatapackVsDatim
 #'
-#' @description Compares the data in a parsed data pack that would be destined for DATIM with target data in in DATIM.
-#' @param d list object - parsed data pack object
-#' @param d2_session R6 datimutils object which handles authentication with DATIM
+#' @description Legacy function maintained for backwards compatibility. If
+#' processing an Datapack (either Datapack or a standalone PSNU tab)
+#' as an OPU, only MER targets should be considered for processing.
+#' @inheritParams datapackr_params
+#' @param datim_data A data frame resulting from datimutils::getDataValueSets. If null, the data will be fetched
+#' from DATIM.
 #' @return  list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,
 #' $updates (import to bring DATIM up to date with datapack), $deletes
 #' (import to bring DATIM up to date with datapack)
-
 compareData_OpuDatapackVsDatim <-
-  function(d, d2_session = dynGet("d2_default_session",
-                                  inherits = TRUE)) {
-# current assumption is that d$datim$OPU has mech codes but this is planned to change
-# this assertion alerts us if the change is made and we forget to make necessary changes here:
-
-    assertthat::assert_that(
-      !any(datapackr::is_uidish(d$datim$OPU$attributeOptionCombo))
-    )
-
-    if (!(d$info$cop_year %in% c(2021, 2022))) {
-      stop("Attempting to use compareData_OpuDatapackVsDatim for unsupported COP year")
-    }
-    datapack_data <- d$datim$OPU #PROBS needs to go too
-
-# recoding to account for code change in DATIM for the default COC
-# if all other code is updated to use uids instead of codes this can be removed
-    datapack_data$categoryOptionCombo[datapack_data$categoryOptionCombo ==
-                                        "HllvX50cXC0"] <- "default"
-    datapack_data$attributeOptionCombo[datapack_data$attributeOptionCombo ==
-                                         "HllvX50cXC0"] <- "default"
-
-    # ensure datapack_data has the expected columns
-    if (!identical(
-      names(datapack_data),
-      c(
-        "dataElement",
-        "period",
-        "orgUnit",
-        "categoryOptionCombo",
-        "attributeOptionCombo",
-        "value"
-      )
-    )) {
-      stop("The column names of your data aren't as expected by compareData_DatapackVsDatim.")
-    }
-
-    # rename columns to fit standards
-    datapack_data <- datapack_data %>%
-      dplyr::rename(
-        datapack_value = value)
-
-
-    # Get mer target data from DATIM using data value sets
-    dataset_uids <- getCOPDatasetUids(d$info$cop_year,
-                                   c("mer_targets"))
-
-    # package parameters for getDataValueSets function call
-    parameters <-
-      dplyr::bind_rows(
-        tibble::tibble(key = "dataSet", value = dataset_uids),
-        tibble::tibble(key = "orgUnit", value = d$info$country_uids),
-        tibble::tribble(~ key, ~ value,
-                        "children", "true",
-                        "categoryOptionComboIdScheme", "code",
-                        "attributeOptionComboIdScheme", "code",
-                        "includeDeleted", "false",
-                        "period", paste0(d$info$cop_year, "Oct")
-        )
-      )
-
-    # get data from datim using dataValueSets
-    # rename to standard names
-    datim_data <-
-      datimutils::getDataValueSets(parameters$key,
-                       parameters$value,
-                       d2_session = d2_session) %>%
-      dplyr::rename(datim_value = value) %>%
-      dplyr::select(dataElement,
-                    period,
-                    orgUnit,
-                    categoryOptionCombo,
-                    attributeOptionCombo,
-                    datim_value) %>%
-# AGYW data don't have mechs and aren't in OPU data packs
-# exclude them from comparison or any other data without mech
-      dplyr::filter(attributeOptionCombo != "default")
-
-# extract dedupes from import file to handle separately
-    dedupes <- dplyr::filter(datapack_data,
-                             attributeOptionCombo %in%
-                               c("00000", "00001")) %>%
-                               dplyr::rename(value = datapack_value)
-
-# for non dedups, extract cases where datapack and datim have different values
-    data_differences <- dplyr::full_join(datapack_data, datim_data) %>%
-      dplyr::filter(datapack_value != datim_value |
-                      is.na(datapack_value) |
-                      is.na(datim_value))
-
-# cases in which datim has a value but datapack does not
-    deletes <- dplyr::filter(data_differences, is.na(datapack_value)) %>%
-      dplyr::select(-datapack_value) %>%
-      dplyr::rename(value = datim_value)
-
-# cases in which datapack has a new orupdated value
-    updates <- dplyr::filter(data_differences, !is.na(datapack_value)) %>%
-      dplyr::select(-datim_value) %>%
-      dplyr::rename(value = datapack_value)
-
-    list(
-      updates = updates,
-      deletes = deletes,
-      dedupes = dedupes
+  function(d,
+           d2_session = dynGet("d2_default_session",
+                               inherits = TRUE),
+           datim_data = NULL) {
+    warning("This function is deprecated. Please use compareData_DatapackVsDatim instead. ")
+    compareData_DatapackVsDatim(
+      d,
+      d2_session = d2_session,
+      datim_data = datim_data,
+      datastreams = "mer_targets"
     )
   }

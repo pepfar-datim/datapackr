@@ -3,7 +3,7 @@
 #'
 #' @inheritParams datapackr_params
 #' @description Generates a PSNUxIM level comparison between
-#' the values in the (OPU) DataPack and what is currently
+#' the COP indicator values in the (OPU) DataPack and what is currently
 #' present in DATIM.
 #'
 #' @return A comparison table

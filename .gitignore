@@ -13,5 +13,6 @@ renv/
 .vscode/
 support_files/
 workspace.code-workspace
+datapackr.Rproj
 # Temporary excel files
 ~$*
