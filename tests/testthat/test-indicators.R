@@ -21,6 +21,7 @@ test_that("Can calculate an indicator with totals", {
   expect_equal(class(test_values), "data.frame")
   expect_setequal(names(test_values), c("id", "name", "numerator", "denominator", "value"))
   expect_equal(NROW(test_values), 1)
+
   expect_equal(0.333333, test_values$value, tolerance = 1e-3)
   expect_equal(test_values$numerator, 10)
   expect_equal(test_values$denominator, 30)
@@ -28,9 +29,6 @@ test_that("Can calculate an indicator with totals", {
 
 
 )
-
-
-
 
 test_that("Can calculate an indicator with missing terms", {
   ind_uid <- "abc123"

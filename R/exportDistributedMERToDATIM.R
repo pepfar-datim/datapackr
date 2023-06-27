@@ -199,7 +199,7 @@ exportDistributedDataToDATIM <- function(d, keep_dedup = FALSE) {
 
     # Make sure no duplicates
     dplyr::group_by(dataElement, period, orgUnit, categoryOptionCombo,
-                    attributeOptionCombo) %>% #TODO: Coordinate with self-service on this name change
+                    attributeOptionCombo) %>%
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup() %>%
 
