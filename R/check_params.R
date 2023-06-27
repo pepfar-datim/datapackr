@@ -307,21 +307,21 @@ check_tool <- function(tool, season, cop_year) {
   }
 
   # If tool & season provided, validate against each other
-  if (tool_provided & season_provided) {
-    if (!season %in% supportedSeasons(tool = tool) |
+  if (tool_provided && season_provided) {
+    if (!season %in% supportedSeasons(tool = tool) ||
         !tool %in% supportedTools(season = season)) {
       stop("In check_tool, provided tool & provided season don't match.")
     }
   }
 
-  if (tool_provided & cop_year_provided) {
-    if (!cop_year %in% supportedCOPYears(tool = tool) |
+  if (tool_provided && cop_year_provided) {
+    if (!cop_year %in% supportedCOPYears(tool = tool) ||
         !tool %in% supportedTools(cop_year = cop_year)) {
       stop("In check_tool, provided tool & provided cop_year don't match.")
     }
   }
 
-  if (tool_provided & cop_year_provided & season_provided) {
+  if (tool_provided && cop_year_provided && season_provided) {
     if (!tool %in% supportedTools(cop_year = cop_year, season = season))
       stop("In check_tool, the tool type provided is not valid for that specific COP Year & Season.")
   }
@@ -349,7 +349,7 @@ check_season <- function(season, tool) {
   tool_provided <- !is.null(tool)
 
   # If neither is provided, default to "COP"
-  if (!season_provided & !tool_provided) {
+  if (!season_provided && !tool_provided) {
     interactive_message("Since neither season nor tool was provided, we assumed you meant 'COP'.")
     return(default_season)
   }
@@ -373,14 +373,14 @@ check_season <- function(season, tool) {
   }
 
   # If both season & tool provided, validate against each other.
-  if (season_provided & tool_provided) {
+  if (season_provided && tool_provided) {
     if (!season %in% deduced_season) {
       interactive_warning("In check_season, provided tool & season aren't compatible.")
     }
   }
 
   # If only tool provided, use it to guess the season.
-  if (!season_provided & tool_provided) {
+  if (!season_provided && tool_provided) {
     if (tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
       interactive_message(
         paste0("Deduced season based on tool."))
