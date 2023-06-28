@@ -34,11 +34,12 @@ packPSNUxIM <- function(wb, # Workbook object
   rm(params, p)
 
   # if the cop year is not 2021 or 2022, stops and throws message. ####
-  years.in.play <- c("PSNUxIM", "OPU Data Pack") %>%
+  years_in_play <- c("PSNUxIM", "OPU Data Pack") %>%
     purrr::map(supportedCOPYears) %>%
     purrr::list_c() %>%
     unique()
-  stopifnot("Packing PSNU x IM tabs is not supported for the requested COP year." = cop_year %in% years.in.play)
+  stopifnot(
+    "Packing PSNU x IM tabs is not supported for the requested COP year." = cop_year %in% years_in_play)
 
   # Create data sidecar to eventually compile and return ####
   r <- list(
