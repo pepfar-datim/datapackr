@@ -6,13 +6,18 @@
 \usage{
 compareData_OpuDatapackVsDatim(
   d,
-  d2_session = dynGet("d2_default_session", inherits = TRUE)
+  d2_session = dynGet("d2_default_session", inherits = TRUE),
+  datim_data = NULL
 )
 }
 \arguments{
-\item{d}{list object - parsed data pack object}
+\item{d}{Datapackr sidecar object}
 
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
+
+\item{datim_data}{A data frame resulting from datimutils::getDataValueSets. If null, the data will be fetched
+from DATIM.}
 }
 \value{
 list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,
@@ -20,5 +25,7 @@ $updates (import to bring DATIM up to date with datapack), $deletes
 (import to bring DATIM up to date with datapack)
 }
 \description{
-Compares the data in a parsed data pack that would be destined for DATIM with target data in in DATIM.
+Legacy function maintained for backwards compatibility. If
+processing an Datapack (either Datapack or a standalone PSNU tab)
+as an OPU, only MER targets should be considered for processing.
 }

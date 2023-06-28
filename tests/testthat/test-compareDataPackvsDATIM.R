@@ -24,7 +24,7 @@ with_mock_api({
 
     compare <- compareData_DatapackVsDatim(d, d2_session = training)
 
-    expect_named(compare, c("psnu_x_im", "psnu", "updates", "deletes"))
+    expect_named(compare, c("psnu_x_im", "psnu", "updates", "deletes", "dedupes"))
 
     diff_names <- c(
       "psnu",
@@ -111,6 +111,7 @@ with_mock_api({
     #Everything should be an update
 
     #Lets just delete half of the data
+
     half_the_data <- dplyr::slice_sample(original_data, prop = 0.5)
     d$datim$UndistributedMER <- half_the_data
     compare <- compareData_DatapackVsDatim(d, d2_session = training, datim_data = datim_data)

@@ -4,7 +4,7 @@
 * 
 
 ## Bug fixes
-* 
+*
 
 ## Minor improvements and fixes
 * Added `season` as a parameter in most unpacking and packing functions to better
@@ -12,6 +12,20 @@ align with new workflows — PSNUxIM tools separate, and both PSNUxIM tool & Dat
 Pack valid for both COP & OPU. This is in preparation for the deprecation of the
 concept of a separate "OPU Tool", as this is now functionally identical to the
 PSNUxIM tool used during main COP.
+
+# datapackr 6.3.2
+
+## New features
+* 
+
+## Bug fixes
+* Fixed issue with merging of message queues when unpacking multiple tools
+
+## Minor improvements and fixes
+* Dedupe Handling
+* Tool to Datim comparison improvements
+* Handling of mech file refresh
+* Updated all dependencies to current versions
 
 # datapackr 6.3.1
 

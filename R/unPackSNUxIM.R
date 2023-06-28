@@ -222,12 +222,11 @@ checkNonEqualTargets <- function(d, original_targets) {
       #If the main tab value is missing and the DataPackTarget is zero, ignore
       dplyr::mutate(are_equal = dplyr::case_when(is.na(MainTabsTarget) & DataPackTarget == 0 ~ TRUE,
                                                  is.na(MainTabsTarget) & DataPackTarget != 0 ~ FALSE,
+                                                 !is.na(MainTabsTarget) & is.na(DataPackTarget) ~ FALSE,
                                                  TRUE ~ are_equal)) %>%
       dplyr::filter(!are_equal | is.na(are_equal)) %>%
-      #Filter non-allocated data to prevent false positives with this test
-      #Other tests should catch whether there is data in the main tabs
-      #but which has not been allocated
-      dplyr::filter(!is.na(DataPackTarget)) %>%
+      #Filter instances where both the DP and PSNUxIM Target are NA
+      dplyr::filter(!(is.na(DataPackTarget) & is.na(MainTabsTarget))) %>%
       dplyr::rename("PSNUxIM Target" = DataPackTarget)
 
     attr(d$tests$non_equal_targets, "test_name") <- "Non-equal targets"
@@ -414,13 +413,16 @@ checkPSNUxIMDisaggs <- function(d) {
                   "Age" = valid_ages.name,
                   Sex = valid_sexes.name,
                   "KeyPop" = valid_kps.name) %>%
-    dplyr::mutate(exists = TRUE)
+    dplyr::mutate(exists = TRUE) %>%
+    dplyr::distinct() #Ignore differences with DSD and TA at this point
 
   data <- d$data$SNUxIM %>%
     dplyr::select(PSNU, indicator_code, "Age", "Sex", "KeyPop") %>%
     dplyr::mutate(row_number = dplyr::row_number() + header_row)
 
-  defunct_disaggs <- dplyr::left_join(data, de_coc_map)
+
+  defunct_disaggs <-
+    dplyr::left_join(data, de_coc_map, by = c("indicator_code", "Age", "Sex", "KeyPop"))
 
   if (any(is.na(defunct_disaggs$exists))) {
 
@@ -885,8 +887,7 @@ unPackSNUxIM <- function(d) {
   }
 
   d$data$SNUxIM %<>%
-    dplyr::mutate(value = round_trunc(value)) %>%
-    dplyr::filter(value > 0)
+    dplyr::mutate(value = round_trunc(value))
 
   #Remove any zeros at this point
 
