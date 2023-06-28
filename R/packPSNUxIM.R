@@ -656,17 +656,6 @@ packPSNUxIM <- function(wb, # Workbook object
                           heights = 0)
 
   ## Hide unused columns in left section ####
-  # openxlsx::setColWidths(wb = r$wb,
-  #                        sheet = "PSNUxIM",
-  #                        cols = col.im.percents[1]:col.im.percents[2],
-  #                        widths = 10)
-  # 6/27/23 SJJ - For some reason the above throws this error, while
-  # removeColWidths does not:
-  #
-  # Error in sprintf("<col min=\"%s\" max=\"%s\" width=\"%s\" hidden=\"%s\" customWidth=\"1\"/>", :
-  # arguments cannot be recycled to the same length
-
-
   openxlsx::removeColWidths(wb = r$wb,
                             sheet = "PSNUxIM",
                             cols = col.im.percents[1]:col.im.percents[2])
