@@ -8,6 +8,8 @@
 #'     \code{\link{unPackSheets}}. This data is also analyzed to identify
 #'     structural or data anomalies and print any issues into running Warning
 #'     Message queue.
+#' @note Internal functions are located in the separate unPackSNUxIM_API.R file
+#'
 #'
 #' @param d Datapackr object
 
@@ -32,7 +34,7 @@ unPackSNUxIM <- function(d) {
         d$keychain$psnuxim_file_path,
         d$keychain$submission_path
       )
-
+    #Read the raw data in from Excel
     d$data$SNUxIM <-
       readxl::read_excel(
         path = psnuxim_path,
@@ -103,6 +105,7 @@ unPackSNUxIM <- function(d) {
 
   #Test for missing right side formulas
   d <- testMissingRightSideFormulas(d, cols_to_keep, header_cols, header_row, blank_cols_idx)
+  #Drop any duplicated columns
   d <- dropDuplicatedPSNUxIMColumns(d)
 
   # Drop rows where entire row is NA ####
@@ -123,6 +126,7 @@ unPackSNUxIM <- function(d) {
                                        as.numeric))
     }
 
+  #Start recalculation of dedupe
   d <- testMissingDedupeRollupColumns(d, cols_to_keep)
 
   d <- recalculateDedupeValues(d)
@@ -167,7 +171,7 @@ unPackSNUxIM <- function(d) {
       dplyr::across(c(header_cols$indicator_code, "psnuid", "mechCode_supportType"))) %>%
     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
 
-  #Data is in long format here
+ #Data is in long format here
  d <- calculateFinalDedupeValues(d, header_cols)
 
  #Note that this function also produces d$info$psnuxim_comparison object

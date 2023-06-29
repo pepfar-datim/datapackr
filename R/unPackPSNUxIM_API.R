@@ -736,8 +736,8 @@ calculateFinalDedupeValues <- function(d, header_cols) {
       ),
       `Crosswalk Dedupe` = dplyr::case_when(
         TA_count == 0 | DSD_count == 0  ~ NA_real_,
-        TA_count >= 1 & DSD_count >= 1 & is.na(`Crosswalk Dedupe`) ~ 0,
-        TA_count >= 1 & DSD_count >= 1 & !is.na(`Crosswalk Dedupe`) ~ `Crosswalk Dedupe`,
+        TA_count > 0 & DSD_count > 0 & is.na(`Crosswalk Dedupe`) ~ 0,
+        TA_count > 0 & DSD_count > 0 & !is.na(`Crosswalk Dedupe`) ~ `Crosswalk Dedupe`,
         TRUE ~ `Crosswalk Dedupe`
       )
     ) %>%
@@ -769,7 +769,7 @@ testNegativeTargetValues <- function(d, header_cols) {
 
     warning_msg <-
       paste0(
-        "ERROR!: ",
+        "ERROR!: In tab PSNUxIM,  ",
         NROW(d$tests$negative_IM_targets),
         " cases where negative numbers are being used for mechanism allocations.",
         " The following mechanisms have been affected. These values will be dropped. -> \n\t* ",
@@ -810,7 +810,7 @@ testInvalidPSNUs <- function(d) {
 
     warning_msg <-
       paste0(
-        "ERROR!: ",
+        "ERROR!: In tab PSNUxIM, ",
         NROW(d$tests$invalid_psnus),
         " invalid PSNU identifiers were detected. Please check the UID and fix the following PSNUs:",
         paste(d$tests$invalid_psnus, sep = "", collapse = ";"))
@@ -834,9 +834,9 @@ testRoundDecimalValues <- function(d) {
 
     warning_msg <-
       paste0(
-        "WARNING! In tab ",
-        sheet,
-        ": DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
+        "WARNING! In tab PSNUxIM, ",
+        NROW(d$tests$decimals),
+        " DECIMAL VALUES found in the following columns! These will be rounded. -> \n\t* ",
         paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
         "\n")
 
@@ -860,7 +860,7 @@ testDropPositiveDedupe <- function(d) {
 
     warning_msg <-
       paste0(
-        "ERROR!: ",
+        "ERROR!: In tab PSNUxIM, ",
         NROW(d$tests$positive_dedupes),
         " cases where Deduplicated Rollups are greater than allowed maximum.",
         " You can find these by filtering to positive values in the `DSD Dedupe`, ",
@@ -890,8 +890,12 @@ testDropPositiveDedupe <- function(d) {
 
 testRoundingDiffs <- function(d, original_targets) {
   # TEST: Rounding Errors; Warn; Continue ####
-  #TODO: For OPUs, create d$data$MER from DataPackTarget col? Use above for missing_combos step?
-  #TODO: original_targets object gets modified here...
+  # TODO: For OPUs, create d$data$MER from DataPackTarget col?
+  # Use above for missing_combos step?
+  # TODO: original_targets object gets modified here...
+  # Currently it is not required in further processing but may
+  # need to be added to the main object.
+  # TODO: Remove the aggregation of age bands.
 
   original_targets %<>%
     dplyr::mutate(
@@ -939,7 +943,7 @@ testRoundingDiffs <- function(d, original_targets) {
   if (NROW(d$tests$PSNUxIM_rounding_diffs) > 0) {
     warning_msg <-
       paste0(
-        "WARNING: ",
+        "WARNING: In tab PSNUxIM, ",
         NROW(d$tests$PSNUxIM_rounding_diffs),
         " cases where rounding based on PSNUxIM distributions has caused a small",
         " amount of variation from original targets set in other sheets.",
@@ -976,7 +980,7 @@ testImbalancedDistribution <- function(d) {
 
     warning_msg <-
       paste0(
-        "WARNING!: ",
+        "WARNING!: In tab PSNUxIM, ",
         NROW(d$tests$imbalanced_distribution),
         " cases where distributed total across all mechanisms and Dedupe is",
         " either more or less than PSNU-level Target.",
@@ -1018,7 +1022,7 @@ appendUnallocatedData <- function(d) {
 
     warning_msg <-
       paste0(
-        "ERROR!: ",
+        "ERROR!: In tab PSNUxIM, ",
         NROW(d$tests$unallocatedIMs),
         " cases where targets have not yet been fully allocated to IMs",
         " (excluding AGYW_PREV & cases possibly due to rounding). These data will be",
