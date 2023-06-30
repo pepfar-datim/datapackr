@@ -41,7 +41,12 @@ checkHasPSNUxIM <- function(d) {
 
 }
 
-#' Title
+#' Title extractSNUxIMCombos for a given datapack (d)
+#' and a given PSNUxIM object (p) extract all of the missing
+#' combos which exist in in the DataPack but do not exist
+#' in the PSNUxIM tab. Note that a combo in this context actually refers
+#' to a combination of PSNU, indicator_code, Age, Sex and KeyPop
+#' so does not contain any IM identifier.
 #'
 #' @inheritParams datapackr_params
 #' @param p An optional PSNUxIM object.
@@ -119,7 +124,9 @@ extractSNUxIMCombos <- function(d, p = NULL) {
 }
 
 
-#' Title
+#' Title extractDuplicateRows
+#'
+#' Identifies Duplicate rows in the PSNUxIM tab.
 #'
 #' @inheritParams datapackr_params
 #'
@@ -174,6 +181,15 @@ extractDuplicateRows <- function(d, sheet = "PSNUxIM") {
 
 }
 
+#' getColumnsToKeep(d)
+#'
+#' Return a vector of columsn names to keep for this tool.
+#'
+#' @param d Datapackr d object.
+#' @param sheet Name of the sheet (PSNUxIM)
+#'
+#' @return A list of columns to keep.
+
 getColumnsToKeep <- function(d, sheet = "PSNUxIM") {
 
   #If we have a hybrid tool, then use the PSNUxIM schema
@@ -193,7 +209,17 @@ getColumnsToKeep <- function(d, sheet = "PSNUxIM") {
                   col_type %in% c("row_header", "target"))
 }
 
+#' getHeaderColumns returns a vector of header columns
+#' provided an input vector of columns to keep.
+#'
+#' @param cols_to_keep
+#' @param sheet
+#'
+#' @return A vector of header columns.
+#'
+
 getHeaderColumns <- function(cols_to_keep, sheet = "PSNUxIM") {
+
   if (is.null(cols_to_keep)) {
     cols_to_keep <- getColumnsToKeep(d, sheet)
   }
