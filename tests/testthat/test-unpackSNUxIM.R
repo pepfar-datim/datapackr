@@ -382,7 +382,7 @@ test_that("Can identify negative mechanism targets", {
   expect_true(is.data.frame(d$test$negative_IM_targets))
   expect_equal(NROW(d$tests$negative_IM_targets), 1L)
   expect_true(d$info$has_error)
-  expect_true(grepl("9999_DSD",d$info$messages$message))
+  expect_true(grepl("9999_DSD", d$info$messages$message))
 
   #Note that this function remove negative targets, but does not remove the row
   ref <- tibble::tribble(
@@ -394,4 +394,3 @@ test_that("Can identify negative mechanism targets", {
 
 
 })
-
