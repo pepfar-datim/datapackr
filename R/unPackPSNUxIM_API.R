@@ -612,7 +612,6 @@ checkNonNumericPSNUxIMValues <- function(d, header_cols) {
 
 }
 
-
 testMissingDedupeRollupColumns <- function(d, cols_to_keep, sheet = "PSNUxIM") {
 
   # TEST: Missing Dedupe Rollup or Not PEPFAR cols; Error; Add ####
@@ -747,8 +746,6 @@ testInvalidDedupeValues <- function(d, header_cols) {
 
 }
 
-
-
 calculateFinalDedupeValues <- function(d, header_cols) {
 
   #Why do we pivot back to wide format here??
@@ -811,9 +808,12 @@ testNegativeTargetValues <- function(d, header_cols) {
     dplyr::filter(stringr::str_detect(mechCode_supportType, "\\d{4,}_(DSD|TA)")
                   & value < 0)
 
-  attr(d$tests$negative_IM_targets, "test_name") <- "Negative Mechanism Targets"
+
 
   if (NROW(d$tests$negative_IM_targets) > 0) {
+
+    attr(d$tests$negative_IM_targets, "test_name") <- "Negative Mechanism Targets"
+
     d$info$has_error <- TRUE
 
     warning_msg <-

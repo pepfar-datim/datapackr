@@ -340,7 +340,7 @@ test_that("Can identify non-numeric values in PSNUxIM", {
 
 })
 
-test_that("Can identify missing dedupe columns", {
+test_that("Can identify and add missing dedupe columns", {
   d <- list()
   d$info$tool <- "Data Pack"
   d$info$messages <- MessageQueue()
@@ -363,3 +363,35 @@ test_that("Can identify missing dedupe columns", {
   )
 
 })
+
+test_that("Can identify negative mechanism targets", {
+
+
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  d$data$SNUxIM <- tibble::tribble(
+    ~"PSNU", ~"indicator_code", ~"Age", ~"Sex", ~"KeyPop", ~"9999_DSD",
+    "abc123", "HTS_TST.KP.Neg.T", NA, NA, "PWID", -10,
+    "abc123", "HTS_TST.KP.Pos.T", NA, NA, "PWID", 10
+  )
+
+  header_cols <- data.frame(indicator_code = c("PSNU"))
+
+  d <- testNegativeTargetValues(d,  header_cols)
+  expect_true(is.data.frame(d$test$negative_IM_targets))
+  expect_equal(NROW(d$tests$negative_IM_targets), 1L)
+  expect_true(d$info$has_error)
+  expect_true(grepl("9999_DSD",d$info$messages$message))
+
+  #Note that this function remove negative targets, but does not remove the row
+  ref <- tibble::tribble(
+    ~"PSNU", ~"indicator_code", ~"Age", ~"Sex", ~"KeyPop", ~"9999_DSD",
+    "abc123", "HTS_TST.KP.Neg.T", NA, NA, "PWID", NA,
+    "abc123", "HTS_TST.KP.Pos.T", NA, NA, "PWID", 10
+  )
+  expect_identical(d$data$SNUxIM, ref)
+
+
+})
+
