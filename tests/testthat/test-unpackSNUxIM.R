@@ -160,6 +160,8 @@ test_that("Can get columns to keep", {
   cols_to_keep <- getColumnsToKeep(d, sheet = "PSNUxIM")
   expect_setequal(names(cols_to_keep), names(cop22OPU_data_pack_schema))
 })
+
+
 with_mock_api({
 test_that("Can detect missing right side formulas", {
 
@@ -266,8 +268,6 @@ test_that("Can drop invalid mechanism columns", {
 
 })
 
-
-
 test_that("Can flag invalid disaggs in PSNUxIM", {
 
   d <- list()
@@ -322,7 +322,6 @@ test_that("Do not  flag valid  disaggs in PSNUxIM", {
 
 })
 
-
 test_that("Can identify non-numeric values in PSNUxIM", {
 
   d <- list()
@@ -338,5 +337,29 @@ test_that("Can identify non-numeric values in PSNUxIM", {
   expect_setequal(d$tests$non_numeric_psnuxim_values$columns, c("B", "C"))
   expect_equal("1", d$tests$non_numeric_psnuxim_values$rows[which(d$tests$non_numeric_psnuxim_values == "B")])
   expect_equal("1:2", d$tests$non_numeric_psnuxim_values$rows[which(d$tests$non_numeric_psnuxim_values == "C")])
+
+})
+
+test_that("Can identify missing dedupe columns", {
+  d <- list()
+  d$info$tool <- "Data Pack"
+  d$info$messages <- MessageQueue()
+  test_data <- data.frame(foo = c(1L, 1L), bar = c(3L, 3L))
+  d$data$SNUxIM <- test_data
+  names(d$data$SNUxIM) <- c("foo", "bar")
+  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  cols_to_keep <- getColumnsToKeep(d, sheet = "PSNUxIM")
+  d <- testMissingDedupeRollupColumns(d, cols_to_keep)
+  expect_setequal(
+    names(d$data$SNUxIM),
+    c(
+      "foo",
+      "bar",
+      "Total Deduplicated Rollup",
+      "Deduplicated DSD Rollup",
+      "Deduplicated TA Rollup",
+      "Not PEPFAR"
+    )
+  )
 
 })

@@ -173,10 +173,11 @@ unPackSNUxIM <- function(d) {
 
  #Data is in long format here
  d <- calculateFinalDedupeValues(d, header_cols)
+ #Generate a PSNUxIM comparison
 
- #Note that this function also produces d$info$psnuxim_comparison object
- # which is used in a subsequent function
- d <- testRoundingDiffs(d, original_targets)
+ d <- generatePSNUxIMComparison(d, original_targets)
+ #Generate test results for rouding diffs
+ d <- testRoundingDiffs(d)
 
  d <- testImbalancedDistribution(d)
 

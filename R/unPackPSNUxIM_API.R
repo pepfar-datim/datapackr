@@ -228,6 +228,14 @@ getHeaderColumns <- function(cols_to_keep, sheet = "PSNUxIM") {
     dplyr::filter(col_type == "row_header")
 }
 
+#' checkNonEqualTargets extracts all rows from the PSNUxIM tab
+#' where the value of the DataPackTarget (currently column G)
+#' does not match the corresponding value in the main DataPackTabs.
+#'
+#' @param d
+#' @param original_targets
+#'
+#' @return Modified d object
 checkNonEqualTargets <- function(d, original_targets) {
 
 
@@ -311,6 +319,19 @@ extractOriginalTargets <- function(d, cols_to_keep, header_cols, sheet = "PSNUxI
   original_targets
 }
 
+#' Title
+#'
+#' @param d
+#' @param cols_to_keep
+#' @param header_cols
+#' @param header_row
+#' @param blank_cols_idx
+#' @param parsed_cells Primarily used for unit testing. When null,
+#' values will be read from the PSNUxIM tab.
+#'
+#' @return Modified d object with data frame of columns with missing formulas.
+#'
+#' @examples
 testMissingRightSideFormulas <- function(d, cols_to_keep, header_cols,
                                          header_row, blank_cols_idx, parsed_cells = NULL) {
 
@@ -328,6 +349,7 @@ testMissingRightSideFormulas <- function(d, cols_to_keep, header_cols,
                                         sheets = "PSNUxIM",
                                         include_blank_cells = TRUE)
   }
+
   # TEST: Missing right-side formulas; Warn; Continue ####
   # TODO: This seems not particularly efficient to
   # again read the Excel sheet from disk.
@@ -473,7 +495,6 @@ checkPSNUxIMDisaggs <- function(d) {
 
   if (any(is.na(defunct_disaggs$exists))) {
 
-
     d$tests$invalid_psnuxim_disaggs <- defunct_disaggs %>%
       dplyr::filter(is.na(exists)) %>%
       dplyr::select(-exists)
@@ -505,6 +526,7 @@ checkPSNUxIMDisaggs <- function(d) {
 }
 
 combineDuplicatePSNUxIMColumns <- function(d, cols_to_keep) {
+
   # TEST: Duplicate Cols; Warn; Combine ####
   col_names <- names(d$data$SNUxIM) %>%
     tibble::tibble(col_name = .) %>%
@@ -569,6 +591,7 @@ checkNonNumericPSNUxIMValues <- function(d, header_cols) {
   df_list <- lapply(as.list(df), function(x) which(!(grepl("^0|(-)?[1-9]\\d*(\\.\\d+)?$", x) | is.na(x))))
   #Remove empty lists
   df_list <- purrr::compact(df_list)
+
   if (length(df_list) > 0) {
     d$tests$non_numeric_psnuxim_values <- data.frame(columns = names(df_list),
                                                      rows = do.call(rbind, lapply(df_list, formatSetStrings)))
@@ -590,7 +613,7 @@ checkNonNumericPSNUxIMValues <- function(d, header_cols) {
 }
 
 
-testMissingDedupeRollupColumns <- function(d, cols_to_keep) {
+testMissingDedupeRollupColumns <- function(d, cols_to_keep, sheet = "PSNUxIM") {
 
   # TEST: Missing Dedupe Rollup or Not PEPFAR cols; Error; Add ####
   dedupe_rollup_cols <- cols_to_keep %>%
@@ -879,6 +902,7 @@ testDropPositiveDedupe <- function(d) {
   # TEST: Positive Dedupes; Error; Drop ####
   d$tests$positive_dedupes <- d$data$SNUxIM %>%
     dplyr::filter(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0)
+
   attr(d$tests$positive_dedupes, "test_name") <- "Positive dedupes"
 
   if (NROW(d$tests$positive_dedupes) > 0) {
@@ -914,10 +938,17 @@ testDropPositiveDedupe <- function(d) {
 
 }
 
-testRoundingDiffs <- function(d, original_targets) {
-  # TEST: Rounding Errors; Warn; Continue ####
-  # TODO: For OPUs, create d$data$MER from DataPackTarget col?
-  # Use above for missing_combos step?
+
+#' Title
+#'
+#' @param d
+#' @param original_targets
+#'
+#' @return Modified d object with a new object d$info$psnuxim_comparison
+
+generatePSNUxIMComparison <- function(d, original_targets) {
+
+
   # TODO: original_targets object gets modified here...
   # Currently it is not required in further processing but may
   # need to be added to the main object.
@@ -960,6 +991,27 @@ testRoundingDiffs <- function(d, original_targets) {
           !is.na(DataPack_value) & DataPack_value != 0 & diff < -2 ~ "Underallocation"
         ))
 
+  d
+}
+
+#' Title
+#'
+#' @param d
+#' @param original_targets
+#'
+#' @return Modified d object with a new object d$info$psnuxim_comparison
+#' and if applicable, d$tests$PSNUxIM_rounding_diffs
+
+testRoundingDiffs <- function(d) {
+
+  if (is.null(d$info$psnuxim_comparison)) {
+    stop("Could not find a existing PSNUxIM comparison")
+  }
+  # TEST: Rounding Errors; Warn; Continue ####
+  # TODO: For OPUs, create d$data$MER from DataPackTarget col?
+  # Use above for missing_combos step?
+
+
   d$tests$PSNUxIM_rounding_diffs <- d$info$psnuxim_comparison  %>%
     dplyr::filter(type == "Rounding") %>%
     dplyr::select(-type)
@@ -990,6 +1042,7 @@ testRoundingDiffs <- function(d, original_targets) {
 }
 
 testImbalancedDistribution <- function(d) {
+
   # TEST: Data Pack total not fully distributed to IM ####
   d$tests$imbalanced_distribution <- d$info$psnuxim_comparison %>%
     dplyr::filter(type %in% c("Underallocation", "Overallocation")) %>%
