@@ -57,10 +57,9 @@ unPackSNUxIM <- function(d) {
   d <- d  %>%
     extractSNUxIMCombos(.) %>%
     extractDuplicateRows(., sheet) %>%
-    checkColStructure(., sheet)
-
-  #Check invalid disaggs before any deletions or reshaping
-  d <- checkPSNUxIMDisaggs(d)
+    checkColStructure(., sheet) %>%
+    #Check invalid disaggs before any deletions or reshaping
+    checkPSNUxIMDisaggs(.)
 
   # Save snapshot of original targets ####
 
@@ -162,10 +161,14 @@ unPackSNUxIM <- function(d) {
 
   d <- testRoundDecimalValues(d)
 
+  #TODO: Since we are about to recalculate dedupe AGAIN, do we need to
+  # remove positive dedupe? How could it ever exist at this point?
+
   d <- testDropPositiveDedupe(d)
 
   #Remove any potential duplicates by summing.
   #TODO: We should really flag anything which is a duplicate at this point.
+  #TODO: This is really quite late in the process to deal with duplicates?
   d$data$SNUxIM %<>%
     dplyr::group_by(
       dplyr::across(c(header_cols$indicator_code, "psnuid", "mechCode_supportType"))) %>%

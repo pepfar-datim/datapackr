@@ -364,7 +364,7 @@ test_that("Can identify and add missing dedupe columns", {
 
 })
 
-test_that("Can identify negative mechanism targets", {
+test_that("Can identify negative mechanism target values", {
 
 
   d <- list()
@@ -392,5 +392,264 @@ test_that("Can identify negative mechanism targets", {
   )
   expect_identical(d$data$SNUxIM, ref)
 
+
+})
+
+test_that(
+  "Can recalculate dedupe values",
+  {
+    d <- list()
+    d$info$messages <- MessageQueue()
+    d$info$has_error <- FALSE
+    df <- tibble::tribble(
+      ~ "PSNU",
+      ~ "indicator_code",
+      ~ "Age",
+      ~ "Sex",
+      ~ "KeyPop",
+      ~ "1234_DSD",
+      ~ "1234_TA",
+      ~ "9999_DSD",
+      ~ "9999_TA",
+      ~ "Total Deduplicated Rollup",
+      ~ "Deduplicated DSD Rollup",
+      ~ "Deduplicated TA Rollup",
+      "abc123",
+      "HTS_TST.KP.Neg.T",
+      NA,
+      NA,
+      "PWID",
+      10,
+      20,
+      30,
+      40,
+      100,
+      40,
+      60
+    )
+
+
+  d$data$SNUxIM <- df
+  d <- recalculateDedupeValues(d)
+  #Simple case with DSD and TA correspoding to SUM or zero dedupe
+  expect_equal(d$data$SNUxIM$`MAX - TA`, 40)
+  expect_equal(d$data$SNUxIM$`MAX - DSD`, 30)
+  expect_equal(d$data$SNUxIM$`TA Duplicated Rollup`, 60)
+  expect_equal(d$data$SNUxIM$`DSD Duplicated Rollup`, 40)
+  expect_equal(d$data$SNUxIM$`SUM - Crosswalk Total`, 100)
+  expect_equal(d$data$SNUxIM$`MAX - Crosswalk Total`, 60)
+  expect_equal(d$data$SNUxIM$`DSD Dedupe`, 0)
+  expect_equal(d$data$SNUxIM$`TA Dedupe`, 0)
+  expect_equal(d$data$SNUxIM$`Crosswalk Dedupe`, 0)
+
+  #Mechanisms 1234 values should be deduped out in this case
+  #There is no DSD-TA crosswalk dedupe here.
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "1234_TA",
+    ~ "9999_DSD",
+    ~ "9999_TA",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10,
+    20,
+    30,
+    40,
+    70,
+    30,
+    40
+  )
+
+  d$data$SNUxIM <- df
+  d <- recalculateDedupeValues(d)
+  expect_equal(d$data$SNUxIM$`MAX - TA`, 40)
+  expect_equal(d$data$SNUxIM$`MAX - DSD`, 30)
+  expect_equal(d$data$SNUxIM$`TA Duplicated Rollup`, 60)
+  expect_equal(d$data$SNUxIM$`DSD Duplicated Rollup`, 40)
+  expect_equal(d$data$SNUxIM$`SUM - Crosswalk Total`, 70)
+  expect_equal(d$data$SNUxIM$`MAX - Crosswalk Total`, 40)
+  expect_equal(d$data$SNUxIM$`DSD Dedupe`, -10)
+  expect_equal(d$data$SNUxIM$`TA Dedupe`, -20)
+  expect_equal(d$data$SNUxIM$`Crosswalk Dedupe`, 0)
+
+  #Complete overlap between DSD and TA. TA should get deduped out completely
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "1234_TA",
+    ~ "9999_DSD",
+    ~ "9999_TA",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10,
+    20,
+    30,
+    40,
+    40,
+    40,
+    40
+  )
+
+  d$data$SNUxIM <- df
+  d <- recalculateDedupeValues(d)
+  expect_equal(d$data$SNUxIM$`MAX - TA`, 40)
+  expect_equal(d$data$SNUxIM$`MAX - DSD`, 30)
+  expect_equal(d$data$SNUxIM$`TA Duplicated Rollup`, 60)
+  expect_equal(d$data$SNUxIM$`DSD Duplicated Rollup`, 40)
+  expect_equal(d$data$SNUxIM$`SUM - Crosswalk Total`, 80)
+  expect_equal(d$data$SNUxIM$`MAX - Crosswalk Total`, 40)
+  expect_equal(d$data$SNUxIM$`DSD Dedupe`, 0)
+  expect_equal(d$data$SNUxIM$`TA Dedupe`, -20)
+  expect_equal(d$data$SNUxIM$`Crosswalk Dedupe`, -40)
+
+})
+
+test_that("Can check invalid dedupe values", {
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  cols_to_keep <- getColumnsToKeep(d, "PSNUxIM")
+  header_cols <- getHeaderColumns(cols_to_keep, sheet)
+
+  #In this case, the Deduplicated DSD Rollup is impossible. It must be at
+  #at least 30. There is no problem with the total, since it is less
+  #Than or equal to the max of all values, but it is impossible
+  #to have less than 30 DSD and less than 40 TA.
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "1234_TA",
+    ~ "9999_DSD",
+    ~ "9999_TA",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10,
+    20,
+    30,
+    40,
+    40,
+    20,
+    20
+  )
+
+  d$data$SNUxIM <- df
+  d <- recalculateDedupeValues(d)
+
+  expect_equal(d$data$SNUxIM$`MAX - TA`, 40)
+  expect_equal(d$data$SNUxIM$`MAX - DSD`, 30)
+  expect_equal(d$data$SNUxIM$`TA Duplicated Rollup`, 60)
+  expect_equal(d$data$SNUxIM$`DSD Duplicated Rollup`, 40)
+  expect_equal(d$data$SNUxIM$`SUM - Crosswalk Total`, 40)
+  expect_equal(d$data$SNUxIM$`MAX - Crosswalk Total`, 20)
+  expect_equal(d$data$SNUxIM$`DSD Dedupe`, -20)
+  expect_equal(d$data$SNUxIM$`TA Dedupe`, -40)
+  expect_equal(d$data$SNUxIM$`Crosswalk Dedupe`, 0)
+
+  d <- testInvalidDedupeValues(d, header_cols)
+
+  expect_true(d$tests$dedupes_outside_range$`issues.Deduplicated DSD Rollup`)
+  expect_true(d$tests$dedupes_outside_range$`issues.Deduplicated TA Rollup`)
+  expect_false(d$tests$dedupes_outside_range$`issues.Total Deduplicated Rollup`)
+
+})
+
+test_that("Can recalculate final dedupe values", {
+
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "1234_TA",
+    ~ "9999_DSD",
+    ~ "9999_TA",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10,
+    20,
+    30,
+    40,
+    100,
+    40,
+    60
+  )
+
+  d$data$SNUxIM <- df
+  d <- recalculateDedupeValues(d)
+  #Simple case with DSD and TA correspoding to SUM or zero dedupe
+  expect_equal(d$data$SNUxIM$`MAX - TA`, 40)
+  expect_equal(d$data$SNUxIM$`MAX - DSD`, 30)
+  expect_equal(d$data$SNUxIM$`TA Duplicated Rollup`, 60)
+  expect_equal(d$data$SNUxIM$`DSD Duplicated Rollup`, 40)
+  expect_equal(d$data$SNUxIM$`SUM - Crosswalk Total`, 100)
+  expect_equal(d$data$SNUxIM$`MAX - Crosswalk Total`, 60)
+  expect_equal(d$data$SNUxIM$`DSD Dedupe`, 0)
+  expect_equal(d$data$SNUxIM$`TA Dedupe`, 0)
+  expect_equal(d$data$SNUxIM$`Crosswalk Dedupe`, 0)
+
+
+})
+
+test_that("Can identify invalid PSNUs", {
+
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$country_uids <- "cDGPF739ZZr"
+  d$info$cop_year <- 2023
+
+  #Looks OK, but the UID is not correct for Joburg
+  d$data$SNUxIM <- tibble::tribble(
+    ~"PSNU", ~"psnuid",
+    "ec Oliver Tambo District Municipality [us2FGzlnk8l]", "us2FGzlnk8l",
+    "gp City of Johannesburg Metropolitan Municipality [NXV5m5fAdaI]", "NXV5m5fAdaI"
+  )
+
+  d <- testInvalidPSNUs(d)
+  expect_true(inherits(d$tests$invalid_psnus, "data.frame"))
+  expect_setequal(names(d$tests$invalid_psnus), c("PSNU"))
+  expect_equal(NROW(d$tests$invalid_psnus), 1L)
 
 })

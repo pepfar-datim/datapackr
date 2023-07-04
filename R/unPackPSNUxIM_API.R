@@ -680,7 +680,9 @@ recalculateDedupeValues <- function(d) {
 }
 
 testInvalidDedupeValues <- function(d, header_cols) {
-  # TEST: Improper dedupe values; Error; Continue ####
+  # TEST: Improper dedupe values
+  #Flag them as an error but continue
+
   dedupe_cols <- names(d$data$SNUxIM)[which(grepl("Deduplicated", names(d$data$SNUxIM)))]
 
   # Deduplicated DSD within range
@@ -713,9 +715,12 @@ testInvalidDedupeValues <- function(d, header_cols) {
       | `issues.Total Deduplicated Rollup`
     )
 
-  attr(d$tests$dedupes_outside_range, "test_name") <- "Dedupes Outside Acceptable Range"
+
 
   if (NROW(d$tests$dedupes_outside_range) > 0) {
+
+    attr(d$tests$dedupes_outside_range, "test_name") <- "Dedupes Outside Acceptable Range"
+
     d$info$has_error <- TRUE
 
     dedupe_issue_cols <-
@@ -849,12 +854,11 @@ testInvalidPSNUs <- function(d) {
   d$tests$invalid_psnus <- d$data$SNUxIM %>%
     dplyr::filter(!(psnuid %in% possible_psnus)) %>%
     dplyr::select(PSNU) %>%
-    dplyr::distinct() %>%
-    dplyr::pull(PSNU)
+    dplyr::distinct()
 
-  attr(d$tests$invalid_psnus, "test_name") <- "Invalid PSNUs"
+  if (NROW(d$tests$invalid_psnus) > 0) {
 
-  if (length(d$tests$invalid_psnus) > 0) {
+    attr(d$tests$invalid_psnus, "test_name") <- "Invalid PSNUs"
     d$info$has_error <- TRUE
 
     warning_msg <-
@@ -862,7 +866,7 @@ testInvalidPSNUs <- function(d) {
         "ERROR!: In tab PSNUxIM, ",
         NROW(d$tests$invalid_psnus),
         " invalid PSNU identifiers were detected. Please check the UID and fix the following PSNUs:",
-        paste(d$tests$invalid_psnus, sep = "", collapse = ";"))
+        paste(d$tests$invalid_psnus$PSNU, sep = "", collapse = ";"))
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
   }
