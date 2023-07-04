@@ -585,7 +585,7 @@ test_that("Can check invalid dedupe values", {
 
 })
 
-test_that("Can recalculate final dedupe values", {
+test_that("Can recalculate initial dedupe values", {
 
   d <- list()
   d$info$messages <- MessageQueue()
@@ -653,3 +653,219 @@ test_that("Can identify invalid PSNUs", {
   expect_equal(NROW(d$tests$invalid_psnus), 1L)
 
 })
+
+test_that("Can recalculate final dedupe values", {
+  ## If only 1 DSD mechanism or only 1 TA mechanism (1 mech total):
+  ##   - Do not import any dedupes (Dedupe = NA_real_)
+
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "psnuid",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "1234_TA",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10, #1234_DSD
+    20, #1234_TA
+    30, #Total
+    30, #DSD Total
+    NA #TA Total
+  )
+
+  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  cols_to_keep <- getColumnsToKeep(d, "PSNUxIM")
+  header_cols <- getHeaderColumns(cols_to_keep, sheet)
+  d$data$SNUxIM <- df
+
+  d <- recalculateDedupeValues(d)
+
+  d$data$SNUxIM %<>%
+    tidyr::gather(key = "mechCode_supportType",
+                  value = "value",
+                  -tidyselect::all_of(c(header_cols$indicator_code, "psnuid"))) %>%
+    dplyr::select(dplyr::all_of(header_cols$indicator_code), psnuid,
+                  mechCode_supportType, value) %>%
+    tidyr::drop_na(value)
+
+  d <- calculateFinalDedupeValues(d, header_cols)
+
+  expect_true(!all(grepl("^(TA Dedupe)$", d$data$SNUxIM$mechCode_supportType)))
+  expect_true(!all(grepl("^(DSD Dedupe)$", d$data$SNUxIM$mechCode_supportType)))
+  expect_true(d$data$SNUxIM[[which(d$data$SNUxIM$mechCode_supportType == "Crosswalk Dedupe"), "value"]] == 0)
+
+
+  ## If only 1 DSD mech and only 1 TA mech (2 mechs total):
+  ##   - Import Crosswalk Dedupe, whether 0 or <0
+  ##   - Do not import any DSD or TA Dedupes (NA_real_)
+
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "psnuid",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "9999_TA",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10, #1234_DSD
+    40, #9999_TA
+    50, #Total
+    10, #DSD Total
+    40 #TA Total
+  )
+
+  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  cols_to_keep <- getColumnsToKeep(d, "PSNUxIM")
+  header_cols <- getHeaderColumns(cols_to_keep, sheet)
+  d$data$SNUxIM <- df
+
+  d <- recalculateDedupeValues(d)
+
+  d$data$SNUxIM %<>%
+    tidyr::gather(key = "mechCode_supportType",
+                  value = "value",
+                  -tidyselect::all_of(c(header_cols$indicator_code, "psnuid"))) %>%
+    dplyr::select(dplyr::all_of(header_cols$indicator_code), psnuid,
+                  mechCode_supportType, value) %>%
+    tidyr::drop_na(value)
+
+  d <- calculateFinalDedupeValues(d, header_cols)
+  expect_true(!all(grepl("^(TA Dedupe)$", d$data$SNUxIM$mechCode_supportType)))
+  expect_true(!all(grepl("^(DSD Dedupe)$", d$data$SNUxIM$mechCode_supportType)))
+  expect_true(d$data$SNUxIM[[which(d$data$SNUxIM$mechCode_supportType == "Crosswalk Dedupe"), "value"]] == 0)
+
+
+
+  ## If >1 DSD mech, but no TA mechs (or vice versa):
+  ##   - Import DSD or TA dedupes, whether 0 or <0 (if NA -> 0)
+  ##   - Do not import any Crosswalk dedupes
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "psnuid",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "9999_DSD",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10, #1234_DSD
+    30, #9999_DSD
+    30, #Total
+    30, #DSD Total
+    NA #TA Total
+  )
+
+  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  cols_to_keep <- getColumnsToKeep(d, "PSNUxIM")
+  header_cols <- getHeaderColumns(cols_to_keep, sheet)
+  d$data$SNUxIM <- df
+
+  d <- recalculateDedupeValues(d)
+
+  d$data$SNUxIM %<>%
+    tidyr::gather(key = "mechCode_supportType",
+                  value = "value",
+                  -tidyselect::all_of(c(header_cols$indicator_code, "psnuid"))) %>%
+    dplyr::select(dplyr::all_of(header_cols$indicator_code), psnuid,
+                  mechCode_supportType, value) %>%
+    tidyr::drop_na(value)
+
+  d <- calculateFinalDedupeValues(d, header_cols)
+  expect_true(!all(grepl("^(TA Dedupe)$", d$data$SNUxIM$mechCode_supportType)))
+  expect_true(!all(grepl("^(Crosswalk Dedupe)$", d$data$SNUxIM$mechCode_supportType)))
+  expect_true(d$data$SNUxIM[[which(d$data$SNUxIM$mechCode_supportType == "DSD Dedupe"), "value"]] == -10)
+
+
+  ## If >1 DSD mech and >1 TA mech:
+  ##   - Import all dedupes, whether 0 or <0 (if NA -> 0)
+
+
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "psnuid",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "1234_TA",
+    ~ "9999_DSD",
+    ~ "9999_TA",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10, #1234_DSD
+    20, #1234_TA
+    30, #9999_DSD
+    40, #9999_TA
+    40, #Total
+    40, #DSD Total
+    40 #TA Total
+  )
+
+  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  cols_to_keep <- getColumnsToKeep(d, "PSNUxIM")
+  header_cols <- getHeaderColumns(cols_to_keep, sheet)
+  d$data$SNUxIM <- df
+
+  d <- recalculateDedupeValues(d)
+
+  d$data$SNUxIM %<>%
+    tidyr::gather(key = "mechCode_supportType",
+                  value = "value",
+                  -tidyselect::all_of(c(header_cols$indicator_code, "psnuid"))) %>%
+    dplyr::select(dplyr::all_of(header_cols$indicator_code), psnuid,
+                  mechCode_supportType, value) %>%
+    tidyr::drop_na(value)
+
+  d <- calculateFinalDedupeValues(d, header_cols)
+  expect_true(d$data$SNUxIM[[which(d$data$SNUxIM$mechCode_supportType == "TA Dedupe"), "value"]] == -20)
+  expect_true(d$data$SNUxIM[[which(d$data$SNUxIM$mechCode_supportType == "DSD Dedupe"), "value"]] == 0)
+  expect_true(d$data$SNUxIM[[which(d$data$SNUxIM$mechCode_supportType == "Crosswalk Dedupe"), "value"]] == -40) })
