@@ -11,23 +11,24 @@ test_that("Can generate a key chain from a Data Pack Template", {
   testthat::expect_setequal(
      names(d$info),
      c(
-       "datapack_name",
-       "sane_name",
-       "tool",
-       "country_uids",
-       "cop_year",
-       "operating_unit",
-       "schema",
-       "has_error",
-       "newSNUxIM",
-       "has_psnuxim",
-       "missing_psnuxim_combos",
-       "missing_DSNUs",
-       "needs_psnuxim",
-       "unallocatedIMs",
-       "messages"
+        "tool",
+        "country_uids",
+        "cop_year",
+        "season",
+        "messages",
+        "has_error",
+        "schema",
+        "datapack_name",
+        "sane_name",
+        "operating_unit",
+        "needs_psnuxim",
+        "newSNUxIM",
+        "has_psnuxim",
+        "missing_psnuxim_combos",
+        "missing_DSNUs",
+        "unallocatedIMs"
      )
-   )
+  )
    expect_equal(d$keychain$submission_path, getTemplate("COP23_Data_Pack_Template.xlsx"))
    expect_setequal(class(d$info$messages), c("MessageQueue"))
    expect_false(d$info$has_error)

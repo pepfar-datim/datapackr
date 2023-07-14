@@ -254,8 +254,10 @@ check_cop_year <- function(cop_year, tool) {
 #' @export
 #' @rdname parameter-checks
 check_tool <- function(tool, season, cop_year) {
-
-  default_tool <- "Data Pack"
+  # If tool not provided — even if season or cop_year are — return default.
+  # If only tool provided, validate it's a valid choice.
+  # If tool & season provided, validate against each other.
+  # If tool & cop_year provided, validate against each other.
 
   # Collect parameters.
   tool <- tool %missing% NULL
@@ -264,12 +266,39 @@ check_tool <- function(tool, season, cop_year) {
   season <- season %missing% NULL
   season_provided <- !is.null(season)
 
-
   cop_year <- cop_year %missing% NULL
   cop_year_provided <- !is.null(cop_year)
 
+  # Validate clue parameters
+  if (cop_year_provided) {
+    cop_year %<>% check_cop_year()
+  }
+  if (season_provided) {
+    season %<>% check_season()
+  }
 
-  # Rule out any bogus tools so only NULL or valid tools remain.
+  # If tool not provided, return default.
+  default_cop_tool <- "Data Pack"
+  default_opu_tool <- "OPU Data Pack"
+  if (cop_year_provided) {
+    if (cop_year >= 2023) {
+      default_opu_tool <- "PSNUxIM"
+    }
+  }
+
+  if (!tool_provided) {
+    tool_to_return <- default_cop_tool
+    if (season_provided) {
+      if (season == "OPU") {
+        tool_to_return <- default_opu_tool
+      }
+    }
+    interactive_message(
+      paste0("In check_tool, deduced you meant a ", tool_to_return))
+    return(tool_to_return)
+  }
+
+  # Rule out invalid tools.
   if (tool_provided) {
     if (!tool %in% supportedTools()) {
       stop("Unknown tool parameter provided. We only support ",
@@ -277,47 +306,24 @@ check_tool <- function(tool, season, cop_year) {
     }
   }
 
-  # Validate cop_year. If its still NULL here, assume the current COP Year.
-  cop_year %<>% check_cop_year()
-
-  if (season_provided) {
-    season %<>% check_season(season = ., tool = tool)
-
-    if (cop_year == 2023) {
-      deduced_tool <- switch(season, "OPU" = "PSNUxIM", "COP" = "Data Pack")
-    } else {
-      deduced_tool <- switch(season, "OPU" = "OPU Data Pack", "COP" = "Data Pack")
-    }
-
-  }
-
-  # For NULL tools, attempt to deduce from season.
-  if (!tool_provided) {
-    if (season_provided) {
-      tool <- deduced_tool
-      interactive_message("Deduced tool based on season.")
-    } else {
-      # If tool and season are both NULL, default tool is "Data Pack".
-      tool <- default_tool
-      interactive_message("Since neither tool nor season was provided, we assumed you meant 'Data Pack'.")
-    }
-
-  # No matter what, we now have a tool. If we also have season, use it to
-  # validate tool type.
-  #TODO: This needs to be fixed, since PSNUxIM tabs are also valid in COP
-  } else if (season_provided) {
-    if (!tool %in% c(deduced_tool, paste0(deduced_tool, " Template"))) {
-      interactive_message("That tool is not valid for that season.")
+  # If tool & season provided, validate against each other
+  if (tool_provided && season_provided) {
+    if (!season %in% supportedSeasons(tool = tool) ||
+        !tool %in% supportedTools(season = season)) {
+      stop("In check_tool, provided tool & provided season don't match.")
     }
   }
 
-  # If we have cop_year, check whether the tool is still compatible with
-  # datapackr for that year.
-  if (cop_year_provided) {
-    if (!cop_year %in% supportedCOPYears(tool = tool)) {
-      interactive_message(paste0("Sorry, we no longer fully support ",
-                                 tool, "s for that cop_year."))
+  if (tool_provided && cop_year_provided) {
+    if (!cop_year %in% supportedCOPYears(tool = tool) ||
+        !tool %in% supportedTools(cop_year = cop_year)) {
+      stop("In check_tool, provided tool & provided cop_year don't match.")
     }
+  }
+
+  if (tool_provided && cop_year_provided && season_provided) {
+    if (!tool %in% supportedTools(cop_year = cop_year, season = season))
+      stop("In check_tool, the tool type provided is not valid for that specific COP Year & Season.")
   }
 
   tool
@@ -327,61 +333,69 @@ check_tool <- function(tool, season, cop_year) {
 #' @export
 #' @rdname parameter-checks
 check_season <- function(season, tool) {
-  # If season & tool are both provided, validate season against tool. If season
-  # alone is provided, . If only tool is provided, deduce season from tool. If
-  # neither is provided, default to "COP".
+  # If neither season nor tool is provided, default to "COP".
+  # If season alone is provided, check it's a valid choice.
+  # If season & tool are both provided, validate season against tool.
+  # If only tool is provided, deduce season from tool.
 
   supported_seasons <- c("COP", "OPU")
   default_season <- "COP"
 
-  # If tool provided, validate it.
+  # Collect parameters
+  season <- season %missing% NULL
+  season_provided <- !is.null(season)
+
   tool <- tool %missing% NULL
   tool_provided <- !is.null(tool)
+
+  # If neither is provided, default to "COP"
+  if (!season_provided && !tool_provided) {
+    interactive_message("Since neither season nor tool was provided, we assumed you meant 'COP'.")
+    return(default_season)
+  }
+
+  # Validate what's been provided.
+  if (season_provided) {
+    if (!season %in% supported_seasons) {
+      stop("Cannot support any seasons other than 'COP' or 'OPU'.")
+    }
+  }
 
   if (tool_provided) {
     tool %<>% check_tool()
     deduced_season <- switch(tool,
-                             "Data Pack" = "COP",
+                             "Data Pack" = c("OPU", "COP"),
+                             "Data Pack Template" = c("OPU", "COP"),
+                             "PSNUxIM" = c("OPU", "COP"),
+                             "PSNUxIM Template" = c("OPU", "COP"),
                              "OPU Data Pack" = "OPU",
-                             "Data Pack Template" = "COP",
-                             "OPU Data Pack Template" = "OPU",
-                             "PSNUxIM" = "COP",
-                             "PSNUxIM Template" = "COP",
-                             stop("Invalid tool type provided."))
+                             "OPU Data Pack Template" = "OPU")
   }
 
-  # Determine if season is provided
-  season <- season %missing% NULL
-  season_provided <- !is.null(season)
-
-  if (!season_provided) {
-    # If season not provided, attempt to deduce based on tool
-    if (tool_provided) {
-      season <- deduced_season
-      interactive_message("Deduced season based on tool.")
-    } else {
-      # Default season is "COP", because default tool type is "Data Pack"
-      season <- default_season
-      interactive_message("Since neither season nor tool was provided, we assumed you meant 'COP'.")
+  # If both season & tool provided, validate against each other.
+  if (season_provided && tool_provided) {
+    if (!season %in% deduced_season) {
+      interactive_warning("In check_season, provided tool & season aren't compatible.")
     }
   }
 
-  # No matter what, we now have a season. If we also have a tool, use it to validate season.
-  if (!season %in% supported_seasons) {
-    stop("Cannot support any seasons other than `COP` or `OPU`.")
+  # If only tool provided, use it to guess the season.
+  if (!season_provided && tool_provided) {
+    if (tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
+      interactive_message(
+        paste0("Deduced season based on tool."))
+      return(deduced_season)
+    } else {
+      interactive_message(
+        paste0("Since Data Packs & PSNUxIM tools are now valid for both COP & ",
+               "OPU seasons, we couldn't deduce season based on just tool. ",
+               "Please provide season as a parameter. In the meantime, we'll ",
+               "use 'COP' as a placeholder for season."))
+      return(default_season)
+    }
   }
 
-  #Commenting this out for DP-947. It is only an warning
-  #In general, datapacks and PSNUxIM tabs are valid in either season
-  #Only COP22 OPU data packs are only valid for OPU season.
-
-  # if (tool_provided) {
-  #   if (season != deduced_season) {
-  #     interactive_message("That season is not valid for that tool.")
-  #   }
-  # }
-
-  season
+  return(season)
 }
 
 
