@@ -21,4 +21,12 @@ datapack_cogs$COP23 <-
                           "groupSets.id:eq:CIqgMytqbMA",
                           d2_session = d2_default_session)
 
+datapack_cogs$COP24 <-
+  # Patch before MER 3.0 deployment:
+  datapack_cogs$COP23
+  # datimutils::getMetadata(categoryOptionGroups,
+  #                         fields = "id,name,categoryOptions[id,name]", # nolint
+  #                         "groupSets.id:eq:CIqgMytqbMA",
+  #                         d2_session = d2_default_session)
+
 save(datapack_cogs, file = "./data/datapack_cogs.rda", compress = "xz")
