@@ -445,7 +445,7 @@ rowMax <- function(df, cn, regex) {
 }
 
 #' @export
-#' @title get_Map_DataPack_DATIM_DEs_COCs
+#' @title get_Map_DataPack_DATIM_DEs_COCs.
 #'
 #' @param cop_year cop year to pull get map for
 #' @param datasource Type of datasource (Data Pack, OPU Data Pack, DATIM)
