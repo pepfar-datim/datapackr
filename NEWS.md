@@ -1,3 +1,29 @@
+# datapackr 7.0.0
+
+## New features
+* Cop24 Data Pack Template created
+
+## Bug fixes
+* Updated valid Org Units to include UG SNU 2 PSNU's
+
+## Minor improvements and fixes
+* 
+
+# datapackr 6.3.3
+
+## New features
+* 
+
+## Bug fixes
+*
+
+## Minor improvements and fixes
+* Added `season` as a parameter in most unpacking and packing functions to better
+align with new workflows — PSNUxIM tools separate, and both PSNUxIM tool & Data
+Pack valid for both COP & OPU. This is in preparation for the deprecation of the
+concept of a separate "OPU Tool", as this is now functionally identical to the
+PSNUxIM tool used during main COP.
+
 # datapackr 6.3.2
 
 ## New features

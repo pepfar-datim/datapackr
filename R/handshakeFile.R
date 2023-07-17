@@ -42,11 +42,11 @@ handshakeFile <- function(path,
   tool <- tool %missing% NULL
   tool_provided <- !is.null(tool)
 
-  if (tool %in% datapackrSupports()$tool) {
+  if (tool %in% datapackrSupports()$tools) {
     extension <- "xlsx"
   } else {
     msg <- paste0("Please specify correct file type:",
-                  paste(datapackrSupports()$tool, sep = "", collapse = ","))
+                  paste(datapackrSupports()$tools, sep = "", collapse = ","))
     stop(msg)
   }
 

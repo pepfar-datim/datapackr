@@ -12,21 +12,22 @@ test_that("Can write a home tab", {
   testthat::expect_setequal(
     names(d$info),
     c(
-      "datapack_name",
-      "sane_name",
       "tool",
       "country_uids",
       "cop_year",
-      "operating_unit",
-      "schema",
+      "season",
+      "messages",
       "has_error",
+      "schema",
+      "datapack_name",
+      "sane_name",
+      "operating_unit",
+      "needs_psnuxim",
       "newSNUxIM",
       "has_psnuxim",
       "missing_psnuxim_combos",
       "missing_DSNUs",
-      "needs_psnuxim",
-      "unallocatedIMs",
-      "messages"
+      "unallocatedIMs"
     )
   )
   expect_equal(d$keychain$submission_path, template_copy)

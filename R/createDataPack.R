@@ -9,6 +9,7 @@
 #'
 createDataPack <- function(datapack_name = NULL,
                            country_uids,
+                           season,
                            template_path = NULL,
                            cop_year = NULL,
                            tool = NULL,
@@ -23,6 +24,7 @@ createDataPack <- function(datapack_name = NULL,
   params <- check_params(
     country_uids = country_uids,
     cop_year = cop_year,
+    season = season,
     tool = tool,
     template_path = template_path,
     schema = NULL,
@@ -52,6 +54,7 @@ createDataPack <- function(datapack_name = NULL,
   d <- createKeychainInfo(submission_path = wb_copy,
                           tool = tool,
                           country_uids = country_uids,
+                          season = season,
                           cop_year = cop_year,
                           d2_session = d2_session)
 
