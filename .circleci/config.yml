@@ -28,7 +28,7 @@ jobs:
           command: R CMD build --no-build-vignettes --no-manual .
       - run:
           name: Test package
-          no_output_timeout: 30m
+          no_output_timeout: 40m
           command: |
             R -e "devtools::test(stop_on_failure = TRUE, error_on='error')"
       - run:
