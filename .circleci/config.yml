@@ -16,10 +16,10 @@ jobs:
       - run:
           name: Install package dependencies
           command: R -e "install.packages(c('renv','rlang'))"
-          no_output_timeout: 30m
       - run:
           name: Restore from lock file
           command: R -e "options(renv.consent = TRUE); renv::restore()"
+          no_output_timeout: 30m
       - save_cache:
           key: deps1-{{ checksum "renv.lock" }}
           paths:
