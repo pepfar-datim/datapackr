@@ -1,6 +1,6 @@
 #' @export
 #'
-#' @title merge two datapacks into one d object.
+#' @title merge two datapacks into one d object
 #'
 #' @description
 #' If two datapacks are supplied, they will be merged into one d object.
