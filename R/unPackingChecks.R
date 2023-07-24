@@ -862,7 +862,7 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = TRUE) {
 
   data %<>% dplyr::left_join(valid_orgunits_local, by = c("snu_uid" = "uid"))
 
-  dataset_levels_local <-   dataset_levels %>%
+  dataset_levels_local <- datapackr::dataset_levels %>%
     dplyr::filter(cop_year == d$info$cop_year, ou_uid == d$info$operating_unit$ou_uid) %>%
     dplyr::select(ou_uid, country_uid, prioritization)
 
