@@ -1,3 +1,14 @@
+# datapackr 7.0.0
+
+## New features
+* Cop24 Data Pack Template created
+
+## Bug fixes
+* Updated valid Org Units to include UG SNU 2 PSNU's
+
+## Minor improvements and fixes
+* 
+
 # datapackr 6.3.3
 
 ## New features

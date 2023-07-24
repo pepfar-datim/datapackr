@@ -14,6 +14,6 @@ A comparison table
 }
 \description{
 Generates a PSNUxIM level comparison between
-the values in the (OPU) DataPack and what is currently
+the COP indicator values in the (OPU) DataPack and what is currently
 present in DATIM.
 }
