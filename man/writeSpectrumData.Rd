@@ -2,17 +2,17 @@
 % Please edit documentation in R/writeSpectrumData.R
 \name{writeSpectrumData}
 \alias{writeSpectrumData}
-\title{Title writeSpectrumData}
+\title{writeSpectrumData}
 \usage{
 writeSpectrumData(wb, spectrum_data)
 }
 \arguments{
-\item{wb}{Openxlsx worbook object}
+\item{wb}{Openxlsx workbook object.}
 
-\item{spectrum_data}{Spectrum data}
+\item{spectrum_data}{Spectrum output, as a dataframe.}
 }
 \value{
-Modified openxlsx worbook object with Spectrum data written to the
+Modified openxlsx workbook object with Spectrum data written to the
 Spectrum tab.
 }
 \description{
