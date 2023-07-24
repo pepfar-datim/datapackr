@@ -57,6 +57,8 @@ saved upon export.}
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}
 
+\item{spectrum_data}{Spectrum output, as a dataframe.}
+
 \item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
 authentication with DATIM.}
 }

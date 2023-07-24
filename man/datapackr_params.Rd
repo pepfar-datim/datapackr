@@ -40,6 +40,7 @@ datapackr_params(
   prios,
   include_no_prio,
   remove_empty_columns,
+  spectrum_data,
   ...
 )
 }
@@ -141,6 +142,8 @@ should come from the Data Pack or from DATIM. Values can be either
 as a column in the output.}
 
 \item{remove_empty_columns}{Should empty columns be removed from memos?}
+
+\item{spectrum_data}{Spectrum output, as a dataframe.}
 
 \item{...}{Additional arguments to pass.}
 }
