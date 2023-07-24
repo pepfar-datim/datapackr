@@ -4,12 +4,15 @@
 \alias{writeSpectrumData}
 \title{writeSpectrumData}
 \usage{
-writeSpectrumData(wb, spectrum_data)
+writeSpectrumData(wb, spectrum_data, cop_year = NULL)
 }
 \arguments{
 \item{wb}{Openxlsx workbook object.}
 
 \item{spectrum_data}{Spectrum output, as a dataframe.}
+
+\item{cop_year}{COP Year to use for tailoring functions. Remember,
+FY22 targets = COP21.}
 }
 \value{
 Modified openxlsx workbook object with Spectrum data written to the
