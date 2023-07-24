@@ -313,6 +313,15 @@ getCOPDatasetUids <-  function(cop_year, datastreams) {
   #List of COP Datasets by year
   cop_datasets <-
     list(
+      "2024" = list(
+        #TODO: Update this for COP24 once datasets deployed for COP24
+        "mer_targets" =   c("dA9C5bL44NX", # MER Target Setting: PSNU (Facility and Community Combined)
+                            "A2GxohPT9Hw", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
+                            "vpDd67HlZcT"), # Host Country Targets: DREAMS (USG)
+        "mer_results" = NA,
+        "subnat_targets" = "bKSmkDP5YTc",
+        "subnat_results" = "fZVvcMSA9mZ",
+        "impatt" = "kWKJQYP1uT7"),
       "2023" = list(
         "mer_targets" =   c("dA9C5bL44NX", # MER Target Setting: PSNU (Facility and Community Combined)
                             "A2GxohPT9Hw", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
@@ -457,6 +466,8 @@ rowMax <- function(df, cn, regex) {
 #'
 getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1) {
 
+  #TODO: Move this file to packageSetup.R
+
   if (!all(year %in% c(1, 2))) {
     stop("You must specify either year 1, 2 or both.")
   }
@@ -470,6 +481,7 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1)
            "2021" = cop21_map_DataPack_DATIM_DEs_COCs,
            "2022" = cop22_map_DataPack_DATIM_DEs_COCs,
            "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
+           "2024" = cop24_map_DataPack_DATIM_DEs_COCs,
            stop("Invalid COP Year"))
     }
 
@@ -478,10 +490,11 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1)
                          "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
                          "2022" = datapackr::cop22_map_adorn_import_file,
                          "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
+                         "2024" = cop24_map_DataPack_DATIM_DEs_COCs,
                          stop("Invalid COP Year"))
   }
 
-  if (cop_year == 2023) {
+  if (cop_year >= 2023) {
 
      if (year == 1) {
        de_coc_map <- de_coc_map %>%

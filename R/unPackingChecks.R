@@ -787,7 +787,8 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
   cols_to_filter <- switch(as.character(d$info$cop_year),
                            "2021" = c("SNU1", "PSNU", "Age", "Sex"),
                            "2022" = c("SNU1", "PSNU", "Age", "Sex"),
-                           "2023" = c("PSNU", "Age", "Sex"))
+                           "2023" = c("PSNU", "Age", "Sex"),
+                           "2024" = c("PSNU", "Age", "Sex"))
 
   invalid_orgunits <- d$sheets[sheets] %>%
     dplyr::bind_rows(.id = "sheet_name") %>%
@@ -990,7 +991,7 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
        dplyr::select(-col)
    }
 
-  if (d$info$cop_year == "2023") {
+  if (d$info$cop_year >= "2023") {
 
     critical_columns <- getCriticalColumns()
 
