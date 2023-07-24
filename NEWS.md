@@ -1,3 +1,15 @@
+# datapackr 7.0.1
+
+## New features
+* Opens generation & processing of COP24 Data Packs.
+
+## Bug fixes
+* Updates a formula in the Spectrum tab of the COP24 Data Pack to allow for correct referencing of TX_CURR_SUBNAT.R data.
+* Corrects formatting of randomized Spectrum data saved in testing files from RData to rds.
+
+## Minor improvements and fixes
+* Exports writeSpectrumData to allow functionalized writing of Spectrum data to Spectrum tab of Data Packs.
+
 # datapackr 7.0.0
 
 ## New features
