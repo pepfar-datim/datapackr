@@ -288,6 +288,7 @@ checkNonEqualTargets <- function(d, original_targets) {
           "and consult the tab non_equal_targets for details.\n")
 
       d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+      d$info$has_error <- TRUE
     }
 
   }
@@ -299,9 +300,9 @@ checkNonEqualTargets <- function(d, original_targets) {
 extractOriginalTargets <- function(d, cols_to_keep, header_cols, sheet = "PSNUxIM") {
 
   if (d$info$tool == "Data Pack") {
-    original_targets <- d$data$MER
+    d$data$MER
   } else {
-    original_targets <- d$data$SNUxIM %>%
+    d$data$SNUxIM %>%
       dplyr::select(header_cols$indicator_code, "DataPackTarget") %>%
       { suppressWarnings(dplyr::mutate_at(., dplyr::vars(-dplyr::all_of(header_cols$indicator_code)), # nolint
                                           as.numeric))
@@ -316,10 +317,9 @@ extractOriginalTargets <- function(d, cols_to_keep, header_cols, sheet = "PSNUxI
                     value = DataPackTarget)
   }
 
-  original_targets
 }
 
-#' Title
+#' Title testMissingRightSideFormulas
 #'
 #' @param d
 #' @param cols_to_keep
@@ -331,7 +331,6 @@ extractOriginalTargets <- function(d, cols_to_keep, header_cols, sheet = "PSNUxI
 #'
 #' @return Modified d object with data frame of columns with missing formulas.
 #'
-#' @examples
 testMissingRightSideFormulas <- function(d, cols_to_keep, header_cols,
                                          header_row, blank_cols_idx, parsed_cells = NULL) {
 
@@ -385,6 +384,13 @@ testMissingRightSideFormulas <- function(d, cols_to_keep, header_cols,
   d
 }
 
+#' Title dropDuplicatedPSNUxIMColumns
+#' @description Identify and drop any duplicated user specified mechanism
+#' columns in the PSNUxIM tab.
+#'
+#' @param d
+#'
+#' @return d object
 dropDuplicatedPSNUxIMColumns <- function(d) {
 
   #Test for duplicate columns
@@ -412,7 +418,17 @@ dropDuplicatedPSNUxIMColumns <- function(d) {
 
 }
 
+#' Title dropInvalidMechColumns
+#' @description Removes any invalid, user-specified mechanism
+#' columns in the PSNUxIM tab.
+#'
+#' @param d
+#' @param cols_to_keep Object of columns to keep
+#' @param sheet Name of the sheet
+#'
+#' @return d
 dropInvalidMechColumns <- function(d, cols_to_keep, sheet = "PSNUxIM") {
+
   # nolint
   # nolint start
   # TEST: Improper Col Names; Error; Drop ####
@@ -463,11 +479,11 @@ dropInvalidMechColumns <- function(d, cols_to_keep, sheet = "PSNUxIM") {
 
 
 #' Title checkPSNUxIMDisaggs
-#'
+#' @description Compares Age/Sex/KeyPop disaggs found in the PSNUxIM tab
+#' with those found in the DE/COC map for a given year.
 #' @param d Datapack d object
 #'
 #' @return d Datapack d object
-#' @export
 #'
 
 checkPSNUxIMDisaggs <- function(d) {
@@ -648,6 +664,11 @@ testMissingDedupeRollupColumns <- function(d, cols_to_keep, sheet = "PSNUxIM") {
   d
 }
 
+#' Title recalculateDedupeValues
+#' Recalculates dedupe values based on the provided duplicated and deduplicated values.
+#' @param d
+#'
+#' @return d object
 recalculateDedupeValues <- function(d) {
   # Recalculate dedupes ####
   ## Other than IM cols, only the following should be considered safe for reuse here:
@@ -679,6 +700,15 @@ recalculateDedupeValues <- function(d) {
   d
 }
 
+#' testInvalidDedupeValues
+#' @description Tests dedupe adjustments to determine if they are valid.
+#' The function does not remove any data, but will flag any invalid dedupes
+#' as an error.
+#'
+#' @param d
+#' @param header_cols
+#'
+#' @return d object
 testInvalidDedupeValues <- function(d, header_cols) {
   # TEST: Improper dedupe values
   #Flag them as an error but continue
@@ -751,6 +781,15 @@ testInvalidDedupeValues <- function(d, header_cols) {
 
 }
 
+#' Title calculateFinalDedupeValues
+#' @description Imputes zeros for dedupe values (if needed), keeps valid
+#' depudes (where valid) and removes any dedupes which should not exist
+#' based on the logic of pure and crosswalk deduplication.
+#'
+#' @param d
+#' @param header_cols
+#'
+#' @return d object with final dedupe values
 calculateFinalDedupeValues <- function(d, header_cols) {
 
   #Why do we pivot back to wide format here??
@@ -883,7 +922,9 @@ testRoundDecimalValues <- function(d) {
   attr(d$tests$decimals, "test_name") <- "Decimal values"
 
   if (NROW(d$tests$decimals) > 0) {
-    d$info$has_error <- TRUE
+
+
+    d$info$has_error <- FALSE
 
     warning_msg <-
       paste0(
