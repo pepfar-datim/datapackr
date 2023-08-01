@@ -2,11 +2,13 @@
 % Please edit documentation in R/extractRawColumnData.R
 \name{extractRawColumnData}
 \alias{extractRawColumnData}
-\title{Title}
+\title{Title extractRawColumnData}
 \usage{
 extractRawColumnData(d, sheet, cols)
 }
 \arguments{
+\item{d}{Datapackr d object}
+
 \item{sheet}{Name of the sheet}
 
 \item{cols}{Name of the columns to extract. PSNU is mandatory}

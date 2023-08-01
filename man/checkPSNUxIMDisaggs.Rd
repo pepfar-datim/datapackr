@@ -7,11 +7,12 @@
 checkPSNUxIMDisaggs(d)
 }
 \arguments{
-\item{d}{Datapack d object}
+\item{d}{Datapackr d object}
 }
 \value{
-d Datapack d object
+d Datapackr d object
 }
 \description{
-Title checkPSNUxIMDisaggs
+Compares Age/Sex/KeyPop disaggs found in the PSNUxIM tab
+with those found in the DE/COC map for a given year.
 }

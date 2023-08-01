@@ -129,7 +129,7 @@ extractSNUxIMCombos <- function(d, p = NULL) {
 #' Identifies Duplicate rows in the PSNUxIM tab.
 #'
 #' @inheritParams datapackr_params
-#'
+#' @param sheet Name of the sheet (PSNUxIM)
 #' @return Modified d object with a list of duplicated rows
 #'
 extractDuplicateRows <- function(d, sheet = "PSNUxIM") {
@@ -212,8 +212,8 @@ getColumnsToKeep <- function(d, sheet = "PSNUxIM") {
 #' getHeaderColumns returns a vector of header columns
 #' provided an input vector of columns to keep.
 #'
-#' @param cols_to_keep
-#' @param sheet
+#' @param cols_to_keep cols_to_keep object
+#' @param sheet Name of the sheet (PSNUxIM)
 #'
 #' @return A vector of header columns.
 #'
@@ -232,8 +232,8 @@ getHeaderColumns <- function(cols_to_keep, sheet = "PSNUxIM") {
 #' where the value of the DataPackTarget (currently column G)
 #' does not match the corresponding value in the main DataPackTabs.
 #'
-#' @param d
-#' @param original_targets
+#' @param d Datpackr d object
+#' @param original_targets original_targets object
 #'
 #' @return Modified d object
 checkNonEqualTargets <- function(d, original_targets) {
@@ -297,6 +297,15 @@ checkNonEqualTargets <- function(d, original_targets) {
 
 }
 
+#' Title
+#'
+#' @param d Datapackr d object
+#' @param cols_to_keep cols_to_keep object
+#' @param header_cols headers_cols object
+#' @param sheet Name of the sheet (PSNUxIM)
+#'
+#' @return original_targets object as a data frame.
+#'
 extractOriginalTargets <- function(d, cols_to_keep, header_cols, sheet = "PSNUxIM") {
 
   if (d$info$tool == "Data Pack") {
@@ -321,11 +330,11 @@ extractOriginalTargets <- function(d, cols_to_keep, header_cols, sheet = "PSNUxI
 
 #' Title testMissingRightSideFormulas
 #'
-#' @param d
-#' @param cols_to_keep
-#' @param header_cols
-#' @param header_row
-#' @param blank_cols_idx
+#' @param d Datapackr d object
+#' @param cols_to_keep cols_to_keep object
+#' @param header_cols headers_cols object
+#' @param header_row Numeric index of the header row in the PSNUxIM tab.
+#' @param blank_cols_idx Index of the first column which is blank in the sheet.
 #' @param parsed_cells Primarily used for unit testing. When null,
 #' values will be read from the PSNUxIM tab.
 #'
@@ -388,9 +397,9 @@ testMissingRightSideFormulas <- function(d, cols_to_keep, header_cols,
 #' @description Identify and drop any duplicated user specified mechanism
 #' columns in the PSNUxIM tab.
 #'
-#' @param d
+#' @param d Datapackr d object
 #'
-#' @return d object
+#' @return Modified d object
 dropDuplicatedPSNUxIMColumns <- function(d) {
 
   #Test for duplicate columns
@@ -422,7 +431,7 @@ dropDuplicatedPSNUxIMColumns <- function(d) {
 #' @description Removes any invalid, user-specified mechanism
 #' columns in the PSNUxIM tab.
 #'
-#' @param d
+#' @param d Datpackr d object
 #' @param cols_to_keep Object of columns to keep
 #' @param sheet Name of the sheet
 #'
@@ -481,9 +490,9 @@ dropInvalidMechColumns <- function(d, cols_to_keep, sheet = "PSNUxIM") {
 #' Title checkPSNUxIMDisaggs
 #' @description Compares Age/Sex/KeyPop disaggs found in the PSNUxIM tab
 #' with those found in the DE/COC map for a given year.
-#' @param d Datapack d object
+#' @param d Datapackr d object
 #'
-#' @return d Datapack d object
+#' @return d Datapackr d object
 #'
 
 checkPSNUxIMDisaggs <- function(d) {
@@ -597,6 +606,15 @@ combineDuplicatePSNUxIMColumns <- function(d, cols_to_keep) {
 
 }
 
+#' Title checkNonNumericPSNUxIMValues
+#' @description
+#' Checks for non-numeric data values in the PSNUxIM tab.
+#'
+#' @param d Datapackr d object
+#' @param header_cols header_cols object
+#'
+#' @return Datapackr d object
+#'
 checkNonNumericPSNUxIMValues <- function(d, header_cols) {
 
   df <- d$data$SNUxIM %>%
@@ -627,6 +645,14 @@ checkNonNumericPSNUxIMValues <- function(d, header_cols) {
   d
 
 }
+
+#' Title testMissingDedupeRollupColumns
+#'
+#' @param d Datapackr d object
+#' @param cols_to_keep cols_to_keep object
+#' @param sheet Name of the sheet
+#'
+#' @return Datapackr d object
 
 testMissingDedupeRollupColumns <- function(d, cols_to_keep, sheet = "PSNUxIM") {
 
@@ -666,9 +692,9 @@ testMissingDedupeRollupColumns <- function(d, cols_to_keep, sheet = "PSNUxIM") {
 
 #' Title recalculateDedupeValues
 #' Recalculates dedupe values based on the provided duplicated and deduplicated values.
-#' @param d
+#' @param d Datapackr d object
 #'
-#' @return d object
+#' @return Datapackr d object
 recalculateDedupeValues <- function(d) {
   # Recalculate dedupes ####
   ## Other than IM cols, only the following should be considered safe for reuse here:
@@ -705,8 +731,8 @@ recalculateDedupeValues <- function(d) {
 #' The function does not remove any data, but will flag any invalid dedupes
 #' as an error.
 #'
-#' @param d
-#' @param header_cols
+#' @param d Datapackr d object
+#' @param header_cols header_cols object
 #'
 #' @return d object
 testInvalidDedupeValues <- function(d, header_cols) {
@@ -786,8 +812,8 @@ testInvalidDedupeValues <- function(d, header_cols) {
 #' depudes (where valid) and removes any dedupes which should not exist
 #' based on the logic of pure and crosswalk deduplication.
 #'
-#' @param d
-#' @param header_cols
+#' @param d Datapackr d object
+#' @param header_cols header_cols object
 #'
 #' @return d object with final dedupe values
 calculateFinalDedupeValues <- function(d, header_cols) {
@@ -843,7 +869,18 @@ calculateFinalDedupeValues <- function(d, header_cols) {
 
 }
 
+#' Title testNegativeTargetValues
+#'
+#' @description
+#' Tests for any targets values which are negative. Converts any negative
+#' target values to numeric NAs.
+#'
+#' @param d Datapackr d object
+#' @param header_cols header_cols object
+#'
+#' @return Datapackr d object
 testNegativeTargetValues <- function(d, header_cols) {
+
   # TEST: Negative IM Targets; Error; Drop ####
   d$tests$negative_IM_targets <- d$data$SNUxIM %>%
     tidyr::gather(key = "mechCode_supportType",
@@ -882,7 +919,17 @@ testNegativeTargetValues <- function(d, header_cols) {
   d
 }
 
+#' Title testInvalidPSNUs
+#' @description
+#' Tests for any PSNUs in the PSNUxIM sheet which are not valid.
+#'
+#' @param d Datapackr d object
+#'
+#' @return Datapackr d object
+#'
 testInvalidPSNUs <- function(d) {
+
+
   #Test for invalid PSNUs
 
   possible_psnus <- getValidOrgUnits(d$info$cop_year) %>%
@@ -914,7 +961,17 @@ testInvalidPSNUs <- function(d) {
 }
 
 
+#' Title testRoundDecimalValues
+#' @description
+#' Test for any values which are not whole integers. Using the round_trunc
+#' function, values are rounded here.
+#'
+#' @param d Datapackr d object
+#'
+#' @return Datapackr d object
+#'
 testRoundDecimalValues <- function(d) {
+
   # TEST: Decimals; Error; Round ####
   d$tests$decimals <- d$data$SNUxIM %>%
     dplyr::filter(value %% 1 != 0)
@@ -943,7 +1000,15 @@ testRoundDecimalValues <- function(d) {
   d
 }
 
+#' Title testDropPositiveDedupe
+#' @description
+#' Identifies and deletes any cases where dedupe is positive in the PSNUxIM tab.
+#'
+#' @param d Datapackr d object
+#'
+#' @return Datapackr d object
 testDropPositiveDedupe <- function(d) {
+
   # TEST: Positive Dedupes; Error; Drop ####
   d$tests$positive_dedupes <- d$data$SNUxIM %>%
     dplyr::filter(stringr::str_detect(mechCode_supportType, "Dedupe") & value > 0)
@@ -984,10 +1049,14 @@ testDropPositiveDedupe <- function(d) {
 }
 
 
-#' Title
+#' Title generatePSNUxIMComparison
+#' @description
+#' Classifies discrepancies between the aggregated targets in the PSNUxIM
+#' tab with those in the main sheets (original_targets).
 #'
-#' @param d
-#' @param original_targets
+#'
+#' @param d Datapackr d object
+#' @param original_targets original_targets object
 #'
 #' @return Modified d object with a new object d$info$psnuxim_comparison
 
@@ -1039,10 +1108,12 @@ generatePSNUxIMComparison <- function(d, original_targets) {
   d
 }
 
-#' Title
+#' Title testRoundingDiffs
+#' @description
+#' Tests for rounding errors in the PSNUxIM allocation.
 #'
-#' @param d
-#' @param original_targets
+#' @param d Datapackr d object
+#' @param original_targets original_targets object
 #'
 #' @return Modified d object with a new object d$info$psnuxim_comparison
 #' and if applicable, d$tests$PSNUxIM_rounding_diffs
@@ -1086,6 +1157,15 @@ testRoundingDiffs <- function(d) {
   d
 }
 
+#' Title testImbalancedDistribution
+#' @description
+#' Tests for any imbalanced distribution between the main DataPack sheets
+#' and the PSNUxIM tab.
+#'
+#' @param d Datapackr d object
+#'
+#' @return Datapackr d object
+#'
 testImbalancedDistribution <- function(d) {
 
   # TEST: Data Pack total not fully distributed to IM ####
@@ -1122,6 +1202,16 @@ testImbalancedDistribution <- function(d) {
   d
 }
 
+#' Title appendUnallocatedData
+#'
+#' @param d Datapackr d object
+#' @description
+#' Performs a test for any data which has not been allocated to a mechanism
+#' in the PNSUxIM tab. If there is any unallocated data, it will be appended
+#' to the already allocated data using the default mechanism.
+#'
+#' @return Datapackr d object
+#'
 appendUnallocatedData <- function(d) {
 
   # Add Unallocated Data to bottom ####

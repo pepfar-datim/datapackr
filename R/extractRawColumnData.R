@@ -1,6 +1,6 @@
-#' Title
+#' Title extractRawColumnData
 #'
-#' @param d
+#' @param d Datapackr d object
 #' @param sheet Name of the sheet
 #' @param cols Name of the columns to extract. PSNU is mandatory
 #' @description In certain situations in the checkAnalytics function, we need to extract raw

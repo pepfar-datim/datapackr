@@ -24,10 +24,6 @@ from DATIM.}
 \code{mer_results}, \code{subnat_targets}, \code{subnat_results}, or
 \code{impatt}. If not specified, then all data streams
 are returned.}
-\item{d2_session}{R6 datimutils object which handles authentication with DATIM}
-
-\item{datim_data}{A data frame resulting from datimutils::getDataValueSets. If null, the data will be fetched
-from DATIM.}
 }
 \value{
 list object of diff result $psnu_x_im_wo_dedup, $psnu_w_dedup,

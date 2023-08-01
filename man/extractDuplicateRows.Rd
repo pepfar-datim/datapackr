@@ -8,6 +8,8 @@ extractDuplicateRows(d, sheet = "PSNUxIM")
 }
 \arguments{
 \item{d}{Datapackr sidecar object}
+
+\item{sheet}{Name of the sheet (PSNUxIM)}
 }
 \value{
 Modified d object with a list of duplicated rows

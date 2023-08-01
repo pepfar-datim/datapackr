@@ -869,3 +869,36 @@ test_that("Can recalculate final dedupe values", {
   expect_true(d$data$SNUxIM[[which(d$data$SNUxIM$mechCode_supportType == "TA Dedupe"), "value"]] == -20)
   expect_true(d$data$SNUxIM[[which(d$data$SNUxIM$mechCode_supportType == "DSD Dedupe"), "value"]] == 0)
   expect_true(d$data$SNUxIM[[which(d$data$SNUxIM$mechCode_supportType == "Crosswalk Dedupe"), "value"]] == -40) })
+
+
+test_that("Can test and round decimal values in PSNUxIM tab", {
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  d$data$SNUxIM <- tibble::tribble(
+    ~"mechCode_supportType", ~"value",
+    "12345_DSD", 1,
+    "6789_TA", 1.45
+  )
+
+  d <- testRoundDecimalValues(d)
+
+  expect_equal(NROW(d$tests$decimals), 1L)
+  expect_equal(d$tests$decimals$mechCode_supportType, "6789_TA")
+  expect_equal(d$tests$decimals$value, 1.45)
+
+  expect_false(d$info$has_error)
+
+  expect_true(grepl("DECIMAL VALUES", d$info$messages$message))
+
+
+  after_rounding <-
+    tibble::tribble(
+      ~"mechCode_supportType", ~"value",
+      "12345_DSD", 1,
+      "6789_TA", 1
+    )
+
+  expect_identical(d$data$SNUxIM, after_rounding)
+
+})

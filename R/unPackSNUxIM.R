@@ -158,7 +158,7 @@ unPackSNUxIM <- function(d) {
                   mechCode_supportType, value) %>%
     tidyr::drop_na(value)
 
-
+  #IMPORTANT: Values are rounded here
   d <- testRoundDecimalValues(d)
 
   #TODO: Since we are about to recalculate dedupe AGAIN, do we need to

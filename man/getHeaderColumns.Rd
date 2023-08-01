@@ -8,7 +8,9 @@ provided an input vector of columns to keep.}
 getHeaderColumns(cols_to_keep, sheet = "PSNUxIM")
 }
 \arguments{
-\item{sheet}{}
+\item{cols_to_keep}{cols_to_keep object}
+
+\item{sheet}{Name of the sheet (PSNUxIM)}
 }
 \value{
 A vector of header columns.
