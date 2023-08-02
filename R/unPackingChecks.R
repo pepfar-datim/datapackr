@@ -265,7 +265,7 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
       purrr::map2(., names(.),
                   function(x, y) {
                     x %>%
-                      dplyr::arrange(dplyr::across()) %>%
+                      dplyr::arrange(dplyr::across(tidyselect::everything())) %>%
                       tibble::add_column(sheet = y, .before = 1)
                   })
 
