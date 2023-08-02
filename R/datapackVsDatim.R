@@ -88,8 +88,8 @@ compareData_DatapackVsDatim <-
       dplyr::mutate(dataset = dplyr::case_when(dataset == "impatt" ~ "subnat_targets",
                                                dataset == "mer" ~ "mer_targets",
                                                dataset == "subnat" ~ "subnat_targets",
-                                               TRUE ~ dataset)) %>%
-      dplyr::filter(dataset %in% datastreams)
+                                               TRUE ~ dataset))#%>%
+      #dplyr::filter(dataset %in% datastreams)
 
     # Do not consider AGYW_PREV if this is a OPU Data Pack aka PSNUxIM
     if (d$info$tool == "OPU Data Pack") {
