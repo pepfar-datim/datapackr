@@ -1,5 +1,6 @@
 context("test-checkColStructure")
 
+with_mock_api({
 test_that("Can create test data...", {
 
   c_year <- 2021
@@ -21,7 +22,7 @@ test_that("Can create test data...", {
   res <- createTestDataset(
     country_uids = c_uids,
     cop_year = c_year,
-    d2_session = play2361
+    d2_session = training
   )
 
   # test names
@@ -59,4 +60,5 @@ test_that("Can create test data...", {
   testthat::expect_true(unique(org_units$orgUnit %in% res$orgUnit))
 
 
+})
 })
