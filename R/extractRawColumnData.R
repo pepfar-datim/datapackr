@@ -32,7 +32,7 @@ valid_orgunits_local <- getValidOrgUnits(d$info$cop_year) %>%
 
  extract <-  d$sheets %>%
     purrr::pluck(sheet) %>%
-    dplyr::select(cols) %>%
+    dplyr::select(tidyselect::all_of(cols)) %>%
     dplyr::mutate(psnu_uid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
     dplyr::select(-PSNU) %>%
     dplyr::left_join(valid_orgunits_local, by = "psnu_uid")
