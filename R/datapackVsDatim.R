@@ -70,7 +70,7 @@ compareData_DatapackVsDatim <-
            d2_session = dynGet("d2_default_session",
                                inherits = TRUE),
            datim_data = NULL,
-           datastreams = c("mer_targets", "subnat_targets", "impatt", "dreams")) {
+           datastreams = c("mer_targets", "subnat_targets", "impatt")) {
 
 
     # HO5wSDKttn3
@@ -88,14 +88,14 @@ compareData_DatapackVsDatim <-
       dplyr::mutate(dataset = dplyr::case_when(dataset == "impatt" ~ "subnat_targets",
                                                dataset == "mer" ~ "mer_targets",
                                                dataset == "subnat" ~ "subnat_targets",
-                                               dataset == "dreams" ~ "dreams",
+                                               dataset == "dreams" ~ "mer_targets",
                                                TRUE ~ dataset)) %>%
       dplyr::filter(dataset %in% datastreams)
 
     # Do not consider AGYW_PREV if this is a OPU Data Pack aka PSNUxIM
     if (d$info$tool == "OPU Data Pack") {
       included_data_elements <- included_data_elements %>%
-        dplyr::filter(dataset != "dreams")
+        dplyr::filter(dataset != "dreams") #This might not work anymore...
     }
 
     datapack_data <- createDATIMExport(d) %>%
