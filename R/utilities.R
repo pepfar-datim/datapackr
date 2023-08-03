@@ -301,7 +301,7 @@ getCOPDatasetUids <-  function(cop_year, datastreams) {
   #Datastream validation
   all_datastreams <- c("mer_targets", "mer_results",
                  "subnat_targets", "subnat_results",
-                 "impatt")
+                 "impatt","dreams") #added
   datastreams <- datastreams %missing% all_datastreams
 
   stopifnot("You must specify a vector of dataset types" = is.vector(datastreams))
