@@ -265,7 +265,7 @@ checkDupeRows <- function(sheets, d, quiet = TRUE) {
       purrr::map2(., names(.),
                   function(x, y) {
                     x %>%
-                      dplyr::arrange(dplyr::across()) %>%
+                      dplyr::arrange(dplyr::across(tidyselect::everything())) %>%
                       tibble::add_column(sheet = y, .before = 1)
                   })
 
@@ -792,6 +792,9 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
 
   invalid_orgunits <- d$sheets[sheets] %>%
     dplyr::bind_rows(.id = "sheet_name") %>%
+    #Reverting this back to the previous logic to filter
+    #to ignore any rows which are NA in the columsn to filter.
+    dplyr::filter(dplyr::if_any(tidyselect::any_of(cols_to_filter), ~ !is.na(.))) %>%
     #dplyr::filter(dplyr::if_all(tidyselect::all_of(cols_to_filter), ~ !is.na(.x))) %>%
     dplyr::select(sheet_name, PSNU) %>%
     dplyr::distinct() %>%
