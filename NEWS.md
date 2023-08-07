@@ -1,3 +1,14 @@
+# datapackr 7.0.1
+
+## New features
+* COP24 PSNUxIM Tool Template created
+
+## Bug fixes
+*
+
+## Minor improvements and fixes
+* 
+
 # datapackr 7.0.0
 
 ## New features
