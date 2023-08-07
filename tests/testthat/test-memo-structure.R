@@ -21,7 +21,7 @@ with_mock_api({
       #expect_silent(d <- memoStructure(d, d2_session = training))
       expect_false(is.null(d$memo$structure))
       expect_equal(typeof(d$memo$structure), "list")
-      expect_setequal(names(d$memo$structure), c("row_order", "col_order"))
+      expect_setequal(names(d$memo$structure), c("row_order", "col_order", "age_order"))
       expect_true("data.frame" %in% class(d$memo$structure$row_order))
       expect_setequal(names(d$memo$structure$row_order),
                       c("ind",
