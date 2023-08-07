@@ -49,9 +49,9 @@ writeSpectrumData <- function(wb, spectrum_data, cop_year = NULL) {
 
   # Write IDs to columns
   if (is.null(cop_year)) {
-    A1 = datapackr::toolName_homeCell()
-    col = openxlsx::convertFromExcelRef(A1)
-    row = stringr::str_remove(A1, openxlsx::int2col(col))
+    A1 <- datapackr::toolName_homeCell()
+    col <- openxlsx::convertFromExcelRef(A1)
+    row <- stringr::str_remove(A1, openxlsx::int2col(col))
 
     cop_year <- openxlsx::readWorkbook(wb,
                                        sheet = "Home",
@@ -73,7 +73,7 @@ writeSpectrumData <- function(wb, spectrum_data, cop_year = NULL) {
            "&\"|\"&$K", rows_to_write,
            "&\"|\"&$G", rows_to_write,
            "&\"|\"&IF($G", rows_to_write,
-           "=\"TX_CURR_SUBNAT.R\",\"",CY,"\",$M", rows_to_write,
+           "=\"TX_CURR_SUBNAT.R\",\"", CY, "\",$M", rows_to_write,
            "),\"\")")
 
   openxlsx::writeFormula(
