@@ -156,7 +156,10 @@ memoStructure <- function(d, d2_session = dynGet("d2_default_session",
     8, "Not PEPFAR Supported", 8, "p0JrTY2hLii") %>%
     dplyr::mutate(Prioritization = paste0(value, " - ", name))
 
-  d$memo$structure <- list(row_order = row_order, col_order = col_order)
+
+  age_order <- c("<15", "<18", "15+", "18+", "Total")
+
+  d$memo$structure <- list(row_order = row_order, col_order = col_order, age_order = age_order)
 
   d$memo$inds <- getMemoIndicators(d$info$cop_year, d2_session)
 
