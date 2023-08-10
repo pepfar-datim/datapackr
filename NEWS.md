@@ -7,7 +7,8 @@
 *
 
 ## Minor improvements and fixes
-* 
+* COP24 Data Pack Template updated to incorporate formulas flagged for edit during COP23.
+* COP24 Data Pack Template updated to increment FY references in Year 2 tab.
 
 # datapackr 7.0.0
 
