@@ -4,11 +4,13 @@
 * COP24 PSNUxIM Tool Template created
 
 ## Bug fixes
-*
+* Updated dataset levels
+* Fixed issue related to ordering by age in the memo tables
 
 ## Minor improvements and fixes
 * COP24 Data Pack Template updated to incorporate formulas flagged for edit during COP23.
 * COP24 Data Pack Template updated to increment FY references in Year 2 tab.
+* Package dependencies updated
 
 # datapackr 7.0.0
 
