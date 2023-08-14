@@ -170,16 +170,12 @@ createKeychainInfo <- function(submission_path = NULL,
                                               tool = d$info$tool)
 
   # Placeholders ####
-  if (d$info$tool %in% c("Data Pack", "Data Pack Template", "OPU Data Pack",
-                         "OPU Data Pack Template", "PSNUxIM", "PSNUxIM Template")
-      && d$info$cop_year %in% c("2021", "2022", "2023")) {
-    d$info$needs_psnuxim <- FALSE
-    d$info$newSNUxIM <- FALSE
-    d$info$has_psnuxim <- FALSE
-    d$info$missing_psnuxim_combos <- FALSE
-    d$info$missing_DSNUs <- FALSE
-    d$info$unallocatedIMs <- FALSE
-  }
+  d$info$needs_psnuxim <- FALSE
+  d$info$newSNUxIM <- FALSE
+  d$info$has_psnuxim <- FALSE
+  d$info$missing_psnuxim_combos <- FALSE
+  d$info$missing_DSNUs <- FALSE
+  d$info$unallocatedIMs <- FALSE
 
   return(d)
 

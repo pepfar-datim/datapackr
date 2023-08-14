@@ -1,14 +1,14 @@
-#' Title writeSpectrumData
+#' @export
+#' @title writeSpectrumData
 #'
 #' @description Utility function mostly for testing which will
 #' write Spectrum data in a defined format to the Spectrum tab.
 #'
-#' @param wb Openxlsx worbook object
-#' @param spectrum_data Spectrum data
+#' @inheritParams datapackr_params
 #'
-#' @return Modified openxlsx worbook object with Spectrum data written to the
+#' @return Modified openxlsx workbook object with Spectrum data written to the
 #' Spectrum tab.
-writeSpectrumData <- function(wb, spectrum_data) {
+writeSpectrumData <- function(wb, spectrum_data, cop_year = NULL) {
 
 
   if (!inherits(spectrum_data, "data.frame")) {
@@ -46,15 +46,35 @@ writeSpectrumData <- function(wb, spectrum_data) {
     startCol = cellranger::letter_to_num("Q"),
     startRow = 2
   )
-  # #Write IDs to columns
-  id_formulas <- paste0("=IF($D", rows_to_write,
-  "<>\"\",\"[\"&$E", rows_to_write
-  , "&\"]\"&\"|\"&$Q", rows_to_write,
-   "&\"|\"&$K", rows_to_write,
-  "&\"|\"&$G", rows_to_write,
-  "&\"|\"&IF($G", rows_to_write,
-  "=\"TX_CURR_SUBNAT.R\",\"CY2022Q4\",$M", rows_to_write,
-  "),\"\")")
+
+  # Write IDs to columns
+  if (is.null(cop_year)) {
+    A1 <- datapackr::toolName_homeCell()
+    col <- openxlsx::convertFromExcelRef(A1)
+    row <- stringr::str_remove(A1, openxlsx::int2col(col))
+
+    cop_year <- openxlsx::readWorkbook(wb,
+                                       sheet = "Home",
+                                       rows = row,
+                                       cols = col,
+                                       colNames = FALSE) %>%
+      dplyr::mutate(
+        cop_year = stringr::str_extract(X1, "COP\\d{2}"),
+        cop_year = as.numeric(stringr::str_replace(cop_year, "COP", "20"))) %>%
+      dplyr::pull(cop_year)
+  }
+
+  CY <- paste0("CY", cop_year - 1, "Q4")
+
+  id_formulas <-
+    paste0("=IF($D", rows_to_write,
+           "<>\"\",\"[\"&$E", rows_to_write,
+           "&\"]\"&\"|\"&$Q", rows_to_write,
+           "&\"|\"&$K", rows_to_write,
+           "&\"|\"&$G", rows_to_write,
+           "&\"|\"&IF($G", rows_to_write,
+           "=\"TX_CURR_SUBNAT.R\",\"", CY, "\",$M", rows_to_write,
+           "),\"\")")
 
   openxlsx::writeFormula(
     wb = wb,

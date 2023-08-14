@@ -185,7 +185,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
     skip$schema <- skip$pack[skip$pack %in% skip$unpack]
 
   } else if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM", "PSNUxIM Template") &&
-             cop_year %in% c(2021, 2022, 2023)) {
+             cop_year %in% c(2021, 2022, 2023, 2024)) {
     skip$pack <- c("Home")
     skip$unpack <- c("Home")
     skip$schema <- c("Home")
@@ -260,6 +260,7 @@ pick_schema <- function(cop_year, tool) {
   } else if (tool %in% c("PSNUxIM", "PSNUxIM Template")) {
     schema <- switch(as.character(cop_year),
                      "2023" =  cop23_psnuxim_schema,
+                     #"2024" =  cop24_psnuxim_schema,
                      stop("PSNUxIM schema not available for the COP year provided."))
   } else {
     stop("No schema could be found for the combination of tool and COP year provided.")
@@ -313,6 +314,7 @@ pick_template_path <- function(cop_year, tool) {
   if (tool %in% c("PSNUxIM", "PSNUxIM Template")) {
     template_filename <- switch(as.character(cop_year),
                                 "2023" = "COP23_PSNUxIM_Template.xlsx",
+                                #"2024" = "COP24_PSNUxIM_Template.xlsx",
                                 NULL)
 
   }
@@ -400,6 +402,7 @@ pick_template_path <- function(cop_year, tool) {
 #' @param include_no_prio If TRUE, include \code{"No Prioritiation"}
 #' as a column in the output.
 #' @param remove_empty_columns Should empty columns be removed from memos?
+#' @param spectrum_data Spectrum output, as a dataframe.
 #' @param ... Additional arguments to pass.
 #'
 #' @family parameter-helpers
@@ -440,6 +443,7 @@ datapackr_params <- function(model_data,
                              prios,
                              include_no_prio,
                              remove_empty_columns,
+                             spectrum_data,
                              ...) {
 
   # This function should return something

@@ -37,7 +37,7 @@ unPackTool <- function(submission_path = NULL,
     d <- unPackDataPack(d,
                         d2_session = d2_session)
 
-    if (d$info$cop_year == "2023") {
+    if (d$info$cop_year %in% c("2023", "2024")) {
       d <- unpackYear2Sheet(d)
     }
 
