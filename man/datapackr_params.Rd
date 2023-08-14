@@ -41,6 +41,8 @@ datapackr_params(
   include_no_prio,
   remove_empty_columns,
   spectrum_data,
+  sheet,
+  sheets,
   ...
 )
 }
@@ -144,6 +146,10 @@ as a column in the output.}
 \item{remove_empty_columns}{Should empty columns be removed from memos?}
 
 \item{spectrum_data}{Spectrum output, as a dataframe.}
+
+\item{sheet}{String. Name of sheet/tab within tool.}
+
+\item{sheets}{Character vector. Names of sheets/tabs within tool.}
 
 \item{...}{Additional arguments to pass.}
 }

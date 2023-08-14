@@ -403,6 +403,8 @@ pick_template_path <- function(cop_year, tool) {
 #' as a column in the output.
 #' @param remove_empty_columns Should empty columns be removed from memos?
 #' @param spectrum_data Spectrum output, as a dataframe.
+#' @param sheet String. Name of sheet/tab within tool.
+#' @param sheets Character vector. Names of sheets/tabs within tool.
 #' @param ... Additional arguments to pass.
 #'
 #' @family parameter-helpers
@@ -444,6 +446,8 @@ datapackr_params <- function(model_data,
                              include_no_prio,
                              remove_empty_columns,
                              spectrum_data,
+                             sheet,
+                             sheets,
                              ...) {
 
   # This function should return something
