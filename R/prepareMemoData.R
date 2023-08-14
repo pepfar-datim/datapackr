@@ -356,7 +356,8 @@ prepareMemoDataByAgency <- function(df, memo_structure) {
   df_final <- dplyr::bind_rows(df, df_totals) %>%
     dplyr::mutate(
       Agency = factor(Agency, levels = df_cols$Agency),
-      Indicator = factor(Indicator, levels = unique(df_rows$ind))) %>%
+      Indicator = factor(Indicator, levels = unique(df_rows$ind)),
+      Age = factor(Age, levels = memo_structure$age_order)) %>%
     dplyr::arrange(Indicator, Age, Agency) %>%
     tidyr::pivot_wider(names_from = Agency,
                        values_from = "Value",
@@ -418,8 +419,9 @@ prepareMemoDataByPrio <- function(df,
   df_final <- dplyr::bind_rows(df, df_totals) %>%
     dplyr::mutate(
       col_name = factor(col_name, levels = df_cols$name),
-      Indicator = factor(Indicator, levels = unique(df_rows$ind))) %>%
-    dplyr::arrange(Indicator, col_name) %>%
+      Indicator = factor(Indicator, levels = unique(df_rows$ind)),
+      Age = factor(Age, levels = memo_structure$age_order)) %>%
+    dplyr::arrange(Indicator, Age, col_name) %>%
     tidyr::pivot_wider(names_from = col_name,
                        values_from = "Value",
                        values_fill = 0) %>%
