@@ -282,7 +282,7 @@ check_tool <- function(tool, season, cop_year) {
   default_opu_tool <- "OPU Data Pack"
   if (cop_year_provided) {
     if (cop_year >= 2023) {
-      default_opu_tool <- "PSNUxIM"
+      default_opu_tool <- "PSNUxIM Tool"
     }
   }
 
@@ -366,8 +366,8 @@ check_season <- function(season, tool) {
     deduced_season <- switch(tool,
                              "Data Pack" = c("OPU", "COP"),
                              "Data Pack Template" = c("OPU", "COP"),
-                             "PSNUxIM" = c("OPU", "COP"),
-                             "PSNUxIM Template" = c("OPU", "COP"),
+                             "PSNUxIM Tool" = c("OPU", "COP"),
+                             "PSNUxIM Tool Template" = c("OPU", "COP"),
                              "OPU Data Pack" = "OPU",
                              "OPU Data Pack Template" = "OPU")
   }

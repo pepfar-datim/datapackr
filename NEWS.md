@@ -8,6 +8,7 @@
 
 ## Minor improvements and fixes
 * Exports writeSpectrumData to allow functionalized writing of Spectrum data to Spectrum tab of Data Packs.
+* Updated some minor R package documentation.
 
 
 # datapackr 7.0.1

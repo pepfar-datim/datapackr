@@ -414,8 +414,8 @@ unPackSchema <- function(template_path = NULL,
   #
   # rm(params, p)
 
-  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack")
-        && cop_year %in% c(2021, 2022)) {
+  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM Tool", "PSNUxIM Tool Template")
+        && cop_year %in% c(2021, 2022, 2023, 2024)) {
     include_blank_cells <-  TRUE
   } else {
     include_blank_cells <-  FALSE
@@ -473,7 +473,7 @@ unPackSchema <- function(template_path = NULL,
     dplyr::mutate(formula = dplyr::if_else(is.na(formula), value, formula))
 
   # For OPU Data Packs, delete everything in metadata rows/cols
-  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM", "PSNUxIM Template")) {
+  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM Tool", "PSNUxIM Tool Template")) {
     schema %<>%
       dplyr::mutate_at(
         dplyr::vars(
@@ -487,7 +487,7 @@ unPackSchema <- function(template_path = NULL,
     ~name, ~id,
     NA_character_, NA_character_))
 
-  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM", "PSNUxIM Template")) {
+  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM Tool", "PSNUxIM Tool Template")) {
     disaggs <- list(tibble::tribble(
       ~name, ~id,
       NA_character_, NA_character_))

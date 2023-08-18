@@ -15,8 +15,8 @@ test_that("We can pick a schema", {
   testthat::expect_identical(test_schema, cop23_data_pack_schema)
 
 
-  expect_error(pick_schema(1999, "PSNUxIM"))
-  test_schema <-  pick_schema(2023, "PSNUxIM")
+  expect_error(pick_schema(1999, "PSNUxIM Tool"))
+  test_schema <-  pick_schema(2023, "PSNUxIM Tool")
   testthat::expect_identical(test_schema, cop23_psnuxim_schema)
 
 
@@ -55,7 +55,7 @@ test_that("We can pick template file", {
   expect_true(file.exists(test_template))
 
 
-  test_template <-  pick_template_path(2023, "PSNUxIM")
+  test_template <-  pick_template_path(2023, "PSNUxIM Tool")
   expect_true(grepl("COP23_PSNUxIM_Template.xlsx",
                     test_template))
   expect_true(file.exists(test_template))
@@ -176,13 +176,13 @@ test_that("We can check datapack paramaters", {
   expect_equal(season, "COP")
   expect_message(check_season(tool = "Data Pack", season = NULL))
 
-  season <- check_season(tool = "PSNUxIM", season = NULL)
+  season <- check_season(tool = "PSNUxIM Tool", season = NULL)
   expect_equal(season, "COP")
-  expect_message(check_season(tool = "PSNUxIM", season = NULL))
+  expect_message(check_season(tool = "PSNUxIM Tool", season = NULL))
 
-  season <- check_season(tool = "PSNUxIM Template", season = NULL)
+  season <- check_season(tool = "PSNUxIM Tool Template", season = NULL)
   expect_equal(season, "COP")
-  expect_message(check_season(tool = "PSNUxIM Template", season = NULL))
+  expect_message(check_season(tool = "PSNUxIM Tool Template", season = NULL))
 
   season <- check_season(tool = "OPU Data Pack", season = NULL)
   expect_equal(season, "OPU")
@@ -213,12 +213,12 @@ test_that("We can check datapack paramaters", {
   season <- check_season(tool = "Data Pack Template", season = "COP")
   expect_equal(season, "COP")
   expect_warning(check_season(tool = "Data Pack", season = "COP"), regexp = NA)
-  season <- check_season(tool = "PSNUxIM", season = "COP")
+  season <- check_season(tool = "PSNUxIM Tool", season = "COP")
   expect_equal(season, "COP")
-  expect_warning(check_season(tool = "PSNUxIM", season = "COP"), regexp = NA)
-  season <- check_season(tool = "PSNUxIM Template", season = "COP")
+  expect_warning(check_season(tool = "PSNUxIM Tool", season = "COP"), regexp = NA)
+  season <- check_season(tool = "PSNUxIM Tool Template", season = "COP")
   expect_equal(season, "COP")
-  expect_warning(check_season(tool = "PSNUxIM Template", season = "COP"), regexp = NA)
+  expect_warning(check_season(tool = "PSNUxIM Tool Template", season = "COP"), regexp = NA)
   season <- check_season(tool = "OPU Data Pack", season = "OPU")
   expect_equal(season, "OPU")
   expect_warning(check_season(tool = "OPU Data Pack", season = "OPU"), regexp = NA)
@@ -231,12 +231,12 @@ test_that("We can check datapack paramaters", {
   season <- check_season(tool = "Data Pack Template", season = "OPU")
   expect_equal(season, "OPU")
   expect_warning(check_season(tool = "Data Pack Template", season = "OPU"), regexp = NA)
-  season <- check_season(tool = "PSNUxIM", season = "OPU")
+  season <- check_season(tool = "PSNUxIM Tool", season = "OPU")
   expect_equal(season, "OPU")
-  expect_warning(check_season(tool = "PSNUxIM", season = "OPU"), regexp = NA)
-  season <- check_season(tool = "PSNUxIM Template", season = "OPU")
+  expect_warning(check_season(tool = "PSNUxIM Tool", season = "OPU"), regexp = NA)
+  season <- check_season(tool = "PSNUxIM Tool Template", season = "OPU")
   expect_equal(season, "OPU")
-  expect_warning(check_season(tool = "PSNUxIM Template", season = "OPU"), regexp = NA)
+  expect_warning(check_season(tool = "PSNUxIM Tool Template", season = "OPU"), regexp = NA)
 
 
 
@@ -295,15 +295,15 @@ test_that("We can check datapack paramaters", {
   expect_true(identical(sort(unlist(test_params)), sort(unlist(test_args))))
 
   # Test deduction power
-  test_args <- list(template_path = NULL, cop_year = 2023, tool = "PSNUxIM")
+  test_args <- list(template_path = NULL, cop_year = 2023, tool = "PSNUxIM Tool")
   test_params <- do.call(check_params, test_args)
   expect_setequal(names(test_params), c("cop_year", "tool", "template_path"))
-  expected_path <- pick_template_path(cop_year = 2023, tool = "PSNUxIM")
+  expected_path <- pick_template_path(cop_year = 2023, tool = "PSNUxIM Tool")
   expect_identical(test_params$template_path, expected_path)
 
   # Test invalid combination
   template_path <- pick_template_path(cop_year = 2023, tool = "Data Pack")
-  test_args <- list(template_path = template_path, cop_year = 2023, tool = "PSNUxIM")
+  test_args <- list(template_path = template_path, cop_year = 2023, tool = "PSNUxIM Tool")
   expect_message(do.call(check_params, test_args))
 
   # Sheets ----
