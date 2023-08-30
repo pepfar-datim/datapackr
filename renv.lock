@@ -410,6 +410,7 @@
       "RemoteRef": "master",
       "RemoteSha": "7214f32cc8b21f5466013d8825756322fe9e7353",
       "Remotes": "pepfar-datim/datimutils",
+      "Remotes": "pepfar-datim/datimutils",
       "Requirements": [
         "ISOweek",
         "R",
@@ -428,7 +429,7 @@
         "stringr",
         "xml2"
       ],
-      "Hash": "5f4816416db6e9f36664ebf5b586365a"
+      "Hash": "d4cfb73081cd730545daa823cb50bcbe"
     },
     "dbplyr": {
       "Package": "dbplyr",
@@ -950,7 +951,7 @@
     },
     "htmltools": {
       "Package": "htmltools",
-      "Version": "0.5.5",
+      "Version": "0.5.6",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -963,7 +964,7 @@
         "rlang",
         "utils"
       ],
-      "Hash": "ba0240784ad50a62165058a27459304a"
+      "Hash": "a2326a66919a3311f7fbb1e3bf568283"
     },
     "httpcache": {
       "Package": "httpcache",

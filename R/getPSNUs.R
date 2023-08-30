@@ -50,26 +50,40 @@ getDataPackOrgUnits <- function(include_mil = TRUE,
 
   # If not using cache, then pulling from API. Remainder helps do that.
 
-  api_filters <-
-    c(paste0("organisationUnitGroups.id:in:[AVy8gJXym2D", # Filter for COP Prioritization SNU
-             ifelse(include_mil, ",nwQbMeALRjL", ""), # Add military SNUs if requested
-             ifelse(include_DREAMS, ",mRRlkbZolDR", ""), # Add DREAMS SNUs if requested
-             "]"))
+  org_unit_groups <-
+    c("AVy8gJXym2D", # Filter for COP Prioritization SNU
+      if (include_mil) "nwQbMeALRjL" else NULL, # Add military SNUs if requested
+      if (include_DREAMS) "mRRlkbZolDR" else NULL) # Add DREAMS SNUs if requested
+
+
+  # api_filters <-
+  #   c(paste0("organisationUnitGroups.id:in:[AVy8gJXym2D", # Filter for COP Prioritization SNU
+  #            ifelse(include_mil, ",nwQbMeALRjL", ""), # Add military SNUs if requested
+  #            ifelse(include_DREAMS, ",mRRlkbZolDR", ""), # Add DREAMS SNUs if requested
+  #            "]"))
 
   fields <-
     paste0(
-      "id,name,lastUpdated,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]",
-      ifelse(!is.null(additional_fields), paste0(",", additional_fields), ""))
+      "organisationUnits[id,name,lastUpdated,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]",
+      ifelse(!is.null(additional_fields), paste0(",", additional_fields), ""),"]")
+
+    # fields <-
+    # paste0(
+    #   "id,name,lastUpdated,ancestors[id,name,organisationUnitGroups[id,name]],organisationUnitGroups[id,name]",
+    #   ifelse(!is.null(additional_fields), paste0(",", additional_fields), ""))
 
   # Pull Org Units ####
-  organisationUnits <-
-    datimutils::getMetadata(
-      "organisationUnits",
-      api_filters,
-      fields = fields,
-      d2_session = d2_session)
+  organisationUnits <- datimutils::getOrgUnitGroups(org_unit_groups,
+                                                      fields = fields,
+                                                      d2_session = d2_session) %>% .$organisationUnits
 
-  # orgunits <- datimutils::getSqlView(sql_view_uid = ""), #Replace once DP-786 resolved
+  # organisationUnits <-
+  #   datimutils::getMetadata(
+  #     "organisationUnits",
+  #     api_filters,
+  #     fields = fields,
+  #     d2_session = d2_session)
+
 
   # Extract metadata ####
   orgunits <- organisationUnits %>%
