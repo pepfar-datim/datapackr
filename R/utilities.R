@@ -470,6 +470,7 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1)
            "2021" = cop21_map_DataPack_DATIM_DEs_COCs,
            "2022" = cop22_map_DataPack_DATIM_DEs_COCs,
            "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
+           "2024" = cop24_map_DataPack_DATIM_DEs_COCs,
            stop("Invalid COP Year"))
     }
 
@@ -478,6 +479,7 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1)
                          "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
                          "2022" = datapackr::cop22_map_adorn_import_file,
                          "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
+                         "2024" = cop24_map_DataPack_DATIM_DEs_COCs,
                          stop("Invalid COP Year"))
   }
 

@@ -1002,6 +1002,19 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
 
   }
 
+  #TODO modify to COP24
+  if (d$info$cop_year == "2024") {
+
+    critical_columns <- getCriticalColumns()
+
+    formulas_schema <- formulas_schema %>%
+      dplyr::left_join(critical_columns, by = c("sheet_name", "col")) %>%
+      dplyr::mutate(critical = dplyr::case_when(is.na(critical) ~ "N",
+                                                TRUE ~ critical)) %>%
+      dplyr::select(-col)
+
+  }
+
   formulas_schema %<>% dplyr::select(sheet_num, sheet_name, indicator_code, fx_schema = formula,
                                      critical)
   # Pull in formulas from Data Pack sheet
