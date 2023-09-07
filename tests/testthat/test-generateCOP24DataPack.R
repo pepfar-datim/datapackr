@@ -27,7 +27,7 @@ with_mock_api({
                   country_uids = unlist(pick$country_uids[1]),
                   template_path = template_path,
                   cop_year = 2024,
-                  output_folder = "/Users/faustolopezbao/Desktop",#output_folder,
+                  output_folder = output_folder,
                   results_archive = FALSE,
                   expand_formulas = TRUE,
                   spectrum_data = spectrum_data,
