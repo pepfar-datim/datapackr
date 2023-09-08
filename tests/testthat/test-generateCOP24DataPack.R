@@ -130,7 +130,8 @@ with_mock_api({
       df %>%
         dplyr::select(PSNU) %>%
         dplyr::distinct() %>%
-        dplyr::mutate(psnu_uid = stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
+        dplyr::mutate(psnu_uid =
+                        stringr::str_extract(PSNU, "(?<=(\\(|\\[))([A-Za-z][A-Za-z0-9]{10})(?=(\\)|\\])$)")) %>%
         dplyr::arrange(PSNU)
     }
 
