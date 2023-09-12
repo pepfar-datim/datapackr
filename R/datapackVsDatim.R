@@ -164,7 +164,8 @@ if (d$info$cop_year == 2022) {
 
     if (!is.null(datim_data))  {
       datim_data %<>%
-        dplyr::filter(value != 0) %>% # we don't import 0s up front so we should ignore any here
+        dplyr::filter(value != 0) %>% # we don't import 0s up front so we should ignore any here THIS ONE
+        # Commenting out the above does return 0's in the deletes section which is what we want for opus?
         dplyr::filter(value != "") %>%
         dplyr::rename(datim_value = value)
 
