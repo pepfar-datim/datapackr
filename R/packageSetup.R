@@ -331,7 +331,7 @@ pick_template_path <- function(cop_year, tool) {
 
   }
 
-  if (tool %in% c("PSNUxIM Tool", "PSNUxIM Tool Template")) {
+  if (tool %in% c("PSNUxIM", "PSNUxIM Template")) {
     template_filename <- switch(as.character(cop_year),
                                 "2023" = "COP23_PSNUxIM_Template.xlsx",
                                 "2024" = "COP24_PSNUxIM_Template.xlsx",
