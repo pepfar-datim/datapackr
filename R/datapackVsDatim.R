@@ -164,10 +164,15 @@ if (d$info$cop_year == 2022) {
 
     if (!is.null(datim_data))  {
       datim_data %<>%
-        dplyr::filter(value != 0) %>% # we don't import 0s up front so we should ignore any here THIS ONE
-        # Commenting out the above does return 0's in the deletes section which is what we want for opus?
-        dplyr::filter(value != "") %>%
-        dplyr::rename(datim_value = value)
+        if (d$info$tool == "OPU Data Pack") {
+          # We DO import 0s up front
+          dplyr::filter(value != "") %>%
+          dplyr::rename(datim_value = value)
+        } else {
+          dplyr::filter(value != 0) %>% # we don't import 0s up front so we should ignore any here THIS ONE
+          dplyr::filter(value != "") %>%
+          dplyr::rename(datim_value = value)
+        }
 
     #Ignore SUBNATT/IMPATT if we are dealing with a standalone OPU
     if (is.null(d$data$SUBNAT_IMPATT)) {
