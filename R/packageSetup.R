@@ -21,8 +21,8 @@ datapackrSupports <- function() {
     "OPU Data Pack", c(2021, 2022, 2023), c("OPU"),
     "Data Pack Template", c(2021, 2022, 2023, 2024), c("COP", "OPU"),
     "OPU Data Pack Template", c(2021, 2022, 2023), c("OPU"),
-    "PSNUxIM Tool", c(2023, 2024), c("COP", "OPU"),
-    "PSNUxIM Tool Template", c(2023, 2024), c("COP", "OPU"))
+    "PSNUxIM", c(2023, 2024), c("COP", "OPU"),
+    "PSNUxIM Template", c(2023, 2024), c("COP", "OPU"))
 }
 
 
@@ -194,7 +194,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year) {
 
     skip$schema <- skip$pack[skip$pack %in% skip$unpack]
 
-  } else if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM Tool", "PSNUxIM Tool Template") &&
+  } else if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM", "PSNUxIM Template") &&
              cop_year %in% c(2021, 2022, 2023, 2024)) {
     skip$pack <- c("Home")
     skip$unpack <- c("Home")
@@ -277,7 +277,7 @@ pick_schema <- function(cop_year, tool) {
                      "2024" =  cop24_data_pack_schema,
                      stop("Data Pack schema not available for the COP year provided."))
 
-  } else if (tool %in% c("PSNUxIM Tool", "PSNUxIM Tool Template")) {
+  } else if (tool %in% c("PSNUxIM", "PSNUxIM Template")) {
     schema <- switch(as.character(cop_year),
                      "2023" =  cop23_psnuxim_schema,
                      "2024" =  cop24_psnuxim_schema,
