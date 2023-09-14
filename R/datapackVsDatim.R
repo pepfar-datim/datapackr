@@ -166,7 +166,7 @@ if (d$info$cop_year == 2022) {
       datim_data %<>%
         if (d$info$tool == "OPU Data Pack") {
           # We DO import 0s up front
-          dplyr::filter(value != "") %>%
+          dplyr::filter(value != "") %>% #Do we need to keep these too?
           dplyr::rename(datim_value = value)
         } else {
           dplyr::filter(value != 0) %>% # we don't import 0s up front so we should ignore any here THIS ONE
