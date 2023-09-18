@@ -169,18 +169,6 @@ if (d$info$cop_year == 2022) {
         dplyr::filter(value != "") %>%
         dplyr::rename(datim_value = value)
 
-      # datim_data %<>%
-      #   #Not sure if this ifelse is actually needed, but safer solution.
-      #   if (d$info$tool == "OPU Data Pack") {
-      #     # We DO import 0s up front
-      #     dplyr::filter(value != "") %>% #Do we need to keep these too?
-      #     dplyr::rename(datim_value = value)
-      #   } else {
-      #     dplyr::filter(value != 0) %>% # we don't import 0s up front so we should ignore any here THIS ONE
-      #     dplyr::filter(value != "") %>%
-      #     dplyr::rename(datim_value = value)
-      #   }
-
     #Ignore SUBNATT/IMPATT if we are dealing with a standalone OPU
     if (is.null(d$data$SUBNAT_IMPATT)) {
 
