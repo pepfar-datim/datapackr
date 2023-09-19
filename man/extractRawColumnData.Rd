@@ -7,7 +7,9 @@
 extractRawColumnData(d, sheet, cols)
 }
 \arguments{
-\item{sheet}{Name of the sheet}
+\item{d}{Datapackr sidecar object}
+
+\item{sheet}{String. Name of sheet/tab within tool.}
 
 \item{cols}{Name of the columns to extract. PSNU is mandatory}
 }

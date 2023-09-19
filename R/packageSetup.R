@@ -159,7 +159,17 @@ dataPackName_homeCell <- function() {
 #'
 #' @return List of tab names to skip.
 #'
-skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
+skip_tabs <- function(tool = "Data Pack", cop_year) {
+
+  # Check/Fill in parameters ####
+  params <- check_params(cop_year = cop_year,
+                         tool = tool)
+
+  for (p in names(params)) {
+    assign(p, purrr::pluck(params, p))
+  }
+
+  rm(params, p)
 
   skip <- list("pack" = c(NA_character_),
                "unpack" = c(NA_character_),
@@ -203,7 +213,17 @@ skip_tabs <- function(tool = "Data Pack", cop_year = getCurrentCOPYear()) {
 #'
 #' @return Header row
 #'
-headerRow <- function(tool, cop_year = getCurrentCOPYear()) {
+headerRow <- function(tool, cop_year) {
+
+  # Check/Fill in parameters ####
+  params <- check_params(cop_year = cop_year,
+                         tool = tool)
+
+  for (p in names(params)) {
+    assign(p, purrr::pluck(params, p))
+  }
+
+  rm(params, p)
 
   #Currently all tools use row 14 as the header.
   if (cop_year %in% c(2021, 2022, 2023, 2024)) {
@@ -260,7 +280,7 @@ pick_schema <- function(cop_year, tool) {
   } else if (tool %in% c("PSNUxIM", "PSNUxIM Template")) {
     schema <- switch(as.character(cop_year),
                      "2023" =  cop23_psnuxim_schema,
-                     #"2024" =  cop24_psnuxim_schema,
+                     "2024" =  cop24_psnuxim_schema,
                      stop("PSNUxIM schema not available for the COP year provided."))
   } else {
     stop("No schema could be found for the combination of tool and COP year provided.")
@@ -314,7 +334,7 @@ pick_template_path <- function(cop_year, tool) {
   if (tool %in% c("PSNUxIM", "PSNUxIM Template")) {
     template_filename <- switch(as.character(cop_year),
                                 "2023" = "COP23_PSNUxIM_Template.xlsx",
-                                #"2024" = "COP24_PSNUxIM_Template.xlsx",
+                                "2024" = "COP24_PSNUxIM_Template.xlsx",
                                 NULL)
 
   }
@@ -403,6 +423,8 @@ pick_template_path <- function(cop_year, tool) {
 #' as a column in the output.
 #' @param remove_empty_columns Should empty columns be removed from memos?
 #' @param spectrum_data Spectrum output, as a dataframe.
+#' @param sheet String. Name of sheet/tab within tool.
+#' @param sheets Character vector. Names of sheets/tabs within tool.
 #' @param ... Additional arguments to pass.
 #'
 #' @family parameter-helpers
@@ -444,6 +466,8 @@ datapackr_params <- function(model_data,
                              include_no_prio,
                              remove_empty_columns,
                              spectrum_data,
+                             sheet,
+                             sheets,
                              ...) {
 
   # This function should return something

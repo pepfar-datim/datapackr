@@ -9,6 +9,8 @@ unPackSheets(d, sheets = NULL, check_sheets = TRUE, separate_datasets = TRUE)
 \arguments{
 \item{d}{Datapackr sidecar object}
 
+\item{sheets}{Character vector. Names of sheets/tabs within tool.}
+
 \item{check_sheets}{Logical. Should sheet data be validated?}
 
 \item{separate_datasets}{Logical. Should datasets be separated?}

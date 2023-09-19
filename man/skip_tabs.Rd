@@ -4,7 +4,7 @@
 \alias{skip_tabs}
 \title{List of tabs to skip for given tool.}
 \usage{
-skip_tabs(tool = "Data Pack", cop_year = getCurrentCOPYear())
+skip_tabs(tool = "Data Pack", cop_year)
 }
 \arguments{
 \item{tool}{"Data Pack", "Data Pack Template".}
