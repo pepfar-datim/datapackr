@@ -74,7 +74,7 @@ compareData_DatapackVsDatim <-
 
 
 # start main processing
-# start off with dedups included
+# start off with dedupes included
 
     if (!(d$info$cop_year %in% supportedCOPYears())) {
       stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
@@ -90,7 +90,7 @@ compareData_DatapackVsDatim <-
       included_data_elements <- included_data_elements %>%
         dplyr::filter(dataset != "dreams")
     }
-
+#I'm not convinced this chunk is being executed.
     included_data_elements %>%
       dplyr::mutate(dataset = dplyr::case_when(dataset == "impatt" ~ "subnat_targets",
                                                dataset == "mer" ~ "mer_targets",
@@ -138,7 +138,7 @@ compareData_DatapackVsDatim <-
         datapack_value = value) %>%
       dplyr::filter(datapack_value != 0)
 
-# Sum over IM including dedup
+# Sum over IM including dedupe
     datapack_data_psnu <- dplyr::group_by(datapack_data,
                                                   dataElement,
                                                   orgUnit,
@@ -186,7 +186,7 @@ if (d$info$cop_year == 2022) {
   }
 
 } else if (d$info$cop_year == 2023) {
-
+#Based on this Idk if the 0's are getting cleaned up.
 if (is.null(datim_data)) {
   datim_data <-
     getCOPDataFromDATIM(country_uids = d$info$country_uids,
@@ -199,6 +199,7 @@ if (is.null(datim_data)) {
   if (!is.null(datim_data)) {
     datim_data %<>%
       dplyr::filter(value != "") %>%
+      #MIGHT NEED TO FILTER 0 here?
       dplyr::rename(datim_value = value)
 
     #Ignore SUBNATT/IMPATT if we are dealing with a standalone OPU
@@ -276,6 +277,12 @@ if (is.null(datim_data)) {
 
     data_psnu %<>% .compare_beautify(cop_year = d$info$cop_year,
                                      d2_session = d2_session) %>% dplyr::select(-effect)
+
+    #FIX the 0's not being deleted renames datim_value into value
+    data_datim_only <- data_datim_only %>%
+      dplyr::rename(
+        value = datim_value)
+
 
     list(
       psnu_x_im = data_psnu_x_im,
