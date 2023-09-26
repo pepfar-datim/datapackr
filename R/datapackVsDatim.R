@@ -73,7 +73,6 @@ compareData_DatapackVsDatim <-
            datastreams = c("mer_targets", "subnat_targets", "impatt")) {
 
 
-
 # start main processing
 # start off with dedups included
 
@@ -84,18 +83,21 @@ compareData_DatapackVsDatim <-
 
     included_data_elements <- getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
       dplyr::select(dataelementuid, dataset) %>%
-      dplyr::distinct() %>%
-      dplyr::mutate(dataset = dplyr::case_when(dataset == "impatt" ~ "subnat_targets",
-                                               dataset == "mer" ~ "mer_targets",
-                                               dataset == "subnat" ~ "subnat_targets",
-                                               TRUE ~ dataset)) %>%
-      dplyr::filter(dataset %in% datastreams)
+      dplyr::distinct()
 
     # Do not consider AGYW_PREV if this is a OPU Data Pack aka PSNUxIM
     if (d$info$tool == "OPU Data Pack") {
       included_data_elements <- included_data_elements %>%
         dplyr::filter(dataset != "dreams")
     }
+
+    included_data_elements %>%
+      dplyr::mutate(dataset = dplyr::case_when(dataset == "impatt" ~ "subnat_targets",
+                                               dataset == "mer" ~ "mer_targets",
+                                               dataset == "subnat" ~ "subnat_targets",
+                                               dataset == "dreams" ~ "mer_targets",
+                                               TRUE ~ dataset)) %>%
+      dplyr::filter(dataset %in% datastreams)
 
     datapack_data <- createDATIMExport(d) %>%
       dplyr::filter(dataElement %in% included_data_elements$dataelementuid)

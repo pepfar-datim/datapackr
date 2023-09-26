@@ -108,6 +108,8 @@ saved upon export.}
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}
 
+\item{sheets}{Character vector. Names of sheets/tabs within tool.}
+
 \item{all_sheets}{Logical. Return/check against all sheets (as opposed to only
 those with targets)?}
 

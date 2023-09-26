@@ -16,6 +16,7 @@
 unPackTool <- function(submission_path = NULL,
                        tool = NULL,
                        country_uids = NULL,
+                       season = NULL,
                        cop_year = NULL,
                        pzns = NULL,
                        mer_data = NULL,
@@ -25,6 +26,7 @@ unPackTool <- function(submission_path = NULL,
   d <- loadDataPack(submission_path = submission_path,
                     tool = tool,
                     country_uids = country_uids,
+                    season = season,
                     cop_year = cop_year,
                     load_wb = FALSE,
                     load_sheets = FALSE,
@@ -35,7 +37,7 @@ unPackTool <- function(submission_path = NULL,
     d <- unPackDataPack(d,
                         d2_session = d2_session)
 
-    if (d$info$cop_year == "2023") {
+    if (d$info$cop_year %in% c("2023", "2024")) {
       d <- unpackYear2Sheet(d)
     }
 

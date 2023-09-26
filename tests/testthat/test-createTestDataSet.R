@@ -1,5 +1,5 @@
-context("test-checkColStructure")
-
+context("test-checkTestDataSet")
+with_mock_api({
 test_that("Can create test data...", {
   testthat::skip("Creating test data is broken for 2022-2023.")
   c_year <- 2022
@@ -13,7 +13,6 @@ test_that("Can create test data...", {
       createTestDataset(country_uids = c_uids, cop_year = cop_year),
       "Not yet set up to produce a test dataset for that COP Year."
     )
-  })
 
   # test can return for year 2021
   output_columns <- c("orgUnit", "dataElement", "categoryOptionCombo",
@@ -58,5 +57,7 @@ test_that("Can create test data...", {
     dplyr::distinct()
   testthat::expect_true(unique(org_units$orgUnit %in% res$orgUnit))
 
+
+  })
 
 })

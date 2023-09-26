@@ -42,5 +42,7 @@ updatePSNUxIMTargetValues <- function(d) {
 
   d$tool$wb <- wb
 
+  d <- strip_wb_NAs(d)
+
   d
 }

@@ -15,6 +15,8 @@ unPackDataPackSheet(
 \arguments{
 \item{d}{Datapackr sidecar object}
 
+\item{sheets}{Character vector. Names of sheets/tabs within tool.}
+
 \item{clean_orgs}{Logical. If TRUE, drops rows with missing or invalid org
 units.}
 
