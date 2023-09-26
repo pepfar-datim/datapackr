@@ -279,9 +279,9 @@ check_tool <- function(tool, season, cop_year) {
 
   # If tool not provided, return default.
   default_cop_tool <- "Data Pack"
-  default_opu_tool <- "OPU Data Pack"
+  default_opu_tool <- "PSNUxIM"
   if (cop_year_provided) {
-    if (cop_year >= 2023) {
+    if (cop_year >= 2022) {
       default_opu_tool <- "PSNUxIM"
     }
   }

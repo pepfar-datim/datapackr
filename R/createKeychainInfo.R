@@ -74,6 +74,11 @@ createKeychainInfo <- function(submission_path = NULL,
                                              "Target Setting Tool",
                                              "Data Pack")
 
+  #OPU Datapacks are really just PSNUxIM Tools
+  tool_metadata$tool <- stringr::str_replace(tool_metadata$tool,
+                                             "OPU Data Pack",
+                                             "PSNUxIM")
+
   # Is this even a DataPack tool? ----
   if (!tool_metadata$cop_year[1] %in% supportedCOPYears()
         || !tool_metadata$tool[1] %in% supportedTools()) {
@@ -94,7 +99,8 @@ createKeychainInfo <- function(submission_path = NULL,
   d$info$tool <- d$info$tool %||% tool_metadata$tool
 
   if (d$info$tool != tool_metadata$tool) {
-    stop("The file submitted does not seem to match the tool type you've specified.")
+    #Warn and try and proceed
+    warning("The file submitted does not seem to match the tool type you've specified.")
   }
 
   d$info$tool %<>% check_tool()

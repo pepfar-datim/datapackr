@@ -18,10 +18,10 @@ datapackrSupports <- function() {
   tibble::tribble(
     ~tools, ~yrs, ~seasons,
     "Data Pack", c(2021, 2022, 2023, 2024), c("COP", "OPU"),
-    "OPU Data Pack", c(2021, 2022, 2023), c("OPU"),
+    "OPU Data Pack", c(2021, 2022, 2023), c("OPU", "COP"),
     "Data Pack Template", c(2021, 2022, 2023, 2024), c("COP", "OPU"),
-    "OPU Data Pack Template", c(2021, 2022, 2023), c("OPU"),
-    "PSNUxIM", c(2023, 2024), c("COP", "OPU"),
+    "OPU Data Pack Template", c(2021, 2022, 2023), c("OPU", "COP"),
+    "PSNUxIM", c(2022, 2023, 2024), c("COP", "OPU"),
     "PSNUxIM Template", c(2023, 2024), c("COP", "OPU"))
 }
 
@@ -279,6 +279,7 @@ pick_schema <- function(cop_year, tool) {
 
   } else if (tool %in% c("PSNUxIM", "PSNUxIM Template")) {
     schema <- switch(as.character(cop_year),
+                     "2022" = cop22OPU_data_pack_schema,
                      "2023" =  cop23_psnuxim_schema,
                      "2024" =  cop24_psnuxim_schema,
                      stop("PSNUxIM schema not available for the COP year provided."))
@@ -333,6 +334,7 @@ pick_template_path <- function(cop_year, tool) {
 
   if (tool %in% c("PSNUxIM", "PSNUxIM Template")) {
     template_filename <- switch(as.character(cop_year),
+                                "2022" = "COP22_OPU_Data_Pack_Template.xlsx",
                                 "2023" = "COP23_PSNUxIM_Template.xlsx",
                                 "2024" = "COP24_PSNUxIM_Template.xlsx",
                                 NULL)
