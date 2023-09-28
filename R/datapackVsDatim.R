@@ -91,7 +91,7 @@ compareData_DatapackVsDatim <-
         dplyr::filter(dataset != "dreams")
     }
 #I'm not convinced this chunk is being executed.
-    included_data_elements %>%
+    included_data_elements <- included_data_elements %>%
       dplyr::mutate(dataset = dplyr::case_when(dataset == "impatt" ~ "subnat_targets",
                                                dataset == "mer" ~ "mer_targets",
                                                dataset == "subnat" ~ "subnat_targets",
