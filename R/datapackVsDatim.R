@@ -132,6 +132,9 @@ compareData_DatapackVsDatim <-
                              attributeOptionCombo %in%
                                c("00000", "00001"))
 
+    # Thu Sep 28 21:16:26 2023 ------------------------------
+    # We could just drop dedupes from data_pack data here?
+
     # rename columns to fit standards
     datapack_data <- datapack_data %>%
       dplyr::rename(
