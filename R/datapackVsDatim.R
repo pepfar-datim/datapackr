@@ -81,27 +81,7 @@ compareData_DatapackVsDatim <-
     }
 
 
-
-    included_data_elements <- getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
-      dplyr::select(dataelementuid, dataset) %>%
-      dplyr::distinct()
-
-    # Do not consider AGYW_PREV if this is a OPU Data Pack aka PSNUxIM
-    if (d$info$tool == "OPU Data Pack") {
-      included_data_elements <- included_data_elements %>%
-        dplyr::filter(dataset != "dreams")
-    }
-
-    included_data_elements %>%
-      dplyr::mutate(dataset = dplyr::case_when(dataset == "impatt" ~ "subnat_targets",
-                                               dataset == "mer" ~ "mer_targets",
-                                               dataset == "subnat" ~ "subnat_targets",
-                                               dataset == "dreams" ~ "mer_targets",
-                                               TRUE ~ dataset)) %>%
-      dplyr::filter(dataset %in% datastreams)
-
-    datapack_data <- createDATIMExport(d) %>%
-      dplyr::filter(dataElement %in% included_data_elements$dataelementuid)
+    datapack_data <- createDATIMExport(d)
 
     #Need to make value a numeric
     datapack_data$value <- as.numeric(datapack_data$value)
@@ -174,6 +154,12 @@ compareData_DatapackVsDatim <-
 
       if (!is.null(datim_data)) {
         datim_data %<>% dplyr::rename(datim_value = value)
+        if(d$info$tool == "OPU Data Pack"){
+          ### data in OPUU datapacks muust have a valid Mech or dedupe
+          ### so we do not compare dreams or any other data without mech
+          datim_data <- dplyr::filter(datim_data,
+                                      attributeOptionCombo != "default")
+        }
       }
 
   #There might not be any data in DAITM
@@ -215,7 +201,7 @@ compareData_DatapackVsDatim <-
         orgUnit,
         categoryOptionCombo,
         attributeOptionCombo,
-        datapack_value
+        value = datapack_value
       )
 
     # data in datim but not in the data pack
@@ -228,7 +214,7 @@ compareData_DatapackVsDatim <-
         orgUnit,
         categoryOptionCombo,
         attributeOptionCombo,
-        datim_value
+        valuue = datim_value
       )
 
     data_psnu_x_im %<>% .compare_beautify(cop_year = d$info$cop_year,
