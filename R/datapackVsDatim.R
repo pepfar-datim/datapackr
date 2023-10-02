@@ -137,7 +137,7 @@ compareData_DatapackVsDatim <-
     datapack_data_psnu_x_im <- datapack_data
 
 # Get data from DATIM using data value sets
-    if (is.null(datim_data)){
+    if (is.null(datim_data)) {
       if (d$info$cop_year == 2022 &&
           "subnat_targets" %in% datastreams) {
         datim_data <- dplyr::bind_rows(
@@ -161,7 +161,7 @@ compareData_DatapackVsDatim <-
 
     if (!is.null(datim_data)) {
       datim_data %<>% dplyr::rename(datim_value = value)
-      if(d$info$tool == "OPU Data Pack"){
+      if (d$info$tool == "OPU Data Pack") {
 ### data in OPU datapacks must have a valid Mech or dedupe mech
 ### so we do not compare dreams or any other data without mech
         datim_data <- dplyr::filter(datim_data,
