@@ -72,16 +72,23 @@ compareData_DatapackVsDatim <-
            datim_data = NULL,
            datastreams = c("mer_targets", "subnat_targets", "impatt")) {
 
-
-# start main processing
-# start off with dedups included
-
     if (!(d$info$cop_year %in% supportedCOPYears())) {
       stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
     }
 
+    included_data_elements <- getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
+      dplyr::select(dataelementuid, dataset) %>%
+      dplyr::distinct() %>%
+      dplyr::mutate(dataset = dplyr::case_when(dataset == "impatt" ~ "impatt",
+                                               dataset == "mer" ~ "mer_targets",
+                                               dataset == "subnat" ~ "subnat_targets",
+                                               dataset == "dreams" ~ "mer_targets",
+                                               TRUE ~ dataset)) %>%
+      dplyr::filter(dataset %in% datastreams)
 
-    datapack_data <- createDATIMExport(d)
+
+    datapack_data <- createDATIMExport(d) %>%
+      dplyr::filter(dataElement %in% included_data_elements$dataelementuid)
 
     #Need to make value a numeric
     datapack_data$value <- as.numeric(datapack_data$value)
@@ -122,9 +129,9 @@ compareData_DatapackVsDatim <-
 
 # Sum over IM including dedup
     datapack_data_psnu <- dplyr::group_by(datapack_data,
-                                                  dataElement,
-                                                  orgUnit,
-                                                  categoryOptionCombo) %>%
+                                          dataElement,
+                                          orgUnit,
+                                          categoryOptionCombo) %>%
       dplyr::summarise(datapack_value = sum(datapack_value, na.rm = TRUE), .groups = "drop")
 
     datapack_data_psnu_x_im <- datapack_data
