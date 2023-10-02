@@ -216,7 +216,7 @@ compareData_DatapackVsDatim <-
         orgUnit,
         categoryOptionCombo,
         attributeOptionCombo,
-        valuue = datim_value
+        value = datim_value
       )
 
     data_psnu_x_im %<>% .compare_beautify(cop_year = d$info$cop_year,
