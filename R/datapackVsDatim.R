@@ -115,11 +115,6 @@ compareData_DatapackVsDatim <-
       stop("The column names of your data aren't as expected by compareData_DatapackVsDatim.")
     }
 
-# extract dedupes from import file to handle separately
-    dedupes <-  dplyr::filter(datapack_data,
-                              attributeOptionCombo %in%
-                                c("00000", "00001"))
-
 # rename columns to fit standards
     datapack_data <- datapack_data %>%
       dplyr::rename(
@@ -234,8 +229,7 @@ compareData_DatapackVsDatim <-
       psnu_x_im = data_psnu_x_im,
       psnu = data_psnu,
       updates = data_different_value,
-      deletes = data_datim_only,
-      dedupes = dedupes
+      deletes = data_datim_only
     )
   }
 
