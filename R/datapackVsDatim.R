@@ -137,7 +137,7 @@ compareData_DatapackVsDatim <-
     if (is.null(datim_data)) {
       if (d$info$cop_year == 2022 &&
           "subnat_targets" %in% datastreams &&
-          d$info$tool = "Data Pack") { # Get last year's subnat targets too
+          d$info$tool == "Data Pack") { # Get last year's subnat targets too
         datim_data <- dplyr::bind_rows(
           getCOPDataFromDATIM(country_uids = d$info$country_uids,
                               cop_year = d$info$cop_year,
