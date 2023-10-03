@@ -76,6 +76,7 @@ compareData_DatapackVsDatim <-
       stop("Attempting to use compareData_DatapackVsDatim for unsupported COP year")
     }
 
+# filter to data elements in the stream specified
     included_data_elements <- getMapDataPack_DATIM_DEs_COCs(d$info$cop_year) %>%
       dplyr::select(dataelementuid, dataset) %>%
       dplyr::distinct() %>%
@@ -127,14 +128,16 @@ compareData_DatapackVsDatim <-
                                           dataElement,
                                           orgUnit,
                                           categoryOptionCombo) %>%
-      dplyr::summarise(datapack_value = sum(datapack_value, na.rm = TRUE), .groups = "drop")
+      dplyr::summarise(datapack_value = sum(datapack_value, na.rm = TRUE),
+                       .groups = "drop")
 
     datapack_data_psnu_x_im <- datapack_data
 
 # Get data from DATIM using data value sets
     if (is.null(datim_data)) {
       if (d$info$cop_year == 2022 &&
-          "subnat_targets" %in% datastreams) {
+          "subnat_targets" %in% datastreams &&
+          d$info$tool = "Data Pack") { # Get last year's subnat targets too
         datim_data <- dplyr::bind_rows(
           getCOPDataFromDATIM(country_uids = d$info$country_uids,
                               cop_year = d$info$cop_year,
@@ -176,7 +179,8 @@ compareData_DatapackVsDatim <-
                       dataElement,
                       orgUnit,
                       categoryOptionCombo) %>%
-      dplyr::summarise(datim_value = sum(datim_value), .groups = "drop")
+      dplyr::summarise(datim_value = sum(datim_value),
+                       .groups = "drop")
 
 # get rid of dedups in the data dissagregated by IM
     datim_data_psnu_x_im <- datim_data
@@ -188,8 +192,6 @@ compareData_DatapackVsDatim <-
     data_psnu_x_im <-
       dplyr::full_join(datim_data_psnu_x_im,
                        datapack_data_psnu_x_im)
-
-
 
 # Find the cases with different values. These should be  imported into DATIM
     data_different_value <-
