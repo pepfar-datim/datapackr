@@ -24,7 +24,7 @@ with_mock_api({
 
     compare <- compareData_DatapackVsDatim(d, d2_session = training)
 
-    expect_named(compare, c("psnu_x_im", "psnu", "updates", "deletes", "dedupes"))
+    expect_named(compare, c("psnu_x_im", "psnu", "updates", "deletes"))
 
     diff_names <- c(
       "psnu",
@@ -80,7 +80,7 @@ with_mock_api({
       compare$updates$categoryOptionCombo == "default"))
     #Since this is undistributed data, we should only be dealing with the default mechanism
     expect_true(all(compare$updates$attributeOptionCombo  == "default"))
-    expect_true(inherits(compare$updates$datapack_value, "numeric"))
+    expect_true(inherits(compare$updates$value, "numeric"))
 
     # skip("Remove this after merging with DP-901")
     # #For COP23, there should only be 2023Oct data
