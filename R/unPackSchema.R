@@ -414,8 +414,8 @@ unPackSchema <- function(template_path = NULL,
   #
   # rm(params, p)
 
-  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack")
-        && cop_year %in% c(2021, 2022)) {
+  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM", "PSNUxIM Template")
+        && cop_year %in% c(2021, 2022, 2023, 2024)) {
     include_blank_cells <-  TRUE
   } else {
     include_blank_cells <-  FALSE

@@ -16,6 +16,8 @@ packDataPack(
 
 \item{model_data}{Data from DATIM needed to pack into a COP Data Pack.}
 
+\item{spectrum_data}{Spectrum output, as a dataframe.}
+
 \item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
 authentication with DATIM.}
 }

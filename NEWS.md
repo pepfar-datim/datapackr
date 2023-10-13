@@ -1,3 +1,17 @@
+# datapackr 7.0.2
+
+## New features
+* Opens generation & processing of COP24 Data Packs.
+
+## Bug fixes
+* Corrects formatting of randomized Spectrum data saved in testing files from RData to rds.
+
+## Minor improvements and fixes
+* Exports writeSpectrumData to allow functionalized writing of Spectrum data to Spectrum tab of Data Packs.
+* Updated some minor R package documentation.
+* `compareData_DatapackVsDatim` updated to no longer include a dedupe data frame. This is more in line with the current operations of datim, and will assist with imports.
+
+
 # datapackr 7.0.1
 
 ## New features

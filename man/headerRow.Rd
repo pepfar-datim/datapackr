@@ -4,7 +4,7 @@
 \alias{headerRow}
 \title{Tool to assist with formatting the header rows}
 \usage{
-headerRow(tool, cop_year = getCurrentCOPYear())
+headerRow(tool, cop_year)
 }
 \arguments{
 \item{tool}{"Data Pack", "Data Pack Template",""OPU Data Pack".}

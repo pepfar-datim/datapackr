@@ -1,7 +1,6 @@
 #' Title
 #'
-#' @param d
-#' @param sheet Name of the sheet
+#' @inheritParams datapackr_params
 #' @param cols Name of the columns to extract. PSNU is mandatory
 #' @description In certain situations in the checkAnalytics function, we need to extract raw
 #' data from the DataPack sheets for use in calculations. This

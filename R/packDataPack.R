@@ -57,6 +57,7 @@ packDataPack <- function(d,
   if (!is.null(spectrum_data)) {
     interactive_print("Writing Spectrum data...")
     d$tool$wb <- writeSpectrumData(wb = d$tool$wb,
+                                   cop_year = NULL,
                                    spectrum_data = spectrum_data)
   }
 
