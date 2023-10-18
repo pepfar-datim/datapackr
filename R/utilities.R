@@ -703,6 +703,20 @@ formatSetStrings <- function(vec) {
   paste0(set_strings, collapse = ",")
 }
 
+
+#' @export
+#' @title DHIS2 UID pattern
+#' @md
+#' @description Returns the DHIS2 UID pattern, expressed as a regular expression
+#' in form of a character vector.
+#'
+#' @return DHIS2 UID pattern, expressed as a regular expression in form of a
+#' character vector.
+uid_pattern <- function() {
+  "[[:alpha:]][[:alnum:]]{10}"
+}
+
+
 #' @export
 #' @title Is UID-ish
 #' @md
@@ -717,11 +731,10 @@ formatSetStrings <- function(vec) {
 #' @return A logical vector.
 is_uidish <- function(string, ish = FALSE) {
   if (!ish) {
-    stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")
+    stringr::str_detect(string, paste0("^", uid_pattern(), "$"))
   } else {
-    stringr::str_detect(string, "[[:alpha:]][[:alnum:]]{10}")
+    stringr::str_detect(string, uid_pattern())
   }
-
 }
 
 #' @export
@@ -804,8 +817,8 @@ NULL
 extract_uid <- function(string, bracketed = TRUE) {
 
   pattern <- ifelse(bracketed,
-                    "(?<=\\[)[[:alpha:]][[:alnum:]]{10}(?=\\]$)",
-                    "[[:alpha:]][[:alnum:]]{10}")
+                    paste0("(?<=\\[)", uid_pattern(), "(?=\\]$)"),
+                    uid_pattern())
 
   stringr::str_extract(string, pattern)
 
@@ -815,7 +828,7 @@ extract_uid <- function(string, bracketed = TRUE) {
 #' @rdname extract_uid
 #'
 extract_uid_all <- function(string) {
-  unlist(stringr::str_extract_all(string, "[[:alpha:]][[:alnum:]]{10}"))
+  unlist(stringr::str_extract_all(string, uid_pattern()))
 }
 
 

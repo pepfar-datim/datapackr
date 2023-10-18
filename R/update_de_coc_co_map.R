@@ -44,16 +44,20 @@ update_de_coc_co_map <- function(cop_year = NULL,
   datasets_to_pull <- tibble::tribble(
     ~dataset_uid, ~dataset_name, ~FY, ~targets_results, ~datastream, ~org_unit,
     "dA9C5bL44NX", "FY24 MER Targets", 2024, "targets", "mer", "psnu",
-    "dA9C5bL44NX", "FY25 MER Targets", 2025, "targets", "mer", "psnu",
+    "lHUEzkjkij1", "FY25 MER Targets", 2025, "targets", "mer", "psnu",
+    "lHUEzkjkij1", "FY26 MER Targets", 2026, "targets", "mer", "psnu",
     "vpDd67HlZcT", "FY24 DREAMS Targets", 2024, "targets", "dreams", "dsnu",
-    "vpDd67HlZcT", "FY25 DREAMS Targets", 2025, "targets", "dreams", "dsnu",
+    "tNbhYbrKbnk", "FY25 DREAMS Targets", 2025, "targets", "dreams", "dsnu",
+    "tNbhYbrKbnk", "FY26 DREAMS Targets", 2026, "targets", "dreams", "dsnu",
     # For all FY25 SUBNAT/IMPATT, mimic FY24
-    "kWKJQYP1uT7", "FY25 IMPATT", 2025, "targets", "impatt", "psnu",
+    "jgp20ElKCMD", "FY26 IMPATT", 2026, "targets", "impatt", "psnu",
+    "jgp20ElKCMD", "FY25 IMPATT", 2025, "targets", "impatt", "psnu",
     "kWKJQYP1uT7", "FY24 IMPATT", 2024, "targets", "impatt", "psnu",
+    "CMJtVW4ecLn", "FY26 SUBNAT Targets", 2026, "targets", "subnat", "psnu",
+    "CMJtVW4ecLn", "FY25 SUBNAT Targets", 2025, "targets", "subnat", "psnu",
     # For all FY23 SUBNAT/IMPATT, remap to FY24 disaggs, as these won't go to
     #   DATIM, but must go to PAW alongside FY24.
     "kWKJQYP1uT7", "FY23 IMPATT", 2023, "targets", "impatt", "psnu",
-    "bKSmkDP5YTc", "FY25 SUBNAT Targets", 2025, "targets", "subnat", "psnu",
     "bKSmkDP5YTc", "FY24 SUBNAT Targets", 2024, "targets", "subnat", "psnu",
     "bKSmkDP5YTc", "FY23 SUBNAT Targets", 2023, "targets", "subnat", "psnu",
     # May not be able to map FY22 SUBNAT Results, since these are results instead
@@ -77,6 +81,8 @@ update_de_coc_co_map <- function(cop_year = NULL,
       datasets_to_pull[datasets_to_pull$dataset_uid %in% dataSetUIDs$id, ]
   }
 
+  rm(dataSetUIDs)
+
   # Compile all DATIM code lists ----
   fullCodeList <-
     purrr::map_dfr(
@@ -90,6 +96,8 @@ update_de_coc_co_map <- function(cop_year = NULL,
     dplyr::left_join(datasets_to_pull, by = c("dataset_uid" = "dataset_uid")) %>%
     dplyr::select(-dataset, -dataset_uid, -dataset_name) %>%
     dplyr::distinct()
+
+  rm(datasets_to_pull)
 
   ## Add DATIM periods & FYs to code lists ####
   fullCodeList %<>%
@@ -144,17 +152,17 @@ update_de_coc_co_map <- function(cop_year = NULL,
     dplyr::filter(sheet_name == "Year 2") %>%
 
     ## Handle unique KP & EID data ----
-  # KP
-  tidyr::separate_wider_regex(
-    dataelement_dsd,
-    c(dataelement_dsd = ".*",
-      "\\.\\{KP\\}",
-      dataelement_dsd_KP = ".*"),
-    too_few = "align_start") %>%
+    # KP
+    tidyr::separate_wider_regex(
+      dataelement_dsd,
+      c(dataelement_dsd = ".*",
+        "\\{KP\\}",
+        dataelement_dsd_KP = ".*"),
+      too_few = "align_start") %>%
     tidyr::separate_wider_regex(
       categoryoption_specified,
       c(categoryoption_specified = ".*",
-        "\\.\\{KP\\}",
+        "\\{KP\\}",
         categoryoption_specified_KP = ".*"),
       too_few = "align_start") %>%
 
@@ -177,7 +185,6 @@ update_de_coc_co_map <- function(cop_year = NULL,
   Year2$categoryoption_specified[Year2$categoryoption_specified == ""] <- NA
 
   # Split KP, Age/Sex, EID into separate rows
-
   empty <- list(tibble::tribble(
     ~name, ~id,
     NA_character_, NA_character_))
@@ -204,12 +211,12 @@ update_de_coc_co_map <- function(cop_year = NULL,
                   valid_sexes = empty,
                   valid_kps = empty,
                   indicator_code = paste0(indicator_code, ".EID")) %>%
-    tidyr::separate_longer_delim(categoryoption_specified, ".") %>%
+    tidyr::separate_longer_delim(categoryoption_specified, "/") %>%
     dplyr::mutate(
       indicator_code =
         dplyr::case_when(
-          categoryoption_specified == "J4SQd7SnDi2" ~ paste0(indicator_code, ".2"),
-          categoryoption_specified == "pbXCUjm50XK" ~ paste0(indicator_code, ".12"),
+          categoryoption_specified == "J4SQd7SnDi2.fELDwOVs9TV" ~ paste0(indicator_code, ".2"),
+          categoryoption_specified == "pbXCUjm50XK.fELDwOVs9TV" ~ paste0(indicator_code, ".12"),
           TRUE ~ categoryoption_specified))
 
   ## Recombine
