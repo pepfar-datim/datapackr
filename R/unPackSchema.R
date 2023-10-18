@@ -48,12 +48,17 @@ getSkipSheets <- function(schema, tool, cop_year) {
     names = schema_skip$sheet_name)
 }
 
-uid_pattern <- function() {
-  "[A-Za-z][A-Za-z0-9]{10}"
-}
 multi_uid_pattern <- function() {
-  paste0("^(\\{EID\\})?(", uid_pattern(), ")(\\.((\\{KP\\})?(", uid_pattern(), ")))*$")
-  }
+  tag <- "(\\{(EID|KP)\\})"
+  delim <- "\\."
+  sep <- "/"
+  single <- paste0(uid_pattern(), "(", delim, uid_pattern(), ")*")
+  multi <- paste0(single, "(", sep, single, ")*")
+  tag_block <- paste0(tag, "?", multi)
+  paste0("^",
+            "(", tag_block, ")+",
+         "$")
+}
 
 
 
@@ -195,7 +200,8 @@ checkSchema_DataElementSyntax <- function(schema) {
 
 #' @rdname schema-validations
 checkSchema_COsSyntax <- function(schema) {
-  COs_syntax_invalid <- schema %>%
+
+  schema %>%
     dplyr::filter(col_type %in% c("past", "target", "result")) %>%
     dplyr::select(sheet_name, col, indicator_code, categoryoption_specified) %>%
     dplyr::mutate(
@@ -206,7 +212,6 @@ checkSchema_COsSyntax <- function(schema) {
     #TODO: How to handle situations when the categoryoption_specified is NA?
     dplyr::filter(invalid_COs == TRUE)
 
-  COs_syntax_invalid
 }
 
 #' @rdname schema-validations
