@@ -152,17 +152,17 @@ update_de_coc_co_map <- function(cop_year = NULL,
     dplyr::filter(sheet_name == "Year 2") %>%
 
     ## Handle unique KP & EID data ----
-  # KP
-  tidyr::separate_wider_regex(
-    dataelement_dsd,
-    c(dataelement_dsd = ".*",
-      "\\.\\{KP\\}",
-      dataelement_dsd_KP = ".*"),
-    too_few = "align_start") %>%
+    # KP
+    tidyr::separate_wider_regex(
+      dataelement_dsd,
+      c(dataelement_dsd = ".*",
+        "\\{KP\\}",
+        dataelement_dsd_KP = ".*"),
+      too_few = "align_start") %>%
     tidyr::separate_wider_regex(
       categoryoption_specified,
       c(categoryoption_specified = ".*",
-        "\\.\\{KP\\}",
+        "\\{KP\\}",
         categoryoption_specified_KP = ".*"),
       too_few = "align_start") %>%
 
@@ -185,7 +185,6 @@ update_de_coc_co_map <- function(cop_year = NULL,
   Year2$categoryoption_specified[Year2$categoryoption_specified == ""] <- NA
 
   # Split KP, Age/Sex, EID into separate rows
-
   empty <- list(tibble::tribble(
     ~name, ~id,
     NA_character_, NA_character_))
@@ -212,12 +211,12 @@ update_de_coc_co_map <- function(cop_year = NULL,
                   valid_sexes = empty,
                   valid_kps = empty,
                   indicator_code = paste0(indicator_code, ".EID")) %>%
-    tidyr::separate_longer_delim(categoryoption_specified, ".") %>%
+    tidyr::separate_longer_delim(categoryoption_specified, "/") %>%
     dplyr::mutate(
       indicator_code =
         dplyr::case_when(
-          categoryoption_specified == "J4SQd7SnDi2" ~ paste0(indicator_code, ".2"),
-          categoryoption_specified == "pbXCUjm50XK" ~ paste0(indicator_code, ".12"),
+          categoryoption_specified == "J4SQd7SnDi2.fELDwOVs9TV" ~ paste0(indicator_code, ".2"),
+          categoryoption_specified == "pbXCUjm50XK.fELDwOVs9TV" ~ paste0(indicator_code, ".12"),
           TRUE ~ categoryoption_specified))
 
   ## Recombine
