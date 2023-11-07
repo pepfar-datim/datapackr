@@ -14,7 +14,7 @@ cop22_data_pack_schema <-
     template_path = template_file,
     cop_year = 2022)
 
-waldo::compare(cop22_data_pack_schema, datapackr::cop22_data_pack_schema)
+waldo::compare(datapackr::cop22_data_pack_schema, cop22_data_pack_schema, max_diffs = Inf)
 
 usethis::use_data(cop22_data_pack_schema, overwrite = TRUE, compress = "xz")
 
