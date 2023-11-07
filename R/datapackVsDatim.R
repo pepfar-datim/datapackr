@@ -36,8 +36,8 @@
       effect = dplyr::case_when(
         is.na(datapack_value) ~ "Delete",
         is.na(datim_value) ~ "Create",
-        abs(difference) < 1e-5 ~ "Update",
-        abs(difference) >= 1e-5 ~ "No Change"
+        abs(difference) > 1e-5 ~ "Update",
+        abs(difference) <= 1e-5 ~ "No Change"
       )
     ) %>%
     dplyr::select(tidyselect::any_of(c(
