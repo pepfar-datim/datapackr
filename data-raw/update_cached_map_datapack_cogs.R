@@ -27,6 +27,6 @@ datapack_cogs$COP24 <-
                           "groupSets.id:eq:NRX13fNOP2L",
                           d2_session = d2_default_session)
 
-waldo::compare(datapack_cogs, datapackr::datapack_cogs)
+waldo::compare(datapackr::datapack_cogs, datapack_cogs)
 
 usethis::use_data(datapack_cogs, overwrite = TRUE, compress = "xz")
