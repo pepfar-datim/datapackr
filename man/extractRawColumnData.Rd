@@ -2,7 +2,7 @@
 % Please edit documentation in R/extractRawColumnData.R
 \name{extractRawColumnData}
 \alias{extractRawColumnData}
-\title{Title}
+\title{Title extractRawColumnData}
 \usage{
 extractRawColumnData(d, sheet, cols)
 }
