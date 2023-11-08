@@ -1,4 +1,4 @@
-#' Title
+#' Title extractRawColumnData
 #'
 #' @inheritParams datapackr_params
 #' @param cols Name of the columns to extract. PSNU is mandatory
