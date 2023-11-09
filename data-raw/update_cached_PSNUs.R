@@ -16,7 +16,7 @@ compare_diffs <- datapackr::valid_OrgUnits %>%
   dplyr::full_join(valid_OrgUnits, by = "uid") %>%
   dplyr::filter(is.na(name.x) | is.na(name.y))
 
-waldo::compare(valid_OrgUnits, datapackr::valid_OrgUnits)
+waldo::compare(datapackr::valid_OrgUnits, valid_OrgUnits)
 
 # Overwriting default list with newly created list
 usethis::use_data(valid_OrgUnits,
