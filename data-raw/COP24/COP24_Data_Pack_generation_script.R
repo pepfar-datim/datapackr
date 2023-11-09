@@ -25,7 +25,7 @@ generation_list <- c("Malawi",
                      "Ghana",
                      "Benin")
 
-pick <- datapackr::cop_datapack_countries %>%
+pick <- datapackr::cop24_datapack_countries %>%
   dplyr::filter(datapack_name %in% generation_list)
 
 # test valid org units against cached ####

@@ -513,40 +513,6 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1)
 }
 
 
-
-#' @export
-#' @title Return a data frame of valid organisation units
-#' based on the COP year
-#'
-#' @param cop_year The COP Year
-#'
-#' @return A data frame of organisation units along with their attributes.
-getValidOrgUnits <- function(cop_year = NULL) {
-
-  cop_year <- cop_year %missing% NULL
-
-  if (length(cop_year) != 1L) {
-
-    stop("You must specify a single COP Year!")
-  }
-
-  if (is.na(cop_year) || is.null(cop_year))  {
-
-    stop(paste("COP Year was not specified"))
-  }
-
-  if (!(cop_year %in% supportedCOPYears())) {
-    stop(paste("COP Year", cop_year, "has no valid orgunits."))
-  }
-
-  switch(as.character(cop_year),
-         "2021" = valid_PSNUs,
-         "2022" = valid_PSNUs,
-         "2023" = valid_OrgUnits,
-         "2024" = valid_OrgUnits)
-
-}
-
 #' @export
 #' @title Compile a list ending with different final collapse
 #'

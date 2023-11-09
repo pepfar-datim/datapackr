@@ -10,7 +10,7 @@ cop24_data_pack_schema <-
     template_path = datapack_template_filepath,
     cop_year = 2024)
 
-waldo::compare(datapackr::cop24_data_pack_schema, cop24_data_pack_schema)
+waldo::compare(datapackr::cop24_data_pack_schema, cop24_data_pack_schema, max_diffs = Inf)
 
 checkSchema(schema = cop24_data_pack_schema,
             template_path = datapack_template_filepath,
