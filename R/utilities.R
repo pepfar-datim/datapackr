@@ -324,15 +324,18 @@ getCOPDatasetUids <-  function(cop_year, datastreams) {
         "impatt" = "kWKJQYP1uT7"),
       "2023" = list(
         "mer_targets" =   c("dA9C5bL44NX", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2024
-                            "A2GxohPT9Hw", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY (TARGETS) FY2024
+                            "A2GxohPT9Hw", # MER Target Setting:
+                            #PSNU (Facility and Community Combined) - DoD ONLY (TARGETS) FY2024
                             "vpDd67HlZcT"), # Host Country Targets: DREAMS (USG) FY2024
         "mer_results" = NA,
         "subnat_targets" = "bKSmkDP5YTc",
         "subnat_results" = "fZVvcMSA9mZ",
         "impatt" = "kWKJQYP1uT7"),
       "2022" = list(
-        "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2023
-                            "o71WtN5JrUu", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY (TARGETS) FY2023
+        "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting:
+                            #PSNU (Facility and Community Combined) (TARGETS) FY2023
+                            "o71WtN5JrUu", # MER Target Setting:
+                            #PSNU (Facility and Community Combined) - DoD ONLY (TARGETS) FY2023
                             "vzhO50taykm"), # Host Country Targets: DREAMS (USG) FY2023
         "mer_results" = NA,
         "subnat_targets" = "J4tdiDEi08O",
@@ -340,7 +343,8 @@ getCOPDatasetUids <-  function(cop_year, datastreams) {
         "impatt" = "CxMsvlKepvE"),
       "2021" = list(
         "mer_targets" =   c("YfZot37BbTm", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2022
-                            "cihuwjoY5xP", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY (TARGETS) FY2022
+                            "cihuwjoY5xP", # MER Target Setting:
+                            #PSNU (Facility and Community Combined) - DoD ONLY (TARGETS) FY2022
                             "wvnouBMuLuE"), # Host Country Targets: DREAMS (USG) FY2022),
         "mer_results" = c("BHlhyPmRTUY", # MER Results: Facility Based
                           "HfhTPdnRWES", # MER Results: Community Based
