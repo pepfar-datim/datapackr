@@ -297,6 +297,7 @@ addcols <- function(data, cnames, type = "character") {
 #'
 getCOPDatasetUids <-  function(cop_year, datastreams) {
   # TODO: Need to move this into R/packageSetup.R!
+  # TODO: Reevaluate the need for this function with introduction of update_de_coc_co_map.R
 
   #Datastream validation
   all_datastreams <- c("mer_targets", "mer_results",
@@ -315,32 +316,35 @@ getCOPDatasetUids <-  function(cop_year, datastreams) {
     list(
       "2024" = list(
         #TODO: Update this for COP24 once datasets deployed for COP24
-        "mer_targets" =   c("dA9C5bL44NX", # MER Target Setting: PSNU (Facility and Community Combined)
-                            "A2GxohPT9Hw", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
-                            "vpDd67HlZcT"), # Host Country Targets: DREAMS (USG)
+        "mer_targets" =   c("lHUEzkjkij1", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS)
+                            "tNbhYbrKbnk"), # Host Country Targets: DREAMS (USG)
         "mer_results" = NA,
         "subnat_targets" = "bKSmkDP5YTc",
         "subnat_results" = "fZVvcMSA9mZ",
         "impatt" = "kWKJQYP1uT7"),
       "2023" = list(
-        "mer_targets" =   c("dA9C5bL44NX", # MER Target Setting: PSNU (Facility and Community Combined)
-                            "A2GxohPT9Hw", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
-                            "vpDd67HlZcT"), # Host Country Targets: DREAMS (USG)
+        "mer_targets" =   c("dA9C5bL44NX", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2024
+                            "A2GxohPT9Hw", # MER Target Setting:
+                            #PSNU (Facility and Community Combined) - DoD ONLY (TARGETS) FY2024
+                            "vpDd67HlZcT"), # Host Country Targets: DREAMS (USG) FY2024
         "mer_results" = NA,
         "subnat_targets" = "bKSmkDP5YTc",
         "subnat_results" = "fZVvcMSA9mZ",
         "impatt" = "kWKJQYP1uT7"),
       "2022" = list(
-        "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
-                            "o71WtN5JrUu", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
-                            "vzhO50taykm"), # Host Country Targets: DREAMS (USG)
+        "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting:
+                            #PSNU (Facility and Community Combined) (TARGETS) FY2023
+                            "o71WtN5JrUu", # MER Target Setting:
+                            #PSNU (Facility and Community Combined) - DoD ONLY (TARGETS) FY2023
+                            "vzhO50taykm"), # Host Country Targets: DREAMS (USG) FY2023
         "mer_results" = NA,
         "subnat_targets" = "J4tdiDEi08O",
         "subnat_results" = NA,
         "impatt" = "CxMsvlKepvE"),
       "2021" = list(
-        "mer_targets" =   c("YfZot37BbTm", # MER Target Setting: PSNU (Facility and Community Combined) FY2022
-                            "cihuwjoY5xP", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
+        "mer_targets" =   c("YfZot37BbTm", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2022
+                            "cihuwjoY5xP", # MER Target Setting:
+                            #PSNU (Facility and Community Combined) - DoD ONLY (TARGETS) FY2022
                             "wvnouBMuLuE"), # Host Country Targets: DREAMS (USG) FY2022),
         "mer_results" = c("BHlhyPmRTUY", # MER Results: Facility Based
                           "HfhTPdnRWES", # MER Results: Community Based
