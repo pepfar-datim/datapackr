@@ -546,7 +546,7 @@ unPackSchema <- function(template_path = NULL,
       dplyr::rename(datapack_cog = name) %>%
       tidyr::unnest(cols = categoryOptions) %>%
       dplyr::distinct() %>%
-      ?dplyr::arrange(datapack_cog, name, .locale = "en") %>%
+      dplyr::arrange(datapack_cog, name, .locale = "en") %>%
       dplyr::group_by(datapack_cog) %>%
       tidyr::nest(options = c(name, id))
 
