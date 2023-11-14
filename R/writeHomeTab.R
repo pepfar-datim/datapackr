@@ -53,11 +53,15 @@ writeHomeTab <- function(wb = NULL,
     tool_title <- tool
   }
 
+  pd <- "COP"
+  yr <- cop_year - 2000
+  if (cop_year %in% c(2024)) {
+    pd <- "FY"
+    yr <- yr + 1
+  }
+
   openxlsx::writeData(wb, "Home",
-                      x = paste0("COP",
-                                 stringr::str_sub(cop_year, -2, -1),
-                                 " ",
-                                 tool_title),
+                      x = paste0(pd, yr, " ", tool_title),
                       xy = c(2, 10),
                       colNames = FALSE)
   openxlsx::addStyle(wb, "Home",
