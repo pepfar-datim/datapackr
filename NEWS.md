@@ -1,3 +1,23 @@
+# datapackr 7.0.3
+
+## New features
+* 
+
+## Bug fixes
+* Updated `datapackVSDatim` to be more representative.
+* Updated COP22 schema update script
+* Updated cached map script for cogs for year 2024
+* Fixed `getRDA` for unit tests
+* Updated unit test related to create schema.
+
+## Minor improvements and fixes
+* Added year 2024 to `getHTSModality`
+* Updated `unPackSchema` in how it handles multi uid patterns.
+* Updated `update_de_coc_co_map` for year 2024
+* Added an utility function related to DHIS2 UID's patterns
+* Updated various configuration files
+
+
 # datapackr 7.0.2
 
 ## New features
@@ -9,6 +29,7 @@
 ## Minor improvements and fixes
 * Exports writeSpectrumData to allow functionalized writing of Spectrum data to Spectrum tab of Data Packs.
 * Updated some minor R package documentation.
+* `compareData_DatapackVsDatim` updated to no longer include a dedupe data frame. This is more in line with the current operations of datim, and will assist with imports.
 
 
 # datapackr 7.0.1

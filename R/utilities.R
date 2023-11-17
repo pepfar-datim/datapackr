@@ -297,6 +297,7 @@ addcols <- function(data, cnames, type = "character") {
 #'
 getCOPDatasetUids <-  function(cop_year, datastreams) {
   # TODO: Need to move this into R/packageSetup.R!
+  # TODO: Reevaluate the need for this function with introduction of update_de_coc_co_map.R
 
   #Datastream validation
   all_datastreams <- c("mer_targets", "mer_results",
@@ -315,32 +316,35 @@ getCOPDatasetUids <-  function(cop_year, datastreams) {
     list(
       "2024" = list(
         #TODO: Update this for COP24 once datasets deployed for COP24
-        "mer_targets" =   c("dA9C5bL44NX", # MER Target Setting: PSNU (Facility and Community Combined)
-                            "A2GxohPT9Hw", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
-                            "vpDd67HlZcT"), # Host Country Targets: DREAMS (USG)
+        "mer_targets" =   c("lHUEzkjkij1", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS)
+                            "tNbhYbrKbnk"), # Host Country Targets: DREAMS (USG)
         "mer_results" = NA,
         "subnat_targets" = "bKSmkDP5YTc",
         "subnat_results" = "fZVvcMSA9mZ",
         "impatt" = "kWKJQYP1uT7"),
       "2023" = list(
-        "mer_targets" =   c("dA9C5bL44NX", # MER Target Setting: PSNU (Facility and Community Combined)
-                            "A2GxohPT9Hw", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
-                            "vpDd67HlZcT"), # Host Country Targets: DREAMS (USG)
+        "mer_targets" =   c("dA9C5bL44NX", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2024
+                            "A2GxohPT9Hw", # MER Target Setting:
+                            #PSNU (Facility and Community Combined) - DoD ONLY (TARGETS) FY2024
+                            "vpDd67HlZcT"), # Host Country Targets: DREAMS (USG) FY2024
         "mer_results" = NA,
         "subnat_targets" = "bKSmkDP5YTc",
         "subnat_results" = "fZVvcMSA9mZ",
         "impatt" = "kWKJQYP1uT7"),
       "2022" = list(
-        "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting: PSNU (Facility and Community Combined)
-                            "o71WtN5JrUu", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
-                            "vzhO50taykm"), # Host Country Targets: DREAMS (USG)
+        "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting:
+                            #PSNU (Facility and Community Combined) (TARGETS) FY2023
+                            "o71WtN5JrUu", # MER Target Setting:
+                            #PSNU (Facility and Community Combined) - DoD ONLY (TARGETS) FY2023
+                            "vzhO50taykm"), # Host Country Targets: DREAMS (USG) FY2023
         "mer_results" = NA,
         "subnat_targets" = "J4tdiDEi08O",
         "subnat_results" = NA,
         "impatt" = "CxMsvlKepvE"),
       "2021" = list(
-        "mer_targets" =   c("YfZot37BbTm", # MER Target Setting: PSNU (Facility and Community Combined) FY2022
-                            "cihuwjoY5xP", # MER Target Setting: PSNU (Facility and Community Combined) - DoD ONLY)
+        "mer_targets" =   c("YfZot37BbTm", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2022
+                            "cihuwjoY5xP", # MER Target Setting:
+                            #PSNU (Facility and Community Combined) - DoD ONLY (TARGETS) FY2022
                             "wvnouBMuLuE"), # Host Country Targets: DREAMS (USG) FY2022),
         "mer_results" = c("BHlhyPmRTUY", # MER Results: Facility Based
                           "HfhTPdnRWES", # MER Results: Community Based
@@ -513,40 +517,6 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1)
 }
 
 
-
-#' @export
-#' @title Return a data frame of valid organisation units
-#' based on the COP year
-#'
-#' @param cop_year The COP Year
-#'
-#' @return A data frame of organisation units along with their attributes.
-getValidOrgUnits <- function(cop_year = NULL) {
-
-  cop_year <- cop_year %missing% NULL
-
-  if (length(cop_year) != 1L) {
-
-    stop("You must specify a single COP Year!")
-  }
-
-  if (is.na(cop_year) || is.null(cop_year))  {
-
-    stop(paste("COP Year was not specified"))
-  }
-
-  if (!(cop_year %in% supportedCOPYears())) {
-    stop(paste("COP Year", cop_year, "has no valid orgunits."))
-  }
-
-  switch(as.character(cop_year),
-         "2021" = valid_PSNUs,
-         "2022" = valid_PSNUs,
-         "2023" = valid_OrgUnits,
-         "2024" = valid_OrgUnits)
-
-}
-
 #' @export
 #' @title Compile a list ending with different final collapse
 #'
@@ -703,6 +673,20 @@ formatSetStrings <- function(vec) {
   paste0(set_strings, collapse = ",")
 }
 
+
+#' @export
+#' @title DHIS2 UID pattern
+#' @md
+#' @description Returns the DHIS2 UID pattern, expressed as a regular expression
+#' in form of a character vector.
+#'
+#' @return DHIS2 UID pattern, expressed as a regular expression in form of a
+#' character vector.
+uid_pattern <- function() {
+  "[[:alpha:]][[:alnum:]]{10}"
+}
+
+
 #' @export
 #' @title Is UID-ish
 #' @md
@@ -717,11 +701,10 @@ formatSetStrings <- function(vec) {
 #' @return A logical vector.
 is_uidish <- function(string, ish = FALSE) {
   if (!ish) {
-    stringr::str_detect(string, "^[[:alpha:]][[:alnum:]]{10}$")
+    stringr::str_detect(string, paste0("^", uid_pattern(), "$"))
   } else {
-    stringr::str_detect(string, "[[:alpha:]][[:alnum:]]{10}")
+    stringr::str_detect(string, uid_pattern())
   }
-
 }
 
 #' @export
@@ -804,8 +787,8 @@ NULL
 extract_uid <- function(string, bracketed = TRUE) {
 
   pattern <- ifelse(bracketed,
-                    "(?<=\\[)[[:alpha:]][[:alnum:]]{10}(?=\\]$)",
-                    "[[:alpha:]][[:alnum:]]{10}")
+                    paste0("(?<=\\[)", uid_pattern(), "(?=\\]$)"),
+                    uid_pattern())
 
   stringr::str_extract(string, pattern)
 
@@ -815,7 +798,7 @@ extract_uid <- function(string, bracketed = TRUE) {
 #' @rdname extract_uid
 #'
 extract_uid_all <- function(string) {
-  unlist(stringr::str_extract_all(string, "[[:alpha:]][[:alnum:]]{10}"))
+  unlist(stringr::str_extract_all(string, uid_pattern()))
 }
 
 

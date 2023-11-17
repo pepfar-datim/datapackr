@@ -20,3 +20,6 @@ Looks inside submitted Data Pack to extract SNU x IM data from
     structural or data anomalies and print any issues into running Warning
     Message queue.
 }
+\note{
+Internal functions are located in the separate unPackSNUxIM_API.R file
+}

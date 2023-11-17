@@ -8,9 +8,12 @@ unPackHomeTabMetadata <- function(submission_path)  {
     col_types = "text",
     trim_ws = TRUE) %>%
     dplyr::mutate(
-      cop_year = stringr::str_extract(home_cell, "COP\\d{2}"),
-      cop_year = as.numeric(stringr::str_replace(cop_year, "COP", "20")),
-      tool = stringr::str_extract(home_cell, "OPU Data Pack|Data Pack|Target Setting Tool|PSNUxIM"))
+      cop_year = as.numeric(stringr::str_extract(home_cell, "(?<=(FY|COP))\\d{2}")),
+      cop_year = dplyr::case_when(
+        stringr::str_detect(home_cell, "^FY\\d{2}") ~ cop_year + 2000 - 1,
+        TRUE ~ cop_year + 2000),
+      tool = stringr::str_extract(home_cell, "OPU Data Pack|Data Pack|Target Setting Tool|PSNUxIM"),
+      tool = stringr::str_replace(tool, "Target Setting Tool", "Data Pack"))
 }
 
 

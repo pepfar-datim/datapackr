@@ -160,6 +160,8 @@ test_that("Can get columns to keep", {
   cols_to_keep <- getColumnsToKeep(d, sheet = "PSNUxIM")
   expect_setequal(names(cols_to_keep), names(cop22OPU_data_pack_schema))
 })
+
+
 with_mock_api({
 test_that("Can detect missing right side formulas", {
 
@@ -266,8 +268,6 @@ test_that("Can drop invalid mechanism columns", {
 
 })
 
-
-
 test_that("Can flag invalid disaggs in PSNUxIM", {
 
   d <- list()
@@ -322,7 +322,6 @@ test_that("Do not  flag valid  disaggs in PSNUxIM", {
 
 })
 
-
 test_that("Can identify non-numeric values in PSNUxIM", {
 
   d <- list()
@@ -338,5 +337,568 @@ test_that("Can identify non-numeric values in PSNUxIM", {
   expect_setequal(d$tests$non_numeric_psnuxim_values$columns, c("B", "C"))
   expect_equal("1", d$tests$non_numeric_psnuxim_values$rows[which(d$tests$non_numeric_psnuxim_values == "B")])
   expect_equal("1:2", d$tests$non_numeric_psnuxim_values$rows[which(d$tests$non_numeric_psnuxim_values == "C")])
+
+})
+
+test_that("Can identify and add missing dedupe columns", {
+  d <- list()
+  d$info$tool <- "Data Pack"
+  d$info$messages <- MessageQueue()
+  test_data <- data.frame(foo = c(1L, 1L), bar = c(3L, 3L))
+  d$data$SNUxIM <- test_data
+  names(d$data$SNUxIM) <- c("foo", "bar")
+  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  cols_to_keep <- getColumnsToKeep(d, sheet = "PSNUxIM")
+  d <- testMissingDedupeRollupColumns(d, cols_to_keep)
+  expect_setequal(
+    names(d$data$SNUxIM),
+    c(
+      "foo",
+      "bar",
+      "Total Deduplicated Rollup",
+      "Deduplicated DSD Rollup",
+      "Deduplicated TA Rollup",
+      "Not PEPFAR"
+    )
+  )
+
+})
+
+test_that("Can identify negative mechanism target values", {
+
+
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  d$data$SNUxIM <- tibble::tribble(
+    ~"PSNU", ~"indicator_code", ~"Age", ~"Sex", ~"KeyPop", ~"9999_DSD",
+    "abc123", "HTS_TST.KP.Neg.T", NA, NA, "PWID", -10,
+    "abc123", "HTS_TST.KP.Pos.T", NA, NA, "PWID", 10
+  )
+
+  header_cols <- data.frame(indicator_code = c("PSNU"))
+
+  d <- testNegativeTargetValues(d,  header_cols)
+  expect_true(is.data.frame(d$test$negative_IM_targets))
+  expect_equal(NROW(d$tests$negative_IM_targets), 1L)
+  expect_true(d$info$has_error)
+  expect_true(grepl("9999_DSD", d$info$messages$message))
+
+  #Note that this function remove negative targets, but does not remove the row
+  ref <- tibble::tribble(
+    ~"PSNU", ~"indicator_code", ~"Age", ~"Sex", ~"KeyPop", ~"9999_DSD",
+    "abc123", "HTS_TST.KP.Neg.T", NA, NA, "PWID", NA,
+    "abc123", "HTS_TST.KP.Pos.T", NA, NA, "PWID", 10
+  )
+  expect_identical(d$data$SNUxIM, ref)
+
+
+})
+
+test_that(
+  "Can recalculate dedupe values",
+  {
+    d <- list()
+    d$info$messages <- MessageQueue()
+    d$info$has_error <- FALSE
+    df <- tibble::tribble(
+      ~ "PSNU",
+      ~ "indicator_code",
+      ~ "Age",
+      ~ "Sex",
+      ~ "KeyPop",
+      ~ "1234_DSD",
+      ~ "1234_TA",
+      ~ "9999_DSD",
+      ~ "9999_TA",
+      ~ "Total Deduplicated Rollup",
+      ~ "Deduplicated DSD Rollup",
+      ~ "Deduplicated TA Rollup",
+      "abc123",
+      "HTS_TST.KP.Neg.T",
+      NA,
+      NA,
+      "PWID",
+      10,
+      20,
+      30,
+      40,
+      100,
+      40,
+      60
+    )
+
+
+  d$data$SNUxIM <- df
+  d <- recalculateDedupeValues(d)
+  #Simple case with DSD and TA correspoding to SUM or zero dedupe
+  expect_equal(d$data$SNUxIM$`MAX - TA`, 40)
+  expect_equal(d$data$SNUxIM$`MAX - DSD`, 30)
+  expect_equal(d$data$SNUxIM$`TA Duplicated Rollup`, 60)
+  expect_equal(d$data$SNUxIM$`DSD Duplicated Rollup`, 40)
+  expect_equal(d$data$SNUxIM$`SUM - Crosswalk Total`, 100)
+  expect_equal(d$data$SNUxIM$`MAX - Crosswalk Total`, 60)
+  expect_equal(d$data$SNUxIM$`DSD Dedupe`, 0)
+  expect_equal(d$data$SNUxIM$`TA Dedupe`, 0)
+  expect_equal(d$data$SNUxIM$`Crosswalk Dedupe`, 0)
+
+  #Mechanisms 1234 values should be deduped out in this case
+  #There is no DSD-TA crosswalk dedupe here.
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "1234_TA",
+    ~ "9999_DSD",
+    ~ "9999_TA",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10,
+    20,
+    30,
+    40,
+    70,
+    30,
+    40
+  )
+
+  d$data$SNUxIM <- df
+  d <- recalculateDedupeValues(d)
+  expect_equal(d$data$SNUxIM$`MAX - TA`, 40)
+  expect_equal(d$data$SNUxIM$`MAX - DSD`, 30)
+  expect_equal(d$data$SNUxIM$`TA Duplicated Rollup`, 60)
+  expect_equal(d$data$SNUxIM$`DSD Duplicated Rollup`, 40)
+  expect_equal(d$data$SNUxIM$`SUM - Crosswalk Total`, 70)
+  expect_equal(d$data$SNUxIM$`MAX - Crosswalk Total`, 40)
+  expect_equal(d$data$SNUxIM$`DSD Dedupe`, -10)
+  expect_equal(d$data$SNUxIM$`TA Dedupe`, -20)
+  expect_equal(d$data$SNUxIM$`Crosswalk Dedupe`, 0)
+
+  #Complete overlap between DSD and TA. TA should get deduped out completely
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "1234_TA",
+    ~ "9999_DSD",
+    ~ "9999_TA",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10,
+    20,
+    30,
+    40,
+    40,
+    40,
+    40
+  )
+
+  d$data$SNUxIM <- df
+  d <- recalculateDedupeValues(d)
+  expect_equal(d$data$SNUxIM$`MAX - TA`, 40)
+  expect_equal(d$data$SNUxIM$`MAX - DSD`, 30)
+  expect_equal(d$data$SNUxIM$`TA Duplicated Rollup`, 60)
+  expect_equal(d$data$SNUxIM$`DSD Duplicated Rollup`, 40)
+  expect_equal(d$data$SNUxIM$`SUM - Crosswalk Total`, 80)
+  expect_equal(d$data$SNUxIM$`MAX - Crosswalk Total`, 40)
+  expect_equal(d$data$SNUxIM$`DSD Dedupe`, 0)
+  expect_equal(d$data$SNUxIM$`TA Dedupe`, -20)
+  expect_equal(d$data$SNUxIM$`Crosswalk Dedupe`, -40)
+
+})
+
+test_that("Can check invalid dedupe values", {
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  cols_to_keep <- getColumnsToKeep(d, "PSNUxIM")
+  header_cols <- getHeaderColumns(cols_to_keep, sheet)
+
+  #In this case, the Deduplicated DSD Rollup is impossible. It must be at
+  #at least 30. There is no problem with the total, since it is less
+  #Than or equal to the max of all values, but it is impossible
+  #to have less than 30 DSD and less than 40 TA.
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "1234_TA",
+    ~ "9999_DSD",
+    ~ "9999_TA",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10,
+    20,
+    30,
+    40,
+    40,
+    20,
+    20
+  )
+
+  d$data$SNUxIM <- df
+  d <- recalculateDedupeValues(d)
+
+  expect_equal(d$data$SNUxIM$`MAX - TA`, 40)
+  expect_equal(d$data$SNUxIM$`MAX - DSD`, 30)
+  expect_equal(d$data$SNUxIM$`TA Duplicated Rollup`, 60)
+  expect_equal(d$data$SNUxIM$`DSD Duplicated Rollup`, 40)
+  expect_equal(d$data$SNUxIM$`SUM - Crosswalk Total`, 40)
+  expect_equal(d$data$SNUxIM$`MAX - Crosswalk Total`, 20)
+  expect_equal(d$data$SNUxIM$`DSD Dedupe`, -20)
+  expect_equal(d$data$SNUxIM$`TA Dedupe`, -40)
+  expect_equal(d$data$SNUxIM$`Crosswalk Dedupe`, 0)
+
+  d <- testInvalidDedupeValues(d, header_cols)
+
+  expect_true(d$tests$dedupes_outside_range$`issues.Deduplicated DSD Rollup`)
+  expect_true(d$tests$dedupes_outside_range$`issues.Deduplicated TA Rollup`)
+  expect_false(d$tests$dedupes_outside_range$`issues.Total Deduplicated Rollup`)
+
+})
+
+test_that("Can recalculate initial dedupe values", {
+
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "1234_TA",
+    ~ "9999_DSD",
+    ~ "9999_TA",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10,
+    20,
+    30,
+    40,
+    100,
+    40,
+    60
+  )
+
+  d$data$SNUxIM <- df
+  d <- recalculateDedupeValues(d)
+  #Simple case with DSD and TA correspoding to SUM or zero dedupe
+  expect_equal(d$data$SNUxIM$`MAX - TA`, 40)
+  expect_equal(d$data$SNUxIM$`MAX - DSD`, 30)
+  expect_equal(d$data$SNUxIM$`TA Duplicated Rollup`, 60)
+  expect_equal(d$data$SNUxIM$`DSD Duplicated Rollup`, 40)
+  expect_equal(d$data$SNUxIM$`SUM - Crosswalk Total`, 100)
+  expect_equal(d$data$SNUxIM$`MAX - Crosswalk Total`, 60)
+  expect_equal(d$data$SNUxIM$`DSD Dedupe`, 0)
+  expect_equal(d$data$SNUxIM$`TA Dedupe`, 0)
+  expect_equal(d$data$SNUxIM$`Crosswalk Dedupe`, 0)
+
+
+})
+
+test_that("Can identify invalid PSNUs", {
+
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$country_uids <- "cDGPF739ZZr"
+  d$info$cop_year <- 2023
+
+  #Looks OK, but the UID is not correct for Joburg
+  d$data$SNUxIM <- tibble::tribble(
+    ~"PSNU", ~"psnuid",
+    "ec Oliver Tambo District Municipality [us2FGzlnk8l]", "us2FGzlnk8l",
+    "gp City of Johannesburg Metropolitan Municipality [NXV5m5fAdaI]", "NXV5m5fAdaI"
+  )
+
+  d <- testInvalidPSNUs(d)
+  expect_true(inherits(d$tests$invalid_psnus, "data.frame"))
+  expect_setequal(names(d$tests$invalid_psnus), c("PSNU"))
+  expect_equal(NROW(d$tests$invalid_psnus), 1L)
+
+})
+
+test_that("Can recalculate final dedupe values", {
+  ## If only 1 DSD mechanism or only 1 TA mechanism (1 mech total):
+  ##   - Do not import any dedupes (Dedupe = NA_real_)
+
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "psnuid",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "1234_TA",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10, #1234_DSD
+    20, #1234_TA
+    30, #Total
+    30, #DSD Total
+    NA #TA Total
+  )
+
+  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  cols_to_keep <- getColumnsToKeep(d, "PSNUxIM")
+  header_cols <- getHeaderColumns(cols_to_keep, sheet)
+  d$data$SNUxIM <- df
+
+  d <- recalculateDedupeValues(d)
+
+  d$data$SNUxIM %<>%
+    tidyr::gather(key = "mechCode_supportType",
+                  value = "value",
+                  -tidyselect::all_of(c(header_cols$indicator_code, "psnuid"))) %>%
+    dplyr::select(dplyr::all_of(header_cols$indicator_code), psnuid,
+                  mechCode_supportType, value) %>%
+    tidyr::drop_na(value)
+
+  d <- calculateFinalDedupeValues(d, header_cols)
+
+  expect_true(!all(grepl("^(TA Dedupe)$", d$data$SNUxIM$mechCode_supportType)))
+  expect_true(!all(grepl("^(DSD Dedupe)$", d$data$SNUxIM$mechCode_supportType)))
+  expect_true(d$data$SNUxIM[[which(d$data$SNUxIM$mechCode_supportType == "Crosswalk Dedupe"), "value"]] == 0)
+
+
+  ## If only 1 DSD mech and only 1 TA mech (2 mechs total):
+  ##   - Import Crosswalk Dedupe, whether 0 or <0
+  ##   - Do not import any DSD or TA Dedupes (NA_real_)
+
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "psnuid",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "9999_TA",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10, #1234_DSD
+    40, #9999_TA
+    50, #Total
+    10, #DSD Total
+    40 #TA Total
+  )
+
+  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  cols_to_keep <- getColumnsToKeep(d, "PSNUxIM")
+  header_cols <- getHeaderColumns(cols_to_keep, sheet)
+  d$data$SNUxIM <- df
+
+  d <- recalculateDedupeValues(d)
+
+  d$data$SNUxIM %<>%
+    tidyr::gather(key = "mechCode_supportType",
+                  value = "value",
+                  -tidyselect::all_of(c(header_cols$indicator_code, "psnuid"))) %>%
+    dplyr::select(dplyr::all_of(header_cols$indicator_code), psnuid,
+                  mechCode_supportType, value) %>%
+    tidyr::drop_na(value)
+
+  d <- calculateFinalDedupeValues(d, header_cols)
+  expect_true(!all(grepl("^(TA Dedupe)$", d$data$SNUxIM$mechCode_supportType)))
+  expect_true(!all(grepl("^(DSD Dedupe)$", d$data$SNUxIM$mechCode_supportType)))
+  expect_true(d$data$SNUxIM[[which(d$data$SNUxIM$mechCode_supportType == "Crosswalk Dedupe"), "value"]] == 0)
+
+
+
+  ## If >1 DSD mech, but no TA mechs (or vice versa):
+  ##   - Import DSD or TA dedupes, whether 0 or <0 (if NA -> 0)
+  ##   - Do not import any Crosswalk dedupes
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "psnuid",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "9999_DSD",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10, #1234_DSD
+    30, #9999_DSD
+    30, #Total
+    30, #DSD Total
+    NA #TA Total
+  )
+
+  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  cols_to_keep <- getColumnsToKeep(d, "PSNUxIM")
+  header_cols <- getHeaderColumns(cols_to_keep, sheet)
+  d$data$SNUxIM <- df
+
+  d <- recalculateDedupeValues(d)
+
+  d$data$SNUxIM %<>%
+    tidyr::gather(key = "mechCode_supportType",
+                  value = "value",
+                  -tidyselect::all_of(c(header_cols$indicator_code, "psnuid"))) %>%
+    dplyr::select(dplyr::all_of(header_cols$indicator_code), psnuid,
+                  mechCode_supportType, value) %>%
+    tidyr::drop_na(value)
+
+  d <- calculateFinalDedupeValues(d, header_cols)
+  expect_true(!all(grepl("^(TA Dedupe)$", d$data$SNUxIM$mechCode_supportType)))
+  expect_true(!all(grepl("^(Crosswalk Dedupe)$", d$data$SNUxIM$mechCode_supportType)))
+  expect_true(d$data$SNUxIM[[which(d$data$SNUxIM$mechCode_supportType == "DSD Dedupe"), "value"]] == -10)
+
+
+  ## If >1 DSD mech and >1 TA mech:
+  ##   - Import all dedupes, whether 0 or <0 (if NA -> 0)
+
+
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  df <- tibble::tribble(
+    ~ "PSNU",
+    ~ "psnuid",
+    ~ "indicator_code",
+    ~ "Age",
+    ~ "Sex",
+    ~ "KeyPop",
+    ~ "1234_DSD",
+    ~ "1234_TA",
+    ~ "9999_DSD",
+    ~ "9999_TA",
+    ~ "Total Deduplicated Rollup",
+    ~ "Deduplicated DSD Rollup",
+    ~ "Deduplicated TA Rollup",
+    "abc123",
+    "abc123",
+    "HTS_TST.KP.Neg.T",
+    NA,
+    NA,
+    "PWID",
+    10, #1234_DSD
+    20, #1234_TA
+    30, #9999_DSD
+    40, #9999_TA
+    40, #Total
+    40, #DSD Total
+    40 #TA Total
+  )
+
+  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  cols_to_keep <- getColumnsToKeep(d, "PSNUxIM")
+  header_cols <- getHeaderColumns(cols_to_keep, sheet)
+  d$data$SNUxIM <- df
+
+  d <- recalculateDedupeValues(d)
+
+  d$data$SNUxIM %<>%
+    tidyr::gather(key = "mechCode_supportType",
+                  value = "value",
+                  -tidyselect::all_of(c(header_cols$indicator_code, "psnuid"))) %>%
+    dplyr::select(dplyr::all_of(header_cols$indicator_code), psnuid,
+                  mechCode_supportType, value) %>%
+    tidyr::drop_na(value)
+
+  d <- calculateFinalDedupeValues(d, header_cols)
+  expect_true(d$data$SNUxIM[[which(d$data$SNUxIM$mechCode_supportType == "TA Dedupe"), "value"]] == -20)
+  expect_true(d$data$SNUxIM[[which(d$data$SNUxIM$mechCode_supportType == "DSD Dedupe"), "value"]] == 0)
+  expect_true(d$data$SNUxIM[[which(d$data$SNUxIM$mechCode_supportType == "Crosswalk Dedupe"), "value"]] == -40) })
+
+
+test_that("Can test and round decimal values in PSNUxIM tab", {
+  d <- list()
+  d$info$messages <- MessageQueue()
+  d$info$has_error <- FALSE
+  d$data$SNUxIM <- tibble::tribble(
+    ~"mechCode_supportType", ~"value",
+    "12345_DSD", 1,
+    "6789_TA", 1.45
+  )
+
+  d <- testRoundDecimalValues(d)
+
+  expect_equal(NROW(d$tests$decimals), 1L)
+  expect_equal(d$tests$decimals$mechCode_supportType, "6789_TA")
+  expect_equal(d$tests$decimals$value, 1.45)
+
+  expect_false(d$info$has_error)
+
+  expect_true(grepl("DECIMAL VALUES", d$info$messages$message))
+
+
+  after_rounding <-
+    tibble::tribble(
+      ~"mechCode_supportType", ~"value",
+      "12345_DSD", 1,
+      "6789_TA", 1
+    )
+
+  expect_identical(d$data$SNUxIM, after_rounding)
 
 })

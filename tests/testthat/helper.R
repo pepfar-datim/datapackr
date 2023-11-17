@@ -50,8 +50,8 @@ getRDA <- function(object_name) {
     return(paste0("/root/project/data/", object_name, ".rda"))
   }
 
-  first <- rprojroot::find_package_root_file("data", path)
-  second <- paste0(getwd(), "/", path)
+  first <- rprojroot::find_package_root_file("data", paste0(object_name, ".rda"))
+  second <- paste0(getwd(), "/", object_name, ".rda")
   if (file.exists(first)) {
     return(first)
   } else if (file.exists(second)) {
