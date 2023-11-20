@@ -46,3 +46,21 @@ cop24_map_DataPack_DATIM_DEs_COCs <- dp_map
 usethis::use_data(cop24_map_DataPack_DATIM_DEs_COCs, overwrite = TRUE, compress = "xz")
 
 ## Rebuild package again. (Cmd+Shift+B)
+
+## Save metadata in API for easy access by Data Management Team
+
+shareable <- datapackr::cop24_map_DataPack_DATIM_DEs_COCs %>%
+  dplyr::select(dataElement = dataelementuid,
+                period,
+                categoryOptionCombo = categoryoptioncombouid)
+
+output_folder <- paste0(rprojroot::find_package_root_file(),
+                        "/data-raw/")
+
+filename <- "cop24_metadata_DEsCOCs"
+
+filepath <- paste0(output_folder, filename, ".csv")
+
+utils::write.csv(shareable, filepath, row.names = FALSE)
+
+## Rebuild package again. (Cmd+Shift+B)

@@ -22,7 +22,25 @@ waldo::compare(datapackr::valid_OrgUnits, valid_OrgUnits)
 usethis::use_data(valid_OrgUnits,
                   compress = "xz", overwrite = TRUE)
 
-## Rebuild the package
+## Rebuild the package (Cmd+Shift+B)
+
+
+## Save metadata in API for easy access by Data Management Team
+
+shareable <- datapackr::valid_OrgUnits %>%
+  dplyr::select(orgUnit = uid)
+
+output_folder <- paste0(rprojroot::find_package_root_file(),
+                        "/data-raw/")
+
+filename <- "cop24_metadata_organisationUnits"
+
+filepath <- paste0(output_folder, filename, ".csv")
+
+utils::write.csv(shareable, filepath, row.names = FALSE)
+
+## Rebuild package again. (Cmd+Shift+B)
+
 
 # cop_datapack_countries ----
 # If anything has changed at country level or above, update dataframe of data pack countries/names
