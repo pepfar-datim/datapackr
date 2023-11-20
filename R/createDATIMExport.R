@@ -21,7 +21,7 @@ createDATIMExport <- function(d) {
       }
     }
 
-    if (d$info$cop_year == 2023) {
+    if (d$info$cop_year %in% c(2023, 2024)) {
       if (d$info$has_psnuxim) {
         datim_export <- dplyr::bind_rows(d$datim$subnat_impatt,
                                          d$datim$prioritizations,
