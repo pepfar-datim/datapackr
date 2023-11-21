@@ -1,3 +1,21 @@
+# datapackr 7.1.0
+
+## New features
+* Updated logic related to the PSNUxIm.
+* Updated various configuration files for year 2024
+
+## Bug fixes
+*
+
+## Minor improvements and fixes
+* Updated home tab title to reflect new fiscal year syntax.
+* Updated `createKycahinInfo` to reflect new fiscal year syntax
+* Moved `getPSNUs` into its own file
+* Updated metadata, reviewed formulas, and formatting. 
+* Added tests related to unpackSNUxIM and dataset creation
+* Updated year 23 data pack template and schema
+* Various small updates to how configuration files are generated 
+
 # datapackr 7.0.3
 
 ## New features
