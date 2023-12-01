@@ -1,3 +1,14 @@
+# datapackr 7.1.1
+
+## New features
+* 
+
+## Bug fixes
+* upgrade related to check params and the breaking out of regions into countries
+
+## Minor improvements and fixes
+* 
+
 # datapackr 7.1.0
 
 ## New features
