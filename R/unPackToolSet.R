@@ -17,6 +17,17 @@ checkToolSetMetadata <- function(d, p) {
 
 }
 
+masqueradeTool <- function(tool)  {
+  if (tool == "Target Setting Tool") {
+    return("Data Pack")
+  }
+
+  if (tool == "OPU Data Pack") {
+    return("PSNUxIM")
+  }
+
+  tool
+}
 
 #' @title unPackToolSet
 #'
@@ -49,13 +60,17 @@ unPackToolSet <- function(d1_path = NULL,
   d1_path <- d1$keychain$submission_path
   d2_path <- d2$keychain$submission_path
 
-  if (!setequal(c(d1$info$tool, d2$info$tool), c("Data Pack", "PSNUxIM"))) {
+  #Deal with renaming of tools
+
+  d1_tool <- masqueradeTool(d1$info$tool)
+  d2_tool <- masqueradeTool(d2$info$tool)
+
+  if (!setequal(c(d1_tool, d2_tool), c("Data Pack", "PSNUxIM"))) {
     stop("Cannot unpack that combination of tools.")
   }
 
-  datapack_path <- ifelse(d1$info$tool == "Data Pack", d1_path, d2_path)
-  psnuxim_path <- ifelse(d1$info$tool == "PSNUxIM", d1_path, d2_path)
-
+  datapack_path <- ifelse(d1_tool == "Data Pack", d1_path, d2_path)
+  psnuxim_path <- ifelse(d2_tool == "PSNUxIM", d2_path, d1_path)
 
   #Get the datapack
   d <- unPackTool(submission_path = datapack_path,
@@ -73,7 +88,7 @@ unPackToolSet <- function(d1_path = NULL,
   }
 
   p <- unPackTool(submission_path = psnuxim_path,
-                  tool = "PSNUxIM",
+                  tool = NULL, #TODO: Fix this when removing OPU Data Packs
                   country_uids = d$info$country_uids,
                   cop_year = d$info$cop_year,
                   pzns = pzns,
