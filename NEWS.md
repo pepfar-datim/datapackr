@@ -11,13 +11,14 @@
 * Reorganized COP24 files
 * Cached valid_OrgUnits as CSV
 * Updated createDatimExport to handle COP24
+* Saved DEsCOCs metadata as CSV accessible via API
 
 # datapackr 7.1.0
-
-## New features
 * Updated logic related to the PSNUxIm.
 * Updated various configuration files for year 2024
-* Save DEsCOCs metadata as CSV accessible via API
+
+## New features
+* 
 
 ## Bug fixes
 *
