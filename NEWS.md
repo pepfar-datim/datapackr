@@ -1,19 +1,23 @@
 # datapackr 7.1.1
 
 ## New features
-* 
+* Added support for either PSNUxIM or OPU Data Packs for COP23.
+
 
 ## Bug fixes
-* upgrade related to check params and the breaking out of regions into countries
+* upgrade related to check params and Added exclusion of COP24 for regions
 
 ## Minor improvements and fixes
-* 
+* Reorganized COP24 files
+* Cached valid_OrgUnits as CSV
+* Updated createDatimExport to handle COP24
 
 # datapackr 7.1.0
 
 ## New features
 * Updated logic related to the PSNUxIm.
 * Updated various configuration files for year 2024
+* Save DEsCOCs metadata as CSV accessible via API
 
 ## Bug fixes
 *
