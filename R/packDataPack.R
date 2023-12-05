@@ -85,6 +85,23 @@ packDataPack <- function(d,
   interactive_print("Adding Validations...")
   #TODO: Adding validations prevents use of openxlsx to add SNU x IM tab
 
+  # because YEAR 2 tab is skipped by skip tabs we hide rows here
+  # AGYW is also skipped because its excluded in packSheets
+  interactive_print("Hiding Year 2 and AGYW Rows...")
+  if ("Year 2" %in% names(d$tool$wb)) {
+    openxlsx::setRowHeights(d$tool$wb,
+                            sheet = "Year 2",
+                            rows = 5:13,
+                            heights = 0)
+  }
+
+  if ("AGYW" %in% names(d$tool$wb)) {
+    openxlsx::setRowHeights(d$tool$wb,
+                            sheet = "AGYW",
+                            rows = 5:13,
+                            heights = 0)
+  }
+
   # Return d object ####
   d
 }
