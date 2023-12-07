@@ -625,6 +625,7 @@ unpackYear2Sheet <- function(d) {
     #   cols_compare %>% dplyr::filter(!is_equal)
     # attr(d$tests$year2_cols_out_of_order, "test_name") <-
     #   "NA's found in final Year 2 export."
+  }
 
   d$datim$year2 <- d$datim$year2 %>%
     tidyr::drop_na() %>%
