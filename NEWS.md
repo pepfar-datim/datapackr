@@ -1,4 +1,14 @@
-# datapackr 7.1.1
+# datapackr 7.2.0
+
+## New features
+* 
+
+
+## Bug fixes
+* 
+
+## Minor improvements and fixes
+* 
 
 ## New features
 * Added support for either PSNUxIM or OPU Data Packs for COP23.
