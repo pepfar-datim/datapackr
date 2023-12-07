@@ -6,9 +6,11 @@
 
 
 ## Bug fixes
-* 
+* Updated `unPackYear2Sheet` regular expression to better capture data.
 
 ## Minor improvements and fixes
+* Update to Year 2 tab for OVC to include 18-20 age band
+* update default cell to A1 for all tabs
 * Updated `packDataPack` to hide rows in Year 2 and AGYW sheets
 * Updated documentation related to `getValidOrgUnits`
 * Updated documentation related to `extractDuplicateRows`
