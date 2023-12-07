@@ -1,3 +1,20 @@
+# datapackr 7.2.0
+
+## New features
+* Finalized model
+* Able to produce production 2024 Target Setting Tools
+
+
+## Bug fixes
+* Updated `unPackYear2Sheet` regular expression to better capture data.
+
+## Minor improvements and fixes
+* Update to Year 2 tab for OVC to include 18-20 age band
+* update default cell to A1 for all tabs
+* Updated `packDataPack` to hide rows in Year 2 and AGYW sheets
+* Updated documentation related to `getValidOrgUnits`
+* Updated documentation related to `extractDuplicateRows`
+
 # datapackr 7.1.1
 
 ## New features

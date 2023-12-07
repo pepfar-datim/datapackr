@@ -150,6 +150,7 @@ y2DecimalValues <- function(d) {
   d
 
 }
+
 #' Title pickUIDFromType is a utility function used to obtain a
 #' particular UID from a supplied list based on the type of
 #' value we are dealing with. In the Year2 tab, values disaggregated
@@ -370,7 +371,7 @@ generateY2IndicatorCodeDataElementMap <- function(cols_to_keep, cop_year) {
     c("PLHIV|TX_CURR|TX_NEW|TX_PVLS|HTS_TST|HTS_RECENT|CXCA_SCRN|HTS_RECENT")
 
 
-  map_ind_code_des <-
+   map_ind_code_des <-
     datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year) %>%
     dplyr::filter(indicator_code %in% cols_to_keep$indicator_code) %>%
     dplyr::select(
@@ -513,7 +514,7 @@ unpackYear2Sheet <- function(d) {
 
   Year2_KP_stacked <- pick_schema(d$info$cop_year, d$info$tool) %>%
     dplyr::filter(sheet_name == "Year 2",
-                  stringr::str_detect(dataelement_dsd, "\\.\\{KP\\}"))
+                  stringr::str_detect(dataelement_dsd, "\\{KP\\}"))
 
   d$data$Year2 %<>%
     dplyr::select(tidyselect::any_of(cols_to_keep$indicator_code)) %>%
@@ -612,7 +613,7 @@ unpackYear2Sheet <- function(d) {
     ) %>%
     tidyr::drop_na() %>%
     dplyr::distinct()
-
+  # Thu Dec  7 14:04:43 2023 -- Need to add a test for NA's
 
   #DP-970
   #TODO: This needs to be fixed in the DE/COC map
