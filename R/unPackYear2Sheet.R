@@ -610,10 +610,10 @@ unpackYear2Sheet <- function(d) {
       attributeOptionCombo,
       value = value
     ) %>%
-    #tidyr::drop_na() %>% # Tue Dec  5 14:19:52 2023 delete if 2 months pass
+    # tidyr::drop_na() %>% # Tue Dec  5 14:19:52 2023 delete if 2 months pass
     dplyr::distinct()
 
-  if (any(export_dups_vec)) {
+  if (any(is.na(d$datim$year2))) {
     warning("NA's found in final Year2 export.")
   }
 
