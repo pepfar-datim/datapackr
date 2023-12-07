@@ -613,6 +613,7 @@ unpackYear2Sheet <- function(d) {
     ) %>%
     tidyr::drop_na() %>%
     dplyr::distinct()
+  # Thu Dec  7 14:04:43 2023 -- Need to add a test for NA's
 
   #DP-970
   #TODO: This needs to be fixed in the DE/COC map
