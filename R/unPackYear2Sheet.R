@@ -610,8 +610,8 @@ unpackYear2Sheet <- function(d) {
       attributeOptionCombo,
       value = value
     )
-  #Check for Na's and add to messages
 
+  #Check for Na's and add to messages
   if (any(is.na(d$datim$year2))) {
     warning_msg <-
       paste0(
@@ -619,16 +619,13 @@ unpackYear2Sheet <- function(d) {
         "\n"
       )
 
-
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
 
-    d$tests$year2_cols_out_of_order  <-
-      cols_compare %>% dplyr::filter(!is_equal)
-    attr(d$tests$year2_cols_out_of_order, "test_name") <-
-      "NA's found in final Year 2 export."
+    # d$tests$year2_cols_out_of_order  <-
+    #   cols_compare %>% dplyr::filter(!is_equal)
+    # attr(d$tests$year2_cols_out_of_order, "test_name") <-
+    #   "NA's found in final Year 2 export."
 
-
-  ##########################%>%
   d$datim$year2 <- d$datim$year2 %>%
     tidyr::drop_na() %>%
     dplyr::distinct()
