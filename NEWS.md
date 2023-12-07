@@ -9,7 +9,7 @@
 * 
 
 ## Minor improvements and fixes
-* Hid year 2 configuration rows in sheet
+* Updated `packDataPack` to hide rows in Year 2 and AGYW sheets
 * Updated documentation related to `getValidOrgUnits`
 * Updated documentation related to `extractDuplicateRows`
 
