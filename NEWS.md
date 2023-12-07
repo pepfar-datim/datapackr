@@ -13,6 +13,8 @@
 * Updated documentation related to `getValidOrgUnits`
 * Updated documentation related to `extractDuplicateRows`
 
+# datapackr 7.1.1
+
 ## New features
 * Added support for either PSNUxIM or OPU Data Packs for COP23.
 
