@@ -1,14 +1,17 @@
 # datapackr 7.2.0
 
 ## New features
-* 
+* Finalized model
+* Able to produce production 2024 Target Setting Tools
 
 
 ## Bug fixes
 * 
 
 ## Minor improvements and fixes
-* 
+* Hid year 2 configuration rows in sheet
+* Updated documentation related to `getValidOrgUnits`
+* Updated documentation related to `extractDuplicateRows`
 
 ## New features
 * Added support for either PSNUxIM or OPU Data Packs for COP23.
