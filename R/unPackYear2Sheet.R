@@ -633,11 +633,6 @@ unpackYear2Sheet <- function(d) {
     tidyr::drop_na() %>%
     dplyr::distinct()
 
-  if (any(is.na(d$datim$year2))) {
-    warning("NA's found in final Year2 export.")
-  }
-
-
   #DP-970
   #TODO: This needs to be fixed in the DE/COC map
   export_dups_vec <- duplicated(d$datim$year2[, 1:5])
