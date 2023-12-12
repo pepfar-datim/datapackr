@@ -42,7 +42,8 @@ if (NROW(compare_diffs) > 0) {
 }
 
 # # For Production run ####
-# pick <- datapackr::cop_datapack_countries
+#pick <- datapackr::cop24_datapack_countries %>%
+#  dplyr::filter(!datapack_name %in% c("Asia Region", "Western Hemisphere Region", "Turkmenistan"))
 
 # Execution ####
 for (i in seq_along(pick$datapack_name)) {
