@@ -159,7 +159,7 @@ compareData_DatapackVsDatim <-
 
     if (!is.null(datim_data)) {
       datim_data %<>% dplyr::rename(datim_value = value)
-      if (d$info$tool == "OPU Data Pack") {
+      if (d$info$tool %in% c("OPU Data Pack","PSNUxIM")) {
 ### data in OPU datapacks must have a valid Mech or dedupe mech
 ### so we do not compare dreams or any other data without mech
         datim_data <- dplyr::filter(datim_data,
