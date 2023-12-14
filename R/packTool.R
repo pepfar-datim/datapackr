@@ -74,7 +74,7 @@ packTool <- function(model_data = NULL,
                       model_data = model_data,
                       spectrum_data = spectrum_data,
                       d2_session = d2_session)
-  } else if (d$info$tool == "OPU Data Pack") {
+  } else if (d$info$tool %in% c("OPU Data Pack", "PSNUxIM")) {
 
     d <- packOPUDataPack(d,
                          undistributed_mer_data = undistributed_mer_data,
