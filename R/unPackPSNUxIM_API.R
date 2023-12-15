@@ -24,7 +24,7 @@ checkHasPSNUxIM <- function(d) {
           " all changes to other tabs of your Data Pack are complete.  Once all other updates",
           " are complete, you may return here to update your PSNUxIM tab at any time.",
           "\n")
-    } else if (d$info$tool == "OPU Data Pack") {
+    } else if (d$info$tool %in% c("OPU Data Pack", "PSNUxIM")) {
       warning_msg <- paste0(
         "WARNING! Your OPU Data Pack's PSNUxIM tab appears to be empty. Please",
         " investigate and resubmit."
