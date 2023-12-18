@@ -1,3 +1,16 @@
+# datapackr 7.2.1
+
+## New features
+* Updates to COP24 Template
+
+
+## Bug fixes
+* Completed updates related to OPU Data Pack's conversion PSNUxIM tools
+* Updated country list for COP24 Target Setting Tool Generation script
+
+## Minor improvements and fixes
+* 
+
 # datapackr 7.2.0
 
 ## New features
