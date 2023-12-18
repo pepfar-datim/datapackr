@@ -7,6 +7,7 @@
 ## Bug fixes
 * Completed updates related to OPU Data Pack's conversion PSNUxIM tools
 * Updated country list for COP24 Target Setting Tool Generation script
+* Updated regular expression related to Year2 KP data
 
 ## Minor improvements and fixes
 * 
