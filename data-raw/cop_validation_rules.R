@@ -12,13 +12,13 @@ datimutils::loginToDATIM(secrets)
 # unhash the following api link and run
 # validation rules release is handled along side MER meta data
 base_url <- Sys.getenv("BASE_URL")
-r <- paste0(base_url, "api/validationRules.json?",
-       "filter=name:like:TARGET&fields=id,name,periodType,description,operator",
-       "leftSide[expression,missingValueStrategy]",
-       "rightSide[expression,missingValueStrategy]&paging=false")
+url <- paste0(base_url, "api/validationRules.json?",
+              "filter=name:like:TARGET&fields=id,name,periodType,description,operator",
+              ",leftSide%5Bexpression,missingValueStrategy%5D,rightSide%5Bexpression,",
+              "missingValueStrategy%5D&paging=false")
 
 # hit api and write out file
-httr::GET(r, httr::timeout(30),
+httr::GET(url, httr::timeout(30),
           handle = d2_default_session$handle,
           httr::write_disk(
             path = "./data-raw/COP24/cop24_validation_rules.json",
@@ -53,26 +53,18 @@ processValidationRules <- function(r) {
                                  warn_missing = FALSE)
 
   # Count the left and right side operators
-  if ("rightSide.ops" %in% names(vr)) {
-    vr$rightSide.ops <- stringr::str_count(vr$rightSide.expression,
+  vr$rightSide.ops <- stringr::str_count(vr$rightSide.expression,
                                            expression.pattern)
-  }
 
-  if ("leftSide.ops" %in% names(vr)) {
-    vr$leftSide.ops <- stringr::str_count(vr$leftSide.expression,
+  vr$leftSide.ops <- stringr::str_count(vr$leftSide.expression,
                                           expression.pattern)
-  }
 
   # Remove any line breaks
-  if ("leftSide.expression" %in% names(vr)) {
-    vr$leftSide.expression <- stringr::str_replace(vr$leftSide.expression,
+  vr$leftSide.expression <- stringr::str_replace(vr$leftSide.expression,
                                                    pattern = "\n", "")
-  }
 
-  if ("rightSide.expression" %in% names(vr)) {
-    vr$rightSide.expression <- stringr::str_replace(vr$rightSide.expression,
+  vr$rightSide.expression <- stringr::str_replace(vr$rightSide.expression,
                                                     pattern = "\n", "")
-  }
 
   return(vr)
 }

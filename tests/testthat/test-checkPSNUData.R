@@ -4,13 +4,13 @@ with_mock_api({
   test_that("Can detect validation rule violations", {
 
     d <- list()
-    d$info$cop_year <- "2022"
+    d$info$cop_year <- "2023"
     d$info$messages <- MessageQueue()
 
     d$data$analytics <- tibble::tribble(
       ~dataelement_id, ~fiscal_year, ~psnu_uid, ~categoryoptioncombo_id, ~mechanism_code, ~target_value,
-      "DhrLCUBm3bK", "2023", "uXwFHXCPYgj", "yWgBf6UOK8d", "12345", "20", #TX_NEW
-      "HGZY9RNZjRd", "2023", "uXwFHXCPYgj", "yWgBf6UOK8d", "12345", "10" #TX_CURR
+      "DhrLCUBm3bK", "2024", "uXwFHXCPYgj", "yWgBf6UOK8d", "12345", "20", #TX_NEW
+      "HGZY9RNZjRd", "2024", "uXwFHXCPYgj", "yWgBf6UOK8d", "12345", "10" #TX_CURR
     )
     #Never run more than two threads here to avoid errors in checkPackage
     Sys.setenv("MAX_CORES" = 2L)
@@ -32,13 +32,13 @@ with_mock_api({
   test_that("Can detect no validation rule violations", {
 
     d <- list()
-    d$info$cop_year <- "2022"
+    d$info$cop_year <- "2023"
     d$info$messages <- MessageQueue()
     Sys.setenv("MAX_CORES" = 1L)
     d$data$analytics <- tibble::tribble(
       ~dataelement_id, ~fiscal_year, ~psnu_uid, ~categoryoptioncombo_id, ~mechanism_code, ~target_value,
-      "DhrLCUBm3bK", "2023", "uXwFHXCPYgj", "yWgBf6UOK8d", "12345", "10", #TX_NEW
-      "HGZY9RNZjRd", "2023", "uXwFHXCPYgj", "yWgBf6UOK8d", "12345", "20" #TX_CURR
+      "DhrLCUBm3bK", "2024", "uXwFHXCPYgj", "yWgBf6UOK8d", "12345", "10", #TX_NEW
+      "HGZY9RNZjRd", "2024", "uXwFHXCPYgj", "yWgBf6UOK8d", "12345", "20" #TX_CURR
     )
     d <- checkPSNUData(d)
     #Return NULL if there are no violations
