@@ -139,7 +139,7 @@ writePSNUxIM <- function(d,
 
     dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
     targets_data <- prepareTargetsData(d, append)
-    template_file <- pick_template_path(tool=d$info$tool,
+    template_file <- pick_template_path(tool=d$info$tool, #Updated to not be hardcoded to 2023
                                         cop_year=d$info$cop_year)#system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr")
 
 
