@@ -133,106 +133,14 @@ writePSNUxIM <- function(d,
     return(d)
   }
 
-  # Check whether to write anything into SNU x IM tab and write if needed ####
-  if (d$info$cop_year == 2022) {
-  # Prepare data to distribute ####
-    d$info$has_psnuxim <- !(NROW(d$data$SNUxIM) == 1 & is.na(d$data$SNUxIM$PSNU[1]))
-
-    targets_data <- prepareTargetsData(d)
-
-    # Prepare d$tool$wb ####
-    # If append is true, add the missing PSNUxIM combos to the existing
-    # workbook, otherwise, use a template.
-    if (append == TRUE) {
-
-      if (is.null(d$tool$wb)) {
-        d$tool$wb <- openxlsx::loadWorkbook(d$keychain$submission_path)
-      }
-      openxlsx::removeFilter(d$tool$wb, names(d$tool$wb))
-    } else {
-
-      template_file <- system.file("extdata", "COP22_Data_Pack_Template.xlsx", package = "datapackr")
-      wb <- openxlsx::loadWorkbook(template_file)
-      openxlsx::activeSheet(wb) <- "PSNUxIM"
-      sheets <- openxlsx::getSheetNames(template_file)
-      sheets_to_keep <- which(sheets %in% c("Home", "PSNUxIM"))
-      sheets_to_delete <- seq_along(sheets)[!(seq_along(sheets) %in% sheets_to_keep)]
-      for (i in seq_along(sheets_to_delete)) {
-            openxlsx::sheetVisibility(wb)[sheets_to_delete[i]] <- "veryHidden"
-      }
-
-      #These hard coded values are maybe present in the schema???
-      openxlsx::writeData(wb, "Home", "Missing PSNUxIM Targets", startCol = 2, startRow = 10)
-      openxlsx::writeData(wb, "Home", d$info$datapack_name, startCol = 2, startRow = 20)
-      openxlsx::writeData(wb, "Home", d$info$country_uids, startCol = 2, startRow = 25)
-      d$tool$wb <- wb
-
-    }
-
-    # Prepare d$data$snuxim_model_data ####
-    smd <- readRDS(d$keychain$snuxim_model_data_path)
-    d$data$snuxim_model_data <- smd[d$info$country_uids] %>%
-      dplyr::bind_rows()
-    rm(smd)
-
-    dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
-
-    d$data$snuxim_model_data %<>%
-    ## Address issues with PMTCT_EID ####
-      dplyr::mutate_at(
-        c("age_option_name", "age_option_uid"),
-        ~dplyr::case_when(indicator_code %in% c("PMTCT_EID.N.2.T", "PMTCT_EID.N.12.T")
-                          ~ NA_character_,
-                          TRUE ~ .)) %>%
-    ## Convert to import file format ####
-      dplyr::left_join(
-        dp_datim_map,
-        by = c("indicator_code" = "indicator_code",
-               "age_option_uid" = "valid_ages.id",
-               "sex_option_uid" = "valid_sexes.id",
-               "kp_option_uid" = "valid_kps.id",
-               "type" = "support_type")) %>%
-      dplyr::select(dataElement = dataelementuid,
-                    period,
-                    orgUnit = psnu_uid,
-                    categoryOptionCombo = categoryoptioncombouid,
-                    attributeOptionCombo = mechanism_uid,
-                    value) %>%
-    ## Aggregate across 50+ age bands ####
-      dplyr::group_by(dplyr::across(c(-value))) %>%
-      dplyr::summarise(value = sum(value), .groups = "drop")
-
-
-    org_units <-  getValidOrgUnits(d$info$cop_year) %>%
-      dplyr::filter(country_uid %in% d$info$country_uids) %>%
-      add_dp_label(orgunits = ., cop_year = d$info$cop_year) %>%
-      dplyr::arrange(dp_label) %>%
-      ## Remove DSNUs
-      dplyr::filter(!is.na(org_type)) %>%
-      dplyr::select(dp_label, orgUnit = uid)
-
-    r <- packPSNUxIM(wb = d$tool$wb,
-                     data = targets_data,
-                     snuxim_model_data = d$data$snuxim_model_data,
-                     org_units = org_units,
-                     cop_year = d$info$cop_year,
-                     tool = d$info$tool,
-                     schema = d$info$schema,
-                     d2_session = d2_session)
-
-    d$tool$wb <- r$wb
-    d$info$messages <- appendMessage(d$info$messages, r$info$messages$message, r$info$messages$level)
-    d$info$newSNUxIM <- TRUE
-
-  }
-
-  if (d$info$cop_year == 2023) {
+  if (d$info$cop_year >= 2023) { #Need to be greater than
 
     d$info$has_psnuxim <- !is.null(d$data$SNUxIM)
 
     dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
     targets_data <- prepareTargetsData(d, append)
-    template_file <- system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr")
+    template_file <- pick_template_path(tool=d$info$tool,
+                                        cop_year=d$info$cop_year)#system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr")
 
 
     if (!d$info$has_psnuxim) {
@@ -294,7 +202,7 @@ writePSNUxIM <- function(d,
       dplyr::filter(!is.na(org_type)) %>%
       dplyr::select(dp_label, orgUnit = uid)
 
-    schema <- cop23_psnuxim_schema
+    schema <- cop23_psnuxim_schema #Need to look at
     tool <- "PSNUxIM"
 
     r <- packPSNUxIM(wb = wb,
@@ -306,7 +214,7 @@ writePSNUxIM <- function(d,
                      schema = schema,
                      d2_session = d2_session)
 
-    if (d$info$cop_year == 2023) {
+    if (d$info$cop_year == 2023) {#Needs to be updated as well? >
 
       country_uids <-  getValidOrgUnits(d$info$cop_year) %>%
         dplyr::filter(uid %in% org_units$orgUnit) %>%
