@@ -12,10 +12,10 @@ datimutils::loginToDATIM(secrets)
 # unhash the following api link and run
 # validation rules release is handled along side MER meta data
 base_url <- Sys.getenv("BASE_URL")
-url <- paste0(base_url, "api/validationRules.json?",
-              "filter=name:like:TARGET&fields=id,name,periodType,description,operator",
-              ",leftSide%5Bexpression,missingValueStrategy%5D,rightSide%5Bexpression,",
-              "missingValueStrategy%5D&paging=false")
+url <- paste0(base_url, "api/validationRules.json?
+              filter=name:like:TARGET&fields=id,name,periodType,description,
+              operator,leftSide[expression,missingValueStrategy],
+              rightSide[expression,missingValueStrategy]&paging=false")
 
 # hit api and write out file
 httr::GET(url, httr::timeout(30),
