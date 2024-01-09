@@ -133,7 +133,7 @@ writePSNUxIM <- function(d,
     return(d)
   }
 
-  if (d$info$cop_year >= 2023) { #Need to be greater than
+  if (d$info$cop_year >= 2023) { #Need to be greater than: COMPLETED
 
     d$info$has_psnuxim <- !is.null(d$data$SNUxIM)
 
@@ -214,7 +214,7 @@ writePSNUxIM <- function(d,
                      schema = schema,
                      d2_session = d2_session)
 
-    if (d$info$cop_year == 2023) {#Needs to be updated as well? >
+    if (d$info$cop_year >= 2023) {#Needs to be updated as well? >. Could also just remove year
 
       country_uids <-  getValidOrgUnits(d$info$cop_year) %>%
         dplyr::filter(uid %in% org_units$orgUnit) %>%
@@ -242,6 +242,7 @@ writePSNUxIM <- function(d,
     tool <- switch(as.character(d$info$cop_year),
                    "2022" = "OPU Data Pack",
                    "2023" = "PSNUxIM",
+                   "2024" = "PSNUxIMm", #Updated this check with Jason
                    stop("We do not seem to have a tool for that year"))
 
     interactive_print("Exporting your new Data Pack...")
