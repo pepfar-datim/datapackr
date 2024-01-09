@@ -133,7 +133,7 @@ writePSNUxIM <- function(d,
     return(d)
   }
 
-  if (d$info$cop_year >= 2023) { #Need to be greater than: COMPLETED
+  if (d$info$cop_year >= 2023) {
 
     d$info$has_psnuxim <- !is.null(d$data$SNUxIM)
 
@@ -144,11 +144,6 @@ writePSNUxIM <- function(d,
                                         d$info$cop_year %% 100,
                                         "_PSNUxIM_Template.xlsx"),
                                  package = "datapackr")
-
-    # template_file <- pick_template_path(tool=d$info$tool, #Updated to not be hardcoded to 2023
-    #                                     cop_year=d$info$cop_year)
-    #WAS: #system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr")
-
 
     if (!d$info$has_psnuxim) {
       print("Loading initial PSNUxIM Template")
@@ -215,14 +210,6 @@ writePSNUxIM <- function(d,
       cop24_psnuxim_schema
     }
 
-
-      #cop24_psnuxim_schema
-    # datapackr::cop24_psnuxim_schema
-    paste0("cop",
-                     d$info$cop_year %% 100,
-                     "_psnuxim_schema")
-    #schema <- cop23_psnuxim_schema
-
     tool <- "PSNUxIM"
 
     r <- packPSNUxIM(wb = wb,
@@ -234,7 +221,7 @@ writePSNUxIM <- function(d,
                      schema = schema,
                      d2_session = d2_session)
 
-    if (d$info$cop_year >= 2023) {#Needs to be updated as well? >. Could also just remove year
+    if (d$info$cop_year >= 2023) {
 
       country_uids <-  getValidOrgUnits(d$info$cop_year) %>%
         dplyr::filter(uid %in% org_units$orgUnit) %>%
@@ -262,11 +249,11 @@ writePSNUxIM <- function(d,
     tool <- switch(as.character(d$info$cop_year),
                    "2022" = "OPU Data Pack",
                    "2023" = "PSNUxIM",
-                   "2024" = "PSNUxIM", #Updated this check with Jason
+                   "2024" = "PSNUxIM",
                    stop("We do not seem to have a tool for that year"))
 
     interactive_print("Exporting your new Data Pack...")
-    d$info$output_file <- exportPackr(#THROWING FILE NAME ERROR
+    d$info$output_file <- exportPackr(
       data = d$tool$wb,
       output_folder = d$keychain$output_folder,
       tool = tool,
