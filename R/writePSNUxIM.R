@@ -139,8 +139,15 @@ writePSNUxIM <- function(d,
 
     dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
     targets_data <- prepareTargetsData(d, append)
-    template_file <- pick_template_path(tool=d$info$tool, #Updated to not be hardcoded to 2023
-                                        cop_year=d$info$cop_year)#system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr")
+    template_file <- system.file("extdata",
+                                 paste0("COP",
+                                        d$info$cop_year %% 100,
+                                        "_PSNUxIM_Template.xlsx"),
+                                 package = "datapackr")
+
+    # template_file <- pick_template_path(tool=d$info$tool, #Updated to not be hardcoded to 2023
+    #                                     cop_year=d$info$cop_year)
+    #WAS: #system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr")
 
 
     if (!d$info$has_psnuxim) {
@@ -202,7 +209,11 @@ writePSNUxIM <- function(d,
       dplyr::filter(!is.na(org_type)) %>%
       dplyr::select(dp_label, orgUnit = uid)
 
-    schema <- cop23_psnuxim_schema #Need to look at
+    schema <- paste0("cop",
+                     d$info$cop_year %% 100,
+                     "_psnuxim_schema")
+    #schema <- cop23_psnuxim_schema
+
     tool <- "PSNUxIM"
 
     r <- packPSNUxIM(wb = wb,
@@ -242,11 +253,11 @@ writePSNUxIM <- function(d,
     tool <- switch(as.character(d$info$cop_year),
                    "2022" = "OPU Data Pack",
                    "2023" = "PSNUxIM",
-                   "2024" = "PSNUxIMm", #Updated this check with Jason
+                   "2024" = "PSNUxIM", #Updated this check with Jason
                    stop("We do not seem to have a tool for that year"))
 
     interactive_print("Exporting your new Data Pack...")
-    d$info$output_file <- exportPackr(
+    d$info$output_file <- exportPackr(#THROWING FILE NAME ERROR
       data = d$tool$wb,
       output_folder = d$keychain$output_folder,
       tool = tool,
