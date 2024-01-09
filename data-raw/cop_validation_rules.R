@@ -69,16 +69,10 @@ processValidationRules <- function(r) {
   return(vr)
 }
 
-# DEPRECATE 21 and 22 as of 12/19/23
-#cop21 <- processValidationRules("./data-raw/COP21/cop21_validation_rules.json")
-#cop22 <- processValidationRules("./data-raw/COP22/cop22_validation_rules.json") %>%
-#  dplyr::filter(id != "h6ACV56qnvz") # Patch for DP-552
 cop23 <- processValidationRules("./data-raw/COP23/cop23_validation_rules.json")
 cop24 <- processValidationRules("./data-raw/COP24/cop24_validation_rules.json")
 
 cop_validation_rules <- list(
-  #"2021" = cop21,
-  #"2022" = cop22,
   "2023" = cop23,
   "2024" = cop24
   )
