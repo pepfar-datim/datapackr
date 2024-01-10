@@ -395,6 +395,9 @@ analyze_retention <- function(data) {
                            "2023" =  c("TX_CURR.T",
                                        "TX_CURR.Expected.T_1",
                                        "TX_NEW.T"),
+                           "2024" =  c("TX_CURR.T",
+                                       "TX_CURR.Expected.T_1",
+                                       "TX_NEW.T"),
                            stop("Unsupported COP Year"))
 
 
