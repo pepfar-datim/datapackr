@@ -39,7 +39,7 @@ analyze_eid_2mo <- function(data) {
     required_names <- c("PMTCT_EID.N.12.T",
                         "PMTCT_EID.N.2.T")
   }
-  if (this_cop_year == "2023") {
+  if (this_cop_year >= "2023") {
     required_names <- c("PMTCT_EID.D.T",
                         "PMTCT_EID.N.2.T")
   }
@@ -69,7 +69,7 @@ analyze_eid_2mo <- function(data) {
         PMTCT_EID.2mo.rate)
   }
 
-  if (this_cop_year == "2023") {
+  if (this_cop_year >= "2023") {
     analysis <- data %>%
       dplyr::mutate(
         PMTCT_EID.2mo.rate = PMTCT_EID.N.2.T / PMTCT_EID.D.T
@@ -105,7 +105,7 @@ analyze_eid_2mo <- function(data) {
             PMTCT_EID.N.2.T / PMTCT_EID.T)
     }
 
-    if (this_cop_year == "2023") {
+    if (this_cop_year >= "2023") {
       national_avg <- analysis %>%
         dplyr::select(
           PMTCT_EID.D.T,
@@ -431,7 +431,7 @@ analyze_retention <- function(data) {
         TX_NEW.T)
   }
 
-  if (this_cop_year == "2023") {
+  if (this_cop_year >= "2023") {
     analysis <- data %>%
       dplyr::group_by(psnu, psnu_uid, age, sex, key_population, cop_year) %>%
       dplyr::summarise_all(sum) %>%
@@ -477,7 +477,7 @@ analyze_retention <- function(data) {
       )
   }
 
-    if (this_cop_year == "2023") {
+    if (this_cop_year >= "2023") {
       national_avg <- data %>%
         dplyr::select(
           TX_CURR.T,
@@ -650,7 +650,7 @@ analyze_indexpos_ratio <- function(data) {
                         "TX_CURR_SUBNAT.T_1")
    }
 
-   if (this_cop_year == "2023") {
+   if (this_cop_year >= "2023") {
      required_names <- c("HTS.Index.Pos.T",
                          "PLHIV.T",
                          "TX_CURR_SUBNAT.T")
@@ -691,7 +691,7 @@ analyze_indexpos_ratio <- function(data) {
                     HTS_INDEX.total, HTS_TST_POS.T, HTS_TST_POS.index_rate)
   }
 
-  if (this_cop_year == "2023")  {
+  if (this_cop_year >= "2023")  {
     analysis <- data %>%
       dplyr::filter(is.na(key_population)) %>%
       dplyr::select(-age, -sex, -key_population) %>%
@@ -791,7 +791,7 @@ checkAnalytics <- function(d,
     dplyr::ungroup()
 
   #Special analytics indicators needed for some checksin COP23
-  if (d$info$cop_year == "2023") {
+  if (d$info$cop_year >= "2023") {
     pmtct_eid_d <- datapackr:::extractRawColumnData(d, "EID", "PMTCT_EID.D.T")
     tx_curr_expected <- datapackr:::extractRawColumnData(d, "Cascade", c("Age", "Sex", "TX_CURR.Expected.T_1"))
     data <- data %>%
