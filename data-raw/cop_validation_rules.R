@@ -4,15 +4,33 @@ require(jsonlite)
 require(purrr)
 require(dplyr)
 require(magrittr)
-#
-# paste0("https://www.datim.org/api/validationRules.json?
-#        filter=name:like:TARGET&fields=id,name,periodType,description,operator,
-#        leftSide[expression,missingValueStrategy],
-#        rightSide[expression,missingValueStrategy]&paging=false")
+
+# login
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
+datimutils::loginToDATIM(secrets)
+
+# unhash the following api link and run
+# validation rules release is handled along side MER meta data
+base_url <- Sys.getenv("BASE_URL")
+url <- paste0(base_url, "api/validationRules.json?
+              filter=name:like:TARGET&fields=id,name,periodType,description,
+              operator,leftSide[expression,missingValueStrategy],
+              rightSide[expression,missingValueStrategy]&paging=false")
+
+# hit api and write out file
+httr::GET(url, httr::timeout(30),
+          handle = d2_default_session$handle,
+          httr::write_disk(
+            path = "./data-raw/COP24/cop24_validation_rules.json",
+            overwrite = TRUE
+            )
+          )
 
 processValidationRules <- function(r) {
   expression.pattern <- "[a-zA-Z][a-zA-Z0-9]{10}(\\.[a-zA-Z][a-zA-Z0-9]{10})?"
+
   vr <- jsonlite::fromJSON(r, flatten = TRUE)$validationRules
+
   # Static predefined map of operators
   op.map <- data.frame(x = c("greater_than_or_equal_to",
                              "greater_than",
@@ -33,25 +51,36 @@ processValidationRules <- function(r) {
                                  op.map$x,
                                  op.map$y,
                                  warn_missing = FALSE)
+
   # Count the left and right side operators
   vr$rightSide.ops <- stringr::str_count(vr$rightSide.expression,
-                                         expression.pattern)
+                                           expression.pattern)
+
   vr$leftSide.ops <- stringr::str_count(vr$leftSide.expression,
-                                        expression.pattern)
+                                          expression.pattern)
+
   # Remove any line breaks
   vr$leftSide.expression <- stringr::str_replace(vr$leftSide.expression,
-                                                 pattern = "\n", "")
+                                                   pattern = "\n", "")
+
   vr$rightSide.expression <- stringr::str_replace(vr$rightSide.expression,
-                                                  pattern = "\n", "")
+                                                    pattern = "\n", "")
+
   return(vr)
 }
 
-
-cop21 <- processValidationRules("./data-raw/COP21/cop21_validation_rules.json")
-cop22 <- processValidationRules("./data-raw/COP22/cop22_validation_rules.json") %>%
-  dplyr::filter(id != "h6ACV56qnvz") # Patch for DP-552
 cop23 <- processValidationRules("./data-raw/COP23/cop23_validation_rules.json")
+cop24 <- processValidationRules("./data-raw/COP24/cop24_validation_rules.json")
 
-cop_validation_rules <- list("2021" = cop21, "2022" = cop22, "2023" = cop23)
+cop_validation_rules <- list(
+  "2023" = cop23,
+  "2024" = cop24
+  )
+
+# use waldo to look at the differences in case
+waldo::compare(
+  cop_validation_rules$`2023`,
+  cop_validation_rules$`2024`
+)
 
 usethis::use_data(cop_validation_rules, overwrite = TRUE)
