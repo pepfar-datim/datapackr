@@ -303,7 +303,7 @@ test_that(" Test linkage < 95% expect message", {
 
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS.Index.Pos.T,
-     ~HTS_TST.SNS.Pos.T, ~TX_NEW.T,~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T, ~cop_year,
+     ~HTS_TST.SNS.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T, ~cop_year,
     "a", 1, "25-49", "F", NA, 95, 5, 94, 0, 0, 2024,
     "b", 2, "25-49", "M", NA, 95, 5, 95, 0, 0, 2024
   )
