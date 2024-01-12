@@ -139,7 +139,6 @@ writePSNUxIM <- function(d,
 
     dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
     targets_data <- prepareTargetsData(d, append)
-    # template_file <- system.file("extdata", "COP23_PSNUxIM_Template.xlsx", package = "datapackr") # REMOVE Before PR
     template_file <- system.file("extdata",
                                  paste0("COP",
                                         d$info$cop_year %% 100,
@@ -225,8 +224,6 @@ writePSNUxIM <- function(d,
                      schema = schema,
                      d2_session = d2_session)
 
-    # if (d$info$cop_year == 2023) {
-
       country_uids <-  getValidOrgUnits(d$info$cop_year) %>%
         dplyr::filter(uid %in% org_units$orgUnit) %>%
         dplyr::pull(country_uid) %>%
@@ -237,13 +234,11 @@ writePSNUxIM <- function(d,
                            country_uids = country_uids,
                            cop_year = d$info$cop_year,
                            tool = tool)
-    # }
 
     d$tool$wb <- r$wb
     d$info$messages <- appendMessage(d$info$messages, r$info$messages$message, r$info$messages$level)
     d$info$newSNUxIM <- TRUE
 
-  # }
 
   # If new information added to SNU x IM tab, reexport Data Pack for user ####
   if (d$info$newSNUxIM && !is.null(output_folder)) {
