@@ -1,14 +1,16 @@
 # datapackr 7.3.0
 
 ## New features
-* 
+* Updated COP validation rules for 2024
+* Updated `checkAnalytics` to analyze 2024 psnu data
+* Updated `writePSNUxIM` to be able to write 2024 PSNUxIM tabs
 
 
 ## Bug fixes
 * 
 
 ## Minor improvements and fixes
-* 
+* Updated unit tests related to the New features above
 
 # datapackr 7.2.1
 
