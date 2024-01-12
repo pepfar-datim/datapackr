@@ -209,7 +209,7 @@ writePSNUxIM <- function(d,
     # schema <- cop23_psnuxim_schema
     schema <- if (d$info$cop_year == 2023) {
       cop23_psnuxim_schema
-    } else if (d$info$cop_year == 2024){
+    } else if (d$info$cop_year == 2024) {
       cop24_psnuxim_schema
     }
 
