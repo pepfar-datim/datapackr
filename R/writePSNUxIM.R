@@ -133,8 +133,6 @@ writePSNUxIM <- function(d,
     return(d)
   }
 
-  # if (d$info$cop_year == 2023) {
-
     d$info$has_psnuxim <- !is.null(d$data$SNUxIM)
 
     dp_datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year)
@@ -206,11 +204,6 @@ writePSNUxIM <- function(d,
       dplyr::select(dp_label, orgUnit = uid)
 
     schema <- pick_schema(d$info$cop_year, "PSNUxIM")
-    # schema <- if (d$info$cop_year == 2023) {
-    #   cop23_psnuxim_schema
-    # } else if (d$info$cop_year == 2024) {
-    #   cop24_psnuxim_schema
-    # }
 
     tool <- "PSNUxIM"
 
