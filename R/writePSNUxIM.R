@@ -205,13 +205,12 @@ writePSNUxIM <- function(d,
       dplyr::filter(!is.na(org_type)) %>%
       dplyr::select(dp_label, orgUnit = uid)
 
-    #Should try to integrate pickschema, but not working as of 1/10/24
-    # schema <- cop23_psnuxim_schema
-    schema <- if (d$info$cop_year == 2023) {
-      cop23_psnuxim_schema
-    } else if (d$info$cop_year == 2024) {
-      cop24_psnuxim_schema
-    }
+    schema <- pick_schema(d$info$cop_year,"PSNUxIM")
+    # schema <- if (d$info$cop_year == 2023) {
+    #   cop23_psnuxim_schema
+    # } else if (d$info$cop_year == 2024) {
+    #   cop24_psnuxim_schema
+    # }
 
     tool <- "PSNUxIM"
 
