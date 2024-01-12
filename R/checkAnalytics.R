@@ -663,8 +663,7 @@ checkAnalytics <- function(d,
     dplyr::ungroup()
 
   #Special analytics indicators needed for some checksin COP23
-  #NOTE did not update this for COP24, as it seemed to be specific? Need to confirm
-  if (d$info$cop_year == "2023") {
+  if (d$info$cop_year >= "2023") {
     pmtct_eid_d <- datapackr:::extractRawColumnData(d, "EID", "PMTCT_EID.D.T")
     tx_curr_expected <- datapackr:::extractRawColumnData(d, "Cascade", c("Age", "Sex", "TX_CURR.Expected.T_1"))
     data <- data %>%
