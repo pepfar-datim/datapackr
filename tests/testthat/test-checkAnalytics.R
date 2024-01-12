@@ -299,25 +299,21 @@ test_that(" Test retention all zeros expect NULL", {
 
 })
 
-
-#NOTE: This doesn't work with 2023 or 2024, but does work for 2022 NEED TO LOOK AT
-#required_names <- c("TX_NEW.T", "TX_NEW.KP.T")
 test_that(" Test linkage < 95% expect message", {
 
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
-     ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T,~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T, ~cop_year,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS.Index.Pos.T,
+     ~HTS_TST.SNS.Pos.T, ~TX_NEW.T,~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T, ~cop_year,
     "a", 1, "25-49", "F", NA, 95, 5, 94, 0, 0, 2024,
     "b", 2, "25-49", "M", NA, 95, 5, 95, 0, 0, 2024
   )
 
-  foo <- analyze_linkage(data) #This failing
+  foo <- analyze_linkage(data)
   testthat::expect_equal(class(foo), "list")
   testthat::expect_setequal(names(foo), c("test_results", "msg"))
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$HTS_TST.Linkage.T, 0.94, tolerance = 1e-3)
 })
-
 
 test_that(" Test linkage < 95% missing data", {
   data <- tribble(
@@ -334,7 +330,6 @@ test_that(" Test linkage < 95% missing data", {
   expect_equal(foo$test_results$msg, "Missing data.")
 })
 
-
 test_that(" Test KP linkage < 95% expect message", {
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
@@ -350,12 +345,11 @@ test_that(" Test KP linkage < 95% expect message", {
   expect_equal(foo$test_results$HTS_TST.KP.Linkage.T, 0.94, tolerance = 1e-3)
 })
 
-#NOTE: This doesn't work with 2023 or 2024 NEED TO LOOK AT
 test_that(" Test linkage > 100% expect message", {
 
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_INDEX_COM.New.Pos.T,
-    ~HTS_INDEX_FAC.New.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T, ~cop_year,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~HTS_TST.ActiveOther.Pos.T,
+    ~HTS.Index.Pos.T, ~TX_NEW.T, ~HTS_TST.KP.Pos.T, ~TX_NEW.KP.T, ~cop_year,
     "a", 1, "25-49", "F", NA, 50, 50, 100, 0, 0, 2024,
     "b", 2, "25-49", "M", NA, 50, 50, 101, 0, 0, 2024
   )
@@ -449,7 +443,6 @@ test_that(" Test index pos ratio", {
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$HTS_TST_POS.index_rate, 10 / 110, tolerance = 1e-3)
 })
-
 
 test_that(" Test linkage with age <1", {
   data <- tribble(
