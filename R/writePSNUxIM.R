@@ -205,7 +205,7 @@ writePSNUxIM <- function(d,
       dplyr::filter(!is.na(org_type)) %>%
       dplyr::select(dp_label, orgUnit = uid)
 
-    schema <- pick_schema(d$info$cop_year,"PSNUxIM")
+    schema <- pick_schema(d$info$cop_year, "PSNUxIM")
     # schema <- if (d$info$cop_year == 2023) {
     #   cop23_psnuxim_schema
     # } else if (d$info$cop_year == 2024) {
