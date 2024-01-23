@@ -44,8 +44,8 @@ checkMechanisms <- function(d,
 
   can_have_dedupe <-
     (d$info$tool %in% c("Data Pack", "OPU Data Pack") &&
-    d$info$cop_year %in% c(2021:2023)) ||
-  (d$info$tool == "PSNUxIM" && d$info$cop_year == 2023)
+    d$info$cop_year %in% c(2021:2024)) ||
+  (d$info$tool == "PSNUxIM" && d$info$cop_year >= 2023)
 
   if (can_have_dedupe) {
     mechs_datim <- append(c("00000", "00001"), mechs_datim)
