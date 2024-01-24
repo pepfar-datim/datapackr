@@ -36,19 +36,9 @@ checkMechanisms <- function(d,
   #Default should only be allowable with certain data elements.
   #Allow for the default mechanism
   mechs_datim <- append("default", mechs_datim)
-  #Allow for the dedupe mechanisms in COP21/COP22/COP23 DataPacks and OPUs
 
-  #TODO: There is some discrepancy here regarding
-  #the use of OPU Data Pack and PSNUxIM.
-  #Get rid of OPU Data Pack completely and only use PSNUxIM.
-
-  can_have_dedupe <-
-    (d$info$tool %in% c("Data Pack", "OPU Data Pack","PSNUxIM") &&
-    d$info$cop_year %in% c(2021:2024))
-
-  if (can_have_dedupe) {
-    mechs_datim <- append(c("00000", "00001"), mechs_datim)
-  }
+  #Append the dedupe mechanisms in COP21/COP22/COP23 DataPacks and OPUs
+  mechs_datim <- append(c("00000", "00001"), mechs_datim)
 
   bad_mechs <- sort(mechs_data[!(mechs_data %in% mechs_datim)])
 
