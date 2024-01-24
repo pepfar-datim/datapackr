@@ -37,7 +37,7 @@ checkMechanisms <- function(d,
   #Allow for the default mechanism
   mechs_datim <- append("default", mechs_datim)
 
-  #Append the dedupe mechanisms in COP21/COP22/COP23 DataPacks and OPUs
+  #Append the dedupe mechanisms in DataPacks and OPUs
   mechs_datim <- append(c("00000", "00001"), mechs_datim)
 
   bad_mechs <- sort(mechs_data[!(mechs_data %in% mechs_datim)])
