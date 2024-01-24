@@ -43,9 +43,8 @@ checkMechanisms <- function(d,
   #Get rid of OPU Data Pack completely and only use PSNUxIM.
 
   can_have_dedupe <-
-    (d$info$tool %in% c("Data Pack", "OPU Data Pack") &&
-    d$info$cop_year %in% c(2021:2024)) ||
-  (d$info$tool == "PSNUxIM" && d$info$cop_year >= 2023)
+    (d$info$tool %in% c("Data Pack", "OPU Data Pack","PSNUxIM") &&
+    d$info$cop_year %in% c(2021:2024))
 
   if (can_have_dedupe) {
     mechs_datim <- append(c("00000", "00001"), mechs_datim)
