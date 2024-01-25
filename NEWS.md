@@ -3,7 +3,6 @@
 ## New features
 * 
 
-
 ## Bug fixes
 * Updated how `checkMechanisms` handles dedupe mechs.
 
