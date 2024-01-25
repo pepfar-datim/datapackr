@@ -5,7 +5,7 @@
 
 
 ## Bug fixes
-* 
+* Updated how `checkMechanisms` handles dedupe mechs.
 
 ## Minor improvements and fixes
 * 
