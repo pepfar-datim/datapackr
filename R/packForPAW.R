@@ -1,6 +1,6 @@
 getPopData <- function(d) {
 
-  d$data$SUBNAT_IMPATT
+  d$data$SUBNAT_IMPATT #null for cameroon need intermediate steps
 
   datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
                                              datasource = "Data Pack")
