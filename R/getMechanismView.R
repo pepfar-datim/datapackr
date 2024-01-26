@@ -125,7 +125,6 @@ mechs %<>% dplyr::filter(!(mechanism_code %in% c("00000", "00001", "00100", "002
 if (!is.null(cop_year)) {
 
   cop_year %<>% check_cop_year(cop_year = cop_year)
-
   mechs %<>%
     dplyr::filter(
       (startdate < paste0(as.numeric(cop_year) + 1, "-10-01") &
