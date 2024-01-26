@@ -119,11 +119,13 @@ packForDATIM <- function(d, type = NULL) {
                   value)
 
   # DP-901: Drop SUBNAT/IMPATT data from past and future years. Keep COP Year data only ----
+  # DP-1195: Keep data from past cop year and current cop year.
   if (type == "SUBNAT_IMPATT") {
-    current_period <- paste0(d$info$cop_year, "Oct")
+    current_period <- paste0(d$info$cop_year+1, "Oct")
+    previous_year_period <- paste0(d$info$cop_year -1 , "Oct")
 
     data %<>%
-      dplyr::filter(period == current_period)
+      dplyr::filter(period == current_period | period == previous_year_period)
   }
 
   #Nothing should be NA at this point
