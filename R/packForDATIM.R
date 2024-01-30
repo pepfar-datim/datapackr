@@ -123,7 +123,7 @@ packForDATIM <- function(d, type = NULL) {
   if (type == "SUBNAT_IMPATT") {
     current_period <- paste0(d$info$cop_year, "Oct")
     previous_year_period <- paste0(d$info$cop_year - 1, "Oct")
-    pop_data <- c("MktYDp33kd6", "KssDaTsGWnS", "iwSejvD8cXl", "lJtpR5byqps",
+    pop_data <- c("MktYDp33kd6", "KssDaTsGWnS", "lJtpR5byqps",
                  "nF19GOjcnoD", "xghQXueYJxu", "P2XNbiNnIqV", "zoKiMGRucOY")
     if (d$info$cop_year <= 2023) {
     data %<>%
