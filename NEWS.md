@@ -1,3 +1,14 @@
+# datapackr 7.3.2
+
+## New features
+* 
+
+## Bug fixes
+* Updated `packForDATIM` to included pop indicators for COP24 in `createDATIMExport`.
+
+## Minor improvements and fixes
+* 
+
 # datapackr 7.3.1
 
 ## New features
