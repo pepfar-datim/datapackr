@@ -136,16 +136,14 @@ update_de_coc_co_map <- function(cop_year = NULL,
   # DP-1195 PATCH
   # P2XNbiNnIqV was not included in forms
   #Setup dataframe to append back to fullCodeList
-  Patch = fullCodeList[fullCodeList$dataelementuid == "P2XNbiNnIqV" &
-                         fullCodeList$period == "2024Oct",]
-  Patch$FY = 2024
-  Patch$period = "2023Oct"
-  Patch$period_dataset = "FY24 SUBNAT Targets"
+  Patch <- fullCodeList[fullCodeList$dataelementuid == "P2XNbiNnIqV" &
+                         fullCodeList$period == "2024Oct", ]
+  Patch$FY <- 2024
+  Patch$period <- "2023Oct"
+  Patch$period_dataset <- "FY24 SUBNAT Targets"
 
   #Append back to full code list
-  fullCodeList=rbind(fullCodeList,Patch)
-
-  #############
+  fullCodeList <- rbind(fullCodeList, Patch)
 
 
   # Prep Data Pack schema for mapping ####
