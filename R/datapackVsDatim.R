@@ -91,6 +91,13 @@ compareData_DatapackVsDatim <-
     datapack_data <- createDATIMExport(d) %>%
       dplyr::filter(dataElement %in% included_data_elements$dataelementuid)
 
+    if (d$info$cop_year == 2024) {
+      pop_data <- c("KssDaTsGWnS", "lJtpR5byqps", "nF19GOjcnoD", "P2XNbiNnIqV")
+      datapack_data <-
+        datapack_data %>%
+        dplyr::filter(!dataElement %in% pop_data)
+    }
+
     #Need to make value a numeric
     datapack_data$value <- as.numeric(datapack_data$value)
 
