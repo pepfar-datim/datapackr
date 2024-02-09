@@ -77,7 +77,7 @@ memoStructure <- function(d, d2_session = dynGet("d2_default_session",
       "AGYW_PREV", "Total", NA)
   }
 
-  if (d$info$cop_year %in% c("2022", "2023","2024")) {
+  if (d$info$cop_year %in% c("2022", "2023", "2024")) {
     row_order <- tibble::tribble(
       ~ind, ~options, ~partner_chunk,
       "TX_NEW", "<15", 1,
