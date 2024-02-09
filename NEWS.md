@@ -4,9 +4,11 @@
 * 
 
 ## Bug fixes
-* Updated `packForDATIM` to includ only certain pop indicators for COP24 in `createDATIMExport`.
-* Patched `update_de_coc_co_map` to allow for certain dataelements to be included even though they were left off the data entry forms
-* Updated `getCOPDataFromDATIM`, as it releates to imports, to work with COP24
+* Updated `packForDATIM` to include only certain pop indicators for COP24 in `createDATIMExport`.
+* Patched `update_de_coc_co_map` to allow for certain data elements to be included even though they were left off the data entry forms
+* Updated `getCOPDataFromDATIM`, as it relates to imports, to work with COP24
+* Updated `getMemoIndicators` to allow for COP24
+* Updated `memoStructure` to allow for COP24
 
 ## Minor improvements and fixes
 * 
