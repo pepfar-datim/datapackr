@@ -1,16 +1,15 @@
 #' @export
-#' @title packForDATIM
+#' @title packForPAW
 #'
 #' @description
-#' Flexible function that allows packaging of a variety of datapackr outputs as
-#' DATIM import files.
+#' Function built to specifically export data to PAW
 #'
 #' @inheritParams datapackr_params
-#' @param type Type of dataset to prep for DATIM. Choose from \code{PSNUxIM},
+#' @param type Type of dataset to prep for PAW. Choose from \code{PSNUxIM},
 #' \code{SUBNAT_IMPATT}, \code{OPU PSNUxIM}, or \code{Undistributed MER}.
 #'
 #' @return d object
-packForDATIM <- function(d, type = NULL) {
+packForPAW <- function(d, type = NULL) {
 
 
   # Check params ----
@@ -64,7 +63,7 @@ packForDATIM <- function(d, type = NULL) {
     }
 
     datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
-                                                          datasource = "PSNUxIM")
+                                               datasource = "PSNUxIM")
   }
 
   if (type == "Undistributed MER") { ## Undistributed MER ----
@@ -85,7 +84,7 @@ packForDATIM <- function(d, type = NULL) {
       dplyr::mutate(
         mech_code = default_catOptCombo(),
         support_type = "Sub-National") %>%
-    # PATCH: Drop TX_CURR_SUBNAT.R for now
+      # PATCH: Drop TX_CURR_SUBNAT.R for now
       dplyr::filter(indicator_code != "TX_CURR_SUBNAT.R")
 
     datim_map <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
@@ -97,48 +96,42 @@ packForDATIM <- function(d, type = NULL) {
     dplyr::select(tidyselect::all_of(expected_col_names))
 
   data %<>%
-  # Map to dataElement & categoryOptionCombo ----
-    dplyr::left_join(datim_map,
-                     by = c("indicator_code" = "indicator_code",
-                            "Age" = "valid_ages.name",
-                            "Sex" = "valid_sexes.name",
-                            "KeyPop" = "valid_kps.name",
-                            "support_type" = "support_type")) %>%
-  # Round value as needed ----
-    dplyr::mutate(
-      value =
-        dplyr::case_when(
-          value_type == "integer" ~ datapackr::round_trunc(value),
-          TRUE ~ value)) %>%
-  # Form into DATIM import file ----
-    dplyr::select(dataElement = dataelementuid,
-                  period,
-                  orgUnit = psnuid,
-                  categoryOptionCombo = categoryoptioncombouid,
-                  attributeOptionCombo = mech_code,
-                  value)
+    # Map to dataElement & categoryOptionCombo ----
+  dplyr::left_join(datim_map,
+                   by = c("indicator_code" = "indicator_code",
+                          "Age" = "valid_ages.name",
+                          "Sex" = "valid_sexes.name",
+                          "KeyPop" = "valid_kps.name",
+                          "support_type" = "support_type")) %>%
+    # Round value as needed ----
+  dplyr::mutate(
+    value =
+      dplyr::case_when(
+        value_type == "integer" ~ datapackr::round_trunc(value),
+        TRUE ~ value)) %>%
+    # Form into DATIM import file ----
+  dplyr::select(dataElement = dataelementuid,
+                period,
+                orgUnit = psnuid,
+                categoryOptionCombo = categoryoptioncombouid,
+                attributeOptionCombo = mech_code,
+                value)
 
   # DP-901: Drop SUBNAT/IMPATT data from past and future years. Keep COP Year data only ----
   # DP-1195: Keep data from past cop year and current cop year.
-  # if (type == "SUBNAT_IMPATT") {
-  #   current_period <- paste0(d$info$cop_year, "Oct")
-  #   previous_year_period <- paste0(d$info$cop_year - 1, "Oct")
-  #   pop_data <- c("KssDaTsGWnS", "lJtpR5byqps", "nF19GOjcnoD", "P2XNbiNnIqV")
-  #   if (d$info$cop_year <= 2023) {
-  #   data %<>%
-  #     dplyr::filter(period == current_period)
-  #   } else {
-  #     data %<>%
-  #       dplyr::filter(period == current_period |
-  #                       period == previous_year_period & dataElement %in% pop_data
-  #       )
-  #   }
-  # }
   if (type == "SUBNAT_IMPATT") {
     current_period <- paste0(d$info$cop_year, "Oct")
-
-    data %<>%
-      dplyr::filter(period == current_period)
+    previous_year_period <- paste0(d$info$cop_year - 1, "Oct")
+    pop_data <- c("KssDaTsGWnS", "lJtpR5byqps", "nF19GOjcnoD", "P2XNbiNnIqV")
+    if (d$info$cop_year <= 2023) {
+      data %<>%
+        dplyr::filter(period == current_period)
+    } else {
+      data %<>%
+        dplyr::filter(period == current_period |
+                        period == previous_year_period & dataElement %in% pop_data
+        )
+    }
   }
 
   #Nothing should be NA at this point
@@ -158,15 +151,15 @@ packForDATIM <- function(d, type = NULL) {
   }
 
   data %<>%
-  # Aggregate across 50+ age bands ----
-    dplyr::group_by(dplyr::across(c(-value))) %>%
+    # Aggregate across 50+ age bands ----
+  dplyr::group_by(dplyr::across(c(-value))) %>%
     dplyr::summarise(value = sum(value), .groups = "drop") %>%
     tidyr::drop_na()
 
 
   # Prioritizations ----
   if (type == "SUBNAT_IMPATT") {
-    d$datim$prioritizations <- data %>%
+    d$paw$prioritizations <- data %>%
       dplyr::filter(
         dataElement %in%
           datim_map$dataelementuid[which(datim_map$indicator_code == "IMPATT.PRIORITY_SNU.T")])
@@ -181,10 +174,10 @@ packForDATIM <- function(d, type = NULL) {
 
   # nolint start
   switch(type,
-         PSNUxIM = {d$datim$MER <- data},
-         SUBNAT_IMPATT = {d$datim$subnat_impatt <- data},
-         `OPU PSNUxIM` = {d$datim$OPU <- data},
-         `Undistributed MER` = {d$datim$UndistributedMER <- data})
+         PSNUxIM = {d$paw$MER <- data},
+         SUBNAT_IMPATT = {d$paw$subnat_impatt <- data},
+         `OPU PSNUxIM` = {d$paw$OPU <- data},
+         `Undistributed MER` = {d$paw$UndistributedMER <- data})
   # nolint end
 
 
