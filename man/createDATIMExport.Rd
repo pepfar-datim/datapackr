@@ -2,7 +2,7 @@
 % Please edit documentation in R/createDATIMExport.R
 \name{createDATIMExport}
 \alias{createDATIMExport}
-\title{Title}
+\title{createDATIMExport}
 \usage{
 createDATIMExport(d)
 }
@@ -10,8 +10,8 @@ createDATIMExport(d)
 \item{d}{}
 }
 \value{
-A data frame in standardized DHIS2 export format
+A data frame in standardized DHIS2 export format for DATIM
 }
 \description{
-Title
+createDATIMExport
 }
