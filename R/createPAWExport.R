@@ -9,17 +9,6 @@
 createPAWExport <- function(d) {
 
   if (d$info$tool == "Data Pack") {
-    if (d$info$cop_year == 2022) {
-      if (d$info$has_psnuxim) {
-        paw_export <- dplyr::bind_rows(d$datim$subnat_impatt,
-                                         d$datim$fy22_prioritizations,
-                                         d$datim$MER)
-      } else {
-        paw_export <- dplyr::bind_rows(d$datim$subnat_impatt,
-                                         d$datim$fy22_prioritizations,
-                                         d$datim$UndistributedMER)
-      }
-    }
 
     if (d$info$cop_year %in% c(2023, 2024)) {
       if (d$info$has_psnuxim) {

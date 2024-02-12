@@ -10,19 +10,6 @@ createDATIMExport <- function(d) {
 
   if (d$info$tool == "Data Pack") {
 
-    # 2022 exceptions ----
-    if (d$info$cop_year == 2022) {
-      if (d$info$has_psnuxim) {
-        datim_export <- dplyr::bind_rows(d$datim$subnat_impatt,
-                                         d$datim$fy22_prioritizations,
-                                         d$datim$MER)
-      } else {
-        datim_export <- dplyr::bind_rows(d$datim$subnat_impatt,
-                                         d$datim$fy22_prioritizations,
-                                         d$datim$UndistributedMER)
-      }
-    }
-
     # 2023 exceptions ----
     if (d$info$cop_year == 2023) {
       if (d$info$has_psnuxim) {
