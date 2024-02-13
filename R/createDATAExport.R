@@ -18,22 +18,8 @@ createDATAExport <- function(d, export_type = NULL) {
 
     if (d$info$tool == "Data Pack") {
 
-      # 2023 exceptions ----
-      if (d$info$cop_year == 2023) {
-        if (d$info$has_psnuxim) {
-          datim_export <- dplyr::bind_rows(d$datim$subnat_impatt,
-                                           d$datim$prioritizations,
-                                           d$datim$OPU)
-        } else {
-          datim_export <- dplyr::bind_rows(d$datim$subnat_impatt,
-                                           d$datim$prioritizations,
-                                           d$datim$UndistributedMER)
-        }
-      }
-
-
-      # 2024 exceptions ----
-      if (d$info$cop_year == 2024) {
+      # 2023-2024 exceptions ----
+      if (d$info$cop_year %in% c(2023, 2024)) {
         if (d$info$has_psnuxim) {
           datim_export <- dplyr::bind_rows(d$datim$subnat_impatt,
                                            d$datim$prioritizations,
