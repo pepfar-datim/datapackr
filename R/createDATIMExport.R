@@ -10,8 +10,23 @@ createDATIMExport <- function(d) {
 
   if (d$info$tool == "Data Pack") {
 
-    # 2023-2024 exceptions ----
-    if (d$info$cop_year %in% c(2023, 2024)) {
+    # 2023 is handled separate ----
+    # dp-1195 in packForDatim already handles 2023 subnat data
+    if (d$info$cop_year == 2023) {
+      if (d$info$has_psnuxim) {
+        datim_export <- dplyr::bind_rows(d$datim$subnat_impatt,
+                                         d$datim$prioritizations,
+                                         d$datim$OPU)
+      } else {
+        datim_export <- dplyr::bind_rows(d$datim$subnat_impatt,
+                                         d$datim$prioritizations,
+                                         d$datim$UndistributedMER)
+      }
+    }
+
+    # 2024 exceptions ----
+    # remove pop data for datim
+    if (d$info$cop_year == 2024) {
       if (d$info$has_psnuxim) {
         datim_export <- dplyr::bind_rows(d$datim$subnat_impatt,
                                          d$datim$prioritizations,
