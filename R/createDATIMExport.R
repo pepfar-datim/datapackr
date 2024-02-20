@@ -1,26 +1,17 @@
-
-#' Title
+#' @export
+#' @title createDATIMExport
 #'
 #' @param d
 #'
-#' @return A data frame in standardized DHIS2 export format
+#' @return A data frame in standardized DHIS2 export format for DATIM
 #' @export
 #'
 createDATIMExport <- function(d) {
 
   if (d$info$tool == "Data Pack") {
-    if (d$info$cop_year == 2022) {
-      if (d$info$has_psnuxim) {
-        datim_export <- dplyr::bind_rows(d$datim$subnat_impatt,
-                                         d$datim$fy22_prioritizations,
-                                         d$datim$MER)
-      } else {
-        datim_export <- dplyr::bind_rows(d$datim$subnat_impatt,
-                                         d$datim$fy22_prioritizations,
-                                         d$datim$UndistributedMER)
-      }
-    }
 
+    # 2023/2024
+    # remove pop data for datim
     if (d$info$cop_year %in% c(2023, 2024)) {
       if (d$info$has_psnuxim) {
         datim_export <- dplyr::bind_rows(d$datim$subnat_impatt,
@@ -31,9 +22,18 @@ createDATIMExport <- function(d) {
                                          d$datim$prioritizations,
                                          d$datim$UndistributedMER)
       }
+
+      # pop data needs to removed for COP24, specifically FY24 Targets aka 2023Oct
+      # pop data should not be in 2023 as well so it is okay to run here
+      pop_data <- c("KssDaTsGWnS", "lJtpR5byqps", "nF19GOjcnoD", "P2XNbiNnIqV")
+      datim_export <-
+        datim_export %>%
+        dplyr::filter(!dataElement %in% pop_data)
+
     }
   }
 
+  # handle OPU
   if (d$info$tool %in% c("OPU Data Pack", "PSNUxIM")) {
     datim_export <-  d$datim$OPU
   }
