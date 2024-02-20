@@ -47,7 +47,11 @@ checkMechanisms <- function(d,
                   "Please ensure that these mechanisms have been marked ",
                   "as active for COP",
                   substr(d$info$cop_year, 3, 4), " in FACTS-Info or ",
-                  "reallocate values to a valid mechanism:",
+                  "reallocate values to a valid mechanism.",
+                  "Please reference the FAQ section of the User Guide or navigate to ",
+                  "https://peptest.dfafacts.gov/assets/guides/HowtoMakeMechanismsAppearinDATIM.pdf ,",
+                  "to see step by step instructions on how to resolve.",
+                  "The following mechanisms are implicated: ",
                   paste(bad_mechs, sep = "", collapse = ", "))
     d$tests$bad_mechs <- data.frame(mechanism_code = bad_mechs)
     d$info$messages <- appendMessage(d$info$messages, msg, "ERROR")
