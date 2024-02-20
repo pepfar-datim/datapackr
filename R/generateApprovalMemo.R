@@ -245,8 +245,8 @@ renderPartnerTable <- function(memo_doc, partners_table, memoStructure, source_t
 
   # Set the caption based on the source_type
   fig_caption <- switch(source_type,
-                        "datapack" = "Table 3a: Partners Table (Proposed)",
-                        "datim" = "Table 3b: Partners Table (Current)")
+                        "datapack" = "Table 3a: Partner Tables (Proposed)",
+                        "datim" = "Table 3b: Partner Tables (Current)")
 
   memo_doc  %<>% officer::body_add(fig_caption, style = "Normal")
 
