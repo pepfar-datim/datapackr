@@ -17,5 +17,6 @@ d object
 }
 \description{
 Flexible function that allows packaging of a variety of datapackr outputs as
-DATIM import files.
+DATIM or PAW import files. All data is packed with this function and then properly
+filtered with createDATIMExport or createPAWExport for the right purpose export.
 }
