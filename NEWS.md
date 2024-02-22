@@ -10,6 +10,7 @@
 
 ## Minor improvements and fixes
 * Added tests around both `createPAWExport`,`createDATIMExport`, and `packForDATIM`
+* Please note a few hot fixes related to visual formatting went into main between 7.3.3 and 7.4.0.
 
 # datapackr 7.3.3
 
