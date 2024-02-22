@@ -69,7 +69,7 @@ prepareExistingDataAnalytics <- function(d, d2_session =
                       datastreams = "mer_targets",
                       d2_session = d2_session)
 
-  if (d$info$tool %in% c("OPU Data Pack", "PSNUxIM")) {
+  if ((d$info$tool %in% c("OPU Data Pack", "PSNUxIM")) && (!is.null(df))) {
     ### OPU DataPacks only include data with a funding mechanism
     ### drop data with default attribute option combo
     df <- dplyr::filter(df,
