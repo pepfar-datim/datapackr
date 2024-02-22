@@ -1,17 +1,15 @@
 # datapackr 7.4.0
 
 ## New features
-* 
+* Created `createPAWExport` to prepare data to be exported to PAW
+* Modified `createDATIMExport` to prepare data to be exported only to DATIM
+* Modified `packForDATIM` to feed both of the aforementioned export functions
 
 ## Bug fixes
-* Updated `packForDATIM` to include only certain pop indicators for COP24 in `createDATIMExport`.
-* Patched `update_de_coc_co_map` to allow for certain data elements to be included even though they were left off the data entry forms
-* Updated `getCOPDataFromDATIM`, as it relates to imports, to work with COP24
-* Updated `getMemoIndicators` to allow for COP24
-* Updated `memoStructure` to allow for COP24
+* 
 
 ## Minor improvements and fixes
-* 
+* Added tests around both `createPAWExport`,`createDATIMExport`, and `packForDATIM`
 
 # datapackr 7.3.3
 
