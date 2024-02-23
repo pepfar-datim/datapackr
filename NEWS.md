@@ -1,3 +1,17 @@
+# datapackr 7.4.0
+
+## New features
+* Created `createPAWExport` to prepare data to be exported to PAW
+* Modified `createDATIMExport` to prepare data to be exported only to DATIM
+* Modified `packForDATIM` to feed both of the aforementioned export functions
+
+## Bug fixes
+* 
+
+## Minor improvements and fixes
+* Added tests around both `createPAWExport`,`createDATIMExport`, and `packForDATIM`
+* Please note a few hot fixes related to visual formatting went into main between 7.3.3 and 7.4.0.
+
 # datapackr 7.3.3
 
 ## New features
