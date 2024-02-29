@@ -6,7 +6,7 @@
 #' @return Current COP Year. (e.g., for COP19, returns 2019)
 #'
 getCurrentCOPYear <- function() {
-  2023
+  2024
 }
 
 
