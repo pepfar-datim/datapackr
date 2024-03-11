@@ -226,22 +226,12 @@ check_cop_year <- function(cop_year=NULL, tool) {
   cop_year <- cop_year %missing% NULL
 
   if (length(cop_year) != 1L) {
-
     stop("You must specify a single COP Year!")
   }
 
   if (is.na(cop_year) || is.null(cop_year))  {
-
     stop(paste("COP Year was not specified"))
   }
-
-  if (!(cop_year %in% supportedCOPYears())) {
-    stop(paste("COP Year", cop_year, "is not supported at this time."))
-  }
-
-  # Fri Mar  8 15:08:05 2024 ------------------------------
-  # should place logic here that has the ifelse when cop_year is NULL
-  # This one could have a lot of down stream impacts, need to check the 5 or so files that rely on this
 
   # Check type & parse if character and resembles a numeric
   cop_year %<>% parse_maybe_number() # Found in utilities.R

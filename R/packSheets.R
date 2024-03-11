@@ -31,21 +31,7 @@ packDataPackSheets <- function(wb,
                                sheets = NULL,
                                cop_year = NULL) {
 
-  cop_year <- cop_year %missing% NULL
-
-  if (length(cop_year) != 1L) {
-
-    stop("You must specify a single COP Year!")
-  }
-
-  if (is.na(cop_year) || is.null(cop_year))  {
-
-    stop(paste("COP Year was not specified"))
-  }
-
-  if (!(cop_year %in% supportedCOPYears())) {
-    stop(paste("COP Year", cop_year, "is not supported at this time."))
-  }
+  cop_year %<>% check_cop_year()
 
   # Resolve parameter issues. ####
   if (is.null(model_data)) {
