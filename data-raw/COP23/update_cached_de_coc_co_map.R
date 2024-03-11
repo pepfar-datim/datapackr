@@ -6,7 +6,7 @@
 secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
 datimutils::loginToDATIM(secrets)
 
-cop_year <- getCurrentCOPYear()
+cop_year <- 2023 #Need to double check this with Scott, but believe correct
 
 # Pull Code Lists for FY22 data (MER Targets, IMPATT, SUBNAT Targets) ####
   mer.T <- getCodeList(cop_year = cop_year, datastreams = c("mer_targets"))

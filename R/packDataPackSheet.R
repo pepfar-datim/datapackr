@@ -21,7 +21,23 @@ packDataPackSheet <- function(wb,
                               org_units,
                               schema = pick_schema(),
                               sheet_data,
-                              cop_year = getCurrentCOPYear()) { #TODO: Could we load a play dataset here?
+                              cop_year = NULL) { #TODO: Could we load a play dataset here?
+
+  cop_year <- cop_year %missing% NULL
+
+  if (length(cop_year) != 1L) {
+
+    stop("You must specify a single COP Year!")
+  }
+
+  if (is.na(cop_year) || is.null(cop_year))  {
+
+    stop(paste("COP Year was not specified"))
+  }
+
+  if (!(cop_year %in% supportedCOPYears())) {
+    stop(paste("COP Year", cop_year, "is not supported at this time."))
+  }
 
   # Prepare data for writing to sheet ####
   sheet_data <- prepareSheetData(sheet = sheet,
