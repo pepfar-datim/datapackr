@@ -208,9 +208,16 @@ analyze_vmmc_indeterminate <- function(data) {
 analyze_pmtctknownpos <- function(data) {
   a <- NULL
 
-  required_names <- c("PMTCT_STAT.N.New.Pos.T",
-                      "PMTCT_STAT.N.KnownPos.T",
-                      "PMTCT_STAT.N.New.Neg.T")
+  this_cop_year <- as.character(data$cop_year[1])
+
+  required_names <- switch(this_cop_year,
+                           "2023" =  c("PMTCT_STAT.N.New.Pos.T",
+                                       "PMTCT_STAT.N.KnownPos.T",
+                                       "PMTCT_STAT.N.New.Neg.T"),
+                           "2024" =  c("PMTCT_STAT.N.New.Pos.T",
+                                       "PMTCT_STAT.N.Known.Pos.T",
+                                       "PMTCT_STAT.N.New.Neg.T"),
+                           stop("Unsupported COP Year"))
 
   if (any(!(required_names %in% names(data)))) {
     a$test_results <- data.frame(msg = "Missing data.")
@@ -277,9 +284,16 @@ analyze_pmtctknownpos <- function(data) {
 analyze_tbknownpos <- function(data) {
   a <- NULL
 
-  required_names <- c("TB_STAT.N.New.Pos.T",
-                      "TB_STAT.N.KnownPos.T",
-                      "TB_STAT.N.New.Neg.T")
+  this_cop_year <- as.character(data$cop_year[1])
+
+  required_names <- switch(this_cop_year,
+                           "2023" =  c("TB_STAT.N.New.Pos.T",
+                                       "TB_STAT.N.KnownPos.T",
+                                       "TB_STAT.N.New.Neg.T"),
+                           "2024" =  c("TB_STAT.N.New.Pos.T",
+                                       "TB_STAT.N.Known.Pos.T",
+                                       "TB_STAT.N.New.Neg.T"),
+                           stop("Unsupported COP Year"))
 
   if (any(!(required_names %in% names(data)))) {
     a$test_results <- data.frame(msg = "Missing data.")
