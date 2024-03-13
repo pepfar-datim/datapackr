@@ -226,20 +226,32 @@ analyze_pmtctknownpos <- function(data) {
     return(a)
   }
 
+  pick2 <- function(x, v1, v2, v3, v4) {
+    out = case_when(
+      x == 1 ~ PMTCT_STAT.N.KnownPos.T,
+      x == 2 ~ PMTCT_STAT.N.Known.Pos.T
+    )
+    return(out)
+  }
+  # x="PMTCT_STAT.N.KnownPos.T"
+  # y="PMTCT_STAT.N.Known.Pos.T"
+
   issues <- data %>%
     dplyr::filter(is.na(key_population)) %>%
+
     dplyr::mutate(
       PMTCT_STAT.N.Total =
         PMTCT_STAT.N.New.Pos.T
-        + PMTCT_STAT.N.KnownPos.T
+        + ifelse(this_cop_year=="2023", x, y)
         + PMTCT_STAT.N.New.Neg.T,
       knownpos_ratio =
-        (PMTCT_STAT.N.KnownPos.T / PMTCT_STAT.N.Total)) %>%
+        (ifelse(this_cop_year=="2023", x, y) / PMTCT_STAT.N.Total)) %>%
+
     dplyr::select(
       psnu, psnu_uid, age, sex, key_population,
       PMTCT_STAT.N.Total,
       PMTCT_STAT.N.New.Pos.T,
-      PMTCT_STAT.N.KnownPos.T,
+      ifelse(this_cop_year=="2023", "PMTCT_STAT.N.KnownPos.T", "PMTCT_STAT.N.Known.Pos.T"),
       PMTCT_STAT.N.New.Neg.T,
       knownpos_ratio
     ) %>%
