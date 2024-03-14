@@ -6,13 +6,11 @@ datimutils::loginToDATIM(secrets)
 
 # NOTE: Full documentation can be found in data.R
 # The current list can be viewed by running View(valid_OrgUnits)
-
 cop_year <- 2024
-menu(c("Yes", "No"), title = "Have you set the cop_year variable correctly?")
 
 # valid_OrgUnits ----
 # Fetch PSNU values
-valid_OrgUnits <- getDataPackOrgUnits(cop_year = cop_year, use_cache = FALSE)
+valid_OrgUnits <- getDataPackOrgUnits(use_cache = FALSE)
 
 # Comparing default valid_OrgUnits list to newly modified list
 compare_diffs <- datapackr::valid_OrgUnits_2024 %>%
