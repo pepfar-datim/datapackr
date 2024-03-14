@@ -28,10 +28,13 @@ generation_list <- c("Malawi",
 pick <- datapackr::cop24_datapack_countries %>%
   dplyr::filter(datapack_name %in% generation_list)
 
-# test valid org units against cached ####
-valid_OrgUnits <- getDataPackOrgUnits(use_cache = FALSE)
+cop_year=2024
+menu(c("Yes", "No"), title = "Have you set the cop_year variable correctly?")
 
-compare_diffs <- datapackr::valid_OrgUnits %>%
+# test valid org units against cached ####
+valid_OrgUnits <- getDataPackOrgUnits(cop_year = cop_year, use_cache = FALSE)
+
+compare_diffs <- datapackr::valid_OrgUnits_2024 %>%
   dplyr::full_join(valid_OrgUnits, by = "uid") %>%
   dplyr::filter(is.na(name.x) | is.na(name.y))
 
