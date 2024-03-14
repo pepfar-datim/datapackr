@@ -7,16 +7,19 @@ datimutils::loginToDATIM(secrets)
 # NOTE: Full documentation can be found in data.R
 # The current list can be viewed by running View(valid_OrgUnits)
 
+cop_year=2024
+menu(c("Yes", "No"), title = "Have you set the cop_year variable correctly?")
+
 # valid_OrgUnits ----
 # Fetch PSNU values
-valid_OrgUnits <- getDataPackOrgUnits(use_cache = FALSE)
+valid_OrgUnits <- getDataPackOrgUnits(cop_year = cop_year, use_cache = FALSE)
 
 # Comparing default valid_OrgUnits list to newly modified list
-compare_diffs <- datapackr::valid_OrgUnits %>%
+compare_diffs <- datapackr::valid_OrgUnits_2024 %>%
   dplyr::full_join(valid_OrgUnits, by = "uid") %>%
   dplyr::filter(is.na(name.x) | is.na(name.y))
 
-waldo::compare(datapackr::valid_OrgUnits, valid_OrgUnits)
+waldo::compare(datapackr::valid_OrgUnits_2024, valid_OrgUnits)
 
 # Overwriting default list with newly created list
 usethis::use_data(valid_OrgUnits,
@@ -27,7 +30,7 @@ usethis::use_data(valid_OrgUnits,
 
 ## Save metadata in API for easy access by Data Management Team
 
-shareable <- datapackr::valid_OrgUnits %>%
+shareable <- datapackr::valid_OrgUnits_2024 %>%
   dplyr::select(orgUnit = uid)
 
 output_folder <- paste0(rprojroot::find_package_root_file(),
@@ -45,7 +48,7 @@ utils::write.csv(shareable, filepath, row.names = FALSE)
 # cop_datapack_countries ----
 # If anything has changed at country level or above, update dataframe of data pack countries/names
 
-cop24_datapack_countries <- datapackr::valid_OrgUnits %>%
+cop24_datapack_countries <- getValidOrgUnits(cop_year= 2024) %>%
   dplyr::select(ou, ou_uid, country_name, country_uid) %>%
   dplyr::distinct() %>%
   # dplyr::mutate(
