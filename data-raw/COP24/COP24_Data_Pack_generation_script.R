@@ -28,7 +28,7 @@ generation_list <- c("Malawi",
 pick <- datapackr::cop24_datapack_countries %>%
   dplyr::filter(datapack_name %in% generation_list)
 
-cop_year=2024
+cop_year <- 2024
 menu(c("Yes", "No"), title = "Have you set the cop_year variable correctly?")
 
 # test valid org units against cached ####
