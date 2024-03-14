@@ -48,7 +48,7 @@ utils::write.csv(shareable, filepath, row.names = FALSE)
 # cop_datapack_countries ----
 # If anything has changed at country level or above, update dataframe of data pack countries/names
 
-cop24_datapack_countries <- getValidOrgUnits(cop_year= 2024) %>%
+cop24_datapack_countries <- getValidOrgUnits(cop_year = cop_year) %>%
   dplyr::select(ou, ou_uid, country_name, country_uid) %>%
   dplyr::distinct() %>%
   # dplyr::mutate(
