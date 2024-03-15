@@ -121,10 +121,10 @@ test_that("VMMC_CIRC Indeterminate Rate all keypop not NA expect NULL", {
 test_that("PMTCT Known Pos/PMTCT Total >  0.75 expect message", {
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,
-    ~PMTCT_STAT.N.New.Pos.T, ~PMTCT_STAT.N.Known.Pos.T, ~PMTCT_STAT.N.New.Neg.T,
+    ~PMTCT_STAT.N.New.Pos.T, ~PMTCT_STAT.N.KnownPos.T, ~PMTCT_STAT.N.New.Neg.T,
     ~ cop_year,
-    "a", 1, "<1", "M", NA, 10, 100, 10, 2024,
-    "b", 2, "<1", "M", NA, 0, 0, 0, 2024
+    "a", 1, "<1", "M", NA, 10, 100, 10, 2023,
+    "b", 2, "<1", "M", NA, 0, 0, 0, 2023
   )
 
   foo <- analyze_pmtctknownpos(data)
@@ -138,9 +138,9 @@ test_that("PMTCT Known Pos/PMTCT Total >  0.75 expect message", {
 test_that("PMTCT Known Pos/PMTCT Total >  0.75 missing data", {
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,
-    ~PMTCT_STAT.N.New.Pos.T, ~PMTCT_STAT.N.KnownPos.T,
-    "a", 1, "<1", "M", NA, 10, 100,
-    "b", 2, "<1", "M", NA, 0, 0
+    ~PMTCT_STAT.N.New.Pos.T, ~PMTCT_STAT.N.KnownPos.T, ~ cop_year,
+    "a", 1, "<1", "M", NA, 10, 100, 2023,
+    "b", 2, "<1", "M", NA, 0, 0, 2023
   )
 
   foo <- analyze_pmtctknownpos(data)
@@ -155,10 +155,10 @@ test_that("PMTCT Known Pos/PMTCT Total >  0.75 missing data", {
 test_that("PMTCT Known Pos/PMTCT Total <  0.75 expect null", {
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,
-    ~PMTCT_STAT.N.New.Pos.T, ~PMTCT_STAT.N.KnownPos.T, ~PMTCT_STAT.N.New.Neg.T,
-    "a", 1, "<1", "M", NA, 10, 10, 10,
-    "b", 2, "<1", "M", NA, 0, 0, 0,
-    "c", 3, "<1", "M", NA, 25, 150, 25
+    ~PMTCT_STAT.N.New.Pos.T, ~PMTCT_STAT.N.KnownPos.T, ~PMTCT_STAT.N.New.Neg.T, ~ cop_year,
+    "a", 1, "<1", "M", NA, 10, 10, 10, 2023,
+    "b", 2, "<1", "M", NA, 0, 0, 0, 2023,
+    "c", 3, "<1", "M", NA, 25, 150, 25, 2023
   )
 
   expect_null(analyze_pmtctknownpos(data))
@@ -168,9 +168,9 @@ test_that("PMTCT Known Pos/PMTCT Total <  0.75 expect null", {
 test_that("PMTCT Known Pos/PMTCT Total all zeros expect null", {
   data <- tribble(
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~PMTCT_STAT.N.New.Pos.T
-    , ~PMTCT_STAT.N.KnownPos.T, ~PMTCT_STAT.N.New.Neg.T,
-    "a", 1, "<1", "M", NA, 0, 0, 0,
-    "b", 2, "<1", "M", NA, 0, 0, 0
+    , ~PMTCT_STAT.N.KnownPos.T, ~PMTCT_STAT.N.New.Neg.T, ~ cop_year,
+    "a", 1, "<1", "M", NA, 0, 0, 0, 2023,
+    "b", 2, "<1", "M", NA, 0, 0, 0, 2023
   )
 
   expect_null(analyze_pmtctknownpos(data))
@@ -179,9 +179,9 @@ test_that("PMTCT Known Pos/PMTCT Total all zeros expect null", {
 
 test_that("TB Known Pos ratio > 75% expect message", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T, ~TB_STAT.N.KnownPos.T, ~TB_STAT.N.New.Neg.T,
-    "a", 1, "<1", "M", NA, 25, 156, 25,
-    "b", 2, "<1", "M", NA, 0, 0, 0
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T, ~TB_STAT.N.Known.Pos.T, ~TB_STAT.N.New.Neg.T, ~ cop_year,
+    "a", 1, "<1", "M", NA, 25, 156, 25, 2023,
+    "b", 2, "<1", "M", NA, 0, 0, 0, 2023
   )
 
   foo <- analyze_tbknownpos(data)
@@ -195,9 +195,9 @@ test_that("TB Known Pos ratio > 75% expect message", {
 
 test_that("TB Known Pos ratio > 75% expect message", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T, ~TB_STAT.N.KnownPos.T,
-    "a", 1, "<1", "M", NA, 25, 151,
-    "b", 2, "<1", "M", NA, 0, 0
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T, ~TB_STAT.N.KnownPos.T, ~ cop_year,
+    "a", 1, "<1", "M", NA, 25, 151, 2023,
+    "b", 2, "<1", "M", NA, 0, 0, 2023
   )
 
   foo <- analyze_tbknownpos(data)
@@ -210,9 +210,9 @@ test_that("TB Known Pos ratio > 75% expect message", {
 
 test_that("TB Known Pos ratio < 75% expect message expect null", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T, ~TB_STAT.N.KnownPos.T, ~TB_STAT.N.New.Neg.T,
-    "a", 1, "<1", "M", NA, 25, 150, 25,
-    "b", 2, "<1", "M", NA, 0, 0, 0,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T, ~TB_STAT.N.KnownPos.T, ~TB_STAT.N.New.Neg.T, ~ cop_year,
+    "a", 1, "<1", "M", NA, 25, 150, 25, 2023,
+    "b", 2, "<1", "M", NA, 0, 0, 0, 2023
   )
 
   expect_null(analyze_tbknownpos(data))
@@ -221,9 +221,9 @@ test_that("TB Known Pos ratio < 75% expect message expect null", {
 
 test_that("PMTCT Known Pos/PMTCT Total all zeros expect null", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T, ~TB_STAT.N.KnownPos.T, ~TB_STAT.N.New.Neg.T,
-    "a", 1, "<1", "M", NA, 0, 0, 0,
-    "b", 2, "<1", "M", NA, 0, 0, 0
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T, ~TB_STAT.N.KnownPos.T, ~TB_STAT.N.New.Neg.T, ~ cop_year,
+    "a", 1, "<1", "M", NA, 0, 0, 0, 2023,
+    "b", 2, "<1", "M", NA, 0, 0, 0, 2023
   )
 
   expect_null(analyze_tbknownpos(data))

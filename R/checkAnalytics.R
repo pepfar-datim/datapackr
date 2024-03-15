@@ -226,39 +226,49 @@ analyze_pmtctknownpos <- function(data) {
     return(a)
   }
 
-  pick2 <- function(x, v1, v2, v3, v4) {
-    out = case_when(
-      x == 1 ~ PMTCT_STAT.N.KnownPos.T,
-      x == 2 ~ PMTCT_STAT.N.Known.Pos.T
-    )
-    return(out)
-  }
-  # x="PMTCT_STAT.N.KnownPos.T"
-  # y="PMTCT_STAT.N.Known.Pos.T"
-
-  issues <- data %>%
-    dplyr::filter(is.na(key_population)) %>%
-
-    dplyr::mutate(
-      PMTCT_STAT.N.Total =
-        PMTCT_STAT.N.New.Pos.T
-        + ifelse(this_cop_year=="2023", x, y)
+  issues <- if(this_cop_year=="2023"){
+      data %>%
+      dplyr::filter(is.na(key_population)) %>%
+      dplyr::mutate(
+        PMTCT_STAT.N.Total =
+          PMTCT_STAT.N.New.Pos.T
+        + PMTCT_STAT.N.KnownPos.T,
         + PMTCT_STAT.N.New.Neg.T,
-      knownpos_ratio =
-        (ifelse(this_cop_year=="2023", x, y) / PMTCT_STAT.N.Total)) %>%
-
-    dplyr::select(
-      psnu, psnu_uid, age, sex, key_population,
-      PMTCT_STAT.N.Total,
-      PMTCT_STAT.N.New.Pos.T,
-      ifelse(this_cop_year=="2023", "PMTCT_STAT.N.KnownPos.T", "PMTCT_STAT.N.Known.Pos.T"),
-      PMTCT_STAT.N.New.Neg.T,
-      knownpos_ratio
-    ) %>%
-    dplyr::filter(!is.na(knownpos_ratio)) %>%
-    dplyr::filter(
-      round(knownpos_ratio, 2) > 0.75
-    )
+        knownpos_ratio = (PMTCT_STAT.N.KnownPos.T) / (PMTCT_STAT.N.Total))  %>%
+        dplyr::select(
+          psnu, psnu_uid, age, sex, key_population,
+          PMTCT_STAT.N.Total,
+          PMTCT_STAT.N.New.Pos.T,
+          PMTCT_STAT.N.KnownPos.T,
+          PMTCT_STAT.N.New.Neg.T,
+          knownpos_ratio
+        ) %>%
+        dplyr::filter(!is.na(knownpos_ratio)) %>%
+        dplyr::filter(
+          round(knownpos_ratio, 2) > 0.75
+        )
+    } else if(this_cop_year=="2024") {
+      data %>%
+      dplyr::filter(is.na(key_population)) %>%
+      dplyr::mutate(
+        PMTCT_STAT.N.Total =
+          PMTCT_STAT.N.New.Pos.T
+        + PMTCT_STAT.N.Known.Pos.T,
+        + PMTCT_STAT.N.New.Neg.T,
+        knownpos_ratio = (PMTCT_STAT.N.Known.Pos.T) / (PMTCT_STAT.N.Total))  %>%
+        dplyr::select(
+          psnu, psnu_uid, age, sex, key_population,
+          PMTCT_STAT.N.Total,
+          PMTCT_STAT.N.New.Pos.T,
+          PMTCT_STAT.N.Known.Pos.T,
+          PMTCT_STAT.N.New.Neg.T,
+          knownpos_ratio
+        ) %>%
+        dplyr::filter(!is.na(knownpos_ratio)) %>%
+        dplyr::filter(
+          round(knownpos_ratio, 2) > 0.75
+        )
+    }
 
   if (NROW(issues) > 0) {
 
@@ -314,7 +324,8 @@ analyze_tbknownpos <- function(data) {
     return(a)
   }
 
-  issues <- data %>%
+  issues <- if(this_cop_year=="2023"){
+    data %>%
     dplyr::mutate(
       TB_STAT.N.Total =
         TB_STAT.N.New.Pos.T
@@ -331,6 +342,25 @@ analyze_tbknownpos <- function(data) {
     dplyr::filter(!is.na(knownpos_ratio)) %>%
     dplyr::filter(
       round(knownpos_ratio, 2) > 0.75)
+  } else if(this_cop_year=="2024") {
+    data %>%
+      dplyr::mutate(
+        TB_STAT.N.Total =
+          TB_STAT.N.New.Pos.T
+        + TB_STAT.N.Known.Pos.T
+        + TB_STAT.N.New.Neg.T,
+        knownpos_ratio = TB_STAT.N.Known.Pos.T / TB_STAT.N.Total) %>%
+      dplyr::select(
+        psnu, psnu_uid, age, sex, key_population,
+        TB_STAT.N.Total,
+        TB_STAT.N.New.Pos.T,
+        TB_STAT.N.Known.Pos.T,
+        TB_STAT.N.New.Neg.T,
+        knownpos_ratio) %>%
+      dplyr::filter(!is.na(knownpos_ratio)) %>%
+      dplyr::filter(
+        round(knownpos_ratio, 2) > 0.75)
+  }
 
   if (NROW(issues) > 0) {
 
