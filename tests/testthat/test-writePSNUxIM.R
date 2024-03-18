@@ -1,4 +1,5 @@
 
+with_mock_api({
 test_that("We can write psnuxim", {
 
   # TEST 1: missing model data ----
@@ -44,10 +45,11 @@ test_that("We can write psnuxim", {
     "ERROR! Cannot update PSNUxIM information in a Data Pack with Threaded"
   )
 
-  # TEST 4: no psnuxim & we have UndistributedMER data ----
+  # TEST 4: can we write psnuxim into a new sheet ----
   d <- list()
   d$info$cop_year <- 2024
   d$info$tool <- "Data Pack"
+  d$info$datapack_name <- "Sierra Leone"
   d$info$needs_psnuxim <- TRUE
   d$info$has_psnuxim <- FALSE
   d$info$has_comments_issue <- FALSE
@@ -94,22 +96,20 @@ test_that("We can write psnuxim", {
     snuxim_model_data_path = tmp_mock_snuxim_model,
     output_folder = output_folder,
     append = TRUE,
-    d2_session = training
+    d2_session = triage
   )
 
-  # Be sure we can unpack what we just wrote to a file
-  # borrowed from test-packCOP22OPU.R
+  # Be sure we can unpack what we just wrote
   d_out <- unPackTool(
-    submission_path = d$info$output_file
-    , d2_session = training
+    submission_path = d$info$output_file,
+    d2_session = triage
   )
 
+  # UndistributedMER data now in new psnuxim
   expect_identical(d$info$datapack_name, d_out$info$datapack_name)
   expect_setequal(names(d_out), c("keychain", "info", "data", "tests", "datim", "sheets"))
-  # ....
-
-  # TEST 5: has psnuxim and missing combos ----
+  expect_equal(nrow(d_out$sheets$PSNUxIM), 3)
 
 
-
+})
 })
