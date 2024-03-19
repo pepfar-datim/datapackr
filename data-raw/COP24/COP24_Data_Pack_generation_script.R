@@ -31,7 +31,7 @@ pick <- datapackr::cop24_datapack_countries %>%
 # test valid org units against cached ####
 valid_OrgUnits <- getDataPackOrgUnits(use_cache = FALSE)
 
-compare_diffs <- datapackr::valid_OrgUnits %>%
+compare_diffs <- datapackr::valid_OrgUnits_2024 %>%
   dplyr::full_join(valid_OrgUnits, by = "uid") %>%
   dplyr::filter(is.na(name.x) | is.na(name.y))
 
