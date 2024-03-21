@@ -179,7 +179,8 @@ test_that("PMTCT Known Pos/PMTCT Total all zeros expect null", {
 
 test_that("TB Known Pos ratio > 75% expect message", {
   data <- tribble(
-    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T, ~TB_STAT.N.Known.Pos.T, ~TB_STAT.N.New.Neg.T, ~ cop_year,
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T,
+    ~TB_STAT.N.KnownPos.T, ~TB_STAT.N.New.Neg.T, ~ cop_year,
     "a", 1, "<1", "M", NA, 25, 156, 25, 2023,
     "b", 2, "<1", "M", NA, 0, 0, 0, 2023
   )
