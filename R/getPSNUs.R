@@ -27,7 +27,7 @@ getValidOrgUnits <- function(cop_year = NULL) {
          "2021" = valid_PSNUs,
          "2022" = valid_PSNUs,
          "2023" = valid_OrgUnits,
-         "2024" = valid_OrgUnits)
+         "2024" = valid_OrgUnits_2024)
 
 }
 
