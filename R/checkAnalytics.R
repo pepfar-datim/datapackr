@@ -226,7 +226,7 @@ analyze_pmtctknownpos <- function(data) {
     return(a)
   }
 
-  issues <- if(this_cop_year=="2023"){
+  issues <- if (this_cop_year == "2023") {
     data %>%
     dplyr::filter(is.na(key_population)) %>%
     dplyr::mutate(
@@ -248,7 +248,7 @@ analyze_pmtctknownpos <- function(data) {
     dplyr::filter(
       round(knownpos_ratio, 2) > 0.75
     )
-  } else if(this_cop_year=="2024") {
+  } else if (this_cop_year == "2024") {
     data %>%
       dplyr::filter(is.na(key_population)) %>%
       dplyr::mutate(
@@ -326,7 +326,7 @@ analyze_tbknownpos <- function(data) {
     return(a)
   }
 
-  issues <- if(this_cop_year=="2023"){
+  issues <- if (this_cop_year == "2023") {
     data %>%
     dplyr::mutate(
       TB_STAT.N.Total =
@@ -344,7 +344,7 @@ analyze_tbknownpos <- function(data) {
     dplyr::filter(!is.na(knownpos_ratio)) %>%
     dplyr::filter(
       round(knownpos_ratio, 2) > 0.75)
-    } else if(this_cop_year=="2024") {
+    } else if (this_cop_year == "2024") {
       data %>%
       dplyr::mutate(
         TB_STAT.N.Total =
