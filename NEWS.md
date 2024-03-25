@@ -1,3 +1,8 @@
+# datapackr 7.4.1
+
+## Bug fixes
+* Updated valid Org units with changes from 2024
+
 # datapackr 7.4.0
 
 ## New features
