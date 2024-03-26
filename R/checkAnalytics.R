@@ -208,9 +208,16 @@ analyze_vmmc_indeterminate <- function(data) {
 analyze_pmtctknownpos <- function(data) {
   a <- NULL
 
-  required_names <- c("PMTCT_STAT.N.New.Pos.T",
-                      "PMTCT_STAT.N.KnownPos.T",
-                      "PMTCT_STAT.N.New.Neg.T")
+  this_cop_year <- as.character(data$cop_year[1])
+
+  required_names <- switch(this_cop_year,
+                           "2023" =  c("PMTCT_STAT.N.New.Pos.T",
+                                       "PMTCT_STAT.N.KnownPos.T",
+                                       "PMTCT_STAT.N.New.Neg.T"),
+                           "2024" =  c("PMTCT_STAT.N.New.Pos.T",
+                                       "PMTCT_STAT.N.Known.Pos.T",
+                                       "PMTCT_STAT.N.New.Neg.T"),
+                           stop("Unsupported COP Year"))
 
   if (any(!(required_names %in% names(data)))) {
     a$test_results <- data.frame(msg = "Missing data.")
@@ -219,13 +226,14 @@ analyze_pmtctknownpos <- function(data) {
     return(a)
   }
 
-  issues <- data %>%
+  issues <- if (this_cop_year == "2023") {
+    data %>%
     dplyr::filter(is.na(key_population)) %>%
     dplyr::mutate(
       PMTCT_STAT.N.Total =
         PMTCT_STAT.N.New.Pos.T
-        + PMTCT_STAT.N.KnownPos.T
-        + PMTCT_STAT.N.New.Neg.T,
+      + PMTCT_STAT.N.KnownPos.T
+      + PMTCT_STAT.N.New.Neg.T,
       knownpos_ratio =
         (PMTCT_STAT.N.KnownPos.T / PMTCT_STAT.N.Total)) %>%
     dplyr::select(
@@ -240,6 +248,29 @@ analyze_pmtctknownpos <- function(data) {
     dplyr::filter(
       round(knownpos_ratio, 2) > 0.75
     )
+  } else if (this_cop_year == "2024") {
+    data %>%
+      dplyr::filter(is.na(key_population)) %>%
+      dplyr::mutate(
+        PMTCT_STAT.N.Total =
+          PMTCT_STAT.N.New.Pos.T
+        + PMTCT_STAT.N.Known.Pos.T
+        + PMTCT_STAT.N.New.Neg.T,
+        knownpos_ratio =
+          (PMTCT_STAT.N.Known.Pos.T / PMTCT_STAT.N.Total)) %>%
+      dplyr::select(
+        psnu, psnu_uid, age, sex, key_population,
+        PMTCT_STAT.N.Total,
+        PMTCT_STAT.N.New.Pos.T,
+        PMTCT_STAT.N.Known.Pos.T,
+        PMTCT_STAT.N.New.Neg.T,
+        knownpos_ratio
+      ) %>%
+      dplyr::filter(!is.na(knownpos_ratio)) %>%
+      dplyr::filter(
+        round(knownpos_ratio, 2) > 0.75
+      )
+    }
 
   if (NROW(issues) > 0) {
 
@@ -277,9 +308,16 @@ analyze_pmtctknownpos <- function(data) {
 analyze_tbknownpos <- function(data) {
   a <- NULL
 
-  required_names <- c("TB_STAT.N.New.Pos.T",
-                      "TB_STAT.N.KnownPos.T",
-                      "TB_STAT.N.New.Neg.T")
+  this_cop_year <- as.character(data$cop_year[1])
+
+  required_names <- switch(this_cop_year,
+                           "2023" =  c("TB_STAT.N.New.Pos.T",
+                                       "TB_STAT.N.KnownPos.T",
+                                       "TB_STAT.N.New.Neg.T"),
+                           "2024" =  c("TB_STAT.N.New.Pos.T",
+                                       "TB_STAT.N.Known.Pos.T",
+                                       "TB_STAT.N.New.Neg.T"),
+                           stop("Unsupported COP Year"))
 
   if (any(!(required_names %in% names(data)))) {
     a$test_results <- data.frame(msg = "Missing data.")
@@ -288,7 +326,8 @@ analyze_tbknownpos <- function(data) {
     return(a)
   }
 
-  issues <- data %>%
+  issues <- if (this_cop_year == "2023") {
+    data %>%
     dplyr::mutate(
       TB_STAT.N.Total =
         TB_STAT.N.New.Pos.T
@@ -305,6 +344,25 @@ analyze_tbknownpos <- function(data) {
     dplyr::filter(!is.na(knownpos_ratio)) %>%
     dplyr::filter(
       round(knownpos_ratio, 2) > 0.75)
+    } else if (this_cop_year == "2024") {
+      data %>%
+      dplyr::mutate(
+        TB_STAT.N.Total =
+          TB_STAT.N.New.Pos.T
+        + TB_STAT.N.Known.Pos.T
+        + TB_STAT.N.New.Neg.T,
+        knownpos_ratio = TB_STAT.N.Known.Pos.T / TB_STAT.N.Total) %>%
+      dplyr::select(
+        psnu, psnu_uid, age, sex, key_population,
+        TB_STAT.N.Total,
+        TB_STAT.N.New.Pos.T,
+        TB_STAT.N.Known.Pos.T,
+        TB_STAT.N.New.Neg.T,
+        knownpos_ratio) %>%
+      dplyr::filter(!is.na(knownpos_ratio)) %>%
+      dplyr::filter(
+        round(knownpos_ratio, 2) > 0.75)
+  }
 
   if (NROW(issues) > 0) {
 
