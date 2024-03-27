@@ -218,19 +218,9 @@ getSaneName <- function(datapack_name) {
 #'
 #' @return A data frame consisting of the name of the operating unit
 #'
-getOUFromCountryUIDs <- function(country_uids, cop_year = NA) {
+getOUFromCountryUIDs <- function(country_uids, cop_year = NULL) {
 
-
-  if (is.na(cop_year)) {
-    warning("No COP Year specified so using the current COP year")
-    cop_year <- getCurrentCOPYear()
-  }
-
-  if (length(cop_year) > 1) {
-    stop("You must supply a single COP Year!")
-  }
-
-  cop_year %<>% check_cop_year(cop_year = cop_year)
+  cop_year %<>% check_cop_year()
 
   ou <- getValidOrgUnits(cop_year = cop_year) %>%
     dplyr::select(ou, ou_uid, country_name, country_uid) %>%
@@ -295,7 +285,7 @@ addcols <- function(data, cnames, type = "character") {
 #' @inheritParams datapackr_params
 #' @return returns a character vector of the related dataset uids
 #'
-getCOPDatasetUids <-  function(cop_year, datastreams) {
+getCOPDatasetUids <-  function(cop_year=NULL, datastreams) {
   # TODO: Need to move this into R/packageSetup.R!
   # TODO: Reevaluate the need for this function with introduction of update_de_coc_co_map.R
 
@@ -378,18 +368,11 @@ getCOPDatasetUids <-  function(cop_year, datastreams) {
         "impatt" = "pTuDWXzkAkJ"))
 
 
-  # If cop_year is NULL or missing, use default from package
-  cop_year <- cop_year %missing% NULL
-  cop_year <- cop_year %||% getCurrentCOPYear()
-
-  if (length(cop_year) > 1) {
-    stop("You must specify a single COP Year")
-  }
+  cop_year %<>% check_cop_year()
 
   if (!(cop_year %in% names(cop_datasets))) {
     stop(paste("There are no COP datasets for ", cop_year))
   }
-
 
     datasets_filtered <- cop_datasets %>%
     purrr::pluck(as.character(cop_year)) %>%

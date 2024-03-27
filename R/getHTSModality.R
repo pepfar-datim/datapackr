@@ -7,9 +7,12 @@
 #' @inheritParams datapackr_params
 #' @return Dataframe of HTS modalities mapped to dataElements
 #'
-getHTSModality <- function(cop_year = getCurrentCOPYear(),
+getHTSModality <- function(cop_year = NULL,
                            d2_session = dynGet("d2_default_session",
                                                inherits = TRUE)) {
+
+  cop_year %<>% check_cop_year()
+
   groupSet <- switch(
     as.character(cop_year),
     "2024" = "Bm4JmNS8ciD",

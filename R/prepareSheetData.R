@@ -18,7 +18,9 @@ prepareSheetData <- function(sheet,
                              org_units,
                              schema = pick_schema(),
                              sheet_data,
-                             cop_year = getCurrentCOPYear()) {
+                             cop_year = NULL) {
+
+  cop_year %<>% check_cop_year()
 
   # Get valid disaggs ####
   valid_disaggs <- schema %>%
