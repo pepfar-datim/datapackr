@@ -18,7 +18,7 @@ test_that("No modifications on if there are no duplicates", {
     "Bar", "abc123", "TX_CURR", "<1", "Male", NA, "DSD", "54321", 1
   )
 
-  foo <- datapackr:::autoResolveDuplicates(foo, keep_dedup = FALSE)
+  foo <- autoResolveDuplicates(foo, keep_dedup = FALSE)
 
   expect_true(NROW(foo$datim$MER)  == 2)
 
@@ -46,7 +46,7 @@ test_that("Can resolve non-overallocated  pure dupes", {
     "Foo", "abc123", "TX_CURR", "<1", "Male", NA, "DSD", "54321", 0.5
   )
 
-  foo <- datapackr:::autoResolveDuplicates(foo, keep_dedup = FALSE)
+  foo <- autoResolveDuplicates(foo, keep_dedup = FALSE)
 
   expect_true(NROW(foo$datim$MER) == 3)
 
@@ -74,7 +74,7 @@ test_that("Provide info only for  over-allocated pure dupes", {
     "Foo", "abc123", "TX_CURR", "<1", "Male", NA, "DSD", "54321", 1
   )
 
-  foo <- datapackr:::autoResolveDuplicates(foo, keep_dedup = FALSE)
+  foo <- autoResolveDuplicates(foo, keep_dedup = FALSE)
 
   expect_true(NROW(foo$datim$MER) == 2)
 
@@ -101,7 +101,7 @@ test_that("Can resolve non-overallocated crosswalk dupes", {
     "Foo", "abc123", "TX_CURR", "<1", "Male", NA, "TA", "54321", 0.5
   )
 
-  foo <- datapackr:::autoResolveDuplicates(foo, keep_dedup = FALSE)
+  foo <- autoResolveDuplicates(foo, keep_dedup = FALSE)
 
   expect_true(NROW(foo$datim$MER) == 3)
 
@@ -135,7 +135,7 @@ test_that("Provide info only for over-allocated crosswalk dupes", {
     "Foo", "abc123", "TX_CURR", "<1", "Male", NA, "DSD", "E", 0.02
     )
 
-  foo <- datapackr:::autoResolveDuplicates(foo, keep_dedup = FALSE)
+  foo <- autoResolveDuplicates(foo, keep_dedup = FALSE)
 
   expect_true(NROW(foo$datim$MER) == 5)
 
@@ -166,7 +166,7 @@ test_that("Preserve non-deduplicated data when having over-allocated crosswalk d
     "Bar", "abc123", "TX_CURR", "<1", "Male", NA, "TA", "D", 0.6
   )
 
-  foo <- datapackr:::autoResolveDuplicates(foo, keep_dedup = FALSE)
+  foo <- autoResolveDuplicates(foo, keep_dedup = FALSE)
 
   expect_true(NROW(foo$datim$MER) == 3)
 

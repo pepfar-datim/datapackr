@@ -156,7 +156,7 @@ test_that("Can get columns to keep", {
   d <- list()
   d$info$tool <- "Data Pack"
   d$info$messages <- MessageQueue()
-  d$info$schema <- datapackr::cop22OPU_data_pack_schema
+  d$info$schema <- cop22OPU_data_pack_schema
   cols_to_keep <- getColumnsToKeep(d, sheet = "PSNUxIM")
   expect_setequal(names(cols_to_keep), names(cop22OPU_data_pack_schema))
 })
@@ -168,7 +168,7 @@ test_that("Can detect missing right side formulas", {
 
   generation_list <- c("Eswatini")
 
-  pick <- datapackr::COP21_datapacks_countries %>%
+  pick <- COP21_datapacks_countries %>%
     dplyr::filter(datapack_name %in% generation_list) %>%
     dplyr::arrange(datapack_name)
 
@@ -236,8 +236,8 @@ test_that("Can drop invalid mechanism columns", {
   d <- list()
   d$info$tool <- "Data Pack"
   d$info$messages <- MessageQueue()
-  d$info$schema <- datapackr::cop22OPU_data_pack_schema
-  cols_to_keep <- datapackr:::getColumnsToKeep(d, sheet = "PSNUxIM")
+  d$info$schema <- cop22OPU_data_pack_schema
+  cols_to_keep <- getColumnsToKeep(d, sheet = "PSNUxIM")
 
   #Do nothing if the columns are OK
   test_data <- tibble::tribble(
@@ -274,7 +274,7 @@ test_that("Can flag invalid disaggs in PSNUxIM", {
   d$info$tool <- "OPU Data Pack"
   d$info$messages <- MessageQueue()
   d$info$cop_year <- 2022
-  d$info$schema <- datapackr::cop22OPU_data_pack_schema
+  d$info$schema <- cop22OPU_data_pack_schema
   d$info$has_error <- FALSE
 
   #Flag invalid disaggs
@@ -304,7 +304,7 @@ test_that("Do not  flag valid  disaggs in PSNUxIM", {
   d$info$tool <- "OPU Data Pack"
   d$info$messages <- MessageQueue()
   d$info$cop_year <- 2022
-  d$info$schema <- datapackr::cop22OPU_data_pack_schema
+  d$info$schema <- cop22OPU_data_pack_schema
   d$info$has_error <- FALSE
 
 
@@ -347,7 +347,7 @@ test_that("Can identify and add missing dedupe columns", {
   test_data <- data.frame(foo = c(1L, 1L), bar = c(3L, 3L))
   d$data$SNUxIM <- test_data
   names(d$data$SNUxIM) <- c("foo", "bar")
-  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  d$info$schema <- pick_schema(2023, "PSNUxIM")
   cols_to_keep <- getColumnsToKeep(d, sheet = "PSNUxIM")
   d <- testMissingDedupeRollupColumns(d, cols_to_keep)
   expect_setequal(
@@ -529,7 +529,7 @@ test_that("Can check invalid dedupe values", {
   d <- list()
   d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
-  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  d$info$schema <- pick_schema(2023, "PSNUxIM")
   cols_to_keep <- getColumnsToKeep(d, "PSNUxIM")
   header_cols <- getHeaderColumns(cols_to_keep, sheet)
 
@@ -686,7 +686,7 @@ test_that("Can recalculate final dedupe values", {
     NA #TA Total
   )
 
-  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  d$info$schema <- pick_schema(2023, "PSNUxIM")
   cols_to_keep <- getColumnsToKeep(d, "PSNUxIM")
   header_cols <- getHeaderColumns(cols_to_keep, sheet)
   d$data$SNUxIM <- df
@@ -740,7 +740,7 @@ test_that("Can recalculate final dedupe values", {
     40 #TA Total
   )
 
-  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  d$info$schema <- pick_schema(2023, "PSNUxIM")
   cols_to_keep <- getColumnsToKeep(d, "PSNUxIM")
   header_cols <- getHeaderColumns(cols_to_keep, sheet)
   d$data$SNUxIM <- df
@@ -793,7 +793,7 @@ test_that("Can recalculate final dedupe values", {
     NA #TA Total
   )
 
-  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  d$info$schema <- pick_schema(2023, "PSNUxIM")
   cols_to_keep <- getColumnsToKeep(d, "PSNUxIM")
   header_cols <- getHeaderColumns(cols_to_keep, sheet)
   d$data$SNUxIM <- df
@@ -850,7 +850,7 @@ test_that("Can recalculate final dedupe values", {
     40 #TA Total
   )
 
-  d$info$schema <- datapackr::pick_schema(2023, "PSNUxIM")
+  d$info$schema <- pick_schema(2023, "PSNUxIM")
   cols_to_keep <- getColumnsToKeep(d, "PSNUxIM")
   header_cols <- getHeaderColumns(cols_to_keep, sheet)
   d$data$SNUxIM <- df
