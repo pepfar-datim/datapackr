@@ -29,18 +29,13 @@ getTemplate <- function(path) {
     return(paste0("/root/project/inst/extdata/", path))
   }
 
+  location <- system.file("extdata", path, package = "datapackr")
 
-  first <- rprojroot::find_package_root_file("inst/extdata", path)
-  second <- rprojroot::find_package_root_file("extdata", path)
-
-  if (file.exists(first)) {
-    return(first)
-  } else if (file.exists(second)) {
-    return(second)
+if (file.exists(location)) {
+    return(location)
   } else {
     stop("No template could be found")
   }
-
 
 }
 
@@ -50,15 +45,15 @@ getRDA <- function(object_name) {
     return(paste0("/root/project/data/", object_name, ".rda"))
   }
 
-  first <- rprojroot::find_package_root_file("data", paste0(object_name, ".rda"))
-  second <- paste0(getwd(), "/", object_name, ".rda")
-  if (file.exists(first)) {
-    return(first)
-  } else if (file.exists(second)) {
-    return(second)
-  } else {
-    stop("No template could be found")
-  }
+ foo <- tryCatch({
+    return(rprojroot::find_package_root_file("data", paste0(object_name, ".rda")))
+  }, error = function(e) {
+    return(system.file("data", paste0(object_name, ".rda"), package = "datapackr"))
+  })
+
+ cat(foo)
+ return(foo)
+
 }
 
 # login object stubs sufficient for use in mocked api calls
