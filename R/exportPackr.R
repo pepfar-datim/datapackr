@@ -36,7 +36,7 @@ exportPackr <- function(data, output_folder, tool, datapack_name) {
 
 
   if (tool %in% c("Data Pack", "OPU Data Pack", "PSNUxIM", "Target Setting Tool")) {
-    if (class(data) != "Workbook") {
+    if (!inherits(data, "Workbook")) {
       stop("Output type and data do not match!")
     }
 
@@ -44,7 +44,7 @@ exportPackr <- function(data, output_folder, tool, datapack_name) {
 
     openxlsx::saveWorkbook(wb = data, file = output_file_name, overwrite = TRUE)
   } else if (tool %in% c("SUBNAT IMPATT", "Spectrum Example", "DATIM Export File")) {
-    if (!any(stringr::str_detect(class(data), "data\\.frame|tbl_df"))) {
+    if (!inherits(data, c("data.frame"))) {
       stop("Output type and data do not match!")
     }
 
@@ -52,7 +52,7 @@ exportPackr <- function(data, output_folder, tool, datapack_name) {
 
     utils::write.csv(data, output_file_name, row.names = FALSE)
   } else if (tool %in% c("Results Archive")) {
-    if (class(data) != "list") {
+    if (!inherits(data, "list")) {
       stop("Output type and data do not match!")
     }
 
