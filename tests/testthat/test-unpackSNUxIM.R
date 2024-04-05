@@ -236,8 +236,8 @@ test_that("Can drop invalid mechanism columns", {
   d <- list()
   d$info$tool <- "Data Pack"
   d$info$messages <- MessageQueue()
-  d$info$schema <- datapackr::cop22OPU_data_pack_schema
-  cols_to_keep <- datapackr:::getColumnsToKeep(d, sheet = "PSNUxIM")
+  d$info$schema <- cop22OPU_data_pack_schema
+  cols_to_keep <- getColumnsToKeep(d, sheet = "PSNUxIM")
 
   #Do nothing if the columns are OK
   test_data <- tibble::tribble(
