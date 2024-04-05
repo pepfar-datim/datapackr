@@ -1,0 +1,145 @@
+{
+    "headers": [
+        {
+            "name": "dx",
+            "column": "Data",
+            "valueType": "TEXT",
+            "type": "java.lang.String",
+            "hidden": false,
+            "meta": true
+        },
+        {
+            "name": "ou",
+            "column": "Organisation unit",
+            "valueType": "TEXT",
+            "type": "java.lang.String",
+            "hidden": false,
+            "meta": true
+        },
+        {
+            "name": "value",
+            "column": "Value",
+            "valueType": "NUMBER",
+            "type": "java.lang.Double",
+            "hidden": false,
+            "meta": false
+        }
+    ],
+    "metaData": {
+        "items": {
+            "lG6CEZEBBz8": {
+                "name": "Kono"
+            },
+            "fs5wnlQJVsD": {
+                "name": "_Military Sierra Leone"
+            },
+            "sNMoVbgC08a": {
+                "name": "Western Area Rural"
+            },
+            "iQP6sMIxs34": {
+                "name": "Bo District"
+            },
+            "tyTgX5H0jkm": {
+                "name": "Moyamba"
+            },
+            "QaqUu9vgorH": {
+                "name": "Kambia"
+            },
+            "rQ1jPsQV6Iq": {
+                "name": "Tonkolili"
+            },
+            "hYE7ESNDauP": {
+                "name": "Koinadugu"
+            },
+            "AookYR4ECPH": {
+                "name": "Other organisation unit type"
+            },
+            "POHZmzofoVx": {
+                "name": "Facility"
+            },
+            "dx": {
+                "name": "Data"
+            },
+            "ZNM46EmjhIW": {
+                "name": "Bombali"
+            },
+            "mINJi7rR1a6": {
+                "name": "Type of organisational unit"
+            },
+            "GBV7CsmDD37": {
+                "name": "Kenema"
+            },
+            "ou": {
+                "name": "Organisation unit"
+            },
+            "h9zFApu9xka": {
+                "name": "Bonthe"
+            },
+            "AeZKV2y4FmE": {
+                "name": "Port Loko"
+            },
+            "r4zbW3owX9n": {
+                "name": "IMPATT.PRIORITY_SNU (N, SUBNAT) TARGET: "
+            },
+            "pe": {
+                "name": "Period"
+            },
+            "HllvX50cXC0": {
+                "name": "default"
+            },
+            "I2wk4Eupd1p": {
+                "name": "Western Area Urban"
+            },
+            "2024Oct": {
+                "name": "October 2024 - September 2025"
+            },
+            "PvuaP6YALSA": {
+                "name": "Community"
+            },
+            "FV1k1EDxc41": {
+                "name": "Kailahun"
+            }
+        },
+        "dimensions": {
+            "dx": [
+                "r4zbW3owX9n"
+            ],
+            "pe": [
+                "2024Oct"
+            ],
+            "ou": [
+                "fs5wnlQJVsD",
+                "iQP6sMIxs34",
+                "ZNM46EmjhIW",
+                "h9zFApu9xka",
+                "FV1k1EDxc41",
+                "QaqUu9vgorH",
+                "GBV7CsmDD37",
+                "hYE7ESNDauP",
+                "lG6CEZEBBz8",
+                "tyTgX5H0jkm",
+                "AeZKV2y4FmE",
+                "rQ1jPsQV6Iq",
+                "sNMoVbgC08a",
+                "I2wk4Eupd1p"
+            ],
+            "mINJi7rR1a6": [
+                "POHZmzofoVx",
+                "PvuaP6YALSA",
+                "AookYR4ECPH"
+            ],
+            "co": [
+                "HllvX50cXC0"
+            ]
+        }
+    },
+    "rowContext": {
+
+    },
+    "width": 0,
+    "rows": [
+
+    ],
+    "height": 0,
+    "headerWidth": 3
+}
