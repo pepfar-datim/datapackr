@@ -664,8 +664,8 @@ checkAnalytics <- function(d,
 
   #Special analytics indicators needed for some checksin COP23
   if (d$info$cop_year >= "2023") {
-    pmtct_eid_d <- datapackr:::extractRawColumnData(d, "EID", "PMTCT_EID.D.T")
-    tx_curr_expected <- datapackr:::extractRawColumnData(d, "Cascade", c("Age", "Sex", "TX_CURR.Expected.T_1"))
+    pmtct_eid_d <- extractRawColumnData(d, "EID", "PMTCT_EID.D.T")
+    tx_curr_expected <- extractRawColumnData(d, "Cascade", c("Age", "Sex", "TX_CURR.Expected.T_1"))
     data <- data %>%
       dplyr::bind_rows(pmtct_eid_d, tx_curr_expected)
   }
