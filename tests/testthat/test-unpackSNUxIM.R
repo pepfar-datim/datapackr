@@ -376,22 +376,25 @@ test_that("Can identify negative mechanism target values", {
     "abc123", "HTS_TST.KP.Pos.T", NA, NA, "PWID", 10
   )
 
-  header_cols <- data.frame(indicator_code = c("PSNU"))
+  header_cols <- data.frame(indicator_code = c("PSNU", "indicator_code", "Age", "Sex", "KeyPop"))
 
   d <- testNegativeTargetValues(d,  header_cols)
   expect_true(is.data.frame(d$test$negative_IM_targets))
   expect_equal(NROW(d$tests$negative_IM_targets), 1L)
   expect_true(d$info$has_error)
-  expect_true(grepl("9999_DSD", d$info$messages$message))
+  expect_true(grepl("1 cases", d$info$messages$message))
+  expect_true(setequal(names(d$tests$negative_IM_targets),
+                       c("PSNU", "indicator_code",
+                         "Age", "Sex", "KeyPop", "mechCode_supportType", "value")))
+  expect_true(all(d$tests$negative_IM_targets$value < 0))
 
   #Note that this function remove negative targets, but does not remove the row
   ref <- tibble::tribble(
     ~"PSNU", ~"indicator_code", ~"Age", ~"Sex", ~"KeyPop", ~"9999_DSD",
-    "abc123", "HTS_TST.KP.Neg.T", NA, NA, "PWID", NA,
+    "abc123", "HTS_TST.KP.Neg.T", NA, NA, "PWID", NA_real_,
     "abc123", "HTS_TST.KP.Pos.T", NA, NA, "PWID", 10
   )
   expect_identical(d$data$SNUxIM, ref)
-
 
 })
 
