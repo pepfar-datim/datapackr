@@ -881,17 +881,31 @@ calculateFinalDedupeValues <- function(d, header_cols) {
 #' @return Datapackr d object
 testNegativeTargetValues <- function(d, header_cols) {
 
-  # TEST: Negative IM Targets; Error; Drop ####
+  cols_to_test <- grep("\\d{4,}_(DSD|TA)", names(d$data$SNUxIM), value = TRUE)
+
+  #Nothing to test
+  if (length(cols_to_test) == 0L) {
+    return(d)
+  }
+
   d$tests$negative_IM_targets <- d$data$SNUxIM %>%
-    tidyr::gather(key = "mechCode_supportType",
-                  value = "value",
-                  -tidyselect::all_of(header_cols$indicator_code)) %>%
-    dplyr::filter(stringr::str_detect(mechCode_supportType, "\\d{4,}_(DSD|TA)")
-                  & value < 0)
-
-
+    dplyr::filter(dplyr::if_any(dplyr::all_of(cols_to_test), ~ .x < 0))
 
   if (NROW(d$tests$negative_IM_targets) > 0) {
+
+    #Get the names of the columns which match the regex which have negative values
+    negative_cols <- d$tests$negative_IM_targets %>%
+      dplyr::select(dplyr::matches("\\d{4,}_(DSD|TA)")) %>%
+      dplyr::summarise_all(~ any(.x < 0))
+
+    negative_col_names <- names(negative_cols)[unlist(negative_cols)]
+    final_columns_to_keep <- c(header_cols$indicator_code, negative_col_names)
+    d$tests$negative_IM_targets <- dplyr::select(d$tests$negative_IM_targets, dplyr::all_of(final_columns_to_keep))
+    #Reshape this data to be more readable
+    d$tests$negative_IM_targets <- tidyr::pivot_longer(d$tests$negative_IM_targets,
+                                                      cols = tidyselect::all_of(negative_col_names),
+                                                      names_to = "mechCode_supportType", values_to = "value")
+
 
     attr(d$tests$negative_IM_targets, "test_name") <- "Negative Mechanism Targets"
 
@@ -901,20 +915,22 @@ testNegativeTargetValues <- function(d, header_cols) {
       paste0(
         "ERROR!: In tab PSNUxIM,  ",
         NROW(d$tests$negative_IM_targets),
-        " cases where negative numbers are being used for mechanism allocations.",
-        " The following mechanisms have been affected. These values will be dropped. -> \n\t* ",
-        paste(unique(d$tests$negative_IM_targets$mechCode_supportType), collapse = "\n\t* "),
-        "\n")
+        " cases where negative numbers are being used for mechanism allocations.
+        Please consult
+        the validation report tab \"Negative Mechanism Targets\"
+        for the specific rows where these values were found.\n\t* "
+      )
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
-  }
 
-  d$data$SNUxIM %<>%
-    dplyr::mutate(
-      dplyr::across(
-        dplyr::matches("\\d{4,}_(DSD|TA)"),
-        ~ dplyr::if_else(.x < 0, NA_real_, .x))
-    )
+    d$data$SNUxIM %<>%
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::matches("\\d{4,}_(DSD|TA)"),
+          ~ dplyr::if_else(.x < 0, NA_real_, .x))
+      )
+
+  }
 
   d
 }
