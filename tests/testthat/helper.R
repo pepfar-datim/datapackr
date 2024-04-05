@@ -45,14 +45,13 @@ getRDA <- function(object_name) {
     return(paste0("/root/project/data/", object_name, ".rda"))
   }
 
- foo <- tryCatch({
+ rda_location <- tryCatch({
     return(rprojroot::find_package_root_file("data", paste0(object_name, ".rda")))
   }, error = function(e) {
     return(system.file("data", paste0(object_name, ".rda"), package = "datapackr"))
   })
 
- cat(foo)
- return(foo)
+ return(rda_location)
 
 }
 
