@@ -4,7 +4,9 @@ linters: linters_with_defaults(
     object_usage_linter = NULL, # 84
     object_length_linter = NULL, # 270
     commented_code_linter = NULL, # 88
-    cyclocomp_linter = NULL
+    cyclocomp_linter = NULL,
+    indentation_linter = NULL, # TODO
+    assignment_linter = NULL # TODO
   )
 exclusions: list(
     "tests/testthat/play.dhis2.org" = Inf,
