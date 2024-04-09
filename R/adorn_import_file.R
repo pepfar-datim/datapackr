@@ -1,4 +1,5 @@
 #' @export
+#' @importFrom datimutils getMetadata
 #' @title getPSNUInfo
 #' @description Certain special PSNUs (like DREAMS) are part of the
 #' target setting process, but may exist at a level in the
