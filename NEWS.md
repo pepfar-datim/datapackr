@@ -7,8 +7,8 @@
 * Updated `checkanalytics` and their associated tests. Relating to PMTCT & TB_STAT columns being based on COP Year.  
 
 ## Minor improvements and fixes
-* Added tests related to writePSNUxIM
-* Updated getCurrentCOPYear to 2024, and started development on sunsetting this function. 
+* Added tests related to `writePSNUxIM`
+* Updated `getCurrentCOPYear` to 2024, and started development on sunsetting this function. 
 
 # datapackr 7.4.1
 
