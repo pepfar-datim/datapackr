@@ -8,7 +8,8 @@
 
 ## Minor improvements and fixes
 * Added tests related to `writePSNUxIM`
-* Updated `getCurrentCOPYear` to 2024, and started development on sunsetting this function. 
+* Updated `getCurrentCOPYear` to 2024, and started development on sunsetting this function.
+* Removed non-ASCII character from file unPackingChecks
 
 # datapackr 7.4.1
 
