@@ -516,6 +516,7 @@ checkDataPackName <- function(datapack_name, country_uids, cop_year) {
 
 #' @export
 #' @rdname parameter-checks
+#' @importFrom utils capture.output
 checkTemplatePath <- function(template_path,
                               cop_year,
                               tool,

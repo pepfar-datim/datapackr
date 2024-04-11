@@ -7,9 +7,7 @@
 testRoundingDiffs(d)
 }
 \arguments{
-\item{d}{Datapackr d object}
-
-\item{original_targets}{original_targets object}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 Modified d object with a new object d$info$psnuxim_comparison

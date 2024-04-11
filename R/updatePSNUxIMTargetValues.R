@@ -1,9 +1,9 @@
 
-#' Title updatePSNUxIMTargetValues
+#' @title Update PSNUxIM Target Values
 #'
-#' @param d
+#' @inheritParams datapackr_params
 #'
-#' @return Modified d object with a PSNUxIM workbook object.
+#' @return d object with a PSNUxIM workbook object.
 #' Target values in the "Data Pack Target" column will be updated with values
 #' from the main DataPack tabs.
 #' @export

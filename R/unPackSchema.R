@@ -104,6 +104,7 @@ checkSchema_SheetNums <- function(schema) {
 }
 
 #' @rdname schema-validations
+#' @param filepath_schema Path to the schema file.
 checkSchema_SheetNames <- function(schema, filepath_schema) {
   observed_sheet_names <- unique(schema$sheet_name)
   expected_sheet_names <- unique(filepath_schema$sheet_name)

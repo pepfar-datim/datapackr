@@ -61,6 +61,8 @@ unPackSchema(
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}
 
+\item{filepath_schema}{Path to the schema file.}
+
 \item{template_path}{Local filepath to Data Pack template Excel (XLSX) file.
 This file MUST NOT have any data validation formats present. If left
 \code{NULL}, will select the default based on \code{cop_year} and \code{tool}.}

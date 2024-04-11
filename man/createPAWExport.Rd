@@ -7,7 +7,7 @@
 createPAWExport(d)
 }
 \arguments{
-\item{d}{}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 A data frame in standardized DHIS2 export format for PAW
