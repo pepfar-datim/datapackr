@@ -108,6 +108,7 @@ readSheet <- function(d,
 
 #' @export
 #' @title Load a DataPack from a supplied filepath.
+#' @importFrom stats setNames
 #' @author Scott Jackson
 #' @description `loadSheets` uses `readSheet` to load data from specified sheets
 #' into the DataPack `d` object for use in further functions.

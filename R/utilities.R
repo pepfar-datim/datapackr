@@ -215,6 +215,7 @@ getSaneName <- function(datapack_name) {
 #' @description Takes in a set of Country UIDs and returns an Operating Unit name.
 #'
 #' @param country_uids List of country UIDs from the \code{d$info$country_uids} object.
+#' @param cop_year The COP year to use. Defaults to the current COP Year if not specified.
 #'
 #' @return A data frame consisting of the name of the operating unit
 #'
@@ -290,7 +291,7 @@ addcols <- function(data, cnames, type = "character") {
 #' {"2019", "2020", ... , "2023"}
 #' and type {"mer_targets", "mer_results", "subnat_targets", "subnat_results",
 #' "impatt"}
-#' @param datastream character vector - one or more of:
+#' @param datastreams character vector - one or more of:
 #' {"mer_targets", "mer_results", "subnat_targets", "subnat_results", "impatt"}
 #' @inheritParams datapackr_params
 #' @return returns a character vector of the related dataset uids
@@ -776,6 +777,7 @@ can_spawn <- function() {
 #'
 #' @param string Input vector. Either a character vector, or something coercible
 #' to one.
+#' @param bracketed Boolean to indicate whether the UID is encased in square brackets.
 #'
 #' @return Character vector of DHIS2 11-digit UIDs found in string.
 #'
@@ -845,22 +847,14 @@ is_empty <- function(x) {
 
 #' Default value for `NULL`
 #' @importFrom rlang `%||%`
-#' @keywords NULL
-#' @export
-#' @name null-default
 rlang::`%||%`
 
 #' Default value for `NA`
 #' @importFrom rlang `%|%`
-#' @keywords NA
-#' @export
-#' @name na-default
 rlang::`%|%`
 
 #' @importFrom magrittr `%>%`
-#' @export
 magrittr::`%>%`
 
 #' @importFrom magrittr `%<>%`
-#' @export
 magrittr::`%<>%`

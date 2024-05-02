@@ -20,3 +20,5 @@
 ^data-raw$
 ^.*mechs\.rds$
 ^psnus\.rds$
+^.history
+^.vscode

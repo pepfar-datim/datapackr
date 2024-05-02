@@ -27,6 +27,9 @@ authentication with DATIM.}
 
 \item{append}{If TRUE append rows to the existing DataPack otherwise,
 output a Missing PSNUxIM targets workbook.}
+
+\item{use_template}{If TRUE, use a template to create the object, otherwise
+use the existing workbook object which is part of the main d object.}
 }
 \value{
 d

@@ -7,7 +7,7 @@
 unpackYear2Sheet(d)
 }
 \arguments{
-\item{d}{}
+\item{d}{Datapackr sidecar object}
 }
 \value{
 d

@@ -2,18 +2,18 @@
 % Please edit documentation in R/updatePSNUxIMTargetValues.R
 \name{updatePSNUxIMTargetValues}
 \alias{updatePSNUxIMTargetValues}
-\title{Title updatePSNUxIMTargetValues}
+\title{Update PSNUxIM Target Values}
 \usage{
 updatePSNUxIMTargetValues(d)
 }
 \arguments{
-\item{d}{}
+\item{d}{Datapackr sidecar object}
 }
 \value{
-Modified d object with a PSNUxIM workbook object.
+d object with a PSNUxIM workbook object.
 Target values in the "Data Pack Target" column will be updated with values
 from the main DataPack tabs.
 }
 \description{
-Title updatePSNUxIMTargetValues
+Update PSNUxIM Target Values
 }

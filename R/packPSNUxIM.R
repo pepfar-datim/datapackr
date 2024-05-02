@@ -3,10 +3,9 @@
 #'
 #' @description Packs the PSNUxIM tab in either a COP or OPU Data Pack.
 #'
-#' @param expand_formulas Write all formulas on right side of PSNUxIM tab, not
-#' just the first row.
 #' @param data Dataset containing totals for allocation within PSNUxIM tab,
 #' formatted as a standard DHIS2 import file.
+#' @param org_units Object containing organisation unit information for the Data Pack.
 #' @inheritParams datapackr_params
 #'
 #' @return r Sidecar object containing both an openxlsx Workbook and alert messages
