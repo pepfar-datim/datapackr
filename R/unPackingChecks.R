@@ -1257,7 +1257,7 @@ checkToolEmptySheets <- function(d, sheets, quiet = TRUE) {
     msg <-
       paste0(
         lvl, "! MISSING KEY COLUMNS: The following sheets are missing critical ",
-        "columns — usually PSNU, Age, Sex, and/or KeyPop. This prevents us from ",
+        "columns, usually PSNU, Age, Sex, and/or KeyPop. This prevents us from ",
         "checking and reading any data from these sheets. -> \n  * ",
         paste0(sheets[!has_all_header_columns], collapse = "\n  * "),
         "\n")
