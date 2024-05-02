@@ -3,9 +3,11 @@
 \docType{import}
 \name{reexports}
 \alias{reexports}
+\alias{\%||\%}
+\alias{\%|\%}
 \alias{\%>\%}
 \alias{\%<>\%}
-\title{Objects exported from other packages}
+\title{Default value for `NULL`}
 \keyword{internal}
 \description{
 These objects are imported from other packages. Follow the links
@@ -13,5 +15,7 @@ below to see their documentation.
 
 \describe{
   \item{magrittr}{\code{\link[magrittr:compound]{\%<>\%}}, \code{\link[magrittr:pipe]{\%>\%}}}
+
+  \item{rlang}{\code{\link[rlang:op-na-default]{\%|\%}}, \code{\link[rlang:op-null-default]{\%||\%}}}
 }}
 

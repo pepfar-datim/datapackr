@@ -18,6 +18,9 @@ packOPUDataPack(
 dataset that can be provided while generating an OPU tool such that the
 targets to be distributed will be sourced from this file.}
 
+\item{expand_formulas}{Write all formulas on right side of PSNUxIM tab, not
+just the first row.}
+
 \item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
 authentication with DATIM.}
 }

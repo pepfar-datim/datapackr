@@ -1,8 +1,21 @@
+# datapackr 7.4.3
+
+## New features
+* 
+
+## Bug fixes
+* Updated `checkanalytics` and their associated tests. Relating to PMTCT & TB_STAT columns being based on COP Year.  
+
+## Minor improvements and fixes
+* Added tests related to `writePSNUxIM`
+* Updated `getCurrentCOPYear` to 2024, and started development on sunsetting this function.
+* Removed non-ASCII character from file unPackingChecks
+* Fix issue with package imports flagged by devtools::check
+
 # datapackr 7.4.1
 
 ## Bug fixes
 * Updated valid Org units with changes from 2024
-
 
 # datapackr 7.4.0
 

@@ -1,4 +1,6 @@
 #' @export
+#'
+#' @importFrom stats na.omit
 #' @title Generate a map from Data Pack indicators to Data Pack DEs, COCs, & COs
 #'
 #' @description For a given COP Year, produces a dataframe mapping from Data Pack

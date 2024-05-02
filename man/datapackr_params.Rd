@@ -43,6 +43,9 @@ datapackr_params(
   spectrum_data,
   sheet,
   sheets,
+  expand_formulas,
+  pzns,
+  mer_data,
   ...
 )
 }
@@ -150,6 +153,16 @@ as a column in the output.}
 \item{sheet}{String. Name of sheet/tab within tool.}
 
 \item{sheets}{Character vector. Names of sheets/tabs within tool.}
+
+\item{expand_formulas}{Write all formulas on right side of PSNUxIM tab, not
+just the first row.}
+
+\item{pzns}{A object containing prioiritization information by organisation unit
+to be added to the DataPack object.}
+
+\item{mer_data}{If prior MER data (for instance from DATIM), is passed to this
+parameter, it will be used. Otherwise, data from the existing set of tools
+will be used.}
 
 \item{...}{Additional arguments to pass.}
 }

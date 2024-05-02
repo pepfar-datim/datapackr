@@ -1128,8 +1128,7 @@ generatePSNUxIMComparison <- function(d, original_targets) {
 #' @description
 #' Tests for rounding errors in the PSNUxIM allocation.
 #'
-#' @param d Datapackr d object
-#' @param original_targets original_targets object
+#' @inheritParams datapackr_params
 #'
 #' @return Modified d object with a new object d$info$psnuxim_comparison
 #' and if applicable, d$tests$PSNUxIM_rounding_diffs

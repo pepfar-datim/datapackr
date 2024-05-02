@@ -53,12 +53,13 @@ checkToolEmptySheets(d, sheets, quiet = TRUE)
 checkSheetData(d, sheets = NULL, quiet = TRUE, ...)
 }
 \arguments{
-\item{d}{DataPack object loaded via \code{loadDataPack}.}
+\item{d}{Datapackr sidecar object}
 
 \item{quiet}{Logical. Should warning messages be printed? Default is TRUE.}
 
-\item{sheet}{String. Name of DataPack sheet to check data from. Default is
-first sheet.}
+\item{sheets}{Character vector. Names of sheets/tabs within tool.}
+
+\item{...}{Additional arguments to pass.}
 }
 \value{
 A DataPack object, with updated tests and warnings.

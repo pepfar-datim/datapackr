@@ -12,9 +12,17 @@ unPackOPUDataPack(
 )
 }
 \arguments{
-\item{d}{datapackr sidecar}
+\item{d}{Datapackr sidecar object}
 
-\item{d2_session}{DHIS2 Session id}
+\item{pzns}{A object containing prioiritization information by organisation unit
+to be added to the DataPack object.}
+
+\item{mer_data}{If prior MER data (for instance from DATIM), is passed to this
+parameter, it will be used. Otherwise, data from the existing set of tools
+will be used.}
+
+\item{d2_session}{DHIS2 Session id. R6 datimutils object which handles
+authentication with DATIM.}
 }
 \description{
 Processes a submitted OPU Data Pack (in .xlsx format) by identifying integrity

@@ -46,9 +46,7 @@
 #' @name unPackDataChecks
 #' @md
 #'
-#' @param d DataPack object loaded via `loadDataPack`.
-#' @param sheet String. Name of DataPack sheet to check data from. Default is
-#'   first sheet.
+#' @inheritParams datapackr_params
 #' @param quiet Logical. Should warning messages be printed? Default is TRUE.
 #'
 #' @return A DataPack object, with updated tests and warnings.
@@ -935,6 +933,7 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = TRUE) {
 #Extracts grey cells from Row3 for all sheets
 getCriticalColumns <- function()  {
 
+  #TODO: Should this be hardcoded like this with no paramaters to the function?
   template_file <- system.file("extdata/COP23_Data_Pack_Template.xlsx", package = "datapackr")
 
   template <- readxl::read_excel(template_file)
@@ -1258,7 +1257,7 @@ checkToolEmptySheets <- function(d, sheets, quiet = TRUE) {
     msg <-
       paste0(
         lvl, "! MISSING KEY COLUMNS: The following sheets are missing critical ",
-        "columns — usually PSNU, Age, Sex, and/or KeyPop. This prevents us from ",
+        "columns, usually PSNU, Age, Sex, and/or KeyPop. This prevents us from ",
         "checking and reading any data from these sheets. -> \n  * ",
         paste0(sheets[!has_all_header_columns], collapse = "\n  * "),
         "\n")

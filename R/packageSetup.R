@@ -6,7 +6,7 @@
 #' @return Current COP Year. (e.g., for COP19, returns 2019)
 #'
 getCurrentCOPYear <- function() {
-  2023
+  2024 #Should be updated with the release of Beta-Packs every year
 }
 
 
@@ -427,6 +427,13 @@ pick_template_path <- function(cop_year, tool) {
 #' @param spectrum_data Spectrum output, as a dataframe.
 #' @param sheet String. Name of sheet/tab within tool.
 #' @param sheets Character vector. Names of sheets/tabs within tool.
+#' @param expand_formulas Write all formulas on right side of PSNUxIM tab, not
+#' just the first row.
+#' @param pzns A object containing prioiritization information by organisation unit
+#'  to be added to the DataPack object.
+#' @param mer_data If prior MER data (for instance from DATIM), is passed to this
+#' parameter, it will be used. Otherwise, data from the existing set of tools
+#' will be used.
 #' @param ... Additional arguments to pass.
 #'
 #' @family parameter-helpers
@@ -470,6 +477,9 @@ datapackr_params <- function(model_data,
                              spectrum_data,
                              sheet,
                              sheets,
+                             expand_formulas,
+                             pzns,
+                             mer_data,
                              ...) {
 
   # This function should return something
