@@ -1,3 +1,14 @@
+# datapackr 7.4.4
+
+## New features
+*
+
+## Bug fixes
+*
+
+## Minor improvements and fixes
+*
+
 # datapackr 7.4.3
 
 ## New features
