@@ -7,7 +7,9 @@
 *
 
 ## Minor improvements and fixes
-*
+* Updated exported functions and back end param handling.
+* Updated documentation
+
 
 # datapackr 7.4.3
 
