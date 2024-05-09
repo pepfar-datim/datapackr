@@ -1,5 +1,3 @@
-
-
 #' @title Upload DATIM Export to PDAP
 #' Title
 #'
@@ -15,15 +13,11 @@
 #' @return Returns the presigned URL list (file_key, presigned_url, expiration time)
 #' @export
 #'
-awsJob <-
+getPresignedURL <-
   function(job,
            endpoint,
-           job_type,
-           destination,
-           file_suffix,
-           service,
-           payload,
-           job_paramaters) {
+           query,
+           service) {
 
     creds <- aws.signature::locate_credentials()
 
@@ -38,25 +32,18 @@ awsJob <-
       service = service,
       verb = "GET",
       action = endpoint,
-      query_args = list(
-        job_type = job_type,
-        destination = destination,
-        file_suffix = file_suffix
-      ),
+      query_args = query,
       canonical_headers = list(Host = ssm_response$Parameter$Value),
-      request_body = ""
+      request_body = "",
+      algorithm = "AWS4-HMAC-SHA256"
     )
 
-    url <-
-      paste0("https://", ssm_response$Parameter$Value, endpoint)
+    url <- paste0("https://", ssm_response$Parameter$Value, endpoint)
+
     # retreive presigned url
     response <- httr::GET(
       url = url,
-      query = list(
-        job_type = job_type,
-        destination = destination,
-        file_suffix = file_suffix
-      ),
+      query = query,
       httr::add_headers(Authorization = auth$SignatureHeader,
                         Date = datetime)
     )
@@ -67,34 +54,30 @@ awsJob <-
       stop("Error getting presigned url")
     }
 
-    tmp <- tempfile()
-    #Need better error checking here if we cannot write the file.
-    write.table(
-      payload,
-      file = tmp,
-      quote = FALSE,
-      sep = "|",
-      row.names = FALSE,
-      na = "",
-      fileEncoding = "UTF-8"
-    )
-
-    response <- httr::PUT(url = presigned_url_data$presigned_url,
-                          body = list(x = httr::upload_file(tmp)))
-
-    if (response$status_code != 200) {
-      stop("Error uploading file")
-    }
-
-    #Return for further processing if needed
-    return(presigned_url_data)
-
   }
 
 
 uploadDATIMExportToPDAP <- function(d) {
-  payload <- createPAWExport(d)
 
+  datim_export <- createPAWExport(d)
+  tmp <- tempfile()
+  #Need better error checking here.
+  write.table(
+    datim_export,
+    file = tmp,
+    quote = FALSE,
+    sep = "|",
+    row.names = FALSE,
+    na = "",
+    fileEncoding = "UTF-8"
+  )
+
+  # Load the file as a raw binary
+  read_file <- file(tmp, "rb")
+  raw_file <- readBin(read_file, "raw", n = file.size(tmp))
+  close(read_file)
+
+  # List of paramaters for the DataPack PDAP DATIM Exports
   job <- "PDAPAPIDomainName"
   endpoint <- "/jobs/presignedurl"
   job_type <- "target_setting_tool"
@@ -102,22 +85,31 @@ uploadDATIMExportToPDAP <- function(d) {
   file_suffix <- "csv"
   service <- "execute-api"
 
-  #TODO...may need more here but leave for now.
-  job_paramaters <- list(job_type = job_type,
+  query <- list(job_type = job_type,
                          destination = destination,
                          file_suffix = file_suffix)
 
-  job_result <- awsJob(
+  presigned_url_data <- getPresignedURL(
     job = job,
     endpoint = endpoint,
-    jobType = job_type,
-    destination = destination,
-    file_suffix = file_suffix,
+    query = query,
     service = service,
-    payload = payload,
-    job_paramaters = job_paramaters
+    request_body = raw_file,
+    verb = verb
   )
 
-  return(job_result)
+  # Upload the file
+  response <- httr::PUT(
+    url = presigned_url_data$presigned_url,
+    body = raw_file,
+    httr::add_headers("Content-Type" = "text/csv")
+  )
+
+  if (response$status_code != 200) {
+    warning("Error uploading file")
+  }
+
+  #Just return the raw response if we need to do anything else
+  return(response)
 
 }
