@@ -36,7 +36,7 @@ awsJob <-
       datetime = datetime,
       region = creds$region,
       service = service,
-      verb = 'GET',
+      verb = "GET",
       action = endpoint,
       query_args = list(
         job_type = job_type,
@@ -95,13 +95,12 @@ awsJob <-
 uploadDATIMExportToPDAP <- function(d) {
   payload <- createPAWExport(d)
 
-  job <- 'PDAPAPIDomainName'
-  endpoint <- '/jobs/presignedurl'
-  job_type <- 'target_setting_tool'
-  destination <- 'processed'
-  file_suffix <- 'csv'
-  service <- 'execute-api'
-  verb <- 'GET'
+  job <- "PDAPAPIDomainName"
+  endpoint <- "/jobs/presignedurl"
+  job_type <- "target_setting_tool"
+  destination <- "processed"
+  file_suffix <- "csv"
+  service <- "execute-api"
 
   #TODO...may need more here but leave for now.
   job_paramaters <- list(job_type = job_type,
