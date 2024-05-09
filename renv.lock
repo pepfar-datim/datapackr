@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.2.2",
+    "Version": "4.3.2",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -112,6 +112,17 @@
         "tools"
       ],
       "Hash": "50c838a310445e954bc13f26f26a6ecf"
+    },
+    "aws.signature": {
+      "Package": "aws.signature",
+      "Version": "0.6.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "base64enc",
+        "digest"
+      ],
+      "Hash": "0006bcef272aad12f78dd5a85fc7f4fc"
     },
     "backports": {
       "Package": "backports",
@@ -382,11 +393,11 @@
       "Version": "0.6.0",
       "Source": "GitHub",
       "RemoteType": "github",
+      "RemoteHost": "api.github.com",
       "RemoteUsername": "pepfar-datim",
       "RemoteRepo": "datimutils",
       "RemoteRef": "master",
       "RemoteSha": "31c0be49b3e7d224394c54f1578a0d901b93d8e0",
-      "RemoteHost": "api.github.com",
       "Requirements": [
         "R",
         "R6",
@@ -404,11 +415,11 @@
       "Version": "1.3.5",
       "Source": "GitHub",
       "RemoteType": "github",
-      "RemoteHost": "api.github.com",
       "RemoteUsername": "pepfar-datim",
       "RemoteRepo": "datim-validation",
       "RemoteRef": "master",
       "RemoteSha": "7214f32cc8b21f5466013d8825756322fe9e7353",
+      "RemoteHost": "api.github.com",
       "Remotes": "pepfar-datim/datimutils",
       "Requirements": [
         "ISOweek",
@@ -1019,9 +1030,9 @@
     },
     "httr": {
       "Package": "httr",
-      "Version": "1.4.6",
+      "Version": "1.4.7",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "R6",
@@ -1030,7 +1041,7 @@
         "mime",
         "openssl"
       ],
-      "Hash": "7e5e3cbd2a7bc07880c94e22348fb661"
+      "Hash": "ac107251d9d9fd72f0ca8049988f1d7f"
     },
     "httr2": {
       "Package": "httr2",
@@ -1092,13 +1103,13 @@
     },
     "jsonlite": {
       "Package": "jsonlite",
-      "Version": "1.8.7",
+      "Version": "1.8.8",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "methods"
       ],
-      "Hash": "266a20443ca13c65688b2116d5220f76"
+      "Hash": "e1b9c55281c5adc4dd113652d9e26768"
     },
     "keyring": {
       "Package": "keyring",
@@ -1337,12 +1348,13 @@
     },
     "paws": {
       "Package": "paws",
-      "Version": "0.3.0",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "paws.analytics",
         "paws.application.integration",
+        "paws.common",
         "paws.compute",
         "paws.cost.management",
         "paws.customer.engagement",
@@ -1355,31 +1367,31 @@
         "paws.security.identity",
         "paws.storage"
       ],
-      "Hash": "8c3650837ceb3b7879d0accfe5eaac09"
+      "Hash": "373745f3091ac32bd5f70d783d89d6db"
     },
     "paws.analytics": {
       "Package": "paws.analytics",
-      "Version": "0.3.0",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "paws.common"
       ],
-      "Hash": "f3a27b0314926120e8c333db7645351a"
+      "Hash": "ce1b08551d30927f07cf980fbcd624b9"
     },
     "paws.application.integration": {
       "Package": "paws.application.integration",
-      "Version": "0.3.1",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "paws.common"
       ],
-      "Hash": "bd24295846d31fbfba786d9560b34c6d"
+      "Hash": "f50fab812dd899553df4313532636028"
     },
     "paws.common": {
       "Package": "paws.common",
-      "Version": "0.5.8",
+      "Version": "0.7.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1390,120 +1402,121 @@
         "httr",
         "jsonlite",
         "methods",
+        "stats",
         "utils",
         "xml2"
       ],
-      "Hash": "35039630a878ed95aa7780ebe8f7e0bf"
+      "Hash": "c66dfa46eb607d3171f89596d7529446"
     },
     "paws.compute": {
       "Package": "paws.compute",
-      "Version": "0.3.1",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "paws.common"
       ],
-      "Hash": "53bdd51873b59a4f26b2ec2e8492a307"
+      "Hash": "31c510a7c324db340d7616f111fdbefb"
     },
     "paws.cost.management": {
       "Package": "paws.cost.management",
-      "Version": "0.3.1",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "paws.common"
       ],
-      "Hash": "2cb9fc07abcb18e9c8bc5daf36c8af5f"
+      "Hash": "bac681f234f9001f016aaea8e35fe03c"
     },
     "paws.customer.engagement": {
       "Package": "paws.customer.engagement",
-      "Version": "0.3.0",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "paws.common"
       ],
-      "Hash": "166659f02d517cb7ce1b966884de3c2c"
+      "Hash": "96440cd4b84c6b15a0a56d3c37771d6b"
     },
     "paws.database": {
       "Package": "paws.database",
-      "Version": "0.3.0",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "paws.common"
       ],
-      "Hash": "e73eabf72c6e44ca35ae03c6cea8d054"
+      "Hash": "56926d954574e87f102e6a26f62471dc"
     },
     "paws.developer.tools": {
       "Package": "paws.developer.tools",
-      "Version": "0.3.1",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "paws.common"
       ],
-      "Hash": "087b29e9b3f918c5953f282a9bf52200"
+      "Hash": "9b002332f4656bb0829a47f7451a14b7"
     },
     "paws.end.user.computing": {
       "Package": "paws.end.user.computing",
-      "Version": "0.3.0",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "paws.common"
       ],
-      "Hash": "10eaafdd8088af3b07dccb0e1ad7604e"
+      "Hash": "887c30831c3db80d11938f3d19eb3b0a"
     },
     "paws.machine.learning": {
       "Package": "paws.machine.learning",
-      "Version": "0.3.0",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "paws.common"
       ],
-      "Hash": "00130f561ff59d48577fc35af1eccbb9"
+      "Hash": "2f003f926ece4d969c6120c1782072e9"
     },
     "paws.management": {
       "Package": "paws.management",
-      "Version": "0.3.1",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "paws.common"
       ],
-      "Hash": "a4538ca2179f7038c08bc89c9ccc5146"
+      "Hash": "351811e503d344c0cb2162d5d0fd717e"
     },
     "paws.networking": {
       "Package": "paws.networking",
-      "Version": "0.3.0",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "paws.common"
       ],
-      "Hash": "db990536001b21755174e160b53c381d"
+      "Hash": "53d730871228a41085d56c223eaabbcc"
     },
     "paws.security.identity": {
       "Package": "paws.security.identity",
-      "Version": "0.3.1",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "paws.common"
       ],
-      "Hash": "6c142af824a896d966dc31a950605e79"
+      "Hash": "a7ed398f6e8d4153ab19626a71a49cfa"
     },
     "paws.storage": {
       "Package": "paws.storage",
-      "Version": "0.3.0",
+      "Version": "0.5.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "paws.common"
       ],
-      "Hash": "25361c4afcfa4b7201b37d4b54b6157b"
+      "Hash": "e4a5655c4172112449f7f501c60ed671"
     },
     "pillar": {
       "Package": "pillar",
