@@ -46,9 +46,11 @@ getPresignedURL <-
 
     presigned_url_data <- httr::content(response)
 
-    if (response$status_code != 200) {
+    if (response$status_code != 200L) {
       stop("Error getting presigned url")
     }
+
+    return(presigned_url_data)
 
   }
 
