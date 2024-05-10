@@ -99,9 +99,7 @@ uploadDATIMExportToPDAP <- function(d) {
     job = job,
     endpoint = endpoint,
     query = query,
-    service = service,
-    request_body = raw_file,
-    verb = verb
+    service = service
   )
 
   # Upload the file
