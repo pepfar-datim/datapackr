@@ -3,12 +3,8 @@
 #'
 #' @param job Name of the job, i.e. PDAPAPIDomainName
 #' @param endpoint Path of the endpoint, i.e. /jobs/presignedurl
-#' @param job_type Type of job, i.e. target_setting_tool
-#' @param destination Destination of the job, i.e. processed
-#' @param file_suffix File suffix, i.e. csv
-#' @param service Name of the service to execute, i.e. execute-api
-#' @param payload Data to be uploaded
-#' @param job_paramaters List of job parameters
+#' @param query List of query parameters
+#' @param service Name of the service, i.e. execute-api
 #'
 #' @return Returns the presigned URL list (file_key, presigned_url, expiration time)
 #' @export
@@ -57,11 +53,21 @@ getPresignedURL <-
   }
 
 
+#' @title Upload DATIM Export to PDAP
+#'
+#' @description Extracts current COP year data from the d object,
+#' formats it, and uploads the data to PDAP.
+#'
+#' @inheritParams datapackr_params
+#'
+#' @return Returns the response from the upload
+#' @export
+#'
 uploadDATIMExportToPDAP <- function(d) {
-
+  # Create the DATIM export
   datim_export <- createPAWExport(d)
   tmp <- tempfile()
-  #Need better error checking here.
+  #Need better error checking here if we cannot write the file.
   write.table(
     datim_export,
     file = tmp,
