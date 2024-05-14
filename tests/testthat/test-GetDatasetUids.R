@@ -8,7 +8,7 @@ test_that("getCOPDatasetUids", {
   expect_error(getCOPDatasetUids("foo"))
   expect_error(getCOPDatasetUids("foo", NULL))
 
-  expect_true(all(is_uidish(getCOPDatasetUids(cop_year = 2021))))
+  expect_true(all(is_uidish(getCOPDatasetUids(cop_year = 2024))))
   expect_true(all(is_uidish(getCOPDatasetUids())))
 
   expect_identical(getCOPDatasetUids(), getCOPDatasetUids(getCurrentCOPYear()))
@@ -17,11 +17,10 @@ test_that("getCOPDatasetUids", {
     expect_true(all(sapply(getCOPDatasetUids(cop_year, datastream), is_uidish)))
   }
 
-  expect_true(testGetDataSetUIDS(2021, "mer_targets"))
-  expect_true(testGetDataSetUIDS(2021, "subnat_targets"))
-  expect_true(testGetDataSetUIDS(2021, "subnat_results"))
-  expect_true(testGetDataSetUIDS(2022, "mer_targets"))
-  expect_true(testGetDataSetUIDS(2022, c("mer_targets", "subnat_targets", "impatt")))
-
+  expect_true(testGetDataSetUIDS(2024, "mer_targets"))
+  expect_true(testGetDataSetUIDS(2024, "subnat_targets"))
+  expect_true(testGetDataSetUIDS(2024, "subnat_results"))
+  expect_true(testGetDataSetUIDS(2024, "mer_targets"))
+  expect_true(testGetDataSetUIDS(2024, c("mer_targets", "subnat_targets", "impatt")))
 
 })

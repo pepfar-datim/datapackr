@@ -39,9 +39,9 @@ with_mock_api({
 test_that("We can add a DataPack Label", {
 
   #Angola
-  df <- getValidOrgUnits(2022) %>%
+  df <- getValidOrgUnits(2024) %>%
     dplyr::filter(ou == "Angola")
-  df2 <- add_dp_label(df, 2022)
+  df2 <- add_dp_label(df, 2024)
   expect_true(setequal(names(df2),  c(names(df), "dp_label")))
   expect_true(all(stringr::str_detect(df2$dp_label, "^(.+) \\[#[A-Za-z]+\\] \\[[A-Za-z0-9]+\\]$")))
 
@@ -55,9 +55,9 @@ test_that("We can add a DataPack Label", {
 
 
   #Asia region. The DP label takes a different form
-  df <- getValidOrgUnits(2022) %>%
+  df <- getValidOrgUnits(2023) %>%
     dplyr::filter(ou == "Asia Region")
-  df2 <- add_dp_label(df, 2022)
+  df2 <- add_dp_label(df, 2023)
   expect_true(setequal(names(df2),  c(names(df), "dp_label")))
 
   matches <- stringr::str_detect(df2$dp_label, "^(.+) > (.+) \\[#[A-Za-z]+\\] \\[[A-Za-z0-9]+\\]$")
