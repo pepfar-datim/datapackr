@@ -14,10 +14,10 @@
 #' @return Returns the raw response from the API
 #'
 
-aws.executeapi <- function(url, verb, query = NULL, body ="" , headers = NULL) {
+aws.executeapi <- function(url, verb, query = NULL, body = "", headers = NULL) {
 
 
-  if (!(verb %in% c('GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'))) {
+  if (!(verb %in% c("GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"))) {
     stop("Invalid verb")
   }
 
@@ -34,11 +34,11 @@ aws.executeapi <- function(url, verb, query = NULL, body ="" , headers = NULL) {
   auth <- aws.signature::signature_v4_auth(
     datetime = datetime,
     service = "execute-api",
-    action = paste0('/', parsed_url$path),
+    action = paste0("/", parsed_url$path),
     verb = verb,
     canonical_headers = canonical_headers,
     query_args = query,
-    request_body = if (verb %in% c('GET', 'HEAD', 'OPTIONS')) '' else request_body,
+    request_body = if (verb %in% c("GET", "HEAD", "OPTIONS")) "" else request_body,
     algorithm = "AWS4-HMAC-SHA256",
   )
 
@@ -61,13 +61,13 @@ aws.executeapi <- function(url, verb, query = NULL, body ="" , headers = NULL) {
 
 }
 
-aws.executeapi.delete <- purrr::partial(aws.executeapi, verb = 'DELETE')
-aws.executeapi.get <- purrr::partial(aws.executeapi, verb = 'GET')
-aws.executeapi.head <- purrr::partial(aws.executeapi, verb = 'HEAD')
-aws.executeapi.options <- purrr::partial(aws.executeapi, verb = 'OPTIONS')
-aws.executeapi.patch <- purrr::partial(aws.executeapi, verb = 'PATCH')
-aws.executeapi.post <- purrr::partial(aws.executeapi, verb = 'POST')
-aws.executeapi.put <- purrr::partial(aws.executeapi, verb = 'PUT')
+aws.executeapi.delete <- purrr::partial(aws.executeapi, verb = "DELETE")
+aws.executeapi.get <- purrr::partial(aws.executeapi, verb = "GET")
+aws.executeapi.head <- purrr::partial(aws.executeapi, verb = "HEAD")
+aws.executeapi.options <- purrr::partial(aws.executeapi, verb = "OPTIONS")
+aws.executeapi.patch <- purrr::partial(aws.executeapi, verb = "PATCH")
+aws.executeapi.post <- purrr::partial(aws.executeapi, verb = "POST")
+aws.executeapi.put <- purrr::partial(aws.executeapi, verb = "PUT")
 
 getPDAPJobsAPIURL <- function(job = "PDAPAPIDomainName") {
   creds <- aws.signature::locate_credentials()
@@ -110,7 +110,7 @@ getPresignedURL <- function(job = "PDAPAPIDomainName",
     stop("Error getting presigned url")
   }
 
-  return(httr::content(response))
+  return(response)
 
 }
 
@@ -124,14 +124,15 @@ getPresignedURL <- function(job = "PDAPAPIDomainName",
 #' @param job_type The type of job to upload the data to. Currently only
 #' target_setting_tool or year_two_targets are supported.
 #'
-#' @return Returns the S3 file location of the uploaded file
+#' @return Returns the S3 file location of the uploaded file if successful,
+#' otherwise NULL
 #' @export
 #'
 uploadDATIMExportToPDAP <- function(d, job_type) {
 
-  if (job_type = "target_setting_tool") {
+  if (job_type == "target_setting_tool") {
     datim_export <- createPAWExport(d)
-  } else if (job_type = "year_two_targets") {
+  } else if (job_type == "year_two_targets") {
     datim_export <- d$datim$year2 %>%
       dplyr::mutate(value = as.character(round(value)))
   } else {
@@ -166,12 +167,18 @@ uploadDATIMExportToPDAP <- function(d, job_type) {
                 file_suffix = file_suffix)
 
   #Get the presigned URL
-  presigned_url_data <-getPresignedURL(job = "PDAPAPIDomainName",
+  presigned_url_response <- getPresignedURL(job = "PDAPAPIDomainName",
                                                    endpoint = endpoint,
-                                                   job_type = job_type ,
+                                                   job_type = job_type,
                                                    destination = destination,
                                                    file_suffix = file_suffix)
 
+  if (presigned_url_response$status_code != 200L) {
+    warning("Error getting presigned URL")
+    return(NULL)
+  }
+
+  presigned_url_data <- httr::content(presigned_url_response)
   # Upload the file
   response <- httr::PUT(
     url = presigned_url_data$presigned_url,
@@ -201,7 +208,7 @@ uploadDATIMExportToPDAP <- function(d, job_type) {
 #'
 getExistingPDAPJobs <- function(org_unit_id, period_id, job_type) {
 
-  url_pdap_jobs_api <-getPDAPJobsAPIURL(job = "PDAPAPIDomainName")
+  url_pdap_jobs_api <- getPDAPJobsAPIURL(job = "PDAPAPIDomainName")
   endpoint <- "/jobs"
 
   query <- list(job_type = job_type,
@@ -217,7 +224,7 @@ getExistingPDAPJobs <- function(org_unit_id, period_id, job_type) {
     warning("Error getting existing jobs")
   }
 
-  return(httr::content(response))
+  return(response)
 }
 
 #' Title
@@ -231,12 +238,19 @@ getExistingPDAPJobs <- function(org_unit_id, period_id, job_type) {
 #'
 deleteExistingPDAPJobs <- function(org_unit_id, period_id, job_type) {
 
-  url_pdap_jobs_api <-getPDAPJobsAPIURL(job = "PDAPAPIDomainName")
-  existing_jobs <- getExistingPDAPJobs(org_unit_id, period_id, job_type)
+  url_pdap_jobs_api <- getPDAPJobsAPIURL(job = "PDAPAPIDomainName")
+  response <- getExistingPDAPJobs(org_unit_id, period_id, job_type)
+
+  if (response$status_code != 200L) {
+    warning("Error getting existing jobs")
+    return(FALSE)
+  }
+
+  existing_jobs <- httr::content(response)
   success <- TRUE
 
   if (length(existing_jobs) > 0) {
-   for (i in 1:length(existing_jobs)) {
+   for (i in seq_along(existing_jobs)) {
      response <- aws.executeapi.delete(
        url = paste0("https://", url_pdap_jobs_api, "/jobs/", existing_jobs[[i]]$job_id)
      )
@@ -262,7 +276,16 @@ deleteExistingPDAPJobs <- function(org_unit_id, period_id, job_type) {
 #'
 initiatePDAPJob <- function(job_type, datim_export, org_unit_id, period_id) {
 
-  url_pdap_jobs_api <-getPDAPJobsAPIURL(job = "PDAPAPIDomainName")
+  if (!inherits(datim_export, "character")) {
+    stop("Invalid S3 file object type.")
+  }
+
+  s3_regex <- "^s3://[a-zA-Z0-9/._-]+\\.csv$"
+  if (!grepl(s3_regex, datim_export)) {
+    stop("Invalid S3 file location")
+  }
+
+  url_pdap_jobs_api <- getPDAPJobsAPIURL(job = "PDAPAPIDomainName")
 
   query <- list(job_type = job_type,
                 datim_export = datim_export,
@@ -280,13 +303,13 @@ initiatePDAPJob <- function(job_type, datim_export, org_unit_id, period_id) {
     warning("Error initiating job")
   }
 
-  return(httr::content(response))
+  return(response)
 
 }
 
 getExistingFileS3Location <- function(job_type, org_unit_id, period_id) {
 
-  url_pdap_jobs_api <-getPDAPJobsAPIURL(job = "PDAPAPIDomainName")
+  url_pdap_jobs_api <- getPDAPJobsAPIURL(job = "PDAPAPIDomainName")
   endpoint <- "/jobs"
   service <- "execute-api"
 
@@ -294,8 +317,14 @@ getExistingFileS3Location <- function(job_type, org_unit_id, period_id) {
                 org_unit_id = org_unit_id,
                 period_id = period_id)
 
-  existing_jobs <- getExistingPDAPJobs(org_unit_id, period_id, job_type)
+  response <- getExistingPDAPJobs(org_unit_id, period_id, job_type)
 
+  if (response$status_code != 200L) {
+    warning("Error getting existing jobs")
+    return(NULL)
+  } else {
+    existing_jobs <- httr::content(response)
+  }
 
   if (length(existing_jobs) == 0) {
     return(NULL)
@@ -306,8 +335,6 @@ getExistingFileS3Location <- function(job_type, org_unit_id, period_id) {
   }
 
   existing_file_s3_location <- existing_jobs[[1]]$job_payload$datim_export
-
-
 
   return(existing_file_s3_location)
 

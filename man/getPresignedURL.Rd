@@ -5,7 +5,13 @@
 \title{Upload DATIM Export to PDAP
 Title}
 \usage{
-getPresignedURL(job, endpoint, query, service)
+getPresignedURL(
+  job = "PDAPAPIDomainName",
+  endpoint = "/jobs/presignedurl",
+  job_type = "target_setting_tool",
+  destination = "processed",
+  file_suffix = "csv"
+)
 }
 \arguments{
 \item{job}{Name of the job, i.e. PDAPAPIDomainName}

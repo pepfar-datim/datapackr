@@ -4,13 +4,17 @@
 \alias{uploadDATIMExportToPDAP}
 \title{Upload DATIM Export to PDAP}
 \usage{
-uploadDATIMExportToPDAP(d)
+uploadDATIMExportToPDAP(d, job_type)
 }
 \arguments{
 \item{d}{Datapackr sidecar object}
+
+\item{job_type}{The type of job to upload the data to. Currently only
+target_setting_tool or year_two_targets are supported.}
 }
 \value{
-Returns the response from the upload
+Returns the S3 file location of the uploaded file if successful,
+otherwise NULL
 }
 \description{
 Extracts current COP year data from the d object,
