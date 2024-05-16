@@ -1,3 +1,83 @@
+
+
+#' Title
+#' @description Generic function to interact with the PDAP Jobs API. Based on origina
+#' from Patrick Linton https://gist.github.com/pashri/c889ebb79c18ca77312490217b534da4
+#' @param url URL of the PDAP Jobs API
+#' @param verb HTTP verb to use
+#' @param query Any query parameters which should be added to the request
+#' @param body The body of the request. Be sure to convert to the proper format
+#' as needed. If converting to JSON, use toJSON() from the jsonlite package.
+#' If uploading a file, use the raw binary data.
+#' @param headers Any additional headers which should be supplied, such as "application/csv".
+#'
+#' @return Returns the raw response from the API
+#'
+
+aws.executeapi <- function(url, verb, query = NULL, body ="" , headers = NULL) {
+
+
+  if (!(verb %in% c('GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE'))) {
+    stop("Invalid verb")
+  }
+
+  parsed_url <- httr::parse_url(url)
+  datetime <- format(Sys.time(), "%Y%m%dT%H%M%SZ", tz = "UTC")
+
+  request_body <- body
+
+  canonical_headers <- list(
+    Host = parsed_url$hostname
+  )
+  ## Create the signature
+
+  auth <- aws.signature::signature_v4_auth(
+    datetime = datetime,
+    service = "execute-api",
+    action = paste0('/', parsed_url$path),
+    verb = verb,
+    canonical_headers = canonical_headers,
+    query_args = query,
+    request_body = if (verb %in% c('GET', 'HEAD', 'OPTIONS')) '' else request_body,
+    algorithm = "AWS4-HMAC-SHA256",
+  )
+
+  auth_headers <- list(
+    Authorization = paste0(
+      "AWS4-HMAC-SHA256 Credential=", auth$Credential,
+      ", SignedHeaders=", auth$SignedHeaders,
+      ", Signature=", auth$Signature
+    ),
+    Date = datetime
+  )
+
+  httr::VERB(
+    verb = verb,
+    url = url,
+    body = request_body,
+    query = query,
+    do.call(httr::add_headers, c(auth_headers, headers))
+  )
+
+}
+
+aws.executeapi.delete <- purrr::partial(aws.executeapi, verb = 'DELETE')
+aws.executeapi.get <- purrr::partial(aws.executeapi, verb = 'GET')
+aws.executeapi.head <- purrr::partial(aws.executeapi, verb = 'HEAD')
+aws.executeapi.options <- purrr::partial(aws.executeapi, verb = 'OPTIONS')
+aws.executeapi.patch <- purrr::partial(aws.executeapi, verb = 'PATCH')
+aws.executeapi.post <- purrr::partial(aws.executeapi, verb = 'POST')
+aws.executeapi.put <- purrr::partial(aws.executeapi, verb = 'PUT')
+
+getPDAPJobsAPIURL <- function(job = "PDAPAPIDomainName") {
+  creds <- aws.signature::locate_credentials()
+  ssm_client <- paws::ssm()
+  #This will throw an error the the creds do not work.
+  ssm_response <- ssm_client$get_parameter(Name = job)
+  return(ssm_response$Parameter$Value)
+}
+
+
 #' @title Upload DATIM Export to PDAP
 #' Title
 #'
@@ -9,50 +89,30 @@
 #' @return Returns the presigned URL list (file_key, presigned_url, expiration time)
 #' @export
 #'
-getPresignedURL <-
-  function(job,
-           endpoint,
-           query,
-           service) {
+getPresignedURL <- function(job = "PDAPAPIDomainName",
+                            endpoint = "/jobs/presignedurl",
+                            job_type = "target_setting_tool",
+                            destination = "processed",
+                            file_suffix = "csv") {
 
-    creds <- aws.signature::locate_credentials()
+  url_pdap_jobs_api <- getPDAPJobsAPIURL(job)
 
-    ssm_client <- paws::ssm()
-    ssm_response <- ssm_client$get_parameter(Name = job)
-    datetime <- format(Sys.time(), "%Y%m%dT%H%M%SZ", tz = "UTC")
+  query <- list(job_type = job_type,
+                destination = destination,
+                file_suffix = file_suffix)
 
-    # Create the signature
-    auth <- aws.signature::signature_v4_auth(
-      datetime = datetime,
-      region = creds$region,
-      service = service,
-      verb = "GET",
-      action = endpoint,
-      query_args = query,
-      canonical_headers = list(Host = ssm_response$Parameter$Value),
-      request_body = "",
-      algorithm = "AWS4-HMAC-SHA256"
-    )
+  response <- aws.executeapi.get(
+    url = paste0("https://", url_pdap_jobs_api, endpoint),
+    query = query
+  )
 
-    url <- paste0("https://", ssm_response$Parameter$Value, endpoint)
-
-    # retreive presigned url
-    response <- httr::GET(
-      url = url,
-      query = query,
-      httr::add_headers(Authorization = auth$SignatureHeader,
-                        Date = datetime)
-    )
-
-    presigned_url_data <- httr::content(response)
-
-    if (response$status_code != 200L) {
-      stop("Error getting presigned url")
-    }
-
-    return(presigned_url_data)
-
+  if (response$status_code != 200L) {
+    stop("Error getting presigned url")
   }
+
+  return(httr::content(response))
+
+}
 
 
 #' @title Upload DATIM Export to PDAP
@@ -61,13 +121,23 @@ getPresignedURL <-
 #' formats it, and uploads the data to PDAP.
 #'
 #' @inheritParams datapackr_params
+#' @param job_type The type of job to upload the data to. Currently only
+#' target_setting_tool or year_two_targets are supported.
 #'
-#' @return Returns the response from the upload
+#' @return Returns the S3 file location of the uploaded file
 #' @export
 #'
-uploadDATIMExportToPDAP <- function(d) {
-  # Create the DATIM export
-  datim_export <- createPAWExport(d)
+uploadDATIMExportToPDAP <- function(d, job_type) {
+
+  if (job_type = "target_setting_tool") {
+    datim_export <- createPAWExport(d)
+  } else if (job_type = "year_two_targets") {
+    datim_export <- d$datim$year2 %>%
+      dplyr::mutate(value = as.character(round(value)))
+  } else {
+    stop("Invalid job type")
+  }
+
   tmp <- tempfile()
   #Need better error checking here if we cannot write the file.
   write.table(
@@ -85,24 +155,22 @@ uploadDATIMExportToPDAP <- function(d) {
   raw_file <- readBin(read_file, "raw", n = file.size(tmp))
   close(read_file)
 
-  # List of paramaters for the DataPack PDAP DATIM Exports
+  # List of parameters for the DataPack PDAP DATIM Exports
   job <- "PDAPAPIDomainName"
   endpoint <- "/jobs/presignedurl"
-  job_type <- "target_setting_tool"
   destination <- "processed"
   file_suffix <- "csv"
-  service <- "execute-api"
 
   query <- list(job_type = job_type,
-                         destination = destination,
-                         file_suffix = file_suffix)
+                destination = destination,
+                file_suffix = file_suffix)
 
-  presigned_url_data <- getPresignedURL(
-    job = job,
-    endpoint = endpoint,
-    query = query,
-    service = service
-  )
+  #Get the presigned URL
+  presigned_url_data <-getPresignedURL(job = "PDAPAPIDomainName",
+                                                   endpoint = endpoint,
+                                                   job_type = job_type ,
+                                                   destination = destination,
+                                                   file_suffix = file_suffix)
 
   # Upload the file
   response <- httr::PUT(
@@ -111,11 +179,136 @@ uploadDATIMExportToPDAP <- function(d) {
     httr::add_headers("Content-Type" = "text/csv")
   )
 
-  if (response$status_code != 200) {
+  if (response$status_code != 200L) {
     warning("Error uploading file")
   }
 
-  #Just return the raw response if we need to do anything else
-  return(response)
+  #Return the actual file location here if successful
+  return(presigned_url_data$file_key)
+
+}
+
+#' Title
+#'
+#' @param org_unit_id UID of the organization unit
+#' @param period_id ISO8601 formatted period ID
+#' @param job_type Type of job to get, i.e. 'target_setting_tool'
+#'
+#' @return Returns the response from the API. Should be a list of jobs if
+#' successful, otherwise, an empty list. If an error occurs (e.g. 5xx), the
+#' response will also be returned.
+#' @export
+#'
+getExistingPDAPJobs <- function(org_unit_id, period_id, job_type) {
+
+  url_pdap_jobs_api <-getPDAPJobsAPIURL(job = "PDAPAPIDomainName")
+  endpoint <- "/jobs"
+
+  query <- list(job_type = job_type,
+                org_unit_id = org_unit_id,
+                period_id = period_id)
+
+  response <- aws.executeapi.get(
+    url = paste0("https://", url_pdap_jobs_api, endpoint),
+    query = query
+  )
+
+  if (response$status_code != 200L) {
+    warning("Error getting existing jobs")
+  }
+
+  return(httr::content(response))
+}
+
+#' Title
+#'
+#' @param org_unit_id UID of the organization unit
+#' @param period_id ISO8601 formatted period ID
+#' @param job_type Type of job to delete, i.e. 'target_setting_tool'
+#'
+#' @return TRUE if all jobs are deleted, otherwise, FALSE.
+#' @export
+#'
+deleteExistingPDAPJobs <- function(org_unit_id, period_id, job_type) {
+
+  url_pdap_jobs_api <-getPDAPJobsAPIURL(job = "PDAPAPIDomainName")
+  existing_jobs <- getExistingPDAPJobs(org_unit_id, period_id, job_type)
+  success <- TRUE
+
+  if (length(existing_jobs) > 0) {
+   for (i in 1:length(existing_jobs)) {
+     response <- aws.executeapi.delete(
+       url = paste0("https://", url_pdap_jobs_api, "/jobs/", existing_jobs[[i]]$job_id)
+     )
+     if (response$status_code != 200L) {
+       success <- FALSE
+       warning("Error deleting existing jobs")
+     }
+   }
+  }
+
+  return(success)
+}
+
+#' Title
+#'
+#' @param job_type Type of the job, i.e. target_setting_tool
+#' @param datim_export Location of the S3 file
+#' @param org_unit_id UID of the organisation unit
+#' @param period_id ISO8601 formatted period ID
+#'
+#' @return Returns the result of the job initiation
+#' @export
+#'
+initiatePDAPJob <- function(job_type, datim_export, org_unit_id, period_id) {
+
+  url_pdap_jobs_api <-getPDAPJobsAPIURL(job = "PDAPAPIDomainName")
+
+  query <- list(job_type = job_type,
+                datim_export = datim_export,
+                org_unit_id = org_unit_id,
+                period_id = period_id)
+
+  #Initiate the job
+  response <- aws.executeapi.post(
+    url = paste0("https://", url_pdap_jobs_api, endpoint),
+    body = toJSON(query, auto_unbox = TRUE),
+    headers = list("Content-Type" = "application/json")
+  )
+
+  if (response$status_code != 200L) {
+    warning("Error initiating job")
+  }
+
+  return(httr::content(response))
+
+}
+
+getExistingFileS3Location <- function(job_type, org_unit_id, period_id) {
+
+  url_pdap_jobs_api <-getPDAPJobsAPIURL(job = "PDAPAPIDomainName")
+  endpoint <- "/jobs"
+  service <- "execute-api"
+
+  query <- list(job_type = job_type,
+                org_unit_id = org_unit_id,
+                period_id = period_id)
+
+  existing_jobs <- getExistingPDAPJobs(org_unit_id, period_id, job_type)
+
+
+  if (length(existing_jobs) == 0) {
+    return(NULL)
+  }
+
+  if (length(existing_jobs) > 1) {
+    warning("More than one job found. Using the first one.")
+  }
+
+  existing_file_s3_location <- existing_jobs[[1]]$job_payload$datim_export
+
+
+
+  return(existing_file_s3_location)
 
 }
