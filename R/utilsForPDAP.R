@@ -115,20 +115,16 @@ getPresignedURL <- function(job = "PDAPAPIDomainName",
 }
 
 
-#' @title Upload DATIM Export to PDAP
-#'
-#' @description Extracts current COP year data from the d object,
-#' formats it, and uploads the data to PDAP.
+
+#' Title
 #'
 #' @inheritParams datapackr_params
 #' @param job_type The type of job to upload the data to. Currently only
-#' target_setting_tool or year_two_targets are supported.
+#' target_setting_tool or year_two_targets are supported. An invalid job
+#' type will throw an error.
 #'
-#' @return Returns the S3 file location of the uploaded file if successful,
-#' otherwise NULL
-#' @export
-#'
-uploadDATIMExportToPDAP <- function(d, job_type) {
+#' @return Returns the raw binary data of the CSV file
+writePDAPExportCSV <- function(d, job_type) {
 
   if (job_type == "target_setting_tool") {
     datim_export <- createPAWExport(d)
@@ -155,6 +151,23 @@ uploadDATIMExportToPDAP <- function(d, job_type) {
   read_file <- file(tmp, "rb")
   raw_file <- readBin(read_file, "raw", n = file.size(tmp))
   close(read_file)
+
+  return(raw_file)
+}
+#' @title Upload DATIM Export to PDAP
+#'
+#' @description Extracts current COP year data from the d object,
+#' formats it, and uploads the data to PDAP.
+#'
+#' @inheritParams datapackr_params
+#' @param job_type The type of job to upload the data to. Currently only
+#' target_setting_tool or year_two_targets are supported.
+#'
+#' @return Returns the S3 file location of the uploaded file if successful,
+#' otherwise NULL
+#' @export
+#'
+uploadDATIMExportToPDAP <- function(raw_file, job_type, content_type = "text/csv") {
 
   # List of parameters for the DataPack PDAP DATIM Exports
   job <- "PDAPAPIDomainName"
@@ -183,7 +196,7 @@ uploadDATIMExportToPDAP <- function(d, job_type) {
   response <- httr::PUT(
     url = presigned_url_data$presigned_url,
     body = raw_file,
-    httr::add_headers("Content-Type" = "text/csv")
+    httr::add_headers("Content-Type" = content_type)
   )
 
   if (response$status_code != 200L) {
@@ -292,10 +305,17 @@ initiatePDAPJob <- function(job_type, datim_export, org_unit_id, period_id) {
                 org_unit_id = org_unit_id,
                 period_id = period_id)
 
+  #Any existing jobs need to be removed
+  jobs_deleted <- deleteExistingPDAPJobs(org_unit_id, period_id, job_type)
+  if (!jobs_deleted) {
+    warning("Error deleting existing jobs")
+  }
+
+  endpoint <- "/jobs"
   #Initiate the job
   response <- aws.executeapi.post(
     url = paste0("https://", url_pdap_jobs_api, endpoint),
-    body = toJSON(query, auto_unbox = TRUE),
+    body = jsonlite::toJSON(query, auto_unbox = TRUE),
     headers = list("Content-Type" = "application/json")
   )
 
