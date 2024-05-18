@@ -138,4 +138,14 @@ test_that("Can initiate a PDAP job", {
   expect_true(jobs[[1]]$job_payload$datim_export == file_location)
   expect_identical(d$info$country_uids, jobs[[1]]$job_payload$org_unit_id)
   expect_identical("2024Oct", jobs[[1]]$job_payload$period_id)
+
+  #Modify the approval status of this job
+  resp <- changePDAPJobApprovalStatus(org_unit_id = d$info$country_uids,
+                                      period_id = "2024Oct",
+                                      approval_status = "approved")
+  expect_identical("response", class(resp))
+  expect_equal(200L, resp$status_code)
+  response_content <- httr::content(resp)
+  expect_identical("list", class(response_content))
+  expect_identical("approved", response_content$approval_info$approval_status)
 })

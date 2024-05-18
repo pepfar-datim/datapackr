@@ -69,8 +69,22 @@ aws.executeapi.patch <- purrr::partial(aws.executeapi, verb = "PATCH")
 aws.executeapi.post <- purrr::partial(aws.executeapi, verb = "POST")
 aws.executeapi.put <- purrr::partial(aws.executeapi, verb = "PUT")
 
+#' Title
+#' @description
+#' Utility function to get the PDAP API URL from the AWS SSM Parameter Store.
+#'
+#' @param job Name of the job, i.e. PDAPAPIDomainName
+#'
+#' @return Returns the PDAP API URL
+#'
 getPDAPJobsAPIURL <- function(job = "PDAPAPIDomainName") {
+
   creds <- aws.signature::locate_credentials()
+  assertthat::assert_that(!is.null(creds), msg = "No AWS credentials found")
+  assertthat::assert_that(!is.null(creds$key), msg = "No AWS key found")
+  assertthat::assert_that(!is.null(creds$secret), msg = "No AWS secret found")
+  assertthat::assert_that(!is.null(creds$region), msg = "No AWS region found")
+
   ssm_client <- paws::ssm()
   #This will throw an error the the creds do not work.
   ssm_response <- ssm_client$get_parameter(Name = job)
@@ -87,7 +101,6 @@ getPDAPJobsAPIURL <- function(job = "PDAPAPIDomainName") {
 #' @param service Name of the service, i.e. execute-api
 #'
 #' @return Returns the presigned URL list (file_key, presigned_url, expiration time)
-#' @export
 #'
 getPresignedURL <- function(job = "PDAPAPIDomainName",
                             endpoint = "/jobs/presignedurl",
@@ -117,6 +130,12 @@ getPresignedURL <- function(job = "PDAPAPIDomainName",
 
 
 #' Title
+#' @description
+#' Given a DataPack object, this function will extract the necessary data
+#' and format it for the PDAP API. The data will be written to a CSV file
+#' and returned as raw binary data. The job type will determine the format
+#' of the data. Currently, only target_setting_tool and year_two_targets
+#' are supported.
 #'
 #' @inheritParams datapackr_params
 #' @param job_type The type of job to upload the data to. Currently only
@@ -327,6 +346,65 @@ initiatePDAPJob <- function(job_type, datim_export, org_unit_id, period_id) {
 
 }
 
+#' Title
+#'
+#' @param org_unit_id UID of the organisation unit
+#' @param period_id ISO8601 formatted period ID
+#' @param approval_status One of 'submitted', 'cancelled', 'approved', 'rejected'
+#'
+#' @return Returns the response from the API when changing the approval status
+#' @export
+#'
+changePDAPJobApprovalStatus <- function(org_unit_id, period_id, approval_status) {
+
+  if (!(approval_status %in% c("submitted", "cancelled", "approved", "rejected"))) {
+    stop("Invalid approval status")
+  }
+
+  url_pdap_jobs_api <- getPDAPJobsAPIURL(job = "PDAPAPIDomainName")
+
+  #Get the job
+  jobs <- getExistingPDAPJobs(org_unit_id = org_unit_id,
+                             period_id = period_id,
+                             job_type = "target_setting_tool") %>% httr::content()
+  if (length(jobs) == 0) {
+    warning("No job found")
+    return(NULL)
+  }
+
+  endpoint <- paste0("/jobs/", jobs[[1]]$job_id)
+
+  pl <- list(approval_info = list(approval_status = approval_status))
+
+  response <- aws.executeapi.patch(
+    url = paste0("https://", url_pdap_jobs_api, endpoint),
+    body = jsonlite::toJSON(pl, auto_unbox = TRUE),
+    headers = list("Content-Type" = "application/json")
+  )
+
+  if (response$status_code != 200L) {
+    warning("Error changing job status")
+  }
+
+  return(response)
+
+}
+
+
+#' Title
+#' @description
+#' Given a job type, organization unit ID, and period ID, this function will
+#' return the S3 file location of the existing job. If no job is found, NULL
+#' will be returned. If more than one job is found, a warning will be issued
+#' and the first job will be used. If an error occurs, NULL will be returned.
+#'
+#' @param job_type Type of job to get, i.e. 'target_setting_tool'
+#' @param org_unit_id UID of the organization unit
+#' @param period_id ISO8601 formatted period ID
+#'
+#' @return Returns the S3 file location of the existing job, otherwise NULL
+#' @export
+#'
 getExistingFileS3Location <- function(job_type, org_unit_id, period_id) {
 
   url_pdap_jobs_api <- getPDAPJobsAPIURL(job = "PDAPAPIDomainName")

@@ -4,11 +4,9 @@
 \alias{uploadDATIMExportToPDAP}
 \title{Upload DATIM Export to PDAP}
 \usage{
-uploadDATIMExportToPDAP(d, job_type)
+uploadDATIMExportToPDAP(raw_file, job_type, content_type = "text/csv")
 }
 \arguments{
-\item{d}{Datapackr sidecar object}
-
 \item{job_type}{The type of job to upload the data to. Currently only
 target_setting_tool or year_two_targets are supported.}
 }
