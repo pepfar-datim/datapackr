@@ -113,6 +113,17 @@
       ],
       "Hash": "50c838a310445e954bc13f26f26a6ecf"
     },
+    "aws.signature": {
+      "Package": "aws.signature",
+      "Version": "0.6.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "base64enc",
+        "digest"
+      ],
+      "Hash": "0006bcef272aad12f78dd5a85fc7f4fc"
+    },
     "backports": {
       "Package": "backports",
       "Version": "1.4.1",
@@ -390,11 +401,11 @@
       "Version": "0.7.0",
       "Source": "GitHub",
       "RemoteType": "github",
+      "RemoteHost": "api.github.com",
       "RemoteUsername": "pepfar-datim",
       "RemoteRepo": "datimutils",
       "RemoteRef": "master",
-      "RemoteSha": "338c374674876850707f642d1998f8aff4a41096",
-      "RemoteHost": "api.github.com",
+      "RemoteSha": "31c0be49b3e7d224394c54f1578a0d901b93d8e0",
       "Requirements": [
         "R",
         "R6",
@@ -1394,7 +1405,7 @@
     },
     "paws.common": {
       "Package": "paws.common",
-      "Version": "0.7.1",
+      "Version": "0.7.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1409,7 +1420,7 @@
         "utils",
         "xml2"
       ],
-      "Hash": "908623ede866613cc8da7a2e748cb969"
+      "Hash": "c66dfa46eb607d3171f89596d7529446"
     },
     "paws.compute": {
       "Package": "paws.compute",
