@@ -8,6 +8,8 @@ getOUFromCountryUIDs(country_uids, cop_year = NA)
 }
 \arguments{
 \item{country_uids}{List of country UIDs from the \code{d$info$country_uids} object.}
+
+\item{cop_year}{The COP year to use. Defaults to the current COP Year if not specified.}
 }
 \value{
 A data frame consisting of the name of the operating unit

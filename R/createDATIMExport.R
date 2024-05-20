@@ -1,7 +1,7 @@
 #' @export
 #' @title createDATIMExport
 #'
-#' @param d
+#' @inheritParams datapackr_params
 #'
 #' @return A data frame in standardized DHIS2 export format for DATIM
 #' @export

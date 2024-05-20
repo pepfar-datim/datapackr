@@ -12,6 +12,8 @@ extract_uid_all(string)
 \arguments{
 \item{string}{Input vector. Either a character vector, or something coercible
 to one.}
+
+\item{bracketed}{Boolean to indicate whether the UID is encased in square brackets.}
 }
 \value{
 Character vector of DHIS2 11-digit UIDs found in string.

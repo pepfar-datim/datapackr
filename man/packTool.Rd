@@ -57,6 +57,9 @@ saved upon export.}
 \item{results_archive}{If TRUE, will export compiled results of all tests and
 processes to output_folder.}
 
+\item{expand_formulas}{Write all formulas on right side of PSNUxIM tab, not
+just the first row.}
+
 \item{spectrum_data}{Spectrum output, as a dataframe.}
 
 \item{d2_session}{DHIS2 Session id. R6 datimutils object which handles

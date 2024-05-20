@@ -10,12 +10,7 @@ getCOPDatasetUids(cop_year, datastreams)
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}
 
-\item{datastreams}{Data stream or streams. One or more of \code{mer_targets},
-\code{mer_results}, \code{subnat_targets}, \code{subnat_results}, or
-\code{impatt}. If not specified, then all data streams
-are returned.}
-
-\item{datastream}{character vector - one or more of:
+\item{datastreams}{character vector - one or more of:
 {"mer_targets", "mer_results", "subnat_targets", "subnat_results", "impatt"}}
 }
 \value{

@@ -475,7 +475,7 @@ generateY2IndicatorCodeDataElementMap <- function(cols_to_keep, cop_year) {
 
 #' Title unpackYear2Sheet
 #'
-#' @param d
+#' @inheritParams datapackr_params
 #'
 #' @return d
 #' @export

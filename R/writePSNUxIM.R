@@ -77,6 +77,8 @@ prepareTargetsData <- function(d, append = TRUE) {
 #' output a Missing PSNUxIM targets workbook.
 #' @param snuxim_model_data_path Export from DATIM needed to allocate data
 #' across mechanisms in the PSNUxIM tab
+#' @param use_template If TRUE, use a template to create the object, otherwise
+#' use the existing workbook object which is part of the main d object.
 #' @inheritParams datapackr_params
 #' @return d
 #'
