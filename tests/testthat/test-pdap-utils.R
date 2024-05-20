@@ -1,6 +1,6 @@
 context("PDAP Utility tests")
 
-skip_on_ci()
+#skip_on_ci()
 
 test_that("Can generate a PDAP API location", {
   response <- getPDAPJobsAPIURL()
