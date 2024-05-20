@@ -7,6 +7,8 @@
 uploadDATIMExportToPDAP(raw_file, job_type, content_type = "text/csv")
 }
 \arguments{
+\item{raw_file}{Raw binary data of the CSV file to upload}
+
 \item{job_type}{The type of job to upload the data to. Currently only
 target_setting_tool or year_two_targets are supported.}
 }

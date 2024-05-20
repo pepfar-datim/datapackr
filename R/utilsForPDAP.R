@@ -97,8 +97,9 @@ getPDAPJobsAPIURL <- function(job = "PDAPAPIDomainName") {
 #'
 #' @param job Name of the job, i.e. PDAPAPIDomainName
 #' @param endpoint Path of the endpoint, i.e. /jobs/presignedurl
-#' @param query List of query parameters
-#' @param service Name of the service, i.e. execute-api
+#' @param job_type Type of job to get, i.e. 'target_setting_tool'
+#' @param destination Destination of the file, i.e. 'processed'
+#' @param file_suffix Suffix of the file, i.e. 'csv'
 #'
 #' @return Returns the presigned URL list (file_key, presigned_url, expiration time)
 #'
@@ -181,6 +182,7 @@ writePDAPExportCSV <- function(d, job_type) {
 #' formats it, and uploads the data to PDAP.
 #'
 #' @inheritParams datapackr_params
+#' @param raw_file Raw binary data of the CSV file to upload
 #' @param job_type The type of job to upload the data to. Currently only
 #' target_setting_tool or year_two_targets are supported.
 #'
