@@ -130,6 +130,7 @@ getPresignedURL <- function(job = "PDAPAPIDomainName",
 
 
 #' Title
+#' @export
 #' @description
 #' Given a DataPack object, this function will extract the necessary data
 #' and format it for the PDAP API. The data will be written to a CSV file
@@ -170,6 +171,7 @@ writePDAPExportCSV <- function(d, job_type) {
   read_file <- file(tmp, "rb")
   raw_file <- readBin(read_file, "raw", n = file.size(tmp))
   close(read_file)
+  unlink(tmp)
 
   return(raw_file)
 }
