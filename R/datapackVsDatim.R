@@ -225,7 +225,8 @@ compareData_DatapackVsDatim <-
                                           d2_session = d2_session)
 
     data_psnu %<>% .compare_beautify(cop_year = d$info$cop_year,
-                                     d2_session = d2_session) %>% dplyr::select(-effect)
+                                     d2_session = d2_session) %>%
+      dplyr::select(-effect)
 
     list(
       psnu_x_im = data_psnu_x_im,

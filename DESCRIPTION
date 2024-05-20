@@ -52,7 +52,9 @@ Suggests:
     rprojroot,
     stringi,
     testthat,
-    waldo
+    waldo,
+    paws,
+    aws.signature
 Remotes:
     pepfar-datim/datim-validation,
     pepfar-datim/datimutils
