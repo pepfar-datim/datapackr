@@ -1,5 +1,8 @@
-# datapackr 7.4.4
+# datapackr 7.5.0
+## New features
+* Add utility functions for interacting with PDAP Jobs 
 
+# datapackr 7.4.4
 ## New features
 *
 
