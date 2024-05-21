@@ -58,7 +58,7 @@ getMemoIndicators <- function(cop_year,
     )
 
   #If we do not get any indicators at this point, something is wrong.
-  if (class(inds) != "data.frame") {
+  if (!inherits(inds, "data.frame")) {
     warning("Could not find fetch indicators from DATIM!")
     return(NULL)
   } else {
