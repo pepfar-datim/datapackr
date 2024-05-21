@@ -141,19 +141,22 @@ getPresignedURL <- function(job = "PDAPAPIDomainName",
 #'
 #' @inheritParams datapackr_params
 #' @param job_type The type of job to upload the data to. Currently only
+#' @param export_type PAW vs DATIM export
 #' target_setting_tool or year_two_targets are supported. An invalid job
 #' type will throw an error.
 #'
 #' @return Returns the raw binary data of the CSV file
-writePDAPExportCSV <- function(d, job_type) {
+writePDAPExportCSV <- function(d, job_type, export_type = "PAW") {
 
-  if (job_type == "target_setting_tool") {
+  if (job_type == "target_setting_tool" & export_type == "PAW") {
     datim_export <- createPAWExport(d)
+  } else if (job_type == "target_setting_tool" & export_type == "DATIM") {
+    datim_export <- createDATIMExport(d)
   } else if (job_type == "year_two_targets") {
     datim_export <- d$datim$year2 %>%
       dplyr::mutate(value = as.character(round(value)))
   } else {
-    stop("Invalid job type")
+    stop("Invalid job or export type")
   }
 
   tmp <- tempfile()
