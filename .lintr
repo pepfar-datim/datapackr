@@ -5,10 +5,11 @@ linters: linters_with_defaults(
     object_length_linter = NULL, # 270
     commented_code_linter = NULL, # 88
     cyclocomp_linter = NULL,
-    assignment_linter = NULL,
-    indentation_linter = NULL
+    indentation_linter = NULL,
+    assignment_linter = NULL
   )
 exclusions: list(
     "tests/testthat/play.dhis2.org" = Inf,
-    "tests/testthat/training.datim.org" = Inf
+    "tests/testthat/training.datim.org" = Inf,
+    "data-raw"
   )
