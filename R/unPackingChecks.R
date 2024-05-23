@@ -1250,7 +1250,7 @@ checkToolEmptySheets <- function(d, sheets, quiet = TRUE) {
                 }) %>%
     unlist()
 
-  if (any(!has_all_header_columns)) {
+  if (!all(has_all_header_columns)) {
 
     lvl <- "ERROR"
 
@@ -1280,7 +1280,7 @@ checkToolEmptySheets <- function(d, sheets, quiet = TRUE) {
                }) %>%
     unlist()
 
-  if (any(!has_rows_data)) {
+  if (!all(has_rows_data)) {
 
     lvl <- "INFO"
 
