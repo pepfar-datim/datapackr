@@ -69,7 +69,7 @@ checkToolStructure <- function(d, quiet = TRUE) {
 
   submission_sheets <- readxl::excel_sheets(d$keychain$submission_path)
   schema_sheets <- unique(d$info$schema$sheet_name)
-  #TODO: Why is Spectrum part of the PSNUxIM schema?
+
   if (d$info$tool == "PSNUxIM") {
     schema_sheets <- schema_sheets[schema_sheets != "Spectrum"]
   }
@@ -665,9 +665,6 @@ checkNegativeValues <- function(sheets, d, quiet = TRUE) {
                                          clean_orgs = FALSE,
                                          clean_disaggs = FALSE,
                                          clean_values = FALSE) %>%
-    #TODO: Keeping this consistent with checkDecimalValues
-    #Consider doing the numeric conversion once in unPackDataSheet
-    #instead of multiple times in these checks.
     dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
     dplyr::filter(value < 0)
 
@@ -930,7 +927,6 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = TRUE) {
 #Extracts grey cells from Row3 for all sheets
 getCriticalColumns <- function()  {
 
-  #TODO: Should this be hardcoded like this with no paramaters to the function?
   template_file <- system.file("extdata/COP23_Data_Pack_Template.xlsx", package = "datapackr")
 
   template <- readxl::read_excel(template_file)
@@ -1134,8 +1130,6 @@ checkDisaggs <- function(sheets, d, quiet = TRUE) {
     interactive_warning("Sorry! Can't check the PSNUxIM tab with this function.") # DP-472
   }
   sheets <- sheets[sheets != "PSNUxIM"]
-
-  #TODO: Add functionality for PSNUxIM
 
   ch <- list(result = NULL,
             msg = NULL,

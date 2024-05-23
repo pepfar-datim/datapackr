@@ -210,7 +210,6 @@ checkSchema_COsSyntax <- function(schema) {
         dplyr::if_else(
           sheet_name == "PSNUxIM", categoryoption_specified != "NA",
           !stringr::str_detect(categoryoption_specified, multi_uid_pattern()))) %>%
-    #TODO: How to handle situations when the categoryoption_specified is NA?
     dplyr::filter(invalid_COs == TRUE)
 
 }
@@ -218,10 +217,6 @@ checkSchema_COsSyntax <- function(schema) {
 #' @rdname schema-validations
 checkSchema_ValidAges <- function(schema) {
 
-  #TODO: This is a bit speculative and may obviously change
-  # depending on the fiscal year. Revisit how to define this.
-  #Similar to the tests above, we should potentially be matching
-  #the category options UID to an actual DATIM category option UID.
   valid_age_pattern <- "[0-9]{2}-[0-9]{2}|<01|<1[58]|1[58]+|65\\+|50\\+"
 
     schema %>%
@@ -246,7 +241,6 @@ checkSchema_ValidSexes <- function(schema) {
   schema %>%
     dplyr::select(sheet_name, col, indicator_code, valid_sexes) %>%
     tidyr::unnest(valid_sexes) %>%
-    #TODO: How should we handle "NA"?
     tidyr::drop_na() %>%
     dplyr::mutate(invalid_sex_uid = !stringr::str_detect(id, multi_uid_pattern())) %>%
     dplyr::mutate(invalid_sex_string = !stringr::str_detect(name, valid_sex_pattern)) %>%
@@ -256,14 +250,12 @@ checkSchema_ValidSexes <- function(schema) {
 
 #' @rdname schema-validations
 checkSchema_ValidKPs <- function(schema) {
-  #TODO: Consider a single function for all three of these
   #Instead of this repetitive code.
   valid_KP_names <- unique(map_DataPack_DATIM_DEs_COCs$valid_kps.name)
 
   schema %>%
     dplyr::select(sheet_name, col, indicator_code, valid_kps) %>%
     tidyr::unnest(valid_kps) %>%
-    #TODO: How should we handle "NA"?
     tidyr::drop_na() %>%
     dplyr::mutate(invalid_kp_uid = !stringr::str_detect(id, multi_uid_pattern())) %>%
     dplyr::mutate(invalid_kp_string = !(name %in% valid_KP_names)) %>%
@@ -446,7 +438,6 @@ unPackSchema <- function(template_path = NULL,
     tidyr::gather(key, value, -sheet_num, -sheet_name, -col, -row) %>%
     tidyr::unite(new.col, c(key, row)) %>%
     tidyr::spread(new.col, value) %>%
-    #TODO: How to avoid hardcoding these numbers??
     dplyr::select(sheet_num, sheet_name, col,
                   dataset = character_5,
                   col_type = character_6,

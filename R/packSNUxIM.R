@@ -35,7 +35,6 @@ packSNUxIM <- function(d,
     }
   }
 
-  #TODO: Consider preparing this ahead of time for all OUs
   snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path) %>%
     prepare_model_data.PSNUxIM(snuxim_model_data = .,
                                country_uids = d$info$country_uids)
@@ -207,8 +206,6 @@ packSNUxIM <- function(d,
   }
 
   # Combine schema with SNU x IM model dataset ####
-  #TODO: Fix this to not re-add mechanisms removed by the Country Team (filter snuxim_model_data
-  #to only columns with not all NA related to data in missing combos)
   data_structure <- datapackr::swapColumns(data_structure, snuxim_model_data) %>%
     dplyr::bind_cols(
       snuxim_model_data %>%

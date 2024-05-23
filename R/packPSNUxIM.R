@@ -570,7 +570,6 @@ packPSNUxIM <- function(wb, # Workbook object
   ## Add green highlights to appended rows, if any
     newRowStyle <- openxlsx::createStyle(fontColour = "#006100", fgFill = "#C6EFCE")
 
-    #TODO: Adding styles takes a very very long time. Any way to build this into the template itself??
     openxlsx::addStyle(
       wb = r$wb,
       sheet = "PSNUxIM",
@@ -594,7 +593,6 @@ packPSNUxIM <- function(wb, # Workbook object
 
   percentStyle <- openxlsx::createStyle(numFmt = "0%")
 
-  #TODO: Adding styles takes a very very long time. Any way to build this into the template itself??
   openxlsx::addStyle(wb = r$wb,
                      sheet = "PSNUxIM",
                      style = percentStyle,
@@ -611,7 +609,6 @@ packPSNUxIM <- function(wb, # Workbook object
                   value_type == "integer") %>%
     dplyr::pull(col)
 
-  #TODO: Adding styles takes a very very long time. Any way to build this into the template itself??
   openxlsx::addStyle(
     wb = r$wb,
     sheet = "PSNUxIM",

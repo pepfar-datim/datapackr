@@ -64,7 +64,6 @@ packDataPack <- function(d,
   # Add Styles ####
   interactive_print("Cleaning up Styles...")
 
-  #TODO: See if new openxlsx release addresses this issue
   spectrumStyle1 <- openxlsx::createStyle(fgFill = "#073763")
   spectrumStyle2 <- openxlsx::createStyle(fgFill = "#FFEB84")
 

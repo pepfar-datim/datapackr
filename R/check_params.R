@@ -237,14 +237,6 @@ check_cop_year <- function(cop_year, tool) {
                 "."))
   }
 
-  #TODO: @jacksons Do we need to check the tool here??
-  # Check other parameters
-  #tool <- tool %missing% NULL
-  #tool_provided <- !is.null(tool)
-  #if (tool_provided) {
-  #  tool <- check_tool(tool = tool, cop_year = cop_year)
-  #}
-
   cop_year
 }
 

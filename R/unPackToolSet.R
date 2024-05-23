@@ -88,7 +88,7 @@ unPackToolSet <- function(d1_path = NULL,
   }
 
   p <- unPackTool(submission_path = psnuxim_path,
-                  tool = NULL, #TODO: Fix this when removing OPU Data Packs
+                  tool = NULL,
                   country_uids = d$info$country_uids,
                   cop_year = d$info$cop_year,
                   pzns = pzns,
@@ -108,10 +108,6 @@ unPackToolSet <- function(d1_path = NULL,
   d$keychain$psnuxim_file_path <- p$keychain$submission_path
   #Keep PSNUxIM Schema for later
   d$info$psnuxim_schema <- p$info$schema
-
-  #TODO: Check to be sure that the analytics should
-  #be coming from the PSNUxIM tab, but we will merge everything
-  #SUBNAT, IMPATT, DREAMS which is only in the datapack
 
   dp_indicators <- unique(d$data$analytics$indicator_code)
   dp_indicators <- dp_indicators[!dp_indicators %in% unique(p$data$analytics$indicator_code)]

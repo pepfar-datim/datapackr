@@ -313,7 +313,6 @@ getCOPDatasetUids <-  function(cop_year, datastreams) {
   cop_datasets <-
     list(
       "2024" = list(
-        #TODO: Update this for COP24 once datasets deployed for COP24
         "mer_targets" =   c("lHUEzkjkij1", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS)
                             "tNbhYbrKbnk"), # Host Country Targets: DREAMS (USG)
         "mer_results" = NA,
@@ -467,8 +466,6 @@ rowMax <- function(df, cn, regex) {
 #' @return {cop21, cop22, cop23}_map_DataPack_DATIM_DEs_COCs
 #'
 getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1) {
-
-  #TODO: Move this file to packageSetup.R
 
   if (!all(year %in% c(1, 2))) {
     stop("You must specify either year 1, 2 or both.")

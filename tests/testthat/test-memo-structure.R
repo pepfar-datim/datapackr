@@ -15,9 +15,6 @@ with_mock_api({
     for (year in years) {
       d$info$cop_year <- year
       d <- memoStructure(d, d2_session = training)
-      #TODO: No idea what the message is or where it is coming from..
-      #This should be silent but is not. testthat suppresses the messages
-      #and cannot reproduce it on the console
       #expect_silent(d <- memoStructure(d, d2_session = training))
       expect_false(is.null(d$memo$structure))
       expect_equal(typeof(d$memo$structure), "list")

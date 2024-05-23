@@ -111,7 +111,6 @@ test_that("Can check sheet data...", {
    expect_true("invalid_prioritizations" %in% names(d$tests))
    expect_true("altered_formulas" %in% names(d$tests))
 
-   #TODO: This is still broken
    #expect_true("defunct_disaggs" %in% names(d$tests))
 
    expect_true(any(grepl("In tab GEND: DUPLICATE ROWS", d$info$messages$message)))

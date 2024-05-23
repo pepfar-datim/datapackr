@@ -55,7 +55,6 @@ packOPUDataPack <- function(d,
       dplyr::mutate(attributeOptionCombo = default_catOptCombo(),
                     value = as.numeric(value)) %>%
       dplyr::group_by(dplyr::across(c(-value))) %>%
-      #TODO: Are these not numeric here?
       dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop") %>%
       dplyr::filter(value != 0)
   }

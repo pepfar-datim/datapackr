@@ -100,8 +100,6 @@ with_mock_api({
                  ignore.order = TRUE)
 
 
-    #TODO: Add additional tests for data
-
     #DP-837
     #Specific test of AGYW_PREV orgunits
     agyw_have <- d$sheets$AGYW %>%

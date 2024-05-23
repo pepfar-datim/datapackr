@@ -6,7 +6,8 @@ linters: linters_with_defaults(
     commented_code_linter = NULL, # 88
     cyclocomp_linter = NULL,
     indentation_linter = NULL,
-    assignment_linter = NULL
+    assignment_linter = NULL,
+    todo_comment_linter(todo = c("todo", "fixme"))
   )
 exclusions: list(
     "tests/testthat/play.dhis2.org" = Inf,

@@ -71,8 +71,6 @@ unPackDataPackSheet <- function(d,
   dplyr::select(PSNU, psnuid, sheet_name, indicator_code, Age, Sex, KeyPop, value) %>%
     tidyr::drop_na(value)
 
-  #TODO: Decide whether to map PMTCT_EID ages now or later.
-
   valid_orgunits_local <- getValidOrgUnits(d$info$cop_year)
 
   # Munge ----
