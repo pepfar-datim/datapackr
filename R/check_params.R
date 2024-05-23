@@ -134,7 +134,7 @@ check_country_uids <- function(country_uids, cop_year, force = TRUE) {
   valid_orgunits_local <- getValidOrgUnits(cop_year)
 
   # If any country_uids are invalid, warn but remove and still move on.
-  if (any(!country_uids %in% valid_orgunits_local$country_uid)) {
+  if (!all(country_uids %in% valid_orgunits_local$country_uid)) {
     # subset submitted list base on it values NOT being in valid_OrgUnits
     invalid_country_uids <- country_uids[!country_uids %in% valid_orgunits_local$country_uid]
 
@@ -197,7 +197,7 @@ check_PSNUs <- function(PSNUs = NULL, country_uids = NULL, cop_year = NULL) {
   } else {
     # If PSNUs is provided, check to make sure these are all valid.
     # Warn and remove invalid PSNu's as needed.
-    if (any(!PSNUs$psnu_uid %in% valid_orgunits_local$uid)) {
+    if (!all(PSNUs$psnu_uid %in% valid_orgunits_local$uid)) {
       invalid_PSNUs <- PSNUs %>%
         dplyr::filter(!psnu_uid %in% valid_orgunits_local$uid) %>%
         add_dp_label(orgunits = ., cop_year = cop_year) %>%

@@ -38,7 +38,7 @@ analyze_eid_2mo <- function(data) {
     required_names <- c("PMTCT_EID.D.T",
                         "PMTCT_EID.N.2.T")
 
-  if (any(!(required_names %in% names(data)))) {
+  if (!all((required_names %in% names(data)))) {
     a$test_results <- data.frame(msg = "Missing data.")
     attr(a$test_results, "test_name") <- "PMTCT_EID coverage by 2 months issues"
     a$msg <- "Could not analyze PMTCT EID due to missing data."
@@ -118,7 +118,7 @@ analyze_vmmc_indeterminate <- function(data) {
                       "VMMC_CIRC.Neg.T",
                       "VMMC_CIRC.Unk.T")
 
-  if (any(!(required_names %in% names(data)))) {
+  if (!all(required_names %in% names(data))) {
     a$test_results <- data.frame(msg = "Missing data.")
     attr(a$test_results, "test_name") <- "VMMC Indeterminate rate issues"
     a$msg <- "Could not analyze VMMC_CIRC Indeterminate Rate due to missing data."
@@ -219,7 +219,7 @@ analyze_pmtctknownpos <- function(data) {
                                        "PMTCT_STAT.N.New.Neg.T"),
                            stop("Unsupported COP Year"))
 
-  if (any(!(required_names %in% names(data)))) {
+  if (!all(required_names %in% names(data))) {
     a$test_results <- data.frame(msg = "Missing data.")
     attr(a$test_results, "test_name") <- "PMTCT Known Pos issues"
     a$msg <- "Could not analyze PMTCT Known Pos issues due to missing data."
@@ -319,7 +319,7 @@ analyze_tbknownpos <- function(data) {
                                        "TB_STAT.N.New.Neg.T"),
                            stop("Unsupported COP Year"))
 
-  if (any(!(required_names %in% names(data)))) {
+  if (!all(required_names %in% names(data))) {
     a$test_results <- data.frame(msg = "Missing data.")
     attr(a$test_results, "test_name") <- "TB Known Pos issues"
     a$msg <- "Could not analyze TB Known Pos issues due to missing data."
@@ -412,7 +412,7 @@ analyze_retention <- function(data) {
                            stop("Unsupported COP Year"))
 
 
-  if (any(!(required_names %in% names(data)))) {
+  if (!all(required_names %in% names(data))) {
     a$test_results <- data.frame(msg = "Missing data.")
     attr(a$test_results, "test_name") <- "Retention rate issues"
     a$msg <- "Could not analyze Retention rate issues due to missing data."
@@ -501,7 +501,7 @@ analyze_linkage <- function(data) {
 
   required_names <- c("TX_NEW.T", "TX_NEW.KP.T")
 
-  if (any(!(required_names %in% names(data)))) {
+  if (!all(required_names %in% names(data))) {
     a$test_results <- data.frame(msg = "Missing data.")
     attr(a$test_results, "test_name") <- "Linkage rate issues"
     a$msg <- "Could not analyze Linkage rate issues due to missing data."
@@ -614,7 +614,7 @@ analyze_indexpos_ratio <- function(data) {
                          "TX_CURR_SUBNAT.T")
 
 
-  if (any(!(required_names %in% names(data)))) {
+  if (!all(required_names %in% names(data))) {
     a$test_results <- data.frame(msg = "Missing data.")
     attr(a$test_results, "test_name") <- "HTS_INDEX_POS Rate Issues"
     a$msg <- "Could not analyze HTS_INDEX_POS Rate Issues due to missing data."
