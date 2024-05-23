@@ -31,7 +31,7 @@ test_that(
                              "PSNUxIM",
                              startRow = header_row)
 
-    expect_equal(2L, p$DataPackTarget[1])
+    expect_equal(p$DataPackTarget[1], 2L)
 
 
   })

@@ -34,7 +34,7 @@ with_mock_api({
                   d2_session = training)
 
   expect_setequal(names(d), c("keychain", "info", "tool", "data"))
-  expect_equal("Malawi", d$info$datapack_name)
+  expect_equal(d$info$datapack_name, "Malawi")
 
   #Open the generated tool in libreoffice to kick off the formulas
   #Do not even try and do this on Windows
@@ -157,7 +157,7 @@ with_mock_api({
      dplyr::filter(n > 1) %>%
      NROW()
 
-   expect_equal(0L, duplicated_export_rows)
+   expect_equal(duplicated_export_rows, 0L)
 
    #There should be no zeros in d$data$SNUxIM except for dedpe
    expect_false(any(d$data$SNUxIM[d$data$SNUxIM$value == 0 & !grepl("^0000[01]", d$data$SNUxIM$mech_code), ]))

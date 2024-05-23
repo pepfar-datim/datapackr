@@ -13,8 +13,8 @@ test_that("Can error on a NA message with a level", {
   level <- c("INFO", "WARNING")
 
   expect_warning(foo <- appendMessage(foo, message, level))
-  expect_equal("INFO: Hello", foo$message)
-  expect_equal("INFO", foo$level)
+  expect_equal(foo$message, "INFO: Hello")
+  expect_equal(foo$level, "INFO")
 
   })
 
