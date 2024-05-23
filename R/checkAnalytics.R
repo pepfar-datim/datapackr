@@ -805,15 +805,14 @@ checkAnalytics <- function(d,
   d$info$analytics_warning_msg <-
     append(
       d$info$analytics_warning_msg,
-      purrr::map(analytics_checks,
-                 function(x) purrr::pluck(x, "msg"))) %>%
+      purrr::map_chr(analytics_checks, "msg")
+    ) %>%
     purrr::discard(is.null)
 
 
   d$tests <-
     append(d$tests,
-           purrr::map(analytics_checks,
-                      function(x) purrr::pluck(x, "test_results"))) %>%
+           purrr::map(analytics_checks, "test_results")) %>%
     purrr::discard(is.null)
 
   # If warnings, show all grouped by sheet and issue ####
