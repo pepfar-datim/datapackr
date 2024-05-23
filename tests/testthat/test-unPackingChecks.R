@@ -700,7 +700,6 @@ test_that("Can check formulas", {
     )
 
   # test error kicks because of incorrect formulas
-  # TODO: how do we test no errors since checkFormula depends on on a path read
   res <- checkFormulas(d, sheets = test_sheets)
   expect_equal(nrow(res$result), 3L)
   expect_equal(res$lvl, "WARNING")

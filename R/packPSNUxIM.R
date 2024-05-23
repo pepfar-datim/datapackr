@@ -50,14 +50,11 @@ packPSNUxIM <- function(wb, # Workbook object
   ## Check if empty ####
   empty_snuxim_model_data <- snuxim_model_data %>%
     dplyr::filter(rowSums(is.na(.)) != ncol(.))
-  # TODO: Consider replacing this with something more straightforward like:
-  # all(is.na(snuxim_model_data))
 
   if (NROW(empty_snuxim_model_data) == 0 || is.null(snuxim_model_data)) {
     interactive_warning(paste0("Provided SNUxIM model data was empty!"))
   }
 
-  #TODO: Clean this section up. Notes from Slack on March 18 2022.
   #Join with the adorn map to pull in indicator codes
   #Join snuxim_model_data to get inidcator codes
   #Join snxuim_model data and data by indicator code
@@ -197,7 +194,6 @@ packPSNUxIM <- function(wb, # Workbook object
   # Prints for user to see what is occurring
   interactive_print("Studying your deduplication patterns...")
 
-  # TODO: This step takes a lot of time. Find a way to speed up...
   snuxim_model_data %<>%
     dplyr::rowwise() %>%
     dplyr::mutate(ta_im_count = sum(!is.na(dplyr::c_across(tidyselect::matches("\\d{4,}_TA")))), # nolint
@@ -276,10 +272,6 @@ packPSNUxIM <- function(wb, # Workbook object
                                     "Crosswalk Dedupe Resolution"),
                          type = "character")
   }
-
-  # TODO: Filter to see if we're trying to write data that's already there
-  # TODO: Check whether we need to proceed at all, based on whether `data` is duplicated in PSNUxIM tab already
-  # TODO: Then move all these checks up to avoid wasting time processing snuxim_model_data
 
   # Document existing state of PSNUxIM tab ####
   header_row <- headerRow(tool = tool, cop_year = cop_year) # Found in packageSetup.R
@@ -408,9 +400,6 @@ packPSNUxIM <- function(wb, # Workbook object
         !is.na(formula)) %>%
       dplyr::pull(col)
 
-    ## TODO: Improve this next piece to be more efficient instead of using str_replace_all.
-    ## #We could use map, but I don't think a performance boost will be realized?
-
     data_structure %<>%
       dplyr::arrange(col) %>%
       dplyr::mutate(
@@ -440,9 +429,6 @@ packPSNUxIM <- function(wb, # Workbook object
         !is.na(formula),
         col < (col.im.targets[1])) %>%
       dplyr::pull(col)
-
-    ## TODO: Improve this next piece to be more efficient instead of using str_replace_all.
-    ## #We could use map, but I don't think a performance boost will be realized?
 
     data_structure %<>%
       dplyr::arrange(col) %>%
@@ -485,13 +471,6 @@ packPSNUxIM <- function(wb, # Workbook object
   }
 
   # Combine schema with SNU x IM model dataset ####
-  # TODO: Fix this to not re-add mechanisms removed by the Country Team
-  # (filter snuxim_model_data to only columns with not all NA related to data in missing combos)
-  #DP-765: This swapColumns is causing dedupes to not be moved from snuxim_model_data
-  # This seems to be because of mismatches in column names:
-  # In snuxim_model_data (correct): "Custom DSD Dedupe Allocation (% of DataPackTarget)"
-  # In data_structure (incorrect): "Custom DSD Dedupe Allocation  (% of DataPackTarget)"
-  # Note the errant space. This is due to issues in the schema.
   data_structure <- datapackr::swapColumns(data_structure, snuxim_model_data) %>%
     dplyr::bind_cols(
       snuxim_model_data %>%

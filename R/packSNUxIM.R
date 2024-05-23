@@ -22,7 +22,6 @@ packSNUxIM <- function(d,
     d$info$has_psnuxim <- TRUE
     ## If does exist, extract missing combos ####
     d$data$missingCombos <- d$data$MER %>%
-      # TODO: Create this here rather than upstream
       dplyr::anti_join(d$data$PSNUxIM_combos)
 
     d$info$missing_psnuxim_combos <- (NROW(d$data$missingCombos) > 0)
@@ -174,8 +173,6 @@ packSNUxIM <- function(d,
       col < (col.im.targets[1])) %>%
     dplyr::pull(col)
 
-  ## TODO: Improve this next piece to be more efficient instead of using str_replace_all
-
   data_structure %<>%
     dplyr::arrange(col) %>%
     dplyr::mutate(
@@ -203,7 +200,6 @@ packSNUxIM <- function(d,
       )
 
   # Classify formula columns as formulas
-  ## TODO: Improve approach
   for (i in seq_along(data_structure)) {
     if (!all(any(is.na(data_structure[[i]])))) {
       class(data_structure[[i]]) <- c(class(data_structure[[i]]), "formula")

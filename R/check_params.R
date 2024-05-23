@@ -176,8 +176,6 @@ check_country_uids <- function(country_uids, cop_year, force = TRUE) {
 #' @export
 #' @rdname parameter-checks
 check_PSNUs <- function(PSNUs = NULL, country_uids = NULL, cop_year = NULL) {
-  # TODO: Update how we use PSNUs everywhere to use a character vector of uids
-  #   instead of dataframe of all metadata
 
   cop_year <- cop_year %missing% NULL
   cop_year %<>% check_cop_year(cop_year = cop_year)

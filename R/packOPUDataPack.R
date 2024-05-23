@@ -26,8 +26,6 @@ packOPUDataPack <- function(d,
 
     empty_snuxim_model_data <- d$data$snuxim_model_data %>%
       dplyr::filter(rowSums(is.na(.)) != ncol(.))
-    # TODO: Consider replacing this with something more straightforward like:
-    # all(is.na(d$data$snuxim_model_data))
 
     if (NROW(empty_snuxim_model_data) == 0) {
       warning("Provided SNUxIM model data seems empty. Attempting to retrieve data from DATIM instead.")

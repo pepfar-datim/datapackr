@@ -269,7 +269,6 @@ addcols <- function(data, cnames, type = "character") {
 
   if (length(add) != 0) { #If their are columns that need to be filled in THEN
     #Impute the NA value based upon the type provided in the function.
-    # TODO: #Automate the character type or at least a list variable for type.
     if (type == "character") {
       data[add] <- NA_character_
     } else if (type == "numeric") {
@@ -297,8 +296,6 @@ addcols <- function(data, cnames, type = "character") {
 #' @return returns a character vector of the related dataset uids
 #'
 getCOPDatasetUids <-  function(cop_year, datastreams) {
-  # TODO: Need to move this into R/packageSetup.R!
-  # TODO: Reevaluate the need for this function with introduction of update_de_coc_co_map.R
 
   #Datastream validation
   all_datastreams <- c("mer_targets", "mer_results",
