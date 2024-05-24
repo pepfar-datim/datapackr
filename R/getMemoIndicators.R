@@ -20,8 +20,8 @@ isValidIndicator <- function(parsed_inds) {
 }
 
 getValidIndicators <- function(inds) {
-  num_is_valid <- lapply(inds$numerator, function(x) datimvalidation::lex(x, indicator_regexes))
-  denom_is_valid <- lapply(inds$denominator, function(x) datimvalidation::lex(x, indicator_regexes))
+  num_is_valid <- lapply(inds$numerator, datimvalidation::lex, indicator_regexes)
+  denom_is_valid <- lapply(inds$denominator, datimvalidation::lex, indicator_regexes)
   is_valid <- isValidIndicator(num_is_valid) & isValidIndicator(denom_is_valid)
   inds[is_valid, ]
 }

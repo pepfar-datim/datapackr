@@ -43,7 +43,7 @@ fetchPrioritizationTable <- function(psnus, cop_year,
     n_groups <- list("1" = psnus)
   }
 
-  prios <- n_groups %>% purrr::map_dfr(function(x) getPriosFromDatim(x))
+  prios <- n_groups %>% purrr::map_dfr(getPriosFromDatim)
 
   if (NROW(prios) == 0) {
     return(data.frame("orgUnit" = unique(psnus),
