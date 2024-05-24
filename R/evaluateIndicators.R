@@ -118,8 +118,6 @@ evaluateIndicators <- function(combis, values, inds) {
     purrr::modify_at(., c("numerator", "denominator"), evaluateExpression) %>%
     dplyr::mutate(value = numerator / denominator)
 
-  #TODO: Figure out these names attributes
-
   data.frame(id = matches$id,
              name = matches$name,
              numerator = unname(matches$numerator),

@@ -359,8 +359,6 @@ testMissingRightSideFormulas <- function(d, cols_to_keep, header_cols,
   }
 
   # TEST: Missing right-side formulas; Warn; Continue ####
-  # TODO: This seems not particularly efficient to
-  # again read the Excel sheet from disk.
   d$tests$psnuxim_missing_rs_fxs <- parsed_cells %>%
     dplyr::select(col, row, formula, character) %>%
     dplyr::filter(row >= header_row,
@@ -1078,12 +1076,6 @@ testDropPositiveDedupe <- function(d) {
 
 generatePSNUxIMComparison <- function(d, original_targets) {
 
-
-  # TODO: original_targets object gets modified here...
-  # Currently it is not required in further processing but may
-  # need to be added to the main object.
-  # TODO: Remove the aggregation of age bands.
-
   original_targets %<>%
     dplyr::mutate(
       Age =
@@ -1138,10 +1130,6 @@ testRoundingDiffs <- function(d) {
   if (is.null(d$info$psnuxim_comparison)) {
     stop("Could not find a existing PSNUxIM comparison")
   }
-  # TEST: Rounding Errors; Warn; Continue ####
-  # TODO: For OPUs, create d$data$MER from DataPackTarget col?
-  # Use above for missing_combos step?
-
 
   d$tests$PSNUxIM_rounding_diffs <- d$info$psnuxim_comparison  %>%
     dplyr::filter(type == "Rounding") %>%

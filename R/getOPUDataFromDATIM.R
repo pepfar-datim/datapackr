@@ -36,7 +36,6 @@ getOPUDataFromDATIM <- function(cop_year,
                   col_type == "target") %>%
     .[["indicator_code"]]
 
-  # TODO: Remove the mutate function when the COC issue is fixed in DATIM
   data_datim %<>%
     dplyr::mutate(categoryOptionCombo =
                     ifelse(categoryOptionCombo == "default",

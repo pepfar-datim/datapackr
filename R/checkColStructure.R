@@ -105,8 +105,6 @@ checkColStructure <- function(d, sheet) {
     d$info$has_error <- TRUE
   }
 
-  #  TODO: Add code to combine or drop duplicate columns.
-
   # Alert to columns which may be out of order ####
 
   columns_out_of_order <- col_check %>%

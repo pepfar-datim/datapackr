@@ -99,9 +99,6 @@ with_mock_api({
                  "ou", "ou_id", "test_name", "validation_issue_category"),
                ignore.order = TRUE)
 
-
-  #TODO: Add additional tests for data
-
   #DP-837
   #Specific test of AGYW_PREV orgunits
   agyw_have <- d$sheets$AGYW %>%

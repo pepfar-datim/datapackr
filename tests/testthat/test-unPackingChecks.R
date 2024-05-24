@@ -111,7 +111,6 @@ test_that("Can check sheet data...", {
    expect_true("invalid_prioritizations" %in% names(d$tests))
    expect_true("altered_formulas" %in% names(d$tests))
 
-   #TODO: This is still broken
    #expect_true("defunct_disaggs" %in% names(d$tests))
 
    expect_true(any(grepl("In tab GEND: DUPLICATE ROWS", d$info$messages$message)))
@@ -700,7 +699,6 @@ test_that("Can check formulas", {
     )
 
   # test error kicks because of incorrect formulas
-  # TODO: how do we test no errors since checkFormula depends on on a path read
   res <- checkFormulas(d, sheets = test_sheets)
   expect_equal(nrow(res$result), 3L)
   expect_equal(res$lvl, "WARNING")

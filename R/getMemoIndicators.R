@@ -37,7 +37,6 @@ getMemoIndicators <- function(cop_year,
                                 d2_session = dynGet("d2_default_session",
                                                     inherits = TRUE)) {
   #Fetch indicators from the COP21 memo group
-  #TODO: Make this work for both COP years.!
   ind_group <- switch(as.character(cop_year),
                       "2021" = "TslxbFe3VUZ",
                       "2022" = "zRApVEi7qjo",

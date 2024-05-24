@@ -28,7 +28,6 @@ unPackSheets <- function(d,
     d <- loadSheets(d)
   }
 
-  #TODO: Fix this
   sheet_names <- names(d$sheets)[names(d$sheets) != "Year 2"]
 
   sheets <- sheets %||% grep("PSNUxIM", sheet_names, value = TRUE, invert = TRUE)

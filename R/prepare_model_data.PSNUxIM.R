@@ -167,7 +167,6 @@ prepare_model_data.PSNUxIM <- function(snuxim_model_data,
 
   # Pivot wider
   if (inherits(snuxim_model_data, "list")) {
-    #TODO: Consider replacing with something more straightforward like is.list()
     snuxim_model_data <- snuxim_model_data[country_uids] %>%
       dplyr::bind_rows()
   }

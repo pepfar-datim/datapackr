@@ -69,7 +69,7 @@ checkToolStructure <- function(d, quiet = TRUE) {
 
   submission_sheets <- readxl::excel_sheets(d$keychain$submission_path)
   schema_sheets <- unique(d$info$schema$sheet_name)
-  #TODO: Why is Spectrum part of the PSNUxIM schema?
+
   if (d$info$tool == "PSNUxIM") {
     schema_sheets <- schema_sheets[schema_sheets != "Spectrum"]
   }
@@ -569,9 +569,6 @@ checkOutOfOrderCols <- function(sheets, d, quiet = TRUE) {
     }
   }
 
-  # TODO: Add PSNUxIM check for malformed IM/type headers # DP-472
-  # TODO: Add PSNUxIM check for making sure IM appears once in both L & R # DP-472
-
   return(ch)
 
 }
@@ -668,9 +665,6 @@ checkNegativeValues <- function(sheets, d, quiet = TRUE) {
                                          clean_orgs = FALSE,
                                          clean_disaggs = FALSE,
                                          clean_values = FALSE) %>%
-    #TODO: Keeping this consistent with checkDecimalValues
-    #Consider doing the numeric conversion once in unPackDataSheet
-    #instead of multiple times in these checks.
     dplyr::mutate(value = suppressWarnings(as.numeric(value))) %>%
     dplyr::filter(value < 0)
 
@@ -933,7 +927,6 @@ checkInvalidPrioritizations <- function(sheets, d, quiet = TRUE) {
 #Extracts grey cells from Row3 for all sheets
 getCriticalColumns <- function()  {
 
-  #TODO: Should this be hardcoded like this with no paramaters to the function?
   template_file <- system.file("extdata/COP23_Data_Pack_Template.xlsx", package = "datapackr")
 
   template <- readxl::read_excel(template_file)
@@ -968,18 +961,6 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
     dplyr::filter(
       sheet_name %in% sheets,
       !is.na(formula)) %>%
-    # TODO: Maybe use the below example code to add functionality to detect
-    # incorrect row reference in formula
-    # tidyr::crossing(row = ((header_row+1):max(formulas_datapack$row))) %>%
-    # dplyr::select(row, col, indicator_code, formula) %>%
-    # dplyr::mutate(
-    #   formula =
-    #     stringr::str_replace_all(
-    #       formula,
-    #       pattern = paste0("(?<=[:upper:])", header_row+1),
-    #       replacement = as.character((header_row+1):max(formulas_datapack$row))
-    #     )
-    # )
     dplyr::mutate(
       formula = stringr::str_replace_all(formula,
                                          "(?<=[:upper:])\\d+",
@@ -1052,7 +1033,6 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
     #     # Limit to only columns that DUIT cares about
     #     dplyr::filter(indicator_code %in% formulas_schema$indicator_code)
     # ) %>%
-    #TODO: Add to catch where referencing wrong row
     dplyr::mutate(
       formula = stringr::str_replace_all(formula,
                                          "(?<=[:upper:])\\d+",
@@ -1150,8 +1130,6 @@ checkDisaggs <- function(sheets, d, quiet = TRUE) {
     interactive_warning("Sorry! Can't check the PSNUxIM tab with this function.") # DP-472
   }
   sheets <- sheets[sheets != "PSNUxIM"]
-
-  #TODO: Add functionality for PSNUxIM
 
   ch <- list(result = NULL,
             msg = NULL,
@@ -1376,62 +1354,6 @@ checkSheetData <- function(d,
     purrr::map_lgl(data_checks, "has_error") %>%
     c(., d$info$has_error) %>%
     any()
-
-  # TODO: Make sure all functions note sheet name as column in result
-  # TODO: Make sure all functions row bind results
-
-
-    # TODO: TEST AGYW Tab for missing DSNUs #### This will be addressed in future PR
-    # if (sheet == "AGYW") {
-    #   DataPack_DSNUs <- d$data$extract %>%
-    #     dplyr::select(PSNU, psnu_uid = psnuid) %>%
-    #     dplyr::distinct() %>%
-    #     dplyr::mutate(DataPack = 1)
-    #
-    #   DATIM_DSNUs <- datapackr::valid_PSNUs %>%
-    #     dplyr::filter(country_uid %in% d$info$country_uids) %>%
-    #     add_dp_psnu(.) %>%
-    #     dplyr::arrange(dp_psnu) %>%
-    #     dplyr::filter(!is.na(DREAMS)) %>%
-    #     dplyr::select(PSNU = dp_psnu, psnu_uid, snu1) %>%
-    #     dplyr::mutate(DATIM = 1)
-    #
-    #   DSNU_comparison <- DataPack_DSNUs %>%
-    #     dplyr::full_join(DATIM_DSNUs, by = "psnu_uid")
-    #
-    #   d$tests$DSNU_comparison <- DSNU_comparison
-    #   attr(d$tests$DSNU_comparison, "test_name") <- "DSNU List Comparison"
-    #
-    #   if (any(is.na(DSNU_comparison$DataPack))) {
-    #     missing_DSNUs <- DSNU_comparison %>%
-    #       dplyr::filter(is.na(DataPack))
-    #
-    #     msg <- paste0(
-    #       "WARNING! In tab ",
-    #       sheet,
-    #       ": MISSING DREAMS SNUs found! ->  \n\t* ",
-    #       paste(missing_DSNUs$PSNU.y, collapse = "\n\t* "),
-    #       "\n")
-    #
-    #     d$info$messages <- appendMessage(d$info$messages, msg, "WARNING")
-    #     d$info$missing_DSNUs <- TRUE
-    #   }
-    #
-    #   if (any(is.na(DSNU_comparison$DATIM))) {
-    #     invalid_DSNUs <- DSNU_comparison %>%
-    #       dplyr::filter(is.na(DATIM))
-    #
-    #     msg <- paste0(
-    #       "WARNING! In tab ",
-    #       sheet,
-    #       ": INVALID DREAMS SNUs found! ->  \n\t* ",
-    #       paste(invalid_DSNUs$PSNU.x, collapse = "\n\t* "),
-    #       "\n")
-    #
-    #     d$info$messages <- appendMessage(d$info$messages, msg, "WARNING")
-    #   }
-    #
-    # }
 
   return(d)
 
