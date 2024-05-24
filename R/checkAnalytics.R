@@ -712,6 +712,13 @@ checkAnalytics <- function(d,
   d$info$analytics_warning_msg <- NULL
   d$info$has_analytics_error <- FALSE
 
+  #Exit if there is no analytics
+  if (is.null(d$data$analytics)) {
+    d$info$analytics_warning_msg <- append(d$info$analytics_warning_msg,
+                                           "No analytics data found.")
+    return(d)
+  }
+
   # Prepare analytics data ####
   data <- d$data$analytics %>%
     dplyr::select(psnu, psnu_uid,
@@ -802,18 +809,19 @@ checkAnalytics <- function(d,
 
   analytics_checks <-  purrr::map(funs, purrr::exec, data)
 
+
+  #Discard any checks which are NULL
+  analytics_checks <- purrr::discard(analytics_checks, is.null)
+
   d$info$analytics_warning_msg <-
     append(
       d$info$analytics_warning_msg,
       purrr::map_chr(analytics_checks, "msg")
-    ) %>%
-    purrr::discard(is.null)
-
+    )
 
   d$tests <-
     append(d$tests,
-           purrr::map(analytics_checks, "test_results")) %>%
-    purrr::discard(is.null)
+           purrr::map(analytics_checks, "test_results"))
 
   # If warnings, show all grouped by sheet and issue ####
   if (!is.null(d$info$analytics_warning_msg) && interactive()) {
