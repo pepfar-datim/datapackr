@@ -10,18 +10,18 @@ test_that("Can generate a PDAP API location", {
 
 test_that("Can get a presigned URL", {
   resp <- getPresignedURL()
-  expect_identical("response", class(resp))
-  expect_equal(200L, resp$status_code)
+  expect_identical(class(resp), "response")
+  expect_equal(resp$status_code, 200L)
 
   parsed_url <- httr::parse_url(resp$url)
-  expect_equal("https", parsed_url$scheme)
-  expect_equal("jobs/presignedurl", parsed_url$path)
-  expect_equal("target_setting_tool", parsed_url$query$job_type)
-  expect_equal("processed", parsed_url$query$destination)
-  expect_equal("csv", parsed_url$query$file_suffix)
+  expect_equal(parsed_url$scheme, "https")
+  expect_equal(parsed_url$path, "jobs/presignedurl")
+  expect_equal(parsed_url$query$job_type, "target_setting_tool")
+  expect_equal(parsed_url$query$destination, "processed")
+  expect_equal(parsed_url$query$file_suffix, "csv")
 
   presigned_url <- httr::content(resp)
-  expect_setequal(c("file_key", "presigned_url", "presigned_url_utc_expiration_time"), names(presigned_url))
+  expect_setequal(names(presigned_url), c("file_key", "presigned_url", "presigned_url_utc_expiration_time"))
   expect_true(startsWith(presigned_url$file_key, "s3://"))
   expect_true(endsWith(presigned_url$file_key, "csv"))
   exp_time <- strptime(presigned_url$presigned_url_utc_expiration_time, "%Y-%m-%d %H:%M:%S", tz = "UTC")
@@ -46,7 +46,7 @@ test_that("Can upload PDAP CSV export", {
     packForDATIM(., type = "SUBNAT_IMPATT")
 
   raw_file <- writePDAPExportCSV(d, "target_setting_tool")
-  expect_equal("raw", class(raw_file))
+  expect_equal(class(raw_file), "raw")
   df <- read.table(text = rawToChar(raw_file), sep = "|", header = TRUE)
   expect_setequal(
     c(
@@ -83,15 +83,15 @@ test_that("Can get existing PDAP jobs", {
   expect_warning(jobs <- getExistingPDAPJobs(org_unit_id = org_unit_id,
                               period_id = period_id,
                               job_type = job_type))
-  expect_identical("response", class(jobs))
-  expect_equal(502L, jobs$status_code)
+  expect_identical(class(jobs), "response")
+  expect_equal(jobs$status_code, 502L)
 
   period_id <- "2024Oct"
   jobs <- getExistingPDAPJobs(org_unit_id = org_unit_id,
                               period_id = period_id,
                               job_type = job_type)
-  expect_identical("response", class(jobs))
-  expect_equal(200L, jobs$status_code)
+  expect_identical(class(jobs), "response")
+  expect_equal(jobs$status_code, 200L)
 })
 
 
@@ -117,35 +117,36 @@ test_that("Can initiate a PDAP job", {
                   datim_export = file_location,
                   org_unit_id = d$info$country_uids,
                   period_id = "2024Oct")
-  expect_identical("response", class(resp))
-  expect_equal(200L, resp$status_code)
+  expect_identical(class(resp), "response")
+  expect_equal(resp$status_code, 200L)
   response_content <- httr::content(resp)
-  expect_identical("list", class(response_content))
+  expect_identical(class(response_content), "list")
   expect_identical(d$info$country_uids, response_content$org_unit_id)
-  expect_identical("2024Oct", response_content$period_id)
-  expect_identical("target_setting_tool", response_content$job_type)
-  expect_identical("job_completed", response_content$job_status)
+  expect_identical(response_content$period_id, "2024Oct")
+  expect_identical(response_content$job_type, "target_setting_tool")
+  expect_identical(response_content$job_status, "job_completed")
   expect_identical(file_location, response_content$job_payload$datim_export)
 
   #Try to get the file location again
   resp <- getExistingPDAPJobs(org_unit_id = d$info$country_uids,
                               period_id = "2024Oct",
                               job_type = "target_setting_tool")
-  expect_identical("response", class(resp))
+  expect_identical(class(resp), "response")
   jobs <- httr::content(resp)
-  expect_identical("list", class(jobs))
-  expect_true(length(jobs) > 0)
+  expect_identical(class(jobs), "list")
+  #There should only ever be one job
+  expect_true(length(jobs) == 1L)
   expect_true(jobs[[1]]$job_payload$datim_export == file_location)
   expect_identical(d$info$country_uids, jobs[[1]]$job_payload$org_unit_id)
-  expect_identical("2024Oct", jobs[[1]]$job_payload$period_id)
+  expect_identical(jobs[[1]]$job_payload$period_id, "2024Oct")
 
   #Modify the approval status of this job
   resp <- changePDAPJobApprovalStatus(org_unit_id = d$info$country_uids,
                                       period_id = "2024Oct",
                                       approval_status = "approved")
-  expect_identical("response", class(resp))
-  expect_equal(200L, resp$status_code)
+  expect_identical(class(resp), "response")
+  expect_equal(resp$status_code, 200L)
   response_content <- httr::content(resp)
-  expect_identical("list", class(response_content))
-  expect_identical("approved", response_content$approval_info$approval_status)
+  expect_identical(class(response_content), "list")
+  expect_identical(response_content$approval_info$approval_status, "approved")
 })

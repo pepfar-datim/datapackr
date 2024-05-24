@@ -1228,7 +1228,7 @@ checkToolEmptySheets <- function(d, sheets, quiet = TRUE) {
                 }) %>%
     unlist()
 
-  if (any(!has_all_header_columns)) {
+  if (!all(has_all_header_columns)) {
 
     lvl <- "ERROR"
 
@@ -1258,7 +1258,7 @@ checkToolEmptySheets <- function(d, sheets, quiet = TRUE) {
                }) %>%
     unlist()
 
-  if (any(!has_rows_data)) {
+  if (!all(has_rows_data)) {
 
     lvl <- "INFO"
 
@@ -1333,7 +1333,7 @@ checkSheetData <- function(d,
 
   d$tests <-
     append(d$tests,
-           purrr::map(data_checks, ~ purrr::pluck(.x, "result"))) %>%
+           purrr::map(data_checks, "result")) %>%
     purrr::discard(is.null)
 
   msg <- purrr::map(data_checks, ~ Reduce(f = c,
@@ -1351,7 +1351,7 @@ checkSheetData <- function(d,
   }
 
   d$info$has_error <-
-    purrr::map_lgl(data_checks, function(x) purrr::pluck(x, "has_error")) %>%
+    purrr::map_lgl(data_checks, "has_error") %>%
     c(., d$info$has_error) %>%
     any()
 

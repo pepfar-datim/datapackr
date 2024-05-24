@@ -99,7 +99,7 @@ evaluateIndicators <- function(combis, values, inds) {
 
 
   sanitizeExpression <- function(expr) {
-    parsed_exp <- lapply(expr, function(x) datimvalidation::lex(x, expr_regexes))
+    parsed_exp <- lapply(expr, datimvalidation::lex, expr_regexes)
     exp_is_valid <-   !unlist(lapply(lapply(parsed_exp, function(x) names(x) == ".missing"), any))
     expr[!exp_is_valid] <- "NA"
     expr

@@ -32,37 +32,35 @@ test_that(
       "DREAMS"
     )
 
-    expect_true(all(sapply(
-      lapply(all_orgunits, names), \(x) setequal(x, expected_names))))
-
-
-    expect_true(all(sapply(
-      all_orgunits, \(x) all(is_uidish(x$uid))
+    expect_true(all(purrr::map_lgl(
+      all_orgunits, ~ setequal(names(.x), expected_names)
     )))
 
-    expect_true(all(sapply(
-      all_orgunits, \(x) all(is_uidish(x$ou_uid))
+    expect_true(all(purrr::map_lgl(all_orgunits, ~ all(is_uidish(
+      .x$uid
+    )))))
+
+    expect_true(all(purrr::map_lgl(all_orgunits, ~ all(
+      is_uidish(.x$ou_uid)
+    ))))
+
+    expect_true(all(purrr::map_lgl(all_orgunits, ~ all(
+      is_uidish(.x$snu1_uid)
+    ))))
+
+    expect_true(all(purrr::map_lgl(all_orgunits, ~ all(
+      is_uidish(.x$country_uid)
+    ))))
+
+    expect_true(all(purrr::map_lgl(all_orgunits, ~ is.list(.x$ancestors))))
+
+    expect_true(all(purrr::map_lgl(
+      all_orgunits, ~ is.list(.x$organisationUnitGroups)
     )))
 
-    expect_true(all(sapply(
-      all_orgunits, \(x) all(is_uidish(x$snu1_uid))
-    )))
+    expect_true(all(purrr::map_lgl(all_orgunits, ~ is.integer(
+      as.integer(as.Date(.x$lastUpdated, origin = "1970-01-01"))
+    ))))
 
-    expect_true(all(sapply(
-      all_orgunits, \(x) all(is_uidish(x$country_uid))
-    )))
-
-    expect_true(all(sapply(all_orgunits, \(x) is.list(x$ancestors))))
-
-    expect_true(all(sapply(
-      all_orgunits, \(x) is.list(x$organisationUnitGroups)
-    )))
-
-    expect_true(all(sapply(
-      sapply(sapply(
-        all_orgunits,
-        \(x) as.Date(x$lastUpdated, origin = "1970-01-01")
-      ), as.integer), is.integer
-    )))
 
   })

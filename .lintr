@@ -8,6 +8,9 @@ linters: linters_with_defaults(
     indentation_linter = NULL,
     assignment_linter = NULL,
     todo_comment_linter(todo = c("todo", "fixme"))
+    outer_negation_linter(),
+    unnecessary_lambda_linter(),
+    yoda_test_linter()
   )
 exclusions: list(
     "tests/testthat/play.dhis2.org" = Inf,
