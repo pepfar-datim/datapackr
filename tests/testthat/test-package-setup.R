@@ -109,9 +109,6 @@ test_that("We can check datapack paramaters", {
     all_countries)
 
 
-  # TODO: Add test for check_PSNUs
-
-
   # cop_year ####
   # Test for a valid COP year
   test_params <- check_params(cop_year = 2022)

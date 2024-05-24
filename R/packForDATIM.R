@@ -47,8 +47,6 @@ packForDATIM <- function(d, type = NULL) {
   expected_col_names <- c("PSNU", "indicator_code", "Age", "Sex", "KeyPop",
                           "psnuid", "mech_code", "support_type", "value")
 
-  #TODO: Get rid of this OPU PSNUxIM type entirely.
-
   if (type %in%  c("PSNUxIM", "OPU PSNUxIM")) { ## PSNUxIM ----
 
     if (!is.null(d$data$MER)) {

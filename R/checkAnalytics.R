@@ -2,14 +2,6 @@
 
 
 HTS_POS_Modalities <- function(cop_year) {
-    #TODO: This function needs a parameter based on COP year.
-    #More work further down, so I am not going to fix it
-    #at the moment. Each of the checks is being fed a
-    # data object, but this object does not seem to contain
-    # a reference to the cop year. Since the modalities
-    # differ from year to year though, this list needs
-    # to be determined based on the year we are dealing with.
-    # TODO:
 
     datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year) %>%
     dplyr::select(indicator_code, hts_modality, resultstatus) %>%
@@ -737,7 +729,6 @@ checkAnalytics <- function(d,
 
 
   # Prepare model data ####
-  #TODO: Generalize this as function
   model_data <- readRDS(d$keychain$model_data_path)
 
   if (!all(d$info$country_uids %in% names(model_data))) {

@@ -83,8 +83,6 @@ packTool <- function(model_data = NULL,
 
   } else if (d$info$tool %in% c("PSNUxIM", "PSNUxIM Template")) {
 
-    #TODO: How do we handle the existing PSNUxIM distribution once it exists?
-    #If we do not have an existing model from the DataPack, we should use the generated on
     d <- writePSNUxIM(d, snuxim_model_data_path = d$keychain$snuxim_model_data_path, d2_session = d2_session)
 
     } else {

@@ -40,10 +40,6 @@ packDataPack <- function(d,
     )
   }
 
-
-  # TODO: Separate PSNUs as parameter for this function, allowing you to include
-  # a list of whatever org units you want. Sites, PSNUs, Countries, whatever.
-
   # Write Main Sheets ####
   d$tool$wb <- packDataPackSheets(wb = d$tool$wb,
                                   country_uids = d$info$country_uids,
@@ -68,7 +64,6 @@ packDataPack <- function(d,
   # Add Styles ####
   interactive_print("Cleaning up Styles...")
 
-  #TODO: See if new openxlsx release addresses this issue
   spectrumStyle1 <- openxlsx::createStyle(fgFill = "#073763")
   spectrumStyle2 <- openxlsx::createStyle(fgFill = "#FFEB84")
 
@@ -83,7 +78,6 @@ packDataPack <- function(d,
 
   # Add validations ####
   interactive_print("Adding Validations...")
-  #TODO: Adding validations prevents use of openxlsx to add SNU x IM tab
 
   # because YEAR 2 tab is skipped by skip tabs we hide rows here
   # AGYW is also skipped because its excluded in packSheets

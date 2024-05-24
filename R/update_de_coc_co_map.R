@@ -432,10 +432,6 @@ update_de_coc_co_map <- function(cop_year = NULL,
   degs_map <- getDEGSMap(c("HWPJnUTMjEq",
                            "LxhLO68FcXm",
                            "RUkVjD3BsS1",
-                           # 04-24-2023: DEGS id seems to have changed from dDkGyJpCY4c to RUkVjD3BsS1
-                           # Note that this removes FY tags (FY22R/FY23T) from Top Level DEG names
-                           #TODO: Would be better to find a way to deduce top level from dataElement
-                           #list of DEGs, rather than relying on time period specific DEGS names.
                            "TWXpUVE2MqL",
                            "lD2x0c8kywj")) %>%
     dplyr::select(dataElementGroupSets.name, dataElementGroupSets.id,

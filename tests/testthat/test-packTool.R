@@ -1,4 +1,4 @@
-# TODO: test needs to be expanded
+
 
 context("Create a COP22 Data Pack")
 

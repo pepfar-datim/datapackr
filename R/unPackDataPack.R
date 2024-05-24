@@ -57,7 +57,6 @@ unPackDataPack <- function(d,
   }
 
   # Prepare undistributed import file for use in analytics if necessary ####
-  # TODO: Allow packForDATIM to auto-detect what is present and what should be packed.
   d <- packForDATIM(d, type = "Undistributed MER")
 
   # Package SUBNAT/IMPATT DATIM import file ####
