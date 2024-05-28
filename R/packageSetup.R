@@ -59,19 +59,11 @@ supportedCOPYears <- function(tool = NULL) {
 #' @return Character vector of tools supported by the package for a given cop_year.
 #' If cop_year is not provided, will provide list of all tools supported for any
 #' cop_year.
-supportedTools <- function(cop_year = NULL, season = NULL) {
+supportedTools <- function(cop_year = NULL) {
 
   cop_year <- cop_year %missing% NULL
   cop_year_provided <- !is.null(cop_year)
   cop_year %<>% suppressWarnings(check_cop_year())
-
-  season <- season %missing% NULL
-  season_provided <- !is.null(season)
-  if (season_provided) {
-    if (!season %in% supportedSeasons()) {
-      stop("In supportedTools, provided season is invalid.")
-    }
-  }
 
   supported_tools <- datapackrSupports() %>%
     tidyr::unnest(yrs) %>%
@@ -82,41 +74,7 @@ supportedTools <- function(cop_year = NULL, season = NULL) {
       dplyr::filter(yrs == cop_year)
   }
 
-  if (season_provided) {
-    supported_tools %<>%
-      dplyr::filter(seasons == season)
-  }
-
   unique(supported_tools$tools)
-}
-
-#' @export
-#' @title Supported Seasons
-#' @inheritParams datapackr_params
-#' @return Character vector of seasons supported by the package. If neither
-#' cop_year nor tool are provided, will provide list of all seasons supported.
-supportedSeasons <- function(cop_year = NULL, tool = NULL) {
-  cop_year <- cop_year %missing% NULL
-  cop_year_provided <- !is.null(cop_year)
-
-  tool <- tool %missing% NULL
-  tool_provided <- !is.null(tool)
-
-  supported_seasons <- datapackrSupports() %>%
-    tidyr::unnest(seasons) %>%
-    tidyr::unnest(yrs)
-
-  if (cop_year_provided) {
-    supported_seasons %<>%
-      dplyr::filter(yrs == cop_year)
-  }
-
-  if (tool_provided) {
-    supported_seasons %<>%
-      dplyr::filter(tools == tool)
-  }
-
-  unique(supported_seasons$seasons)
 }
 
 

@@ -18,7 +18,6 @@
 #' * `check_PSNUs`: Dataframe of valid `PSNUs` (uid and names).
 #' * `check_cop_year`: Valid `cop_year` as numeric value.
 #' * `check_tool`: Valid `tool` type as string.
-#' * `check_season`: Valid `season` as string.
 #' * `check_schema`: Valid `schema` as dataframe.
 #' * `checkDataPackName`: Valid `datapack_name` as string.
 #' * `checkTemplatePath`: Valid `template_path` as string.
@@ -243,18 +242,14 @@ check_cop_year <- function(cop_year, tool) {
 
 #' @export
 #' @rdname parameter-checks
-check_tool <- function(tool, season, cop_year) {
-  # If tool not provided — even if season or cop_year are — return default.
+check_tool <- function(tool, cop_year) {
+  # If tool not provided — even if cop_year is — return default.
   # If only tool provided, validate it's a valid choice.
-  # If tool & season provided, validate against each other.
   # If tool & cop_year provided, validate against each other.
 
   # Collect parameters.
   tool <- tool %missing% NULL
   tool_provided <- !is.null(tool)
-
-  season <- season %missing% NULL
-  season_provided <- !is.null(season)
 
   cop_year <- cop_year %missing% NULL
   cop_year_provided <- !is.null(cop_year)
@@ -263,29 +258,14 @@ check_tool <- function(tool, season, cop_year) {
   if (cop_year_provided) {
     cop_year %<>% check_cop_year()
   }
-  if (season_provided) {
-    season %<>% check_season()
-  }
 
   # If tool not provided, return default.
   default_cop_tool <- "Data Pack"
   default_opu_tool <- "PSNUxIM"
-  if (cop_year_provided) {
-    if (cop_year >= 2022) {
-      default_opu_tool <- "PSNUxIM"
-    }
-  }
 
+  #Default to a datapack if the tool is not specified.
   if (!tool_provided) {
-    tool_to_return <- default_cop_tool
-    if (season_provided) {
-      if (season == "OPU") {
-        tool_to_return <- default_opu_tool
-      }
-    }
-    interactive_message(
-      paste0("In check_tool, deduced you meant a ", tool_to_return))
-    return(tool_to_return)
+    return(default_cop_tool)
   }
 
   # Rule out invalid tools.
@@ -296,13 +276,6 @@ check_tool <- function(tool, season, cop_year) {
     }
   }
 
-  # If tool & season provided, validate against each other
-  if (tool_provided && season_provided) {
-    if (!season %in% supportedSeasons(tool = tool) ||
-        !tool %in% supportedTools(season = season)) {
-      stop("In check_tool, provided tool & provided season don't match.")
-    }
-  }
 
   if (tool_provided && cop_year_provided) {
     if (!cop_year %in% supportedCOPYears(tool = tool) ||
@@ -311,87 +284,12 @@ check_tool <- function(tool, season, cop_year) {
     }
   }
 
-  if (tool_provided && cop_year_provided && season_provided) {
-    if (!tool %in% supportedTools(cop_year = cop_year, season = season))
-      stop("In check_tool, the tool type provided is not valid for that specific COP Year & Season.")
-  }
-
   tool
 }
 
-
 #' @export
 #' @rdname parameter-checks
-check_season <- function(season, tool) {
-  # If neither season nor tool is provided, default to "COP".
-  # If season alone is provided, check it's a valid choice.
-  # If season & tool are both provided, validate season against tool.
-  # If only tool is provided, deduce season from tool.
-
-  supported_seasons <- c("COP", "OPU")
-  default_season <- "COP"
-
-  # Collect parameters
-  season <- season %missing% NULL
-  season_provided <- !is.null(season)
-
-  tool <- tool %missing% NULL
-  tool_provided <- !is.null(tool)
-
-  # If neither is provided, default to "COP"
-  if (!season_provided && !tool_provided) {
-    interactive_message("Since neither season nor tool was provided, we assumed you meant 'COP'.")
-    return(default_season)
-  }
-
-  # Validate what's been provided.
-  if (season_provided) {
-    if (!season %in% supported_seasons) {
-      stop("Cannot support any seasons other than 'COP' or 'OPU'.")
-    }
-  }
-
-  if (tool_provided) {
-    tool %<>% check_tool()
-    deduced_season <- switch(tool,
-                             "Data Pack" = c("OPU", "COP"),
-                             "Data Pack Template" = c("OPU", "COP"),
-                             "PSNUxIM" = c("OPU", "COP"),
-                             "PSNUxIM Template" = c("OPU", "COP"),
-                             "OPU Data Pack" = "OPU",
-                             "OPU Data Pack Template" = "OPU")
-  }
-
-  # If both season & tool provided, validate against each other.
-  if (season_provided && tool_provided) {
-    if (!season %in% deduced_season) {
-      interactive_warning("In check_season, provided tool & season aren't compatible.")
-    }
-  }
-
-  # If only tool provided, use it to guess the season.
-  if (!season_provided && tool_provided) {
-    if (tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
-      interactive_message(
-        paste0("Deduced season based on tool."))
-      return(deduced_season)
-    } else {
-      interactive_message(
-        paste0("Since Data Packs & PSNUxIM tools are now valid for both COP & ",
-               "OPU seasons, we couldn't deduce season based on just tool. ",
-               "Please provide season as a parameter. In the meantime, we'll ",
-               "use 'COP' as a placeholder for season."))
-      return(default_season)
-    }
-  }
-
-  return(season)
-}
-
-
-#' @export
-#' @rdname parameter-checks
-check_schema <- function(schema, cop_year, tool, season) {
+check_schema <- function(schema, cop_year, tool) {
 
   # Collect parameters
   schema <- schema %missing% NULL
@@ -403,13 +301,9 @@ check_schema <- function(schema, cop_year, tool, season) {
   tool <- tool %missing% NULL
   tool_provided <- !is.null(tool)
 
-  season <- season %missing% NULL
-  season_provided <- !is.null(season)
-
   # Validate parameters
   cop_year %<>% check_cop_year()
-  season <- suppressMessages(check_season(season = season, tool = tool))
-  tool %<>% check_tool(tool = ., season = season, cop_year = cop_year)
+  tool %<>% check_tool(tool = ., cop_year = cop_year)
 
   # For NULL schemas, attempt to deduce from other parameters, if provided.
   # Default here is the COP schema for the most recent/current COP Year
@@ -417,7 +311,7 @@ check_schema <- function(schema, cop_year, tool, season) {
 
   schema <- schema %||% expected_schema
 
-  if (!schema_provided && !tool_provided && (!cop_year_provided || !season_provided)) {
+  if (!schema_provided && !tool_provided && !cop_year_provided) {
     interactive_message(
       paste0(
         "Because of ommitted parameters, we assumed you meant the schema for ",
@@ -509,8 +403,7 @@ checkDataPackName <- function(datapack_name, country_uids, cop_year) {
 #' @importFrom utils capture.output
 checkTemplatePath <- function(template_path,
                               cop_year,
-                              tool,
-                              season) {
+                              tool) {
 
   # Collect parameters
   template_path <- template_path %missing% NULL
@@ -522,13 +415,9 @@ checkTemplatePath <- function(template_path,
   tool <- tool %missing% NULL
   tool_provided <- !is.null(tool)
 
-  season <- season %missing% NULL
-  season_provided <- !is.null(season)
-
   # Validate parameters
   cop_year %<>% check_cop_year()
-  season %<>% check_season(season = ., tool = tool)
-  tool %<>% check_tool(tool = ., season = season, cop_year = cop_year)
+  tool %<>% check_tool(tool = ., cop_year = cop_year)
 
   # For NULL template_paths, attempt to deduce from other parameters, if
   # provided. Default here is the template_path for the most recent/current COP
@@ -713,7 +602,6 @@ check_params <- function(country_uids,
                          PSNUs,
                          cop_year,
                          tool,
-                         season,
                          schema,
                          datapack_name,
                          template_path,
@@ -747,20 +635,14 @@ check_params <- function(country_uids,
 
   # Check tool ####
   if (!missing(tool)) {
-    params$tool <- check_tool(tool, season, cop_year)
-  }
-
-  # Check season ####
-  if (!missing(season)) {
-    params$season <- check_season(season, tool = tool)
+    params$tool <- check_tool(tool, cop_year)
   }
 
   # Check schema ####
   if (!missing(schema)) {
     params$schema <- check_schema(schema = schema,
                                   cop_year = cop_year,
-                                  tool = tool,
-                                  season = season)
+                                  tool = tool)
   }
 
   # Check datapack_name ####
@@ -773,8 +655,7 @@ check_params <- function(country_uids,
   if (!missing(template_path)) {
     params$template_path <- checkTemplatePath(template_path = template_path,
                                               cop_year = cop_year,
-                                              tool = tool,
-                                              season = season)
+                                              tool = tool)
   }
 
   # Check wb ####
