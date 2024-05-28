@@ -6,7 +6,9 @@
 *
 
 ## Minor improvements and fixes
-* 
+* Updated dependencies
+* Updated lintr to be more restrictive and updated code to fit new restrictions
+* Removed TODO's from the entire code base
 
 # datapackr 7.4.4
 ## New features
