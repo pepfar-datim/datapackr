@@ -121,14 +121,8 @@
 #    #   #model match the values in the DATIM export.
 #    #   dplyr::anti_join(d$data$snuxim_model_data)
 #    #
-#    #TODO: Should there be any missing data here?
-#    #Crosswalk dedupes are missing here....
 #    #testthat::expect_true(NROW(missing_data_model) == 0)
 #
-#
-#
-#
-#    #TODO: Test from the analytics
 #    test_data_analytics <- d_opened %>%
 #      purrr::pluck("data") %>%
 #      purrr::pluck("analytics") %>%
@@ -140,9 +134,7 @@
 #                    target_value) %>%
 #      dplyr::mutate(target_value = as.numeric(target_value),
 #                    period = paste0(period - 1, "Oct")) %>%
-#      #TODO: Unclear at the moment of the effect of the inner join
-#      #We are trying to test whether the input and output are equivalent
-#      #But seems that certain things are being dropped in the join
+#
 #      dplyr::full_join(tibble::as_tibble(d$data$snuxim_model_data),
 #      by = c("dataElement", "period", "orgUnit", "categoryOptionCombo", "attributeOptionCombo")) %>%
 #      dplyr::filter(attributeOptionCombo != "default") %>%  #Filter AGYW_PREV data

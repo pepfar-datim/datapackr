@@ -18,12 +18,12 @@ validationSummary <- function(d) {
     dplyr::select(test_name, count) %>%
     tibble::as_tibble()
 
-  tests_names <- t(purrr::map_dfr(d$tests, function(x) attr(x, "test_name"))) %>%
+  tests_names <- t(purrr::map_dfr(d$tests, attr, "test_name")) %>%
     as.data.frame() %>%
     dplyr::mutate(test_name = rownames(.),
                   validation_issue_category = V1) %>%
     dplyr::select(test_name, validation_issue_category) %>%
-  tibble::as_tibble()
+    tibble::as_tibble()
 
 
   dplyr::left_join(tests_names, tests_rows, by = "test_name") %>%

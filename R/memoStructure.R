@@ -67,7 +67,7 @@ memoStructure <- function(d, d2_session = dynGet("d2_default_session",
       "KP_PREV", "Total", 5,
       "KP_MAT", "Total", 5,
       "PrEP_NEW", "Total", 5,
-      "PrEP_CT", "Total", 5, #TODO: Need to fix this indicator
+      "PrEP_CT", "Total", 5,
       "CXCA_SCRN", "Total", 6,
       "PP_PREV", "<15", 6,
       "PP_PREV", "15+", 6,

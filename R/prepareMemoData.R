@@ -79,7 +79,6 @@ prepareExistingDataAnalytics <- function(d, d2_session =
 
   if (!is.null(df) && NROW(df) > 0) {
 
-    #TODO: Does adorn_import file need to be smarter
     map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
                                                             datasource = "DATIM")
 
@@ -167,10 +166,6 @@ prepareMemoDataByPSNU <- function(analytics,
                               prioritization)) %>%
     dplyr::select(uid, prioritization)
 
-  #TODO: Consider to refactor adorn_import_file
-  #To handle this adornment. The logic here is
-  #very similar, but we are dealing with indicators
-  #instead of data elements.
   df %>%
     dplyr::select(-data) %>%
     tidyr::unnest(indicator_results) %>%

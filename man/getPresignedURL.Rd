@@ -5,16 +5,24 @@
 \title{Upload DATIM Export to PDAP
 Title}
 \usage{
-getPresignedURL(job, endpoint, query, service)
+getPresignedURL(
+  job = "PDAPAPIDomainName",
+  endpoint = "/jobs/presignedurl",
+  job_type = "target_setting_tool",
+  destination = "processed",
+  file_suffix = "csv"
+)
 }
 \arguments{
 \item{job}{Name of the job, i.e. PDAPAPIDomainName}
 
 \item{endpoint}{Path of the endpoint, i.e. /jobs/presignedurl}
 
-\item{query}{List of query parameters}
+\item{job_type}{Type of job to get, i.e. 'target_setting_tool'}
 
-\item{service}{Name of the service, i.e. execute-api}
+\item{destination}{Destination of the file, i.e. 'processed'}
+
+\item{file_suffix}{Suffix of the file, i.e. 'csv'}
 }
 \value{
 Returns the presigned URL list (file_key, presigned_url, expiration time)

@@ -1,27 +1,8 @@
-# context("test-unPackingChecks")
-#
-# # test_that("Can read xslx and save as rds for later user", {
-# #
-# #   file <- "COP22_DataPack_unPackingChecks.xlsx"
-# #
-# #   d <- loadDataPack(submission_path = test_sheet(file),
-# #                     tool = "Data Pack",
-# #                     country_uids = NULL,
-# #                     cop_year = NULL,
-# #                     load_wb = FALSE,
-# #                     load_sheets = TRUE,
-# #                     d2_session = training)
-# #
-# #   saveRDS(d, paste0(gsub(".xlsx", "", test_sheet(file)), ".rds"))
-# #   rm(d)
-# #
-# # })
-#
 # test_that("Can detect invalid comment types ...", {
 #
 #   #Note: A warning is thrown here on the command line  for "invalid parameter"
 #   # Does not have any impact on the parsing, but documenting it nonetheless.
-#   expect_warning(d <- loadDataPack(submission_path = test_sheet("COP24_DataPack_unPackingChecks.xlsx"),
+#   expect_warning(d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
 #                     tool = "Data Pack",
 #                     country_uids = NULL,
 #                     cop_year = NULL,
@@ -49,7 +30,7 @@
 # })
 #
 # test_that("Can detect external links in a file ...", {
-#   expect_warning(d <- loadDataPack(submission_path = test_sheet("COP24_DataPack_unPackingChecks.xlsx"),
+#   expect_warning(d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
 #                     tool = "Data Pack",
 #                     country_uids = NULL,
 #                     cop_year = NULL,
@@ -90,7 +71,7 @@
 # test_that("Can check sheet data...", {
 #
 #
-#     d <- loadDataPack(submission_path = test_sheet("COP24_DataPack_unPackingChecks.xlsx"),
+#     d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
 #                                            tool = "Data Pack",
 #                                            country_uids = NULL,
 #                                            cop_year = NULL,
@@ -111,7 +92,6 @@
 #    expect_true("invalid_prioritizations" %in% names(d$tests))
 #    expect_true("altered_formulas" %in% names(d$tests))
 #
-#    #TODO: This is still broken
 #    #expect_true("defunct_disaggs" %in% names(d$tests))
 #
 #    expect_true(any(grepl("In tab GEND: DUPLICATE ROWS", d$info$messages$message)))
@@ -164,7 +144,7 @@
 #     dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
 #
 #
-#   d$info$cop_year <- 2024
+#   d$info$cop_year <- 2022
 #   d$sheets$Prioritization <-
 #     tribble(
 #       ~PSNU, ~IMPATT.PRIORITY_SNU.T,
@@ -214,7 +194,7 @@
 #     dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
 #
 #
-#   d$info$cop_year <- 2024
+#   d$info$cop_year <- 2022
 #   d$sheets$Prioritization <-
 #     tribble(
 #       ~PSNU, ~IMPATT.PRIORITY_SNU.T,
@@ -275,7 +255,7 @@
 #       "Lilongwe District [#SNU] [ScR9iFKAasW]", "20"
 #     )
 #
-#   d$info$cop_year <- 2024
+#   d$info$cop_year <- 2022
 #   # test no errors/warnings
 #   res <- checkNegativeValues(d, sheets = test_sheets)
 #   expect_null(res$result)
@@ -529,7 +509,7 @@
 #       "Female", "_Military Malawi [#Military] [PQZgU9dagaH]|05-09|Female", NA
 #     )
 #
-#   d$info$cop_year <- 2024
+#   d$info$cop_year <- 2022
 #   # test no errors/warnings
 #   res <- checkInvalidOrgUnits(d = d, sheets = test_sheets)
 #   expect_null(res$result)
@@ -569,7 +549,7 @@
 #       "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", NA, "M", "Military",
 #       "Central Region", "Lilongwe District [#SNU] [ScR9iFKAasW]", "4", "4", "Sustained"
 #     )
-#   d$info$cop_year <- 2024
+#   d$info$cop_year <- 2022
 #   d$info$operating_unit$ou_uid <- "lZsCb6y0KDX"
 #
 #   # test no errors/warnings
@@ -671,8 +651,8 @@
 #
 #   d <- list()
 #   d$info$tool <- "Data Pack"
-#   d$info$cop_year <- "2024"
-#   d$keychain$submission_path <- test_sheet("COP24_DataPack_unPackingChecks.xlsx")
+#   d$info$cop_year <- "2022"
+#   d$keychain$submission_path <- test_sheet("COP22_DataPack_unPackingChecks.xlsx")
 #
 #   test_sheets <- c(
 #     "Prioritization"
@@ -700,7 +680,6 @@
 #     )
 #
 #   # test error kicks because of incorrect formulas
-#   # TODO: how do we test no errors since checkFormula depends on on a path read
 #   res <- checkFormulas(d, sheets = test_sheets)
 #   expect_equal(nrow(res$result), 3L)
 #   expect_equal(res$lvl, "WARNING")
@@ -717,7 +696,7 @@
 #   #skip("Defunct disaggs checks needs to be fixed")
 #   # create minimal schema data
 #   d <- list()
-#   d$info$cop_year <- 2024
+#   d$info$cop_year <- 2022
 #   d$info$schema <-
 #     tribble(
 #       ~sheet_num, ~sheet_name, ~col, ~indicator_code, ~col_type, ~value_type,
