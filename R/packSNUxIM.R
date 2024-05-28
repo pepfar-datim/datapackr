@@ -22,7 +22,6 @@ packSNUxIM <- function(d,
     d$info$has_psnuxim <- TRUE
     ## If does exist, extract missing combos ####
     d$data$missingCombos <- d$data$MER %>%
-      # TODO: Create this here rather than upstream
       dplyr::anti_join(d$data$PSNUxIM_combos)
 
     d$info$missing_psnuxim_combos <- (NROW(d$data$missingCombos) > 0)
@@ -36,7 +35,6 @@ packSNUxIM <- function(d,
     }
   }
 
-  #TODO: Consider preparing this ahead of time for all OUs
   snuxim_model_data <- readRDS(d$keychain$snuxim_model_data_path) %>%
     prepare_model_data.PSNUxIM(snuxim_model_data = .,
                                country_uids = d$info$country_uids)
@@ -174,8 +172,6 @@ packSNUxIM <- function(d,
       col < (col.im.targets[1])) %>%
     dplyr::pull(col)
 
-  ## TODO: Improve this next piece to be more efficient instead of using str_replace_all
-
   data_structure %<>%
     dplyr::arrange(col) %>%
     dplyr::mutate(
@@ -203,7 +199,6 @@ packSNUxIM <- function(d,
       )
 
   # Classify formula columns as formulas
-  ## TODO: Improve approach
   for (i in seq_along(data_structure)) {
     if (!all(any(is.na(data_structure[[i]])))) {
       class(data_structure[[i]]) <- c(class(data_structure[[i]]), "formula")
@@ -211,8 +206,6 @@ packSNUxIM <- function(d,
   }
 
   # Combine schema with SNU x IM model dataset ####
-  #TODO: Fix this to not re-add mechanisms removed by the Country Team (filter snuxim_model_data
-  #to only columns with not all NA related to data in missing combos)
   data_structure <- datapackr::swapColumns(data_structure, snuxim_model_data) %>%
     dplyr::bind_cols(
       snuxim_model_data %>%

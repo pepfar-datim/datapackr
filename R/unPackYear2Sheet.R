@@ -46,7 +46,6 @@ y2ExtractInvalidDisaggs <- function(d) {
     d$tests$year2_invalid_disaggs  <-
       d$data$Year2[year2_invalid_disaggs, ]
     attr(d$tests$year2_invalid_disaggs, "test_name") <- "Invalid Year 2 disaggs"
-    #TODO: Re-enable this once the data element /COC map is fixed
     #d$data$Year2 <- d$data$Year2[!year2_invalid_disaggs, ]
   }
 
@@ -205,7 +204,6 @@ pickUIDFromType <- function(type, de_uid_list) {
 
 generateY2IndicatorCodeDataElementMap <- function(cols_to_keep, cop_year) {
 
-  #TODO: Fix this in the main map
   hts_recent_kps <-
     datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year) %>%
     dplyr::filter(support_type == "DSD") %>%
@@ -387,7 +385,6 @@ generateY2IndicatorCodeDataElementMap <- function(cols_to_keep, cop_year) {
       grepl(is_positive, indicator_code) ~ "Positive",
       TRUE ~ resultstatus
     )) %>%
-    #TODO: This should be fixed in the main map I think.
 
     dplyr::mutate(
       resultstatus = dplyr::case_when(
@@ -569,7 +566,6 @@ unpackYear2Sheet <- function(d) {
                     valid_ages.name,
                     valid_kps.name,
                     indicator_code) %>%
-    #TODO: This feels a bit risky. Should we only limit to OVC_HIVSTAT & PMTCT_EID?
     dplyr::summarise(value = sum(value, na.rm = TRUE), .groups = "drop")
 
   #Data tests once we have the final shape
@@ -613,10 +609,7 @@ unpackYear2Sheet <- function(d) {
     ) %>%
     tidyr::drop_na() %>%
     dplyr::distinct()
-  # Thu Dec  7 14:04:43 2023 -- Need to add a test for NA's
 
-  #DP-970
-  #TODO: This needs to be fixed in the DE/COC map
   export_dups_vec <- duplicated(d$datim$year2[, 1:5])
 
   if (any(export_dups_vec)) {

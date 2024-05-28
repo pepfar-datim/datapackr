@@ -25,8 +25,8 @@
 packDataPackSheets <- function(wb,
                                country_uids,
                                ou_level = "Prioritization",
-                               org_units = NULL, #TODO: Any way we could use PEPFARlandia here?
-                               model_data = NULL, #TODO: Could we load a play dataset here?
+                               org_units = NULL,
+                               model_data = NULL,
                                schema = pick_schema(), # Load in current COP year schema from package
                                sheets = NULL,
                                cop_year = getCurrentCOPYear()) {
@@ -34,7 +34,6 @@ packDataPackSheets <- function(wb,
   # Resolve parameter issues. ####
   if (is.null(model_data)) {
     stop("Must provide model_data. Leaving this blank is not an option at this time.")
-    #TODO: Feature to allow production of blank data pack (with just org_units and disaggs)
   }
 
   # Get org_units to write into Data Pack based on provided parameters. ####
@@ -47,13 +46,10 @@ packDataPackSheets <- function(wb,
         ## Remove DSNUs
         dplyr::filter(org_type != "DSNU") %>%
         dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
-      #TODO: Update Data Pack and here to use `OrgUnit as column header instead
-      # of PSNU to allow custom org unit list.
 
     } else if (ou_level %in% c(4:7, "Facility", "Community")) {
       stop("Sorry! I'm learning how to pack a Data Pack at a non-Prioritization
            level, but I'm not quite there yet.")
-      #TODO: Add feature
 
     } else {
       stop("Hmmm... The ou_level you've provided doesn't look like what I'm used

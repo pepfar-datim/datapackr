@@ -24,7 +24,6 @@ createAnalytics <- function(d,
     map_des_cocs <- getMapDataPack_DATIM_DEs_COCs(cop_year = d$info$cop_year,
                                                   datasource = d$info$tool)
 
-    #TODO: Fix the names here as this is not aligned with the orgunit structure now
     if (is.null(d$info$psnus)) {
       d$info$psnus <- getValidOrgUnits(d$info$cop_year) %>%
         dplyr::filter(country_uid %in% d$info$country_uids) %>%
@@ -60,7 +59,6 @@ createAnalytics <- function(d,
   pzns <- d$datim$prioritizations %>%
     dplyr::select(orgUnit, value)
 
-  #TODO: We need to clean this logic up.
   if (d$info$has_psnuxim) {
     data <- d$datim$MER %>%
       dplyr::bind_rows(d$datim$subnat_impatt)

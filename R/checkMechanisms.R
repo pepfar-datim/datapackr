@@ -32,8 +32,6 @@ checkMechanisms <- function(d,
     dplyr::pull(mechanism_code)
 
 
-  #TODO: There should really be a better check here.
-  #Default should only be allowable with certain data elements.
   #Allow for the default mechanism
   mechs_datim <- append("default", mechs_datim)
 

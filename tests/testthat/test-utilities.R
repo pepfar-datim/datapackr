@@ -256,7 +256,7 @@ test_that("Can get an operating unit from country UIDs", {
 
   #Kazakhstan and Kygrystan
   df <- getOUFromCountryUIDs(country_uids = c("xVvOdyoS7wi", "vm58KTm9wvy"), cop_year = 2023)
-  expect_equal("Asia Region", df$ou)
+  expect_equal(df$ou, "Asia Region")
 
   #Kazakhstan and Angola
   expect_error(getOUFromCountryUIDs(country_uids = c("XOivy2uDpMF", "vm58KTm9wvy"), cop_year = 2023))

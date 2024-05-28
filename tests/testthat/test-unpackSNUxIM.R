@@ -288,13 +288,13 @@ test_that("Can flag invalid disaggs in PSNUxIM", {
   d <- checkPSNUxIMDisaggs(d)
 
   expect_true(d$info$has_error)
-  expect_equal(2L, NROW(d$tests$invalid_psnuxim_disaggs))
+  expect_equal(NROW(d$tests$invalid_psnuxim_disaggs), 2L)
   expect_true(grepl("invalid disagg", d$info$messages$message))
   expect_setequal(c("Cupcake District [NYWv44mLzDN]",
                     "Bagel District [ZYWv44mLzDN]"),
                   d$tests$invalid_psnuxim_disaggs$PSNU)
   #Expect an offset here due to the header row
-  expect_setequal(c(17, 18), d$tests$invalid_psnuxim_disaggs$row_number)
+  expect_setequal(d$tests$invalid_psnuxim_disaggs$row_number, c(17, 18))
 
 })
 
@@ -335,8 +335,8 @@ test_that("Can identify non-numeric values in PSNUxIM", {
   d <- checkNonNumericPSNUxIMValues(d,  header_cols)
   expect_true(any(grepl("WARNING! In tab PSNUxIM: Non-numeric values!", d$info$messages$message)))
   expect_setequal(d$tests$non_numeric_psnuxim_values$columns, c("B", "C"))
-  expect_equal("1", d$tests$non_numeric_psnuxim_values$rows[which(d$tests$non_numeric_psnuxim_values == "B")])
-  expect_equal("1:2", d$tests$non_numeric_psnuxim_values$rows[which(d$tests$non_numeric_psnuxim_values == "C")])
+  expect_equal(d$tests$non_numeric_psnuxim_values$rows[which(d$tests$non_numeric_psnuxim_values == "B")], "1")
+  expect_equal(d$tests$non_numeric_psnuxim_values$rows[which(d$tests$non_numeric_psnuxim_values == "C")], "1:2")
 
 })
 
