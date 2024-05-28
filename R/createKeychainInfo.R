@@ -31,7 +31,6 @@ unPackHomeTabMetadata <- function(submission_path)  {
 #'
 createKeychainInfo <- function(submission_path = NULL,
                                tool = NULL,
-                               season = NULL,
                                country_uids = NULL,
                                cop_year = NULL,
                                d2_session = NULL) {
@@ -43,8 +42,7 @@ createKeychainInfo <- function(submission_path = NULL,
     info = list(
       tool = tool,
       country_uids = country_uids,
-      cop_year = cop_year,
-      season = season)
+      cop_year = cop_year)
   )
 
   # Pulls username if `d2_session` object provided
@@ -107,9 +105,6 @@ createKeychainInfo <- function(submission_path = NULL,
   }
 
   d$info$tool %<>% check_tool()
-
-  # season ####
-  d$info$season <- check_season(season = d$info$season, tool = d$info$tool)
 
   # schema ####
   d$info$schema <- check_schema(cop_year = d$info$cop_year, tool = d$info$tool)

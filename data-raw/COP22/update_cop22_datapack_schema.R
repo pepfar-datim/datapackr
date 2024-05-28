@@ -15,8 +15,7 @@ waldo::compare(datapackr::cop22_data_pack_schema, cop22_data_pack_schema, max_di
 checkSchema(schema = cop22_data_pack_schema,
             template_path = datapack_template_filepath,
             cop_year = 2022,
-            tool = "Data Pack",
-            season = "COP")
+            tool = "Data Pack")
 
 usethis::use_data(cop22_data_pack_schema, overwrite = TRUE, compress = "xz")
 
