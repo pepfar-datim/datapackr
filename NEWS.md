@@ -2,6 +2,12 @@
 ## New features
 * Add utility functions for interacting with PDAP Jobs 
 
+## Bug fixes
+*
+
+## Minor improvements and fixes
+* 
+
 # datapackr 7.4.4
 ## New features
 *
@@ -12,7 +18,6 @@
 ## Minor improvements and fixes
 * Updated exported functions and back end param handling.
 * Updated documentation
-
 
 # datapackr 7.4.3
 
