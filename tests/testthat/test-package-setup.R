@@ -166,17 +166,6 @@ test_that("We can check datapack paramaters", {
   expect_equal(season, "COP")
   expect_message(check_season())
 
-  # If season and tool both provided, but don't match, issue warning, but leave
-  # both in place.
-  # Thu May 16 16:18:30 2024 ------------------------------
-  # OPU datapacks don't exist any more
-  # season <- check_season(tool = "OPU Data Pack", season = "COP")
-  # expect_equal(season, "COP")
-  # expect_warning(check_season(tool = "OPU Data Pack", season = "COP"))
-  # season <- check_season(tool = "OPU Data Pack Template", season = "COP")
-  # expect_equal(season, "COP")
-  # expect_warning(check_season(tool = "OPU Data Pack Template", season = "COP"))
-
   # If season & tool both provided, check they match with no warning.
   season <- check_season(tool = "Data Pack", season = "COP")
   expect_equal(season, "COP")
