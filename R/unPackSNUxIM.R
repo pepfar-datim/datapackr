@@ -67,8 +67,6 @@ unPackSNUxIM <- function(d) {
   header_cols <- getHeaderColumns(cols_to_keep, sheet)
   original_targets <- extractOriginalTargets(d, cols_to_keep, header_cols, sheet)
 
-  #TODO: This test is overly simplistic, as we can
-  #simply drop blank columns.
   if (NCOL(d$data$SNUxIM) < max(cols_to_keep$col)) {
     stop(
       paste(
@@ -161,14 +159,9 @@ unPackSNUxIM <- function(d) {
   #IMPORTANT: Values are rounded here
   d <- testRoundDecimalValues(d)
 
-  #TODO: Since we are about to recalculate dedupe AGAIN, do we need to
-  # remove positive dedupe? How could it ever exist at this point?
-
   d <- testDropPositiveDedupe(d)
 
   #Remove any potential duplicates by summing.
-  #TODO: We should really flag anything which is a duplicate at this point.
-  #TODO: This is really quite late in the process to deal with duplicates?
   d$data$SNUxIM %<>%
     dplyr::group_by(
       dplyr::across(c(header_cols$indicator_code, "psnuid", "mechCode_supportType"))) %>%
@@ -195,8 +188,6 @@ unPackSNUxIM <- function(d) {
     )
 
   # Drop `Not PEPFAR` data ####
-  #TODO: Is there anyway we can get rid of this earlier if we are just
-  # dropping the entire column?
   d$data$SNUxIM %<>%
     dplyr::filter(mechCode_supportType != "Not PEPFAR")
 

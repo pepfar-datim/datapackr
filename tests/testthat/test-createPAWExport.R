@@ -42,10 +42,10 @@ test_that("Can export COP24 DATIM data", {
   paw_export <- createPAWExport(d)
   pop_data <- c("KssDaTsGWnS", "lJtpR5byqps", "nF19GOjcnoD", "P2XNbiNnIqV")
   testthat::expect_equal(
-    4,
     paw_export %>%
       dplyr::filter(dataElement %in% pop_data) %>%
-      NROW()
+      NROW(),
+    4L
   )
 
   testthat::expect_true(all(sapply(paw_export, class) == "character"))

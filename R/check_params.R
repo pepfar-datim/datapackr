@@ -134,7 +134,7 @@ check_country_uids <- function(country_uids, cop_year, force = TRUE) {
   valid_orgunits_local <- getValidOrgUnits(cop_year)
 
   # If any country_uids are invalid, warn but remove and still move on.
-  if (any(!country_uids %in% valid_orgunits_local$country_uid)) {
+  if (!all(country_uids %in% valid_orgunits_local$country_uid)) {
     # subset submitted list base on it values NOT being in valid_OrgUnits
     invalid_country_uids <- country_uids[!country_uids %in% valid_orgunits_local$country_uid]
 
@@ -176,8 +176,6 @@ check_country_uids <- function(country_uids, cop_year, force = TRUE) {
 #' @export
 #' @rdname parameter-checks
 check_PSNUs <- function(PSNUs = NULL, country_uids = NULL, cop_year = NULL) {
-  # TODO: Update how we use PSNUs everywhere to use a character vector of uids
-  #   instead of dataframe of all metadata
 
   cop_year <- cop_year %missing% NULL
   cop_year %<>% check_cop_year(cop_year = cop_year)
@@ -197,7 +195,7 @@ check_PSNUs <- function(PSNUs = NULL, country_uids = NULL, cop_year = NULL) {
   } else {
     # If PSNUs is provided, check to make sure these are all valid.
     # Warn and remove invalid PSNu's as needed.
-    if (any(!PSNUs$psnu_uid %in% valid_orgunits_local$uid)) {
+    if (!all(PSNUs$psnu_uid %in% valid_orgunits_local$uid)) {
       invalid_PSNUs <- PSNUs %>%
         dplyr::filter(!psnu_uid %in% valid_orgunits_local$uid) %>%
         add_dp_label(orgunits = ., cop_year = cop_year) %>%
@@ -238,14 +236,6 @@ check_cop_year <- function(cop_year, tool) {
                              oxford = FALSE),
                 "."))
   }
-
-  #TODO: @jacksons Do we need to check the tool here??
-  # Check other parameters
-  #tool <- tool %missing% NULL
-  #tool_provided <- !is.null(tool)
-  #if (tool_provided) {
-  #  tool <- check_tool(tool = tool, cop_year = cop_year)
-  #}
 
   cop_year
 }

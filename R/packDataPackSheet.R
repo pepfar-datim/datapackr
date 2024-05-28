@@ -21,7 +21,7 @@ packDataPackSheet <- function(wb,
                               org_units,
                               schema = pick_schema(),
                               sheet_data,
-                              cop_year = getCurrentCOPYear()) { #TODO: Could we load a play dataset here?
+                              cop_year = getCurrentCOPYear()) {
 
   # Prepare data for writing to sheet ####
   sheet_data <- prepareSheetData(sheet = sheet,

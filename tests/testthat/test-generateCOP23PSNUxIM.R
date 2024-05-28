@@ -55,7 +55,6 @@ with_mock_api({
     d_opened <- unPackTool(submission_path = out_file, d2_session = training)
 
     expect_setequal(names(d_opened), c("keychain", "info", "data", "tests", "datim", "sheets"))
-    #TODO: Add additional tests for data equality
 
 
 

@@ -1,6 +1,3 @@
-#TODO This function was only used for unpacking COP20 OPUs. Should it be
-# integrated into the rest of the package or gotten rid of?
-
 #' @export
 #' @title Check for invalid Indicator Codes
 #'

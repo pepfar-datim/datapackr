@@ -44,7 +44,6 @@ getCOPDataFromDATIM <- function(country_uids,
       tibble::tibble(key = "orgUnit", value = country_uids),
       tibble::tribble(~ key, ~ value,
                       "children", "true",
-                      #TODO: We need to migrate this to use UIDs
                       "categoryOptionComboIdScheme", "code",
                       "attributeOptionComboIdScheme", "code",
                       "includeDeleted", "false",
