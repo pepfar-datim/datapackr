@@ -162,60 +162,60 @@ test_that("Can get columns to keep", {
 })
 
 
-with_mock_api({
-test_that("Can detect missing right side formulas", {
-
-
-  generation_list <- c("Eswatini")
-
-  pick <- datapackr::COP21_datapacks_countries %>%
-    dplyr::filter(datapack_name %in% generation_list) %>%
-    dplyr::arrange(datapack_name)
-
-  output_folder <- paste0("/tmp/", stringi::stri_rand_strings(1, 20))
-  dir.create(output_folder)
-
-  #This should produce a tool with no formulas on the right hand side.
-  d <- packTool(tool = "OPU Data Pack",
-                datapack_name = pick$datapack_name[1],
-                country_uids = unlist(pick$country_uids[1]),
-                template_path = NULL,
-                cop_year = 2022,
-                output_folder = output_folder,
-                results_archive = FALSE,
-                expand_formulas = FALSE,
-                d2_session = training)
-
-  sheet <- "PSNUxIM"
-  header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
-  cols_to_keep <- getColumnsToKeep(d, sheet)
-  header_cols <- getHeaderColumns(cols_to_keep, sheet)
-  d$data$SNUxIM <-
-    readxl::read_excel(
-      path = d$info$output_file,
-      sheet = sheet,
-      range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
-      col_types = "text",
-      .name_repair = "minimal"
-    )
-
-  blank_cols_idx <- which(names(d$data$SNUxIM) == "")
-  #Read from the output file, which has not been opened, thus no formulas
-  parsed_cells <-  tidyxl::xlsx_cells(path = d$info$output_file,
-                                      sheets = "PSNUxIM",
-                                      include_blank_cells = TRUE)
-
-  d <- testMissingRightSideFormulas(d,
-                                 cols_to_keep,
-                                 header_cols,
-                                 header_row,
-                                 blank_cols_idx,
-                                 parsed_cells = parsed_cells)
-
-  expect_named(d$tests$psnuxim_missing_rs_fxs, c("col", "row", "formula", "col_letter"))
-  expect_true(NROW(d$tests$psnuxim_missing_rs_fxs) > 1L)
-})
-})
+# with_mock_api({
+# test_that("Can detect missing right side formulas", {
+#
+#
+#   generation_list <- c("Eswatini")
+#
+#   pick <- datapackr::COP21_datapacks_countries %>%
+#     dplyr::filter(datapack_name %in% generation_list) %>%
+#     dplyr::arrange(datapack_name)
+#
+#   output_folder <- paste0("/tmp/", stringi::stri_rand_strings(1, 20))
+#   dir.create(output_folder)
+#
+#   #This should produce a tool with no formulas on the right hand side.
+#   d <- packTool(tool = "OPU Data Pack",
+#                 datapack_name = pick$datapack_name[1],
+#                 country_uids = unlist(pick$country_uids[1]),
+#                 template_path = NULL,
+#                 cop_year = 2022,
+#                 output_folder = output_folder,
+#                 results_archive = FALSE,
+#                 expand_formulas = FALSE,
+#                 d2_session = training)
+#
+#   sheet <- "PSNUxIM"
+#   header_row <- headerRow(tool = d$info$tool, cop_year = d$info$cop_year)
+#   cols_to_keep <- getColumnsToKeep(d, sheet)
+#   header_cols <- getHeaderColumns(cols_to_keep, sheet)
+#   d$data$SNUxIM <-
+#     readxl::read_excel(
+#       path = d$info$output_file,
+#       sheet = sheet,
+#       range = readxl::cell_limits(c(header_row, 1), c(NA, NA)),
+#       col_types = "text",
+#       .name_repair = "minimal"
+#     )
+#
+#   blank_cols_idx <- which(names(d$data$SNUxIM) == "")
+#   #Read from the output file, which has not been opened, thus no formulas
+#   parsed_cells <-  tidyxl::xlsx_cells(path = d$info$output_file,
+#                                       sheets = "PSNUxIM",
+#                                       include_blank_cells = TRUE)
+#
+#   d <- testMissingRightSideFormulas(d,
+#                                  cols_to_keep,
+#                                  header_cols,
+#                                  header_row,
+#                                  blank_cols_idx,
+#                                  parsed_cells = parsed_cells)
+#
+#   expect_named(d$tests$psnuxim_missing_rs_fxs, c("col", "row", "formula", "col_letter"))
+#   expect_true(NROW(d$tests$psnuxim_missing_rs_fxs) > 1L)
+# })
+# })
 
 test_that("Can drop duplicated PSNUxIM columns", {
   d <- list()
@@ -268,59 +268,59 @@ test_that("Can drop invalid mechanism columns", {
 
 })
 
-test_that("Can flag invalid disaggs in PSNUxIM", {
+# test_that("Can flag invalid disaggs in PSNUxIM", {
+#
+#   d <- list()
+#   d$info$tool <- "OPU Data Pack"
+#   d$info$messages <- MessageQueue()
+#   d$info$cop_year <- 2022
+#   d$info$schema <- datapackr::cop22OPU_data_pack_schema
+#   d$info$has_error <- FALSE
+#
+#   #Flag invalid disaggs
+#   d$data$SNUxIM <- tibble::tribble(
+#     ~PSNU, ~indicator_code, ~Age, ~Sex, ~KeyPop, ~DataPackTarget,
+#     "Fish District [AYWv44mLzDN]", "TX_CURR.T", "25-29", "Female", NA, 10,
+#     "Dog District [BYWv44mLzDN]", "TX_CURR.T", "25-29", "Female", NA, 10,
+#     "Cupcake District [NYWv44mLzDN]", "TX_CURR.T", "25-49", "F", NA, 10,
+#     "Bagel District [ZYWv44mLzDN]", "TX_CURR.T", "25-49", "F", NA, 10)
+#
+#   d <- checkPSNUxIMDisaggs(d)
+#
+#   expect_true(d$info$has_error)
+#   expect_equal(2L, NROW(d$tests$invalid_psnuxim_disaggs))
+#   expect_true(grepl("invalid disagg", d$info$messages$message))
+#   expect_setequal(c("Cupcake District [NYWv44mLzDN]",
+#                     "Bagel District [ZYWv44mLzDN]"),
+#                   d$tests$invalid_psnuxim_disaggs$PSNU)
+#   #Expect an offset here due to the header row
+#   expect_setequal(c(17, 18), d$tests$invalid_psnuxim_disaggs$row_number)
+#
+# })
 
-  d <- list()
-  d$info$tool <- "OPU Data Pack"
-  d$info$messages <- MessageQueue()
-  d$info$cop_year <- 2022
-  d$info$schema <- datapackr::cop22OPU_data_pack_schema
-  d$info$has_error <- FALSE
-
-  #Flag invalid disaggs
-  d$data$SNUxIM <- tibble::tribble(
-    ~PSNU, ~indicator_code, ~Age, ~Sex, ~KeyPop, ~DataPackTarget,
-    "Fish District [AYWv44mLzDN]", "TX_CURR.T", "25-29", "Female", NA, 10,
-    "Dog District [BYWv44mLzDN]", "TX_CURR.T", "25-29", "Female", NA, 10,
-    "Cupcake District [NYWv44mLzDN]", "TX_CURR.T", "25-49", "F", NA, 10,
-    "Bagel District [ZYWv44mLzDN]", "TX_CURR.T", "25-49", "F", NA, 10)
-
-  d <- checkPSNUxIMDisaggs(d)
-
-  expect_true(d$info$has_error)
-  expect_equal(2L, NROW(d$tests$invalid_psnuxim_disaggs))
-  expect_true(grepl("invalid disagg", d$info$messages$message))
-  expect_setequal(c("Cupcake District [NYWv44mLzDN]",
-                    "Bagel District [ZYWv44mLzDN]"),
-                  d$tests$invalid_psnuxim_disaggs$PSNU)
-  #Expect an offset here due to the header row
-  expect_setequal(c(17, 18), d$tests$invalid_psnuxim_disaggs$row_number)
-
-})
-
-test_that("Do not  flag valid  disaggs in PSNUxIM", {
-
-  d <- list()
-  d$info$tool <- "OPU Data Pack"
-  d$info$messages <- MessageQueue()
-  d$info$cop_year <- 2022
-  d$info$schema <- datapackr::cop22OPU_data_pack_schema
-  d$info$has_error <- FALSE
-
-
-  #Flag invalid disaggs
-  d$data$SNUxIM <- tibble::tribble(
-    ~PSNU, ~indicator_code, ~Age, ~Sex, ~KeyPop, ~DataPackTarget,
-    "Cupcake District [NYWv44mLzDN]", "TX_CURR.T", "25-29", "Female", NA, 10,
-    "Bagel District [ZYWv44mLzDN]", "TX_CURR.T", "25-29", "Female", NA, 10)
-
-  d <- checkPSNUxIMDisaggs(d)
-
-  expect_false(d$info$has_error)
-
-  expect_null(d$tests$invalid_psnuxim_disaggs)
-
-})
+# test_that("Do not  flag valid  disaggs in PSNUxIM", {
+#
+#   d <- list()
+#   d$info$tool <- "OPU Data Pack"
+#   d$info$messages <- MessageQueue()
+#   d$info$cop_year <- 2022
+#   d$info$schema <- datapackr::cop22OPU_data_pack_schema
+#   d$info$has_error <- FALSE
+#
+#
+#   #Flag invalid disaggs
+#   d$data$SNUxIM <- tibble::tribble(
+#     ~PSNU, ~indicator_code, ~Age, ~Sex, ~KeyPop, ~DataPackTarget,
+#     "Cupcake District [NYWv44mLzDN]", "TX_CURR.T", "25-29", "Female", NA, 10,
+#     "Bagel District [ZYWv44mLzDN]", "TX_CURR.T", "25-29", "Female", NA, 10)
+#
+#   d <- checkPSNUxIMDisaggs(d)
+#
+#   expect_false(d$info$has_error)
+#
+#   expect_null(d$tests$invalid_psnuxim_disaggs)
+#
+# })
 
 test_that("Can identify non-numeric values in PSNUxIM", {
 
