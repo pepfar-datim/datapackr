@@ -268,59 +268,58 @@ test_that("Can drop invalid mechanism columns", {
 
 })
 
-# test_that("Can flag invalid disaggs in PSNUxIM", {
-#
-#   d <- list()
-#   d$info$tool <- "OPU Data Pack"
-#   d$info$messages <- MessageQueue()
-#   d$info$cop_year <- 2022
-#   d$info$schema <- datapackr::cop22OPU_data_pack_schema
-#   d$info$has_error <- FALSE
-#
-#   #Flag invalid disaggs
-#   d$data$SNUxIM <- tibble::tribble(
-#     ~PSNU, ~indicator_code, ~Age, ~Sex, ~KeyPop, ~DataPackTarget,
-#     "Fish District [AYWv44mLzDN]", "TX_CURR.T", "25-29", "Female", NA, 10,
-#     "Dog District [BYWv44mLzDN]", "TX_CURR.T", "25-29", "Female", NA, 10,
-#     "Cupcake District [NYWv44mLzDN]", "TX_CURR.T", "25-49", "F", NA, 10,
-#     "Bagel District [ZYWv44mLzDN]", "TX_CURR.T", "25-49", "F", NA, 10)
-#
-#   d <- checkPSNUxIMDisaggs(d)
-#
-#   expect_true(d$info$has_error)
-#   expect_equal(NROW(d$tests$invalid_psnuxim_disaggs), 2L)
-#   expect_true(grepl("invalid disagg", d$info$messages$message))
-#   expect_setequal(c("Cupcake District [NYWv44mLzDN]",
-#                     "Bagel District [ZYWv44mLzDN]"),
-#                   d$tests$invalid_psnuxim_disaggs$PSNU)
-#   #Expect an offset here due to the header row
-#   expect_setequal(d$tests$invalid_psnuxim_disaggs$row_number, c(17, 18))
-#
-# })
-#
-# test_that("Do not  flag valid  disaggs in PSNUxIM", {
-#
-#   d <- list()
-#   d$info$tool <- "OPU Data Pack"
-#   d$info$messages <- MessageQueue()
-#   d$info$cop_year <- 2022
-#   d$info$schema <- datapackr::cop22OPU_data_pack_schema
-#   d$info$has_error <- FALSE
-#
-#
-#   #Flag invalid disaggs
-#   d$data$SNUxIM <- tibble::tribble(
-#     ~PSNU, ~indicator_code, ~Age, ~Sex, ~KeyPop, ~DataPackTarget,
-#     "Cupcake District [NYWv44mLzDN]", "TX_CURR.T", "25-29", "Female", NA, 10,
-#     "Bagel District [ZYWv44mLzDN]", "TX_CURR.T", "25-29", "Female", NA, 10)
-#
-#   d <- checkPSNUxIMDisaggs(d)
-#
-#   expect_false(d$info$has_error)
-#
-#   expect_null(d$tests$invalid_psnuxim_disaggs)
-#
-# })
+test_that("Can flag invalid disaggs in PSNUxIM", {
+
+  d <- list()
+  d$info$tool <- "PSNUxIM"
+  d$info$messages <- MessageQueue()
+  d$info$cop_year <- 2024
+  d$info$schema <- datapackr::cop24_psnuxim_schema
+  d$info$has_error <- FALSE
+
+  #Flag invalid disaggs
+  d$data$SNUxIM <- tibble::tribble(
+    ~PSNU, ~indicator_code, ~Age, ~Sex, ~KeyPop, ~DataPackTarget,
+    "Fish District [AYWv44mLzDN]", "TX_CURR.T", "25-34", "Female", NA, 10,
+    "Dog District [BYWv44mLzDN]", "TX_CURR.T", "25-34", "Female", NA, 10,
+    "Cupcake District [NYWv44mLzDN]", "TX_CURR.T", "25-34", "F", NA, 10,
+    "Bagel District [ZYWv44mLzDN]", "TX_CURR.T", "25-34", "F", NA, 10)
+
+  d <- checkPSNUxIMDisaggs(d)
+
+  expect_true(d$info$has_error)
+  expect_equal(NROW(d$tests$invalid_psnuxim_disaggs), 2L)
+  expect_true(grepl("invalid disagg", d$info$messages$message))
+  expect_setequal(c("Cupcake District [NYWv44mLzDN]",
+                    "Bagel District [ZYWv44mLzDN]"),
+                  d$tests$invalid_psnuxim_disaggs$PSNU)
+  #Expect an offset here due to the header row
+  expect_setequal(d$tests$invalid_psnuxim_disaggs$row_number, c(17, 18))
+
+})
+
+test_that("Do not flag valid  disaggs in PSNUxIM", {
+
+  d <- list()
+  d$info$tool <- "PSNUxIM"
+  d$info$messages <- MessageQueue()
+  d$info$cop_year <- 2024
+  d$info$schema <- datapackr::cop24_psnuxim_schema
+  d$info$has_error <- FALSE
+
+
+  #Flag invalid disaggs
+  d$data$SNUxIM <- tibble::tribble(
+    ~PSNU, ~indicator_code, ~Age, ~Sex, ~KeyPop, ~DataPackTarget,
+    "Cupcake District [NYWv44mLzDN]", "TX_CURR.T", "25-34", "Female", NA, 10,
+    "Bagel District [ZYWv44mLzDN]", "TX_CURR.T", "25-34", "Female", NA, 10)
+
+  d <- checkPSNUxIMDisaggs(d)
+
+  expect_false(d$info$has_error)
+
+  expect_null(d$tests$invalid_psnuxim_disaggs)
+})
 
 test_that("Can identify non-numeric values in PSNUxIM", {
 
