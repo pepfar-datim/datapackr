@@ -1,13 +1,13 @@
-# context("Test memo structure")
-#
-# test_that("We can warn on an invalid COP year", {
-#   d <- list()
-#   d$info$cop_year <- "1999"
-#   expect_warning(d2 <- memoStructure(d, d2_session = training))
-#   expect_null(d2$memo$structure)
-#   expect_identical(d, d2)
-# })
-#
+context("Test memo structure")
+
+test_that("We can warn on an invalid COP year", {
+  d <- list()
+  d$info$cop_year <- "1999"
+  expect_warning(d2 <- memoStructure(d, d2_session = training))
+  expect_null(d2$memo$structure)
+  expect_identical(d, d2)
+})
+
 # with_mock_api({
 #   test_that("We can create a memo structure", {
 #     d <- list()
