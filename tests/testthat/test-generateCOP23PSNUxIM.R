@@ -59,6 +59,7 @@ with_mock_api({
         expect_setequal(names(d_psnuxim$datim$OPU), c("dataElement", "period",
                                                      "orgUnit", "categoryOptionCombo", "attributeOptionCombo", "value"))
 
+        #Compare with the original data from the TST tool
         test_data_analytics <- d_psnuxim %>%
           purrr::pluck("data") %>%
           purrr::pluck("analytics") %>%
@@ -70,9 +71,16 @@ with_mock_api({
                         target_value) %>%
           dplyr::mutate(target_value = as.numeric(target_value),
                         period = paste0(period - 1, "Oct")) %>%
-
-          dplyr::full_join(tibble::as_tibble(d$data$snuxim_model_data),
-                           by = c("dataElement", "period", "orgUnit", "categoryOptionCombo", "attributeOptionCombo")) %>%
+          dplyr::full_join(
+            tibble::as_tibble(d$data$snuxim_model_data),
+            by = c(
+              "dataElement",
+              "period",
+              "orgUnit",
+              "categoryOptionCombo",
+              "attributeOptionCombo"
+            )
+          ) %>%
           dplyr::filter(attributeOptionCombo != "default") %>%  #Filter AGYW_PREV data
           dplyr::mutate(diff = dplyr::near(as.numeric(target_value), as.numeric(value), tol = 1.0)) %>%
           dplyr::filter(value != 0, target_value != 0) %>%
