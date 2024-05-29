@@ -43,6 +43,10 @@ test_that("Get a map of data elements and category options", {
   expect_error(getMapDataPack_DATIM_DEs_COCs(1776))
   # Mon May 20 15:46:58 2024 ------------------------------
   # Return dataframes of different lengths
+  # everything in getMapDataPack_DATIM_DEs_COCs(2023) is in datapackr::cop23_map_DataPack_DATIM_DEs_COCs
+  #442 are in datapackr::cop23_map_DataPack_DATIM_DEs_COCs not present in getMapDataPack_DATIM_DEs_COCs(2023)
+  #all of them have .t2 in them
+
   # expect_identical(getMapDataPack_DATIM_DEs_COCs(2023), datapackr::cop23_map_DataPack_DATIM_DEs_COCs)
   # expect_identical(getMapDataPack_DATIM_DEs_COCs(2024), datapackr::cop24_map_DataPack_DATIM_DEs_COCs)
   # expect_identical(getMapDataPack_DATIM_DEs_COCs("2024"), datapackr::cop24_map_DataPack_DATIM_DEs_COCs)
