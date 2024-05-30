@@ -19,7 +19,6 @@ writeHomeTab <- function(wb = NULL,
                          country_uids,
                          cop_year = getCurrentCOPYear(),
                          tool = "Data Pack") {
-  #TODO: Setup for default to run PEPFARLANDIA version.
 
   # Check & assign params
   params <- check_params(
@@ -75,7 +74,6 @@ writeHomeTab <- function(wb = NULL,
                      rows = 20, cols = 2)
 
   # country_uids ####
-  #TODO: Can we just explicitly state row, col here?
   col <- countryUIDs_homeCell() %>%
     openxlsx::convertFromExcelRef() %>%
     as.numeric()

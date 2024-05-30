@@ -158,15 +158,6 @@ createKeychainInfo <- function(submission_path = NULL,
   d$info$datapack_name %<>% checkDataPackName(country_uids = d$info$country_uids,
                                               cop_year = d$info$cop_year)
 
-  # TEST to make sure tool type matches what we see in the submitted file's structure ####
-  # TODO: Improve to use checkColumnStructure
-  # tab_names_expected <- unique(d$info$schema$sheet_name)
-  # tab_names_received <- readxl::excel_sheets(d$keychain$submission_path)
-  #
-  # if (any(tab_names_expected != tab_names_received)) {
-  #   warning("The sheets included in your submitted file don't seem to match the file type specified.")
-  # }
-
   # Generate sane_name for tool
   d$info$sane_name <- getSaneName(d$info$datapack_name)
 

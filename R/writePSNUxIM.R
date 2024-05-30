@@ -126,7 +126,6 @@ writePSNUxIM <- function(d,
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
     d$info$has_error <- TRUE
 
-    #TODO: Replace this with a centralized method
     if (NROW(d$info$messages) > 0 && interactive()) {
       options(warning.length = 8170)
       cat(crayon::red(d$info$messages$message))

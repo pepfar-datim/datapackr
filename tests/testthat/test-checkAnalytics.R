@@ -133,6 +133,23 @@ test_that("PMTCT Known Pos/PMTCT Total >  0.75 expect message", {
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$knownpos_ratio, 0.833, tolerance = 1e-3)
 
+  #COP24 uses a slightly different naming convention, Known.Pos.T instead of KnownPos.T
+  data <- tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,
+    ~PMTCT_STAT.N.New.Pos.T, ~PMTCT_STAT.N.Known.Pos.T, ~PMTCT_STAT.N.New.Neg.T,
+    ~ cop_year,
+    "a", 1, "<1", "M", NA, 10, 100, 10, 2024,
+    "b", 2, "<1", "M", NA, 0, 0, 0, 2024
+  )
+
+  foo <- analyze_pmtctknownpos(data)
+  testthat::expect_equal(class(foo), "list")
+  testthat::expect_setequal(names(foo), c("test_results", "msg"))
+  testthat::expect_equal(NROW(foo$test_results), 1)
+  expect_equal(foo$test_results$knownpos_ratio, 0.833, tolerance = 1e-3)
+
+
+
 })
 
 test_that("PMTCT Known Pos/PMTCT Total >  0.75 missing data", {
@@ -149,6 +166,19 @@ test_that("PMTCT Known Pos/PMTCT Total >  0.75 missing data", {
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$msg, "Missing data.")
 
+  #Note that for COP24, the column name is Known.Pos.T instead of KnownPos.T
+  data <- tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,
+    ~PMTCT_STAT.N.New.Pos.T, ~PMTCT_STAT.N.Known.Pos.T, ~ cop_year,
+    "a", 1, "<1", "M", NA, 10, 100, 2024,
+    "b", 2, "<1", "M", NA, 0, 0, 2024
+  )
+
+  foo <- analyze_pmtctknownpos(data)
+  testthat::expect_equal(class(foo), "list")
+  testthat::expect_setequal(names(foo), c("test_results", "msg"))
+  testthat::expect_equal(NROW(foo$test_results), 1)
+  expect_equal(foo$test_results$msg, "Missing data.")
 
 })
 
@@ -163,6 +193,17 @@ test_that("PMTCT Known Pos/PMTCT Total <  0.75 expect null", {
 
   expect_null(analyze_pmtctknownpos(data))
 
+  #Note that for COP24, the column name is Known.Pos.T instead of KnownPos.T
+  data <- tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population,
+    ~PMTCT_STAT.N.New.Pos.T, ~PMTCT_STAT.N.Known.Pos.T, ~PMTCT_STAT.N.New.Neg.T, ~ cop_year,
+    "a", 1, "<1", "M", NA, 10, 10, 10, 2024,
+    "b", 2, "<1", "M", NA, 0, 0, 0, 2024,
+    "c", 3, "<1", "M", NA, 25, 150, 25, 2024
+  )
+
+  expect_null(analyze_pmtctknownpos(data))
+
 })
 
 test_that("PMTCT Known Pos/PMTCT Total all zeros expect null", {
@@ -171,6 +212,16 @@ test_that("PMTCT Known Pos/PMTCT Total all zeros expect null", {
     , ~PMTCT_STAT.N.KnownPos.T, ~PMTCT_STAT.N.New.Neg.T, ~ cop_year,
     "a", 1, "<1", "M", NA, 0, 0, 0, 2023,
     "b", 2, "<1", "M", NA, 0, 0, 0, 2023
+  )
+
+  expect_null(analyze_pmtctknownpos(data))
+
+  #Note that for COP24, the column name is Known.Pos.T instead of KnownPos.T
+  data <- tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~PMTCT_STAT.N.New.Pos.T
+    , ~PMTCT_STAT.N.Known.Pos.T, ~PMTCT_STAT.N.New.Neg.T, ~ cop_year,
+    "a", 1, "<1", "M", NA, 0, 0, 0, 2024,
+    "b", 2, "<1", "M", NA, 0, 0, 0, 2024
   )
 
   expect_null(analyze_pmtctknownpos(data))
@@ -191,6 +242,19 @@ test_that("TB Known Pos ratio > 75% expect message", {
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$knownpos_ratio, 0.757, tolerance = 1e-3)
 
+  #Note that for COP24, the column name is Known.Pos.T instead of KnownPos.T
+  data <- tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T,
+    ~TB_STAT.N.Known.Pos.T, ~TB_STAT.N.New.Neg.T, ~ cop_year,
+    "a", 1, "<1", "M", NA, 25, 156, 25, 2024,
+    "b", 2, "<1", "M", NA, 0, 0, 0, 2024
+  )
+
+  foo <- analyze_tbknownpos(data)
+  testthat::expect_equal(class(foo), "list")
+  testthat::expect_setequal(names(foo), c("test_results", "msg"))
+  testthat::expect_equal(NROW(foo$test_results), 1)
+  expect_equal(foo$test_results$knownpos_ratio, 0.757, tolerance = 1e-3)
 
 })
 
@@ -199,6 +263,19 @@ test_that("TB Known Pos ratio > 75% expect message", {
     ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T, ~TB_STAT.N.KnownPos.T, ~ cop_year,
     "a", 1, "<1", "M", NA, 25, 151, 2023,
     "b", 2, "<1", "M", NA, 0, 0, 2023
+  )
+
+  foo <- analyze_tbknownpos(data)
+  testthat::expect_equal(class(foo), "list")
+  testthat::expect_setequal(names(foo), c("test_results", "msg"))
+  testthat::expect_equal(NROW(foo$test_results), 1)
+  expect_equal(foo$test_results$msg, "Missing data.")
+
+  #Note that for COP24, the column name is Known.Pos.T instead of KnownPos.T
+  data <- tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T, ~TB_STAT.N.Known.Pos.T, ~ cop_year,
+    "a", 1, "<1", "M", NA, 25, 151, 2024,
+    "b", 2, "<1", "M", NA, 0, 0, 2024
   )
 
   foo <- analyze_tbknownpos(data)
@@ -219,6 +296,16 @@ test_that("TB Known Pos ratio < 75% expect message expect null", {
 
   expect_null(analyze_tbknownpos(data))
 
+  #Note that for COP24, the column name is Known.Pos.T instead of KnownPos.T
+  data <- tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T,
+    ~TB_STAT.N.Known.Pos.T, ~TB_STAT.N.New.Neg.T, ~ cop_year,
+    "a", 1, "<1", "M", NA, 25, 150, 25, 2024,
+    "b", 2, "<1", "M", NA, 0, 0, 0, 2024
+  )
+
+  expect_null(analyze_tbknownpos(data))
+
 })
 
 test_that("PMTCT Known Pos/PMTCT Total all zeros expect null", {
@@ -227,6 +314,16 @@ test_that("PMTCT Known Pos/PMTCT Total all zeros expect null", {
     ~TB_STAT.N.KnownPos.T, ~TB_STAT.N.New.Neg.T, ~ cop_year,
     "a", 1, "<1", "M", NA, 0, 0, 0, 2023,
     "b", 2, "<1", "M", NA, 0, 0, 0, 2023
+  )
+
+  expect_null(analyze_tbknownpos(data))
+
+  #Note that for COP24, the column name is Known.Pos.T instead of KnownPos.T
+  data <- tribble(
+    ~psnu, ~psnu_uid, ~age, ~sex, ~key_population, ~TB_STAT.N.New.Pos.T,
+    ~TB_STAT.N.Known.Pos.T, ~TB_STAT.N.New.Neg.T, ~ cop_year,
+    "a", 1, "<1", "M", NA, 0, 0, 0, 2024,
+    "b", 2, "<1", "M", NA, 0, 0, 0, 2024
   )
 
   expect_null(analyze_tbknownpos(data))
@@ -461,4 +558,21 @@ test_that(" Test linkage with age <1", {
   testthat::expect_setequal(names(foo), c("test_results", "msg"))
   testthat::expect_equal(NROW(foo$test_results), 1)
   expect_equal(foo$test_results$HTS_TST.KP.Linkage.T, 1.01, tolerance = 1e-3)
+})
+
+with_mock_api({
+  test_that("Can check analytics of a datapack", {
+
+    d  <- unPackTool(submission_path = test_sheet("COP23_sample_DataPack_Malawi.xlsx"),
+                     d2_session = training)
+    #Check analytics
+    d <- checkAnalytics(d,
+                        model_data_path = test_sheet("COP23_datapack_model_data_random_MW.rds"),
+                        d2_session = training)
+
+
+  expect_equal(length(d$info$analytics_warning_msg), 3L)
+  expect_equal(sum(names(d$tests) %in% c("retention", "linkage", "pmtctknownpos_issues")), 3L)
+
+  })
 })

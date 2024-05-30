@@ -18,7 +18,6 @@ updatePSNUxIMTargetValues <- function(d) {
     dplyr::mutate(are_equal = ifelse(is.na(are_equal), TRUE, FALSE)) %>%
     dplyr::mutate(final_target = ifelse(!are_equal, MainTabsTarget, original_target)) %>%
     dplyr::select(PSNU, indicator_code, Age, Sex, KeyPop, DataPackTarget = final_target) %>%
-    #TODO: Should we round here?
     dplyr::mutate(DataPackTarget = suppressWarnings(as.numeric(DataPackTarget)))
 
 

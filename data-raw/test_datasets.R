@@ -65,8 +65,6 @@ packCOP22TestDataset <- function(country_uids,
 
   has_dreams <- NROW(orgunits.dreams) != 0
 
-  # TODO: How to handle crossing in multi-country file?
-
   # attributeOptionCombos ####
   aocs.dedupe <- c("X8hrDf6bLDC", "YGT1o7UxfFu")
   aocs.default <-
@@ -202,8 +200,6 @@ packCOP22TestDataset <- function(country_uids,
           ~ sample(pzns, NROW(.), replace = TRUE),
         indicator_code == "HIV_PREV.T_1" ~ runif(NROW(.), 0, 0.15),
         TRUE ~ 100))
-
-  # TODO: how to manage dedupe
 
   # Introduce invalid values ####
   if (invalid_values) {

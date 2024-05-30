@@ -109,7 +109,6 @@ adorn_import_file <- function(psnu_import_file,
 
   # Utilizes row_num to ensure the join worked as expected
   assertthat::are_equal(NROW(psnu_import_file), row_num)
-  # TODO: Convert to test
 
   # Add Prioritizations ####
   if (is.null(psnu_prioritizations)) {

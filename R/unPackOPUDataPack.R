@@ -37,8 +37,6 @@ unPackOPUDataPack <- function(d,
   #Keep the sheets since we are going to need the original targets
 
   d <- loadSheets(d)
-  #TODO: Are we dealing with a PSNUxIM (season is COP)
-  #or an OPU (Season is OPU)
 
   # Check integrity of Workbook tabs ####
   d <- checkToolStructure(d)
