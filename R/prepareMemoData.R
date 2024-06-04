@@ -176,7 +176,9 @@ prepareMemoDataByPSNU <- function(analytics,
     dplyr::mutate(name = stringr::str_trim(name)) %>%
     tidyr::separate("name",
                     into = c("Indicator", "N_OR_D", "Age"),
-                    sep = " ") %>%
+                    sep = " ",
+                    extra = "drop",
+                    fill = "right") %>%
     dplyr::mutate(Indicator = dplyr::case_when(
       Indicator == "GEND_GBV" & N_OR_D == "Physical" ~
         "GEND_GBV Physical and Emotional Violence",

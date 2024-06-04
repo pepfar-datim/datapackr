@@ -60,7 +60,7 @@ test_that("Get a map of data elements and category options", {
   expect_named(de_map, de_map_names)
 
   #Be sure that there are no T2 indicator codes in the map
-  expect_true(all(!grepl("^T2", de_map$indicator_code)))
+  expect_true(!any(grepl("^T2", de_map$indicator_code)))
 
   expect_true(is.data.frame(de_map))
 
