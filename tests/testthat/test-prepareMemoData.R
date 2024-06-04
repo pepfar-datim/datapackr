@@ -144,124 +144,124 @@ with_mock_api({
   })
 })
 
-# with_mock_api({
-#   test_that("We can prepare existing data analytics", {
-#     d <-
-#       loadDataPack(
-#         submission_path = test_sheet("COP21_DP_random_with_psnuxim.xlsx"),
-#         tool = "Data Pack",
-#         country_uids = NULL,
-#         cop_year = 2021,
-#         load_sheets = TRUE,
-#         d2_session = training)
-#
-#     d %<>%
-#       unPackSheets(., check_sheets = FALSE) %>%
-#       unPackSNUxIM(.) %>%
-#       packForDATIM(., type = "Undistributed MER") %>%
-#       packForDATIM(., type = "SUBNAT_IMPATT") %>%
-#       packForDATIM(., type = "PSNUxIM")
-#     #Datapack analytics
-#     d <- createAnalytics(d, training)
-#     #DATIM analytics
-#     d <- prepareExistingDataAnalytics(d, training)
-#
-#
-#     expect_type(d$memo$datim$analytics, "list")
-#     expect_true(NROW(d$memo$datim$analytics) > 0)
-#     #They should have the same structure
-#     expect_setequal(names(d$data$analytics), names(d$memo$datim$analytics))
-#   })
-# })
-#
-# with_mock_api({
-#   test_that("We can create DATIM/Comparison memo data", {
-#     d <-
-#       loadDataPack(
-#         submission_path = test_sheet("COP23_sample_DataPack_Malawi.xlsx"),
-#         tool = "Data Pack",
-#         country_uids = NULL,
-#         cop_year = 2023,
-#         load_sheets = TRUE,
-#         d2_session = training)
-#
-#     d %<>%
-#       unPackSheets(., check_sheets = FALSE) %>%
-#       # unPackSNUxIM(.) %>%
-#       packForDATIM(., type = "Undistributed MER") %>%
-#       packForDATIM(., type = "SUBNAT_IMPATT") #%>%
-#       # packForDATIM(., type = "PSNUxIM")
-#     #Datapack analytics
-#     d <- createAnalytics(d, training)
-#
-#     #DATIM analytics
-#     d <-
-#       prepareMemoData(d,
-#                       "comparison",
-#                       d2_session = training,
-#                       n_cores = 2L)
-#
-#     expect_type(d$memo$datim$analytics, "list")
-#     expect_true(NROW(d$memo$datim$analytics) > 0)
-#     #They should have the same structure
-#     expect_setequal(names(d$data$analytics), names(d$memo$datim$analytics))
-#
-#     expect_setequal(names(d$memo$datim),
-#                     c("prios", "by_psnu", "by_agency", "by_prio", "by_partner", "analytics"))
-#
-#     expect_setequal(names(d$memo$datim$prios),
-#                     c("orgUnit", "value"))
-#     #By PSNU
-#     expect_setequal(
-#       names(d$memo$datim$by_psnu),
-#       c(
-#         "psnu_uid",
-#         "Mechanism",
-#         "Indicator",
-#         "Age",
-#         "value",
-#         "prioritization",
-#         "Partner",
-#         "Agency",
-#         "ou",
-#         "country_name",
-#         "snu1",
-#         "psnu"
-#       ))
-#
-#     #By Prioritization
-#     expect_type(d$memo$datim$by_prio, "list")
-#     expect_true(names(d$memo$datim$by_prio)[[1]] == "Indicator")
-#     expect_true(names(d$memo$datim$by_prio)[[2]] == "Age")
-#     expect_true(names(d$memo$datim$by_prio)[[NCOL(d$memo$datim$by_prio)]] == "Total")
-#     prio_cols_end <- NCOL(d$memo$datim$by_prio) - 1
-#     expect_true(all(
-#       names(d$memo$datim$by_prio[3:prio_cols_end]) %in% prioritization_dict()$name
-#     ))
-#
-#     d <- generateComparisonTable(d)
-#     expect_type(d$memo$comparison, "list")
-#     expect_true(NROW(d$memo$comparison) > 0)
-#     expect_named(
-#       d$memo$comparison,
-#       c(
-#         "Mechanism",
-#         "Indicator",
-#         "Age",
-#         "prioritization",
-#         "Partner",
-#         "Agency",
-#         "ou",
-#         "country_name",
-#         "snu1",
-#         "psnu",
-#         "Data Type",
-#         "value"
-#       ), ignore.order = TRUE
-#     )
-#
-#     expect_setequal(unique(d$memo$comparison$`Data Type`), c("Current", "Proposed", "Percent diff", "Diff"))
-#     expect_type(d$memo$comparison$value, "double")
-#
-#   })
-# })
+with_mock_api({
+  test_that("We can prepare existing data analytics", {
+    d <-
+      loadDataPack(
+        submission_path = test_sheet("COP24_sample_DataPack_Malawi.xlsx"),
+        tool = "Data Pack",
+        country_uids = NULL,
+        cop_year = 2024,
+        load_sheets = TRUE,
+        d2_session = training)
+
+    d %<>%
+      unPackSheets(., check_sheets = FALSE) %>%
+      # unPackSNUxIM(.) %>%
+      packForDATIM(., type = "Undistributed MER") %>%
+      packForDATIM(., type = "SUBNAT_IMPATT") #%>%
+      # packForDATIM(., type = "PSNUxIM")
+    #Datapack analytics
+    d <- createAnalytics(d, training)
+    #DATIM analytics
+    d <- prepareExistingDataAnalytics(d, training)
+
+
+    expect_type(d$memo$datim$analytics, "list")
+    expect_true(NROW(d$memo$datim$analytics) > 0)
+    #They should have the same structure
+    expect_setequal(names(d$data$analytics), names(d$memo$datim$analytics))
+  })
+})
+
+with_mock_api({
+  test_that("We can create DATIM/Comparison memo data", {
+    d <-
+      loadDataPack(
+        submission_path = test_sheet("COP24_sample_DataPack_Malawi.xlsx"),
+        tool = "Data Pack",
+        country_uids = NULL,
+        cop_year = 2024,
+        load_sheets = TRUE,
+        d2_session = training)
+
+    d %<>%
+      unPackSheets(., check_sheets = FALSE) %>%
+      # unPackSNUxIM(.) %>%
+      packForDATIM(., type = "Undistributed MER") %>%
+      packForDATIM(., type = "SUBNAT_IMPATT") #%>%
+      # packForDATIM(., type = "PSNUxIM")
+    #Datapack analytics
+    d <- createAnalytics(d, training)
+
+    #DATIM analytics
+    d <-
+      prepareMemoData(d,
+                      "comparison",
+                      d2_session = training,
+                      n_cores = 2L)
+
+    expect_type(d$memo$datim$analytics, "list")
+    expect_true(NROW(d$memo$datim$analytics) > 0)
+    #They should have the same structure
+    expect_setequal(names(d$data$analytics), names(d$memo$datim$analytics))
+
+    expect_setequal(names(d$memo$datim),
+                    c("prios", "by_psnu", "by_agency", "by_prio", "by_partner", "analytics"))
+
+    expect_setequal(names(d$memo$datim$prios),
+                    c("orgUnit", "value"))
+    #By PSNU
+    expect_setequal(
+      names(d$memo$datim$by_psnu),
+      c(
+        "psnu_uid",
+        "Mechanism",
+        "Indicator",
+        "Age",
+        "value",
+        "prioritization",
+        "Partner",
+        "Agency",
+        "ou",
+        "country_name",
+        "snu1",
+        "psnu"
+      ))
+
+    #By Prioritization
+    expect_type(d$memo$datim$by_prio, "list")
+    expect_true(names(d$memo$datim$by_prio)[[1]] == "Indicator")
+    expect_true(names(d$memo$datim$by_prio)[[2]] == "Age")
+    expect_true(names(d$memo$datim$by_prio)[[NCOL(d$memo$datim$by_prio)]] == "Total")
+    prio_cols_end <- NCOL(d$memo$datim$by_prio) - 1
+    expect_true(all(
+      names(d$memo$datim$by_prio[3:prio_cols_end]) %in% prioritization_dict()$name
+    ))
+
+    d <- generateComparisonTable(d)
+    expect_type(d$memo$comparison, "list")
+    expect_true(NROW(d$memo$comparison) > 0)
+    expect_named(
+      d$memo$comparison,
+      c(
+        "Mechanism",
+        "Indicator",
+        "Age",
+        "prioritization",
+        "Partner",
+        "Agency",
+        "ou",
+        "country_name",
+        "snu1",
+        "psnu",
+        "Data Type",
+        "value"
+      ), ignore.order = TRUE
+    )
+
+    expect_setequal(unique(d$memo$comparison$`Data Type`), c("Current", "Proposed", "Percent diff", "Diff"))
+    expect_type(d$memo$comparison$value, "double")
+
+  })
+})
