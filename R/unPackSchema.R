@@ -281,8 +281,7 @@ checkSchema_Formulas <- function(schema) {
 checkSchema <- function(schema,
                         template_path,
                         cop_year,
-                        tool,
-                        season) {
+                        tool) {
 
   stopifnot("Package \"waldo\" must be installed to use this function." =
               requireNamespace("waldo", quietly = TRUE))
@@ -297,7 +296,6 @@ checkSchema <- function(schema,
   # Validate parameters ####
   params <- check_params(cop_year = cop_year %missing% NULL,
                          tool = tool %missing% NULL,
-                         season = season %missing% NULL,
                          schema = schema %missing% NULL,
                          template_path = template_path %missing% NULL)
 

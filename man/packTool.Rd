@@ -14,7 +14,6 @@ packTool(
   country_uids,
   template_path,
   cop_year,
-  season,
   output_folder,
   results_archive = TRUE,
   expand_formulas = FALSE,
@@ -48,8 +47,6 @@ This file MUST NOT have any data validation formats present. If left
 
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}
-
-\item{season}{Either \code{COP} or \code{OPU}.}
 
 \item{output_folder}{Local folder where you would like your Data Pack to be
 saved upon export.}

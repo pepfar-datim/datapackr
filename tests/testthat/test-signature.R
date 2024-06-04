@@ -14,7 +14,6 @@ test_that("Can generate a key chain from a Data Pack Template", {
         "tool",
         "country_uids",
         "cop_year",
-        "season",
         "messages",
         "has_error",
         "schema",

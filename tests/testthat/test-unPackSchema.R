@@ -514,7 +514,7 @@ test_that("We can pass when a schema is valid", {
   tool <- "Data Pack"
   cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
-  test_results <- checkSchema(schema = ref_schema, cop_year = cop_year, tool = tool, season = "COP")
+  test_results <- checkSchema(schema = ref_schema, cop_year = cop_year, tool = tool)
   expect_true(length(test_results) == 0)
 })
 
@@ -525,6 +525,6 @@ test_that("We can flag when a schema is invalid", {
   bad_schema <- ref_schema %>%
     flubSkippedSheets(.) %>%
     flubColumnTypes(.)
-  test_results <- checkSchema(schema = bad_schema, cop_year = cop_year, tool = tool, season = "COP")
+  test_results <- checkSchema(schema = bad_schema, cop_year = cop_year, tool = tool)
   expect_true(length(test_results) > 0)
 })
