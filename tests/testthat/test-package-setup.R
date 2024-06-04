@@ -139,16 +139,15 @@ test_that("We can check datapack paramaters", {
       season = "COP"
     )
   expect_type(test_params, "list")
-  expect_setequal(names(test_params), c("schema", "cop_year", "season"))
+  expect_setequal(names(test_params), c("schema", "cop_year"))
   expect_identical(test_params$schema, datapackr::cop24_data_pack_schema)
 
   # Return a message when using an invalid combination of schema/cop_year/season
   expect_message(
     test_params  <-
       check_params(
-        schema = datapackr::cop21_data_pack_schema,
-        cop_year = 2024,
-        season = "COP"
+        schema = datapackr::cop23_data_pack_schema,
+        cop_year = 2024
       )
   )
 

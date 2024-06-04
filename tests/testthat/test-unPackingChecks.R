@@ -67,8 +67,7 @@ test_that("Can check Tool structure...", {
   expect_true(grepl("MISSING SHEETS", d$info$messages$message))
 })
 
-
-#can check sheet data ----
+skip("DP-1322: Need an unpacking artifact to test with for COP24")
 test_that("Can check sheet data...", {
 
 
@@ -82,8 +81,8 @@ test_that("Can check sheet data...", {
 
    d <- checkSheetData(d)
 
-expect_true("duplicate_rows" %in% names(d$tests))
-expect_true("missing_cols" %in% names(d$tests))
+   expect_true("duplicate_rows" %in% names(d$tests))
+   expect_true("missing_cols" %in% names(d$tests))
    expect_true("duplicate_columns" %in% names(d$tests))
    expect_true("columns_out_of_order" %in% names(d$tests))
    expect_true("non_numeric" %in% names(d$tests))
