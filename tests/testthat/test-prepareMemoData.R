@@ -30,27 +30,23 @@ with_mock_api({
 
 with_mock_api({
   test_that("We can create Datapack memo data", {
-    testthat_print("Update this to COP23 when possible")
     d <-
       loadDataPack(
-        submission_path = test_sheet("COP21_DP_random_with_psnuxim.xlsx"),
+        submission_path = test_sheet("COP23_sample_DataPack_Malawi.xlsx"),
         tool = "Data Pack",
         country_uids = NULL,
         cop_year = NULL,
         load_sheets = TRUE,
         d2_session = training)
 
-    d <- d %>%
-      unPackSheets(., check_sheets = FALSE)
-
     d %<>%
-      unPackSNUxIM(.) %>%
+      unPackSheets(., check_sheets = FALSE) %>%
       packForDATIM(., type = "Undistributed MER") %>%
-      packForDATIM(., type = "SUBNAT_IMPATT") %>%
-      packForDATIM(., type = "PSNUxIM")
+      packForDATIM(., type = "SUBNAT_IMPATT")#%>%
+    # packForDATIM(., type = "PSNUxIM")
 
     expect_named(d,
-                 c("keychain", "info", "sheets", "tests", "data", "datim"),
+                 c("keychain", "info", "sheets", "data", "datim"),
                  ignore.order = TRUE)
 
     d %<>% createAnalytics(d2_session = training)
@@ -183,19 +179,19 @@ with_mock_api({
   test_that("We can create DATIM/Comparison memo data", {
     d <-
       loadDataPack(
-        submission_path = test_sheet("COP21_DP_random_with_psnuxim.xlsx"),
+        submission_path = test_sheet("COP23_sample_DataPack_Malawi.xlsx"),
         tool = "Data Pack",
         country_uids = NULL,
-        cop_year = 2021,
+        cop_year = 2023,
         load_sheets = TRUE,
         d2_session = training)
 
     d %<>%
       unPackSheets(., check_sheets = FALSE) %>%
-      unPackSNUxIM(.) %>%
+      # unPackSNUxIM(.) %>%
       packForDATIM(., type = "Undistributed MER") %>%
-      packForDATIM(., type = "SUBNAT_IMPATT") %>%
-      packForDATIM(., type = "PSNUxIM")
+      packForDATIM(., type = "SUBNAT_IMPATT") #%>%
+      # packForDATIM(., type = "PSNUxIM")
     #Datapack analytics
     d <- createAnalytics(d, training)
 

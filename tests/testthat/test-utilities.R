@@ -47,9 +47,9 @@ test_that("Get a map of data elements and category options", {
   #442 are in datapackr::cop23_map_DataPack_DATIM_DEs_COCs not present in getMapDataPack_DATIM_DEs_COCs(2023)
   #all of them have .t2 in them
 
-  # expect_identical(getMapDataPack_DATIM_DEs_COCs(2023), datapackr::cop23_map_DataPack_DATIM_DEs_COCs)
-  # expect_identical(getMapDataPack_DATIM_DEs_COCs(2024), datapackr::cop24_map_DataPack_DATIM_DEs_COCs)
-  # expect_identical(getMapDataPack_DATIM_DEs_COCs("2024"), datapackr::cop24_map_DataPack_DATIM_DEs_COCs)
+  expect_identical(getMapDataPack_DATIM_DEs_COCs(2023), datapackr::cop23_map_DataPack_DATIM_DEs_COCs)
+  expect_identical(getMapDataPack_DATIM_DEs_COCs(2024), datapackr::cop24_map_DataPack_DATIM_DEs_COCs)
+  expect_identical(getMapDataPack_DATIM_DEs_COCs("2024"), datapackr::cop24_map_DataPack_DATIM_DEs_COCs)
 
   de_map_names <- c("indicator_code", "col_type", "value_type",
                     "categoryoption_specified", "valid_ages.name",
