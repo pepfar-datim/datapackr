@@ -18,8 +18,7 @@ waldo::compare(datapackr::cop24_psnuxim_schema, cop24_psnuxim_schema)
 checkSchema(schema = cop24_psnuxim_schema,
             template_path = datapack_template_filepath,
             cop_year = 2024,
-            tool = "PSNUxIM Tool",
-            season = "COP")
+            tool = "PSNUxIM Tool")
 
 usethis::use_data(cop24_psnuxim_schema, overwrite = TRUE, compress = "xz")
 
