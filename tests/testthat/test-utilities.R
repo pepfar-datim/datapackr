@@ -58,6 +58,8 @@ test_that("Get a map of data elements and category options", {
   expect_named(de_map, de_map_names)
   de_map <- getMapDataPack_DATIM_DEs_COCs(2024)
   expect_named(de_map, de_map_names)
+  expect_named(datapackr::cop23_map_DataPack_DATIM_DEs_COCs, de_map_names)
+  expect_named(datapackr::cop24_map_DataPack_DATIM_DEs_COCs, de_map_names)
 
   #Be sure that there are no T2 indicator codes in the map
   expect_true(!any(grepl("^T2", de_map$indicator_code)))
