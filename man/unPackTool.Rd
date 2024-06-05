@@ -8,7 +8,6 @@ unPackTool(
   submission_path = NULL,
   tool = NULL,
   country_uids = NULL,
-  season = NULL,
   cop_year = NULL,
   pzns = NULL,
   mer_data = NULL,
@@ -23,8 +22,6 @@ unPackTool(
 
 \item{country_uids}{Unique IDs for countries to include in the Data Pack.
 For full list of these IDs, see \code{datapackr::valid_OrgUnits}.}
-
-\item{season}{Either \code{COP} or \code{OPU}.}
 
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}

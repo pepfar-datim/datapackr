@@ -158,95 +158,15 @@ test_that("We can check datapack paramaters", {
   expect_error(check_params(tool = "Foo Pack"))
 
 
-  # season ####
-  # Can check a valid season
-  season <- check_season(season = "COP")
-  expect_equal(season, "COP")
-  season <- check_season(season = "OPU")
-  expect_equal(season, "OPU")
-
-  # Can error on a bogus season
-  expect_error(check_season(season = "The Long Winter"))
-
-  # Deduce seasons
-  season <- check_season(tool = "Data Pack", season = NULL)
-  expect_equal(season, "COP")
-  expect_message(check_season(tool = "Data Pack", season = NULL))
-
-  season <- check_season(tool = "PSNUxIM", season = NULL)
-  expect_equal(season, "COP")
-  expect_message(check_season(tool = "PSNUxIM", season = NULL))
-
-  season <- check_season(tool = "PSNUxIM Template", season = NULL)
-  expect_equal(season, "COP")
-  expect_message(check_season(tool = "PSNUxIM Template", season = NULL))
-
-  season <- check_season(tool = "OPU Data Pack", season = NULL)
-  expect_equal(season, "OPU")
-  expect_message(check_season(tool = "OPU Data Pack", season = NULL))
-
-  season <- check_season(tool = "OPU Data Pack Template", season = NULL)
-  expect_equal(season, "OPU")
-  expect_message(check_season(tool = "OPU Data Pack Template", season = NULL))
-
-  # Default season if nothing provided
-  season <- check_season()
-  expect_equal(season, "COP")
-  expect_message(check_season())
-
-  # If season and tool both provided, but don't match, issue warning, but leave
-  # both in place.
-  season <- check_season(tool = "OPU Data Pack", season = "COP")
-  expect_equal(season, "COP")
-  expect_warning(check_season(tool = "OPU Data Pack", season = "COP"))
-  season <- check_season(tool = "OPU Data Pack Template", season = "COP")
-  expect_equal(season, "COP")
-  expect_warning(check_season(tool = "OPU Data Pack Template", season = "COP"))
-
-  # If season & tool both provided, check they match with no warning.
-  season <- check_season(tool = "Data Pack", season = "COP")
-  expect_equal(season, "COP")
-  expect_warning(check_season(tool = "Data Pack", season = "COP"), regexp = NA)
-  season <- check_season(tool = "Data Pack Template", season = "COP")
-  expect_equal(season, "COP")
-  expect_warning(check_season(tool = "Data Pack", season = "COP"), regexp = NA)
-  season <- check_season(tool = "PSNUxIM", season = "COP")
-  expect_equal(season, "COP")
-  expect_warning(check_season(tool = "PSNUxIM", season = "COP"), regexp = NA)
-  season <- check_season(tool = "PSNUxIM Template", season = "COP")
-  expect_equal(season, "COP")
-  expect_warning(check_season(tool = "PSNUxIM Template", season = "COP"), regexp = NA)
-  season <- check_season(tool = "OPU Data Pack", season = "OPU")
-  expect_equal(season, "OPU")
-  expect_warning(check_season(tool = "OPU Data Pack", season = "OPU"), regexp = NA)
-  season <- check_season(tool = "OPU Data Pack Template", season = "OPU")
-  expect_equal(season, "OPU")
-  expect_warning(check_season(tool = "OPU Data Pack Template", season = "OPU"), regexp = NA)
-  season <- check_season(tool = "Data Pack", season = "OPU")
-  expect_equal(season, "OPU")
-  expect_warning(check_season(tool = "Data Pack", season = "OPU"), regexp = NA)
-  season <- check_season(tool = "Data Pack Template", season = "OPU")
-  expect_equal(season, "OPU")
-  expect_warning(check_season(tool = "Data Pack Template", season = "OPU"), regexp = NA)
-  season <- check_season(tool = "PSNUxIM", season = "OPU")
-  expect_equal(season, "OPU")
-  expect_warning(check_season(tool = "PSNUxIM", season = "OPU"), regexp = NA)
-  season <- check_season(tool = "PSNUxIM Template", season = "OPU")
-  expect_equal(season, "OPU")
-  expect_warning(check_season(tool = "PSNUxIM Template", season = "OPU"), regexp = NA)
-
-
-
   # schema ####
   # Can check a valid schema
   test_params  <-
     check_params(
       schema = datapackr::cop22_data_pack_schema,
-      cop_year = 2022,
-      season = "COP"
+      cop_year = 2022
     )
   expect_type(test_params, "list")
-  expect_setequal(names(test_params), c("schema", "cop_year", "season"))
+  expect_setequal(names(test_params), c("schema", "cop_year"))
   expect_identical(test_params$schema, datapackr::cop22_data_pack_schema)
 
   # Return a message when using an invalid combination of schema/cop_year/season
@@ -254,8 +174,7 @@ test_that("We can check datapack paramaters", {
     test_params  <-
       check_params(
         schema = datapackr::cop21_data_pack_schema,
-        cop_year = 2022,
-        season = "COP"
+        cop_year = 2022
       )
   )
 
