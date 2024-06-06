@@ -596,26 +596,6 @@ checkNonNumeric <- function(sheets, d, quiet = TRUE) {
   non_numeric <-
     non_numeric[which(is.na(suppressWarnings(as.numeric(non_numeric$value)))), ]
 
-  # if (d$info$tool == "OPU Data Pack") { # DP-472
-  #   data %<>%
-  #     tidyr::gather(key = "mechCode_supportType",
-  #                   value = "value",
-  #                   -tidyselect::all_of(header_cols$indicator_code)) %>%
-  #     dplyr::select(dplyr::all_of(header_cols$indicator_code),
-  #                   mechCode_supportType, value) %>%
-  #     tidyr::drop_na(value)
-  # }
-
-  # if (d$info$tool == "Data Pack" & sheet == "PSNUxIM" & d$info$cop_year %in% c(2021, 2022)) { # DP-472
-  #   data %<>%
-  #     tidyr::gather(key = "mechCode_supportType",
-  #                   value = "value",
-  #                   -tidyselect::all_of(c(header_cols$indicator_code))) %>%
-  #     dplyr::select(dplyr::all_of(header_cols$indicator_code), -indicator_code,
-  #                   indicator_code = mechCode_supportType, value) %>%
-  #     tidyr::drop_na(value)
-  # }
-
   if (NROW(non_numeric) > 0) {
 
     ch$lvl <- "WARNING"
@@ -777,8 +757,6 @@ checkInvalidOrgUnits <- function(sheets, d, quiet = TRUE) {
 
   #There may be some variation in the columns between cop years
   cols_to_filter <- switch(as.character(d$info$cop_year),
-                           "2021" = c("SNU1", "PSNU", "Age", "Sex"),
-                           "2022" = c("SNU1", "PSNU", "Age", "Sex"),
                            "2023" = c("PSNU", "Age", "Sex"),
                            "2024" = c("PSNU", "Age", "Sex"))
 
@@ -965,14 +943,6 @@ checkFormulas <- function(sheets, d, quiet = TRUE) {
       formula = stringr::str_replace_all(formula,
                                          "(?<=[:upper:])\\d+",
                                          "\\\\d+"))
-
-   if (d$info$cop_year == "2022") {
-     formulas_schema %<>% dplyr::mutate(critical =
-       dplyr::case_when(
-         indicator_code == "ID" | col_type == "target" ~ "Y",
-         TRUE ~ "N")) %>%
-       dplyr::select(-col)
-   }
 
   if (d$info$cop_year >= "2023") {
 

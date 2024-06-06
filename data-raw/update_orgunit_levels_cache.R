@@ -25,14 +25,12 @@ fetchOrgunitLevels <- function(cop_year, d2_session) {
 
 ous <- valid_OrgUnits %>% dplyr::select(country_name, ou_uid, country_uid) %>% dplyr::distinct()
 
-cop21_ou_levels <- dataset_levels %>%  dplyr::filter(cop_year == 2021)
-cop22_ou_levels <- dataset_levels %>%  dplyr::filter(cop_year == 2022)
 cop23_ou_levels <- dataset_levels %>%  dplyr::filter(cop_year == 2023)
 cop24_ou_levels <- fetchOrgunitLevels(2024, prod) %>%
   dplyr::mutate(country_name = ifelse(country_name == "", ou, country_name),
                 iso4 = ifelse(iso4 == "", iso3, iso4)) %>%
   dplyr::left_join(ous, by = "country_name")
 
-dataset_levels <- rbind(cop21_ou_levels, cop22_ou_levels, cop23_ou_levels, cop24_ou_levels)
+dataset_levels <- rbind(cop23_ou_levels, cop24_ou_levels)
 
 usethis::use_data(dataset_levels,  compress = "xz", overwrite = TRUE)

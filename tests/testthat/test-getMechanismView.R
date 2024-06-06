@@ -1,4 +1,3 @@
-
 context("Get a mechanism view")
 
   with_mock_api({
@@ -20,7 +19,7 @@ context("Get a mechanism view")
 
 
       zambia_mechs <- getMechanismView(country_uids = "f5RoebaDLMx",
-                                       cop_year = 2022,
+                                       cop_year = 2024,
                                        include_dedupe = FALSE,
                                        include_default = FALSE,
                                        include_MOH = FALSE,

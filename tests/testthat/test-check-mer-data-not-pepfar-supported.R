@@ -3,7 +3,7 @@ context("test-check-mer-data-non-pepfar-supported")
 test_that("Can flag MER data in Not PEPFAR supported PSNUs", {
 
   d <- list()
-  d$info$cop_year <- "2022"
+  d$info$cop_year <- "2024"
   d$info$tool <- "Data Pack"
   d$info$messages <- MessageQueue()
   d$tests <- list()
@@ -24,7 +24,7 @@ test_that("Can flag MER data in Not PEPFAR supported PSNUs", {
 test_that("Can pass MER data in PEPFAR supported PSNUs", {
 
   d <- list()
-  d$info$cop_year <- "2022"
+  d$info$cop_year <- "2024"
   d$info$tool <- "Data Pack"
   d$info$messages <- MessageQueue()
   d$tests <- list()
