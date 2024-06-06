@@ -38,30 +38,30 @@ with_mock_api({
 
 test_that("We can add a DataPack Label", {
 
-  #Angola
-  df <- getValidOrgUnits(2022) %>%
-    dplyr::filter(ou == "Angola")
-  df2 <- add_dp_label(df, 2022)
-  expect_true(setequal(names(df2),  c(names(df), "dp_label")))
-  expect_true(all(stringr::str_detect(df2$dp_label, "^(.+) \\[#[A-Za-z]+\\] \\[[A-Za-z0-9]+\\]$")))
 
-  #Angola for COP23 and above should not have the #PSNU
+  #Test for 2023. The label should consist of the PSNU name, followed by a
+  #space, and then the PSNU UID in square brackets
   df <- getValidOrgUnits(2023) %>%
     dplyr::filter(ou == "Angola")
   df2 <- add_dp_label(df, 2023)
   expect_true(setequal(names(df2),  c(names(df), "dp_label")))
-  expect_false(all(stringr::str_detect(df2$dp_label, "^(.+) \\[#[A-Za-z]+\\] \\[[A-Za-z0-9]+\\]$")))
   expect_true(all(stringr::str_detect(df2$dp_label, "^(.+) \\[[A-Za-z0-9]+\\]$")))
 
 
-  #Asia region. The DP label takes a different form
-  df <- getValidOrgUnits(2022) %>%
+  #The labels for PSNUs in regions take a different form.
+  #It should be the name of the
+  #country, followed by a space, then a ">", then a space, then the name of the
+  #region, followed by a space, then the PSNU UID in square brackets.
+
+  df <- getValidOrgUnits(2023) %>%
     dplyr::filter(ou == "Asia Region")
-  df2 <- add_dp_label(df, 2022)
+  df2 <- add_dp_label(df, 2023)
   expect_true(setequal(names(df2),  c(names(df), "dp_label")))
 
-  matches <- stringr::str_detect(df2$dp_label, "^(.+) > (.+) \\[#[A-Za-z]+\\] \\[[A-Za-z0-9]+\\]$")
-  #There is an exception when a country is a PSNU
+  matches <- stringr::str_detect(df2$dp_label, "^(.+) > (.+) \\[[A-Za-z0-9]+\\]$")
+  #There is an exception when a country is a PSNU. In this case, the DP label
+  #should be the name of the country, followed by a space, then the country UID
+  #in square brackets
   psnu_countries <- df2$country_uid == df2$uid
   expect_true(all(matches | psnu_countries))
 
@@ -94,7 +94,7 @@ with_mock_api({
 
 test_that("We can get a list of dataset UIDs based on the fiscal year", {
   expect_error(suppressWarnings(getCOPDatasetUids("foo")))
-  test_dataset <-  getCOPDatasetUids(2021)
+  test_dataset <-  getCOPDatasetUids(2024)
   expect_type(test_dataset, "character")
   expect_true(length(test_dataset) > 0)
   expect_true(all(unlist(lapply(test_dataset, is_uidish))))
@@ -103,25 +103,17 @@ test_that("We can get a list of dataset UIDs based on the fiscal year", {
 with_mock_api({
   test_that("We can get a full code list", {
 
-    expect_error(getCodeList(cop_year = 2021, datasets = "foo"))
-    expect_error(getCodeList())
+    expect_error(getCodeList(cop_year = 2024, datasets = "foo"))
     expect_error(getCodeList(1999))
-    expect_error(getCodeList(cop_year = 2021, datastreams = c("mer_targets", "foo")))
+    expect_error(getCodeList(cop_year = 2024, datastreams = c("mer_targets", "foo")))
 
-    test_dataset <- getCodeList(2021, d2_session = training)
+    test_dataset <- getCodeList(2024, d2_session = training)
     expect_type(test_dataset, "list")
     expect_setequal(names(test_dataset), c("dataelement", "dataelementuid",
     "categoryoptioncombo", "categoryoptioncombouid", "FY"))
     expect_true(all(is_uidish(test_dataset$dataelementuid)))
     expect_true(all(is_uidish(test_dataset$categoryoptioncombouid)))
-    expect_true(all(test_dataset$FY == "2022"))
+    expect_true(all(test_dataset$FY == "2025"))
 
-    test_dataset <- getCodeList(2022, d2_session = training)
-    expect_type(test_dataset, "list")
-    expect_setequal(names(test_dataset), c("dataelement", "dataelementuid",
-                                           "categoryoptioncombo", "categoryoptioncombouid", "FY"))
-    expect_true(all(is_uidish(test_dataset$dataelementuid)))
-    expect_true(all(is_uidish(test_dataset$categoryoptioncombouid)))
-    expect_true(all(test_dataset$FY == "2023"))
     })
 })

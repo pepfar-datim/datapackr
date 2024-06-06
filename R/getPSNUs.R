@@ -24,8 +24,6 @@ getValidOrgUnits <- function(cop_year = NULL) {
   }
 
   switch(as.character(cop_year),
-         "2021" = valid_PSNUs,
-         "2022" = valid_PSNUs,
          "2023" = valid_OrgUnits,
          "2024" = valid_OrgUnits_2024)
 
@@ -170,23 +168,6 @@ add_dp_label <- function(orgunits, cop_year) {
 
   country_count <- unique(orgunits$country_uid) %>% length()
 
-  if (cop_year <= 2022) {
-    orgunits %>%
-      dplyr::mutate(dp_label = paste0(
-        dplyr::if_else(
-          country_count > 1 & country_uid != uid,
-          paste0(country_name, " > "),
-          ""
-        ),
-        name,
-        " [#",
-        org_type,
-        "]",
-        " [",
-        uid,
-        "]"
-      ))
-  } else {
     orgunits %>%
       dplyr::mutate(dp_label = paste0(
         dplyr::if_else(
@@ -200,5 +181,3 @@ add_dp_label <- function(orgunits, cop_year) {
         "]"
       ))
   }
-
-}

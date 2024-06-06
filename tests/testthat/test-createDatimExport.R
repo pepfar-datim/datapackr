@@ -1,6 +1,6 @@
 context("Create a DATIM export object")
 
-test_that("Can export COP22 data", {
+test_that("Can export COP23 data", {
 
 
   d <-

@@ -327,53 +327,8 @@ getCOPDatasetUids <-  function(cop_year, datastreams) {
         "mer_results" = NA,
         "subnat_targets" = "bKSmkDP5YTc",
         "subnat_results" = "fZVvcMSA9mZ",
-        "impatt" = "kWKJQYP1uT7"),
-      "2022" = list(
-        "mer_targets" =   c("iADcaCD5YXh", # MER Target Setting:
-                            #PSNU (Facility and Community Combined) (TARGETS) FY2023
-                            "o71WtN5JrUu", # MER Target Setting:
-                            #PSNU (Facility and Community Combined) - DoD ONLY (TARGETS) FY2023
-                            "vzhO50taykm"), # Host Country Targets: DREAMS (USG) FY2023
-        "mer_results" = NA,
-        "subnat_targets" = "J4tdiDEi08O",
-        "subnat_results" = NA,
-        "impatt" = "CxMsvlKepvE"),
-      "2021" = list(
-        "mer_targets" =   c("YfZot37BbTm", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2022
-                            "cihuwjoY5xP", # MER Target Setting:
-                            #PSNU (Facility and Community Combined) - DoD ONLY (TARGETS) FY2022
-                            "wvnouBMuLuE"), # Host Country Targets: DREAMS (USG) FY2022),
-        "mer_results" = c("BHlhyPmRTUY", # MER Results: Facility Based
-                          "HfhTPdnRWES", # MER Results: Community Based
-                          "MGNVwVicMVm"), # Host Country Results: DREAMS (USG),
-        "subnat_targets" = "Va7TYyHraRn",
-        "subnat_results" = "IXiORiVFqIv",
-        "impatt" = "Zn27xns9Fmx"),
-      "2020" = list(
-        "mer_targets" =   c("Pmc0yYAIi1t", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS) FY2021
-                            "s1sxJuqXsvV"),  # MER Target Setting: PSNU
-        #(Facility and Community Combined) - DoD ONLY) FY2021,
-        # Host Country Targets: DREAMS (USG) FY2022),
-        "mer_results" =   c("zL8TlPVzEBZ", # MER Results: Facility Based FY2021Q4
-                            "TBcmmtoaCBC", # MER Results: Community Based FY2021Q4
-                            "qHyrHc4zwx4"), # Host Country Results: DREAMS (USG) FY2021Q4
-        "subnat_targets" = "j7jzezIhgPj",
-        "subnat_results" = "xiTCzZJ2GPP",
-        "impatt" = "jxnjnBAb1VD"),
-      "2019" = list(
-        "mer_targets" = c("sBv1dj90IX6", # MER Targets: Facility Based FY2020
-                          "nIHNMxuPUOR", # MER Targets: Community Based FY2020
-                          "C2G7IyPPrvD", # MER Targets: Community Based - DoD ONLY FY2020
-                          "HiJieecLXxN"), # MER Targets: Facility Based - DoD ONLY FY2020
-        "mer_results" =   c("qzVASYuaIey", # MER Results: Community Based FY2020Q4
-                            "BPEyzcDb8fT", # MER Results: Community Based - DoD ONLY FY2021Q4
-                            "jKdHXpBfWop", # MER Results: Facility Based FY2020Q4
-                            "em1U5x9hhXh", # MER Results: Facility Based - DoD ONLY FY2021Q4
-                            "mbdbMiLZ4AA"), # Host Country Results: DREAMS (USG) FY2020Q4
-        "subnat_targets" = "N4X89PgW01w",
-        "subnat_results" = "ctKXzmv2CVu",
-        "impatt" = "pTuDWXzkAkJ"))
-
+        "impatt" = "kWKJQYP1uT7")
+    )
 
   # If cop_year is NULL or missing, use default from package
   cop_year <- cop_year %missing% NULL
@@ -477,8 +432,6 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1)
 
   if (datasource %in%  c("Data Pack", "Data Pack Template")) {
     de_coc_map <- switch(as.character(cop_year),
-           "2021" = cop21_map_DataPack_DATIM_DEs_COCs,
-           "2022" = cop22_map_DataPack_DATIM_DEs_COCs,
            "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
            "2024" = cop24_map_DataPack_DATIM_DEs_COCs,
            stop("Invalid COP Year"))
@@ -486,8 +439,6 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1)
 
   if (datasource %in% c("OPU Data Pack", "OPU Data Pack Template", "DATIM", "PSNUxIM", "PSNUxIM Template")) {
     de_coc_map <- switch(as.character(cop_year),
-                         "2021" = datapackr::cop21_map_DataPack_DATIM_DEs_COCs,
-                         "2022" = datapackr::cop22_map_adorn_import_file,
                          "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
                          "2024" = cop24_map_DataPack_DATIM_DEs_COCs,
                          stop("Invalid COP Year"))
