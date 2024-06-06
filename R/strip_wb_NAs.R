@@ -12,27 +12,30 @@
 #'
 strip_wb_NAs <- function(d) {
 
-  # d$tool$wb$sharedStrings[d$tool$wb$sharedStrings == "<si><t>NA</t></si>"] <- "<si><t>0</t></si>"
+  process_sheet <- function(sheet, NA_sharedString) {
+    # identify cells with sharedStrings that might be "NA"
+    might_be_NA <- sheet$sheet_data$v %in% NA_sharedString
 
+    # identify cells that are string types
+    is_string <- sheet$sheet_data$t == 1
+
+    # combine both conditions to find actual "NA" strings
+    is_na_string <- ifelse(is.na(might_be_NA & is_string), FALSE, might_be_NA & is_string)
+
+    # replace the values and types with NA for identified "NA" strings
+    sheet$sheet_data$v[is_na_string] <- NA_character_
+    sheet$sheet_data$t[is_na_string] <- NA
+
+    return(sheet)
+  }
+
+  # find indices of sharedStrings matching "<si><t>NA</t></si>"
   NA_sharedString <- grep("<si><t>NA</t></si>", d$tool$wb$sharedStrings) - 1
 
+  # proceed only if such sharedStrings are found
   if (length(NA_sharedString) > 0) {
-
-   for (i in seq_along(d$tool$wb$worksheets)) {
-
-     might_be_NA <- d$tool$wb$worksheets[[i]]$sheet_data$v %in% NA_sharedString
-
-     is_string <- d$tool$wb$worksheets[[i]]$sheet_data$t == 1
-
-     is_na_string <- ifelse(is.na(might_be_NA & is_string), FALSE, might_be_NA & is_string)
-
-     d$tool$wb$worksheets[[i]]$sheet_data$v[is_na_string]  <- NA_character_
-
-     d$tool$wb$worksheets[[i]]$sheet_data$t[is_na_string]  <- NA
-    }
-
+    d$tool$wb$worksheets <- lapply(d$tool$wb$worksheets, process_sheet, NA_sharedString)
   }
 
   return(d)
-
 }
