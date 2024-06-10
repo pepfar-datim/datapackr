@@ -46,7 +46,7 @@ y2ExtractInvalidDisaggs <- function(d) {
     d$tests$year2_invalid_disaggs  <-
       d$data$Year2[year2_invalid_disaggs, ]
     attr(d$tests$year2_invalid_disaggs, "test_name") <- "Invalid Year 2 disaggs"
-    #d$data$Year2 <- d$data$Year2[!year2_invalid_disaggs, ]
+    d$data$Year2 <- d$data$Year2[!year2_invalid_disaggs, ]
   }
 
   d
