@@ -46,7 +46,7 @@ writeHomeTab <- function(wb = NULL,
                      rows = 2, cols = 2)
 
   # Title ####
-  if (cop_year %in% c(2023, 2024) && tool == "Data Pack") {
+  if (cop_year %in% c(2023, 2024,2025) && tool == "Data Pack") {
     tool_title <- "Target Setting Tool"
   } else {
     tool_title <- tool
@@ -54,7 +54,7 @@ writeHomeTab <- function(wb = NULL,
 
   pd <- "COP"
   yr <- cop_year - 2000
-  if (cop_year %in% c(2024)) {
+  if (cop_year %in% c(2024,2025)) {
     pd <- "FY"
     yr <- yr + 1
   }

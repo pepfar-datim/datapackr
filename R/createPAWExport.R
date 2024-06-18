@@ -10,7 +10,7 @@ createPAWExport <- function(d) {
 
   if (d$info$tool == "Data Pack") {
 
-    if (d$info$cop_year %in% c(2023, 2024)) {
+    if (d$info$cop_year %in% c(2023, 2024, 2025)) {
       if (d$info$has_psnuxim) {
         paw_export <- dplyr::bind_rows(d$datim$subnat_impatt,
                                          d$datim$prioritizations,
@@ -23,7 +23,7 @@ createPAWExport <- function(d) {
     }
   }
 
-  if (d$info$tool %in% c("OPU Data Pack", "PSNUxIM")) {
+  if (d$info$tool %in% c("PSNUxIM")) {
     paw_export <-  d$datim$OPU
   }
 

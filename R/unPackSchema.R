@@ -338,8 +338,8 @@ checkSchema <- function(schema,
   ## Sheet Numbers don't omit any sheets ####
   tests$sheet_nums_complete <- checkSchema_SheetNums(schema)
 
-  ## OPU Schema Specific Checks ####
-  if (tool != "OPU Data Pack") {
+  ## PSNUxIM Schema Specific Checks ####
+  if (tool != "PSNUxIM") {
     ### dataset ####
     tests$datasets_invalid <- checkSchema_InvalidDatasets(schema, tool, cop_year)
 
@@ -397,7 +397,7 @@ unPackSchema <- function(template_path = NULL,
   #
   # rm(params, p)
 
-  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM", "PSNUxIM Template")
+  if (tool %in% c("PSNUxIM", "PSNUxIM Template")
         && cop_year %in% c(2023, 2024)) {
     include_blank_cells <-  TRUE
   } else {
@@ -454,8 +454,8 @@ unPackSchema <- function(template_path = NULL,
   schema %<>%
     dplyr::mutate(formula = dplyr::if_else(is.na(formula), value, formula))
 
-  # For OPU Data Packs, delete everything in metadata rows/cols
-  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM", "PSNUxIM Template")) {
+  # For PSNUxIM Data Packs, delete everything in metadata rows/cols
+  if (tool %in% c("PSNUxIM", "PSNUxIM Template")) {
     schema %<>%
       dplyr::mutate_at(
         dplyr::vars(
@@ -469,7 +469,7 @@ unPackSchema <- function(template_path = NULL,
     ~name, ~id,
     NA_character_, NA_character_))
 
-  if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM", "PSNUxIM Template")) {
+  if (tool %in% c("PSNUxIM", "PSNUxIM Template")) {
     disaggs <- list(tibble::tribble(
       ~name, ~id,
       NA_character_, NA_character_))

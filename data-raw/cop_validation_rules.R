@@ -71,16 +71,20 @@ processValidationRules <- function(r) {
 
 cop23 <- processValidationRules("./data-raw/COP23/cop23_validation_rules.json")
 cop24 <- processValidationRules("./data-raw/COP24/cop24_validation_rules.json")
+cop25 <- processValidationRules("./data-raw/COP25/cop25_validation_rules.json")
+
 
 cop_validation_rules <- list(
   "2023" = cop23,
-  "2024" = cop24
+  "2024" = cop24,
+  "2025" = cop25
   )
 
 # use waldo to look at the differences in case
 waldo::compare(
   cop_validation_rules$`2023`,
-  cop_validation_rules$`2024`
+  cop_validation_rules$`2024`,
+  cop_validation_rules$`2025`,
 )
 
 usethis::use_data(cop_validation_rules, overwrite = TRUE)

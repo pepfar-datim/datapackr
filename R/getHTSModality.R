@@ -12,6 +12,7 @@ getHTSModality <- function(cop_year = getCurrentCOPYear(),
                                                inherits = TRUE)) {
   groupSet <- switch(
     as.character(cop_year),
+    "2025" = "Bm4JmNS8ciD",#Needs update when available in DATIM
     "2024" = "Bm4JmNS8ciD",
     "2023" = "fmxSIyzexmb",
   )

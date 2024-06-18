@@ -35,11 +35,11 @@ unPackTool <- function(submission_path = NULL,
     d <- unPackDataPack(d,
                         d2_session = d2_session)
 
-    if (d$info$cop_year %in% c("2023", "2024")) {
+    if (d$info$cop_year %in% c("2023", "2024", "2025")) {
       d <- unpackYear2Sheet(d)
     }
 
-  } else if (d$info$tool %in% c("OPU Data Pack", "PSNUxIM")) {
+  } else if (d$info$tool == "PSNUxIM") {
     d <- unPackOPUDataPack(d,
                            pzns = pzns,
                            mer_data = mer_data,
