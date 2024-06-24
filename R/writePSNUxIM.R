@@ -241,6 +241,7 @@ writePSNUxIM <- function(d,
     tool <- switch(as.character(d$info$cop_year),
                    "2023" = "PSNUxIM",
                    "2024" = "PSNUxIM",
+                   "2025" = "PSNUxIM",
                    stop("We do not seem to have a tool for that year"))
 
     interactive_print("Exporting your new Data Pack...")

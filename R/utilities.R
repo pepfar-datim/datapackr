@@ -312,6 +312,13 @@ getCOPDatasetUids <-  function(cop_year, datastreams) {
   #List of COP Datasets by year
   cop_datasets <-
     list(
+      "2025" = list( #HAS TO BE UPDATED when cop25 dataset available
+        "mer_targets" =   c("lHUEzkjkij1", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS)
+                            "tNbhYbrKbnk"), # Host Country Targets: DREAMS (USG)
+        "mer_results" = NA,
+        "subnat_targets" = "bKSmkDP5YTc",
+        "subnat_results" = "fZVvcMSA9mZ",
+        "impatt" = "kWKJQYP1uT7"),
       "2024" = list(
         "mer_targets" =   c("lHUEzkjkij1", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS)
                             "tNbhYbrKbnk"), # Host Country Targets: DREAMS (USG)
@@ -434,6 +441,7 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1)
     de_coc_map <- switch(as.character(cop_year),
            "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
            "2024" = cop24_map_DataPack_DATIM_DEs_COCs,
+           "2025" = cop25_map_DataPack_DATIM_DEs_COCs,
            stop("Invalid COP Year"))
     }
 
@@ -441,6 +449,7 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1)
     de_coc_map <- switch(as.character(cop_year),
                          "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
                          "2024" = cop24_map_DataPack_DATIM_DEs_COCs,
+                         "2025" = cop25_map_DataPack_DATIM_DEs_COCs,
                          stop("Invalid COP Year"))
   }
 
