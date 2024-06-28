@@ -1,3 +1,13 @@
+# datapackr 7.6.0
+## New features
+* 
+
+## Bug fixes
+*
+
+## Minor improvements and fixes
+* 
+
 # datapackr 7.5.0
 ## New features
 * Add utility functions for interacting with PDAP Jobs 
