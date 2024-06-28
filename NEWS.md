@@ -1,19 +1,22 @@
 # datapackr 7.6.0
 ## New features
-* 
+* Sunset COP21 and COP22
+* Added original versions of the COP25 templates
 
 ## Bug fixes
-*
+* reenabled droping invalid disaggs from the year 2 sheet
+* Updated Valid Org Units for 2024 to account for regionalization.
+* Removed COP Season parameter
 
 ## Minor improvements and fixes
-* 
+* Updated strip_wb_nas
 
 # datapackr 7.5.0
 ## New features
 * Add utility functions for interacting with PDAP Jobs 
 
 ## Bug fixes
-*
+* 
 
 ## Minor improvements and fixes
 * Updated dependencies
