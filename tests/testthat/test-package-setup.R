@@ -72,7 +72,7 @@ test_that("We can check datapack paramaters", {
   expect_error(check_params(country_uids = "foo", force = TRUE))
 
   # If country_uids is NULL or invalid and force = FALSE, expect all countries returned
-  all_countries <- sort(unique(valid_PSNUs$country_uid))
+  all_countries <- sort(unique(datapackr::getValidOrgUnits(2024)$country_uid))
   expect_equal(
     sort(check_params(country_uids = NULL, force = FALSE)$country_uids),
     all_countries)
