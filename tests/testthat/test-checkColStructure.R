@@ -5,7 +5,7 @@ test_that("Can check missing column...", {
   # create minimal schema data
   d <- list()
   d$info$messages <- MessageQueue()
-  d$info$cop_year <- 2022
+  d$info$cop_year <- 2024
   d$info$tool <- "Data Pack"
   d$info$has_psnuxim <- TRUE
 
@@ -49,7 +49,7 @@ test_that("Can check duplicate columns and out of order...", {
   # create minimal schema data
   d <- list()
   d$info$messages <- MessageQueue()
-  d$info$cop_year <- 2022
+  d$info$cop_year <- 2024
   d$info$tool <- "Data Pack"
   d$info$has_psnuxim <- TRUE
 

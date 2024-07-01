@@ -2,7 +2,7 @@
 test_that("We can get sheets to skip", {
 
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   test_schema <- pick_schema(cop_year, tool)
   this_skip <- getSkipSheets(test_schema, tool, cop_year)
   expect_named(this_skip, c("package_skip", "num", "names")) })
@@ -14,7 +14,7 @@ flubSkippedSheets <- function(schema) {
 
 test_that("We can flag missing sheets which are skipped", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
   #Simulate deleting the Spectrum tab
   bad_schema <- flubSkippedSheets(ref_schema)
@@ -25,7 +25,7 @@ test_that("We can flag missing sheets which are skipped", {
 
 test_that("We can pass when all skip sheets are present in the schema", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   test_results <- checkSchema_SkippedSheets(ref_schema, tool, cop_year)
@@ -36,7 +36,7 @@ test_that("We can pass when all skip sheets are present in the schema", {
 
 test_that("We can pass when schema sheets are ordered sequentially", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   test_results <- checkSchema_SheetNums(ref_schema)
@@ -46,7 +46,7 @@ test_that("We can pass when schema sheets are ordered sequentially", {
 
 test_that("We can flag when sheets are not ordered sequentially", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
   bad_schema <- ref_schema %>%
     dplyr::filter(sheet_num != 2)
@@ -60,7 +60,7 @@ test_that("We can flag when sheets are not ordered sequentially", {
 
 test_that("We can pass when schema names match the package", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   test_results <- checkSchema_SheetNames(ref_schema, ref_schema)
@@ -70,7 +70,7 @@ test_that("We can pass when schema names match the package", {
 
 test_that("We can flag when sheet names do not match the reference schema", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
   bad_schema <- ref_schema %>%
     dplyr::filter(sheet_num != 2)
@@ -83,7 +83,7 @@ test_that("We can flag when sheet names do not match the reference schema", {
 
 test_that("We can pass when data sets are valid", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   test_results <- checkSchema_InvalidDatasets(ref_schema, tool, cop_year)
@@ -97,7 +97,7 @@ test_that("We can pass when data sets are valid", {
 
 test_that("We can flag when data sets are invalid", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
   bad_schema <- ref_schema %>%
     dplyr::mutate(dataset = dplyr::case_when(col_type == "reference" ~ "foobar",
@@ -127,7 +127,7 @@ test_that("We can flag when data sets are invalid", {
 
 test_that("We can pass valid column types", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   test_results <- checkSchema_InvalidColType(ref_schema, tool, cop_year)
@@ -149,7 +149,7 @@ flubColumnTypes <- function(schema) {
 
 test_that("We can flag when column types are invalid", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
   bad_schema <- flubColumnTypes(ref_schema)
 
@@ -165,7 +165,7 @@ test_that("We can flag when column types are invalid", {
 
 test_that("We can pass valid value types", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   test_results <- checkSchema_InvalidValueType(ref_schema, tool, cop_year)
@@ -179,7 +179,7 @@ test_that("We can pass valid value types", {
 
 test_that("We can flag invalid value types", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
   bad_schema <- ref_schema %>%
     dplyr::mutate(value_type = dplyr::case_when(value_type == "integer" ~ "foobar",
@@ -197,7 +197,7 @@ test_that("We can flag invalid value types", {
 
 test_that("We can pass valid ages", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   test_results <- checkSchema_ValidAges(ref_schema)
@@ -211,7 +211,7 @@ test_that("We can pass valid ages", {
 
 test_that("We can flag invalid ages", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   modify_age <- function(x) {
@@ -259,7 +259,7 @@ test_that("We can flag invalid ages", {
 
 test_that("We can pass valid sex identifiers", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   test_results <- checkSchema_ValidSexes(ref_schema)
@@ -273,7 +273,7 @@ test_that("We can pass valid sex identifiers", {
 
 test_that("We can flag invalid sexes", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   modify_males <- function(x) {
@@ -320,7 +320,7 @@ test_that("We can flag invalid sexes", {
 
 test_that("We can pass valid KP identifiers", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   test_results <- checkSchema_ValidKPs(ref_schema)
@@ -334,7 +334,7 @@ test_that("We can pass valid KP identifiers", {
 
 test_that("We can flag KP identifiers", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   modify_pwid <- function(x) {
@@ -380,7 +380,7 @@ test_that("We can flag KP identifiers", {
 
 test_that("We can pass valid formulas", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   test_results <- checkSchema_Formulas(ref_schema)
@@ -394,7 +394,7 @@ test_that("We can pass valid formulas", {
 
 test_that("We can flag invalid formulas´", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   bad_formulas <- sample(seq_len(NROW(ref_schema)), 10)
@@ -413,7 +413,7 @@ test_that("We can flag invalid formulas´", {
 
 test_that("We can pass valid data element identifiers", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   test_results <- checkSchema_DataElementSyntax(ref_schema)
@@ -439,7 +439,7 @@ test_that("We can pass valid data element identifiers", {
 
 test_that("We can flag invalid data elements´", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   bad_schema <- ref_schema %>%
@@ -471,7 +471,7 @@ test_that("We can flag invalid data elements´", {
 
 test_that("We can pass valid category option identifiers", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   test_results <- checkSchema_COsSyntax(ref_schema)
@@ -490,7 +490,7 @@ test_that("We can pass valid category option identifiers", {
 
 test_that("We can flag invalid data elements´", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
 
   bad_schema <- ref_schema %>%
@@ -512,19 +512,19 @@ test_that("We can flag invalid data elements´", {
 
 test_that("We can pass when a schema is valid", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
-  test_results <- checkSchema(schema = ref_schema, cop_year = cop_year, tool = tool, season = "COP")
+  test_results <- checkSchema(schema = ref_schema, cop_year = cop_year, tool = tool)
   expect_true(length(test_results) == 0)
 })
 
 test_that("We can flag when a schema is invalid", {
   tool <- "Data Pack"
-  cop_year <- 2022
+  cop_year <- 2024
   ref_schema <- pick_schema(cop_year, tool)
   bad_schema <- ref_schema %>%
     flubSkippedSheets(.) %>%
     flubColumnTypes(.)
-  test_results <- checkSchema(schema = bad_schema, cop_year = cop_year, tool = tool, season = "COP")
+  test_results <- checkSchema(schema = bad_schema, cop_year = cop_year, tool = tool)
   expect_true(length(test_results) > 0)
 })

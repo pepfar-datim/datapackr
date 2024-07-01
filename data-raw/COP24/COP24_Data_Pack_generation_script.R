@@ -56,6 +56,5 @@ for (i in seq_along(pick$datapack_name)) {
                 template_path = NULL,
                 cop_year = 2024,
                 output_folder = output_folder,
-                season = "COP",
                 results_archive = FALSE)
 }

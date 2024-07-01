@@ -17,12 +17,12 @@ getCurrentCOPYear <- function() {
 datapackrSupports <- function() {
   tibble::tribble(
     ~tools, ~yrs, ~seasons,
-    "Data Pack", c(2021, 2022, 2023, 2024), c("COP", "OPU"),
-    "OPU Data Pack", c(2021, 2022, 2023), c("OPU", "COP"),
-    "Data Pack Template", c(2021, 2022, 2023, 2024), c("COP", "OPU"),
-    "OPU Data Pack Template", c(2021, 2022, 2023), c("OPU", "COP"),
-    "PSNUxIM", c(2022, 2023, 2024), c("COP", "OPU"),
-    "PSNUxIM Template", c(2023, 2024), c("COP", "OPU"))
+    "Data Pack", c(2023, 2024), c("COP", "OPU"),
+    "OPU Data Pack", c(2023), c("OPU", "COP"),
+    "Data Pack Template", c(2023, 2024), c("COP", "OPU"),
+    "OPU Data Pack Template", c(2023), c("OPU", "COP"),
+    "PSNUxIM", c(2023, 2024), c("COP", "OPU"),
+    "PSNUxIM Template", c(2024), c("COP", "OPU"))
 }
 
 
@@ -59,19 +59,11 @@ supportedCOPYears <- function(tool = NULL) {
 #' @return Character vector of tools supported by the package for a given cop_year.
 #' If cop_year is not provided, will provide list of all tools supported for any
 #' cop_year.
-supportedTools <- function(cop_year = NULL, season = NULL) {
+supportedTools <- function(cop_year = NULL) {
 
   cop_year <- cop_year %missing% NULL
   cop_year_provided <- !is.null(cop_year)
   cop_year %<>% suppressWarnings(check_cop_year())
-
-  season <- season %missing% NULL
-  season_provided <- !is.null(season)
-  if (season_provided) {
-    if (!season %in% supportedSeasons()) {
-      stop("In supportedTools, provided season is invalid.")
-    }
-  }
 
   supported_tools <- datapackrSupports() %>%
     tidyr::unnest(yrs) %>%
@@ -82,41 +74,7 @@ supportedTools <- function(cop_year = NULL, season = NULL) {
       dplyr::filter(yrs == cop_year)
   }
 
-  if (season_provided) {
-    supported_tools %<>%
-      dplyr::filter(seasons == season)
-  }
-
   unique(supported_tools$tools)
-}
-
-#' @export
-#' @title Supported Seasons
-#' @inheritParams datapackr_params
-#' @return Character vector of seasons supported by the package. If neither
-#' cop_year nor tool are provided, will provide list of all seasons supported.
-supportedSeasons <- function(cop_year = NULL, tool = NULL) {
-  cop_year <- cop_year %missing% NULL
-  cop_year_provided <- !is.null(cop_year)
-
-  tool <- tool %missing% NULL
-  tool_provided <- !is.null(tool)
-
-  supported_seasons <- datapackrSupports() %>%
-    tidyr::unnest(seasons) %>%
-    tidyr::unnest(yrs)
-
-  if (cop_year_provided) {
-    supported_seasons %<>%
-      dplyr::filter(yrs == cop_year)
-  }
-
-  if (tool_provided) {
-    supported_seasons %<>%
-      dplyr::filter(tools == tool)
-  }
-
-  unique(supported_seasons$seasons)
 }
 
 
@@ -178,16 +136,12 @@ skip_tabs <- function(tool = "Data Pack", cop_year) {
   if (tool %in% c("Data Pack", "Data Pack Template")) {
     skip$pack <-
       switch(as.character(cop_year),
-             "2021" = c("Home", "Summary", "Spectrum", "KP Validation"),
-             "2022" = c("Home", "Spectrum", "KP Validation"),
              "2023" = c("Home", "Spectrum", "Year 2"),
              "2024" = c("Home", "Spectrum", "Year 2"),
              NA_character_)
 
     skip$unpack <-
       switch(as.character(cop_year),
-             "2021" = c("Home", "Summary", "Spectrum", "KP Validation"),
-             "2022" = c("Home", "Spectrum", "KP Validation"),
              "2023" = c("Home", "Spectrum", "KP Validation"),
              "2024" = c("Home", "Spectrum", "KP Validation"),
              NA_character_)
@@ -195,7 +149,7 @@ skip_tabs <- function(tool = "Data Pack", cop_year) {
     skip$schema <- skip$pack[skip$pack %in% skip$unpack]
 
   } else if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM", "PSNUxIM Template") &&
-             cop_year %in% c(2021, 2022, 2023, 2024)) {
+             cop_year %in% c(2023, 2024)) {
     skip$pack <- c("Home")
     skip$unpack <- c("Home")
     skip$schema <- c("Home")
@@ -226,7 +180,7 @@ headerRow <- function(tool, cop_year) {
   rm(params, p)
 
   #Currently all tools use row 14 as the header.
-  if (cop_year %in% c(2021, 2022, 2023, 2024)) {
+  if (cop_year %in% c(2023, 2024)) {
     if (tool %in% datapackrSupports()$tools) {
       return(14)
     } else {
@@ -264,22 +218,17 @@ pick_schema <- function(cop_year, tool) {
 
   if (tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
     schema <- switch(as.character(cop_year),
-                     "2021" =  cop21OPU_data_pack_schema,
-                     "2022" = cop22OPU_data_pack_schema,
                      "2023" = cop23_psnuxim_schema,
                      stop("OPU Data Pack schema not available for the COP year provided."))
 
   } else if (tool %in% c("Data Pack", "Data Pack Template")) {
     schema <- switch(as.character(cop_year),
-                     "2021" = cop21_data_pack_schema,
-                     "2022" = cop22_data_pack_schema,
                      "2023" =  cop23_data_pack_schema,
                      "2024" =  cop24_data_pack_schema,
                      stop("Data Pack schema not available for the COP year provided."))
 
   } else if (tool %in% c("PSNUxIM", "PSNUxIM Template")) {
     schema <- switch(as.character(cop_year),
-                     "2022" = cop22OPU_data_pack_schema,
                      "2023" =  cop23_psnuxim_schema,
                      "2024" =  cop24_psnuxim_schema,
                      stop("PSNUxIM schema not available for the COP year provided."))
@@ -316,16 +265,12 @@ pick_template_path <- function(cop_year, tool) {
   if (tool %in% c("OPU Data Pack", "OPU Data Pack Template")) {
 
     template_filename <- switch(as.character(cop_year),
-      "2021"  = "COP21_OPU_Data_Pack_Template.xlsx",
-      "2022" = "COP22_OPU_Data_Pack_Template.xlsx",
       "2023" = "COP23_PSNUxIM_Template.xlsx",
       NULL)
   }
 
   if (tool %in% c("Data Pack", "Data Pack Template")) {
     template_filename <- switch(as.character(cop_year),
-                                "2021" = "COP21_Data_Pack_Template.xlsx",
-                                "2022" = "COP22_Data_Pack_Template.xlsx",
                                 "2023" = "COP23_Data_Pack_Template.xlsx",
                                 "2024" = "COP24_Data_Pack_Template.xlsx",
                                 NULL)
@@ -334,7 +279,6 @@ pick_template_path <- function(cop_year, tool) {
 
   if (tool %in% c("PSNUxIM", "PSNUxIM Template")) {
     template_filename <- switch(as.character(cop_year),
-                                "2022" = "COP22_OPU_Data_Pack_Template.xlsx",
                                 "2023" = "COP23_PSNUxIM_Template.xlsx",
                                 "2024" = "COP24_PSNUxIM_Template.xlsx",
                                 NULL)

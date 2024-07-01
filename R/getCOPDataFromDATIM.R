@@ -18,7 +18,7 @@ getCOPDataFromDATIM <- function(country_uids,
                                                     inherits = TRUE)) {
 
 
-  if (!cop_year %in% c(2020:2024)) {
+  if (!cop_year %in% c(2023:2024)) {
 
     stop("The COP year provided is not supported by the internal function getCOPDataFromDATIM")
     ### NOTE for COP23 some special handling of SUBNAT data for FY23 like the code below may be
@@ -30,9 +30,11 @@ getCOPDataFromDATIM <- function(country_uids,
   # hack to allow forward compatibility between FY21 subnat dataset in DATIM and
   # COP21/FY22 datapack
   # need to be able to grab dataelements from FY22 subnat targets dataset for FY21 period
-  if (cop_year == 2020 && "subnat_targets" %in% datastreams) {
-    dataset_uids <-  c(dataset_uids, getCOPDatasetUids(2021, "subnat_targets"))
-  }
+
+  # Mon May 13 19:44:45 2024 ----- Will delete after this proves not to break anything
+  # if (cop_year == 2020 && "subnat_targets" %in% datastreams) {
+  #   dataset_uids <-  c(dataset_uids, getCOPDatasetUids(2021, "subnat_targets"))
+  # }
 
 
   # package parameters for getDataValueSets function call

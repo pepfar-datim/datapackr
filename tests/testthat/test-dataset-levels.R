@@ -13,7 +13,8 @@ test_that("Can provide a data frame of data set levels", {
   expect_true(all(dataset_levels$community_level <= 8))
   expect_true(all(dataset_levels$facility_level <= 9))
   expect_true(all(dataset_levels$prioritization <= 7))
-  expect_true(all(dataset_levels$cop_year %in% supportedCOPYears()))
+  # expect_true(all(dataset_levels$cop_year %in% supportedCOPYears()))
+  expect_true(all(supportedCOPYears() %in% dataset_levels$cop_year))
   expect_true(all(is_uidish(dataset_levels$ou_uid)))
   expect_true(all(is_uidish(dataset_levels$country_uid)))
 

@@ -4,13 +4,11 @@
 \alias{supportedTools}
 \title{Supported Tools}
 \usage{
-supportedTools(cop_year = NULL, season = NULL)
+supportedTools(cop_year = NULL)
 }
 \arguments{
 \item{cop_year}{COP Year to use for tailoring functions. Remember,
 FY22 targets = COP21.}
-
-\item{season}{Either \code{COP} or \code{OPU}.}
 }
 \value{
 Character vector of tools supported by the package for a given cop_year.

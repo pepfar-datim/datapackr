@@ -11,11 +11,10 @@ test_that("We can warn on an invalid COP year", {
 with_mock_api({
   test_that("We can create a memo structure", {
     d <- list()
-    years <- c("2021", "2022")
+    years <- c("2024")
     for (year in years) {
       d$info$cop_year <- year
       d <- memoStructure(d, d2_session = training)
-      #expect_silent(d <- memoStructure(d, d2_session = training))
       expect_false(is.null(d$memo$structure))
       expect_equal(typeof(d$memo$structure), "list")
       expect_setequal(names(d$memo$structure), c("row_order", "col_order", "age_order"))

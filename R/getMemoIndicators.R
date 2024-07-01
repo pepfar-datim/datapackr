@@ -38,8 +38,6 @@ getMemoIndicators <- function(cop_year,
                                                     inherits = TRUE)) {
   #Fetch indicators from the COP21 memo group
   ind_group <- switch(as.character(cop_year),
-                      "2021" = "TslxbFe3VUZ",
-                      "2022" = "zRApVEi7qjo",
                       "2023" = "ZTGhB3qIPsi",
                       "2024" = "VOYwOgsftbT",
                       NULL)

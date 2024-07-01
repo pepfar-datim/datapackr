@@ -42,7 +42,7 @@ checkSchema_ValidKPs(schema)
 
 checkSchema_Formulas(schema)
 
-checkSchema(schema, template_path, cop_year, tool, season)
+checkSchema(schema, template_path, cop_year, tool)
 
 unPackSchema(
   template_path = NULL,
@@ -66,8 +66,6 @@ FY22 targets = COP21.}
 \item{template_path}{Local filepath to Data Pack template Excel (XLSX) file.
 This file MUST NOT have any data validation formats present. If left
 \code{NULL}, will select the default based on \code{cop_year} and \code{tool}.}
-
-\item{season}{Either \code{COP} or \code{OPU}.}
 
 \item{skip}{Character vector of Sheet Names to label for skipping in schema.}
 }

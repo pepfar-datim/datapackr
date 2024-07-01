@@ -1,0 +1,346 @@
+{
+    "headers": [
+        {
+            "name": "dx",
+            "column": "Data",
+            "valueType": "TEXT",
+            "type": "java.lang.String",
+            "hidden": false,
+            "meta": true
+        },
+        {
+            "name": "ou",
+            "column": "Organisation unit",
+            "valueType": "TEXT",
+            "type": "java.lang.String",
+            "hidden": false,
+            "meta": true
+        },
+        {
+            "name": "value",
+            "column": "Value",
+            "valueType": "NUMBER",
+            "type": "java.lang.Double",
+            "hidden": false,
+            "meta": false
+        }
+    ],
+    "metaData": {
+        "items": {
+            "gwVYinjBAe9": {
+                "name": "Neno District"
+            },
+            "cPtvxaZqXIH": {
+                "name": "Karonga District"
+            },
+            "YCKiBAp8QAg": {
+                "name": "Nkhotakota District"
+            },
+            "lPTyjLi4w3d": {
+                "name": "Rumphi District"
+            },
+            "lLDyBx5XyUi": {
+                "name": "Mangochi District"
+            },
+            "am530wpaGvr": {
+                "name": "Ntcheu District"
+            },
+            "UCy710RAWRp": {
+                "name": "Public Health Reference Laboratory (PHL)"
+            },
+            "ScR9iFKAasW": {
+                "name": "Lilongwe District"
+            },
+            "GkIwZrXy1h2": {
+                "name": "Chitipa District"
+            },
+            "TYnMSwzko3z": {
+                "name": "Machinga District"
+            },
+            "msW2zpIN7up": {
+                "name": "Salima District"
+            },
+            "fyEoGEPERdI": {
+                "name": "Zomba District"
+            },
+            "AookYR4ECPH": {
+                "name": "Other organisation unit type"
+            },
+            "zphK9WV8JB4": {
+                "name": "Dowa District"
+            },
+            "POHZmzofoVx": {
+                "name": "Facility"
+            },
+            "dx": {
+                "name": "Data"
+            },
+            "mINJi7rR1a6": {
+                "name": "Type of organisational unit"
+            },
+            "ul0y9diGujK": {
+                "name": "Thyolo District"
+            },
+            "oiPR2CiVJbf": {
+                "name": "Chiradzulu District"
+            },
+            "vA4NcHxfMBq": {
+                "name": "Mzimba District"
+            },
+            "ou": {
+                "name": "Organisation unit"
+            },
+            "JQKLKuVuY61": {
+                "name": "Kasungu District"
+            },
+            "ir8wuHHzoSs": {
+                "name": "Balaka District"
+            },
+            "ZCjuwgaMB9u": {
+                "name": "Likoma District"
+            },
+            "AZyWpGzhcaA": {
+                "name": "Phalombe District"
+            },
+            "mxqa3CDFmIT": {
+                "name": "Blantyre District"
+            },
+            "U8c0so51kT6": {
+                "name": "Chikwawa District"
+            },
+            "umc2n1Z4wNv": {
+                "name": "Mulanje District"
+            },
+            "r4zbW3owX9n": {
+                "name": "IMPATT.PRIORITY_SNU (N, SUBNAT) TARGET: "
+            },
+            "E7zpfyBt7Tw": {
+                "name": "Nkhata Bay District"
+            },
+            "pe": {
+                "name": "Period"
+            },
+            "PekKUkKHAzY": {
+                "name": "Dedza District"
+            },
+            "fiRkU6gEjLz": {
+                "name": "Ntchisi District"
+            },
+            "wNqJp8oRIcF": {
+                "name": "Mwanza District"
+            },
+            "rpw540fmNUz": {
+                "name": "Nsanje District"
+            },
+            "HllvX50cXC0": {
+                "name": "default"
+            },
+            "kxuuIFpOXyO": {
+                "name": "Mchinji District"
+            },
+            "2024Oct": {
+                "name": "October 2024 - September 2025"
+            },
+            "PvuaP6YALSA": {
+                "name": "Community"
+            },
+            "PQZgU9dagaH": {
+                "name": "_Military Malawi"
+            }
+        },
+        "dimensions": {
+            "dx": [
+                "r4zbW3owX9n"
+            ],
+            "pe": [
+                "2024Oct"
+            ],
+            "ou": [
+                "PekKUkKHAzY",
+                "zphK9WV8JB4",
+                "JQKLKuVuY61",
+                "ScR9iFKAasW",
+                "kxuuIFpOXyO",
+                "YCKiBAp8QAg",
+                "am530wpaGvr",
+                "fiRkU6gEjLz",
+                "UCy710RAWRp",
+                "msW2zpIN7up",
+                "GkIwZrXy1h2",
+                "cPtvxaZqXIH",
+                "ZCjuwgaMB9u",
+                "vA4NcHxfMBq",
+                "E7zpfyBt7Tw",
+                "lPTyjLi4w3d",
+                "ir8wuHHzoSs",
+                "mxqa3CDFmIT",
+                "U8c0so51kT6",
+                "oiPR2CiVJbf",
+                "TYnMSwzko3z",
+                "lLDyBx5XyUi",
+                "umc2n1Z4wNv",
+                "wNqJp8oRIcF",
+                "gwVYinjBAe9",
+                "rpw540fmNUz",
+                "AZyWpGzhcaA",
+                "ul0y9diGujK",
+                "fyEoGEPERdI",
+                "PQZgU9dagaH"
+            ],
+            "mINJi7rR1a6": [
+                "POHZmzofoVx",
+                "PvuaP6YALSA",
+                "AookYR4ECPH"
+            ],
+            "co": [
+                "HllvX50cXC0"
+            ]
+        }
+    },
+    "rowContext": {},
+    "width": 3,
+    "rows": [
+        [
+            "r4zbW3owX9n",
+            "TYnMSwzko3z",
+            "1"
+        ],
+        [
+            "r4zbW3owX9n",
+            "lLDyBx5XyUi",
+            "1"
+        ],
+        [
+            "r4zbW3owX9n",
+            "oiPR2CiVJbf",
+            "1"
+        ],
+        [
+            "r4zbW3owX9n",
+            "E7zpfyBt7Tw",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "kxuuIFpOXyO",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "GkIwZrXy1h2",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "ir8wuHHzoSs",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "JQKLKuVuY61",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "U8c0so51kT6",
+            "1"
+        ],
+        [
+            "r4zbW3owX9n",
+            "lPTyjLi4w3d",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "rpw540fmNUz",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "ScR9iFKAasW",
+            "1"
+        ],
+        [
+            "r4zbW3owX9n",
+            "mxqa3CDFmIT",
+            "1"
+        ],
+        [
+            "r4zbW3owX9n",
+            "msW2zpIN7up",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "ZCjuwgaMB9u",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "AZyWpGzhcaA",
+            "1"
+        ],
+        [
+            "r4zbW3owX9n",
+            "PekKUkKHAzY",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "wNqJp8oRIcF",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "fiRkU6gEjLz",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "vA4NcHxfMBq",
+            "1"
+        ],
+        [
+            "r4zbW3owX9n",
+            "ul0y9diGujK",
+            "1"
+        ],
+        [
+            "r4zbW3owX9n",
+            "am530wpaGvr",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "YCKiBAp8QAg",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "gwVYinjBAe9",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "zphK9WV8JB4",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "cPtvxaZqXIH",
+            "4"
+        ],
+        [
+            "r4zbW3owX9n",
+            "umc2n1Z4wNv",
+            "1"
+        ],
+        [
+            "r4zbW3owX9n",
+            "fyEoGEPERdI",
+            "1"
+        ]
+    ],
+    "height": 28,
+    "headerWidth": 3
+}

@@ -2,7 +2,7 @@ context("Indicator code tests")
 
 test_that("We can  pass valid indicator codes", {
   d <- list()
-  d$info$cop_year <- "2021"
+  d$info$cop_year <- "2024"
   d$info$tool <- "Data Pack"
   d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE
@@ -15,7 +15,7 @@ test_that("We can  pass valid indicator codes", {
 
 test_that("We can flag invvalid indicator codes", {
   d <- list()
-  d$info$cop_year <- "2021"
+  d$info$cop_year <- "2024"
   d$info$tool <- "Data Pack"
   d$info$messages <- MessageQueue()
   d$info$has_error <- FALSE

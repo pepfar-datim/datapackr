@@ -1,9 +1,10 @@
 context("test-unPackSheets")
 
-
+# Mon May 20 16:54:17 2024 ------------------------------
+#need to update the xlsx found below touch base with Jason if needed
 test_that("Can load sheets if empty ...", {
 
-  d  <- loadDataPack(submission_path = test_sheet("COP22_Data_Pack_Template_minimal.xlsx"),
+  d  <- loadDataPack(submission_path = test_sheet("COP24_Data_Pack_Template_minimal.xlsx"),
                      tool = "Data Pack",
                      country_uids = NULL,
                      cop_year = NULL,
@@ -14,14 +15,14 @@ test_that("Can load sheets if empty ...", {
   d <- unPackSheets(d)
   # when d$sheets is explicitly NULL, unPackSheets should call
   # loadSheets and therefore fix the NULL value
-  testthat::expect_equal(length(d$sheets), 17)
+  testthat::expect_equal(length(d$sheets), 16) #Changed from 17
 
 })
 
 test_that("Can test sheets are valid...", {
 
   d <- list()
-  d$info$cop_year <- 2022
+  d$info$cop_year <- 2024
   d$info$tool <- "Data Pack"
 
   d$info$schema <-

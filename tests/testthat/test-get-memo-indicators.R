@@ -11,7 +11,7 @@ with_mock_api({
 
 with_mock_api({
   test_that("We can get a data frame of memo indicators", {
-    inds <- datapackr::getMemoIndicators("2022", d2_session = training)
+    inds <- datapackr::getMemoIndicators("2024", d2_session = training)
     expect_type(inds, "list")
     expect_setequal(names(inds), c("id", "name", "numerator", "denominator"))
   })
@@ -20,9 +20,9 @@ with_mock_api({
 
 with_mock_api({
   test_that("We can fetch existing prioritizations", {
-    cop_year <- 2021
+    cop_year <- 2024
     psnus <- getValidOrgUnits(cop_year) %>% dplyr::filter(country_name == "Lesotho") %>% dplyr::pull(uid)
-    prio_table <- fetchPrioritizationTable(psnus = psnus, cop_year = "2021", d2_session = training)
+    prio_table <- fetchPrioritizationTable(psnus = psnus, cop_year = "2024", d2_session = training)
     expect_equal(class(prio_table), "data.frame")
     expect_setequal(names(prio_table), c("orgUnit", "value"))
     expect_equal(typeof(prio_table$orgUnit), "character")

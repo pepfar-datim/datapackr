@@ -7,7 +7,6 @@
 createKeychainInfo(
   submission_path = NULL,
   tool = NULL,
-  season = NULL,
   country_uids = NULL,
   cop_year = NULL,
   d2_session = NULL
@@ -18,8 +17,6 @@ createKeychainInfo(
 
 \item{tool}{Type of tool this function will create or interact with. Either
 \code{OPU Data Pack} or \code{Data Pack}}
-
-\item{season}{Either \code{COP} or \code{OPU}.}
 
 \item{country_uids}{Unique IDs for countries to include in the Data Pack.
 For full list of these IDs, see \code{datapackr::valid_OrgUnits}.}

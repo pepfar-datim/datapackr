@@ -6,7 +6,6 @@
 \alias{check_PSNUs}
 \alias{check_cop_year}
 \alias{check_tool}
-\alias{check_season}
 \alias{check_schema}
 \alias{checkDataPackName}
 \alias{checkTemplatePath}
@@ -23,15 +22,13 @@ check_PSNUs(PSNUs = NULL, country_uids = NULL, cop_year = NULL)
 
 check_cop_year(cop_year, tool)
 
-check_tool(tool, season, cop_year)
+check_tool(tool, cop_year)
 
-check_season(season, tool)
-
-check_schema(schema, cop_year, tool, season)
+check_schema(schema, cop_year, tool)
 
 checkDataPackName(datapack_name, country_uids, cop_year)
 
-checkTemplatePath(template_path, cop_year, tool, season)
+checkTemplatePath(template_path, cop_year, tool)
 
 checkWB(
   wb = NULL,
@@ -60,7 +57,6 @@ check_params(
   PSNUs,
   cop_year,
   tool,
-  season,
   schema,
   datapack_name,
   template_path,
@@ -87,8 +83,6 @@ FY22 targets = COP21.}
 
 \item{tool}{Type of tool this function will create or interact with. Either
 \code{OPU Data Pack} or \code{Data Pack}}
-
-\item{season}{Either \code{COP} or \code{OPU}.}
 
 \item{schema}{Which datapackr schema to use in guiding this function. If left
 \code{NULL} will select the default based on \code{cop_year} and \code{tool}.}
@@ -133,7 +127,6 @@ value/object for each non-missing parameter supplied.
 \item \code{check_PSNUs}: Dataframe of valid \code{PSNUs} (uid and names).
 \item \code{check_cop_year}: Valid \code{cop_year} as numeric value.
 \item \code{check_tool}: Valid \code{tool} type as string.
-\item \code{check_season}: Valid \code{season} as string.
 \item \code{check_schema}: Valid \code{schema} as dataframe.
 \item \code{checkDataPackName}: Valid \code{datapack_name} as string.
 \item \code{checkTemplatePath}: Valid \code{template_path} as string.

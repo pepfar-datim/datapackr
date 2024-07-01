@@ -41,9 +41,7 @@ test_that("Testing swapping of columns...", {
 test_that("Get a map of data elements and category options", {
   expect_error(getMapDataPack_DATIM_DEs_COCs("foo"))
   expect_error(getMapDataPack_DATIM_DEs_COCs(1776))
-  expect_identical(getMapDataPack_DATIM_DEs_COCs(2021), datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
-  expect_identical(getMapDataPack_DATIM_DEs_COCs(2022), datapackr::cop22_map_DataPack_DATIM_DEs_COCs)
-  expect_identical(getMapDataPack_DATIM_DEs_COCs("2021"), datapackr::cop21_map_DataPack_DATIM_DEs_COCs)
+
 
   de_map_names <- c("indicator_code", "col_type", "value_type",
                     "categoryoption_specified", "valid_ages.name",
@@ -56,13 +54,15 @@ test_that("Get a map of data elements and category options", {
                     "support_type", "numerator_denominator")
 
 
-  de_map <- getMapDataPack_DATIM_DEs_COCs(2022)
-  expect_named(de_map, de_map_names)
-  de_map <- getMapDataPack_DATIM_DEs_COCs(2021)
-  expect_named(de_map, de_map_names)
   de_map <- getMapDataPack_DATIM_DEs_COCs(2023)
   expect_named(de_map, de_map_names)
+  de_map <- getMapDataPack_DATIM_DEs_COCs(2024)
+  expect_named(de_map, de_map_names)
+  expect_named(datapackr::cop23_map_DataPack_DATIM_DEs_COCs, de_map_names)
+  expect_named(datapackr::cop24_map_DataPack_DATIM_DEs_COCs, de_map_names)
 
+  #Be sure that there are no T2 indicator codes in the map
+  expect_true(!any(grepl("^T2", de_map$indicator_code)))
 
   expect_true(is.data.frame(de_map))
 
@@ -97,15 +97,15 @@ test_that("Testing can merge data packs...", {
   d1$datim$UndistributedMER <-
     tibble::tribble(
       ~dataElement, ~period, ~orgUnit, ~categoryOptionCombo, ~attributeOptionCombo, ~value,
-      "agoURWZyPpn", "2022Oct", "ARBd3LRy8K3", "BYmlmGMcCWx", "HllvX50cXC0", 1.3,
-      "agoURWZyPpn", "2022Oct", "ARBd3LRy8K3", "u88hOHhmLuF", "HllvX50cXC0", 1
+      "agoURWZyPpn", "2024Oct", "ARBd3LRy8K3", "BYmlmGMcCWx", "HllvX50cXC0", 1.3,
+      "agoURWZyPpn", "2024Oct", "ARBd3LRy8K3", "u88hOHhmLuF", "HllvX50cXC0", 1
     )
 
   d1$datim$prioritizations <-
     tibble::tribble(
       ~dataElement, ~period, ~orgUnit, ~categoryOptionCombo, ~attributeOptionCombo, ~value,
-      "r4zbW3owX9n", "2022Oct", "aBzwAKpuSwJ", "HllvX50cXC0", "HllvX50cXC0", 7,
-      "r4zbW3owX9n", "2022Oct", "aj1PTnemHwu", "HllvX50cXC0", "HllvX50cXC0", 7
+      "r4zbW3owX9n", "2024Oct", "aBzwAKpuSwJ", "HllvX50cXC0", "HllvX50cXC0", 7,
+      "r4zbW3owX9n", "2024Oct", "aj1PTnemHwu", "HllvX50cXC0", "HllvX50cXC0", 7
     )
 
   d1$data$MER <-
@@ -154,15 +154,15 @@ test_that("Testing can merge data packs...", {
   d2$datim$UndistributedMER <-
     tibble::tribble(
       ~dataElement, ~period, ~orgUnit, ~categoryOptionCombo, ~attributeOptionCombo, ~value,
-      "agoURWZyPpn", "2022Oct", "ARBd3LRy8K3", "BYmlmGMcCWx", "HllvX50cXC0", 1,
-      "agoURWZyPpn", "2022Oct", "ARBd3LRy8K3", "u88hOHhmLuF", "HllvX50cXC0", 1
+      "agoURWZyPpn", "2024Oct", "ARBd3LRy8K3", "BYmlmGMcCWx", "HllvX50cXC0", 1,
+      "agoURWZyPpn", "2024Oct", "ARBd3LRy8K3", "u88hOHhmLuF", "HllvX50cXC0", 1
     )
 
   d2$datim$prioritizations <-
     tibble::tribble(
       ~dataElement, ~period, ~orgUnit, ~categoryOptionCombo, ~attributeOptionCombo, ~value,
-      "r4zbW3owX9n", "2022Oct", "aBzwAKpuSwJ", "HllvX50cXC0", "HllvX50cXC0", 7,
-      "r4zbW3owX9n", "2022Oct", "aj1PTnemHwu", "HllvX50cXC0", "HllvX50cXC0", 7
+      "r4zbW3owX9n", "2024Oct", "aBzwAKpuSwJ", "HllvX50cXC0", "HllvX50cXC0", 7,
+      "r4zbW3owX9n", "2024Oct", "aj1PTnemHwu", "HllvX50cXC0", "HllvX50cXC0", 7
     )
 
   d2$data$MER <-
@@ -244,12 +244,12 @@ test_that("Can calculate a max by row for a data frame", {
 test_that("Can get an operating unit from country UIDs", {
   #Use Angola's UID
   expect_warning(getOUFromCountryUIDs("XOivy2uDpMF"))
-  expect_error(getOUFromCountryUIDs(cop_year = 2023))
-  expect_error(getOUFromCountryUIDs("foo", 2023))
+  expect_error(getOUFromCountryUIDs(cop_year = 2024))
+  expect_error(getOUFromCountryUIDs("foo", 2024))
   expect_error(getOUFromCountryUIDs("XOivy2uDpMF", 1776))
-  expect_error(getOUFromCountryUIDs("XOivy2uDpMF", c(2022, 2023)))
+  expect_error(getOUFromCountryUIDs("XOivy2uDpMF", c(2023, 2024)))
 
-  df <- getOUFromCountryUIDs("XOivy2uDpMF", 2023)
+  df <- getOUFromCountryUIDs("XOivy2uDpMF", 2024)
   expect_named(df, c("ou", "ou_uid"))
   expect_true(NROW(df) == 1)
   expect_true(is_uidish(df$ou_uid))
@@ -259,6 +259,6 @@ test_that("Can get an operating unit from country UIDs", {
   expect_equal(df$ou, "Asia Region")
 
   #Kazakhstan and Angola
-  expect_error(getOUFromCountryUIDs(country_uids = c("XOivy2uDpMF", "vm58KTm9wvy"), cop_year = 2023))
+  expect_error(getOUFromCountryUIDs(country_uids = c("XOivy2uDpMF", "vm58KTm9wvy"), cop_year = 2024))
 
 })

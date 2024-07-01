@@ -281,8 +281,7 @@ checkSchema_Formulas <- function(schema) {
 checkSchema <- function(schema,
                         template_path,
                         cop_year,
-                        tool,
-                        season) {
+                        tool) {
 
   stopifnot("Package \"waldo\" must be installed to use this function." =
               requireNamespace("waldo", quietly = TRUE))
@@ -297,7 +296,6 @@ checkSchema <- function(schema,
   # Validate parameters ####
   params <- check_params(cop_year = cop_year %missing% NULL,
                          tool = tool %missing% NULL,
-                         season = season %missing% NULL,
                          schema = schema %missing% NULL,
                          template_path = template_path %missing% NULL)
 
@@ -400,7 +398,7 @@ unPackSchema <- function(template_path = NULL,
   # rm(params, p)
 
   if (tool %in% c("OPU Data Pack Template", "OPU Data Pack", "PSNUxIM", "PSNUxIM Template")
-        && cop_year %in% c(2021, 2022, 2023, 2024)) {
+        && cop_year %in% c(2023, 2024)) {
     include_blank_cells <-  TRUE
   } else {
     include_blank_cells <-  FALSE
@@ -485,16 +483,6 @@ unPackSchema <- function(template_path = NULL,
   }
 
   if (tool %in% c("Data Pack Template", "Data Pack")) {
-
-    # if (cop_year == 2021) {
-    #   map_datapack_cogs <- datapackr::datapack_cogs$COP21
-    # } else if (cop_year %in% c(2022)) {
-    #   map_datapack_cogs <- datapackr::datapack_cogs$COP22
-    # } else if (cop_year %in% c(2023)) {
-    #   map_datapack_cogs <- datapackr::datapack_cogs$COP23
-    # } else {
-    #   stop("Can't find categoryOptionGroups for that cop_year and tool.")
-    # }
 
     cop_year_select <- gsub("^20", "COP", as.character(cop_year))
     map_datapack_cogs <- datapackr::datapack_cogs %>%

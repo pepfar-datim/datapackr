@@ -7,7 +7,6 @@
 createDataPack(
   datapack_name = NULL,
   country_uids,
-  season,
   template_path = NULL,
   cop_year = NULL,
   tool = NULL,
@@ -20,8 +19,6 @@ createDataPack(
 
 \item{country_uids}{Unique IDs for countries to include in the Data Pack.
 For full list of these IDs, see \code{datapackr::valid_OrgUnits}.}
-
-\item{season}{Either \code{COP} or \code{OPU}.}
 
 \item{template_path}{Local filepath to Data Pack template Excel (XLSX) file.
 This file MUST NOT have any data validation formats present. If left

@@ -7,7 +7,7 @@ test_that("Can pack a datapack", {
     #  skip("Need to supply a valid model here")
       # For Generating Individual Data Packs ####
       generation_list <- c("Eswatini")
-      cop_year <- 2022
+      cop_year <- 2024
 
       pick <- datapackr::COP21_datapacks_countries %>%
         dplyr::filter(datapack_name %in% generation_list) %>%

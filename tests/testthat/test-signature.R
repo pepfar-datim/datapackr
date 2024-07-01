@@ -14,7 +14,6 @@ test_that("Can generate a key chain from a Data Pack Template", {
         "tool",
         "country_uids",
         "cop_year",
-        "season",
         "messages",
         "has_error",
         "schema",
@@ -49,9 +48,11 @@ test_that("Can generate a key chain from a Data Pack Template", {
    expect_false(d$info$needs_psnuxim)
 })
 
-test_that("Can get the type and COP year of tool of a COP22 Data Pack", {
+# Mon May 20 17:01:13 2024 ------------------------------
+# Need to update the xlsx below to 2024
+test_that("Can get the type and COP year of tool of a COP24 Data Pack", {
 
-   d <- datapackr::createKeychainInfo(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"))
+   d <- datapackr::createKeychainInfo(submission_path = test_sheet("COP24_DataPack_unPackingChecks.xlsx"))
    expect_equal(d$info$tool, "Data Pack")
-   expect_equal(d$info$cop_year, 2022)
+   expect_equal(d$info$cop_year, 2024)
 })

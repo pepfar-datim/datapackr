@@ -1,27 +1,8 @@
-context("test-unPackingChecks")
-
-# test_that("Can read xslx and save as rds for later user", {
-#
-#   file <- "COP22_DataPack_unPackingChecks.xlsx"
-#
-#   d <- loadDataPack(submission_path = test_sheet(file),
-#                     tool = "Data Pack",
-#                     country_uids = NULL,
-#                     cop_year = NULL,
-#                     load_wb = FALSE,
-#                     load_sheets = TRUE,
-#                     d2_session = training)
-#
-#   saveRDS(d, paste0(gsub(".xlsx", "", test_sheet(file)), ".rds"))
-#   rm(d)
-#
-# })
-
 test_that("Can detect invalid comment types ...", {
 
   #Note: A warning is thrown here on the command line  for "invalid parameter"
   # Does not have any impact on the parsing, but documenting it nonetheless.
-  expect_warning(d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
+  expect_warning(d <- loadDataPack(submission_path = test_sheet("COP24_DataPack_unPackingChecks.xlsx"),
                     tool = "Data Pack",
                     country_uids = NULL,
                     cop_year = NULL,
@@ -49,7 +30,7 @@ test_that("Can detect invalid comment types ...", {
 })
 
 test_that("Can detect external links in a file ...", {
-  expect_warning(d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
+  expect_warning(d <- loadDataPack(submission_path = test_sheet("COP24_DataPack_unPackingChecks.xlsx"),
                     tool = "Data Pack",
                     country_uids = NULL,
                     cop_year = NULL,
@@ -86,11 +67,11 @@ test_that("Can check Tool structure...", {
   expect_true(grepl("MISSING SHEETS", d$info$messages$message))
 })
 
-# can check sheet data ----
+skip("DP-1322: Need an unpacking artifact to test with for COP24")
 test_that("Can check sheet data...", {
 
 
-    d <- loadDataPack(submission_path = test_sheet("COP22_DataPack_unPackingChecks.xlsx"),
+    d <- loadDataPack(submission_path = test_sheet("COP24_DataPack_unPackingChecks.xlsx"),
                                            tool = "Data Pack",
                                            country_uids = NULL,
                                            cop_year = NULL,
@@ -141,6 +122,8 @@ test_that("Can check sheet data...", {
 })
 
 
+
+
 # check decimal values -----
 test_that("Can check decimal values", {
 
@@ -163,7 +146,7 @@ test_that("Can check decimal values", {
     dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
 
 
-  d$info$cop_year <- 2022
+  d$info$cop_year <- 2024
   d$sheets$Prioritization <-
     tribble(
       ~PSNU, ~IMPATT.PRIORITY_SNU.T,
@@ -213,7 +196,7 @@ test_that("Can check non numeric values", {
     dplyr::mutate(valid_kps = I(list(data.frame(id = NA, name = NA))))
 
 
-  d$info$cop_year <- 2022
+  d$info$cop_year <- 2024
   d$sheets$Prioritization <-
     tribble(
       ~PSNU, ~IMPATT.PRIORITY_SNU.T,
@@ -274,7 +257,7 @@ test_that("Can check negative values", {
       "Lilongwe District [#SNU] [ScR9iFKAasW]", "20"
     )
 
-  d$info$cop_year <- 2022
+  d$info$cop_year <- 2024
   # test no errors/warnings
   res <- checkNegativeValues(d, sheets = test_sheets)
   expect_null(res$result)
@@ -528,7 +511,7 @@ test_that("Can check invalid org units", {
       "Female", "_Military Malawi [#Military] [PQZgU9dagaH]|05-09|Female", NA
     )
 
-  d$info$cop_year <- 2022
+  d$info$cop_year <- 2024
   # test no errors/warnings
   res <- checkInvalidOrgUnits(d = d, sheets = test_sheets)
   expect_null(res$result)
@@ -568,7 +551,7 @@ test_that("Can check invalid prioritizations", {
       "_Military Malawi", "_Military Malawi [#Military] [PQZgU9dagaH]", NA, "M", "Military",
       "Central Region", "Lilongwe District [#SNU] [ScR9iFKAasW]", "4", "4", "Sustained"
     )
-  d$info$cop_year <- 2022
+  d$info$cop_year <- 2024
   d$info$operating_unit$ou_uid <- "lZsCb6y0KDX"
 
   # test no errors/warnings
@@ -670,8 +653,8 @@ test_that("Can check formulas", {
 
   d <- list()
   d$info$tool <- "Data Pack"
-  d$info$cop_year <- "2022"
-  d$keychain$submission_path <- test_sheet("COP22_DataPack_unPackingChecks.xlsx")
+  d$info$cop_year <- "2024"
+  d$keychain$submission_path <- test_sheet("COP24_DataPack_unPackingChecks.xlsx")
 
   test_sheets <- c(
     "Prioritization"
@@ -715,7 +698,7 @@ test_that("Can check disaggs", {
   #skip("Defunct disaggs checks needs to be fixed")
   # create minimal schema data
   d <- list()
-  d$info$cop_year <- 2022
+  d$info$cop_year <- 2024
   d$info$schema <-
     tribble(
       ~sheet_num, ~sheet_name, ~col, ~indicator_code, ~col_type, ~value_type,
@@ -770,7 +753,7 @@ test_that("Can check disaggs", {
 test_that("Can check index header columns exist", {
 
   d <- list()
-  d$info$schema <- datapackr::cop22_data_pack_schema
+  d$info$schema <- datapackr::cop24_data_pack_schema
   d$info$messages <- MessageQueue()
 
   #Get the HTS sheet headers. This one should pass

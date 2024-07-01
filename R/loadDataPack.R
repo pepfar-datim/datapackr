@@ -16,7 +16,6 @@
 loadDataPack <- function(submission_path = NULL,
                          tool = NULL,
                          country_uids = NULL,
-                         season = NULL,
                          cop_year = NULL,
                          load_wb = FALSE,
                          load_sheets = FALSE,
@@ -27,7 +26,6 @@ loadDataPack <- function(submission_path = NULL,
   d <- createKeychainInfo(submission_path = submission_path,
                           tool = tool,
                           country_uids = country_uids,
-                          season = season,
                           cop_year = cop_year,
                           d2_session = d2_session)
 

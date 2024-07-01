@@ -15,7 +15,6 @@ test_that("Can write a home tab", {
       "tool",
       "country_uids",
       "cop_year",
-      "season",
       "messages",
       "has_error",
       "schema",

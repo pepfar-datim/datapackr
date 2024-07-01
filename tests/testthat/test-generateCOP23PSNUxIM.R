@@ -51,14 +51,44 @@ with_mock_api({
 
     out_file <- paste0(out_dir, "/", basename(d$info$output_file))
 
-    #Unpack this tool which has been "opened" in libreoffice
-    d_opened <- unPackTool(submission_path = out_file, d2_session = training)
 
-    expect_setequal(names(d_opened), c("keychain", "info", "data", "tests", "datim", "sheets"))
+        #Unpack this tool which has been "opened" in libreoffice
+        d_psnuxim <- unPackTool(submission_path = out_file, d2_session = training)
+        expect_identical(d$info$datapack_name, d_psnuxim$info$datapack_name)
+        expect_setequal(names(d_psnuxim), c("keychain", "info", "data", "tests", "datim", "sheets"))
+        expect_setequal(names(d_psnuxim$datim$OPU), c("dataElement", "period",
+                                                     "orgUnit", "categoryOptionCombo", "attributeOptionCombo", "value"))
 
+        #Compare with the original data from the TST tool
+        test_data_analytics <- d_psnuxim %>%
+          purrr::pluck("data") %>%
+          purrr::pluck("analytics") %>%
+          dplyr::select(dataElement = dataelement_id,
+                        period = fiscal_year,
+                        orgUnit = psnu_uid,
+                        categoryOptionCombo = categoryoptioncombo_id,
+                        attributeOptionCombo = mechanism_code,
+                        target_value) %>%
+          dplyr::mutate(target_value = as.numeric(target_value),
+                        period = paste0(period - 1, "Oct")) %>%
+          dplyr::full_join(
+            tibble::as_tibble(d$data$snuxim_model_data),
+            by = c(
+              "dataElement",
+              "period",
+              "orgUnit",
+              "categoryOptionCombo",
+              "attributeOptionCombo"
+            )
+          ) %>%
+          dplyr::filter(attributeOptionCombo != "default") %>%  #Filter AGYW_PREV data
+          dplyr::mutate(diff = dplyr::near(as.numeric(target_value), as.numeric(value), tol = 1.0)) %>%
+          dplyr::filter(value != 0, target_value != 0) %>%
+          dplyr::filter(!diff | is.na(diff))
 
+        expect_true(NROW(test_data_analytics) == 0, "PSNUxIM data does not match the model data")
 
-
+        unlink(output_folder, recursive = TRUE)
 
   })
 })
