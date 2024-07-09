@@ -104,7 +104,7 @@ checkPSNUData  <-  function(d) {
 
     warning_msg <- paste("WARNING: ", sum(!d$tests$vr_rules_check$Valid),
                          "validation rule issues found in",
-                         d$info$datapack_name, "DataPack.\n")
+                         d$info$datapack_name, d$info$tool)
 
     d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
   }
