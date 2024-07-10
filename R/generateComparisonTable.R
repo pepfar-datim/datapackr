@@ -34,10 +34,9 @@ generateComparisonTable <- function(d) {
       dplyr::mutate("Identical" = dplyr::near(Current, Proposed, tol = 1e-5),
                     "Diff" = Proposed - Current,
                     "Percent diff" = round(Diff / Proposed * 100, digits = 1)) %>%
-      dplyr::filter(!Identical) %>%
       tidyr::pivot_longer(cols = c(Current, Proposed, Diff, `Percent diff`), names_to = "Data Type")  %>%
-      dplyr::mutate(`Data Type` = factor(`Data Type`, levels = c("Proposed", "Current", "Diff", "Percent diff"))) %>%
-      dplyr::select(-psnu_uid, -Identical)
+      dplyr::mutate(`Data Type` = factor(`Data Type`, levels = c("Proposed", "Current","Identical", "Diff", "Percent diff"))) %>%
+      dplyr::select(-psnu_uid)
 
   }
 
