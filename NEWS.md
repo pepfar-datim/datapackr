@@ -1,7 +1,12 @@
-# datapackr 7.6.0
+# datapackr 7.6.1
 ## New features
-* Sunset COP21 and COP22
-* Added original versions of the COP25 templates
+*
+
+## Bug fixes
+* Updated dataset_levels to reflect org hierarchy change
+
+## Minor improvements and fixes
+* 
 
 ## Bug fixes
 * reenabled droping invalid disaggs from the year 2 sheet
