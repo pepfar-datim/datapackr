@@ -20,17 +20,18 @@ checkMechanisms <- function(d,
 
   period_info <- datimvalidation::getPeriodFromISO(paste0(d$info$cop_year, "Oct"))
 
-
-  mechs_datim <- datapackr::getMechanismView(d2_session = d2_session,
+  mechs_datim <- datapackr::getMechanismView(d2_session = d2_default_session,
                                              update_stale_cache = TRUE,
                                              cached_mechs_path = cached_mechs_path) %>%
+    # Fri Jul 19 15:04:49 2024 Due to Regionalization shifts between cop years affecting OPUs.
+    { if (d$info$operating_unit$ou == "West Africa Region")
+      dplyr::mutate(., ou = replace(ou, ou=="West Africa Region 1"|ou=="West Africa Region 2","West Africa Region")) else . } %>%
     dplyr::filter(ou == d$info$operating_unit$ou) %>%
     dplyr::filter(!is.na(startdate)) %>%
     dplyr::filter(!is.na(enddate)) %>%
     dplyr::filter(startdate <= period_info$startDate) %>%
     dplyr::filter(enddate >= period_info$endDate) %>%
     dplyr::pull(mechanism_code)
-
 
   #Allow for the default mechanism
   mechs_datim <- append("default", mechs_datim)
