@@ -20,7 +20,7 @@ checkMechanisms <- function(d,
 
   period_info <- datimvalidation::getPeriodFromISO(paste0(d$info$cop_year, "Oct"))
 
-  mechs_datim <- datapackr::getMechanismView(d2_session = d2_default_session,
+  mechs_datim <- datapackr::getMechanismView(d2_session = d2_session,
                                              update_stale_cache = TRUE,
                                              cached_mechs_path = cached_mechs_path) %>%
     # Fri Jul 19 15:04:49 2024 Due to Regionalization shifts between cop years affecting OPUs.
