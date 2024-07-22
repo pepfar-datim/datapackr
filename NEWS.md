@@ -3,6 +3,16 @@
 *
 
 ## Bug fixes
+* Updated `checkMechanisms` to handle shifts in rationalization as it relates to 23 OPU's
+
+## Minor improvements and fixes
+* 
+
+# datapackr 7.6.1
+## New features
+*
+
+## Bug fixes
 * Updated dataset_levels to reflect org hierarchy change
 
 ## Minor improvements and fixes
