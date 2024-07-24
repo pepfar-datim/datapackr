@@ -1,3 +1,13 @@
+# datapackr 7.7.0
+## New features
+*
+
+## Bug fixes
+* 
+
+## Minor improvements and fixes
+* 
+
 # datapackr 7.6.2
 ## New features
 *
