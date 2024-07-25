@@ -25,7 +25,8 @@ getValidOrgUnits <- function(cop_year = NULL) {
 
   switch(as.character(cop_year),
          "2023" = valid_OrgUnits,
-         "2024" = valid_OrgUnits_2024)
+         "2024" = valid_OrgUnits_2024,
+         "2025" = valid_OrgUnits_2025)
 
 }
 

@@ -227,13 +227,14 @@ pick_schema <- function(cop_year, tool) {
     schema <- switch(as.character(cop_year),
                      "2023" =  cop23_data_pack_schema,
                      "2024" =  cop24_data_pack_schema,
-                     "2025" = cop25_data_pack_schema,
+                     "2025" =  cop25_data_pack_schema,
                      stop("Data Pack schema not available for the COP year provided."))
 
   } else if (tool %in% c("PSNUxIM", "PSNUxIM Template")) {
     schema <- switch(as.character(cop_year),
                      "2023" =  cop23_psnuxim_schema,
                      "2024" =  cop24_psnuxim_schema,
+                     "2025" =  cop25_psnuxim_schema,
                      stop("PSNUxIM schema not available for the COP year provided."))
   } else {
     stop("No schema could be found for the combination of tool and COP year provided.")
