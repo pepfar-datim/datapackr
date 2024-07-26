@@ -45,7 +45,6 @@ packTool <- function(model_data = NULL,
 
   rm(params, p)
 
-
   # Set global numeric format ####
   options("openxlsx.numFmt" = "#,##0")
 
