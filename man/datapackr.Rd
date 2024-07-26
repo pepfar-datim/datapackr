@@ -2,7 +2,6 @@
 % Please edit documentation in R/datapackr.R
 \docType{package}
 \name{datapackr}
-\alias{-package}
 \alias{datapackr}
 \title{Data Pack on R}
 \description{
