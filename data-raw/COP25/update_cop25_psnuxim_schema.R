@@ -21,6 +21,6 @@ checkSchema(schema = cop25_psnuxim_schema,
             cop_year = 2025,
             tool = "PSNUxIM")
 
-usethis::use_data(cop24_psnuxim_schema, overwrite = TRUE, compress = "xz")
+usethis::use_data(cop25_psnuxim_schema, overwrite = TRUE, compress = "xz")
 
 ## Rebuild package again. (Cmd+Shift+B)
