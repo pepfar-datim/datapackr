@@ -19,9 +19,9 @@ with_mock_api({
 
     #Suppress console output
 # Tue Jul 30 13:11:27 2024 - Need to update when time arrives.
-    spectrum_data <- readRDS(test_sheet("COP24_spectrum_data_random_MW.rds"))
+    spectrum_data <- readRDS(test_sheet("COP25_spectrum_data_random_MW.rds"))
 
-    d <- packTool(model_data_path = test_sheet("COP24_datapack_model_data_random_MW.rds"),
+    d <- packTool(model_data_path = test_sheet("COP25_datapack_model_data_random_MW.rds"),
                   tool = "Data Pack",
                   datapack_name = pick$datapack_name[1],
                   country_uids = unlist(pick$country_uids[1]),
