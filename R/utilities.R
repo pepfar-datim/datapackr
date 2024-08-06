@@ -311,6 +311,7 @@ getCOPDatasetUids <-  function(cop_year, datastreams) {
 
   #List of COP Datasets by year
   #Found here https://www.datim.org/dhis-web-maintenance/index.html#/list/dataSetSection/dataSet
+  #mer_targets NEEDS UPDATED BEFORE GO LIVE of generation
   cop_datasets <-
     list(
       "2025" = list(# NOT the COP25 versions NEED To update when released
