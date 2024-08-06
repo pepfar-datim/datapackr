@@ -2,6 +2,7 @@
 
 # loginToDATIM(Sys.getenv("PROD_CREDS"), d2_session_name = "prod")
 secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
+loginToDATIM(secrets)
 
 fetchOrgunitLevels <- function(cop_year, d2_session) {
   ou_levels <- datimutils::getDataStoreKey("dataSetAssignments", "orgUnitLevels", d2_session = d2_session)
@@ -26,18 +27,20 @@ fetchOrgunitLevels <- function(cop_year, d2_session) {
 #Retrieve the list of valid orgunits for the correct years
 ous <- valid_OrgUnits %>% dplyr::select(country_name, ou_uid, country_uid) %>% dplyr::distinct()
 ous_24 <-valid_OrgUnits_2024 %>% dplyr::select(country_name, ou_uid, country_uid) %>% dplyr::distinct()
+ous_25 <-valid_OrgUnits_2024 %>% dplyr::select(country_name, ou_uid, country_uid) %>% dplyr::distinct()
 
 #Capture the previous dataset levels by looking at what is currently in the save datasetlevels.rda
 cop23_ou_levels <- dataset_levels %>%  dplyr::filter(cop_year == 2023)
+cop24_ou_levels <- dataset_levels %>%  dplyr::filter(cop_year == 2024)
 
 #Capture the current dataset levels by fetching from Datim and sorting by the valid orgunits above
-cop24_ou_levels <- fetchOrgunitLevels(2024, d2_default_session) %>%
+cop25_ou_levels <- fetchOrgunitLevels(2025, d2_default_session) %>%
   dplyr::mutate(country_name = ifelse(country_name == "", ou, country_name),
                 iso4 = ifelse(iso4 == "", iso3, iso4)) %>%
-  dplyr::left_join(ous_24, by = "country_name")
+  dplyr::left_join(ous_25, by = "country_name")
 
 #Combine the previous two dataframes into one for saving
-dataset_levels <- rbind(cop23_ou_levels, cop24_ou_levels)
+dataset_levels <- rbind(cop23_ou_levels, cop24_ou_levels, cop25_ou_levels)
 
 #Overwrite current dataset_levels.rda for the package
 usethis::use_data(dataset_levels,  compress = "xz", overwrite = TRUE)
