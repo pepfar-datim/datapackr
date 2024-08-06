@@ -263,5 +263,32 @@ with_mock_api({
     expect_setequal(unique(d$memo$comparison$`Data Type`), c("Current", "Proposed", "Percent diff", "Diff"))
     expect_type(d$memo$comparison$value, "double")
 
+    #Test generating expanded comparison table
+    d <- generateComparisonTable(d, expanded = TRUE)
+    expect_type(d$memo$comparison, "list")
+    expect_true(NROW(d$memo$comparison) > 0)
+    expect_named(
+      d$memo$comparison,
+      c(
+        "Mechanism",
+        "Indicator",
+        "Age",
+        "prioritization",
+        "Partner",
+        "Agency",
+        "ou",
+        "country_name",
+        "snu1",
+        "psnu",
+        "Data Type",
+        "value",
+        "Identical"
+      ), ignore.order = TRUE
+    )
+
+    expect_setequal(unique(d$memo$comparison$`Data Type`), c("Current", "Proposed", "Percent diff", "Diff"))
+    expect_type(d$memo$comparison$value, "double")
+
   })
 })
+# c("Proposed", "Current", "Identical", "Diff", "Percent diff")
