@@ -34,15 +34,15 @@ generateComparisonTable <- function(d, expanded=F) {
       dplyr::mutate("Identical" = dplyr::near(Current, Proposed, tol = 1e-5),
                     "Diff" = Proposed - Current,
                     "Percent diff" = round(Diff / Proposed * 100, digits = 1)) %>%
-      { if (expanded=T)
+      { if (expanded == T)
         dplyr::filter(!Identical) else .
       } %>%
       tidyr::pivot_longer(cols = c(Current, Proposed, Diff, `Percent diff`), names_to = "Data Type")  %>%
       dplyr::mutate(`Data Type` = factor(`Data Type`,
-                                         levels = ifelse(expanded=T,
+                                         levels = ifelse(expanded == T,
                                                          c("Proposed", "Current","Identical", "Diff", "Percent diff"),
                                                          c("Proposed", "Current", "Diff", "Percent diff")))) %>%
-      { if (expanded=T)
+      { if (expanded == T)
         dplyr::select(-psnu_uid) else dplyr::select(-psnu_uid, -Identical)
       }
 
