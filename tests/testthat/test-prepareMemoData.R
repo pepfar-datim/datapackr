@@ -285,10 +285,8 @@ with_mock_api({
         "Identical"
       ), ignore.order = TRUE
     )
-
     expect_setequal(unique(d$memo$comparison$`Data Type`), c("Current", "Proposed", "Percent diff", "Diff"))
     expect_type(d$memo$comparison$value, "double")
 
   })
 })
-# c("Proposed", "Current", "Identical", "Diff", "Percent diff")
