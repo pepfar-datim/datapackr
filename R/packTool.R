@@ -88,7 +88,7 @@ packTool <- function(model_data = NULL,
 
   # Save & Export Workbook ####
   interactive_print("Saving...")
-  if (d$info$cop_year %in% c(2023, 2024) && d$info$tool == "Data Pack") {
+  if (d$info$cop_year %in% c(2023, 2024, 2025) && d$info$tool == "Data Pack") {
     tool_name <- "Target Setting Tool"
   } else {
     tool_name <- d$info$tool
