@@ -18,7 +18,7 @@ getCOPDataFromDATIM <- function(country_uids,
                                                     inherits = TRUE)) {
 
 
-  if (!cop_year %in% c(2023:2024)) {
+  if (!cop_year %in% c(2023:2025)) {
 
     stop("The COP year provided is not supported by the internal function getCOPDataFromDATIM")
     ### NOTE for COP23 some special handling of SUBNAT data for FY23 like the code below may be
