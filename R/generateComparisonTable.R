@@ -8,7 +8,7 @@
 #'
 #' @return A comparison table
 #'
-generateComparisonTable <- function(d) {
+generateComparisonTable <- function(d, expanded = FALSE) {
 
   if (is.null(d$memo$datapack$by_psnu)) {
     d_datapack <- data.frame("psnu_uid" = character(),
@@ -34,10 +34,20 @@ generateComparisonTable <- function(d) {
       dplyr::mutate("Identical" = dplyr::near(Current, Proposed, tol = 1e-5),
                     "Diff" = Proposed - Current,
                     "Percent diff" = round(Diff / Proposed * 100, digits = 1)) %>%
-      dplyr::filter(!Identical) %>%
+      { if (expanded == FALSE)
+        dplyr::filter(., !Identical) else .
+      } %>%
       tidyr::pivot_longer(cols = c(Current, Proposed, Diff, `Percent diff`), names_to = "Data Type")  %>%
-      dplyr::mutate(`Data Type` = factor(`Data Type`, levels = c("Proposed", "Current", "Diff", "Percent diff"))) %>%
-      dplyr::select(-psnu_uid, -Identical)
+      { if (expanded == TRUE)
+        dplyr::mutate(., `Data Type` = factor(`Data Type`,
+                                              levels = c("Proposed", "Current", "Identical",
+                                                         "Diff", "Percent diff"))) else
+          dplyr::mutate(., `Data Type` = factor(`Data Type`, levels = c("Proposed", "Current", "Diff", "Percent diff")))
+      } %>%
+      { if (expanded == TRUE)
+        dplyr::select(., -psnu_uid) else
+          dplyr::select(., -psnu_uid, -Identical)
+      }
 
   }
 
