@@ -32,10 +32,6 @@ mergeDatapack <- function(d1 = d1, d2 = d2) {
   d1$tests <- lapply(d1$tests, dplyr::tibble)
   d2$tests <- lapply(d2$tests, dplyr::tibble)
 
-  # extract extras in each test list
-  d1$tests <- lapply(d1$tests, dplyr::tibble)
-  d2$tests <- lapply(d2$tests, dplyr::tibble)
-
   #Overwrite the tool column. We need to have
   #definitive information about the tool at this point.
   d1$tests <- purrr::map(d1$tests, dplyr::mutate, tool = d1$info$tool)
@@ -70,7 +66,8 @@ mergeDatapack <- function(d1 = d1, d2 = d2) {
 
   d$info$messages <- appendMessage(d1$info$messages,
                                    d2$info$messages$message,
-                                   d2$info$messages$level)
+                                   d2$info$messages$level,
+                                   d2$info$messages$tool)
 
   d
 }

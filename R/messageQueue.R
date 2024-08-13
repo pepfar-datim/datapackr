@@ -9,10 +9,6 @@
 
 MessageQueue <- function(message = character(), level = character(), tool = character()) {
 
-  # if (missing(tool)) {
-  #   tool <- NA_character_
-  # }
-
   messages <- data.frame(
     message = message,
     level = level,

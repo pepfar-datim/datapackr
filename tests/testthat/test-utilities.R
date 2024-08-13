@@ -148,7 +148,7 @@ test_that("Testing can merge data packs...", {
   # create second data pack ----
   d2 <- list()
   d2$info$datapack_name <- "Ehtiopia"
-  d2$info$tool <- "Data Pack"
+  d2$info$tool <- "PSNUxIM"
   d2$info$messages <- MessageQueue()
   d2$info$has_error <- FALSE
 
@@ -206,15 +206,16 @@ test_that("Testing can merge data packs...", {
   dp_merged <- mergeDatapack(d1, d2)
 
   # test binding
-  testthat::expect_equal(NROW(dp_merged$datim$UndistributedMER), 4)
-  testthat::expect_equal(NROW(dp_merged$datim$prioritizations), 4)
-  testthat::expect_equal(NROW(dp_merged$data$MER), 4)
-  testthat::expect_equal(NROW(dp_merged$data$SUBNAT_IMPATT), 3)
-  testthat::expect_equal(NROW(dp_merged$tests$PSNUxIM_rounding_diffs), 2)
-  testthat::expect_true(
+  expect_equal(NROW(dp_merged$datim$UndistributedMER), 4)
+  expect_equal(NROW(dp_merged$datim$prioritizations), 4)
+  expect_equal(NROW(dp_merged$data$MER), 4)
+  expect_equal(NROW(dp_merged$data$SUBNAT_IMPATT), 3)
+  expect_equal(NROW(dp_merged$tests$PSNUxIM_rounding_diffs), 2)
+  expect_true(
     unique(names(dp_merged$tests) %in% c("PSNUxIM_rounding_diffs", "invalid_psnus", "invalid_mech_headers"))
   )
-  testthat::expect_equal(NROW(dp_merged$info$messages), 2)
+  expect_equal(NROW(dp_merged$info$messages), 2)
+  expect_true(all(dp_merged$messages$message$tool == "Data Pack"))
 
 
   # test error out from different data pack
