@@ -7,11 +7,17 @@
 #' @return Object of class data.frame and Message queue.
 #' @export
 
-MessageQueue <- function(message = character(), level = character()) {
+MessageQueue <- function(message = character(), level = character(), tool = character()) {
+
+  # if (missing(tool)) {
+  #   tool <- NA_character_
+  # }
 
   messages <- data.frame(
     message = message,
-    level = level, stringsAsFactors = FALSE
+    level = level,
+    tool = tool,
+    stringsAsFactors = FALSE
   )
 
   ## Set the name for the class
@@ -27,11 +33,12 @@ MessageQueue <- function(message = character(), level = character()) {
 #' @param x A message queue
 #' @param message A string or vector of strings of messages.
 #' @param level A string or vector of strings of
+#' @param tool A string vector of the tool (optional) description
 #' message levels (ERROR, WARNING, INFO)
 #' @return A MessageQueue class.
 #' @export
 
-appendMessage <- function(x, message, level) {
+appendMessage <- function(x, message, level, tool) {
   UseMethod("appendMessage", x)
 }
 
@@ -43,7 +50,7 @@ appendMessage <- function(x, message, level) {
 #' @return A MessageQueue object
 #' @export
 
-appendMessage.MessageQueue <- function(x, message = NA, level = NA) {
+appendMessage.MessageQueue <- function(x, message = NA_character_, level = NA_character_, tool = NA_character_) {
 
   if (!is.vector(message) || is.list(message)) {
     stop("Please supply a vector of messages")
@@ -57,9 +64,23 @@ appendMessage.MessageQueue <- function(x, message = NA, level = NA) {
     stop("Messages and warnings must be of the same length")
   }
 
+  #Make the tool argument optional, but take the shortest length if missing
+  if (missing(tool)) {
+    tool <- rep("UNKNOWN", min(length(message), length(level)))
+  } else {
+    if (!is.vector(tool) || is.list(tool)) {
+      stop("Please supply a vector of tools")
+    }
+  }
+
+
+  if (!all.equal(length(message), length(level), length(tool))) {
+      stop("Messages and tools must be of the same length")
+    }
 
   empty_messages <- sapply(message, is_empty)
   empty_levels <- sapply(level, is_empty)
+  empty_tools <- sapply(tool, is_empty)
 
   #Do nothing if everything is blank
   if (all(empty_messages) && all(empty_levels)) {
@@ -71,11 +92,16 @@ appendMessage.MessageQueue <- function(x, message = NA, level = NA) {
     level[empty_levels] <- "UNKNOWN"
   }
 
+  if (any(empty_tools)) {
+    tool[empty_tools] <- "UNKNOWN"
+  }
+
 
   if (any(empty_messages)) {
     warning("Empty message detected.")
     message <- message[!empty_messages]
     level <- level[!empty_messages]
+    tool <- tool[!empty_messages]
 
     if (length(message) == 0) {
       return(x)
@@ -93,7 +119,7 @@ appendMessage.MessageQueue <- function(x, message = NA, level = NA) {
 
   }
 
-  new_me <- rbind.data.frame(x, data.frame(message = message, level = level),
+  new_me <- rbind.data.frame(x, data.frame(message = message, level = level, tool = tool),
                            stringsAsFactors = FALSE)
   class(new_me) <- c("data.frame", "MessageQueue")
   return(new_me)

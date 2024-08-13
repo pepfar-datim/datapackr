@@ -90,6 +90,7 @@ test_that("Testing can merge data packs...", {
   # create first data pack ----
   d1 <- list()
   d1$info$datapack_name <- "Ehtiopia"
+  d1$info$tool <- "Data Pack"
   d1$info$messages <- MessageQueue()
   d1$info$has_error <- FALSE
 
@@ -147,6 +148,7 @@ test_that("Testing can merge data packs...", {
   # create second data pack ----
   d2 <- list()
   d2$info$datapack_name <- "Ehtiopia"
+  d2$info$tool <- "Data Pack"
   d2$info$messages <- MessageQueue()
   d2$info$has_error <- FALSE
 
