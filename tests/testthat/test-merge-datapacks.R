@@ -204,14 +204,31 @@ test_that("Testing can merge a datapack with a PSNUxIM...", {
   d2$info$has_error <- FALSE
 
   d2$tests$psnuxim_missing_rs_fxs <- tibble::tribble(
-    ~col, ~row, ~formula,~col_letter,
-    4,10, "=(B10*100)/C10", "D"
+    ~col, ~row, ~formula, ~col_letter,
+    4, 10, "=(B10*100)/C10", "D"
   )
 
   d2$data$SNUxIM <-
     tibble::tribble(
-      ~PSNU, ~indicator_code, ~Age, ~Sex, ~KeyPop, ~psnuid, ~mech_code, ~support_type, ~value,
-      "Addis Ketema Woreda 1 [#SNU] [Dl0yK0OhftZ]", "CXCA_SCRN.T", "25-34", "Female", NA_character_, "Dl0yK0OhftZ", "12345", "DSD", 3896)
+      ~ PSNU,
+      ~ indicator_code,
+      ~ Age,
+      ~ Sex,
+      ~ KeyPop,
+      ~ psnuid,
+      ~ mech_code,
+      ~ support_type,
+      ~ value,
+      "Addis Ketema Woreda 1 [#SNU] [Dl0yK0OhftZ]",
+      "CXCA_SCRN.T",
+      "25-34",
+      "Female",
+      NA_character_,
+      "Dl0yK0OhftZ",
+      "12345",
+      "DSD",
+      3896
+    )
 
 
   attr(d2$tests$psnuxim_missing_rs_fxs, "test_name") <- "Missing PSNUxIM R.S. Formulas"
