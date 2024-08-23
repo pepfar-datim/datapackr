@@ -1,3 +1,14 @@
+# datapackr 8.0.0
+## New features
+* Ability to process COP25 datapacks full version 
+* Addition of the comparison plus file
+
+## Bug fixes
+* 
+
+## Minor improvements and fixes
+* 
+
 # datapackr 7.6.2
 ## New features
 *
