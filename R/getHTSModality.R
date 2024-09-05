@@ -10,8 +10,10 @@
 getHTSModality <- function(cop_year = getCurrentCOPYear(),
                            d2_session = dynGet("d2_default_session",
                                                inherits = TRUE)) {
+  #Found here https://www.datim.org/dhis-web-maintenance/index.html#/list/dataElementSection/dataElementGroupSet
   groupSet <- switch(
     as.character(cop_year),
+    "2025" = "Bm4JmNS8ciD", #Need new one created in Datim touch base with Christian
     "2024" = "Bm4JmNS8ciD",
     "2023" = "fmxSIyzexmb",
   )

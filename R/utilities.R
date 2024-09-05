@@ -32,9 +32,11 @@ mergeDatapack <- function(d1 = d1, d2 = d2) {
   d1$tests <- lapply(d1$tests, dplyr::tibble)
   d2$tests <- lapply(d2$tests, dplyr::tibble)
 
-  # extract extras in each test list
-  d1$tests <- lapply(d1$tests, dplyr::tibble)
-  d2$tests <- lapply(d2$tests, dplyr::tibble)
+  #Overwrite the tool column. We need to have
+  #definitive information about the tool at this point.
+  d1$tests <- purrr::map(d1$tests, dplyr::mutate, tool = d1$info$tool)
+  d2$tests <- purrr::map(d2$tests, dplyr::mutate, tool = d2$info$tool)
+
   d1_names <- names(d1$tests)
   d2_names <- names(d2$tests)
   d1_extras <- d1_names[!d1_names %in% d2_names]
@@ -54,13 +56,18 @@ mergeDatapack <- function(d1 = d1, d2 = d2) {
     d$sheets <- c(d1$sheets, d2$sheets)
   }
 
-
   # combine message information
   d$info <- d1$info
 
+
+  #Modify the messages to include the tool name
+  d1$info$messages$tool <- d1$info$tool
+  d2$info$messages$tool <- d2$info$tool
+
   d$info$messages <- appendMessage(d1$info$messages,
                                    d2$info$messages$message,
-                                   d2$info$messages$level)
+                                   d2$info$messages$level,
+                                   d2$info$messages$tool)
 
   d
 }
@@ -310,8 +317,19 @@ getCOPDatasetUids <-  function(cop_year, datastreams) {
   }
 
   #List of COP Datasets by year
+  #Found here https://www.datim.org/dhis-web-maintenance/index.html#/list/dataSetSection/dataSet
+  #mer_targets NEEDS UPDATED BEFORE GO LIVE of generation
   cop_datasets <-
     list(
+      "2025" = list(# NOT the COP25 versions NEED To update when released
+        "mer_targets" =   c("HUEzkjkij1", # MER Target Setting: PSNU (Facility
+                            # and Community Combined) (TARGETS) updated 6/28/24
+                            "tNbhYbrKbnk"), # Host Country Targets: DREAMS (USG) updated 4/9/24
+        "mer_results" = NA,
+        "subnat_targets" = "bKSmkDP5YTc",
+        "subnat_results" = "fZVvcMSA9mZ",
+        "impatt" = "kWKJQYP1uT7"
+      ),
       "2024" = list(
         "mer_targets" =   c("lHUEzkjkij1", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS)
                             "tNbhYbrKbnk"), # Host Country Targets: DREAMS (USG)
@@ -434,6 +452,7 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1)
     de_coc_map <- switch(as.character(cop_year),
            "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
            "2024" = cop24_map_DataPack_DATIM_DEs_COCs,
+           "2025" = cop25_map_DataPack_DATIM_DEs_COCs,
            stop("Invalid COP Year"))
     }
 
@@ -441,6 +460,7 @@ getMapDataPack_DATIM_DEs_COCs <- function(cop_year, datasource = NULL, year = 1)
     de_coc_map <- switch(as.character(cop_year),
                          "2023" = cop23_map_DataPack_DATIM_DEs_COCs,
                          "2024" = cop24_map_DataPack_DATIM_DEs_COCs,
+                         "2025" = cop25_map_DataPack_DATIM_DEs_COCs,
                          stop("Invalid COP Year"))
   }
 

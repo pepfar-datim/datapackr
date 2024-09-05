@@ -65,3 +65,15 @@ test_that("Can error on if messages are not a vector", {
   expect_error(appendMessage(foo, messages_list, level))
 
 })
+
+test_that("Can add a tool (optional)", {
+
+  foo <- MessageQueue()
+  message <- c("INFO: Hello", "WARNING: Goodbye")
+  level <- c("INFO", "WARNING")
+  tool <- c("Tool1", NA_character_)
+
+  foo <- appendMessage(foo, message, level, tool)
+  expect_setequal(names(foo), c("message", "level", "tool"))
+  expect_equal(foo$tool, c("Tool1", "UNKNOWN"))
+})

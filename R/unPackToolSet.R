@@ -61,7 +61,6 @@ unPackToolSet <- function(d1_path = NULL,
   d2_path <- d2$keychain$submission_path
 
   #Deal with renaming of tools
-
   d1_tool <- masqueradeTool(d1$info$tool)
   d2_tool <- masqueradeTool(d2$info$tool)
 

@@ -1,4 +1,15 @@
-# datapackr 7.6.1
+# datapackr 8.0.0
+## New features
+* Ability to process COP25 datapacks full version 
+* Addition of the comparison plus file
+
+## Bug fixes
+* 
+
+## Minor improvements and fixes
+* 
+
+# datapackr 7.6.2
 ## New features
 *
 
@@ -17,6 +28,11 @@
 
 ## Minor improvements and fixes
 * 
+
+# datapackr 7.6.0
+## New features
+* Sunset COP21 and COP22
+* Added original versions of the COP25 templates
 
 ## Bug fixes
 * reenabled droping invalid disaggs from the year 2 sheet
