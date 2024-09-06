@@ -3,7 +3,7 @@ description: Datapackr Test Suite
 jobs:
   build:
     docker:
-      - image: rocker/verse:4.3.2
+      - image: rocker/verse:4.4.1
     steps:
       - checkout
       - restore_cache:
