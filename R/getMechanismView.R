@@ -138,7 +138,7 @@ if (!is.null(cop_year)) {
     cop_year %<>% check_cop_year(cop_year = cop_year)
 
     ous <- getValidOrgUnits(cop_year) %>%
-      dplyr::select(ou, ou_uid, country_uid, country_name) %>%
+      dplyr::select(ou, ou_uid, country_uid) %>%
       dplyr::distinct() %>%
       dplyr::filter(country_uid %in% country_uids) %>%
       dplyr::pull(ou) %>%
