@@ -149,10 +149,10 @@ if (!is.null(cop_year)) {
 
     # Wed Sep 11 14:23:51 2024 ------------------------------
     # DUE to Regionalization, this fix needs to be in place until COP23 tools are no longer processed.
-    regionalized_countries <- c("West Africa Region", "Western Hemisphere Region",
+    regionalized_ous <- c("West Africa Region", "Western Hemisphere Region",
                                 "Asia Region")
 
-    if (cop_year == 2023 & ous$ou %in% regionalized_countries) {
+    if (cop_year == 2023 & ous$ou %in% regionalized_ous) {
       mechs <- mechs %>%
         { if (ous$ou == "West Africa Region")
           dplyr::mutate(., ou = replace(ou, ou == "West Africa Region 1" |
