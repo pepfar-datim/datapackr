@@ -150,28 +150,27 @@ if (!is.null(cop_year)) {
     # Wed Sep 11 14:23:51 2024 ------------------------------
     # DUE to Regionalization, this fix needs to be in place until COP23 tools are no longer processed.
     regionalized_ous <- c("West Africa Region", "Western Hemisphere Region",
-                                "Asia Region")
+                          "Asia Region")
 
-    if (cop_year == 2023 & ous$ou %in% regionalized_ous) {
+    if (cop_year == 2023 & ous %in% regionalized_ous) {
       mechs <- mechs %>%
         { if (ous$ou == "West Africa Region")
           dplyr::mutate(., ou = replace(ou, ou == "West Africa Region 1" |
                                           ou == "West Africa Region 2", "West Africa Region")) else .
-        } %>%
+            } %>%
         { if (ous$ou == "Western Hemisphere Region")
           dplyr::mutate(., ou = replace(ou, ou == "Central America Region" |
                                           ou == "Caribbean Region", "Western Hemisphere Region")) else .
-        } %>%
+            } %>%
         { if (ous$ou == "Asia Region")
           dplyr::mutate(., ou = replace(ou, ou == "South Asia Region" |
                                           ou == "Central Asia Region", "Asia Region")) else .
-        } %>%
-        dplyr::filter(ou %in% ous)
-      } else{ #NOTE should only be the below after COP23 is removed.
+          }
+    }
+
     mechs %<>%
       dplyr::filter(ou %in% ous)
-      }
-    }
+  }
 
   # Include Dedupe or MOH ####
   if (include_MOH) {
