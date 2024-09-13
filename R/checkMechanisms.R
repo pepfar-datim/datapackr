@@ -28,11 +28,11 @@ checkMechanisms <- function(d,
       dplyr::mutate(., ou = replace(ou, ou == "West Africa Region 1" |
                                       ou == "West Africa Region 2", "West Africa Region")) else .
     } %>%
-    { if (ous$ou == "Western Hemisphere Region")
+    { if (d$info$operating_unit$ou == "Western Hemisphere Region")
       dplyr::mutate(., ou = replace(ou, ou == "Central America Region" |
                                       ou == "Caribbean Region", "Western Hemisphere Region")) else .
     } %>%
-    { if (ous$ou == "Asia Region")
+    { if (d$info$operating_unit$ou == "Asia Region")
       dplyr::mutate(., ou = replace(ou, ou == "South Asia Region" |
                                       ou == "Central Asia Region", "Asia Region")) else .
     } %>%
