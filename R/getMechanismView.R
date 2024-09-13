@@ -129,6 +129,18 @@ if (!is.null(cop_year)) {
     dplyr::filter(
       (startdate < paste0(as.numeric(cop_year) + 1, "-10-01") &
          enddate > paste0(as.numeric(cop_year), "-09-30")))
+
+  # Wed Sep 11 14:23:51 2024 ------------------------------
+  # DUE to Regionalization, this fix needs to be in place until COP23 tools are no longer processed.
+  if (cop_year == 2023) {
+    mechs <- mechs %>%
+      dplyr::mutate(ou = replace(ou, ou == "West Africa Region 1" |
+                                   ou == "West Africa Region 2", "West Africa Region")) %>%
+      dplyr::mutate(ou = replace(ou, ou == "Central America Region" |
+                                        ou == "Caribbean Region", "Western Hemisphere Region")) %>%
+      dplyr::mutate(ou = replace(ou, ou == "Asia Region" |
+                                   ou == "South Asia Region", "Asia Region"))
+    }
 }
 
 
@@ -145,33 +157,26 @@ if (!is.null(cop_year)) {
       dplyr::pull(ou) %>%
       unique(.)
 
-    #Transform to df in order for non vector functions to work (., ou)
-    # ous <- as.data.frame(ous)
-
-    # Wed Sep 11 14:23:51 2024 ------------------------------
-    # DUE to Regionalization, this fix needs to be in place until COP23 tools are no longer processed.
-    # regionalized_ous <- c("West Africa Region", "Western Hemisphere Region",
-    #                       "Asia Region")
-
-    # if (cop_year == 2023 & ous %in% regionalized_ous) {
-    if (cop_year == 2023) {
-      # Transform to df in order for non vector functions to work (., ou)
-      ous <- as.data.frame(ous)
-
-      mechs <- mechs %>%
-        { if (ous$ou == "West Africa Region")
-          dplyr::mutate(., ou = replace(ou, ou == "West Africa Region 1" |
-                                          ou == "West Africa Region 2", "West Africa Region")) else .
-            } %>%
-        { if (ous$ou == "Western Hemisphere Region")
-          dplyr::mutate(., ou = replace(ou, ou == "Central America Region" |
-                                          ou == "Caribbean Region", "Western Hemisphere Region")) else .
-            } %>%
-        { if (ous$ou == "Asia Region")
-          dplyr::mutate(., ou = replace(ou, ou == "South Asia Region" |
-                                          ou == "Central Asia Region", "Asia Region")) else .
-          }
-    }
+    # # Wed Sep 11 14:23:51 2024 ------------------------------
+    # # DUE to Regionalization, this fix needs to be in place until COP23 tools are no longer processed.
+    # if (cop_year == 2023) {
+    #   # Transform to df in order for non vector functions to work (., ou)
+    #   ous <- as.data.frame(ous)
+    #
+    #   mechs <- mechs %>%
+    #     { if (ous$ou == "West Africa Region")
+    #       dplyr::mutate(., ou = replace(ou, ou == "West Africa Region 1" |
+    #                                       ou == "West Africa Region 2", "West Africa Region")) else .
+    #         } %>%
+    #     { if (ous$ou == "Western Hemisphere Region")
+    #       dplyr::mutate(., ou = replace(ou, ou == "Central America Region" |
+    #                                       ou == "Caribbean Region", "Western Hemisphere Region")) else .
+    #         } %>%
+    #     { if (ous$ou == "Asia Region")
+    #       dplyr::mutate(., ou = replace(ou, ou == "South Asia Region" |
+    #                                       ou == "Central Asia Region", "Asia Region")) else .
+    #       }
+    # }
 
     mechs %<>%
       dplyr::filter(ou %in% ous)
