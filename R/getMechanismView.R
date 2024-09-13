@@ -131,6 +131,7 @@ if (!is.null(cop_year)) {
          enddate > paste0(as.numeric(cop_year), "-09-30")))
 }
 
+
   # Filter by OU from a vector of country UIDs
   if (!is.null(country_uids)) {
 
@@ -145,14 +146,18 @@ if (!is.null(cop_year)) {
       unique(.)
 
     #Transform to df in order for non vector functions to work (., ou)
-    ous <- as.data.frame(ous)
+    # ous <- as.data.frame(ous)
 
     # Wed Sep 11 14:23:51 2024 ------------------------------
     # DUE to Regionalization, this fix needs to be in place until COP23 tools are no longer processed.
-    regionalized_ous <- c("West Africa Region", "Western Hemisphere Region",
-                          "Asia Region")
+    # regionalized_ous <- c("West Africa Region", "Western Hemisphere Region",
+    #                       "Asia Region")
 
-    if (cop_year == 2023 & ous %in% regionalized_ous) {
+    # if (cop_year == 2023 & ous %in% regionalized_ous) {
+    if (cop_year == 2023) {
+      # Transform to df in order for non vector functions to work (., ou)
+      ous <- as.data.frame(ous)
+
       mechs <- mechs %>%
         { if (ous$ou == "West Africa Region")
           dplyr::mutate(., ou = replace(ou, ou == "West Africa Region 1" |
