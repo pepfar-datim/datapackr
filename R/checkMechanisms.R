@@ -26,8 +26,16 @@ checkMechanisms <- function(d,
     # Fri Jul 19 15:04:49 2024 Due to Regionalization shifts between cop years affecting OPUs.
     { if (d$info$operating_unit$ou == "West Africa Region")
       dplyr::mutate(., ou = replace(ou, ou == "West Africa Region 1" |
-                                     ou == "West Africa Region 2", "West Africa Region")) else .
-      } %>%
+                                      ou == "West Africa Region 2", "West Africa Region")) else .
+    } %>%
+    { if (d$info$operating_unit$ou == "Western Hemisphere Region")
+      dplyr::mutate(., ou = replace(ou, ou == "Central and South America Region" |
+                                      ou == "Caribbean Region", "Western Hemisphere Region")) else .
+    } %>%
+    { if (d$info$operating_unit$ou == "Asia Region")
+      dplyr::mutate(., ou = replace(ou, ou == "South and Southeast Asia Region" |
+                                      ou == "Central Asia Region", "Asia Region")) else .
+    } %>%
     dplyr::filter(ou == d$info$operating_unit$ou) %>%
     dplyr::filter(!is.na(startdate)) %>%
     dplyr::filter(!is.na(enddate)) %>%
