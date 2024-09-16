@@ -33,7 +33,7 @@ checkMechanisms <- function(d,
                                       ou == "Caribbean Region", "Western Hemisphere Region")) else .
     } %>%
     { if (d$info$operating_unit$ou == "Asia Region")
-      dplyr::mutate(., ou = replace(ou, ou == "South Asia Region" |
+      dplyr::mutate(., ou = replace(ou, ou == "Southeast Asia Region" |
                                       ou == "Central Asia Region", "Asia Region")) else .
     } %>%
     dplyr::filter(ou == d$info$operating_unit$ou) %>%
