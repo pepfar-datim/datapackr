@@ -136,7 +136,7 @@ if (!is.null(cop_year)) {
     mechs <- mechs %>%
       dplyr::mutate(ou = replace(ou, ou == "West Africa Region 1" |
                                    ou == "West Africa Region 2", "West Africa Region")) %>%
-      dplyr::mutate(ou = replace(ou, ou == "Central America Region" |
+      dplyr::mutate(ou = replace(ou, ou == "Central and South America Region" |
                                         ou == "Caribbean Region", "Western Hemisphere Region")) %>%
       dplyr::mutate(ou = replace(ou, ou == "Asia Region" |
                                    ou == "South Asia Region", "Asia Region"))
