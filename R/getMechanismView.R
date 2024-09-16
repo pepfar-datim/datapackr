@@ -139,7 +139,7 @@ if (!is.null(cop_year)) {
       dplyr::mutate(ou = replace(ou, ou == "Central and South America Region" |
                                         ou == "Caribbean Region", "Western Hemisphere Region")) %>%
       dplyr::mutate(ou = replace(ou, ou == "Asia Region" |
-                                   ou == "Southeast Asia Region", "Asia Region"))
+                                   ou == "South and Southeast Asia Region", "Asia Region"))
     }
 }
 
