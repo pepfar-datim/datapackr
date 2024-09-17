@@ -400,11 +400,11 @@
       "Version": "0.7.0",
       "Source": "GitHub",
       "RemoteType": "github",
-      "RemoteUsername": "pepfar-datim",
+      "RemoteHost": "api.github.com",
       "RemoteRepo": "datimutils",
+      "RemoteUsername": "pepfar-datim",
       "RemoteRef": "master",
       "RemoteSha": "338c374674876850707f642d1998f8aff4a41096",
-      "RemoteHost": "api.github.com",
       "Requirements": [
         "R",
         "R6",

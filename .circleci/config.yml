@@ -19,7 +19,7 @@ jobs:
       - run:
           name: Restore from lock file
           command: R -e "options(renv.consent = TRUE); renv::restore()"
-          no_output_timeout: 40m
+          no_output_timeout: 50m
       - save_cache:
           key: deps1-{{ checksum "renv.lock" }}
           paths:
