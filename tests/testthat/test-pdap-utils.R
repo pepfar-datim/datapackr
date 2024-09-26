@@ -92,8 +92,6 @@ test_that("Can get existing PDAP jobs", {
                               job_type = job_type)
   expect_identical(class(jobs), "response")
   expect_equal(jobs$status_code, 200L)
-
-
 })
 
 test_that("Can initiate a PDAP job", {
