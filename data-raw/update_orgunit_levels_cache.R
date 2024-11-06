@@ -1,6 +1,5 @@
 # Run this script at least before each major deployment of a Data Pack for review
 
-# loginToDATIM(Sys.getenv("PROD_CREDS"), d2_session_name = "prod")
 secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
 loginToDATIM(secrets)
 
