@@ -7,7 +7,7 @@ with_mock_api({
     d <- list()
     d$info$cop_year <- "2023"
     d$info$messages <- MessageQueue()
-    d$info$tool<- "Data Pack"
+    d$info$tool <- "Data Pack"
 
     d$data$analytics <- tibble::tribble(
       ~dataelement_id, ~fiscal_year, ~psnu_uid, ~categoryoptioncombo_id, ~mechanism_code, ~target_value,
@@ -57,7 +57,7 @@ with_mock_api({
     d <- list()
     d$info$cop_year <- "2024"
     d$info$messages <- MessageQueue()
-    d$info$tool<- "Data Pack"
+    d$info$tool <- "Data Pack"
 
     d$data$analytics <- tibble::tribble(
       ~dataelement_id, ~fiscal_year, ~psnu_uid, ~categoryoptioncombo_id, ~mechanism_code, ~target_value,
