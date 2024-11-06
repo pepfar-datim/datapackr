@@ -31,7 +31,7 @@ checkHasPSNUxIM <- function(d) {
       )
     }
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING", d$info$tool)
 
   } else {
     d$info$has_psnuxim <- TRUE
@@ -115,7 +115,7 @@ extractSNUxIMCombos <- function(d, p = NULL) {
           " are complete, you may return here to update your PSNUxIM tab at any time.",
           "\n")
 
-      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING", d$info$tool)
 
     }
   }
@@ -172,7 +172,7 @@ extractDuplicateRows <- function(d, sheet = "PSNUxIM") {
         paste(dupes_msg, collapse = "\n\t"),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR", d$info$tool)
     d$info$has_error <- TRUE
 
   }
@@ -287,7 +287,7 @@ checkNonEqualTargets <- function(d, original_targets) {
           "download a copy of the validation report from the self-service app",
           "and consult the tab non_equal_targets for details.\n")
 
-      d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+      d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR", d$info$tool)
       d$info$has_error <- TRUE
     }
 
@@ -385,7 +385,7 @@ testMissingRightSideFormulas <- function(d, cols_to_keep, header_cols,
         paste(sort(unique(d$tests$psnuxim_missing_rs_fxs$col_letter)), collapse = ", "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING", d$info$tool)
   }
 
   d
@@ -413,7 +413,7 @@ dropDuplicatedPSNUxIMColumns <- function(d) {
         paste(dup_cols, sep = "", collapse = ","),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR", d$info$tool)
 
     #Drop the duplicated columns and continue
     d$data$SNUxIM <- d$data$SNUxIM[, !duplicated(names(d$data$SNUxIM))]
@@ -472,7 +472,7 @@ dropInvalidMechColumns <- function(d, cols_to_keep, sheet = "PSNUxIM") {
         paste(d$tests$invalid_mech_headers$invalid_mech_headers, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR", d$info$tool)
     d$info$has_error <- TRUE
   }
 
@@ -539,7 +539,7 @@ checkPSNUxIMDisaggs <- function(d) {
              " e.g., 01-04 instead of 1-4.)",
              " The following rows are implicated: ", formatSetStrings(affected_rows), "\n\t")
 
-    d$info$messages <- appendMessage(d$info$messages, msg, lvl)
+    d$info$messages <- appendMessage(d$info$messages, msg, lvl, d$info$tool)
     d$info$has_error <- TRUE
   }
 
@@ -592,7 +592,7 @@ combineDuplicatePSNUxIMColumns <- function(d, cols_to_keep) {
         paste(d$tests$duplicate_cols, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING", d$info$tool)
   }
 
   # --> This also removes non-essential text from IM name to leave only 12345_DSD format.
@@ -636,7 +636,7 @@ checkNonNumericPSNUxIMValues <- function(d, header_cols) {
         ". Please consult the validation report for the specific rows where these values were found.\n\t* ",
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING", d$info$tool)
 
   }
 
@@ -676,7 +676,7 @@ testMissingDedupeRollupColumns <- function(d, cols_to_keep, sheet = "PSNUxIM") {
         paste(missing_cols_fatal, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR", d$info$tool)
     d$info$has_error <- TRUE
   }
 
@@ -798,7 +798,7 @@ testInvalidDedupeValues <- function(d, header_cols) {
           collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR", d$info$tool)
   }
 
   d
@@ -919,7 +919,7 @@ testNegativeTargetValues <- function(d, header_cols) {
         for the specific rows where these values were found.\n\t* "
       )
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR", d$info$tool)
 
     d$data$SNUxIM %<>%
       dplyr::mutate(
@@ -968,7 +968,7 @@ testInvalidPSNUs <- function(d) {
         " invalid PSNU identifiers were detected. Please check the UID and fix the following PSNUs:",
         paste(d$tests$invalid_psnus$PSNU, sep = "", collapse = ";"))
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR", d$info$tool)
   }
 
   d
@@ -1005,7 +1005,7 @@ testRoundDecimalValues <- function(d) {
         paste(unique(d$tests$decimals$mechCode_supportType), collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING", d$info$tool)
   }
 
   d$data$SNUxIM %<>%
@@ -1041,7 +1041,7 @@ testDropPositiveDedupe <- function(d) {
         " `TA Dedupe`, and `Crosswalk Dedupe` columns (columns CX, CY, and CZ) in the PSNUxIM tab.",
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR", d$info$tool)
   }
 
   d$data$SNUxIM %<>%
@@ -1154,7 +1154,7 @@ testRoundingDiffs <- function(d) {
         "\n"
       )
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING", d$info$tool)
   }
 
   d
@@ -1198,7 +1198,7 @@ testImbalancedDistribution <- function(d) {
         paste(imbalanced_distribution_inds, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "WARNING", d$info$tool)
     d$info$has_error <- TRUE
   }
 
@@ -1250,7 +1250,7 @@ appendUnallocatedData <- function(d) {
         paste(unallocated_inds, collapse = "\n\t* "),
         "\n")
 
-    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR")
+    d$info$messages <- appendMessage(d$info$messages, warning_msg, "ERROR", d$info$tool)
     d$info$has_error <- TRUE
   }
 
