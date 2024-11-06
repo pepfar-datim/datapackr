@@ -106,10 +106,14 @@ checkPSNUData  <-  function(d) {
                          "validation rule issues found in",
                          d$info$datapack_name, "DataPack.\n")
 
+    #If we have a hybrid tool, then analytics comes from the PSNUxIM
+    source_tool <- ifelse(!is.null(d$info$hybrid_tool) && d$info$hybrid_tool == TRUE,
+                          "PSNUxIM", d$info$tool)
+
     d$info$messages <- appendMessage(d$info$messages,
                                      warning_msg,
                                      "WARNING",
-                                     d$info$tool)
+                                     source_tool)
   }
 
   d
