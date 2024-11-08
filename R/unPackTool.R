@@ -35,7 +35,7 @@ unPackTool <- function(submission_path = NULL,
     d <- unPackDataPack(d,
                         d2_session = d2_session)
 
-    if (d$info$cop_year %in% c("2023", "2024", "2025")) {
+    if (d$info$cop_year %in% c("2023", "2024")) { # year2 removed cop25 has no year2
       d <- unpackYear2Sheet(d)
     }
 
