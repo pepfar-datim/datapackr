@@ -1,4 +1,5 @@
 library(datapackr)
+library(dplyr)
 
 # Point to DATIM login secrets ####
 secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
