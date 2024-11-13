@@ -48,7 +48,10 @@ unPackTool <- function(submission_path = NULL,
     stop("Selected tool not currently supported.")
   }
 
-  printMessages(d$info$messages)
+  #Modify all messages with the name of the tool
+  if (!is.null(d$info$messages$tool) && length(d$info$messages$tool) > 0) {
+    d$info$messages$tool <- rep(d$info$tool, length(d$info$messages$tool))
+  }
 
   return(d)
 }

@@ -48,11 +48,11 @@ appendMessage <- function(x, message, level, tool) {
 
 appendMessage.MessageQueue <- function(x, message = NA_character_, level = NA_character_, tool = NA_character_) {
 
-  if (!is.vector(message) || is.list(message)) {
+  if (!is.vector(message)) {
     stop("Please supply a vector of messages")
   }
 
-  if (!is.vector(level) || is.list(level)) {
+  if (!is.vector(level)) {
     stop("Please supply a vector of levels")
   }
 
@@ -64,7 +64,7 @@ appendMessage.MessageQueue <- function(x, message = NA_character_, level = NA_ch
   if (missing(tool)) {
     tool <- rep("UNKNOWN", min(length(message), length(level)))
   } else {
-    if (!is.vector(tool) || is.list(tool)) {
+    if (!is.vector(tool)) {
       stop("Please supply a vector of tools")
     }
   }
