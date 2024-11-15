@@ -272,9 +272,12 @@ getTSTOrgUnits <- function(include_mil = TRUE,
       org_type =
         dplyr::case_when(
           stringr::str_detect(as.character(organisationUnitGroups), "nwQbMeALRjL") ~ "Military",
+          # stringr::str_detect(as.character(organisationUnitGroups), "cNzfcPWEGSH") &
+          #   stringr::str_detect(as.character(organisationUnitGroups), "JHP0Je4IgTh") ~ "Country/TSNU",
+          # stringr::str_detect(as.character(organisationUnitGroups), "AVy8gJXym2D") &
+          #   stringr::str_detect(as.character(organisationUnitGroups), "JHP0Je4IgTh") ~ "PSNU/TSNU",
           stringr::str_detect(as.character(organisationUnitGroups), "cNzfcPWEGSH") ~ "Country",
-          stringr::str_detect(as.character(organisationUnitGroups), "AVy8gJXym2D") & stringr::str_detect(as.character(organisationUnitGroups), "JHP0Je4IgTh") ~ "TSNU",
-          # stringr::str_detect(as.character(organisationUnitGroups), "AVy8gJXym2D") ~ "PSNU",
+          stringr::str_detect(as.character(organisationUnitGroups), "AVy8gJXym2D") ~ "PSNU",
           stringr::str_detect(as.character(organisationUnitGroups), "mRRlkbZolDR") ~ "DSNU"),
       # While some PSNUs may also be DSNUs, the above will only categorize
       # as a DSNU when it has not already been tagged as a PSNU, making it
@@ -306,6 +309,9 @@ getTSTOrgUnits <- function(include_mil = TRUE,
   # Sort pretty
   orgunits %<>%
     dplyr::arrange(ou, country_name, snu1, org_type, name)
+
+  # lets add TSNU
+
 
   return(orgunits)
 }

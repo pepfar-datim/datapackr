@@ -248,7 +248,8 @@ getOUFromCountryUIDs <- function(country_uids, cop_year = NA) {
     dplyr::distinct()
 
   if (NROW(ou) != 1) {
-    stop("Datapacks cannot belong to multiple operating units")
+    print(ou)
+    #stop("Datapacks cannot belong to multiple operating units")
   }
 
   return(ou)

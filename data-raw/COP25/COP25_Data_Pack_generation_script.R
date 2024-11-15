@@ -2,7 +2,7 @@ library(datapackr)
 library(dplyr)
 
 # Point to DATIM login secrets ####
-secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "datim.json")
+secrets <- Sys.getenv("SECRETS_FOLDER") %>% paste0(., "coptest.json")
 datimutils::loginToDATIM(secrets)
 
 output_folder <- Sys.getenv("OUTPUT_FOLDER") %>% paste0(., "Beta Packs/")
