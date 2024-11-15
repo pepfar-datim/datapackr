@@ -44,7 +44,7 @@ packDataPackSheets <- function(wb,
         add_dp_label(orgunits = ., cop_year = cop_year) %>%
         dplyr::arrange(dp_label) %>%
         ## Remove DSNUs
-        dplyr::filter(org_type != "DSNU") %>%
+        dplyr::filter(!org_type %in% c("DSNU", "TSNU", "Country")) %>%
         dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
 
     } else if (ou_level %in% c(4:7, "Facility", "Community")) {
@@ -111,24 +111,34 @@ packDataPackSheets <- function(wb,
       sheet_data <- NULL
     }
 
-    if (sheet == "AGYW") {
-      org_units_sheet <- getValidOrgUnits(cop_year) %>% # Load in valid_PSNUs list from package
+    # non prioritization sheets should not have prioritization
+    if (!sheet %in% c("Prioritization", "AGYW")) {
+      temp_org_units_sheet <- getValidOrgUnits(cop_year) %>%
         dplyr::filter(country_uid %in% country_uids) %>%
         add_dp_label(orgunits = ., cop_year = cop_year) %>%
-        dplyr::arrange(dp_label) %>% # Order rows based on dp_psnu col values
+        dplyr::arrange(dp_label) %>%
+        dplyr::filter(!org_type %in% c("DSNU", "PSNU")) %>%
+        dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
+      if (NROW(temp_org_units_sheet) == 0) {
+        next
+      }
+    } else if (sheet == "AGYW") {
+      temp_org_units_sheet <- getValidOrgUnits(cop_year) %>%
+        dplyr::filter(country_uid %in% country_uids) %>%
+        add_dp_label(orgunits = ., cop_year = cop_year) %>%
+        dplyr::arrange(dp_label) %>%
         dplyr::filter(!is.na(DREAMS)) %>%
-        dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)# Only keep these columns
-
-      if (NROW(org_units_sheet) == 0) {
+        dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
+      if (NROW(temp_org_units_sheet) == 0) {
         next
       }
     } else {
-      org_units_sheet <- org_units
+      temp_org_units_sheet <- org_units
     }
 
     wb <- packDataPackSheet(wb = wb,
                             sheet = sheet,
-                            org_units = org_units_sheet,
+                            org_units = temp_org_units_sheet,
                             schema = schema,
                             sheet_data = sheet_data,
                             cop_year = cop_year)
