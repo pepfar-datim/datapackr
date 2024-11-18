@@ -357,9 +357,9 @@ checkDataPackName <- function(datapack_name, country_uids, cop_year) {
                          "oK0gC85xx2f")
 
     # Thu Nov 30 13:59:22 2023 added the 2024 to address country's being broken out.
-    if (all(country_uids %in% caribbean) && cop_year != 2024) {
+    if (all(country_uids %in% caribbean) && !(cop_year %in% c(2024, 2025))) {
       expected_dpname <- "Caribbean Region"
-    } else if (all(country_uids %in% central_america) && cop_year != 2024) {
+    } else if (all(country_uids %in% central_america) && !(cop_year %in% c(2024, 2025))) {
       expected_dpname <- "Central America and Brazil"
     } else {
       expected_dpname <- valid_orgunits_local %>%

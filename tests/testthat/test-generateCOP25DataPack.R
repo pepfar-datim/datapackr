@@ -133,11 +133,12 @@ with_mock_api({
         dplyr::arrange(PSNU)
     }
 
-    sheet_psnus <- d$sheets %>%
+    sheet_psnus <<- d$sheets %>%
       discard_names(c("PSNUxIM", "Year 2", "AGYW")) %>%
       purrr::map(extract_PSNU)
+    print(sheet_psnus)
 
-    wanted_psnus <-
+    wanted_psnus <<-
       getValidOrgUnits("2025") %>%
       dplyr::filter(country_uid %in% d$info$country_uids) %>%
       add_dp_label(., "2025") %>%
@@ -146,6 +147,10 @@ with_mock_api({
       dplyr::filter(org_type != "DSNU") %>%
       dplyr::select(PSNU = dp_label, psnu_uid = uid)
 
+    print("sheet psnus ...")
+    print(sheet_psnus)
+    print("wanted psnus...")
+    print(wanted_psnus)
     expect_true(all(unlist(purrr::map(sheet_psnus, identical, wanted_psnus))))
 
     #DP-970--Duplicates in the Year2 tab # NO YEAR 2 TAB COP 25
