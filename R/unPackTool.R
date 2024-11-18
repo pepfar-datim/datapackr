@@ -35,7 +35,7 @@ unPackTool <- function(submission_path = NULL,
     d <- unPackDataPack(d,
                         d2_session = d2_session)
 
-    if (d$info$cop_year %in% c("2023", "2024", "2025")) {
+    if (d$info$cop_year %in% c("2023", "2024")) { # year2 removed cop25 has no year2
       d <- unpackYear2Sheet(d)
     }
 
@@ -48,7 +48,10 @@ unPackTool <- function(submission_path = NULL,
     stop("Selected tool not currently supported.")
   }
 
-  printMessages(d$info$messages)
+  #Modify all messages with the name of the tool
+  if (!is.null(d$info$messages$tool) && length(d$info$messages$tool) > 0) {
+    d$info$messages$tool <- rep(d$info$tool, length(d$info$messages$tool))
+  }
 
   return(d)
 }

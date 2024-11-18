@@ -148,17 +148,6 @@ with_mock_api({
 
     expect_true(all(unlist(purrr::map(sheet_psnus, identical, wanted_psnus))))
 
-    #DP-970--Duplicates in the Year2 tab
-    duplicated_export_rows <- d$datim$year2 %>%
-      dplyr::select(dataElement, period, orgUnit, categoryOptionCombo, attributeOptionCombo) %>%
-      dplyr::group_by_all() %>%
-      dplyr::mutate(n = dplyr::n()) %>%
-      dplyr::filter(n > 1) %>%
-      NROW()
-
-    expect_equal(duplicated_export_rows, 0L)
-
-
     #There should be no zeros in d$data$SNUxIM except for dedpe
     expect_false(any(d$data$SNUxIM[d$data$SNUxIM$value == 0 & !grepl("^0000[01]", d$data$SNUxIM$mech_code), ]))
 

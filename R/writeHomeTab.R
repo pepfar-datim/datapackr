@@ -54,7 +54,7 @@ writeHomeTab <- function(wb = NULL,
 
   pd <- "COP"
   yr <- cop_year - 2000
-  if (cop_year %in% c(2024)) { #Does this need updated to included 2025?
+  if (cop_year %in% c(2024, 2025)) {
     pd <- "FY"
     yr <- yr + 1
   }

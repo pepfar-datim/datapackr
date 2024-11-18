@@ -1,3 +1,14 @@
+# datapackr 8.1.0
+## New features
+* Updated how messages are handled via labeling by tool and their associated tests
+
+## Bug fixes
+* Removed 2025 from unPackTool as there will be no year 2 data
+
+## Minor improvements and fixes
+* Updated schema and the template to capture COP25 changes
+* Updated the Home tab to allow for COP25
+
 # datapackr 8.0.1
 ## New features
 *
