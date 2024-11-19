@@ -41,7 +41,7 @@ packDataPackSheets <- function(wb,
     if (ou_level == "Prioritization") {
 
 
-      if(cop_year > 2024) {
+      if (cop_year > 2024) {
 
       # extract historic regions
       historic_regional_psnus <-
@@ -50,7 +50,7 @@ packDataPackSheets <- function(wb,
         dplyr::select(name, country_uid)
 
       # if this country historically had its country as psnu include country
-      if(country_uids %in% historic_regional_psnus$country_uid) {
+      if (country_uids %in% historic_regional_psnus$country_uid) {
 
         org_units <- getValidOrgUnits(cop_year) %>%
           dplyr::filter(country_uid %in% country_uids) %>%
@@ -149,7 +149,7 @@ packDataPackSheets <- function(wb,
 
 
     # cop year condition will determine packing procedure
-    if(cop_year > 2024) {
+    if (cop_year > 2024) {
 
       # non prioritization sheets should not have prioritization
       if (!sheet %in% c("Prioritization", "AGYW")) {

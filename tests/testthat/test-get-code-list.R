@@ -26,7 +26,9 @@ with_mock_api({
         "lastUpdated",
         "ancestors",
         "organisationUnitGroups",
-        "DREAMS"
+        "DREAMS",
+        "TSNU",
+        "HISTORIC_PSNU"
       )
     )
     expect_equal(class(test_dataset$ancestors), "list")
