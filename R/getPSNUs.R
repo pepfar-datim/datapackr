@@ -169,18 +169,18 @@ getDataPackOrgUnits <- function(include_mil = TRUE,
 
   # like Dreams we add TSNU as a maker for TSNU related regions
   orgunits <- orgunits %>%
-    mutate(TSNU =
+    dplyr::mutate(TSNU =
              dplyr::case_when(
                stringr::str_detect(as.character(organisationUnitGroups), "JHP0Je4IgTh") ~ "Y"))
 
   # if regional historic psnu identify
   orgunits <- orgunits %>%
-    mutate(HISTORIC_PSNU =
+    dplyr::mutate(HISTORIC_PSNU =
              dplyr::case_when(
                country_name %in% regional_countries & org_type != "Military" ~ "Y"
              )) %>%
-    mutate(ou = if_else(is.na(ou), country_name, ou),
-           ou_uid = if_else(is.na(ou_uid), country_uid, ou_uid)
+    plyr::mutate(ou = dplyr::if_else(is.na(ou), country_name, ou),
+           ou_uid = dplyr::if_else(is.na(ou_uid), country_uid, ou_uid)
            )
 
   # Sort pretty

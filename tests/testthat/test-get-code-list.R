@@ -8,7 +8,7 @@ with_mock_api({
         include_mil = FALSE,
         include_DREAMS = TRUE,
         use_cache = FALSE,
-        d2_session = training)
+        d2_session = triage)
     expect_type(test_dataset, "list")
     expect_true("data.frame" %in% class(test_dataset))
     expect_true(NROW(test_dataset) > 0)
