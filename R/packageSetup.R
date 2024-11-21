@@ -6,7 +6,7 @@
 #' @return Current COP Year. (e.g., for COP19, returns 2019)
 #'
 getCurrentCOPYear <- function() {
-  2025 #Should be updated with the release of Beta-Packs every year
+  2024 #Should be updated with the release of Beta-Packs every year
 }
 
 
