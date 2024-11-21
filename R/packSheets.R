@@ -41,12 +41,12 @@ packDataPackSheets <- function(wb,
     if (ou_level == "Prioritization") {
 
 
-      if (cop_year > 2024) {
+      if (cop_year %in% c("2025")) {
 
       # extract historic regions
       historic_regional_psnus <-
         getValidOrgUnits(cop_year) %>%
-        dplyr::filter(!is.na(HISTORIC_PSNU)) %>%
+        dplyr::filter(!is.na(country_was_psnu)) %>%
         dplyr::select(name, country_uid)
 
       # if this country historically had its country as psnu include country
@@ -158,7 +158,7 @@ packDataPackSheets <- function(wb,
           add_dp_label(orgunits = ., cop_year = cop_year) %>%
           dplyr::arrange(dp_label) %>%
           # dplyr::filter(!org_type %in% c("DSNU", "PSNU")) %>%
-          dplyr::filter(!is.na(TSNU) | org_type == "Military") %>%
+          dplyr::filter(!is.na(tsnu) | org_type == "Military") %>%
           dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
         if (NROW(temp_org_units_sheet) == 0) {
           next

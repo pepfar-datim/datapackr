@@ -202,7 +202,7 @@ with_mock_api({
       purrr::map(sheet_psnus[names(sheet_psnus) == "Prioritization"], identical, wanted_psnus)
     )))
 
-    # Malwi requires TSNUS which for Malawi are country level for other sheets
+    # Malawi requires TSNUS which for Malawi are country level for other sheets
     wanted_tsnus <-
       getValidOrgUnits("2025") %>%
       dplyr::filter(country_uid %in% d$info$country_uids) %>%

@@ -12,7 +12,7 @@ test_that("Can error on a missing cop year", {
 test_that(
   "Structure of orgunits is the defined pre 2025",
   {
-    all_cop_years <- supportedCOPYears()[supportedCOPYears() < 2025]
+    all_cop_years <- supportedCOPYears()[supportedCOPYears() %in% c("2024")]
     expect_silent(all_orgunits <-
                     lapply(all_cop_years, getValidOrgUnits))
 
@@ -68,7 +68,7 @@ test_that(
 test_that(
   "Structure of orgunits is the defined in 2025 above",
   {
-    all_cop_years <- supportedCOPYears()[supportedCOPYears() > 2024]
+    all_cop_years <- supportedCOPYears()[supportedCOPYears() %in% c("2025")]
     expect_silent(all_orgunits <-
                     lapply(all_cop_years, getValidOrgUnits))
 
@@ -86,8 +86,8 @@ test_that(
       "ancestors",
       "organisationUnitGroups",
       "DREAMS",
-      "TSNU",
-      "HISTORIC_PSNU"
+      "tsnu",
+      "country_was_psnu"
     )
 
     expect_true(all(purrr::map_lgl(
@@ -137,7 +137,7 @@ test_that(
     cam <- getValidOrgUnits("2025") %>%
       dplyr::filter(country_uid %in% pick$country_uids) %>%
       dplyr::filter(org_type == "PSNU" & country_name == "Cameroon") %>%
-      dplyr::pull(TSNU) %>%
+      dplyr::pull(tsnu) %>%
       unique()
 
     expect_false(any(is.na(cam)))
@@ -146,23 +146,23 @@ test_that(
     rwan <- getValidOrgUnits("2025") %>%
       dplyr::filter(country_uid %in% pick$country_uids) %>%
       dplyr::filter(org_type == "PSNU" & country_name == "Rwanda") %>%
-      dplyr::pull(TSNU) %>%
+      dplyr::pull(tsnu) %>%
       unique()
 
     expect_true(all(is.na(rwan)))
 
-    # what if a country has the country as historic psnu?
+    # what if country used to be a psnu in a region?
     # peru sets targets at national level, but even tho
     # has no regional psnus it requires national level as a psnu
     # for prioritization tab
     peru <- getValidOrgUnits("2025") %>%
       dplyr::filter(country_uid %in% pick$country_uids) %>%
       dplyr::filter(country_name == "Peru" & org_type != "Military") %>%
-      dplyr::select(name, org_type, TSNU, HISTORIC_PSNU)
+      dplyr::select(name, org_type, tsnu, country_was_psnu)
 
     expect_true(
       identical(
-        peru$HISTORIC_PSNU,
+        peru$country_was_psnu,
         "Y"
       )
     )
@@ -171,8 +171,8 @@ test_that(
     rwan <- getValidOrgUnits("2025") %>%
       dplyr::filter(country_uid %in% pick$country_uids) %>%
       dplyr::filter(country_name == "Rwanda" & org_type != "Military") %>%
-      dplyr::select(name, org_type, TSNU, HISTORIC_PSNU)
+      dplyr::select(name, org_type, tsnu, country_was_psnu)
 
-    expect_true(all(is.na(rwan$HISTORIC_PSNU)))
+    expect_true(all(is.na(rwan$country_was_psnu)))
 
   })
