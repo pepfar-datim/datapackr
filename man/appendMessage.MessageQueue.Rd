@@ -4,7 +4,12 @@
 \alias{appendMessage.MessageQueue}
 \title{Title appendMessage.MessageQueue}
 \usage{
-\method{appendMessage}{MessageQueue}(x, message = NA, level = NA)
+\method{appendMessage}{MessageQueue}(
+  x,
+  message = NA_character_,
+  level = NA_character_,
+  tool = NA_character_
+)
 }
 \arguments{
 \item{x}{A MessageQueue object}

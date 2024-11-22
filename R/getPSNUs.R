@@ -45,6 +45,8 @@ getValidOrgUnits <- function(cop_year = NULL) {
 #' related to \code{country_uids}. Default is \code{TRUE}.
 #' @param include_DREAMS Logical. If \code{TRUE}, will also include DREAMS
 #' organisation units.
+#' @param include_TSNUS Logical. If \code{TRUE}, will also include TSNUS
+#' organisation units.
 #' @param additional_fields Character string of any fields to return from DATIM
 #' API other than those returned by default.
 #' @param use_cache If \code{TRUE}, will first check to see if a cached export
@@ -82,7 +84,7 @@ getDataPackOrgUnits <- function(include_mil = TRUE,
 
     if (!include_TSNUS) {
       orgunits %<>%
-        dplyr::filter(!is.na(TSNU))
+        dplyr::filter(!is.na(tsnu))
     }
 
     return(orgunits)
@@ -169,13 +171,13 @@ getDataPackOrgUnits <- function(include_mil = TRUE,
 
   # like Dreams we add TSNU as a maker for TSNU related regions
   orgunits <- orgunits %>%
-    dplyr::mutate(TSNU =
+    dplyr::mutate(tsnu =
              dplyr::case_when(
                stringr::str_detect(as.character(organisationUnitGroups), "JHP0Je4IgTh") ~ "Y"))
 
   # if regional historic psnu identify
   orgunits <- orgunits %>%
-    dplyr::mutate(HISTORIC_PSNU =
+    dplyr::mutate(country_was_psnu =
              dplyr::case_when(
                country_name %in% regional_countries & org_type != "Military" ~ "Y"
              )) %>%

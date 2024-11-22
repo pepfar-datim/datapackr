@@ -8,6 +8,7 @@ on provided country UIDs.}
 getDataPackOrgUnits(
   include_mil = TRUE,
   include_DREAMS = TRUE,
+  include_TSNUS = TRUE,
   additional_fields = NULL,
   use_cache = TRUE,
   cop_year = NULL,
@@ -19,6 +20,9 @@ getDataPackOrgUnits(
 related to \code{country_uids}. Default is \code{TRUE}.}
 
 \item{include_DREAMS}{Logical. If \code{TRUE}, will also include DREAMS
+organisation units.}
+
+\item{include_TSNUS}{Logical. If \code{TRUE}, will also include TSNUS
 organisation units.}
 
 \item{additional_fields}{Character string of any fields to return from DATIM
