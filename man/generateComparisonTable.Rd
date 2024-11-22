@@ -4,7 +4,7 @@
 \alias{generateComparisonTable}
 \title{Generate Comparison Table}
 \usage{
-generateComparisonTable(d)
+generateComparisonTable(d, expanded = FALSE)
 }
 \arguments{
 \item{d}{Datapackr sidecar object}

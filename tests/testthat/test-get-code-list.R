@@ -7,6 +7,7 @@ with_mock_api({
       getDataPackOrgUnits(
         include_mil = FALSE,
         include_DREAMS = TRUE,
+        include_TSNUS = TRUE,
         use_cache = FALSE,
         d2_session = triage)
     expect_type(test_dataset, "list")
@@ -27,8 +28,8 @@ with_mock_api({
         "ancestors",
         "organisationUnitGroups",
         "DREAMS",
-        "TSNU",
-        "HISTORIC_PSNU"
+        "tsnu",
+        "country_was_psnu"
       )
     )
     expect_equal(class(test_dataset$ancestors), "list")

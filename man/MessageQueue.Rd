@@ -4,7 +4,7 @@
 \alias{MessageQueue}
 \title{Title MessageQueue}
 \usage{
-MessageQueue(message = character(), level = character())
+MessageQueue(message = character(), level = character(), tool = character())
 }
 \arguments{
 \item{message}{One or more character strings}
