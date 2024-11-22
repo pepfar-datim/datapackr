@@ -45,6 +45,8 @@ getValidOrgUnits <- function(cop_year = NULL) {
 #' related to \code{country_uids}. Default is \code{TRUE}.
 #' @param include_DREAMS Logical. If \code{TRUE}, will also include DREAMS
 #' organisation units.
+#' @param include_TSNUS Logical. If \code{TRUE}, will also include TSNUS
+#' organisation units.
 #' @param additional_fields Character string of any fields to return from DATIM
 #' API other than those returned by default.
 #' @param use_cache If \code{TRUE}, will first check to see if a cached export
@@ -55,6 +57,7 @@ getValidOrgUnits <- function(cop_year = NULL) {
 #'
 getDataPackOrgUnits <- function(include_mil = TRUE,
                                 include_DREAMS = TRUE,
+                                include_TSNUS = TRUE,
                                 additional_fields = NULL,
                                 use_cache = TRUE,
                                 cop_year = NULL,
@@ -79,6 +82,11 @@ getDataPackOrgUnits <- function(include_mil = TRUE,
         dplyr::filter(org_type != "DSNU")
     }
 
+    if (!include_TSNUS) {
+      orgunits %<>%
+        dplyr::filter(!is.na(tsnu))
+    }
+
     return(orgunits)
   }
 
@@ -88,6 +96,7 @@ getDataPackOrgUnits <- function(include_mil = TRUE,
     c(paste0("organisationUnitGroups.id:in:[AVy8gJXym2D", # Filter for COP Prioritization SNU
              ifelse(include_mil, ",nwQbMeALRjL", ""), # Add military SNUs if requested
              ifelse(include_DREAMS, ",mRRlkbZolDR", ""), # Add DREAMS SNUs if requested
+             ifelse(include_TSNUS, ",JHP0Je4IgTh", ""), # Add TSNUs if requested
              "]"))
 
   fields <-
@@ -144,6 +153,38 @@ getDataPackOrgUnits <- function(include_mil = TRUE,
                   ou, ou_uid, country_name, country_uid, snu1, snu1_uid,
                   tidyselect::everything(), -level_4_type)
 
+  # list of countries which were part of regions and require country in prio tab
+  regional_countries <- c(
+    "Colombia",
+    "El Salvador",
+    "Guatemala",
+    "Honduras",
+    "Nicaragua",
+    "Panama",
+    "Peru",
+    "Jamaica",
+    "Trinidad and Tobago",
+    "Philippines",
+    "Laos",
+    "Thailand"
+  )
+
+  # like Dreams we add TSNU as a maker for TSNU related regions
+  orgunits <- orgunits %>%
+    dplyr::mutate(tsnu =
+             dplyr::case_when(
+               stringr::str_detect(as.character(organisationUnitGroups), "JHP0Je4IgTh") ~ "Y"))
+
+  # if regional historic psnu identify
+  orgunits <- orgunits %>%
+    dplyr::mutate(country_was_psnu =
+             dplyr::case_when(
+               country_name %in% regional_countries & org_type != "Military" ~ "Y"
+             )) %>%
+    plyr::mutate(ou = dplyr::if_else(is.na(ou), country_name, ou),
+           ou_uid = dplyr::if_else(is.na(ou_uid), country_uid, ou_uid)
+           )
+
   # Sort pretty
   orgunits %<>%
     dplyr::arrange(ou, country_name, snu1, org_type, name)
@@ -181,4 +222,4 @@ add_dp_label <- function(orgunits, cop_year) {
         uid,
         "]"
       ))
-  }
+}

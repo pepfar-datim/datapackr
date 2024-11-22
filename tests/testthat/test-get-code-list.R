@@ -7,8 +7,9 @@ with_mock_api({
       getDataPackOrgUnits(
         include_mil = FALSE,
         include_DREAMS = TRUE,
+        include_TSNUS = TRUE,
         use_cache = FALSE,
-        d2_session = training)
+        d2_session = triage)
     expect_type(test_dataset, "list")
     expect_true("data.frame" %in% class(test_dataset))
     expect_true(NROW(test_dataset) > 0)
@@ -26,7 +27,9 @@ with_mock_api({
         "lastUpdated",
         "ancestors",
         "organisationUnitGroups",
-        "DREAMS"
+        "DREAMS",
+        "tsnu",
+        "country_was_psnu"
       )
     )
     expect_equal(class(test_dataset$ancestors), "list")

@@ -39,13 +39,49 @@ packDataPackSheets <- function(wb,
   # Get org_units to write into Data Pack based on provided parameters. ####
   if (is.null(org_units)) {
     if (ou_level == "Prioritization") {
-      org_units <- getValidOrgUnits(cop_year) %>%
-        dplyr::filter(country_uid %in% country_uids) %>%
-        add_dp_label(orgunits = ., cop_year = cop_year) %>%
-        dplyr::arrange(dp_label) %>%
-        ## Remove DSNUs
-        dplyr::filter(org_type != "DSNU") %>%
-        dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
+
+
+      if (cop_year %in% c("2025")) {
+
+      # extract historic regions
+      historic_regional_psnus <-
+        getValidOrgUnits(cop_year) %>%
+        dplyr::filter(!is.na(country_was_psnu)) %>%
+        dplyr::select(name, country_uid)
+
+      # if this country historically had its country as psnu include country
+      if (country_uids %in% historic_regional_psnus$country_uid) {
+
+        org_units <- getValidOrgUnits(cop_year) %>%
+          dplyr::filter(country_uid %in% country_uids) %>%
+          add_dp_label(orgunits = ., cop_year = cop_year) %>%
+          dplyr::arrange(dp_label) %>%
+          ## Remove DSNUs
+          dplyr::filter(!org_type %in% c("DSNU")) %>%
+          dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
+
+      } else {
+      # otherwise business as usual
+
+        org_units <- getValidOrgUnits(cop_year) %>%
+          dplyr::filter(country_uid %in% country_uids) %>%
+          add_dp_label(orgunits = ., cop_year = cop_year) %>%
+          dplyr::arrange(dp_label) %>%
+          ## Remove DSNUs and country
+          dplyr::filter(!org_type %in% c("DSNU", "Country")) %>%
+          dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
+
+      }
+      } else {
+        org_units <- getValidOrgUnits(cop_year) %>%
+          dplyr::filter(country_uid %in% country_uids) %>%
+          add_dp_label(orgunits = ., cop_year = cop_year) %>%
+          dplyr::arrange(dp_label) %>%
+          ## Remove DSNUs and country
+          dplyr::filter(!org_type %in% c("DSNU")) %>%
+          dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
+
+      }
 
     } else if (ou_level %in% c(4:7, "Facility", "Community")) {
       stop("Sorry! I'm learning how to pack a Data Pack at a non-Prioritization
@@ -111,24 +147,61 @@ packDataPackSheets <- function(wb,
       sheet_data <- NULL
     }
 
-    if (sheet == "AGYW") {
-      org_units_sheet <- getValidOrgUnits(cop_year) %>% # Load in valid_PSNUs list from package
-        dplyr::filter(country_uid %in% country_uids) %>%
-        add_dp_label(orgunits = ., cop_year = cop_year) %>%
-        dplyr::arrange(dp_label) %>% # Order rows based on dp_psnu col values
-        dplyr::filter(!is.na(DREAMS)) %>%
-        dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)# Only keep these columns
 
-      if (NROW(org_units_sheet) == 0) {
-        next
+    # cop year condition will determine packing procedure
+    if (cop_year > 2024) {
+
+      # non prioritization sheets should not have prioritization
+      if (!sheet %in% c("Prioritization", "AGYW")) {
+        temp_org_units_sheet <- getValidOrgUnits(cop_year) %>%
+          dplyr::filter(country_uid %in% country_uids) %>%
+          add_dp_label(orgunits = ., cop_year = cop_year) %>%
+          dplyr::arrange(dp_label) %>%
+          # dplyr::filter(!org_type %in% c("DSNU", "PSNU")) %>%
+          dplyr::filter(!is.na(tsnu) | org_type == "Military") %>%
+          dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
+        if (NROW(temp_org_units_sheet) == 0) {
+          next
+        }
+      } else if (sheet == "AGYW") {
+        temp_org_units_sheet <- getValidOrgUnits(cop_year) %>%
+          dplyr::filter(country_uid %in% country_uids) %>%
+          add_dp_label(orgunits = ., cop_year = cop_year) %>%
+          dplyr::arrange(dp_label) %>%
+          dplyr::filter(!is.na(DREAMS)) %>%
+          dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)
+        if (NROW(temp_org_units_sheet) == 0) {
+          next
+        }
+      } else {
+        temp_org_units_sheet <- org_units
       }
+
+    # else treat 2024 and below
     } else {
-      org_units_sheet <- org_units
+
+      if (sheet == "AGYW") {
+        temp_org_units_sheet <- getValidOrgUnits(cop_year) %>% # Load in valid_PSNUs list from package
+          dplyr::filter(country_uid %in% country_uids) %>%
+          add_dp_label(orgunits = ., cop_year = cop_year) %>%
+          dplyr::arrange(dp_label) %>% # Order rows based on dp_psnu col values
+          dplyr::filter(!is.na(DREAMS)) %>%
+          dplyr::select(PSNU = dp_label, psnu_uid = uid, snu1)# Only keep these columns
+
+        if (NROW(temp_org_units_sheet) == 0) {
+          next
+        }
+      } else {
+        temp_org_units_sheet <- org_units
+      }
+
+
     }
+
 
     wb <- packDataPackSheet(wb = wb,
                             sheet = sheet,
-                            org_units = org_units_sheet,
+                            org_units = temp_org_units_sheet,
                             schema = schema,
                             sheet_data = sheet_data,
                             cop_year = cop_year)
