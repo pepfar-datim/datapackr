@@ -209,6 +209,9 @@ analyze_pmtctknownpos <- function(data) {
                            "2024" =  c("PMTCT_STAT.N.New.Pos.T",
                                        "PMTCT_STAT.N.Known.Pos.T",
                                        "PMTCT_STAT.N.New.Neg.T"),
+                           "2025" =  c("PMTCT_STAT.N.New.Pos.T",
+                                       "PMTCT_STAT.N.Known.Pos.T",
+                                       "PMTCT_STAT.N.New.Neg.T"),#TEMPORARY
                            stop("Unsupported COP Year"))
 
   if (!all(required_names %in% names(data))) {
@@ -240,7 +243,7 @@ analyze_pmtctknownpos <- function(data) {
     dplyr::filter(
       round(knownpos_ratio, 2) > 0.75
     )
-  } else if (this_cop_year == "2024") {
+  } else if (this_cop_year >= "2024") { #TEMPORARY should be ==
     data %>%
       dplyr::filter(is.na(key_population)) %>%
       dplyr::mutate(
@@ -309,6 +312,9 @@ analyze_tbknownpos <- function(data) {
                            "2024" =  c("TB_STAT.N.New.Pos.T",
                                        "TB_STAT.N.Known.Pos.T",
                                        "TB_STAT.N.New.Neg.T"),
+                           "2025" =  c("TB_STAT.N.New.Pos.T",#TEMPORARY
+                                       "TB_STAT.N.Known.Pos.T",
+                                       "TB_STAT.N.New.Neg.T"),
                            stop("Unsupported COP Year"))
 
   if (!all(required_names %in% names(data))) {
@@ -336,7 +342,7 @@ analyze_tbknownpos <- function(data) {
     dplyr::filter(!is.na(knownpos_ratio)) %>%
     dplyr::filter(
       round(knownpos_ratio, 2) > 0.75)
-    } else if (this_cop_year == "2024") {
+    } else if (this_cop_year >= "2024") { #TEMPORARY
       data %>%
       dplyr::mutate(
         TB_STAT.N.Total =
@@ -399,6 +405,9 @@ analyze_retention <- function(data) {
                                        "TX_CURR.Expected.T_1",
                                        "TX_NEW.T"),
                            "2024" =  c("TX_CURR.T",
+                                       "TX_CURR.Expected.T_1",
+                                       "TX_NEW.T"),
+                           "2025" =  c("TX_CURR.T", #TEMPORARY
                                        "TX_CURR.Expected.T_1",
                                        "TX_NEW.T"),
                            stop("Unsupported COP Year"))
