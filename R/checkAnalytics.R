@@ -21,7 +21,7 @@ HTS_POS_Modalities <- function(cop_year) {
 #'
 #' @return a
 #'
-analyze_eid_2mo <- function(data) {
+analyze_eid_2mo <- function(data) { #Doesnt exist for 2025 NOTHING EID RELATED
 
   a <- NULL
 
@@ -104,6 +104,8 @@ analyze_eid_2mo <- function(data) {
 #' @return a
 #'
 analyze_vmmc_indeterminate <- function(data) {
+  # This one vmc circ target, total roll up not disaggs below WILL BE ONEVMMC_CIRC.T
+  # VMMC SUBNAT HOWEVEER is staying the same, NOT in this block btw
 
   a <- NULL
   required_names <- c("VMMC_CIRC.Pos.T",
@@ -124,7 +126,7 @@ analyze_vmmc_indeterminate <- function(data) {
          + VMMC_CIRC.Neg.T
          + VMMC_CIRC.Unk.T),
       VMMC_CIRC.indeterminateRate =
-        (VMMC_CIRC.Unk.T) /
+        (VMMC_CIRC.Unk.T) / #Unkknow doesnt exits in 25, anything tied disags.
         (VMMC_CIRC.T)) %>%
     dplyr::filter(round(VMMC_CIRC.indeterminateRate, 2) > 0.05, is.na(key_population)) %>%
     dplyr::select(
@@ -198,6 +200,7 @@ analyze_vmmc_indeterminate <- function(data) {
 #' @return a
 #'
 analyze_pmtctknownpos <- function(data) {
+  #These are gone for 2025, ANYTHING PMTCT will only see _subnat
   a <- NULL
 
   this_cop_year <- as.character(data$cop_year[1])
@@ -301,6 +304,7 @@ analyze_pmtctknownpos <- function(data) {
 #' @return a
 #'
 analyze_tbknownpos <- function(data) {
+  #GONE for 2025
   a <- NULL
 
   this_cop_year <- as.character(data$cop_year[1])
@@ -396,6 +400,7 @@ analyze_tbknownpos <- function(data) {
 #' @return a
 #'
 analyze_retention <- function(data) {
+  #REMAINING for 2025. Formula will match 2024
   a <- NULL
 
   this_cop_year <- as.character(data$cop_year[1])
@@ -495,9 +500,10 @@ analyze_retention <- function(data) {
 #' @return a
 #'
 analyze_linkage <- function(data) {
+  #Still exist for 25
   a <- NULL
 
-
+  #We only have HTS_tst.pos.T for 2025 NO MODALITIES anymore for target setting
   hts_modalities <- HTS_POS_Modalities(data$cop_year[1])
 
   required_names <- c("TX_NEW.T", "TX_NEW.KP.T")
@@ -521,24 +527,24 @@ analyze_linkage <- function(data) {
           HTS_TST_POS.T == 0 ~ NA_real_,
           TRUE ~
             TX_NEW.T
-          / HTS_TST_POS.T
+          / HTS_TST_POS.T #Change HTS_TST.Pos.T for 2025 IF WE WANTED
         ),
       HTS_TST.KP.Linkage.T =
         dplyr::case_when(
           HTS_TST.KP.Pos.T == 0 ~ NA_real_,
           TRUE ~
             TX_NEW.KP.T
-          / HTS_TST.KP.Pos.T
+          / HTS_TST.KP.Pos.T #CORRECT FOR 25
         )
     )
 
   issues <- analysis %>%
     dplyr::filter((round(HTS_TST.Linkage.T, 2) < 0.95 | round(HTS_TST.Linkage.T, 2) > 1.0
                    | round(HTS_TST.KP.Linkage.T, 2) < 0.95 | round(HTS_TST.KP.Linkage.T, 2) > 1.0)
-  # Need to analyze <01 linkage separately due to EID
-                   & (age != "<01" | is.na(age))) %>%
+  # Need to analyze <01 linkage separately due to EID #2025 NOT TRUE ANYMORE  all captured on same tab
+                   & (age != "<01" | is.na(age))) %>% #REMOVE this for 2025
     dplyr::select(psnu, psnu_uid, age, sex, key_population,
-                  HTS_TST.Linkage.T, HTS_TST_POS.T, TX_NEW.T,
+                  HTS_TST.Linkage.T, HTS_TST_POS.T, TX_NEW.T,#Change HTS_TST.Pos.T for 25
                   HTS_TST.KP.Linkage.T, HTS_TST.KP.Pos.T, TX_NEW.KP.T)
 
   if (NROW(issues) > 0) {
@@ -556,7 +562,7 @@ analyze_linkage <- function(data) {
       dplyr::summarise_all(list(sum), na.rm = TRUE) %>%
       dplyr::mutate(
        HTS_TST.Linkage.T =
-         TX_NEW.T / HTS_TST_POS.T,
+         TX_NEW.T / HTS_TST_POS.T, #Change HTS_TST.Pos.T for 25
        HTS_TST.KP.Linkage.T =
          TX_NEW.KP.T / HTS_TST.KP.Pos.T
       )
@@ -604,13 +610,13 @@ analyze_linkage <- function(data) {
 #'
 #' @return a
 #'
-analyze_indexpos_ratio <- function(data) {
+analyze_indexpos_ratio <- function(data) { #PROBABLY GONE 2025, Christian will confirm First week of December 2024
 
   a <- NULL
 
   this_cop_year <- data$cop_year[[1]]
 
-     required_names <- c("HTS.Index.Pos.T",
+     required_names <- c("HTS.Index.Pos.T", #This is gone 2025, may make below impossible 613 - 629
                          "PLHIV.T",
                          "TX_CURR_SUBNAT.T")
 
@@ -622,7 +628,7 @@ analyze_indexpos_ratio <- function(data) {
     return(a)
   }
 
-  hts_modalities <- HTS_POS_Modalities(this_cop_year)
+  hts_modalities <- HTS_POS_Modalities(this_cop_year) #COP 25 no modalities anymore, so may need to skip entirely
 
     analysis <- data %>%
       dplyr::filter(is.na(key_population)) %>%
@@ -730,7 +736,7 @@ checkAnalytics <- function(d,
 
   #Special analytics indicators needed for some checksin COP23
   if (d$info$cop_year >= "2023") {
-    pmtct_eid_d <- extractRawColumnData(d, "EID", "PMTCT_EID.D.T")
+    pmtct_eid_d <- extractRawColumnData(d, "EID", "PMTCT_EID.D.T") #GONE 2025 so can remove probs
     tx_curr_expected <- extractRawColumnData(d, "Cascade", c("Age", "Sex", "TX_CURR.Expected.T_1"))
     data <- data %>%
       dplyr::bind_rows(pmtct_eid_d, tx_curr_expected)
@@ -763,7 +769,7 @@ checkAnalytics <- function(d,
       getValidOrgUnits(d$info$cop_year) %>%
         dplyr::filter(country_uid %in% d$info$country_uids) %>%
         dplyr::select(psnu = name, psnu_uid = uid),
-      by = c("psnu_uid" = "psnu_uid")
+      by = c("psnu_uid" = "psnu_uid") #Watch this for COP25 may have to update to account for TSNU.
     ) %>%
     dplyr::left_join(dplyr::rename(category_options, age = name),
                      by = c("age_option_uid" = "id")) %>%
