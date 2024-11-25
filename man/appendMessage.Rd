@@ -4,14 +4,16 @@
 \alias{appendMessage}
 \title{Title appendMessage}
 \usage{
-appendMessage(x, message, level)
+appendMessage(x, message, level, tool)
 }
 \arguments{
 \item{x}{A message queue}
 
 \item{message}{A string or vector of strings of messages.}
 
-\item{level}{A string or vector of strings of
+\item{level}{A string or vector of strings of}
+
+\item{tool}{A string vector of the tool (optional) description
 message levels (ERROR, WARNING, INFO)}
 }
 \value{

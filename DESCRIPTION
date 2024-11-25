@@ -2,8 +2,8 @@ Type: Package
 Package: datapackr
 Title: A Package that Packs and Unpacks all Data Packs and Target Setting
     Tools
-Version: 8.0.2
-Date: 2024-10-08
+Version: 8.1.0
+Date: 2024-11-13
 Authors@R: c(
     person("Scott", "Jackson", , "sjackson@baosystems.com", role = c("aut", "cre")),
     person("Jason", "Pickering", , "jason.p.pickering@gmail.com", role = c("aut", "rev")),
@@ -60,4 +60,4 @@ Remotes:
     pepfar-datim/datimutils
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2

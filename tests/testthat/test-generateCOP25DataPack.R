@@ -196,7 +196,6 @@ with_mock_api({
       dplyr::filter(!org_type %in% c("DSNU", "Country")) %>%
       dplyr::select(PSNU = dp_label, psnu_uid = uid)
 
-
     # Malawi requires PNSUS only in prioritization
     expect_true(all(unlist(
       purrr::map(sheet_psnus[names(sheet_psnus) == "Prioritization"], identical, wanted_psnus)
