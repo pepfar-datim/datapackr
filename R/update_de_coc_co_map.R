@@ -51,7 +51,7 @@ update_de_coc_co_map <- function(cop_year = NULL,
 
     "vpDd67HlZcT", "FY24 DREAMS Targets", 2024, "targets", "dreams", "dsnu",
     "tNbhYbrKbnk", "FY25 DREAMS Targets", 2025, "targets", "dreams", "dsnu",
-    "jpn49OHYT7e", "FY26 DREAMS Targets", 2025, "targets", "dreams", "dsnu",
+    "jpn49OHYT7e", "FY26 DREAMS Targets", 2026, "targets", "dreams", "dsnu",
 
     "WA0oJsUDw9U", "FY26 IMPATT", 2026, "targets", "impatt", "psnu",
     "jgp20ElKCMD", "FY25 IMPATT", 2025, "targets", "impatt", "psnu",
@@ -322,9 +322,6 @@ update_de_coc_co_map <- function(cop_year = NULL,
         TRUE ~ support_type))
 
   # Join Full Code List with Schema ####
-  # Mon Nov 25 15:20:51 2024 ------------------------------
-  # FY and Period do not match for TbG5gCQH78Q data element for HTS_TST.Pos.T
-  # I THINK WE NEED A FY26 dataset
   dp_map %<>%
     dplyr::select(-dataset) %>%
     dplyr::inner_join(fullCodeList,
