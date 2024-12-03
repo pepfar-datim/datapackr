@@ -736,7 +736,7 @@ checkAnalytics <- function(d,
 
   #Special analytics indicators needed for some checksin COP23
   if (d$info$cop_year >= "2023") {
-    pmtct_eid_d <- extractRawColumnData(d, "EID", "PMTCT_EID.D.T") #GONE 2025 so can remove probs
+    if (d$info$cop_year < "2025") {pmtct_eid_d <- extractRawColumnData(d, "EID", "PMTCT_EID.D.T")} #GONE 2025 so can remove probs
     tx_curr_expected <- extractRawColumnData(d, "Cascade", c("Age", "Sex", "TX_CURR.Expected.T_1"))
     data <- data %>%
       dplyr::bind_rows(pmtct_eid_d, tx_curr_expected)
@@ -807,10 +807,10 @@ checkAnalytics <- function(d,
     retention = analyze_retention,
     linkage = analyze_linkage,
     index_rate = analyze_indexpos_ratio,
-    pmtctknownpos_issues = analyze_pmtctknownpos,
+    if(copy_year < 2025){pmtctknownpos_issues = analyze_pmtctknownpos},
     tbknownpos_issues = analyze_tbknownpos,
     vmmc_indeterminate_rate = analyze_vmmc_indeterminate,
-    eid_coverage_2mo  = analyze_eid_2mo
+    if(copy_year < 2025){eid_coverage_2mo  = analyze_eid_2mo}
   )
 
   analytics_checks <-  purrr::map(funs, purrr::exec, data)
