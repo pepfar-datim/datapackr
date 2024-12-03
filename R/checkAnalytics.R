@@ -807,7 +807,7 @@ checkAnalytics <- function(d,
     retention = analyze_retention,
     linkage = analyze_linkage,
     index_rate = analyze_indexpos_ratio,
-    if(copy_year < 2025){pmtctknownpos_issues = analyze_pmtctknownpos},
+    if(this_cop_year < 2025){pmtctknownpos_issues = analyze_pmtctknownpos},
     tbknownpos_issues = analyze_tbknownpos,
     vmmc_indeterminate_rate = analyze_vmmc_indeterminate,
     eid_coverage_2mo  = analyze_eid_2mo
