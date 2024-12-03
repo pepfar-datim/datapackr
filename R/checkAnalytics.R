@@ -815,7 +815,7 @@ checkAnalytics <- function(d,
   )
   } else {
     list(
-      index_rate = analyze_indexpos_ratio,
+      index_rate = analyze_indexpos_ratio
     )
   }
 
