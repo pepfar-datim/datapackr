@@ -734,14 +734,19 @@ checkAnalytics <- function(d,
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup()
 
-  #Special analytics indicators needed for some checksin COP23
-  if (d$info$cop_year >= "2023") {
+  # Tue Dec  3 14:54:21 2024 ------------------------------
+  # Do we still need the below?
+  #Special analytics indicators needed for some checks in COP23
+  if (d$info$cop_year %in% c("2023", "2024")) {
     pmtct_eid_d <- extractRawColumnData(d, "EID", "PMTCT_EID.D.T") #GONE 2025 so can remove probs
     tx_curr_expected <- extractRawColumnData(d, "Cascade", c("Age", "Sex", "TX_CURR.Expected.T_1"))
     data <- data %>%
       dplyr::bind_rows(pmtct_eid_d, tx_curr_expected)
+  } else {
+    tx_curr_expected <- extractRawColumnData(d, "Cascade", c("Age", "Sex", "TX_CURR.Expected.T_1"))
+    data <- data %>%
+      dplyr::bind_rows(tx_curr_expected)
   }
-
 
   # Prepare model data ####
   model_data <- readRDS(d$keychain$model_data_path)
