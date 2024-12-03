@@ -803,15 +803,21 @@ checkAnalytics <- function(d,
     dplyr::mutate(cop_year = d$info$cop_year)
 
   #Apply the list of analytics checks functions
-  funs <- list(
+
+  funs <- if (d$info$cop_year %in% c("2023", "2024")) { list(
     retention = analyze_retention,
     linkage = analyze_linkage,
     index_rate = analyze_indexpos_ratio,
-    if(this_cop_year < 2025){pmtctknownpos_issues = analyze_pmtctknownpos},
+    pmtctknownpos_issues = analyze_pmtctknownpos,
     tbknownpos_issues = analyze_tbknownpos,
     vmmc_indeterminate_rate = analyze_vmmc_indeterminate,
     eid_coverage_2mo  = analyze_eid_2mo
   )
+  } else {
+    list(
+      index_rate = analyze_indexpos_ratio,
+    )
+  }
 
   analytics_checks <-  purrr::map(funs, purrr::exec, data)
 
