@@ -212,9 +212,6 @@ analyze_pmtctknownpos <- function(data) {
                            "2024" =  c("PMTCT_STAT.N.New.Pos.T",
                                        "PMTCT_STAT.N.Known.Pos.T",
                                        "PMTCT_STAT.N.New.Neg.T"),
-                           "2025" =  c("PMTCT_STAT.N.New.Pos.T",
-                                       "PMTCT_STAT.N.Known.Pos.T",
-                                       "PMTCT_STAT.N.New.Neg.T"),#TEMPORARY
                            stop("Unsupported COP Year"))
 
   if (!all(required_names %in% names(data))) {
@@ -316,9 +313,6 @@ analyze_tbknownpos <- function(data) {
                            "2024" =  c("TB_STAT.N.New.Pos.T",
                                        "TB_STAT.N.Known.Pos.T",
                                        "TB_STAT.N.New.Neg.T"),
-                           "2025" =  c("TB_STAT.N.New.Pos.T",#TEMPORARY
-                                       "TB_STAT.N.Known.Pos.T",
-                                       "TB_STAT.N.New.Neg.T"),
                            stop("Unsupported COP Year"))
 
   if (!all(required_names %in% names(data))) {
@@ -412,7 +406,7 @@ analyze_retention <- function(data) {
                            "2024" =  c("TX_CURR.T",
                                        "TX_CURR.Expected.T_1",
                                        "TX_NEW.T"),
-                           "2025" =  c("TX_CURR.T", #TEMPORARY
+                           "2025" =  c("TX_CURR.T",
                                        "TX_CURR.Expected.T_1",
                                        "TX_NEW.T"),
                            stop("Unsupported COP Year"))
@@ -810,17 +804,19 @@ checkAnalytics <- function(d,
   #Apply the list of analytics checks functions
 
   funs <- if (d$info$cop_year %in% c("2023", "2024")) { list(
-    retention = analyze_retention,
-    linkage = analyze_linkage,
-    index_rate = analyze_indexpos_ratio,
-    pmtctknownpos_issues = analyze_pmtctknownpos,
-    tbknownpos_issues = analyze_tbknownpos,
-    vmmc_indeterminate_rate = analyze_vmmc_indeterminate,
-    eid_coverage_2mo  = analyze_eid_2mo
+    retention = analyze_retention, #IN 25
+    linkage = analyze_linkage, #IN 25
+    index_rate = analyze_indexpos_ratio,#NOT 25
+    pmtctknownpos_issues = analyze_pmtctknownpos,#NOT 25
+    tbknownpos_issues = analyze_tbknownpos, #NOT 25
+    vmmc_indeterminate_rate = analyze_vmmc_indeterminate, #In 25 kinda?
+    eid_coverage_2mo  = analyze_eid_2mo #NOT 25
   )
   } else {
     list(
-      index_rate = analyze_indexpos_ratio
+      retention = analyze_retention,
+      linkage = analyze_linkage,
+      vmmc_indeterminate_rate = analyze_vmmc_indeterminate
     )
   }
 
