@@ -495,6 +495,8 @@ analyze_retention <- function(data) {
 #'
 analyze_linkage <- function(data) {
   #Still exist for 25
+  # Fri Dec  6 10:03:02 2024 ------------------------------
+  # We need to change HTS_TST_POS.T to HTS_TST.Pos.T for 2025.
   a <- NULL
 
   #We only have HTS_tst.pos.T for 2025 NO MODALITIES anymore for target setting
@@ -508,7 +510,6 @@ analyze_linkage <- function(data) {
     a$msg <- "Could not analyze Linkage rate issues due to missing data."
     return(a)
   }
-
 
 
   analysis <- data %>%
@@ -736,11 +737,11 @@ checkAnalytics <- function(d,
     tx_curr_expected <- extractRawColumnData(d, "Cascade", c("Age", "Sex", "TX_CURR.Expected.T_1"))
     data <- data %>%
       dplyr::bind_rows(pmtct_eid_d, tx_curr_expected)
-  } else {
-    tx_curr_expected <- extractRawColumnData(d, "Cascade", c("Age", "Sex", "TX_CURR.Expected.T_1"))
-    data <- data %>%
-      dplyr::bind_rows(tx_curr_expected)
-  }
+  } #else {
+  #   tx_curr_expected <- extractRawColumnData(d, "Cascade", c("Age", "Sex", "TX_CURR.Expected.T_1"))
+  #   data <- data %>%
+  #     dplyr::bind_rows(tx_curr_expected)
+  # }
 
   # Prepare model data ####
   model_data <- readRDS(d$keychain$model_data_path)
@@ -815,8 +816,8 @@ checkAnalytics <- function(d,
   } else {
     list(
       retention = analyze_retention,
-      linkage = analyze_linkage,
-      vmmc_indeterminate_rate = analyze_vmmc_indeterminate
+      linkage = analyze_linkage
+      # vmmc_indeterminate_rate = analyze_vmmc_indeterminate
     )
   }
 
