@@ -5,7 +5,7 @@ HTS_POS_Modalities <- function(cop_year) {
   # Fix for Retention calculation introduced in 2025
   if (cop_year == 2025) {
     "HTS_TST.Pos.T"
-  } else{
+  } else {
     datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year) %>%
       dplyr::select(indicator_code, hts_modality, resultstatus) %>%
       tidyr::drop_na() %>%
@@ -547,7 +547,7 @@ analyze_linkage <- function(data) {
   # Need to analyze <01 linkage separately due to EID #2025 NOT TRUE ANYMORE  all captured on same tab
                    & (age != "<01" | is.na(age))) %>% #REMOVE this for 2025
     dplyr::select(psnu, psnu_uid, age, sex, key_population,
-                  HTS_TST.Linkage.T, HTS_TST_POS.T, TX_NEW.T,#Change HTS_TST.Pos.T for 25
+                  HTS_TST.Linkage.T, HTS_TST_POS.T, TX_NEW.T, #Change HTS_TST.Pos.T for 25
                   HTS_TST.KP.Linkage.T, HTS_TST.KP.Pos.T, TX_NEW.KP.T)
 
   if (NROW(issues) > 0) {
@@ -811,11 +811,12 @@ checkAnalytics <- function(d,
 
   #Apply the list of analytics checks functions
 
-  funs <- if (d$info$cop_year %in% c("2023", "2024")) { list(
+  funs <- if (d$info$cop_year %in% c("2023", "2024")) {
+    list(
     retention = analyze_retention, #IN 25
     linkage = analyze_linkage, #IN 25
-    index_rate = analyze_indexpos_ratio,#NOT 25
-    pmtctknownpos_issues = analyze_pmtctknownpos,#NOT 25
+    index_rate = analyze_indexpos_ratio, #NOT 25
+    pmtctknownpos_issues = analyze_pmtctknownpos, #NOT 25
     tbknownpos_issues = analyze_tbknownpos, #NOT 25
     vmmc_indeterminate_rate = analyze_vmmc_indeterminate, #In 25 kinda?
     eid_coverage_2mo  = analyze_eid_2mo #NOT 25
