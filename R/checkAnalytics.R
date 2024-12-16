@@ -2,13 +2,17 @@
 
 
 HTS_POS_Modalities <- function(cop_year) {
-
+  # Fix for Retention calculation introduced in 2025
+  if (cop_year == 2025) {
+    "HTS_TST.Pos.T"
+  } else{
     datapackr::getMapDataPack_DATIM_DEs_COCs(cop_year) %>%
-    dplyr::select(indicator_code, hts_modality, resultstatus) %>%
-    tidyr::drop_na() %>%
-    dplyr::filter(resultstatus %in% c("Newly Tested Positives", "Positive")) %>%
-    dplyr::distinct() %>%
-    dplyr::pull(indicator_code)
+      dplyr::select(indicator_code, hts_modality, resultstatus) %>%
+      tidyr::drop_na() %>%
+      dplyr::filter(resultstatus %in% c("Newly Tested Positives", "Positive")) %>%
+      dplyr::distinct() %>%
+      dplyr::pull(indicator_code)
+  }
 }
 #' @export
 #' @title Check Data Pack for <90\% PMTCT_EID from ≤02 months
@@ -494,15 +498,19 @@ analyze_retention <- function(data) {
 #' @return a
 #'
 analyze_linkage <- function(data) {
-  #Still exist for 25
   # Fri Dec  6 10:03:02 2024 ------------------------------
   # We need to change HTS_TST_POS.T to HTS_TST.Pos.T for 2025.
   a <- NULL
 
-  #We only have HTS_tst.pos.T for 2025 NO MODALITIES anymore for target setting
   hts_modalities <- HTS_POS_Modalities(data$cop_year[1])
 
-  required_names <- c("TX_NEW.T", "TX_NEW.KP.T")
+  if (data$cop_year[1] == 2025) {
+    required_names <- c("TX_NEW.T", "TX_NEW.KP.T", "HTS_TST.Pos.T")
+
+  } else {
+
+    required_names <- c("TX_NEW.T", "TX_NEW.KP.T")
+  }
 
   if (!all(required_names %in% names(data))) {
     a$test_results <- data.frame(msg = "Missing data.")
@@ -511,12 +519,12 @@ analyze_linkage <- function(data) {
     return(a)
   }
 
-
   analysis <- data %>%
     dplyr::mutate(age = dplyr::case_when(age %in% c("50-54", "55-59", "60-64", "65+") ~ "50+",
                                          TRUE ~ age)) %>%
     dplyr::mutate(
-      HTS_TST_POS.T  = rowSums(dplyr::select(., tidyselect::any_of(hts_modalities))),
+      HTS_TST_POS.T = rowSums(dplyr::select(., tidyselect::any_of(hts_modalities))),
+# Thu Dec 12 13:18:23 2024 This will set HTS_TST_POS.T equal to HTS_TST.POS.T
       HTS_TST.Linkage.T =
         dplyr::case_when(
           HTS_TST_POS.T == 0 ~ NA_real_,
@@ -532,7 +540,7 @@ analyze_linkage <- function(data) {
           / HTS_TST.KP.Pos.T #CORRECT FOR 25
         )
     )
-
+  #Need ifelse
   issues <- analysis %>%
     dplyr::filter((round(HTS_TST.Linkage.T, 2) < 0.95 | round(HTS_TST.Linkage.T, 2) > 1.0
                    | round(HTS_TST.KP.Linkage.T, 2) < 0.95 | round(HTS_TST.KP.Linkage.T, 2) > 1.0)
@@ -562,6 +570,7 @@ analyze_linkage <- function(data) {
          TX_NEW.KP.T / HTS_TST.KP.Pos.T
       )
 
+    ################################################################################
     a$msg <-
       paste0(
         "WARNING! LINKAGE RATES <95% OR >100%: \n\n\t* ",
@@ -729,19 +738,17 @@ checkAnalytics <- function(d,
     dplyr::summarise(value = sum(value)) %>%
     dplyr::ungroup()
 
-  # Tue Dec  3 14:54:21 2024 ------------------------------
-  # Do we still need the below?
   #Special analytics indicators needed for some checks in COP23
   if (d$info$cop_year %in% c("2023", "2024")) {
-    pmtct_eid_d <- extractRawColumnData(d, "EID", "PMTCT_EID.D.T") #GONE 2025 so can remove probs
+    pmtct_eid_d <- extractRawColumnData(d, "EID", "PMTCT_EID.D.T") #NOT in 2025
     tx_curr_expected <- extractRawColumnData(d, "Cascade", c("Age", "Sex", "TX_CURR.Expected.T_1"))
     data <- data %>%
       dplyr::bind_rows(pmtct_eid_d, tx_curr_expected)
-  } #else {
-  #   tx_curr_expected <- extractRawColumnData(d, "Cascade", c("Age", "Sex", "TX_CURR.Expected.T_1"))
-  #   data <- data %>%
-  #     dplyr::bind_rows(tx_curr_expected)
-  # }
+  } else {
+    tx_curr_expected <- extractRawColumnData(d, "Cascade", c("Age", "Sex", "TX_CURR.Expected.T_1"))
+    data <- data %>%
+      dplyr::bind_rows(tx_curr_expected)
+  }
 
   # Prepare model data ####
   model_data <- readRDS(d$keychain$model_data_path)
@@ -817,7 +824,6 @@ checkAnalytics <- function(d,
     list(
       retention = analyze_retention,
       linkage = analyze_linkage
-      # vmmc_indeterminate_rate = analyze_vmmc_indeterminate
     )
   }
 
