@@ -13,5 +13,5 @@ test_that("can properly round numbers", {
 
 test_that("Can get current COP year", {
   expect_true(is.numeric(getCurrentCOPYear()))
-  expect_equal(getCurrentCOPYear(), 2024)
+  expect_equal(getCurrentCOPYear(), 2025)
 })

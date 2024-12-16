@@ -322,13 +322,13 @@ getCOPDatasetUids <-  function(cop_year, datastreams) {
   cop_datasets <-
     list(
       "2025" = list(# NOT the COP25 versions NEED To update when released
-        "mer_targets" =   c("HUEzkjkij1", # MER Target Setting: PSNU (Facility
+        "mer_targets" =   c("NNDYxUGDHa9", # MER Target Setting: PSNU (Facility
                             # and Community Combined) (TARGETS) updated 6/28/24
-                            "tNbhYbrKbnk"), # Host Country Targets: DREAMS (USG) updated 4/9/24
+                            "jpn49OHYT7e"), # Host Country Targets: DREAMS (USG) updated 4/9/24
         "mer_results" = NA,
-        "subnat_targets" = "bKSmkDP5YTc",
+        "subnat_targets" = "BYwMgcnR0ZD",
         "subnat_results" = "fZVvcMSA9mZ",
-        "impatt" = "kWKJQYP1uT7"
+        "impatt" = "WA0oJsUDw9U"
       ),
       "2024" = list(
         "mer_targets" =   c("lHUEzkjkij1", # MER Target Setting: PSNU (Facility and Community Combined) (TARGETS)
